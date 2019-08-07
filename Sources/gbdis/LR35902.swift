@@ -9,7 +9,11 @@ class LR35902 {
     self.rom = rom
   }
 
-  private let disassembly = Disassembly()
+  var numberOfBanks: UInt8 {
+    return UInt8(UInt32(rom.count) / LR35902.bankSize)
+  }
+
+  let disassembly = Disassembly()
 
   struct BankedAddress: Hashable {
     let bank: UInt8
@@ -31,7 +35,8 @@ class LR35902 {
 
     var description: String {
       if let operandDescription = operandDescription {
-        return "\(spec.name) \(operandDescription)"
+        let opcodeName = "\(spec.name)".padding(toLength: 5, withPad: " ", startingAt: 0)
+        return "\(opcodeName) \(operandDescription)"
       } else {
         return "\(spec.name)"
       }
