@@ -153,7 +153,7 @@ class LR35902 {
           if !visitedAddresses.contains(Int(LR35902.romAddress(for: jumpTo, in: bank))) {
             jumpAddresses.insert(BankedAddress(bank: bank, address: jumpTo))
           }
-          disassembly.register(jumpAddress: jumpTo, in: bank, kind: .relative)
+          disassembly.registerTransferOfControl(to: jumpTo, in: bank, from: pc, kind: .jr)
 
           if condition == nil {
             break linear_sweep
@@ -166,7 +166,7 @@ class LR35902 {
           if !visitedAddresses.contains(Int(LR35902.romAddress(for: jumpTo, in: bank))) {
             jumpAddresses.insert(BankedAddress(bank: bank, address: jumpTo))
           }
-          disassembly.register(jumpAddress: jumpTo, in: bank, kind: .absolute)
+          disassembly.registerTransferOfControl(to: jumpTo, in: bank, from: pc, kind: .jp)
 
           if condition == nil {
             break linear_sweep
@@ -179,7 +179,7 @@ class LR35902 {
           if !visitedAddresses.contains(Int(LR35902.romAddress(for: jumpTo, in: bank))) {
             jumpAddresses.insert(BankedAddress(bank: bank, address: jumpTo))
           }
-          disassembly.register(jumpAddress: jumpTo, in: bank, kind: .absolute)
+          disassembly.registerTransferOfControl(to: jumpTo, in: bank, from: pc, kind: .call)
 
         case .jp(_, nil), .ret:
           break linear_sweep

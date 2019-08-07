@@ -11,7 +11,6 @@ extension LR35902 {
 
   class Disassembly {
     private var instructionMap: [UInt32: Instruction] = [:]
-    private var jumpMap: [UInt32: JumpKind] = [:]
 
     var code = IndexSet()
     func isCode(at pc: UInt16, in bank: UInt8) -> Bool {
@@ -31,16 +30,21 @@ extension LR35902 {
       return instructionMap[index]
     }
 
-    enum JumpKind {
-      case relative
-      case absolute
+    struct TransferOfControl: Hashable {
+      enum Kind {
+        case jr
+        case jp
+        case call
+      }
+      let sourceAddress: UInt16
+      let kind: Kind
     }
-    // TODO: Register the source location and the type of call. This will need to be an accumulating object.
-    func register(jumpAddress pc: UInt16, in bank: UInt8, kind: JumpKind) {
+    private var jumpMap: [UInt32: Set<TransferOfControl>] = [:]
+    func registerTransferOfControl(to pc: UInt16, in bank: UInt8, from fromPc: UInt16, kind: TransferOfControl.Kind) {
       let index = LR35902.romAddress(for: pc, in: bank)
-      jumpMap[index] = kind
+      jumpMap[index, default: Set()].insert(TransferOfControl(sourceAddress: fromPc, kind: kind))
     }
-    func jump(at pc: UInt16, in bank: UInt8) -> JumpKind? {
+    func transfersOfControl(at pc: UInt16, in bank: UInt8) -> Set<TransferOfControl>? {
       let index = LR35902.romAddress(for: pc, in: bank)
       return jumpMap[index]
     }

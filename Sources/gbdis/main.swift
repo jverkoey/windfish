@@ -32,8 +32,12 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
   var line: UInt16 = (bank == 0) ? 0x0000 : 0x4000
   let end: UInt16 = (bank == 0) ? 0x4000 : 0x8000
   while line < end {
-    if cpu.disassembly.jump(at: line, in: bank) != nil {
-      print("Jump_\(bank.hexString)_\(line.hexString):")
+    if let transfersOfControl = cpu.disassembly.transfersOfControl(at: line, in: bank) {
+      let sources = transfersOfControl
+        .sorted(by: { $0.sourceAddress < $1.sourceAddress })
+        .map { "\($0.kind) @ $\($0.sourceAddress.hexString)" }
+        .joined(separator: ", ")
+      print("toc_\(bank.hexString)_\(line.hexString): ; Sources: \(sources)")
     }
 
     if let instruction = cpu.disassembly.instruction(at: line, in: bank) {
