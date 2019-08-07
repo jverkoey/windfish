@@ -34,7 +34,7 @@ extension LR35902 {
     case jp(Operand, Condition? = nil)
 
     // Calls and returns
-    case call(Operand), call(Condition, Operand)
+    case call(Operand, Condition? = nil)
     case ret, retC(Condition), reti
 
     // Restarts

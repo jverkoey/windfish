@@ -69,26 +69,28 @@ class LR35902 {
 
     func describe(operand: Operand) -> String {
       switch operand {
-      case .immediate8:   return "$\(immediate8!.hexString)"
-      case .immediate16:  return "$\(immediate16!.hexString)"
-      case .hlAddress:    return "[hl]"
-      default:            return "\(operand)"
+      case .immediate8:           return "$\(immediate8!.hexString)"
+      case .ffimmediate8Address:  return "[$FF00+$\(immediate8!.hexString)]"
+      case .immediate16:          return "$\(immediate16!.hexString)"
+      case .hlAddress:            return "[hl]"
+      default:                    return "\(operand)"
       }
     }
   }
 
-  func disassemble(startingFrom pcInitial: UInt16, inBank bankInitial: UInt8) {
+  func disassemble(range: Range<UInt16>, inBank bankInitial: UInt8) {
     var jumpAddresses = Set<BankedAddress>()
-    jumpAddresses.insert(BankedAddress(bank: bankInitial, address: pcInitial))
+    jumpAddresses.insert(BankedAddress(bank: bankInitial, address: range.lowerBound))
 
     var visitedAddresses = IndexSet()
+    var isFirst = true
 
     while !jumpAddresses.isEmpty {
       let address = jumpAddresses.removeFirst()
-      self.bank = address.bank
-      self.pc = address.address
+      bank = address.bank
+      pc = address.address
 
-      linear_sweep: while true {
+      linear_sweep: while (!isFirst && pc < 0x4000) || pc < range.upperBound {
         let byte = rom[Int(pc)]
         var opcodeWidth: UInt16 = 1
         guard var spec = LR35902.opcodeDescription[byte] else {
@@ -161,7 +163,16 @@ class LR35902 {
             break linear_sweep
           }
 
-        case .jp(_, nil):
+        case .call(.immediate16, _):
+          let jumpLow = UInt16(rom[Int(pc + 1)])
+          let jumpHigh = UInt16(rom[Int(pc + 2)]) << 8
+          let jumpTo = jumpHigh | jumpLow
+          if !visitedAddresses.contains(Int(jumpTo)) {
+            jumpAddresses.insert(BankedAddress(bank: bank, address: jumpTo))
+          }
+          disassembly.register(jumpAddress: jumpTo, in: bank, kind: .absolute)
+
+        case .jp(_, nil), .ret:
           break linear_sweep
 
         default:
@@ -170,6 +181,8 @@ class LR35902 {
 
         self.pc = nextPc
       }
+
+      isFirst = false
     }
   }
 
