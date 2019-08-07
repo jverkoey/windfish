@@ -8,6 +8,13 @@ let data = try Data(contentsOf: URL(fileURLWithPath: romFilePath))
 let cpu = LR35902(rom: data)
 
 cpu.disassemble(startingFrom: 0x0000, inBank: 0)
+cpu.disassemble(startingFrom: 0x0008, inBank: 0)
+cpu.disassemble(startingFrom: 0x0010, inBank: 0)
+cpu.disassemble(startingFrom: 0x0018, inBank: 0)
+cpu.disassemble(startingFrom: 0x0020, inBank: 0)
+cpu.disassemble(startingFrom: 0x0028, inBank: 0)
+cpu.disassemble(startingFrom: 0x0030, inBank: 0)
+cpu.disassemble(startingFrom: 0x0038, inBank: 0)
 
 for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
 //  let asmUrl = disassemblyPath.appendingPathComponent("bank_\(bank.hexString).asm")

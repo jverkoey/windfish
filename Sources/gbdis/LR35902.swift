@@ -44,7 +44,10 @@ class LR35902 {
 
     var operandDescription: String? {
       let mirror = Mirror(reflecting: spec)
-      switch mirror.children.first!.value {
+      guard let operands = mirror.children.first else {
+        return nil
+      }
+      switch operands.value {
       case let tuple as (Operand, Condition?):
         if let condition = tuple.1 {
           return "\(condition), \(describe(operand: tuple.0))"
@@ -53,8 +56,12 @@ class LR35902 {
         }
       case let tuple as (Operand, Operand):
         return "\(describe(operand: tuple.0)), \(describe(operand: tuple.1))"
+      case let tuple as (Bit, Operand):
+        return "\(tuple.0), \(describe(operand: tuple.1))"
       case let operand as Operand:
         return "\(describe(operand: operand))"
+      case let address as RestartAddress:
+        return "\(address)".replacingOccurrences(of: "x", with: "$")
       default:
         return nil
       }
@@ -120,7 +127,7 @@ class LR35902 {
           instruction = Instruction(spec: spec, width: instructionWidth)
         }
 
-        print("\(pc.hexString): \(instruction)")
+//        print("\(pc.hexString): \(instruction)")
         disassembly.register(instruction: instruction, at: pc, in: bank)
 
         let nextPc = pc + instructionWidth

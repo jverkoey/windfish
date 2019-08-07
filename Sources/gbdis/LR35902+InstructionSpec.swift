@@ -59,14 +59,21 @@ extension LR35902 {
     case invalid(UInt8)
 
     var name: String {
-      return Mirror(reflecting: self).children.first!.label!
+      if let child = Mirror(reflecting: self).children.first {
+        return child.label!
+      } else {
+        return "\("\(self)".split(separator: ".").last!)"
+      }
     }
     var operands: String {
       return String(describing: Mirror(reflecting: self).children.first!.value)
     }
     var operandWidth: UInt16 {
       let mirror = Mirror(reflecting: self)
-      switch mirror.children.first!.value {
+      guard let operands = mirror.children.first else {
+        return 0
+      }
+      switch operands.value {
       case let tuple as (Operand, Condition?):
         return tuple.0.byteWidth
       case let tuple as (Operand, Operand):
