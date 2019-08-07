@@ -29,45 +29,70 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
 //  let asmUrl = disassemblyPath.appendingPathComponent("bank_\(bank.hexString).asm")
 
   print("SECTION \"ROM Bank \(bank.hexString)\", ROM0[$\(bank.hexString)]")
-  var line: UInt16 = (bank == 0) ? 0x0000 : 0x4000
+  cpu.pc = (bank == 0) ? 0x0000 : 0x4000
+  cpu.bank = bank
   let end: UInt16 = (bank == 0) ? 0x4000 : 0x8000
-  while line < end {
-    if let transfersOfControl = cpu.disassembly.transfersOfControl(at: line, in: bank) {
+  var previousInstruction: LR35902.Instruction? = nil
+  while cpu.pc < end {
+    if let transfersOfControl = cpu.disassembly.transfersOfControl(at: cpu.pc, in: bank) {
       let sources = transfersOfControl
         .sorted(by: { $0.sourceAddress < $1.sourceAddress })
         .map { "\($0.kind) @ $\($0.sourceAddress.hexString)" }
         .joined(separator: ", ")
-      print("toc_\(bank.hexString)_\(line.hexString): ; Sources: \(sources)")
+      let label = "\(LR35902.label(at: cpu.pc, in: cpu.bank)):".padding(toLength: 48, withPad: " ", startingAt: 0)
+      print("\(label) ; Sources: \(sources)")
     }
 
-    if let instruction = cpu.disassembly.instruction(at: line, in: bank) {
-      let code = "\(instruction)".padding(toLength: 44, withPad: " ", startingAt: 0)
-      print("    \(code) ; $\(line.hexString)")
-      line += instruction.width
-      switch instruction.spec {
-      case .jp, .jr: print()
-      case .ret, .reti, .retC: print(); print()
-      default: break
-      }
-    } else {
-      var accumulator: [UInt8] = []
-      let initialLine = line
-      repeat {
-        accumulator.append(cpu.rom[Int(LR35902.romAddress(for: line, in: bank))])
-        line += 1
-      } while line < end && cpu.disassembly.instruction(at: line, in: bank) == nil
+    // Code
+    if let instruction = cpu.disassembly.instruction(at: cpu.pc, in: bank) {
 
-      var lineBlock = initialLine
+      if case .ld(.immediate16address, .a) = instruction.spec {
+        if (0x2000..<0x4000).contains(instruction.immediate16!),
+          let previousInstruction = previousInstruction,
+          case .ld(.a, .immediate8) = previousInstruction.spec {
+          cpu.bank = previousInstruction.immediate8!
+        }
+      }
+
+      let code = "    \(instruction.describe(with: cpu))".padding(toLength: 48, withPad: " ", startingAt: 0)
+      print("\(code) ; $\(cpu.pc.hexString)")
+      cpu.pc += instruction.width
+      switch instruction.spec {
+      case .jp, .jr:
+        print()
+        previousInstruction = nil
+        cpu.bank = bank
+      case .ret, .reti, .retC:
+        print(); print()
+        previousInstruction = nil
+        cpu.bank = bank
+      default:
+        previousInstruction = instruction
+      }
+
+    } else {
+      previousInstruction = nil
+      cpu.bank = bank
+
+      // Everything else
+      var accumulator: [UInt8] = []
+      let initialPc = cpu.pc
+      repeat {
+        accumulator.append(cpu.rom[Int(LR35902.romAddress(for: cpu.pc, in: bank))])
+        cpu.pc += 1
+      } while cpu.pc < end && cpu.disassembly.instruction(at: cpu.pc, in: bank) == nil
+
+      var lineBlock = initialPc
       for blocks in accumulator.chunked(into: 8) {
         let operand = blocks.map { "$\($0.hexString)" }.joined(separator: ", ")
         let opcode = "ds".padding(toLength: 5, withPad: " ", startingAt: 0)
         let instruction = "\(opcode) \(operand)"
-        let code = "\(instruction)".padding(toLength: 44, withPad: " ", startingAt: 0)
+        let code = "    \(instruction)".padding(toLength: 48, withPad: " ", startingAt: 0)
 
         let displayableBytes = blocks.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
         let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
 
-        print("    \(code) ; $\(lineBlock.hexString) |\(bytesAsCharacters)|")
+        print("\(code) ; $\(lineBlock.hexString) |\(bytesAsCharacters)|")
         lineBlock += UInt16(blocks.count)
       }
       print()

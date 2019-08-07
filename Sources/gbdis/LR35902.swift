@@ -20,6 +20,13 @@ class LR35902 {
     let address: UInt16
   }
 
+  static func label(at pc: UInt16, in bank: UInt8) -> String {
+    if pc < 0x4000 {
+      return "toc_00_\(pc.hexString)"
+    }
+    return "toc_\(bank.hexString)_\(pc.hexString)"
+  }
+
   struct Instruction: CustomStringConvertible {
     let spec: InstructionSpec
     let width: UInt16
@@ -33,8 +40,8 @@ class LR35902 {
       self.immediate16 = immediate16
     }
 
-    var description: String {
-      if let operandDescription = operandDescription {
+    func describe(with cpu: LR35902? = nil) -> String {
+      if let operandDescription = operandDescription(with: cpu) {
         let opcodeName = "\(spec.name)".padding(toLength: 5, withPad: " ", startingAt: 0)
         return "\(opcodeName) \(operandDescription)"
       } else {
@@ -42,7 +49,52 @@ class LR35902 {
       }
     }
 
-    var operandDescription: String? {
+    var description: String {
+      if let operandDescription = operandDescription() {
+        let opcodeName = "\(spec.name)".padding(toLength: 5, withPad: " ", startingAt: 0)
+        return "\(opcodeName) \(operandDescription)"
+      } else {
+        return "\(spec.name)"
+      }
+    }
+
+    func operandDescription(with cpu: LR35902? = nil) -> String? {
+      switch spec {
+      case let InstructionSpec.jp(operand, condition) where operand == .immediate16,
+           let InstructionSpec.call(operand, condition) where operand == .immediate16:
+        let address: String
+        if let cpu = cpu, cpu.disassembly.transfersOfControl(at: immediate16!, in: cpu.bank) != nil {
+          address = LR35902.label(at: immediate16!, in: cpu.bank)
+        } else {
+          address = describe(operand: operand)
+        }
+
+        if let condition = condition {
+          return "\(condition), \(address)"
+        } else {
+          return "\(address)"
+        }
+      case let InstructionSpec.jr(operand, condition) where operand == .immediate8:
+        let address: String
+        if let cpu = cpu {
+          let jumpAddress = cpu.pc + width + UInt16(immediate8!)
+          if cpu.disassembly.transfersOfControl(at: jumpAddress, in: cpu.bank) != nil {
+            address = "toc_\(cpu.bank.hexString)_\(jumpAddress.hexString)"
+          } else {
+            address = describe(operand: operand)
+          }
+        } else {
+          address = describe(operand: operand)
+        }
+
+        if let condition = condition {
+          return "\(condition), \(address)"
+        } else {
+          return "\(address)"
+        }
+      default:
+        break
+      }
       let mirror = Mirror(reflecting: spec)
       guard let operands = mirror.children.first else {
         return nil
@@ -70,8 +122,8 @@ class LR35902 {
     func describe(operand: Operand) -> String {
       switch operand {
       case .immediate8:           return "$\(immediate8!.hexString)"
-      case .ffimmediate8Address:  return "[$FF00+$\(immediate8!.hexString)]"
       case .immediate16:          return "$\(immediate16!.hexString)"
+      case .ffimmediate8Address:  return "[$FF00+$\(immediate8!.hexString)]"
       case .immediate16address:   return "[$\(immediate16!.hexString)]"
       case .hlAddress:            return "[hl]"
       default:                    return "\(operand)"
@@ -131,7 +183,6 @@ class LR35902 {
           instruction = Instruction(spec: spec, width: instructionWidth)
         }
 
-//        print("\(pc.hexString): \(instruction)")
         disassembly.register(instruction: instruction, at: pc, in: bank)
 
         let nextPc = pc + instructionWidth
