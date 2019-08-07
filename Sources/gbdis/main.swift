@@ -53,7 +53,11 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
         let opcode = "ds".padding(toLength: 5, withPad: " ", startingAt: 0)
         let instruction = "\(opcode) \(operand)"
         let code = "\(instruction)".padding(toLength: 44, withPad: " ", startingAt: 0)
-        print("    \(code) ; $\(lineBlock.hexString)")
+
+        let displayableBytes = blocks.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
+        let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
+
+        print("    \(code) ; $\(lineBlock.hexString) |\(bytesAsCharacters)|")
         lineBlock += UInt16(blocks.count)
       }
     }
