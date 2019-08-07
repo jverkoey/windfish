@@ -1,7 +1,7 @@
 import Foundation
 
 extension LR35902 {
-  enum Instruction {
+  enum InstructionSpec {
     // Loads
     case ld(Operand, Operand)
     case ldi(Operand, Operand), ldd(Operand, Operand)
@@ -30,8 +30,8 @@ extension LR35902 {
     case rra, rrca
 
     // Jumps
-    case jr(Operand), jr(Condition, Operand)
-    case jp(Operand), jp(Condition, Operand)
+    case jr(Operand, Condition? = nil)
+    case jp(Operand, Condition? = nil)
 
     // Calls and returns
     case call(Operand), call(Condition, Operand)
@@ -50,7 +50,22 @@ extension LR35902 {
     case cb
 
     // Invalid opcode
-    case invalid
+    case invalid(UInt8)
+
+    var name: String {
+      return Mirror(reflecting: self).children.first!.label!
+    }
+    var byteWidth: UInt16 {
+      let mirror = Mirror(reflecting: self)
+      switch mirror.children.first!.value {
+      case let tuple as (Operand, Condition?):
+        return 1 + tuple.0.byteWidth
+      case let operand as Operand:
+        return 1 + operand.byteWidth
+      default:
+        return 1
+      }
+    }
   }
   enum Operand {
     case a, af
@@ -58,13 +73,21 @@ extension LR35902 {
     case d, e, de, deAddress
     case h, l, hl, hlAddress
 
-    case sp                   // Stack pointer
+    case sp
     case spPlusImmediate8
 
     case immediate8, immediate16
     case immediate16address
 
     case ffimmediate8Address, ffccAddress
+
+    var byteWidth: UInt16 {
+      switch self {
+      case .spPlusImmediate8, .immediate8, .ffimmediate8Address: return 1
+      case .immediate16, .immediate16address: return 2
+      default: return 0
+      }
+    }
   }
   enum Condition {
     case nz

@@ -7,7 +7,7 @@ let data = try Data(contentsOf: URL(fileURLWithPath: romFilePath))
 
 let cpu = LR35902(rom: data)
 
-
+cpu.disassemble(startingFrom: 0x0000, inBank: 0)
 
 //func disassemble(in bank: UInt64, at pc: UInt16) -> LR35902.Instruction? {
 //  let pcInBank = bank * bankSize + UInt64(pc)
