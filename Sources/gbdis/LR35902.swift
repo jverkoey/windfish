@@ -29,18 +29,24 @@ class LR35902 {
 
       linear_sweep: while true {
         let byte = rom[Int(pc)]
-        guard let instruction = LR35902.opcodeDescription[byte] else {
-          self.pc += 1
+        guard var instruction = LR35902.opcodeDescription[byte] else {
+          pc += 1
           continue
         }
-//        if case .cb = instruction {
-//          
-//        }
+        if case .cb = instruction {
+          pc += 1
+          let byte = rom[Int(pc)]
+          guard let cbInstruction = LR35902.cbOpcodeDescription[byte] else {
+            pc += 1
+            continue
+          }
+          instruction = cbInstruction
+        }
         if case .invalid = instruction {
-          self.pc += 1
+          pc += 1
           continue
         }
-        print("\(pc.hexString): \(instruction.name)")
+        print("\(pc.hexString): \(instruction.name) \(instruction.operands)")
         disassembly.register(instruction: instruction, at: pc, in: bank)
 
         let nextPc = pc + instruction.byteWidth
@@ -73,6 +79,9 @@ class LR35902 {
           if condition == nil {
             break linear_sweep
           }
+
+        case .jp(_, nil):
+          break linear_sweep
 
         default:
           break

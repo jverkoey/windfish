@@ -48,12 +48,21 @@ extension LR35902 {
 
     // 0xCB prefix
     case cb
+    case rlc(Operand), rrc(Operand)
+    case rl(Operand), rr(Operand)
+    case sla(Operand), sra(Operand)
+    case swap(Operand), srl(Operand)
+
+    case bit(Bit, Operand), res(Bit, Operand), set(Bit, Operand)
 
     // Invalid opcode
     case invalid(UInt8)
 
     var name: String {
       return Mirror(reflecting: self).children.first!.label!
+    }
+    var operands: String {
+      return String(describing: Mirror(reflecting: self).children.first!.value)
     }
     var byteWidth: UInt16 {
       let mirror = Mirror(reflecting: self)
@@ -106,5 +115,15 @@ extension LR35902 {
     case x28
     case x30
     case x38
+  }
+  enum Bit {
+    case b0
+    case b1
+    case b2
+    case b3
+    case b4
+    case b5
+    case b6
+    case b7
   }
 }
