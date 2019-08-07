@@ -16,6 +16,55 @@ class LR35902 {
     let address: UInt16
   }
 
+  struct Instruction: CustomStringConvertible {
+    let spec: InstructionSpec
+    let width: UInt16
+    let immediate8: UInt8?
+    let immediate16: UInt16?
+
+    init(spec: InstructionSpec, width: UInt16, immediate8: UInt8? = nil, immediate16: UInt16? = nil) {
+      self.spec = spec
+      self.width = width
+      self.immediate8 = immediate8
+      self.immediate16 = immediate16
+    }
+
+    var description: String {
+      if let operandDescription = operandDescription {
+        return "\(spec.name) \(operandDescription)"
+      } else {
+        return "\(spec.name)"
+      }
+    }
+
+    var operandDescription: String? {
+      let mirror = Mirror(reflecting: spec)
+      switch mirror.children.first!.value {
+      case let tuple as (Operand, Condition?):
+        if let condition = tuple.1 {
+          return "\(condition), \(describe(operand: tuple.0))"
+        } else {
+          return "\(describe(operand: tuple.0))"
+        }
+      case let tuple as (Operand, Operand):
+        return "\(describe(operand: tuple.0)), \(describe(operand: tuple.1))"
+      case let operand as Operand:
+        return "\(describe(operand: operand))"
+      default:
+        return nil
+      }
+    }
+
+    func describe(operand: Operand) -> String {
+      switch operand {
+      case .immediate8:   return "$\(immediate8!.hexString)"
+      case .immediate16:  return "$\(immediate16!.hexString)"
+      case .hlAddress:    return "[hl]"
+      default:            return "\(operand)"
+      }
+    }
+  }
+
   func disassemble(startingFrom pcInitial: UInt16, inBank bankInitial: UInt8) {
     var jumpAddresses = Set<BankedAddress>()
     jumpAddresses.insert(BankedAddress(bank: bankInitial, address: pcInitial))
@@ -29,32 +78,52 @@ class LR35902 {
 
       linear_sweep: while true {
         let byte = rom[Int(pc)]
-        guard var instruction = LR35902.opcodeDescription[byte] else {
-          pc += 1
+        var opcodeWidth: UInt16 = 1
+        guard var spec = LR35902.opcodeDescription[byte] else {
+          pc += opcodeWidth
           continue
         }
-        if case .cb = instruction {
-          pc += 1
-          let byte = rom[Int(pc)]
+        if case .invalid = spec {
+          pc += opcodeWidth
+          continue
+        }
+        if case .cb = spec {
+          let byte = rom[Int(pc + 1)]
+          opcodeWidth += 1
           guard let cbInstruction = LR35902.cbOpcodeDescription[byte] else {
-            pc += 1
+            pc += opcodeWidth
             continue
           }
-          instruction = cbInstruction
+          if case .invalid = spec {
+            pc += opcodeWidth
+            continue
+          }
+          spec = cbInstruction
         }
-        if case .invalid = instruction {
-          pc += 1
-          continue
+
+        let instructionWidth = opcodeWidth + spec.operandWidth
+        let instruction: Instruction
+        switch spec.operandWidth {
+        case 1:
+          instruction = Instruction(spec: spec, width: instructionWidth, immediate8: rom[Int(pc + opcodeWidth)])
+        case 2:
+          let low = UInt16(rom[Int(pc + opcodeWidth)])
+          let high = UInt16(rom[Int(pc + opcodeWidth + 1)]) << 8
+          let immediate16 = high | low
+          instruction = Instruction(spec: spec, width: instructionWidth, immediate16: immediate16)
+        default:
+          instruction = Instruction(spec: spec, width: instructionWidth)
         }
-        print("\(pc.hexString): \(instruction.name) \(instruction.operands)")
+
+        print("\(pc.hexString): \(instruction)")
         disassembly.register(instruction: instruction, at: pc, in: bank)
 
-        let nextPc = pc + instruction.byteWidth
+        let nextPc = pc + instructionWidth
 
         let lowerBound = Int(pc) + Int(bank) * Int(LR35902.bankSize)
-        visitedAddresses.insert(integersIn: lowerBound..<(lowerBound + Int(instruction.byteWidth)))
+        visitedAddresses.insert(integersIn: lowerBound..<(lowerBound + Int(instructionWidth)))
 
-        switch instruction {
+        switch spec {
         case .jr(.immediate8, let condition):
           let relativeJumpAmount = UInt16(rom[Int(pc + 1)])
           let jumpTo = nextPc + relativeJumpAmount

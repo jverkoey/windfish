@@ -64,17 +64,17 @@ extension LR35902 {
     var operands: String {
       return String(describing: Mirror(reflecting: self).children.first!.value)
     }
-    var byteWidth: UInt16 {
+    var operandWidth: UInt16 {
       let mirror = Mirror(reflecting: self)
       switch mirror.children.first!.value {
       case let tuple as (Operand, Condition?):
-        return 1 + tuple.0.byteWidth
+        return tuple.0.byteWidth
       case let tuple as (Operand, Operand):
-        return 1 + tuple.0.byteWidth + tuple.1.byteWidth
+        return tuple.0.byteWidth + tuple.1.byteWidth
       case let operand as Operand:
-        return 1 + operand.byteWidth
+        return operand.byteWidth
       default:
-        return 1
+        return 0
       }
     }
   }
