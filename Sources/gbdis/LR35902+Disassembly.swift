@@ -27,6 +27,7 @@ extension LR35902 {
       case relative
       case absolute
     }
+    // TODO: Register the source location and the type of call. This will need to be an accumulating object.
     func register(jumpAddress pc: UInt16, in bank: UInt8, kind: JumpKind) {
       let index = UInt32(pc) + UInt32(bank) * LR35902.bankSize
       jumpMap[index] = kind
