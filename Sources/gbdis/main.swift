@@ -29,8 +29,9 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
 //  let asmUrl = disassemblyPath.appendingPathComponent("bank_\(bank.hexString).asm")
 
   print("SECTION \"ROM Bank \(bank.hexString)\", ROM0[$\(bank.hexString)]")
-  var line: UInt16 = 0x0000
-  while line < 0x4000 {
+  var line: UInt16 = (bank == 0) ? 0x0000 : 0x4000
+  let end: UInt16 = (bank == 0) ? 0x4000 : 0x8000
+  while line < end {
     if cpu.disassembly.jump(at: line, in: bank) != nil {
       print("Jump_\(bank.hexString)_\(line.hexString):")
     }
@@ -39,13 +40,18 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
       let code = "\(instruction)".padding(toLength: 44, withPad: " ", startingAt: 0)
       print("    \(code) ; $\(line.hexString)")
       line += instruction.width
+      switch instruction.spec {
+      case .jp, .jr: print()
+      case .ret, .reti, .retC: print(); print()
+      default: break
+      }
     } else {
       var accumulator: [UInt8] = []
       let initialLine = line
       repeat {
-        accumulator.append(cpu.rom[Int(UInt32(line) + UInt32(bank) * LR35902.bankSize)])
+        accumulator.append(cpu.rom[Int(LR35902.romAddress(for: line, in: bank))])
         line += 1
-      } while line < 0x4000 && cpu.disassembly.instruction(at: line, in: bank) == nil
+      } while line < end && cpu.disassembly.instruction(at: line, in: bank) == nil
 
       var lineBlock = initialLine
       for blocks in accumulator.chunked(into: 8) {
@@ -60,6 +66,7 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
         print("    \(code) ; $\(lineBlock.hexString) |\(bytesAsCharacters)|")
         lineBlock += UInt16(blocks.count)
       }
+      print()
     }
   }
 }

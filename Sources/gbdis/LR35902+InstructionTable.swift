@@ -250,7 +250,7 @@ extension LR35902 {
     0xe7: .rst(.x20),
     0xe8: .add(.sp, .immediate8),
     0xe9: .jp(.hl),
-    0xea: .ld(.immediate16, .a),
+    0xea: .ld(.immediate16address, .a),
     0xeb: .invalid(0xeb),
     0xec: .invalid(0xec),
     0xed: .invalid(0xed),

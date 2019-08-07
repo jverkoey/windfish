@@ -72,6 +72,7 @@ class LR35902 {
       case .immediate8:           return "$\(immediate8!.hexString)"
       case .ffimmediate8Address:  return "[$FF00+$\(immediate8!.hexString)]"
       case .immediate16:          return "$\(immediate16!.hexString)"
+      case .immediate16address:   return "[$\(immediate16!.hexString)]"
       case .hlAddress:            return "[hl]"
       default:                    return "\(operand)"
       }
@@ -90,7 +91,8 @@ class LR35902 {
       bank = address.bank
       pc = address.address
 
-      linear_sweep: while (!isFirst && pc < 0x4000) || pc < range.upperBound {
+      var previousInstruction: Instruction? = nil
+      linear_sweep: while (!isFirst && ((bank == 0 && pc < 0x4000) || (bank != 0 && pc < 0x8000))) || pc < range.upperBound {
         let byte = rom[Int(pc)]
         var opcodeWidth: UInt16 = 1
         guard var spec = LR35902.opcodeDescription[byte] else {
@@ -134,14 +136,21 @@ class LR35902 {
 
         let nextPc = pc + instructionWidth
 
-        let lowerBound = Int(pc) + Int(bank) * Int(LR35902.bankSize)
+        let lowerBound = Int(LR35902.romAddress(for: pc, in: bank))
         visitedAddresses.insert(integersIn: lowerBound..<(lowerBound + Int(instructionWidth)))
 
         switch spec {
+        case .ld(.immediate16address, .a):
+          if (0x2000..<0x4000).contains(instruction.immediate16!),
+             let previousInstruction = previousInstruction,
+             case .ld(.a, .immediate8) = previousInstruction.spec {
+            bank = previousInstruction.immediate8!
+          }
+          break
         case .jr(.immediate8, let condition):
           let relativeJumpAmount = UInt16(rom[Int(pc + 1)])
           let jumpTo = nextPc + relativeJumpAmount
-          if !visitedAddresses.contains(Int(jumpTo)) {
+          if !visitedAddresses.contains(Int(LR35902.romAddress(for: jumpTo, in: bank))) {
             jumpAddresses.insert(BankedAddress(bank: bank, address: jumpTo))
           }
           disassembly.register(jumpAddress: jumpTo, in: bank, kind: .relative)
@@ -154,7 +163,7 @@ class LR35902 {
           let jumpLow = UInt16(rom[Int(pc + 1)])
           let jumpHigh = UInt16(rom[Int(pc + 2)]) << 8
           let jumpTo = jumpHigh | jumpLow
-          if !visitedAddresses.contains(Int(jumpTo)) {
+          if !visitedAddresses.contains(Int(LR35902.romAddress(for: jumpTo, in: bank))) {
             jumpAddresses.insert(BankedAddress(bank: bank, address: jumpTo))
           }
           disassembly.register(jumpAddress: jumpTo, in: bank, kind: .absolute)
@@ -167,7 +176,7 @@ class LR35902 {
           let jumpLow = UInt16(rom[Int(pc + 1)])
           let jumpHigh = UInt16(rom[Int(pc + 2)]) << 8
           let jumpTo = jumpHigh | jumpLow
-          if !visitedAddresses.contains(Int(jumpTo)) {
+          if !visitedAddresses.contains(Int(LR35902.romAddress(for: jumpTo, in: bank))) {
             jumpAddresses.insert(BankedAddress(bank: bank, address: jumpTo))
           }
           disassembly.register(jumpAddress: jumpTo, in: bank, kind: .absolute)
@@ -179,7 +188,8 @@ class LR35902 {
           break
         }
 
-        self.pc = nextPc
+        pc = nextPc
+        previousInstruction = instruction
       }
 
       isFirst = false
