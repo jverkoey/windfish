@@ -7,33 +7,72 @@ class LR35902 {
   let rom: Data
   init(rom: Data) {
     self.rom = rom
-    self.disassembly = Disassembly(size: UInt32(rom.count))
   }
 
-  private let disassembly: Disassembly
+  private let disassembly = Disassembly()
+
+  struct BankedAddress: Hashable {
+    let bank: UInt8
+    let address: UInt16
+  }
 
   func disassemble(startingFrom pcInitial: UInt16, inBank bankInitial: UInt8) {
-    self.bank = bankInitial
-    self.pc = pcInitial
+    var jumpAddresses = Set<BankedAddress>()
+    jumpAddresses.insert(BankedAddress(bank: bankInitial, address: pcInitial))
 
-    while true {
-      let byte = rom[Int(pc)]
-      if let instruction = LR35902.opcodeDescription[byte] {
+    var visitedAddresses = IndexSet()
+
+    while !jumpAddresses.isEmpty {
+      let address = jumpAddresses.removeFirst()
+      self.bank = address.bank
+      self.pc = address.address
+
+      linear_sweep: while true {
+        let byte = rom[Int(pc)]
+        guard let instruction = LR35902.opcodeDescription[byte] else {
+          self.pc += 1
+          continue
+        }
+//        if case .cb = instruction {
+//          
+//        }
+        if case .invalid = instruction {
+          self.pc += 1
+          continue
+        }
+        print("\(pc.hexString): \(instruction.name)")
         disassembly.register(instruction: instruction, at: pc, in: bank)
 
         let nextPc = pc + instruction.byteWidth
 
+        let lowerBound = Int(pc) + Int(bank) * Int(LR35902.bankSize)
+        visitedAddresses.insert(integersIn: lowerBound..<(lowerBound + Int(instruction.byteWidth)))
+
         switch instruction {
-        case .jr(.immediate8, _):
+        case .jr(.immediate8, let condition):
           let relativeJumpAmount = UInt16(rom[Int(pc + 1)])
           let jumpTo = nextPc + relativeJumpAmount
+          if !visitedAddresses.contains(Int(jumpTo)) {
+            jumpAddresses.insert(BankedAddress(bank: bank, address: jumpTo))
+          }
           disassembly.register(jumpAddress: jumpTo, in: bank, kind: .relative)
 
-        case .jp(.immediate16, _):
+          if condition == nil {
+            break linear_sweep
+          }
+
+        case .jp(.immediate16, let condition):
           let jumpLow = UInt16(rom[Int(pc + 1)])
           let jumpHigh = UInt16(rom[Int(pc + 2)]) << 8
           let jumpTo = jumpHigh | jumpLow
+          if !visitedAddresses.contains(Int(jumpTo)) {
+            jumpAddresses.insert(BankedAddress(bank: bank, address: jumpTo))
+          }
           disassembly.register(jumpAddress: jumpTo, in: bank, kind: .absolute)
+
+          if condition == nil {
+            break linear_sweep
+          }
 
         default:
           break

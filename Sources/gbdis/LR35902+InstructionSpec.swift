@@ -60,6 +60,8 @@ extension LR35902 {
       switch mirror.children.first!.value {
       case let tuple as (Operand, Condition?):
         return 1 + tuple.0.byteWidth
+      case let tuple as (Operand, Operand):
+        return 1 + tuple.0.byteWidth + tuple.1.byteWidth
       case let operand as Operand:
         return 1 + operand.byteWidth
       default:
