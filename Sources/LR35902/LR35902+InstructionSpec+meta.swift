@@ -14,20 +14,20 @@ extension LR35902.InstructionSpec {
     }
     switch operands.value {
     case let tuple as (LR35902.Operand, LR35902.Condition?):
-      return tuple.0.byteWidth
+      return tuple.0.width
     case let tuple as (LR35902.Operand, LR35902.Operand):
-      return tuple.0.byteWidth + tuple.1.byteWidth
+      return tuple.0.width + tuple.1.width
     case let tuple as (LR35902.Bit, LR35902.Operand):
-      return tuple.1.byteWidth
+      return tuple.1.width
     case let operand as LR35902.Operand:
-      return operand.byteWidth
+      return operand.width
     default: return 0
     }
   }
 }
 
 extension LR35902.Operand {
-  var byteWidth: UInt16 {
+  var width: UInt16 {
     switch self {
     case .spPlusImmediate8Signed, .immediate8, .immediate8signed, .ffimmediate8Address: return 1
     case .immediate16, .immediate16address: return 2
