@@ -125,11 +125,11 @@ class LR35902 {
       switch operand {
       case .immediate8:           return "$\(immediate8!.hexString)"
       case .immediate8signed:
-        let signedByte = Int8(bitPattern: immediate8!)
-        if signedByte < 0 {
-          return "-$\((0xff - immediate8! + 1).hexString)"
+        let byte = immediate8!
+        if (byte & UInt8(0x80)) != 0 {
+          return "@-$\((0xff - byte + 1 + 2).hexString)"
         } else {
-          return "+$\(immediate8!)"
+          return "@+$\((byte + 2).hexString)"
         }
       case .immediate16:          return "$\(immediate16!.hexString)"
       case .ffimmediate8Address:  return "[$FF00+$\(immediate8!.hexString)]"
@@ -141,9 +141,9 @@ class LR35902 {
       case .spPlusImmediate8Signed:
         let signedByte = Int8(bitPattern: immediate8!)
         if signedByte < 0 {
-          return "sp-$\((0xff - immediate8! + 1).hexString)"
+          return "@-$\((0xff - immediate8! + 1).hexString)"
         } else {
-          return "sp+$\(immediate8!)"
+          return "@+$\(immediate8!.hexString)"
         }
       default:                    return "\(operand)"
       }

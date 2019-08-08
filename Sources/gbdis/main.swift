@@ -15,7 +15,7 @@ cpu.disassemble(range: 0x0020..<0x0028, inBank: 0)
 cpu.disassemble(range: 0x0028..<0x0030, inBank: 0)
 cpu.disassemble(range: 0x0030..<0x0038, inBank: 0)
 cpu.disassemble(range: 0x0038..<0x0040, inBank: 0)
-cpu.disassemble(range: 0x0150..<0x4000, inBank: 0)
+cpu.disassemble(range: 0x0100..<0x4000, inBank: 0)
 
 extension Array {
   func chunked(into size: Int) -> [[Element]] {
@@ -32,6 +32,9 @@ func print(_ string: String, fileHandle: FileHandle) {
 
 let fm = FileManager.default
 try fm.createDirectory(at: disassemblyPath, withIntermediateDirectories: true, attributes: nil)
+
+
+var instructionsToDecode = 60
 
 for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
   let asmUrl = disassemblyPath.appendingPathComponent("bank_\(bank.hexString).asm")
@@ -63,8 +66,9 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
     }
 
     // Code
-    if let instruction = cpu.disassembly.instruction(at: cpu.pc, in: bank) {
-
+    if instructionsToDecode > 0,
+      let instruction = cpu.disassembly.instruction(at: cpu.pc, in: bank) {
+      instructionsToDecode -= 1
       if case .ld(.immediate16address, .a) = instruction.spec {
         if (0x2000..<0x4000).contains(instruction.immediate16!),
           let previousInstruction = previousInstruction,
@@ -73,7 +77,7 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
         }
       }
 
-      let code = "    \(instruction.describe(with: cpu))".padding(toLength: 48, withPad: " ", startingAt: 0)
+      let code = "    \(instruction.describe(/*with: cpu*/))".padding(toLength: 48, withPad: " ", startingAt: 0)
       print("\(code) ; $\(cpu.pc.hexString)", fileHandle: fileHandle)
       cpu.pc += instruction.width
       switch instruction.spec {
@@ -99,7 +103,7 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
       repeat {
         accumulator.append(cpu.rom[Int(LR35902.romAddress(for: cpu.pc, in: bank))])
         cpu.pc += 1
-      } while cpu.pc < end && cpu.disassembly.instruction(at: cpu.pc, in: bank) == nil
+      } while cpu.pc < end && (instructionsToDecode == 0 || cpu.disassembly.instruction(at: cpu.pc, in: bank) == nil)
 
       var lineBlock = initialPc
       for blocks in accumulator.chunked(into: 8) {
