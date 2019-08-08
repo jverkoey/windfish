@@ -35,7 +35,7 @@ extension LR35902 {
 
     // Calls and returns
     case call(Operand, Condition? = nil)
-    case ret, retC(Condition), reti
+    case ret(Condition? = nil), reti
 
     // Restarts
     case rst(RestartAddress)
@@ -92,16 +92,16 @@ extension LR35902 {
     case h, l, hl, hlAddress
 
     case sp
-    case spPlusImmediate8
+    case spPlusImmediate8Signed
 
-    case immediate8, immediate16
+    case immediate8, immediate8signed, immediate16
     case immediate16address
 
     case ffimmediate8Address, ffccAddress
 
     var byteWidth: UInt16 {
       switch self {
-      case .spPlusImmediate8, .immediate8, .ffimmediate8Address: return 1
+      case .spPlusImmediate8Signed, .immediate8, .immediate8signed, .ffimmediate8Address: return 1
       case .immediate16, .immediate16address: return 2
       default: return 0
       }
@@ -123,14 +123,14 @@ extension LR35902 {
     case x30
     case x38
   }
-  enum Bit {
-    case b0
-    case b1
-    case b2
-    case b3
-    case b4
-    case b5
-    case b6
-    case b7
+  enum Bit: UInt8 {
+    case b0 = 0
+    case b1 = 1
+    case b2 = 2
+    case b3 = 3
+    case b4 = 4
+    case b5 = 5
+    case b6 = 6
+    case b7 = 7
   }
 }

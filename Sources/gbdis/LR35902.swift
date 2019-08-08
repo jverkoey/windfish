@@ -42,7 +42,7 @@ class LR35902 {
 
     func describe(with cpu: LR35902? = nil) -> String {
       if let operandDescription = operandDescription(with: cpu) {
-        let opcodeName = "\(spec.name)".padding(toLength: 5, withPad: " ", startingAt: 0)
+        let opcodeName = "\(spec.name)".padding(toLength: 4, withPad: " ", startingAt: 0)
         return "\(opcodeName) \(operandDescription)"
       } else {
         return "\(spec.name)"
@@ -51,7 +51,7 @@ class LR35902 {
 
     var description: String {
       if let operandDescription = operandDescription() {
-        let opcodeName = "\(spec.name)".padding(toLength: 5, withPad: " ", startingAt: 0)
+        let opcodeName = "\(spec.name)".padding(toLength: 4, withPad: " ", startingAt: 0)
         return "\(opcodeName) \(operandDescription)"
       } else {
         return "\(spec.name)"
@@ -74,10 +74,10 @@ class LR35902 {
         } else {
           return "\(address)"
         }
-      case let InstructionSpec.jr(operand, condition) where operand == .immediate8:
+      case let InstructionSpec.jr(operand, condition) where operand == .immediate8signed:
         let address: String
         if let cpu = cpu {
-          let jumpAddress = cpu.pc + width + UInt16(immediate8!)
+          let jumpAddress = (cpu.pc + width).advanced(by: Int(Int8(bitPattern: immediate8!)))
           if cpu.disassembly.transfersOfControl(at: jumpAddress, in: cpu.bank) != nil {
             address = "toc_\(cpu.bank.hexString)_\(jumpAddress.hexString)"
           } else {
@@ -106,10 +106,12 @@ class LR35902 {
         } else {
           return "\(describe(operand: tuple.0))"
         }
+      case let condition as Condition:
+        return "\(condition)"
       case let tuple as (Operand, Operand):
         return "\(describe(operand: tuple.0)), \(describe(operand: tuple.1))"
       case let tuple as (Bit, Operand):
-        return "\(tuple.0), \(describe(operand: tuple.1))"
+        return "\(tuple.0.rawValue), \(describe(operand: tuple.1))"
       case let operand as Operand:
         return "\(describe(operand: operand))"
       case let address as RestartAddress:
@@ -122,10 +124,27 @@ class LR35902 {
     func describe(operand: Operand) -> String {
       switch operand {
       case .immediate8:           return "$\(immediate8!.hexString)"
+      case .immediate8signed:
+        let signedByte = Int8(bitPattern: immediate8!)
+        if signedByte < 0 {
+          return "-$\((0xff - immediate8! + 1).hexString)"
+        } else {
+          return "+$\(immediate8!)"
+        }
       case .immediate16:          return "$\(immediate16!.hexString)"
       case .ffimmediate8Address:  return "[$FF00+$\(immediate8!.hexString)]"
       case .immediate16address:   return "[$\(immediate16!.hexString)]"
+      case .bcAddress:            return "[bc]"
+      case .deAddress:            return "[de]"
       case .hlAddress:            return "[hl]"
+      case .ffccAddress:          return "[$ff00+c]"
+      case .spPlusImmediate8Signed:
+        let signedByte = Int8(bitPattern: immediate8!)
+        if signedByte < 0 {
+          return "sp-$\((0xff - immediate8! + 1).hexString)"
+        } else {
+          return "sp+$\(immediate8!)"
+        }
       default:                    return "\(operand)"
       }
     }
@@ -145,7 +164,7 @@ class LR35902 {
 
       var previousInstruction: Instruction? = nil
       linear_sweep: while (!isFirst && ((bank == 0 && pc < 0x4000) || (bank != 0 && pc < 0x8000))) || pc < range.upperBound {
-        let byte = rom[Int(pc)]
+        let byte = rom[Int(LR35902.romAddress(for: pc, in: bank))]
         var opcodeWidth: UInt16 = 1
         guard var spec = LR35902.opcodeDescription[byte] else {
           pc += opcodeWidth
@@ -156,7 +175,7 @@ class LR35902 {
           continue
         }
         if case .cb = spec {
-          let byte = rom[Int(pc + 1)]
+          let byte = rom[Int(LR35902.romAddress(for: pc + 1, in: bank))]
           opcodeWidth += 1
           guard let cbInstruction = LR35902.cbOpcodeDescription[byte] else {
             pc += opcodeWidth
@@ -173,10 +192,12 @@ class LR35902 {
         let instruction: Instruction
         switch spec.operandWidth {
         case 1:
-          instruction = Instruction(spec: spec, width: instructionWidth, immediate8: rom[Int(pc + opcodeWidth)])
+          instruction = Instruction(spec: spec,
+                                    width: instructionWidth,
+                                    immediate8: rom[Int(LR35902.romAddress(for: pc + opcodeWidth, in: bank))])
         case 2:
-          let low = UInt16(rom[Int(pc + opcodeWidth)])
-          let high = UInt16(rom[Int(pc + opcodeWidth + 1)]) << 8
+          let low = UInt16(rom[Int(LR35902.romAddress(for: pc + opcodeWidth, in: bank))])
+          let high = UInt16(rom[Int(LR35902.romAddress(for: pc + opcodeWidth + 1, in: bank))]) << 8
           let immediate16 = high | low
           instruction = Instruction(spec: spec, width: instructionWidth, immediate16: immediate16)
         default:
@@ -198,9 +219,9 @@ class LR35902 {
             bank = previousInstruction.immediate8!
           }
           break
-        case .jr(.immediate8, let condition):
-          let relativeJumpAmount = UInt16(rom[Int(pc + 1)])
-          let jumpTo = nextPc + relativeJumpAmount
+        case .jr(.immediate8signed, let condition):
+          let relativeJumpAmount = Int8(bitPattern: instruction.immediate8!)
+          let jumpTo = nextPc.advanced(by: Int(relativeJumpAmount))
           if !visitedAddresses.contains(Int(LR35902.romAddress(for: jumpTo, in: bank))) {
             jumpAddresses.insert(BankedAddress(bank: bank, address: jumpTo))
           }
@@ -211,9 +232,7 @@ class LR35902 {
           }
 
         case .jp(.immediate16, let condition):
-          let jumpLow = UInt16(rom[Int(pc + 1)])
-          let jumpHigh = UInt16(rom[Int(pc + 2)]) << 8
-          let jumpTo = jumpHigh | jumpLow
+          let jumpTo = instruction.immediate16!
           if !visitedAddresses.contains(Int(LR35902.romAddress(for: jumpTo, in: bank))) {
             jumpAddresses.insert(BankedAddress(bank: bank, address: jumpTo))
           }
@@ -224,9 +243,7 @@ class LR35902 {
           }
 
         case .call(.immediate16, _):
-          let jumpLow = UInt16(rom[Int(pc + 1)])
-          let jumpHigh = UInt16(rom[Int(pc + 2)]) << 8
-          let jumpTo = jumpHigh | jumpLow
+          let jumpTo = instruction.immediate16!
           if !visitedAddresses.contains(Int(LR35902.romAddress(for: jumpTo, in: bank))) {
             jumpAddresses.insert(BankedAddress(bank: bank, address: jumpTo))
           }

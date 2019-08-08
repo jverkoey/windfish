@@ -81,7 +81,7 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
         print("", fileHandle: fileHandle)
         previousInstruction = nil
         cpu.bank = bank
-      case .ret, .reti, .retC:
+      case .ret, .reti:
         print("", fileHandle: fileHandle); print("", fileHandle: fileHandle)
         previousInstruction = nil
         cpu.bank = bank
@@ -104,7 +104,7 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
       var lineBlock = initialPc
       for blocks in accumulator.chunked(into: 8) {
         let operand = blocks.map { "$\($0.hexString)" }.joined(separator: ", ")
-        let opcode = "db".padding(toLength: 5, withPad: " ", startingAt: 0)
+        let opcode = "db".padding(toLength: 4, withPad: " ", startingAt: 0)
         let instruction = "\(opcode) \(operand)"
         let code = "    \(instruction)".padding(toLength: 48, withPad: " ", startingAt: 0)
 
