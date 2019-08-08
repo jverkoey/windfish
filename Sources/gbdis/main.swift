@@ -103,7 +103,9 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
       repeat {
         accumulator.append(cpu.rom[Int(LR35902.romAddress(for: cpu.pc, in: bank))])
         cpu.pc += 1
-      } while cpu.pc < end && (instructionsToDecode == 0 || cpu.disassembly.instruction(at: cpu.pc, in: bank) == nil)
+      } while cpu.pc < end
+        && (instructionsToDecode == 0 || cpu.disassembly.instruction(at: cpu.pc, in: bank) == nil)
+        && cpu.disassembly.transfersOfControl(at: cpu.pc, in: bank) == nil
 
       var lineBlock = initialPc
       for blocks in accumulator.chunked(into: 8) {
