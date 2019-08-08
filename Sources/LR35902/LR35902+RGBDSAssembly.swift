@@ -2,14 +2,20 @@ import Foundation
 
 public final class RGBDSAssembly {
 
-  public static let operandWidth = 4
+  public static let maxOpcodeNameLength = 4
   public static func assembly(for instruction: LR35902.Instruction, with cpu: LR35902? = nil) -> String {
     if let operand = operandAssembly(for: instruction, with: cpu) {
-      let opcodeName = instruction.spec.opcode.padding(toLength: operandWidth, withPad: " ", startingAt: 0)
+      let opcodeName = instruction.spec.opcode.padding(toLength: maxOpcodeNameLength, withPad: " ", startingAt: 0)
       return "\(opcodeName) \(operand)"
     } else {
       return instruction.spec.opcode
     }
+  }
+
+  public static func assembly(for bytes: [UInt8]) -> String {
+    let opcode = "db".padding(toLength: maxOpcodeNameLength, withPad: " ", startingAt: 0)
+    let operand = bytes.map { "$\($0.hexString)" }.joined(separator: ", ")
+    return "\(opcode) \(operand)"
   }
 
   private static func operandAssembly(for instruction: LR35902.Instruction, with cpu: LR35902? = nil) -> String? {

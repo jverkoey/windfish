@@ -21,7 +21,7 @@ cpu.disassemble(range: 0x0038..<0x0040, inBank: 0)
 cpu.disassemble(range: 0x0100..<0x4000, inBank: 0)
 
 extension Array {
-  func chunked(into size: Int) -> [[Element]] {
+  fileprivate func chunked(into size: Int) -> [[Element]] {
     return stride(from: 0, to: count, by: size).map {
       Array(self[$0 ..< Swift.min($0 + size, count)])
     }
@@ -68,7 +68,6 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
       write("\(label) ; Sources: \(sources)", fileHandle: fileHandle)
     }
 
-    // Code
     if instructionsToDecode > 0,
       let instruction = cpu.disassembly.instruction(at: cpu.pc, in: bank) {
       instructionsToDecode -= 1
@@ -102,7 +101,6 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
       previousInstruction = nil
       cpu.bank = bank
 
-      // Everything else
       var accumulator: [UInt8] = []
       let initialPc = cpu.pc
       repeat {
@@ -114,9 +112,7 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
 
       var lineBlock = initialPc
       for blocks in accumulator.chunked(into: 8) {
-        let operand = blocks.map { "$\($0.hexString)" }.joined(separator: ", ")
-        let opcode = "db".padding(toLength: RGBDSAssembly.operandWidth, withPad: " ", startingAt: 0)
-        let instruction = "\(opcode) \(operand)"
+        let instruction = RGBDSAssembly.assembly(for: blocks)
         let code = "    \(instruction)".padding(toLength: 48, withPad: " ", startingAt: 0)
 
         let displayableBytes = blocks.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
