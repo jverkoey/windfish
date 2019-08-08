@@ -44,18 +44,43 @@ func line(_ transfersOfControl: Set<LR35902.Disassembly.TransferOfControl>, cpu:
   return line(label, comment: "Sources: \(sources)")
 }
 
+func restartFile(atPath path: String) throws -> FileHandle {
+  if fm.fileExists(atPath: path) {
+    try fm.removeItem(atPath: path)
+  }
+  fm.createFile(atPath: path, contents: Data(), attributes: nil)
+  return try FileHandle(forWritingTo: URL(fileURLWithPath: path))
+}
+
 let fm = FileManager.default
 try fm.createDirectory(at: disassemblyPath, withIntermediateDirectories: true, attributes: nil)
+
+let makefileHandle = try restartFile(atPath: disassemblyPath.appendingPathComponent("Makefile").path)
+
+makefileHandle.write(
+"""
+all: game.gb
+
+game.o: game.asm bank_*.asm
+	rgbasm -h -o game.o game.asm
+
+game.gb: game.o
+	rgblink -d -n game.sym -m game.map -o $@ $<
+	rgbfix -v -p 255 $@
+
+	md5 $@
+
+clean:
+	rm -f game.o game.gb game.sym game.map *.o
+	find . \\( -iname '*.1bpp' -o -iname '*.2bpp' \\) -exec rm {} +
+
+""".data(using: .utf8)!)
 
 var instructionsToDecode = Int.max
 
 for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
   let asmUrl = disassemblyPath.appendingPathComponent("bank_\(bank.hexString).asm")
-  if fm.fileExists(atPath: asmUrl.path) {
-    try fm.removeItem(atPath: asmUrl.path)
-  }
-  fm.createFile(atPath: asmUrl.path, contents: Data(), attributes: nil)
-  let fileHandle = try FileHandle(forWritingTo: asmUrl)
+  let fileHandle = try restartFile(atPath: asmUrl.path)
 
   print("Writing bank \(bank.hexString)")
   if bank == 0 {

@@ -53,6 +53,5 @@ extension LR35902 {
       bankChanges[LR35902.romAddress(for: pc, in: bank)] = bankChange
     }
     private var bankChanges: [UInt32: UInt8] = [:]
-
   }
 }
