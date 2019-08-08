@@ -1,4 +1,5 @@
 import Foundation
+import LR35902
 
 let romFilePath = "/Users/featherless/workbench/awakenlink/rom/LinksAwakening.gb"
 let disassemblyPath = URL(fileURLWithPath: "/Users/featherless/workbench/gbdis/disassembly", isDirectory: true)
@@ -79,7 +80,7 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
 
       let code = "    \(instruction.describe(with: cpu))".padding(toLength: 48, withPad: " ", startingAt: 0)
       let index = LR35902.romAddress(for: cpu.pc, in: cpu.bank)
-      let bytes = cpu.rom[index..<(index + UInt32(instruction.width))]
+      let bytes = cpu[index..<(index + UInt32(instruction.width))]
       print("\(code) ; $\(cpu.pc.hexString): \(bytes.map { "$\($0.hexString)" }.joined(separator: " "))", fileHandle: fileHandle)
       cpu.pc += instruction.width
       switch instruction.spec {
@@ -127,4 +128,4 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
   }
 }
 
-print("code \(Float(cpu.disassembly.code.count) * 100 / Float(cpu.rom.count))%")
+print("code \(Float(cpu.disassembly.code.count) * 100 / Float(data.count))%")

@@ -1,11 +1,11 @@
 import Foundation
 
 extension LR35902 {
-  struct Instruction {
-    let spec: InstructionSpec
-    let width: UInt16
-    let immediate8: UInt8?
-    let immediate16: UInt16?
+  public struct Instruction {
+    public let spec: InstructionSpec
+    public let width: UInt16
+    public let immediate8: UInt8?
+    public let immediate16: UInt16?
 
     init(spec: InstructionSpec, width: UInt16, immediate8: UInt8? = nil, immediate16: UInt16? = nil) {
       self.spec = spec
@@ -14,7 +14,7 @@ extension LR35902 {
       self.immediate16 = immediate16
     }
 
-    func describe(with cpu: LR35902? = nil) -> String {
+    public func describe(with cpu: LR35902? = nil) -> String {
       if let operandDescription = operandDescription(with: cpu) {
         let opcodeName = "\(spec.name)".padding(toLength: 4, withPad: " ", startingAt: 0)
         return "\(opcodeName) \(operandDescription)"

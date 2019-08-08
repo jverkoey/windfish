@@ -1,7 +1,7 @@
 import Foundation
 
 extension LR35902 {
-  enum InstructionSpec {
+  public enum InstructionSpec {
     // Loads
     case ld(Operand, Operand)
     case ldi(Operand, Operand), ldd(Operand, Operand)
@@ -85,7 +85,7 @@ extension LR35902 {
       }
     }
   }
-  enum Operand {
+  public enum Operand {
     case a, af
     case b, c, bc, bcAddress
     case d, e, de, deAddress
@@ -107,13 +107,13 @@ extension LR35902 {
       }
     }
   }
-  enum Condition {
+  public enum Condition {
     case nz
     case z
     case nc
     case c
   }
-  enum RestartAddress {
+  public enum RestartAddress {
     case x00
     case x08
     case x10
@@ -123,7 +123,7 @@ extension LR35902 {
     case x30
     case x38
   }
-  enum Bit: UInt8 {
+  public enum Bit: UInt8 {
     case b0 = 0
     case b1 = 1
     case b2 = 2

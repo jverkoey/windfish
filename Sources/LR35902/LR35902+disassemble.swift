@@ -1,7 +1,7 @@
 import Foundation
 
 extension LR35902 {
-  func disassemble(range: Range<UInt16>, inBank bankInitial: UInt8) {
+  public func disassemble(range: Range<UInt16>, inBank bankInitial: UInt8) {
     var jumpAddresses: [BankedAddress] = []
     jumpAddresses.append(BankedAddress(bank: bankInitial, address: range.lowerBound))
 
