@@ -151,8 +151,8 @@ class LR35902 {
   }
 
   func disassemble(range: Range<UInt16>, inBank bankInitial: UInt8) {
-    var jumpAddresses = Set<BankedAddress>()
-    jumpAddresses.insert(BankedAddress(bank: bankInitial, address: range.lowerBound))
+    var jumpAddresses: [BankedAddress] = []
+    jumpAddresses.append(BankedAddress(bank: bankInitial, address: range.lowerBound))
 
     var visitedAddresses = IndexSet()
     var isFirst = true
@@ -170,11 +170,23 @@ class LR35902 {
           pc += opcodeWidth
           continue
         }
-        if case .invalid = spec {
+        switch spec {
+        case .stop:
+          // The next byte needs to be 00.
+          let nextByte = rom[Int(LR35902.romAddress(for: pc + 1, in: bank))]
+          if nextByte != 0 {
+            pc += opcodeWidth
+            continue
+          } else {
+            // Stop is technically a two-byte instruction.
+            opcodeWidth += 1
+          }
+
+        case .invalid:
           pc += opcodeWidth
           continue
-        }
-        if case .cb = spec {
+
+        case .cb:
           let byte = rom[Int(LR35902.romAddress(for: pc + 1, in: bank))]
           opcodeWidth += 1
           guard let cbInstruction = LR35902.cbOpcodeDescription[byte] else {
@@ -186,6 +198,8 @@ class LR35902 {
             continue
           }
           spec = cbInstruction
+        default:
+          break
         }
 
         let instructionWidth = opcodeWidth + spec.operandWidth
@@ -223,7 +237,7 @@ class LR35902 {
           let relativeJumpAmount = Int8(bitPattern: instruction.immediate8!)
           let jumpTo = nextPc.advanced(by: Int(relativeJumpAmount))
           if !visitedAddresses.contains(Int(LR35902.romAddress(for: jumpTo, in: bank))) {
-            jumpAddresses.insert(BankedAddress(bank: bank, address: jumpTo))
+            jumpAddresses.append(BankedAddress(bank: bank, address: jumpTo))
           }
           disassembly.registerTransferOfControl(to: jumpTo, in: bank, from: pc, kind: .jr)
 
@@ -234,7 +248,7 @@ class LR35902 {
         case .jp(.immediate16, let condition):
           let jumpTo = instruction.immediate16!
           if !visitedAddresses.contains(Int(LR35902.romAddress(for: jumpTo, in: bank))) {
-            jumpAddresses.insert(BankedAddress(bank: bank, address: jumpTo))
+            jumpAddresses.append(BankedAddress(bank: bank, address: jumpTo))
           }
           disassembly.registerTransferOfControl(to: jumpTo, in: bank, from: pc, kind: .jp)
 
@@ -245,7 +259,7 @@ class LR35902 {
         case .call(.immediate16, _):
           let jumpTo = instruction.immediate16!
           if !visitedAddresses.contains(Int(LR35902.romAddress(for: jumpTo, in: bank))) {
-            jumpAddresses.insert(BankedAddress(bank: bank, address: jumpTo))
+            jumpAddresses.append(BankedAddress(bank: bank, address: jumpTo))
           }
           disassembly.registerTransferOfControl(to: jumpTo, in: bank, from: pc, kind: .call)
 
