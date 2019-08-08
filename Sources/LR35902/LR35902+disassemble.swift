@@ -17,7 +17,7 @@ extension LR35902 {
       linear_sweep: while (!isFirst && ((bank == 0 && pc < 0x4000) || (bank != 0 && pc < 0x8000))) || pc < range.upperBound {
         let byte = self[pc, bank]
         var opcodeWidth: UInt16 = 1
-        guard var spec = LR35902.opcodeDescription[byte] else {
+        guard var spec = LR35902.instructionTable[byte] else {
           pc += opcodeWidth
           continue
         }
@@ -40,7 +40,7 @@ extension LR35902 {
         case .cb:
           let byte = self[pc + 1, bank]
           opcodeWidth += 1
-          guard let cbInstruction = LR35902.cbOpcodeDescription[byte] else {
+          guard let cbInstruction = LR35902.instructionTableCB[byte] else {
             pc += opcodeWidth
             continue
           }
