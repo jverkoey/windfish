@@ -34,7 +34,8 @@ let fm = FileManager.default
 try fm.createDirectory(at: disassemblyPath, withIntermediateDirectories: true, attributes: nil)
 
 
-var instructionsToDecode = 60
+// 187..<188
+var instructionsToDecode = 188
 
 for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
   let asmUrl = disassemblyPath.appendingPathComponent("bank_\(bank.hexString).asm")

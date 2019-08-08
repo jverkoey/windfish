@@ -127,7 +127,7 @@ class LR35902 {
       case .immediate8signed:
         let byte = immediate8!
         if (byte & UInt8(0x80)) != 0 {
-          return "@-$\((0xff - byte + 1 + 2).hexString)"
+          return "@-$\((0xff - byte + 1 - 2).hexString)"
         } else {
           return "@+$\((byte + 2).hexString)"
         }
