@@ -80,7 +80,7 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
         }
       }
 
-      let code = "    \(instruction.assembly(with: cpu))".padding(toLength: 48, withPad: " ", startingAt: 0)
+      let code = "    \(assembly(for: instruction, with: cpu))".padding(toLength: 48, withPad: " ", startingAt: 0)
       let index = LR35902.romAddress(for: cpu.pc, in: cpu.bank)
       let bytes = cpu[index..<(index + UInt32(instruction.width))]
       write("\(code) ; $\(cpu.pc.hexString): \(bytes.map { "$\($0.hexString)" }.joined(separator: " "))", fileHandle: fileHandle)
@@ -115,7 +115,7 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
       var lineBlock = initialPc
       for blocks in accumulator.chunked(into: 8) {
         let operand = blocks.map { "$\($0.hexString)" }.joined(separator: ", ")
-        let opcode = "db".padding(toLength: LR35902.Instruction.operandWidth, withPad: " ", startingAt: 0)
+        let opcode = "db".padding(toLength: operandWidth, withPad: " ", startingAt: 0)
         let instruction = "\(opcode) \(operand)"
         let code = "    \(instruction)".padding(toLength: 48, withPad: " ", startingAt: 0)
 
