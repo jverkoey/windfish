@@ -78,7 +78,9 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
       }
 
       let code = "    \(instruction.describe(with: cpu))".padding(toLength: 48, withPad: " ", startingAt: 0)
-      print("\(code) ; $\(cpu.pc.hexString)", fileHandle: fileHandle)
+      let index = LR35902.romAddress(for: cpu.pc, in: cpu.bank)
+      let bytes = cpu.rom[index..<(index + UInt32(instruction.width))]
+      print("\(code) ; $\(cpu.pc.hexString): \(bytes.map { "$\($0.hexString)" }.joined(separator: " "))", fileHandle: fileHandle)
       cpu.pc += instruction.width
       switch instruction.spec {
       case .jp, .jr:

@@ -23,7 +23,7 @@ extension LR35902 {
       }
     }
 
-    func operandDescription(with cpu: LR35902? = nil) -> String? {
+    private func operandDescription(with cpu: LR35902? = nil) -> String? {
       switch spec {
       case let InstructionSpec.jp(operand, condition) where operand == .immediate16,
            let InstructionSpec.call(operand, condition) where operand == .immediate16:
@@ -86,7 +86,7 @@ extension LR35902 {
       }
     }
 
-    func describe(operand: Operand) -> String {
+    private func describe(operand: Operand) -> String {
       switch operand {
       case .immediate8:           return "$\(immediate8!.hexString)"
       case .immediate8signed:
