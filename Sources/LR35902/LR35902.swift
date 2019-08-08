@@ -41,15 +41,5 @@ public final class LR35902 {
     let address: UInt16
   }
 
-  public static func label(at pc: UInt16, in bank: UInt8) -> String {
-    if pc < 0x4000 {
-      return "toc_00_\(pc.hexString)"
-    } else if pc < 0x8000 {
-      return "toc_\(bank.hexString)_\(pc.hexString)"
-    } else {
-      return "$\(pc.hexString)"
-    }
-  }
-
   static let bankSize: UInt32 = 0x4000
 }

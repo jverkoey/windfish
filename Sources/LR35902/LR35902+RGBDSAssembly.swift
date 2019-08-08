@@ -18,13 +18,23 @@ public final class RGBDSAssembly {
     return "\(opcode) \(operand)"
   }
 
+  public static func label(at pc: UInt16, in bank: UInt8) -> String {
+    if pc < 0x4000 {
+      return "toc_00_\(pc.hexString)"
+    } else if pc < 0x8000 {
+      return "toc_\(bank.hexString)_\(pc.hexString)"
+    } else {
+      return "$\(pc.hexString)"
+    }
+  }
+
   private static func operandAssembly(for instruction: LR35902.Instruction, with cpu: LR35902? = nil) -> String? {
     switch instruction.spec {
     case let LR35902.InstructionSpec.jp(operand, condition) where operand == .immediate16,
          let LR35902.InstructionSpec.call(operand, condition) where operand == .immediate16:
       let address: String
       if let cpu = cpu, cpu.disassembly.transfersOfControl(at: instruction.immediate16!, in: cpu.bank) != nil {
-        address = LR35902.label(at: instruction.immediate16!, in: cpu.bank)
+        address = label(at: instruction.immediate16!, in: cpu.bank)
         if let condition = condition {
           return "\(condition), \(address)"
         } else {
@@ -37,7 +47,7 @@ public final class RGBDSAssembly {
       if let cpu = cpu {
         let jumpAddress = (cpu.pc + instruction.width).advanced(by: Int(Int8(bitPattern: instruction.immediate8!)))
         if cpu.disassembly.transfersOfControl(at: jumpAddress, in: cpu.bank) != nil {
-          address = LR35902.label(at: jumpAddress, in: cpu.bank)
+          address = label(at: jumpAddress, in: cpu.bank)
           if let condition = condition {
             return "\(condition), \(address)"
           } else {

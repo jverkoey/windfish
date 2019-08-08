@@ -32,9 +32,35 @@ func write(_ string: String, fileHandle: FileHandle) {
   fileHandle.write("\(string)\n".data(using: .utf8)!)
 }
 
+func line(_ instruction: String, address: UInt16, bytes: Data? = nil, comment: String? = nil) -> String {
+  let code = "    \(instruction)".padding(toLength: 48, withPad: " ", startingAt: 0)
+
+  var parts = ["\(code) ; $\(address.hexString)"]
+
+  if let bytes = bytes {
+    parts.append(": ")
+    parts.append(bytes.map { "$\($0.hexString)" }.joined(separator: " "))
+  }
+
+  if let comment = comment {
+    parts.append(" ")
+    parts.append(comment)
+  }
+
+  return parts.joined()
+}
+
+func line(_ transfersOfControl: Set<LR35902.Disassembly.TransferOfControl>, cpu: LR35902) -> String {
+  let sources = transfersOfControl
+    .sorted(by: { $0.sourceAddress < $1.sourceAddress })
+    .map { "\($0.kind) @ $\($0.sourceAddress.hexString)" }
+    .joined(separator: ", ")
+  let label = "\(RGBDSAssembly.label(at: cpu.pc, in: cpu.bank)):".padding(toLength: 48, withPad: " ", startingAt: 0)
+  return "\(label) ; Sources: \(sources)"
+}
+
 let fm = FileManager.default
 try fm.createDirectory(at: disassemblyPath, withIntermediateDirectories: true, attributes: nil)
-
 
 var instructionsToDecode = Int.max
 
@@ -60,12 +86,7 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
   var previousInstruction: LR35902.Instruction? = nil
   while cpu.pc < end {
     if let transfersOfControl = cpu.disassembly.transfersOfControl(at: cpu.pc, in: bank) {
-      let sources = transfersOfControl
-        .sorted(by: { $0.sourceAddress < $1.sourceAddress })
-        .map { "\($0.kind) @ $\($0.sourceAddress.hexString)" }
-        .joined(separator: ", ")
-      let label = "\(LR35902.label(at: cpu.pc, in: cpu.bank)):".padding(toLength: 48, withPad: " ", startingAt: 0)
-      write("\(label) ; Sources: \(sources)", fileHandle: fileHandle)
+      write(line(transfersOfControl, cpu: cpu), fileHandle: fileHandle)
     }
 
     if instructionsToDecode > 0,
@@ -79,18 +100,20 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
         }
       }
 
-      let code = "    \(RGBDSAssembly.assembly(for: instruction, with: cpu))".padding(toLength: 48, withPad: " ", startingAt: 0)
       let index = LR35902.romAddress(for: cpu.pc, in: cpu.bank)
       let bytes = cpu[index..<(index + UInt32(instruction.width))]
-      write("\(code) ; $\(cpu.pc.hexString): \(bytes.map { "$\($0.hexString)" }.joined(separator: " "))", fileHandle: fileHandle)
+      write(line(RGBDSAssembly.assembly(for: instruction, with: cpu), address: cpu.pc, bytes: bytes), fileHandle: fileHandle)
+
       cpu.pc += instruction.width
+
       switch instruction.spec {
       case .jp, .jr:
         write("", fileHandle: fileHandle)
         previousInstruction = nil
         cpu.bank = bank
       case .ret, .reti:
-        write("", fileHandle: fileHandle); write("", fileHandle: fileHandle)
+        write("", fileHandle: fileHandle)
+        write("", fileHandle: fileHandle)
         previousInstruction = nil
         cpu.bank = bank
       default:
@@ -113,12 +136,9 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
       var lineBlock = initialPc
       for blocks in accumulator.chunked(into: 8) {
         let instruction = RGBDSAssembly.assembly(for: blocks)
-        let code = "    \(instruction)".padding(toLength: 48, withPad: " ", startingAt: 0)
-
         let displayableBytes = blocks.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
         let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
-
-        write("\(code) ; $\(lineBlock.hexString) |\(bytesAsCharacters)|", fileHandle: fileHandle)
+        write(line(instruction, address: lineBlock, comment: "|\(bytesAsCharacters)|"), fileHandle: fileHandle)
         lineBlock += UInt16(blocks.count)
       }
       write("", fileHandle: fileHandle)
