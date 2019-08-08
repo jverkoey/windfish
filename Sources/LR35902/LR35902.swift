@@ -1,6 +1,6 @@
 import Foundation
 
-public class LR35902 {
+public final class LR35902 {
   public var pc: UInt16 = 0
   public var bank: UInt8 = 0
 
