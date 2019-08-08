@@ -23,8 +23,11 @@ class LR35902 {
   static func label(at pc: UInt16, in bank: UInt8) -> String {
     if pc < 0x4000 {
       return "toc_00_\(pc.hexString)"
+    } else if pc < 0x8000 {
+      return "toc_\(bank.hexString)_\(pc.hexString)"
+    } else {
+      return "$\(pc.hexString)"
     }
-    return "toc_\(bank.hexString)_\(pc.hexString)"
   }
 
   struct Instruction: CustomStringConvertible {
@@ -79,7 +82,7 @@ class LR35902 {
         if let cpu = cpu {
           let jumpAddress = (cpu.pc + width).advanced(by: Int(Int8(bitPattern: immediate8!)))
           if cpu.disassembly.transfersOfControl(at: jumpAddress, in: cpu.bank) != nil {
-            address = "toc_\(cpu.bank.hexString)_\(jumpAddress.hexString)"
+            address = LR35902.label(at: jumpAddress, in: cpu.bank)
           } else {
             address = describe(operand: operand)
           }

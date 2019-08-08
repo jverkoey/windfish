@@ -77,7 +77,7 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
         }
       }
 
-      let code = "    \(instruction.describe(/*with: cpu*/))".padding(toLength: 48, withPad: " ", startingAt: 0)
+      let code = "    \(instruction.describe(with: cpu))".padding(toLength: 48, withPad: " ", startingAt: 0)
       print("\(code) ; $\(cpu.pc.hexString)", fileHandle: fileHandle)
       cpu.pc += instruction.width
       switch instruction.spec {
