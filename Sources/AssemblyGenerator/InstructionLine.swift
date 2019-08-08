@@ -4,24 +4,18 @@ import FixedWidthInteger
 
 private let codeWidth = 48
 
-public func line<T: FixedWidthInteger>
-  (_ instruction: String,
-   address: T,
-   bytes: Data? = nil,
-   comment: String? = nil) -> String {
-  let code = "    \(instruction)".padding(toLength: codeWidth, withPad: " ", startingAt: 0)
+private func codeColumn(_ code: String) -> String {
+  return "\(code)".padding(toLength: codeWidth, withPad: " ", startingAt: 0)
+}
 
-  var parts = ["\(code) ; $\(address)"]
+public func line(_ code: String, comment: String) -> String {
+  return "\(codeColumn(code)) ; \(comment)"
+}
 
-  if let bytes = bytes {
-    parts.append(": ")
-    parts.append(bytes.map { "$\($0)" }.joined(separator: " "))
-  }
+public func line<T: FixedWidthInteger>(_ code: String, address: T, comment: String) -> String {
+  return "\(codeColumn("    \(code)")) ; $\(address.hexString) \(comment)"
+}
 
-  if let comment = comment {
-    parts.append(" ")
-    parts.append(comment)
-  }
-
-  return parts.joined()
+public func line<T: FixedWidthInteger>(_ code: String, address: T, bytes: Data) -> String {
+  return "\(codeColumn("    \(code)")) ; $\(address.hexString): \(bytes.map { "$\($0)" }.joined(separator: " "))"
 }

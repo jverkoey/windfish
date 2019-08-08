@@ -41,7 +41,7 @@ func line(_ transfersOfControl: Set<LR35902.Disassembly.TransferOfControl>, cpu:
     .map { "\($0.kind) @ $\($0.sourceAddress.hexString)" }
     .joined(separator: ", ")
   let label = "\(RGBDSAssembly.label(at: cpu.pc, in: cpu.bank)):".padding(toLength: 48, withPad: " ", startingAt: 0)
-  return "\(label) ; Sources: \(sources)"
+  return line(label, comment: "Sources: \(sources)")
 }
 
 let fm = FileManager.default
