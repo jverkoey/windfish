@@ -81,6 +81,8 @@ extension LR35902 {
           if (0x2000..<0x4000).contains(instruction.immediate16!),
             let previousInstruction = previousInstruction,
             case .ld(.a, .immediate8) = previousInstruction.spec {
+            disassembly.register(bankChange: previousInstruction.immediate8!, at: pc, in: bank)
+
             bank = previousInstruction.immediate8!
           }
           break

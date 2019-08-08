@@ -68,21 +68,16 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
   cpu.pc = (bank == 0) ? 0x0000 : 0x4000
   cpu.bank = bank
   let end: UInt16 = (bank == 0) ? 0x4000 : 0x8000
-  var previousInstruction: LR35902.Instruction? = nil
   while cpu.pc < end {
     if let transfersOfControl = cpu.disassembly.transfersOfControl(at: cpu.pc, in: bank) {
       write(line(transfersOfControl, cpu: cpu), fileHandle: fileHandle)
     }
 
-    if instructionsToDecode > 0,
-      let instruction = cpu.disassembly.instruction(at: cpu.pc, in: bank) {
+    if instructionsToDecode > 0, let instruction = cpu.disassembly.instruction(at: cpu.pc, in: bank) {
       instructionsToDecode -= 1
-      if case .ld(.immediate16address, .a) = instruction.spec {
-        if (0x2000..<0x4000).contains(instruction.immediate16!),
-          let previousInstruction = previousInstruction,
-          case .ld(.a, .immediate8) = previousInstruction.spec {
-          cpu.bank = previousInstruction.immediate8!
-        }
+
+      if let bankChange = cpu.disassembly.bankChange(at: cpu.pc, in: bank) {
+        cpu.bank = bankChange
       }
 
       let index = LR35902.romAddress(for: cpu.pc, in: cpu.bank)
@@ -94,19 +89,16 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
       switch instruction.spec {
       case .jp, .jr:
         write("", fileHandle: fileHandle)
-        previousInstruction = nil
         cpu.bank = bank
       case .ret, .reti:
         write("", fileHandle: fileHandle)
         write("", fileHandle: fileHandle)
-        previousInstruction = nil
         cpu.bank = bank
       default:
-        previousInstruction = instruction
+        break
       }
 
     } else {
-      previousInstruction = nil
       cpu.bank = bank
 
       var accumulator: [UInt8] = []
