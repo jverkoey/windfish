@@ -8,6 +8,8 @@ let data = try Data(contentsOf: URL(fileURLWithPath: romFilePath))
 
 let cpu = LR35902(rom: data)
 
+print("Performing recursive descent disassembly...")
+
 cpu.disassemble(range: 0x0000..<0x0008, inBank: 0)
 cpu.disassemble(range: 0x0008..<0x0010, inBank: 0)
 cpu.disassemble(range: 0x0010..<0x0018, inBank: 0)
@@ -26,8 +28,7 @@ extension Array {
   }
 }
 
-func print(_ string: String, fileHandle: FileHandle) {
-  print(string)
+func write(_ string: String, fileHandle: FileHandle) {
   fileHandle.write("\(string)\n".data(using: .utf8)!)
 }
 
@@ -45,12 +46,13 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
   fm.createFile(atPath: asmUrl.path, contents: Data(), attributes: nil)
   let fileHandle = try FileHandle(forWritingTo: asmUrl)
 
+  print("Writing bank \(bank.hexString)")
   if bank == 0 {
-    print("SECTION \"ROM Bank \(bank.hexString)\", ROM0[$\(bank.hexString)]", fileHandle: fileHandle)
+    write("SECTION \"ROM Bank \(bank.hexString)\", ROM0[$\(bank.hexString)]", fileHandle: fileHandle)
   } else {
-    print("SECTION \"ROM Bank \(bank.hexString)\", ROMX[$4000], BANK[$\(bank.hexString)]", fileHandle: fileHandle)
+    write("SECTION \"ROM Bank \(bank.hexString)\", ROMX[$4000], BANK[$\(bank.hexString)]", fileHandle: fileHandle)
   }
-  print("", fileHandle: fileHandle)
+  write("", fileHandle: fileHandle)
 
   cpu.pc = (bank == 0) ? 0x0000 : 0x4000
   cpu.bank = bank
@@ -63,7 +65,7 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
         .map { "\($0.kind) @ $\($0.sourceAddress.hexString)" }
         .joined(separator: ", ")
       let label = "\(LR35902.label(at: cpu.pc, in: cpu.bank)):".padding(toLength: 48, withPad: " ", startingAt: 0)
-      print("\(label) ; Sources: \(sources)", fileHandle: fileHandle)
+      write("\(label) ; Sources: \(sources)", fileHandle: fileHandle)
     }
 
     // Code
@@ -81,15 +83,15 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
       let code = "    \(instruction.assembly(with: cpu))".padding(toLength: 48, withPad: " ", startingAt: 0)
       let index = LR35902.romAddress(for: cpu.pc, in: cpu.bank)
       let bytes = cpu[index..<(index + UInt32(instruction.width))]
-      print("\(code) ; $\(cpu.pc.hexString): \(bytes.map { "$\($0.hexString)" }.joined(separator: " "))", fileHandle: fileHandle)
+      write("\(code) ; $\(cpu.pc.hexString): \(bytes.map { "$\($0.hexString)" }.joined(separator: " "))", fileHandle: fileHandle)
       cpu.pc += instruction.width
       switch instruction.spec {
       case .jp, .jr:
-        print("", fileHandle: fileHandle)
+        write("", fileHandle: fileHandle)
         previousInstruction = nil
         cpu.bank = bank
       case .ret, .reti:
-        print("", fileHandle: fileHandle); print("", fileHandle: fileHandle)
+        write("", fileHandle: fileHandle); write("", fileHandle: fileHandle)
         previousInstruction = nil
         cpu.bank = bank
       default:
@@ -120,10 +122,10 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
         let displayableBytes = blocks.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
         let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
 
-        print("\(code) ; $\(lineBlock.hexString) |\(bytesAsCharacters)|", fileHandle: fileHandle)
+        write("\(code) ; $\(lineBlock.hexString) |\(bytesAsCharacters)|", fileHandle: fileHandle)
         lineBlock += UInt16(blocks.count)
       }
-      print("", fileHandle: fileHandle)
+      write("", fileHandle: fileHandle)
     }
   }
 }
