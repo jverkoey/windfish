@@ -141,9 +141,9 @@ class LR35902 {
       case .spPlusImmediate8Signed:
         let signedByte = Int8(bitPattern: immediate8!)
         if signedByte < 0 {
-          return "@-$\((0xff - immediate8! + 1).hexString)"
+          return "sp-$\((0xff - immediate8! + 1).hexString)"
         } else {
-          return "@+$\(immediate8!.hexString)"
+          return "sp+$\(immediate8!.hexString)"
         }
       default:                    return "\(operand)"
       }
