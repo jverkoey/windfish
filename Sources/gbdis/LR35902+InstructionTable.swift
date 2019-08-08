@@ -267,7 +267,7 @@ extension LR35902 {
     0xf7: .rst(.x30),
     0xf8: .ld(.hl, .spPlusImmediate8),
     0xf9: .ld(.sp, .hl),
-    0xfa: .ld(.a, .immediate16),
+    0xfa: .ld(.a, .immediate16address),
     0xfb: .ei,
     0xfc: .invalid(0xfc),
     0xfd: .invalid(0xfd),

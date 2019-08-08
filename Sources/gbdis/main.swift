@@ -25,10 +25,29 @@ extension Array {
   }
 }
 
-for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
-//  let asmUrl = disassemblyPath.appendingPathComponent("bank_\(bank.hexString).asm")
+func print(_ string: String, fileHandle: FileHandle) {
+  print(string)
+  fileHandle.write("\(string)\n".data(using: .utf8)!)
+}
 
-  print("SECTION \"ROM Bank \(bank.hexString)\", ROM0[$\(bank.hexString)]")
+let fm = FileManager.default
+try fm.createDirectory(at: disassemblyPath, withIntermediateDirectories: true, attributes: nil)
+
+for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
+  let asmUrl = disassemblyPath.appendingPathComponent("bank_\(bank.hexString).asm")
+  if fm.fileExists(atPath: asmUrl.path) {
+    try fm.removeItem(atPath: asmUrl.path)
+  }
+  fm.createFile(atPath: asmUrl.path, contents: Data(), attributes: nil)
+  let fileHandle = try FileHandle(forWritingTo: asmUrl)
+
+  if bank == 0 {
+    print("SECTION \"ROM Bank \(bank.hexString)\", ROM0[$\(bank.hexString)]", fileHandle: fileHandle)
+  } else {
+    print("SECTION \"ROM Bank \(bank.hexString)\", ROMX[$4000], BANK[$\(bank.hexString)]", fileHandle: fileHandle)
+  }
+  print("", fileHandle: fileHandle)
+
   cpu.pc = (bank == 0) ? 0x0000 : 0x4000
   cpu.bank = bank
   let end: UInt16 = (bank == 0) ? 0x4000 : 0x8000
@@ -40,7 +59,7 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
         .map { "\($0.kind) @ $\($0.sourceAddress.hexString)" }
         .joined(separator: ", ")
       let label = "\(LR35902.label(at: cpu.pc, in: cpu.bank)):".padding(toLength: 48, withPad: " ", startingAt: 0)
-      print("\(label) ; Sources: \(sources)")
+      print("\(label) ; Sources: \(sources)", fileHandle: fileHandle)
     }
 
     // Code
@@ -55,15 +74,15 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
       }
 
       let code = "    \(instruction.describe(with: cpu))".padding(toLength: 48, withPad: " ", startingAt: 0)
-      print("\(code) ; $\(cpu.pc.hexString)")
+      print("\(code) ; $\(cpu.pc.hexString)", fileHandle: fileHandle)
       cpu.pc += instruction.width
       switch instruction.spec {
       case .jp, .jr:
-        print()
+        print("", fileHandle: fileHandle)
         previousInstruction = nil
         cpu.bank = bank
       case .ret, .reti, .retC:
-        print(); print()
+        print("", fileHandle: fileHandle); print("", fileHandle: fileHandle)
         previousInstruction = nil
         cpu.bank = bank
       default:
@@ -85,17 +104,17 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
       var lineBlock = initialPc
       for blocks in accumulator.chunked(into: 8) {
         let operand = blocks.map { "$\($0.hexString)" }.joined(separator: ", ")
-        let opcode = "ds".padding(toLength: 5, withPad: " ", startingAt: 0)
+        let opcode = "db".padding(toLength: 5, withPad: " ", startingAt: 0)
         let instruction = "\(opcode) \(operand)"
         let code = "    \(instruction)".padding(toLength: 48, withPad: " ", startingAt: 0)
 
         let displayableBytes = blocks.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
         let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
 
-        print("\(code) ; $\(lineBlock.hexString) |\(bytesAsCharacters)|")
+        print("\(code) ; $\(lineBlock.hexString) |\(bytesAsCharacters)|", fileHandle: fileHandle)
         lineBlock += UInt16(blocks.count)
       }
-      print()
+      print("", fileHandle: fileHandle)
     }
   }
 }
