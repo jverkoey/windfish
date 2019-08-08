@@ -115,9 +115,6 @@ extension LR35902.InstructionSpec {
       return "\("\(self)".split(separator: ".").last!)"
     }
   }
-  var operands: String {
-    return String(describing: Mirror(reflecting: self).children.first!.value)
-  }
   var operandWidth: UInt16 {
     let mirror = Mirror(reflecting: self)
     guard let operands = mirror.children.first else {
