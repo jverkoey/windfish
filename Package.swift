@@ -13,12 +13,19 @@ let package = Package(
   targets: [
     .target(
       name: "gbdis",
-      dependencies: ["LR35902"]),
+      dependencies: ["LR35902", "AssemblyGenerator", "FixedWidthInteger"]),
     .testTarget(
       name: "gbdisTests",
       dependencies: ["gbdis"]),
+
     .target(
       name: "LR35902",
+      dependencies: ["FixedWidthInteger"]),
+    .target(
+      name: "AssemblyGenerator",
+      dependencies: ["FixedWidthInteger"]),
+    .target(
+      name: "FixedWidthInteger",
       dependencies: []),
   ]
 )

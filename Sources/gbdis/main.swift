@@ -1,4 +1,7 @@
 import Foundation
+
+import AssemblyGenerator
+import FixedWidthInteger
 import LR35902
 
 let romFilePath = "/Users/featherless/workbench/awakenlink/rom/LinksAwakening.gb"
@@ -30,24 +33,6 @@ extension Array {
 
 func write(_ string: String, fileHandle: FileHandle) {
   fileHandle.write("\(string)\n".data(using: .utf8)!)
-}
-
-func line(_ instruction: String, address: UInt16, bytes: Data? = nil, comment: String? = nil) -> String {
-  let code = "    \(instruction)".padding(toLength: 48, withPad: " ", startingAt: 0)
-
-  var parts = ["\(code) ; $\(address.hexString)"]
-
-  if let bytes = bytes {
-    parts.append(": ")
-    parts.append(bytes.map { "$\($0.hexString)" }.joined(separator: " "))
-  }
-
-  if let comment = comment {
-    parts.append(" ")
-    parts.append(comment)
-  }
-
-  return parts.joined()
 }
 
 func line(_ transfersOfControl: Set<LR35902.Disassembly.TransferOfControl>, cpu: LR35902) -> String {

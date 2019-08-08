@@ -1,5 +1,7 @@
 import Foundation
 
+import FixedWidthInteger
+
 public final class RGBDSAssembly {
 
   public static let maxOpcodeNameLength = 4
