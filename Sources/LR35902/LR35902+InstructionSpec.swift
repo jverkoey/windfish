@@ -1,10 +1,10 @@
 import Foundation
 
 extension LR35902 {
+  /// The specification for an LR35902's instruction set.
   public enum InstructionSpec {
     // Loads
-    case ld(Operand, Operand)
-    case ldi(Operand, Operand), ldd(Operand, Operand)
+    case ld(Operand, Operand), ldi(Operand, Operand), ldd(Operand, Operand)
 
     // Stack manipulation
     case push(Operand), pop(Operand)
@@ -52,38 +52,10 @@ extension LR35902 {
     case rl(Operand), rr(Operand)
     case sla(Operand), sra(Operand)
     case swap(Operand), srl(Operand)
-
     case bit(Bit, Operand), res(Bit, Operand), set(Bit, Operand)
 
     // Invalid opcode
-    case invalid(UInt8)
-
-    var name: String {
-      if let child = Mirror(reflecting: self).children.first {
-        return child.label!
-      } else {
-        return "\("\(self)".split(separator: ".").last!)"
-      }
-    }
-    var operands: String {
-      return String(describing: Mirror(reflecting: self).children.first!.value)
-    }
-    var operandWidth: UInt16 {
-      let mirror = Mirror(reflecting: self)
-      guard let operands = mirror.children.first else {
-        return 0
-      }
-      switch operands.value {
-      case let tuple as (Operand, Condition?):
-        return tuple.0.byteWidth
-      case let tuple as (Operand, Operand):
-        return tuple.0.byteWidth + tuple.1.byteWidth
-      case let operand as Operand:
-        return operand.byteWidth
-      default:
-        return 0
-      }
-    }
+    case invalid
   }
   public enum Operand {
     case a, af
@@ -98,14 +70,6 @@ extension LR35902 {
     case immediate16address
 
     case ffimmediate8Address, ffccAddress
-
-    var byteWidth: UInt16 {
-      switch self {
-      case .spPlusImmediate8Signed, .immediate8, .immediate8signed, .ffimmediate8Address: return 1
-      case .immediate16, .immediate16address: return 2
-      default: return 0
-      }
-    }
   }
   public enum Condition {
     case nz
@@ -132,5 +96,44 @@ extension LR35902 {
     case b5 = 5
     case b6 = 6
     case b7 = 7
+  }
+}
+
+extension LR35902.InstructionSpec {
+  var name: String {
+    if let child = Mirror(reflecting: self).children.first {
+      return child.label!
+    } else {
+      return "\("\(self)".split(separator: ".").last!)"
+    }
+  }
+  var operands: String {
+    return String(describing: Mirror(reflecting: self).children.first!.value)
+  }
+  var operandWidth: UInt16 {
+    let mirror = Mirror(reflecting: self)
+    guard let operands = mirror.children.first else {
+      return 0
+    }
+    switch operands.value {
+    case let tuple as (LR35902.Operand, LR35902.Condition?):
+      return tuple.0.byteWidth
+    case let tuple as (LR35902.Operand, LR35902.Operand):
+      return tuple.0.byteWidth + tuple.1.byteWidth
+    case let operand as LR35902.Operand:
+      return operand.byteWidth
+    default:
+      return 0
+    }
+  }
+}
+
+extension LR35902.Operand {
+  var byteWidth: UInt16 {
+    switch self {
+    case .spPlusImmediate8Signed, .immediate8, .immediate8signed, .ffimmediate8Address: return 1
+    case .immediate16, .immediate16address: return 2
+    default: return 0
+    }
   }
 }
