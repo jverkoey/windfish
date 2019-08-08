@@ -101,7 +101,7 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
       var accumulator: [UInt8] = []
       let initialPc = cpu.pc
       repeat {
-        accumulator.append(cpu.rom[Int(LR35902.romAddress(for: cpu.pc, in: bank))])
+        accumulator.append(cpu[cpu.pc, cpu.bank])
         cpu.pc += 1
       } while cpu.pc < end
         && (instructionsToDecode == 0 || cpu.disassembly.instruction(at: cpu.pc, in: bank) == nil)

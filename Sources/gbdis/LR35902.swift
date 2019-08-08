@@ -9,6 +9,18 @@ class LR35902 {
     self.rom = rom
   }
 
+  static func romAddress(for pc: UInt16, in bank: UInt8) -> UInt32 {
+    if pc < 0x4000 {
+      return UInt32(pc)
+    } else {
+      return UInt32(bank) * LR35902.bankSize + UInt32(pc - 0x4000)
+    }
+  }
+
+  subscript(pc: UInt16, bank: UInt8) -> UInt8 {
+    return rom[Int(LR35902.romAddress(for: pc, in: bank))]
+  }
+
   var numberOfBanks: UInt8 {
     return UInt8(UInt32(rom.count) / LR35902.bankSize)
   }
@@ -167,7 +179,7 @@ class LR35902 {
 
       var previousInstruction: Instruction? = nil
       linear_sweep: while (!isFirst && ((bank == 0 && pc < 0x4000) || (bank != 0 && pc < 0x8000))) || pc < range.upperBound {
-        let byte = rom[Int(LR35902.romAddress(for: pc, in: bank))]
+        let byte = self[pc, bank]
         var opcodeWidth: UInt16 = 1
         guard var spec = LR35902.opcodeDescription[byte] else {
           pc += opcodeWidth
@@ -176,7 +188,7 @@ class LR35902 {
         switch spec {
         case .stop:
           // The next byte needs to be 00.
-          let nextByte = rom[Int(LR35902.romAddress(for: pc + 1, in: bank))]
+          let nextByte = self[pc + 1, bank]
           if nextByte != 0 {
             pc += opcodeWidth
             continue
@@ -190,7 +202,7 @@ class LR35902 {
           continue
 
         case .cb:
-          let byte = rom[Int(LR35902.romAddress(for: pc + 1, in: bank))]
+          let byte = self[pc + 1, bank]
           opcodeWidth += 1
           guard let cbInstruction = LR35902.cbOpcodeDescription[byte] else {
             pc += opcodeWidth
@@ -211,10 +223,10 @@ class LR35902 {
         case 1:
           instruction = Instruction(spec: spec,
                                     width: instructionWidth,
-                                    immediate8: rom[Int(LR35902.romAddress(for: pc + opcodeWidth, in: bank))])
+                                    immediate8: self[pc + opcodeWidth, bank])
         case 2:
-          let low = UInt16(rom[Int(LR35902.romAddress(for: pc + opcodeWidth, in: bank))])
-          let high = UInt16(rom[Int(LR35902.romAddress(for: pc + opcodeWidth + 1, in: bank))]) << 8
+          let low = UInt16(self[pc + opcodeWidth, bank])
+          let high = UInt16(self[pc + opcodeWidth + 1, bank]) << 8
           let immediate16 = high | low
           instruction = Instruction(spec: spec, width: instructionWidth, immediate16: immediate16)
         default:
