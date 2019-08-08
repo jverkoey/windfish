@@ -57,6 +57,8 @@ extension LR35902 {
     // Invalid opcode
     case invalid
   }
+
+  /// Possible operands in LR35902's instruction set.
   public enum Operand {
     case a, af
     case b, c, bc, bcAddress
@@ -71,12 +73,16 @@ extension LR35902 {
 
     case ffimmediate8Address, ffccAddress
   }
+
+  /// Possible conditions in LR35902's instruction set.
   public enum Condition {
     case nz
     case z
     case nc
     case c
   }
+
+  /// Possible rst addresses in LR35902's instruction set.
   public enum RestartAddress {
     case x00
     case x08
@@ -87,6 +93,8 @@ extension LR35902 {
     case x30
     case x38
   }
+
+  /// Possible bits in LR35902's instruction set.
   public enum Bit: UInt8 {
     case b0 = 0
     case b1 = 1
@@ -100,7 +108,7 @@ extension LR35902 {
 }
 
 extension LR35902.InstructionSpec {
-  var name: String {
+  var opcode: String {
     if let child = Mirror(reflecting: self).children.first {
       return child.label!
     } else {

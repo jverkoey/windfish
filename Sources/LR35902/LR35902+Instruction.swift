@@ -14,16 +14,17 @@ extension LR35902 {
       self.immediate16 = immediate16
     }
 
-    public func describe(with cpu: LR35902? = nil) -> String {
-      if let operandDescription = operandDescription(with: cpu) {
-        let opcodeName = "\(spec.name)".padding(toLength: 4, withPad: " ", startingAt: 0)
-        return "\(opcodeName) \(operandDescription)"
+    public static let operandWidth = 4
+    public func assembly(with cpu: LR35902? = nil) -> String {
+      if let operand = operandAssembly(with: cpu) {
+        let opcodeName = spec.opcode.padding(toLength: Instruction.operandWidth, withPad: " ", startingAt: 0)
+        return "\(opcodeName) \(operand)"
       } else {
-        return "\(spec.name)"
+        return spec.opcode
       }
     }
 
-    private func operandDescription(with cpu: LR35902? = nil) -> String? {
+    private func operandAssembly(with cpu: LR35902? = nil) -> String? {
       switch spec {
       case let InstructionSpec.jp(operand, condition) where operand == .immediate16,
            let InstructionSpec.call(operand, condition) where operand == .immediate16:
