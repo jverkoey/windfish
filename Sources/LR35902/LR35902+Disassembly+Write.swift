@@ -88,6 +88,7 @@ clean:
         if let transfersOfControl = cpu.disassembly.transfersOfControl(at: cpu.pc, in: bank) {
           write(line(transfersOfControl, cpu: cpu), fileHandle: fileHandle)
         } else if let label = cpu.disassembly.label(at: cpu.pc, in: bank) {
+          write("", fileHandle: fileHandle)
           write("\(label):", fileHandle: fileHandle)
         }
 

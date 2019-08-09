@@ -35,7 +35,9 @@ extension LR35902 {
       let index = LR35902.romAddress(for: pc, in: bank)
       transfers[index, default: Set()]
         .insert(TransferOfControl(sourceAddress: fromPc, kind: kind))
-      if labels[index] == nil {
+      if labels[index] == nil
+        // Don't create a label in the middle of an instruction.
+        && (!code.contains(Int(index)) || instruction(at: pc, in: bank) != nil) {
         labels[index] = RGBDSAssembly.defaultLabel(at: pc, in: bank)
       }
     }
