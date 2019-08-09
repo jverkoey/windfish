@@ -76,6 +76,16 @@ extension LR35902 {
       text.insert(integersIn: Int(lowerBound)..<Int(upperBound))
     }
 
+    // MARK: - Comments
+
+    public func preComment(at address: UInt16, in bank: UInt8) -> String? {
+      return preComments[LR35902.romAddress(for: address, in: bank)]
+    }
+    public func setPreComment(at address: UInt16, in bank: UInt8, text: String) {
+      preComments[LR35902.romAddress(for: address, in: bank)] = text
+    }
+    private var preComments: [UInt32: String] = [:]
+
     // MARK: - Bank changes
 
     public func bankChange(at pc: UInt16, in bank: UInt8) -> UInt8? {

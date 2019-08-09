@@ -87,6 +87,11 @@ clean:
       var didJustWriteNewline = true
 
       while cpu.pc < end {
+        if let preComment = cpu.disassembly.preComment(at: cpu.pc, in: bank) {
+          write("", fileHandle: fileHandle)
+          write(line(comment: preComment), fileHandle: fileHandle)
+          didJustWriteNewline = false
+        }
         if let transfersOfControl = cpu.disassembly.transfersOfControl(at: cpu.pc, in: bank) {
           write(line(transfersOfControl, cpu: cpu), fileHandle: fileHandle)
           didJustWriteNewline = false

@@ -8,6 +8,10 @@ private func codeColumn(_ code: String) -> String {
   return "\(code)".padding(toLength: codeWidth, withPad: " ", startingAt: 0)
 }
 
+public func line(comment: String) -> String {
+  return "    ; \(comment)"
+}
+
 public func line(_ code: String, comment: String) -> String {
   return "\(codeColumn(code)) ; \(comment)"
 }
