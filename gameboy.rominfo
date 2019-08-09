@@ -38,5 +38,5 @@ executionRegion {
 
 label {
   address: 0x0100
-  name: "boot"
+  name: "Boot"
 }
