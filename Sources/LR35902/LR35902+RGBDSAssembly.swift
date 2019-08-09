@@ -31,25 +31,25 @@ public final class RGBDSAssembly {
   }
 
   private static func operandAssembly(for instruction: LR35902.Instruction, with cpu: LR35902? = nil) -> String? {
-    switch instruction.spec {
-    case let LR35902.InstructionSpec.jp(operand, condition) where operand == .immediate16,
-         let LR35902.InstructionSpec.call(operand, condition) where operand == .immediate16:
-      if let cpu = cpu, cpu.disassembly.transfersOfControl(at: instruction.immediate16!, in: cpu.bank) != nil {
-        var addressLabel: String
-        if let label = cpu.disassembly.label(at: instruction.immediate16!, in: cpu.bank) {
-          addressLabel = label
-        } else {
-          addressLabel = "$\(instruction.immediate16!.hexString)"
+    if let cpu = cpu {
+      switch instruction.spec {
+      case let LR35902.InstructionSpec.jp(operand, condition) where operand == .immediate16,
+           let LR35902.InstructionSpec.call(operand, condition) where operand == .immediate16:
+        if cpu.disassembly.transfersOfControl(at: instruction.immediate16!, in: cpu.bank) != nil {
+          var addressLabel: String
+          if let label = cpu.disassembly.label(at: instruction.immediate16!, in: cpu.bank) {
+            addressLabel = label
+          } else {
+            addressLabel = "$\(instruction.immediate16!.hexString)"
+          }
+          if let condition = condition {
+            return "\(condition), \(addressLabel)"
+          } else {
+            return "\(addressLabel)"
+          }
         }
-        if let condition = condition {
-          return "\(condition), \(addressLabel)"
-        } else {
-          return "\(addressLabel)"
-        }
-      }
 
-    case let LR35902.InstructionSpec.jr(operand, condition) where operand == .immediate8signed:
-      if let cpu = cpu {
+      case let LR35902.InstructionSpec.jr(operand, condition) where operand == .immediate8signed:
         let jumpAddress = (cpu.pc + instruction.width).advanced(by: Int(Int8(bitPattern: instruction.immediate8!)))
         if cpu.disassembly.transfersOfControl(at: jumpAddress, in: cpu.bank) != nil {
           var addressLabel: String
@@ -64,10 +64,28 @@ public final class RGBDSAssembly {
             return "\(addressLabel)"
           }
         }
-      }
 
-    default:
-      break
+      case let LR35902.InstructionSpec.ld(operand1, operand2) where operand1 == .immediate16address:
+        var addressLabel: String
+        if let label = cpu.disassembly.label(at: instruction.immediate16!, in: cpu.bank) {
+          addressLabel = "[\(label)]"
+        } else {
+          addressLabel = "[$\(instruction.immediate16!.hexString)]"
+        }
+        return "\(addressLabel), \(describe(for: instruction, operand: operand2))"
+
+      case let LR35902.InstructionSpec.ld(operand1, operand2) where operand2 == .immediate16address:
+        var addressLabel: String
+        if let label = cpu.disassembly.label(at: instruction.immediate16!, in: cpu.bank) {
+          addressLabel = "[\(label)]"
+        } else {
+          addressLabel = "[$\(instruction.immediate16!.hexString)]"
+        }
+        return "\(describe(for: instruction, operand: operand1)), \(addressLabel)"
+
+      default:
+        break
+      }
     }
     let mirror = Mirror(reflecting: instruction.spec)
     guard let operands = mirror.children.first else {
