@@ -17,6 +17,7 @@ extension LR35902 {
       linear_sweep: while (!isFirst && ((bank == 0 && pc < 0x4000) || (bank != 0 && pc < 0x8000))) || pc < range.upperBound {
         let byte = self[pc, bank]
         var opcodeWidth: UInt16 = 1
+        var operandWidth: UInt16
         var spec = LR35902.instructionTable[Int(byte)]
         switch spec {
         case .stop:
@@ -28,6 +29,7 @@ extension LR35902 {
           } else {
             // Stop is technically a two-byte instruction.
             opcodeWidth += 1
+            operandWidth = 0
           }
 
         case .invalid:
@@ -43,13 +45,15 @@ extension LR35902 {
             continue
           }
           spec = cbInstruction
+          operandWidth = LR35902.operandWidthsCB[Int(byte)]
         default:
+          operandWidth = LR35902.operandWidths[Int(byte)]
           break
         }
 
-        let instructionWidth = opcodeWidth + spec.operandWidth
+        let instructionWidth = opcodeWidth + operandWidth
         let instruction: Instruction
-        switch spec.operandWidth {
+        switch operandWidth {
         case 1:
           instruction = Instruction(spec: spec,
                                     width: instructionWidth,

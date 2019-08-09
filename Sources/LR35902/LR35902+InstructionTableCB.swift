@@ -1,6 +1,11 @@
 import Foundation
 
 extension LR35902 {
+  static var operandWidthsCB: [UInt16] = {
+    instructionTableCB.map { spec in
+      spec.operandWidth
+    }
+  }()
   static let instructionTableCB: [InstructionSpec] = [
     /* 0x00 */ .rlc(.b),
     /* 0x01 */ .rlc(.c),
