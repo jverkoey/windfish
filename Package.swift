@@ -16,14 +16,14 @@ let package = Package(
   targets: [
     .target(
       name: "gbdis",
-      dependencies: ["LR35902", "AssemblyGenerator", "FixedWidthInteger", "SwiftProtobuf"]),
+      dependencies: ["LR35902", "FixedWidthInteger", "SwiftProtobuf"]),
     .testTarget(
       name: "gbdisTests",
       dependencies: ["gbdis"]),
 
     .target(
       name: "LR35902",
-      dependencies: ["FixedWidthInteger"]),
+      dependencies: ["FixedWidthInteger", "AssemblyGenerator"]),
     .target(
       name: "AssemblyGenerator",
       dependencies: ["FixedWidthInteger"]),
