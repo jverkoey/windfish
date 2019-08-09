@@ -64,6 +64,12 @@ public final class LR35902 {
 
     disassembly.setLabel(at: 0x0100, in: 0x00, named: "Boot")
     disassemble(range: 0x0100..<0x104, inBank: 0)
+
+    disassembly.setLabel(at: 0x0104, in: 0x00, named: "HeaderLogo")
+    disassembly.setData(at: 0x0104..<0x0134, in: 0x00)
+
+    disassembly.setLabel(at: 0x0134, in: 0x00, named: "HeaderTitle")
+    disassembly.setData(at: 0x0134..<0x0143, in: 0x00)
   }
 
   struct BankedAddress: Hashable {
