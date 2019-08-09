@@ -104,6 +104,7 @@ public final class LR35902 {
     disassembly.setLabel(at: 0x014E, in: 0x00, named: "HeaderGlobalChecksum")
     disassembly.setData(at: 0x014E..<0x0150, in: 0x00)
 
+//    disassembly.createVariable(at: 0x8000, named: "_VRAM")
     disassembly.createVariable(at: 0xFF47, named: "rBGP")
     disassembly.createVariable(at: 0xFF48, named: "rOBP0")
     disassembly.createVariable(at: 0xFF49, named: "rOBP1")
