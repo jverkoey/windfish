@@ -146,7 +146,7 @@ public final class RGBDSAssembly {
         return "@+$\((byte + 2).hexString)"
       }
     case .immediate16:          return "$\(instruction.immediate16!.hexString)"
-    case .ffimmediate8Address:  return "[$FF00+$\(instruction.immediate8!.hexString)]"
+    case .ffimmediate8Address:  return "[$FF\(instruction.immediate8!.hexString)]"
     case .immediate16address:   return "[$\(instruction.immediate16!.hexString)]"
     case .bcAddress:            return "[bc]"
     case .deAddress:            return "[de]"
