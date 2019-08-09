@@ -9,10 +9,9 @@ let disassemblyPath = URL(fileURLWithPath: "/Users/featherless/workbench/gbdis/d
 
 let data = try Data(contentsOf: URL(fileURLWithPath: romFilePath))
 
-let cpu = LR35902(rom: data)
-
 print("Performing recursive descent disassembly...")
 
+let cpu = LR35902(rom: data)
 cpu.disassemble(range: 0x0000..<0x0008, inBank: 0)
 cpu.disassemble(range: 0x0008..<0x0010, inBank: 0)
 cpu.disassemble(range: 0x0010..<0x0018, inBank: 0)
@@ -75,6 +74,14 @@ clean:
 	find . \\( -iname '*.1bpp' -o -iname '*.2bpp' \\) -exec rm {} +
 
 """.data(using: .utf8)!)
+
+let gameHandle = try restartFile(atPath: disassemblyPath.appendingPathComponent("game.asm").path)
+
+gameHandle.write(
+  ((UInt8(0)..<UInt8(cpu.numberOfBanks))
+    .map { "INCLUDE \"bank_\($0.hexString).asm\"" }
+    .joined(separator: "\n") + "\n")
+    .data(using: .utf8)!)
 
 var instructionsToDecode = Int.max
 
