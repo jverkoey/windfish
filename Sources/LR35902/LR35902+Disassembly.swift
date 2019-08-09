@@ -86,6 +86,13 @@ extension LR35902 {
     }
     private var preComments: [UInt32: String] = [:]
 
+    // MARK: - Variables
+
+    public func createVariable(at address: UInt16, named name: String) {
+      variables[address] = name
+    }
+    var variables: [UInt16: String] = [:]
+
     // MARK: - Bank changes
 
     public func bankChange(at pc: UInt16, in bank: UInt8) -> UInt8? {

@@ -104,6 +104,7 @@ public final class LR35902 {
     disassembly.setLabel(at: 0x014E, in: 0x00, named: "HeaderGlobalChecksum")
     disassembly.setData(at: 0x014E..<0x0150, in: 0x00)
 
+    disassembly.createVariable(at: 0xFF47, named: "rBGP")
   }
 
   struct BankedAddress: Hashable {

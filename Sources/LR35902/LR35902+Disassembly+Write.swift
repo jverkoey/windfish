@@ -62,6 +62,16 @@ clean:
 
     let gameHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("game.asm").path)
 
+    if !cpu.disassembly.variables.isEmpty {
+      let variablesHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("variables.asm").path)
+
+      variablesHandle.write(cpu.disassembly.variables.map { address, name in
+        "\(name) EQU $\(address.hexString)"
+      }.joined(separator: "\n\n").data(using: .utf8)!)
+
+      gameHandle.write("INCLUDE \"variables.asm\"\n".data(using: .utf8)!)
+    }
+
     gameHandle.write(
       ((UInt8(0)..<UInt8(cpu.numberOfBanks))
         .map { "INCLUDE \"bank_\($0.hexString).asm\"" }
