@@ -69,7 +69,7 @@ public final class LR35902 {
     disassembly.setData(at: 0x0104..<0x0134, in: 0x00)
 
     disassembly.setLabel(at: 0x0134, in: 0x00, named: "HeaderTitle")
-    disassembly.setData(at: 0x0134..<0x0143, in: 0x00)
+    disassembly.setText(at: 0x0134..<0x0143, in: 0x00)
   }
 
   struct BankedAddress: Hashable {

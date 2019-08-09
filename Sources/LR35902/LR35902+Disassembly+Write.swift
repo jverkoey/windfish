@@ -135,13 +135,18 @@ clean:
             && cpu.disassembly.type(of: cpu.pc, in: bank) == initialType
 
           // Dump the bytes in blocks of 8.
-          var address = initialPc
-          for chunk in accumulator.chunked(into: 8) {
-            let instruction = RGBDSAssembly.assembly(for: chunk)
-            let displayableBytes = chunk.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
-            let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
-            write(line(instruction, address: address, comment: "|\(bytesAsCharacters)|"), fileHandle: fileHandle)
-            address += UInt16(chunk.count)
+          if initialType == .text {
+            write(line(RGBDSAssembly.text(for: accumulator), address: initialPc), fileHandle: fileHandle)
+
+          } else {
+            var address = initialPc
+            for chunk in accumulator.chunked(into: 8) {
+              let instruction = RGBDSAssembly.assembly(for: chunk)
+              let displayableBytes = chunk.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
+              let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
+              write(line(instruction, address: address, comment: "|\(bytesAsCharacters)|"), fileHandle: fileHandle)
+              address += UInt16(chunk.count)
+            }
           }
           write("", fileHandle: fileHandle)
         }

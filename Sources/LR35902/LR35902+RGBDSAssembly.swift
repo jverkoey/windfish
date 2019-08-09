@@ -20,6 +20,28 @@ public final class RGBDSAssembly {
     return "\(opcode) \(operand)"
   }
 
+  public static func text(for bytes: [UInt8]) -> String {
+    var accumulator: [String] = []
+    var asciiCharacterAccumulator: [UInt8] = []
+    for byte in bytes {
+      if byte >= 32 && byte <= 126 {
+        asciiCharacterAccumulator.append(byte)
+      } else {
+        if asciiCharacterAccumulator.count > 0 {
+          accumulator.append("\"\(String(bytes: asciiCharacterAccumulator, encoding: .ascii)!)\"")
+          asciiCharacterAccumulator.removeAll()
+        }
+        accumulator.append("$\(byte.hexString)")
+      }
+    }
+    if asciiCharacterAccumulator.count > 0 {
+      accumulator.append("\"\(String(bytes: asciiCharacterAccumulator, encoding: .ascii)!)\"")
+    }
+    let opcode = "db".padding(toLength: maxOpcodeNameLength, withPad: " ", startingAt: 0)
+    let operand = accumulator.joined(separator: ", ")
+    return "\(opcode) \(operand)"
+  }
+
   public static func defaultLabel(at pc: UInt16, in bank: UInt8) -> String? {
     if pc < 0x4000 {
       return "toc_00_\(pc.hexString)"

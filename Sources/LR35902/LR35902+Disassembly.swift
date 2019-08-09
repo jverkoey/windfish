@@ -67,6 +67,15 @@ extension LR35902 {
       let upperBound = LR35902.romAddress(for: range.upperBound, in: bank)
       data.insert(integersIn: Int(lowerBound)..<Int(upperBound))
     }
+
+    // MARK: - Text segments
+
+    public func setText(at range: Range<UInt16>, in bank: UInt8) {
+      let lowerBound = LR35902.romAddress(for: range.lowerBound, in: bank)
+      let upperBound = LR35902.romAddress(for: range.upperBound, in: bank)
+      text.insert(integersIn: Int(lowerBound)..<Int(upperBound))
+    }
+
     // MARK: - Bank changes
 
     public func bankChange(at pc: UInt16, in bank: UInt8) -> UInt8? {
@@ -84,6 +93,7 @@ extension LR35902 {
       case unknown
       case code
       case data
+      case text
     }
     public func type(of address: UInt16, in bank: UInt8) -> ByteType {
       let index = Int(LR35902.romAddress(for: address, in: bank))
@@ -91,6 +101,8 @@ extension LR35902 {
         return .code
       } else if data.contains(index) {
         return .data
+      } else if text.contains(index) {
+        return .text
       } else {
         return .unknown
       }
@@ -98,5 +110,6 @@ extension LR35902 {
 
     private var code = IndexSet()
     private var data = IndexSet()
+    private var text = IndexSet()
   }
 }
