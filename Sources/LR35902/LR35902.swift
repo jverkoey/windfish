@@ -105,6 +105,8 @@ public final class LR35902 {
     disassembly.setData(at: 0x014E..<0x0150, in: 0x00)
 
     disassembly.createVariable(at: 0xFF47, named: "rBGP")
+    disassembly.createVariable(at: 0xFF48, named: "rOBP0")
+    disassembly.createVariable(at: 0xFF49, named: "rOBP1")
   }
 
   struct BankedAddress: Hashable {
