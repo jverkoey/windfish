@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+message ROM {
+  repeated ExecutionRegion executionRegion = 1;
+}
+
+message ExecutionRegion {
+  uint32 startAddress = 1;
+  uint32 endAddress = 2;
+  uint32 bank = 3;
+}

@@ -11,16 +11,13 @@ let data = try Data(contentsOf: URL(fileURLWithPath: romFilePath))
 
 print("Performing recursive descent disassembly...")
 
+let romInfo = try ROM(textFormatString: String(contentsOfFile: "/Users/featherless/workbench/gbdis/gbdis/gameboy.rominfo"))
+
 let cpu = LR35902(rom: data)
-cpu.disassemble(range: 0x0000..<0x0008, inBank: 0)
-cpu.disassemble(range: 0x0008..<0x0010, inBank: 0)
-cpu.disassemble(range: 0x0010..<0x0018, inBank: 0)
-cpu.disassemble(range: 0x0018..<0x0020, inBank: 0)
-cpu.disassemble(range: 0x0020..<0x0028, inBank: 0)
-cpu.disassemble(range: 0x0028..<0x0030, inBank: 0)
-cpu.disassemble(range: 0x0030..<0x0038, inBank: 0)
-cpu.disassemble(range: 0x0038..<0x0040, inBank: 0)
-cpu.disassemble(range: 0x0100..<0x4000, inBank: 0)
+for executionRegion in romInfo.executionRegion {
+  cpu.disassemble(range: UInt16(executionRegion.startAddress)..<UInt16(executionRegion.endAddress),
+                  inBank: UInt8(executionRegion.bank))
+}
 
 extension Array {
   fileprivate func chunked(into size: Int) -> [[Element]] {
