@@ -7,9 +7,6 @@ extension LR35902 {
 
     // MARK: - Querying disassembly information.
 
-    // Indexes of bytes that are known to be code.
-    public var code = IndexSet()
-
     // MARK: - Labels
 
     public func label(at pc: UInt16, in bank: UInt8) -> String? {
@@ -58,6 +55,16 @@ extension LR35902 {
     }
     private var instructionMap: [UInt32: Instruction] = [:]
 
+    // MARK: - Data segments
+
+    public func setData(at address: UInt16, in bank: UInt8) {
+      data.insert(Int(LR35902.romAddress(for: address, in: bank)))
+    }
+    public func setData(at range: Range<UInt16>, in bank: UInt8) {
+      let lowerBound = LR35902.romAddress(for: range.lowerBound, in: bank)
+      let upperBound = LR35902.romAddress(for: range.upperBound, in: bank)
+      data.insert(integersIn: Int(lowerBound)..<Int(upperBound))
+    }
     // MARK: - Bank changes
 
     public func bankChange(at pc: UInt16, in bank: UInt8) -> UInt8? {
@@ -68,5 +75,26 @@ extension LR35902 {
       bankChanges[LR35902.romAddress(for: pc, in: bank)] = bankChange
     }
     private var bankChanges: [UInt32: UInt8] = [:]
+
+    // MARK: - Regions
+
+    public enum ByteType {
+      case unknown
+      case code
+      case data
+    }
+    public func type(of address: UInt16, in bank: UInt8) -> ByteType {
+      let index = Int(LR35902.romAddress(for: address, in: bank))
+      if code.contains(index) {
+        return .code
+      } else if data.contains(index) {
+        return .data
+      } else {
+        return .unknown
+      }
+    }
+
+    private var code = IndexSet()
+    private var data = IndexSet()
   }
 }

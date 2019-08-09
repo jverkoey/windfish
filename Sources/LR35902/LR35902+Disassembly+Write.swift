@@ -124,12 +124,14 @@ clean:
           // Accumulate bytes until the next instruction or transfer of control.
           var accumulator: [UInt8] = []
           let initialPc = cpu.pc
+          let initialType = cpu.disassembly.type(of: cpu.pc, in: bank)
           repeat {
             accumulator.append(cpu[cpu.pc, cpu.bank])
             cpu.pc += 1
           } while cpu.pc < end
             && (instructionsToDecode == 0 || cpu.disassembly.instruction(at: cpu.pc, in: bank) == nil)
             && cpu.disassembly.label(at: cpu.pc, in: bank) == nil
+            && cpu.disassembly.type(of: cpu.pc, in: bank) == initialType
 
           // Dump the bytes in blocks of 8.
           var address = initialPc
