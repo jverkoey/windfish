@@ -36,6 +36,19 @@ public final class LR35902 {
 
   public let disassembly = Disassembly()
 
+  public func initializeDisassembly() {
+    let numberOfRestartAddresses = 8
+    let restartSize = 8
+    let rstAddresses = (0..<numberOfRestartAddresses)
+      .map { UInt16($0 * restartSize)..<UInt16($0 * restartSize + restartSize) }
+    rstAddresses.forEach {
+      disassemble(range: $0, inBank: 0)
+    }
+    disassemble(range: 0x0100..<0x4000, inBank: 0)
+
+    disassembly.setLabel(at: 0x0100, in: 0x00, named: "Boot")
+  }
+
   struct BankedAddress: Hashable {
     let bank: UInt8
     let address: UInt16
