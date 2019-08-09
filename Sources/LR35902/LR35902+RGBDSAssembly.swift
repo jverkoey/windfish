@@ -20,13 +20,13 @@ public final class RGBDSAssembly {
     return "\(opcode) \(operand)"
   }
 
-  public static func label(at pc: UInt16, in bank: UInt8) -> String {
+  public static func defaultLabel(at pc: UInt16, in bank: UInt8) -> String? {
     if pc < 0x4000 {
       return "toc_00_\(pc.hexString)"
     } else if pc < 0x8000 {
       return "toc_\(bank.hexString)_\(pc.hexString)"
     } else {
-      return "$\(pc.hexString)"
+      return nil
     }
   }
 
@@ -34,26 +34,34 @@ public final class RGBDSAssembly {
     switch instruction.spec {
     case let LR35902.InstructionSpec.jp(operand, condition) where operand == .immediate16,
          let LR35902.InstructionSpec.call(operand, condition) where operand == .immediate16:
-      let address: String
       if let cpu = cpu, cpu.disassembly.transfersOfControl(at: instruction.immediate16!, in: cpu.bank) != nil {
-        address = label(at: instruction.immediate16!, in: cpu.bank)
-        if let condition = condition {
-          return "\(condition), \(address)"
+        var addressLabel: String
+        if let label = cpu.disassembly.label(at: instruction.immediate16!, in: cpu.bank) {
+          addressLabel = label
         } else {
-          return "\(address)"
+          addressLabel = "$\(instruction.immediate16!.hexString)"
+        }
+        if let condition = condition {
+          return "\(condition), \(addressLabel)"
+        } else {
+          return "\(addressLabel)"
         }
       }
 
     case let LR35902.InstructionSpec.jr(operand, condition) where operand == .immediate8signed:
-      let address: String
       if let cpu = cpu {
         let jumpAddress = (cpu.pc + instruction.width).advanced(by: Int(Int8(bitPattern: instruction.immediate8!)))
         if cpu.disassembly.transfersOfControl(at: jumpAddress, in: cpu.bank) != nil {
-          address = label(at: jumpAddress, in: cpu.bank)
-          if let condition = condition {
-            return "\(condition), \(address)"
+          var addressLabel: String
+          if let label = cpu.disassembly.label(at: jumpAddress, in: cpu.bank) {
+            addressLabel = label
           } else {
-            return "\(address)"
+            addressLabel = "$\(jumpAddress.hexString)"
+          }
+          if let condition = condition {
+            return "\(condition), \(addressLabel)"
+          } else {
+            return "\(addressLabel)"
           }
         }
       }

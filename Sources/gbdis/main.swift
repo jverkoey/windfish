@@ -18,6 +18,9 @@ for executionRegion in romInfo.executionRegion {
   cpu.disassemble(range: UInt16(executionRegion.startAddress)..<UInt16(executionRegion.endAddress),
                   inBank: UInt8(executionRegion.bank))
 }
+for label in romInfo.label {
+  cpu.disassembly.setLabel(at: UInt16(label.address), in: UInt8(label.bank), named: label.name)
+}
 
 extension Array {
   fileprivate func chunked(into size: Int) -> [[Element]] {
@@ -36,8 +39,8 @@ func line(_ transfersOfControl: Set<LR35902.Disassembly.TransferOfControl>, cpu:
     .sorted(by: { $0.sourceAddress < $1.sourceAddress })
     .map { "\($0.kind) @ $\($0.sourceAddress.hexString)" }
     .joined(separator: ", ")
-  let label = "\(RGBDSAssembly.label(at: cpu.pc, in: cpu.bank)):".padding(toLength: 48, withPad: " ", startingAt: 0)
-  return line(label, comment: "Sources: \(sources)")
+  let label = cpu.disassembly.label(at: cpu.pc, in: cpu.bank)!
+  return line("\(label):", comment: "Sources: \(sources)")
 }
 
 func restartFile(atPath path: String) throws -> FileHandle {
@@ -101,6 +104,8 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
   while cpu.pc < end {
     if let transfersOfControl = cpu.disassembly.transfersOfControl(at: cpu.pc, in: bank) {
       write(line(transfersOfControl, cpu: cpu), fileHandle: fileHandle)
+    } else if let label = cpu.disassembly.label(at: cpu.pc, in: bank) {
+      write("\(label):", fileHandle: fileHandle)
     }
 
     if instructionsToDecode > 0, let instruction = cpu.disassembly.instruction(at: cpu.pc, in: bank) {
@@ -141,7 +146,7 @@ for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
         cpu.pc += 1
       } while cpu.pc < end
         && (instructionsToDecode == 0 || cpu.disassembly.instruction(at: cpu.pc, in: bank) == nil)
-        && cpu.disassembly.transfersOfControl(at: cpu.pc, in: bank) == nil
+        && cpu.disassembly.label(at: cpu.pc, in: bank) == nil
 
       // Dump the bytes in blocks of 8.
       var address = initialPc

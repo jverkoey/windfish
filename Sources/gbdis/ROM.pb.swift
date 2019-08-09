@@ -26,6 +26,8 @@ struct ROM {
 
   var executionRegion: [ExecutionRegion] = []
 
+  var label: [Labels] = []
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -47,18 +49,36 @@ struct ExecutionRegion {
   init() {}
 }
 
+struct Labels {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var address: UInt32 = 0
+
+  var bank: UInt32 = 0
+
+  var name: String = String()
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 extension ROM: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = "ROM"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "executionRegion"),
+    2: .same(proto: "label"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       switch fieldNumber {
       case 1: try decoder.decodeRepeatedMessageField(value: &self.executionRegion)
+      case 2: try decoder.decodeRepeatedMessageField(value: &self.label)
       default: break
       }
     }
@@ -68,11 +88,15 @@ extension ROM: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, 
     if !self.executionRegion.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.executionRegion, fieldNumber: 1)
     }
+    if !self.label.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.label, fieldNumber: 2)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: ROM, rhs: ROM) -> Bool {
     if lhs.executionRegion != rhs.executionRegion {return false}
+    if lhs.label != rhs.label {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -114,6 +138,47 @@ extension ExecutionRegion: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
     if lhs.startAddress != rhs.startAddress {return false}
     if lhs.endAddress != rhs.endAddress {return false}
     if lhs.bank != rhs.bank {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Labels: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "Labels"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "address"),
+    2: .same(proto: "bank"),
+    3: .same(proto: "name"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      switch fieldNumber {
+      case 1: try decoder.decodeSingularUInt32Field(value: &self.address)
+      case 2: try decoder.decodeSingularUInt32Field(value: &self.bank)
+      case 3: try decoder.decodeSingularStringField(value: &self.name)
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.address != 0 {
+      try visitor.visitSingularUInt32Field(value: self.address, fieldNumber: 1)
+    }
+    if self.bank != 0 {
+      try visitor.visitSingularUInt32Field(value: self.bank, fieldNumber: 2)
+    }
+    if !self.name.isEmpty {
+      try visitor.visitSingularStringField(value: self.name, fieldNumber: 3)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Labels, rhs: Labels) -> Bool {
+    if lhs.address != rhs.address {return false}
+    if lhs.bank != rhs.bank {return false}
+    if lhs.name != rhs.name {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

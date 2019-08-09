@@ -35,3 +35,8 @@ executionRegion {
   startAddress: 0x0100
   endAddress:   0x4000
 }
+
+label {
+  address: 0x0100
+  name: "boot"
+}
