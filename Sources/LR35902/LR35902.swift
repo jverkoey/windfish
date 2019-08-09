@@ -70,6 +70,40 @@ public final class LR35902 {
 
     disassembly.setLabel(at: 0x0134, in: 0x00, named: "HeaderTitle")
     disassembly.setText(at: 0x0134..<0x0143, in: 0x00)
+
+    disassembly.setLabel(at: 0x0143, in: 0x00, named: "HeaderIsColorGB")
+    disassembly.setData(at: 0x0143, in: 0x00)
+
+    disassembly.setLabel(at: 0x0144, in: 0x00, named: "HeaderNewLicenseeCode")
+    disassembly.setData(at: 0x0144..<0x0146, in: 0x00)
+
+    disassembly.setLabel(at: 0x0146, in: 0x00, named: "HeaderSGBFlag")
+    disassembly.setData(at: 0x0146, in: 0x00)
+
+    disassembly.setLabel(at: 0x0147, in: 0x00, named: "HeaderCartridgeType")
+    disassembly.setData(at: 0x0147, in: 0x00)
+
+    disassembly.setLabel(at: 0x0148, in: 0x00, named: "HeaderROMSize")
+    disassembly.setData(at: 0x0148, in: 0x00)
+
+    disassembly.setLabel(at: 0x0149, in: 0x00, named: "HeaderRAMSize")
+    disassembly.setData(at: 0x0149, in: 0x00)
+
+    disassembly.setLabel(at: 0x014A, in: 0x00, named: "HeaderDestinationCode")
+    disassembly.setData(at: 0x014A, in: 0x00)
+
+    disassembly.setLabel(at: 0x014B, in: 0x00, named: "HeaderOldLicenseeCode")
+    disassembly.setData(at: 0x014B, in: 0x00)
+
+    disassembly.setLabel(at: 0x014C, in: 0x00, named: "HeaderMaskROMVersion")
+    disassembly.setData(at: 0x014C, in: 0x00)
+
+    disassembly.setLabel(at: 0x014D, in: 0x00, named: "HeaderComplementCheck")
+    disassembly.setData(at: 0x014D, in: 0x00)
+
+    disassembly.setLabel(at: 0x014E, in: 0x00, named: "HeaderGlobalChecksum")
+    disassembly.setData(at: 0x014E..<0x0150, in: 0x00)
+
   }
 
   struct BankedAddress: Hashable {

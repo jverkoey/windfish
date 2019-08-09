@@ -84,12 +84,18 @@ clean:
       cpu.bank = bank
       let end: UInt16 = (bank == 0) ? 0x4000 : 0x8000
 
+      var didJustWriteNewline = true
+
       while cpu.pc < end {
         if let transfersOfControl = cpu.disassembly.transfersOfControl(at: cpu.pc, in: bank) {
           write(line(transfersOfControl, cpu: cpu), fileHandle: fileHandle)
+          didJustWriteNewline = false
         } else if let label = cpu.disassembly.label(at: cpu.pc, in: bank) {
-          write("", fileHandle: fileHandle)
+          if !didJustWriteNewline {
+            write("", fileHandle: fileHandle)
+          }
           write("\(label):", fileHandle: fileHandle)
+          didJustWriteNewline = false
         }
 
         if instructionsToDecode > 0, let instruction = cpu.disassembly.instruction(at: cpu.pc, in: bank) {
@@ -110,10 +116,12 @@ clean:
           switch instruction.spec {
           case .jp, .jr:
             write("", fileHandle: fileHandle)
+            didJustWriteNewline = true
             cpu.bank = bank
           case .ret, .reti:
             write("", fileHandle: fileHandle)
             write("", fileHandle: fileHandle)
+            didJustWriteNewline = true
             cpu.bank = bank
           default:
             break
@@ -149,6 +157,7 @@ clean:
             }
           }
           write("", fileHandle: fileHandle)
+          didJustWriteNewline = true
         }
       }
     }
