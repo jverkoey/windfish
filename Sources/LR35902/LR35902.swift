@@ -63,7 +63,7 @@ public final class LR35902 {
     disassemble(range: 0x0060..<0x0068, inBank: 0)
 
     disassembly.setLabel(at: 0x0100, in: 0x00, named: "Boot")
-    disassemble(range: 0x0100..<0x4000, inBank: 0)
+    disassemble(range: 0x0100..<0x104, inBank: 0)
   }
 
   struct BankedAddress: Hashable {

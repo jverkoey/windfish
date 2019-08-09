@@ -10,4 +10,6 @@ cpu.initializeDisassembly()
 cpu.disassembly.setLabel(at: 0x0003, in: 0x00, named: "DEBUG_TOOL")
 cpu.disassembly.setData(at: 0x0003, in: 0x00)
 
+cpu.disassembly.setLabel(at: 0x0150, in: 0x00, named: "Main")
+
 try cpu.disassembly.writeTo(directory: "/Users/featherless/workbench/gbdis/disassembly", cpu: cpu)
