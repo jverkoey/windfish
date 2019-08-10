@@ -149,10 +149,11 @@ clean:
 
           // Write the instruction as assembly.
           let index = LR35902.romAddress(for: cpu.pc, in: bank)
-          let bytes = cpu[index..<(index + UInt32(instruction.width))]
+          let instructionWidth = LR35902.instructionWidths[instruction.spec]!
+          let bytes = cpu[index..<(index + UInt32(instructionWidth))]
           lineGroup.append(.instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: cpu), cpu.pc, bytes))
 
-          cpu.pc += instruction.width
+          cpu.pc += instructionWidth
 
           // Handle context changes.
           switch instruction.spec {
@@ -170,7 +171,7 @@ clean:
           // Is this the beginning of a macro?
           if macroNode == nil, let child = cpu.disassembly.macroTree.children[instruction.spec] {
             flush()
-            lineBufferAddress = cpu.pc - instruction.width
+            lineBufferAddress = cpu.pc - instructionWidth
             macroNode = child
 
           } else if let macroNodeIterator = macroNode {
@@ -191,7 +192,7 @@ clean:
                 lineBuffer.removeAll()
 
                 let lowerBound = LR35902.romAddress(for: lineBufferAddress, in: bank)
-                let upperBound = LR35902.romAddress(for: cpu.pc - instruction.width, in: bank)
+                let upperBound = LR35902.romAddress(for: cpu.pc - instructionWidth, in: bank)
                 let bytes = cpu[lowerBound..<upperBound]
                 lineBuffer.append(.macro("\(macro) \(assembly)", lineBufferAddress, bytes))
 

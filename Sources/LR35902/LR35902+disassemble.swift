@@ -48,16 +48,14 @@ extension LR35902 {
         let instruction: Instruction
         switch operandWidth {
         case 1:
-          instruction = Instruction(spec: spec,
-                                    width: instructionWidth,
-                                    immediate8: self[pc + opcodeWidth, bank])
+          instruction = Instruction(spec: spec, immediate8: self[pc + opcodeWidth, bank])
         case 2:
           let low = UInt16(self[pc + opcodeWidth, bank])
           let high = UInt16(self[pc + opcodeWidth + 1, bank]) << 8
           let immediate16 = high | low
-          instruction = Instruction(spec: spec, width: instructionWidth, immediate16: immediate16)
+          instruction = Instruction(spec: spec, immediate16: immediate16)
         default:
-          instruction = Instruction(spec: spec, width: instructionWidth)
+          instruction = Instruction(spec: spec)
         }
 
         if case .stop = spec {

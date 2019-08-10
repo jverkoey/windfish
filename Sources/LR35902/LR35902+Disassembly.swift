@@ -40,7 +40,7 @@ extension LR35902 {
       let address = romAddress(for: pc, in: bank)
       instructionMap[address] = instruction
 
-      code.insert(integersIn: Int(address)..<(Int(address) + Int(instruction.width)))
+      code.insert(integersIn: Int(address)..<(Int(address) + Int(LR35902.instructionWidths[instruction.spec]!)))
     }
     private var instructionMap: [UInt32: Instruction] = [:]
 
