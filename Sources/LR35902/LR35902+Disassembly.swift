@@ -84,14 +84,14 @@ extension LR35902 {
 
     // MARK: - Transfers of control
 
-    public struct TransferOfControl: Hashable {
-      public enum Kind {
+    struct TransferOfControl: Hashable {
+      enum Kind {
         case jr, jp, call
       }
-      public let sourceAddress: UInt16
-      public let kind: Kind
+      let sourceAddress: UInt16
+      let kind: Kind
     }
-    public func transfersOfControl(at pc: UInt16, in bank: UInt8) -> Set<TransferOfControl>? {
+    func transfersOfControl(at pc: UInt16, in bank: UInt8) -> Set<TransferOfControl>? {
       return transfers[romAddress(for: pc, in: bank)]
     }
 
@@ -109,7 +109,7 @@ extension LR35902 {
 
     // MARK: - Instructions
 
-    public func instruction(at pc: UInt16, in bank: UInt8) -> Instruction? {
+    func instruction(at pc: UInt16, in bank: UInt8) -> Instruction? {
       return instructionMap[romAddress(for: pc, in: bank)]
     }
 

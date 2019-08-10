@@ -4,9 +4,9 @@ import FixedWidthInteger
 
 public final class RGBDSAssembly {
 
-  public static let maxOpcodeNameLength = 4
+  static let maxOpcodeNameLength = 4
 
-  public struct Statement: Equatable, CustomStringConvertible {
+  struct Statement: Equatable, CustomStringConvertible {
     let opcode: String
     let operands: [String]?
     init(opcode: String, operands: [String]? = nil) {
@@ -14,7 +14,7 @@ public final class RGBDSAssembly {
       self.operands = operands
     }
 
-    public var description: String {
+    var description: String {
       let opcodeName = opcode.padding(toLength: maxOpcodeNameLength, withPad: " ", startingAt: 0)
       if let operands = operands {
         return "\(opcodeName) \(operands.joined(separator: ", "))"
@@ -24,7 +24,7 @@ public final class RGBDSAssembly {
     }
   }
 
-  public static func assembly(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil) -> Statement {
+  static func assembly(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil) -> Statement {
     if let operands = operands(for: instruction, with: disassembly) {
       return Statement(opcode: instruction.spec.opcode, operands: operands)
     } else {
