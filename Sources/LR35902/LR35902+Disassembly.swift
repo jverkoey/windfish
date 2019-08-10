@@ -185,6 +185,9 @@ extension LR35902 {
     public func defineFunction(startingAt pc: UInt16, in bank: UInt8, named name: String) {
       setLabel(at: pc, in: bank, named: name)
 
+      let upperBound: UInt16 = (bank == 0) ? 0x4000 : 0x8000
+      disassemble(range: pc..<upperBound, inBank: bank)
+
       functions[romAddress(for: pc, in: bank)] = name
     }
     private var functions: [UInt32: String] = [:]
@@ -305,12 +308,10 @@ extension LR35902 {
             instruction = Instruction(spec: spec)
           }
 
-          if case .stop = spec {
-            // STOP must be followed by 0
-            if instruction.immediate8 != 0 {
-              cpu.pc += 1
-              continue
-            }
+          // STOP must be followed by 0
+          if case .stop = spec, instruction.immediate8 != 0 {
+            cpu.pc += 1
+            continue
           }
 
           register(instruction: instruction, at: cpu.pc, in: cpu.bank)
