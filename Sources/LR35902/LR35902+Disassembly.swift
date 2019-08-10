@@ -183,12 +183,11 @@ extension LR35902 {
     }
 
     public func defineFunction(startingAt pc: UInt16, in bank: UInt8, named name: String) {
-      setLabel(at: pc, in: bank, named: name)
-
-      let upperBound: UInt16 = (bank == 0) ? 0x4000 : 0x8000
-      disassemble(range: pc..<upperBound, inBank: bank)
-
       functions[romAddress(for: pc, in: bank)] = name
+
+      setLabel(at: pc, in: bank, named: name)
+      let upperBound: UInt16 = (bank == 0) ? 0x4000 : 0x8000
+      disassemble(range: pc..<upperBound, inBank: bank, function: name)
     }
     private var functions: [UInt32: String] = [:]
 
@@ -251,7 +250,7 @@ extension LR35902 {
     }
     public let macroTree = MacroNode()
 
-    public func disassemble(range: Range<UInt16>, inBank bankInitial: UInt8) {
+    public func disassemble(range: Range<UInt16>, inBank bankInitial: UInt8, function: String? = nil) {
       var jumpAddresses: [BankedAddress] = []
       jumpAddresses.append(BankedAddress(bank: bankInitial, address: range.lowerBound))
 
@@ -263,8 +262,14 @@ extension LR35902 {
         cpu.bank = address.bank
         cpu.pc = address.address
 
+        let pcIsValidForBank: () -> Bool = {
+          let pc = self.cpu.pc
+          let bank = self.cpu.bank
+          return (bank == 0 && pc < 0x4000) || (bank != 0 && pc < 0x8000)
+        }
+
         var previousInstruction: Instruction? = nil
-        linear_sweep: while (!isFirst && ((cpu.bank == 0 && cpu.pc < 0x4000) || (cpu.bank != 0 && cpu.pc < 0x8000))) || cpu.pc < range.upperBound {
+        linear_sweep: while (isFirst && cpu.pc < range.upperBound) || (!isFirst && pcIsValidForBank()) {
           let byte = Int(cpu[cpu.pc, cpu.bank])
 
           var spec = LR35902.instructionTable[byte]
