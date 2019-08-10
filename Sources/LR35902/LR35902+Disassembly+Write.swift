@@ -179,7 +179,7 @@ clean:
               macroNode = child
             } else {
               if let macro = macroNodeIterator.macro,
-                let assemblyGenerator = macroNodeIterator.assemblyGenerator {
+                let arguments = macroNodeIterator.arguments {
                 let instructions = lineBuffer.compactMap { thisLine -> LR35902.Instruction? in
                   if case let .instruction(instruction, _, _, _) = thisLine {
                     return instruction
@@ -187,8 +187,7 @@ clean:
                     return nil
                   }
                 }
-                let assembly = assemblyGenerator(instructions)
-                print("This is a macro \(macro) \(assembly)")
+                let assembly = arguments(instructions).joined(separator: ", ")
                 lineBuffer.removeAll()
 
                 let lowerBound = LR35902.romAddress(for: lineBufferAddress, in: bank)

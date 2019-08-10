@@ -131,20 +131,20 @@ extension LR35902 {
 
     public func defineMacro(named name: String,
                             instructions: [InstructionSpec],
-                            assemblyGenerator: @escaping ([Instruction]) -> String) {
+                            arguments: @escaping ([Instruction]) -> [String]) {
       let leaf = instructions.reduce(macroTree, { node, spec in
         let child = node.children[spec, default: MacroNode()]
         node.children[spec] = child
         return child
       })
       leaf.macro = name
-      leaf.assemblyGenerator = assemblyGenerator
+      leaf.arguments = arguments
     }
 
     public class MacroNode {
       var children: [InstructionSpec: MacroNode] = [:]
       var macro: String?
-      var assemblyGenerator: (([Instruction]) -> String)?
+      var arguments: (([Instruction]) -> [String])?
     }
     public let macroTree = MacroNode()
   }

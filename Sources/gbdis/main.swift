@@ -21,8 +21,8 @@ cpu.disassembly.defineMacro(named: "callcb", instructions: [
   .ld(.a, .immediate8),
   .ld(.immediate16address, .a),
   .call(.immediate16)
-]) { instructions in
-  "$\(instructions.last!.immediate16!.hexString)"
-}
+], arguments: { instructions in
+  ["$\(instructions.last!.immediate16!.hexString)"]
+})
 
 try cpu.disassembly.writeTo(directory: "/Users/featherless/workbench/gbdis/disassembly", cpu: cpu)
