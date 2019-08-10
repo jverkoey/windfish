@@ -2,7 +2,7 @@ import Foundation
 
 extension LR35902 {
   /// The specification for an LR35902's instruction set.
-  public enum InstructionSpec: Equatable, Hashable {
+  public indirect enum InstructionSpec: Equatable, Hashable {
     // Loads
     case ld(Operand, Operand), ldi(Operand, Operand), ldd(Operand, Operand)
 
@@ -47,7 +47,7 @@ extension LR35902 {
     case cpl
 
     // 0xCB prefix
-    case cb
+    case cb(InstructionSpec)
     case rlc(Operand), rrc(Operand)
     case rl(Operand), rr(Operand)
     case sla(Operand), sra(Operand)

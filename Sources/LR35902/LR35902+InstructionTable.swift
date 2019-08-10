@@ -222,7 +222,7 @@ extension LR35902 {
     /* 0xc8 */ .ret(.z),
     /* 0xc9 */ .ret(),
     /* 0xca */ .jp(.immediate16, .z),
-    /* 0xcb */ .cb,
+    /* 0xcb */ .cb(.invalid),
     /* 0xcc */ .call(.immediate16, .z),
     /* 0xcd */ .call(.immediate16),
     /* 0xce */ .adc(.immediate8),
