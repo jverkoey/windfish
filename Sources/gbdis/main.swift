@@ -17,16 +17,14 @@ cpu.disassembly.setPreComment(at: 0x0156, in: 0x00, text: "Reset the palette reg
 cpu.disassembly.setPreComment(at: 0x015D, in: 0x00, text: "Clears 6144 bytes of video ram. Graphics vram location for OBJ and BG tiles start at $8000 and end at $97FF; for a total of 0x1800 bytes.")
 cpu.disassembly.setLabel(at: 0x2999, in: 0x00, named: "ClearMemoryRegion")
 
-cpu.disassembly.defineMacro(named: "callcb", instructions: [
-  .any(.ld(.a, .immediate8)),
-  .instruction(.init(spec: .ld(.immediate16address, .a), immediate16: 0x2100)),
-  .any(.call(.immediate16))
-], code: [
-  .ld(.a, .macro("bank(\\1)")),
-  .ld(.immediate16address, .a),
-  .call(.macro("\\1"))
-], arguments: { instructions in
-  ["$\(instructions.last!.immediate16!.hexString)"]
-})
+//cpu.disassembly.defineMacro(named: "callcb", instructions: [
+//  .any(.ld(.a, .immediate8)),
+//  .instruction(.init(spec: .ld(.immediate16address, .a), immediate16: 0x2100)),
+//  .any(.call(.immediate16))
+//], code: [
+//  .ld(.a, .macro("bank(\\1)")),
+//  .ld(.immediate16address, .a),
+//  .call(.macro("\\1"))
+//])
 
 try cpu.disassembly.writeTo(directory: "/Users/featherless/workbench/gbdis/disassembly", cpu: cpu)

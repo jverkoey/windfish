@@ -135,8 +135,7 @@ extension LR35902 {
     }
     public func defineMacro(named name: String,
                             instructions: [MacroLine],
-                            code: [InstructionSpec],
-                            arguments: @escaping ([Instruction]) -> [String]) {
+                            code: [InstructionSpec]) {
       let leaf = instructions.reduce(macroTree, { node, spec in
         let child = node.children[spec, default: MacroNode()]
         node.children[spec] = child
@@ -144,7 +143,6 @@ extension LR35902 {
       })
       leaf.macro = name
       leaf.code = code
-      leaf.arguments = arguments
       leaf.macroLines = instructions
     }
 
@@ -152,7 +150,6 @@ extension LR35902 {
       var children: [MacroLine: MacroNode] = [:]
       var macro: String?
       var code: [InstructionSpec]?
-      var arguments: (([Instruction]) -> [String])?
       var macroLines: [MacroLine]?
       var hasWritten = false
     }

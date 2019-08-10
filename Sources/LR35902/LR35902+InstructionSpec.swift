@@ -75,7 +75,8 @@ extension LR35902 {
 
     case zero8
 
-    case macro(String) // For macro use only
+     // For macro use only
+    case macro(String)
   }
 
   /// Possible conditions in LR35902's instruction set.

@@ -54,7 +54,7 @@ extension LR35902.Disassembly {
       case let .macroInstruction(_, assembly): return line(assembly)
       case let .macro(assembly, address, bytes): return line(assembly, address: address, bytes: bytes)
       case let .macroDefinition(name):         return "\(name): MACRO"
-      case let .macroTerminator:               return line("ENDM")
+      case .macroTerminator:                   return line("ENDM")
       }
     }
   }
@@ -192,11 +192,10 @@ clean:
               macroNode = child
             } else {
               if let macro = macroNodeIterator.macro,
-                let arguments = macroNodeIterator.arguments,
                 let code = macroNodeIterator.code {
-                let instructions = lineBuffer.compactMap { thisLine -> LR35902.Instruction? in
-                  if case let .instruction(instruction, _, _, _) = thisLine {
-                    return instruction
+                let instructions = lineBuffer.compactMap { thisLine -> (LR35902.Instruction, String)? in
+                  if case let .instruction(instruction, assembly, _, _) = thisLine {
+                    return (instruction, assembly)
                   } else {
                     return nil
                   }
@@ -212,9 +211,10 @@ clean:
                   lines.append(.empty)
                   lines.append(.macroDefinition(macro))
                   lines.append(contentsOf: zip(code, instructions).map { spec, instruction in
-                    var macroInstruction = instruction
+                    var macroInstruction = instruction.0
                     macroInstruction.spec = spec
-                    return .macroInstruction(macroInstruction, RGBDSAssembly.assembly(for: macroInstruction, with: cpu))
+                    let macroAssembly = RGBDSAssembly.assembly(for: macroInstruction, with: cpu)
+                    return .macroInstruction(macroInstruction, macroAssembly)
                   })
                   lines.append(.macroTerminator)
                   writeLinesToFile(lines, macrosHandle!)
@@ -222,14 +222,16 @@ clean:
                   macroNodeIterator.hasWritten = true
                 }
 
-                let macroOperands = arguments(instructions).joined(separator: ", ")
+                // Extract the arguments.
+                zip(code, instructions).forEach { spec, instruction in
+                }
 
                 let lowerBound = LR35902.romAddress(for: lineBufferAddress, in: bank)
                 let upperBound = LR35902.romAddress(for: cpu.pc - instructionWidth, in: bank)
                 let bytes = cpu[lowerBound..<upperBound]
 
                 lineBuffer.removeAll()
-                lineBuffer.append(.macro("\(macro) \(macroOperands)", lineBufferAddress, bytes))
+                lineBuffer.append(.macro("\(macro) ?", lineBufferAddress, bytes))
 
                 lineBufferAddress = cpu.pc
               }
