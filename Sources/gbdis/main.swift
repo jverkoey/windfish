@@ -18,9 +18,10 @@ cpu.disassembly.setPreComment(at: 0x015D, in: 0x00, text: "Clears 6144 bytes of 
 cpu.disassembly.setLabel(at: 0x2999, in: 0x00, named: "ClearMemoryRegion")
 
 cpu.disassembly.defineMacro(named: "callcb", instructions: [
-  .ld(.a, .immediate8),
-  .ld(.immediate16address, .a),
-  .call(.immediate16)
+  // TODO: How do we translate this into the macro assembly?
+  .ld(.a, .immediate8),         // This needs to be bank(\1)
+  .ld(.immediate16address, .a), // TODO: This must match 0x2100 exactly. How to express this?
+  .call(.immediate16)           // This needs to be \1
 ], arguments: { instructions in
   ["$\(instructions.last!.immediate16!.hexString)"]
 })
