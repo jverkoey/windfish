@@ -169,14 +169,17 @@ clean:
           }
 
           // Is this the beginning of a macro?
-          if macroNode == nil, let child = cpu.disassembly.macroTree.children[instruction.spec] {
+          let asInstruction = MacroLine.instruction(instruction)
+          let asWildcard = MacroLine.wildcard(instruction.spec)
+          if macroNode == nil,
+              let child = cpu.disassembly.macroTree.children[asInstruction] ?? cpu.disassembly.macroTree.children[asWildcard] {
             flush()
             lineBufferAddress = cpu.pc - instructionWidth
             macroNode = child
 
           } else if let macroNodeIterator = macroNode {
             // Still building the macro.
-            if let child = macroNodeIterator.children[instruction.spec] {
+            if let child = macroNodeIterator.children[asInstruction] ?? macroNodeIterator.children[asWildcard] {
               macroNode = child
             } else {
               if let macro = macroNodeIterator.macro,

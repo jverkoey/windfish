@@ -129,8 +129,12 @@ extension LR35902 {
 
     // MARK: - Macros
 
+    public enum MacroLine: Hashable {
+      case wildcard(InstructionSpec)
+      case instruction(Instruction)
+    }
     public func defineMacro(named name: String,
-                            instructions: [InstructionSpec],
+                            instructions: [MacroLine],
                             arguments: @escaping ([Instruction]) -> [String]) {
       let leaf = instructions.reduce(macroTree, { node, spec in
         let child = node.children[spec, default: MacroNode()]
@@ -142,7 +146,7 @@ extension LR35902 {
     }
 
     public class MacroNode {
-      var children: [InstructionSpec: MacroNode] = [:]
+      var children: [MacroLine: MacroNode] = [:]
       var macro: String?
       var arguments: (([Instruction]) -> [String])?
     }
