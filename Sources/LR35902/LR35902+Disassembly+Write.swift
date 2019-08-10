@@ -32,14 +32,27 @@ extension FileManager {
   }
 }
 
+private func extractArgs(from statement: RGBDSAssembly.Statement, using spec: LR35902.InstructionSpec) -> [Int: String] {
+  guard let operands = Mirror(reflecting: spec).children.first else {
+    return [:]
+  }
+  var args: [Int: String] = [:]
+  for (index, child) in Mirror(reflecting: operands.value).children.enumerated() {
+    if case let LR35902.Operand.arg(argumentNumber) = child.value {
+      args[argumentNumber] = Mirror(reflecting: statement).descendant(1, 0, index) as? String
+    }
+  }
+  return args
+}
+
 extension LR35902.Disassembly {
   enum Line: Equatable, CustomStringConvertible {
     case empty
     case preComment(String)
     case label(String)
     case transferOfControl(Set<TransferOfControl>, String)
-    case instruction(LR35902.Instruction, String, UInt16, Data)
-    case macroInstruction(LR35902.Instruction, String)
+    case instruction(LR35902.Instruction, RGBDSAssembly.Statement, UInt16, Data)
+    case macroInstruction(LR35902.Instruction, RGBDSAssembly.Statement)
     case macro(String, UInt16, Data)
     case macroDefinition(String)
     case macroTerminator
@@ -50,8 +63,8 @@ extension LR35902.Disassembly {
       case let .label(label):                  return "\(label):"
       case let .preComment(comment):           return line(comment: comment)
       case let .transferOfControl(toc, label): return line(toc, label: label)
-      case let .instruction(_, assembly, address, bytes): return line(assembly, address: address, bytes: bytes)
-      case let .macroInstruction(_, assembly): return line(assembly)
+      case let .instruction(_, assembly, address, bytes): return line(assembly.description, address: address, bytes: bytes)
+      case let .macroInstruction(_, assembly): return line(assembly.description)
       case let .macro(assembly, address, bytes): return line(assembly, address: address, bytes: bytes)
       case let .macroDefinition(name):         return "\(name): MACRO"
       case .macroTerminator:                   return line("ENDM")
@@ -91,7 +104,7 @@ clean:
     if !cpu.disassembly.variables.isEmpty {
       let variablesHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("variables.asm").path)
 
-      variablesHandle.write(cpu.disassembly.variables.map { address, name in
+      variablesHandle.write(cpu.disassembly.variables.sorted { $0.0 < $1.0 }.map { address, name in
         "\(name) EQU $\(address.hexString)"
       }.joined(separator: "\n\n").data(using: .utf8)!)
 
@@ -161,7 +174,7 @@ clean:
           let index = LR35902.romAddress(for: cpu.pc, in: bank)
           let instructionWidth = LR35902.instructionWidths[instruction.spec]!
           let bytes = cpu[index..<(index + UInt32(instructionWidth))]
-          lineGroup.append(.instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: cpu).description, cpu.pc, bytes))
+          lineGroup.append(.instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: cpu), cpu.pc, bytes))
 
           cpu.pc += instructionWidth
 
@@ -178,6 +191,8 @@ clean:
             break
           }
 
+          // TODO: Start a macro descent for every instruction.
+
           // Is this the beginning of a macro?
           let asInstruction = MacroLine.instruction(instruction)
           let asAny = MacroLine.any(instruction.spec)
@@ -192,8 +207,9 @@ clean:
               macroNode = child
             } else {
               if let macro = macroNodeIterator.macro,
-                let code = macroNodeIterator.code {
-                let instructions = lineBuffer.compactMap { thisLine -> (LR35902.Instruction, String)? in
+                let code = macroNodeIterator.code,
+                let validArgumentValues = macroNodeIterator.validArgumentValues {
+                let instructions = lineBuffer.compactMap { thisLine -> (LR35902.Instruction, RGBDSAssembly.Statement)? in
                   if case let .instruction(instruction, assembly, _, _) = thisLine {
                     return (instruction, assembly)
                   } else {
@@ -213,7 +229,7 @@ clean:
                   lines.append(contentsOf: zip(code, instructions).map { spec, instruction in
                     var macroInstruction = instruction.0
                     macroInstruction.spec = spec
-                    let macroAssembly = RGBDSAssembly.assembly(for: macroInstruction, with: cpu).description
+                    let macroAssembly = RGBDSAssembly.assembly(for: macroInstruction, with: cpu)
                     return .macroInstruction(macroInstruction, macroAssembly)
                   })
                   lines.append(.macroTerminator)
@@ -223,17 +239,47 @@ clean:
                 }
 
                 // Extract the arguments.
-                zip(code, instructions).forEach { spec, instruction in
+                let arguments: [Int: String] = zip(code, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
+                  let args = extractArgs(from: zipped.1.1, using: zipped.0)
+                  return iter.merging(args, uniquingKeysWith: { first, second in
+                    assert(first == second, "Mismatch in arguments")
+                    return first
+                  })
+                })
+
+                let rawArguments: [Int: String] = zip(code, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
+                  let args = extractArgs(from: RGBDSAssembly.assembly(for: zipped.1.0), using: zipped.0)
+                  return iter.merging(args, uniquingKeysWith: { first, second in
+                    assert(first == second, "Mismatch in arguments")
+                    return first
+                  })
+                })
+
+                let firstInvalidArgument = rawArguments.first { argumentNumber, argumentValue in
+                  guard validArgumentValues[argumentNumber] != nil else {
+                    return false
+                  }
+                  assert(argumentValue.hasPrefix("$"), "Can only validate hex values.")
+                  if argumentValue.hasPrefix("$") {
+                    let number = Int(UInt16(argumentValue.dropFirst(), radix: 16)!)
+                    return !validArgumentValues[argumentNumber]!.contains(number)
+                  }
+                  return false
                 }
 
-                let lowerBound = LR35902.romAddress(for: lineBufferAddress, in: bank)
-                let upperBound = LR35902.romAddress(for: cpu.pc - instructionWidth, in: bank)
-                let bytes = cpu[lowerBound..<upperBound]
+                if firstInvalidArgument == nil {
+                  let lowerBound = LR35902.romAddress(for: lineBufferAddress, in: bank)
+                  let upperBound = LR35902.romAddress(for: cpu.pc - instructionWidth, in: bank)
+                  let bytes = cpu[lowerBound..<upperBound]
 
-                lineBuffer.removeAll()
-                lineBuffer.append(.macro("\(macro) ?", lineBufferAddress, bytes))
+                  let macroArgs = arguments.keys.sorted().map { arguments[$0]! }.joined(separator: ", ")
 
-                lineBufferAddress = cpu.pc
+                  let firstInstruction = lineBuffer.firstIndex { line in if case .instruction = line { return true } else { return false} }
+                  lineBuffer.removeLast(lineBuffer.count - firstInstruction!)
+                  lineBuffer.append(.macro("\(macro) \(macroArgs)", lineBufferAddress, bytes))
+
+                  lineBufferAddress = cpu.pc
+                }
               }
               macroNode = nil
             }

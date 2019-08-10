@@ -6,7 +6,7 @@ public final class RGBDSAssembly {
 
   public static let maxOpcodeNameLength = 4
 
-  public struct Statement: CustomStringConvertible {
+  public struct Statement: Equatable, CustomStringConvertible {
     let opcode: String
     let operands: [String]?
     init(opcode: String, operands: [String]? = nil) {
@@ -200,10 +200,14 @@ public final class RGBDSAssembly {
         return "sp+$\(instruction.immediate8!.hexString)"
       }
     case .a, .af, .b, .c, .bc, .d, .e, .de, .h, .l, .hl, .sp: return "\(operand)"
-    case .zero8:
-      preconditionFailure("Unable to print out a zero8")
+
     case let .macro(text):
       return text
+    case let .arg(number):
+      return "\\\(number)"
+
+    case .zero8:
+      preconditionFailure("Unable to print out a zero8")
     }
   }
 }

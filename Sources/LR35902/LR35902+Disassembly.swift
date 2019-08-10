@@ -135,7 +135,8 @@ extension LR35902 {
     }
     public func defineMacro(named name: String,
                             instructions: [MacroLine],
-                            code: [InstructionSpec]) {
+                            code: [InstructionSpec],
+                            validArgumentValues: [Int: IndexSet]) {
       let leaf = instructions.reduce(macroTree, { node, spec in
         let child = node.children[spec, default: MacroNode()]
         node.children[spec] = child
@@ -144,6 +145,7 @@ extension LR35902 {
       leaf.macro = name
       leaf.code = code
       leaf.macroLines = instructions
+      leaf.validArgumentValues = validArgumentValues
     }
 
     public class MacroNode {
@@ -151,6 +153,7 @@ extension LR35902 {
       var macro: String?
       var code: [InstructionSpec]?
       var macroLines: [MacroLine]?
+      var validArgumentValues: [Int: IndexSet]?
       var hasWritten = false
     }
     public let macroTree = MacroNode()

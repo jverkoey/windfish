@@ -77,6 +77,7 @@ extension LR35902 {
 
      // For macro use only
     case macro(String)
+    case arg(Int)
   }
 
   /// Possible conditions in LR35902's instruction set.
