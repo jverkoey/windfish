@@ -161,7 +161,7 @@ clean:
           let index = LR35902.romAddress(for: cpu.pc, in: bank)
           let instructionWidth = LR35902.instructionWidths[instruction.spec]!
           let bytes = cpu[index..<(index + UInt32(instructionWidth))]
-          lineGroup.append(.instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: cpu), cpu.pc, bytes))
+          lineGroup.append(.instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: cpu).description, cpu.pc, bytes))
 
           cpu.pc += instructionWidth
 
@@ -213,7 +213,7 @@ clean:
                   lines.append(contentsOf: zip(code, instructions).map { spec, instruction in
                     var macroInstruction = instruction.0
                     macroInstruction.spec = spec
-                    let macroAssembly = RGBDSAssembly.assembly(for: macroInstruction, with: cpu)
+                    let macroAssembly = RGBDSAssembly.assembly(for: macroInstruction, with: cpu).description
                     return .macroInstruction(macroInstruction, macroAssembly)
                   })
                   lines.append(.macroTerminator)

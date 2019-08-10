@@ -5,12 +5,30 @@ import FixedWidthInteger
 public final class RGBDSAssembly {
 
   public static let maxOpcodeNameLength = 4
-  public static func assembly(for instruction: LR35902.Instruction, with cpu: LR35902? = nil) -> String {
-    if let operand = operandAssembly(for: instruction, with: cpu) {
-      let opcodeName = instruction.spec.opcode.padding(toLength: maxOpcodeNameLength, withPad: " ", startingAt: 0)
-      return "\(opcodeName) \(operand)"
+
+  public struct Statement: CustomStringConvertible {
+    let opcode: String
+    let operands: [String]?
+    init(opcode: String, operands: [String]? = nil) {
+      self.opcode = opcode
+      self.operands = operands
+    }
+
+    public var description: String {
+      let opcodeName = opcode.padding(toLength: maxOpcodeNameLength, withPad: " ", startingAt: 0)
+      if let operands = operands {
+        return "\(opcodeName) \(operands.joined(separator: ", "))"
+      } else {
+        return opcodeName
+      }
+    }
+  }
+
+  public static func assembly(for instruction: LR35902.Instruction, with cpu: LR35902? = nil) -> Statement {
+    if let operands = operands(for: instruction, with: cpu) {
+      return Statement(opcode: instruction.spec.opcode, operands: operands)
     } else {
-      return instruction.spec.opcode
+      return Statement(opcode: instruction.spec.opcode)
     }
   }
 
@@ -52,7 +70,7 @@ public final class RGBDSAssembly {
     }
   }
 
-  private static func operandAssembly(for instruction: LR35902.Instruction, with cpu: LR35902? = nil) -> String? {
+  private static func operands(for instruction: LR35902.Instruction, with cpu: LR35902? = nil) -> [String]? {
     if let cpu = cpu {
       switch instruction.spec {
       case let LR35902.InstructionSpec.jp(operand, condition) where operand == .immediate16,
@@ -65,9 +83,9 @@ public final class RGBDSAssembly {
             addressLabel = "$\(instruction.immediate16!.hexString)"
           }
           if let condition = condition {
-            return "\(condition), \(addressLabel)"
+            return ["\(condition)", addressLabel]
           } else {
-            return "\(addressLabel)"
+            return [addressLabel]
           }
         }
 
@@ -81,9 +99,9 @@ public final class RGBDSAssembly {
             addressLabel = "$\(jumpAddress.hexString)"
           }
           if let condition = condition {
-            return "\(condition), \(addressLabel)"
+            return ["\(condition)", addressLabel]
           } else {
-            return "\(addressLabel)"
+            return [addressLabel]
           }
         }
 
@@ -94,7 +112,7 @@ public final class RGBDSAssembly {
         } else {
           addressLabel = "[$\(instruction.immediate16!.hexString)]"
         }
-        return "\(addressLabel), \(describe(for: instruction, operand: operand2))"
+        return [addressLabel, describe(for: instruction, operand: operand2)]
       case let LR35902.InstructionSpec.ld(operand1, operand2) where operand2 == .immediate16address:
         var addressLabel: String
         if let label = cpu.disassembly.label(at: instruction.immediate16!, in: cpu.bank) {
@@ -102,7 +120,7 @@ public final class RGBDSAssembly {
         } else {
           addressLabel = "[$\(instruction.immediate16!.hexString)]"
         }
-        return "\(describe(for: instruction, operand: operand1)), \(addressLabel)"
+        return [describe(for: instruction, operand: operand1), addressLabel]
 
       case let LR35902.InstructionSpec.ld(operand1, operand2) where operand1 == .ffimmediate8Address:
         var addressLabel: String
@@ -111,7 +129,7 @@ public final class RGBDSAssembly {
         } else {
           addressLabel = "[$FF\(instruction.immediate8!.hexString)]"
         }
-        return "\(addressLabel), \(describe(for: instruction, operand: operand2))"
+        return [addressLabel, describe(for: instruction, operand: operand2)]
       case let LR35902.InstructionSpec.ld(operand1, operand2) where operand2 == .ffimmediate8Address:
         var addressLabel: String
         if let variableName = cpu.disassembly.variables[0xFF00 | UInt16(instruction.immediate8!)] {
@@ -119,7 +137,7 @@ public final class RGBDSAssembly {
         } else {
           addressLabel = "[$FF\(instruction.immediate8!.hexString)]"
         }
-        return "\(describe(for: instruction, operand: operand1)), \(addressLabel)"
+        return [describe(for: instruction, operand: operand1), addressLabel]
 
       default:
         break
@@ -128,7 +146,7 @@ public final class RGBDSAssembly {
     return describe(for: instruction, spec: instruction.spec)
   }
 
-  private static func describe(for instruction: LR35902.Instruction, spec: LR35902.InstructionSpec) -> String? {
+  private static func describe(for instruction: LR35902.Instruction, spec: LR35902.InstructionSpec) -> [String]? {
     let mirror = Mirror(reflecting: spec)
     guard let operands = mirror.children.first else {
       return nil
@@ -138,20 +156,20 @@ public final class RGBDSAssembly {
       return describe(for: instruction, spec: childInstruction)
     case let tuple as (LR35902.Operand, LR35902.Condition?):
       if let condition = tuple.1 {
-        return "\(condition), \(describe(for: instruction, operand: tuple.0))"
+        return ["\(condition)", describe(for: instruction, operand: tuple.0)]
       } else {
-        return "\(describe(for: instruction, operand: tuple.0))"
+        return [describe(for: instruction, operand: tuple.0)]
       }
     case let condition as LR35902.Condition:
-      return "\(condition)"
+      return ["\(condition)"]
     case let tuple as (LR35902.Operand, LR35902.Operand):
-      return "\(describe(for: instruction, operand: tuple.0)), \(describe(for: instruction, operand: tuple.1))"
+      return [describe(for: instruction, operand: tuple.0), describe(for: instruction, operand: tuple.1)]
     case let tuple as (LR35902.Bit, LR35902.Operand):
-      return "\(tuple.0.rawValue), \(describe(for: instruction, operand: tuple.1))"
+      return ["\(tuple.0.rawValue)", describe(for: instruction, operand: tuple.1)]
     case let operand as LR35902.Operand:
-      return "\(describe(for: instruction, operand: operand))"
+      return [describe(for: instruction, operand: operand)]
     case let address as LR35902.RestartAddress:
-      return "\(address)".replacingOccurrences(of: "x", with: "$")
+      return ["\(address)".replacingOccurrences(of: "x", with: "$")]
     default:
       return nil
     }
