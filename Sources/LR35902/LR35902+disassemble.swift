@@ -15,39 +15,32 @@ extension LR35902 {
 
       var previousInstruction: Instruction? = nil
       linear_sweep: while (!isFirst && ((bank == 0 && pc < 0x4000) || (bank != 0 && pc < 0x8000))) || pc < range.upperBound {
-        let byte = self[pc, bank]
-        var opcodeWidth: UInt16 = 1
-        var operandWidth: UInt16
-        var spec = LR35902.instructionTable[Int(byte)]
-        switch spec {
-        case .stop:
-          // The next byte needs to be 00.
-          let nextByte = self[pc + 1, bank]
-          if nextByte != 0 {
-            pc += opcodeWidth
-            continue
-          } else {
-            // Stop is technically a two-byte instruction.
-            opcodeWidth += 1
-            operandWidth = 0
-          }
+        let byte = Int(self[pc, bank])
 
+        var spec = LR35902.instructionTable[byte]
+
+        var opcodeWidth: UInt16
+        var operandWidth: UInt16
+        switch spec {
         case .invalid:
-          pc += opcodeWidth
+          pc += 1
           continue
 
         case .cb:
-          let byte = self[pc + 1, bank]
-          opcodeWidth += 1
-          let cbInstruction = LR35902.instructionTableCB[Int(byte)]
+          let byteCB = Int(self[pc + 1, bank])
+          let cbInstruction = LR35902.instructionTableCB[byteCB]
           if case .invalid = spec {
-            pc += opcodeWidth
+            pc += 2
             continue
           }
           spec = cbInstruction
-          operandWidth = LR35902.operandWidthsCB[Int(byte)]
+
+          opcodeWidth = 2
+          operandWidth = LR35902.operandWidthsCB[byteCB]
+
         default:
-          operandWidth = LR35902.operandWidths[Int(byte)]
+          opcodeWidth = 1
+          operandWidth = LR35902.operandWidths[byte]
           break
         }
 
@@ -65,6 +58,14 @@ extension LR35902 {
           instruction = Instruction(spec: spec, width: instructionWidth, immediate16: immediate16)
         default:
           instruction = Instruction(spec: spec, width: instructionWidth)
+        }
+
+        if case .stop = spec {
+          // STOP must be followed by 0
+          if instruction.immediate8 != 0 {
+            pc += 1
+            continue
+          }
         }
 
         disassembly.register(instruction: instruction, at: pc, in: bank)

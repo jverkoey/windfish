@@ -125,11 +125,17 @@ public final class RGBDSAssembly {
         break
       }
     }
-    let mirror = Mirror(reflecting: instruction.spec)
+    return describe(for: instruction, spec: instruction.spec)
+  }
+
+  private static func describe(for instruction: LR35902.Instruction, spec: LR35902.InstructionSpec) -> String? {
+    let mirror = Mirror(reflecting: spec)
     guard let operands = mirror.children.first else {
       return nil
     }
     switch operands.value {
+    case let childInstruction as LR35902.InstructionSpec:
+      return describe(for: instruction, spec: childInstruction)
     case let tuple as (LR35902.Operand, LR35902.Condition?):
       if let condition = tuple.1 {
         return "\(condition), \(describe(for: instruction, operand: tuple.0))"

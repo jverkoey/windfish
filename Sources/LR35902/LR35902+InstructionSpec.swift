@@ -20,7 +20,7 @@ extension LR35902 {
     case ccf, scf
 
     // Program execution
-    case nop, stop, halt
+    case nop, stop(Operand), halt
 
     // Interrupts
     case di, ei
@@ -72,6 +72,8 @@ extension LR35902 {
     case immediate16address
 
     case ffimmediate8Address, ffccAddress
+
+    case zero8
   }
 
   /// Possible conditions in LR35902's instruction set.

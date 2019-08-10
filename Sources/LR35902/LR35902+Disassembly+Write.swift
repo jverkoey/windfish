@@ -204,6 +204,7 @@ clean:
           lineBuffer.append(contentsOf: lineGroup)
 
         } else {
+          lineBuffer.append(contentsOf: lineGroup)
           flush()
 
           cpu.bank = bank

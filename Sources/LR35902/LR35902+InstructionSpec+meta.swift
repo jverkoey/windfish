@@ -16,6 +16,8 @@ extension LR35902.InstructionSpec {
       return 0
     }
     switch operands.value {
+    case let childInstruction as LR35902.InstructionSpec:
+      return childInstruction.operandWidth
     case let tuple as (LR35902.Operand, LR35902.Condition?):
       return tuple.0.width
     case let tuple as (LR35902.Operand, LR35902.Operand):
@@ -32,7 +34,7 @@ extension LR35902.InstructionSpec {
 extension LR35902.Operand {
   var width: UInt16 {
     switch self {
-    case .spPlusImmediate8Signed, .immediate8, .immediate8signed, .ffimmediate8Address: return 1
+    case .spPlusImmediate8Signed, .immediate8, .immediate8signed, .ffimmediate8Address, .zero8: return 1
     case .immediate16, .immediate16address: return 2
     default: return 0
     }

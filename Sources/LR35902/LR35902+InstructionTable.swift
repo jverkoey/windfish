@@ -24,7 +24,7 @@ extension LR35902 {
     /* 0x0e */ .ld(.c, .immediate8),
     /* 0x0f */ .rrca,
 
-    /* 0x10 */ .stop,
+    /* 0x10 */ .stop(.zero8),
     /* 0x11 */ .ld(.de, .immediate16),
     /* 0x12 */ .ld(.deAddress, .a),
     /* 0x13 */ .inc(.de),
