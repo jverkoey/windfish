@@ -113,6 +113,7 @@ public final class RGBDSAssembly {
           addressLabel = "[$\(instruction.immediate16!.hexString)]"
         }
         return [addressLabel, describe(for: instruction, operand: operand2)]
+        
       case let LR35902.InstructionSpec.ld(operand1, operand2) where operand2 == .immediate16address:
         var addressLabel: String
         if let label = cpu.disassembly.label(at: instruction.immediate16!, in: cpu.bank) {
@@ -124,18 +125,28 @@ public final class RGBDSAssembly {
 
       case let LR35902.InstructionSpec.ld(operand1, operand2) where operand1 == .ffimmediate8Address:
         var addressLabel: String
-        if let variableName = cpu.disassembly.variables[0xFF00 | UInt16(instruction.immediate8!)] {
-          addressLabel = "[\(variableName)]"
+        if let name = cpu.disassembly.globals[0xFF00 | UInt16(instruction.immediate8!)] {
+          addressLabel = "[\(name)]"
         } else {
           addressLabel = "[$FF\(instruction.immediate8!.hexString)]"
         }
         return [addressLabel, describe(for: instruction, operand: operand2)]
+
       case let LR35902.InstructionSpec.ld(operand1, operand2) where operand2 == .ffimmediate8Address:
         var addressLabel: String
-        if let variableName = cpu.disassembly.variables[0xFF00 | UInt16(instruction.immediate8!)] {
-          addressLabel = "[\(variableName)]"
+        if let name = cpu.disassembly.globals[0xFF00 | UInt16(instruction.immediate8!)] {
+          addressLabel = "[\(name)]"
         } else {
           addressLabel = "[$FF\(instruction.immediate8!.hexString)]"
+        }
+        return [describe(for: instruction, operand: operand1), addressLabel]
+
+      case let LR35902.InstructionSpec.ld(operand1, operand2) where operand2 == .immediate16:
+        var addressLabel: String
+        if let name = cpu.disassembly.globals[instruction.immediate16!] {
+          addressLabel = "\(name)"
+        } else {
+          addressLabel = "$\(instruction.immediate16!.hexString)"
         }
         return [describe(for: instruction, operand: operand1), addressLabel]
 

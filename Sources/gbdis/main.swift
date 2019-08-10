@@ -29,4 +29,6 @@ cpu.disassembly.defineMacro(named: "callcb", instructions: [
   1: IndexSet(integersIn: 0x4000..<0x8000)
 ])
 
+cpu.disassembly.createGlobal(at: 0xA100, named: "SAVEFILES")
+
 try cpu.disassembly.writeTo(directory: "/Users/featherless/workbench/gbdis/disassembly", cpu: cpu)

@@ -101,10 +101,10 @@ clean:
 
     let gameHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("game.asm").path)
 
-    if !cpu.disassembly.variables.isEmpty {
+    if !cpu.disassembly.globals.isEmpty {
       let variablesHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("variables.asm").path)
 
-      variablesHandle.write(cpu.disassembly.variables.sorted { $0.0 < $1.0 }.map { address, name in
+      variablesHandle.write(cpu.disassembly.globals.sorted { $0.0 < $1.0 }.map { address, name in
         "\(name) EQU $\(address.hexString)"
       }.joined(separator: "\n\n").data(using: .utf8)!)
 

@@ -110,12 +110,12 @@ extension LR35902 {
     }
     private var labels: [UInt32: String] = [:]
 
-    // MARK: - Variables
+    // MARK: - Globals
 
-    public func createVariable(at address: UInt16, named name: String) {
-      variables[address] = name
+    public func createGlobal(at address: UInt16, named name: String) {
+      globals[address] = name
     }
-    var variables: [UInt16: String] = [:]
+    var globals: [UInt16: String] = [:]
 
     // MARK: - Comments
 
