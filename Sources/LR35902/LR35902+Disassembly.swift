@@ -99,6 +99,19 @@ extension LR35902 {
     private var data = IndexSet()
     private var text = IndexSet()
 
+    // MARK: - Functions
+
+    public func function(startingAt pc: UInt16, in bank: UInt8) -> String? {
+      return functions[romAddress(for: pc, in: bank)]
+    }
+
+    public func defineFunction(startingAt pc: UInt16, in bank: UInt8, named name: String) {
+      setLabel(at: pc, in: bank, named: name)
+
+      functions[romAddress(for: pc, in: bank)] = name
+    }
+    private var functions: [UInt32: String] = [:]
+
     // MARK: - Labels
 
     public func label(at pc: UInt16, in bank: UInt8) -> String? {
@@ -157,5 +170,133 @@ extension LR35902 {
       var hasWritten = false
     }
     public let macroTree = MacroNode()
+
+    public func disassemble(range: Range<UInt16>, inBank bankInitial: UInt8, cpu: LR35902) {
+      var jumpAddresses: [BankedAddress] = []
+      jumpAddresses.append(BankedAddress(bank: bankInitial, address: range.lowerBound))
+
+      var visitedAddresses = IndexSet()
+      var isFirst = true
+
+      while !jumpAddresses.isEmpty {
+        let address = jumpAddresses.removeFirst()
+        cpu.bank = address.bank
+        cpu.pc = address.address
+
+        var previousInstruction: Instruction? = nil
+        linear_sweep: while (!isFirst && ((cpu.bank == 0 && cpu.pc < 0x4000) || (cpu.bank != 0 && cpu.pc < 0x8000))) || cpu.pc < range.upperBound {
+          let byte = Int(cpu[cpu.pc, cpu.bank])
+
+          var spec = LR35902.instructionTable[byte]
+
+          var opcodeWidth: UInt16
+          var operandWidth: UInt16
+          switch spec {
+          case .invalid:
+            cpu.pc += 1
+            continue
+
+          case .cb:
+            let byteCB = Int(cpu[cpu.pc + 1, cpu.bank])
+            let cbInstruction = LR35902.instructionTableCB[byteCB]
+            if case .invalid = spec {
+              cpu.pc += 2
+              continue
+            }
+            spec = cbInstruction
+
+            opcodeWidth = 2
+            operandWidth = LR35902.operandWidthsCB[byteCB]
+
+          default:
+            opcodeWidth = 1
+            operandWidth = LR35902.operandWidths[byte]
+            break
+          }
+
+          let instructionWidth = opcodeWidth + operandWidth
+          let instruction: Instruction
+          switch operandWidth {
+          case 1:
+            instruction = Instruction(spec: spec, immediate8: cpu[cpu.pc + opcodeWidth, cpu.bank])
+          case 2:
+            let low = UInt16(cpu[cpu.pc + opcodeWidth, cpu.bank])
+            let high = UInt16(cpu[cpu.pc + opcodeWidth + 1, cpu.bank]) << 8
+            let immediate16 = high | low
+            instruction = Instruction(spec: spec, immediate16: immediate16)
+          default:
+            instruction = Instruction(spec: spec)
+          }
+
+          if case .stop = spec {
+            // STOP must be followed by 0
+            if instruction.immediate8 != 0 {
+              cpu.pc += 1
+              continue
+            }
+          }
+
+          register(instruction: instruction, at: cpu.pc, in: cpu.bank)
+
+          let nextPc = cpu.pc + instructionWidth
+
+          let lowerBound = Int(LR35902.romAddress(for: cpu.pc, in: cpu.bank))
+          visitedAddresses.insert(integersIn: lowerBound..<(lowerBound + Int(instructionWidth)))
+
+          switch spec {
+          case .ld(.immediate16address, .a):
+            if (0x2000..<0x4000).contains(instruction.immediate16!),
+              let previousInstruction = previousInstruction,
+              case .ld(.a, .immediate8) = previousInstruction.spec {
+              register(bankChange: previousInstruction.immediate8!, at: cpu.pc, in: cpu.bank)
+
+              cpu.bank = previousInstruction.immediate8!
+            }
+            break
+          case .jr(.immediate8signed, let condition):
+            let relativeJumpAmount = Int8(bitPattern: instruction.immediate8!)
+            let jumpTo = nextPc.advanced(by: Int(relativeJumpAmount))
+            if !visitedAddresses.contains(Int(LR35902.romAddress(for: jumpTo, in: cpu.bank))) {
+              jumpAddresses.append(BankedAddress(bank: cpu.bank, address: jumpTo))
+            }
+            registerTransferOfControl(to: jumpTo, in: cpu.bank, from: cpu.pc, kind: .jr)
+
+            if condition == nil {
+              break linear_sweep
+            }
+
+          case .jp(.immediate16, let condition):
+            let jumpTo = instruction.immediate16!
+            if !visitedAddresses.contains(Int(LR35902.romAddress(for: jumpTo, in: cpu.bank))) {
+              jumpAddresses.append(BankedAddress(bank: cpu.bank, address: jumpTo))
+            }
+            registerTransferOfControl(to: jumpTo, in: cpu.bank, from: cpu.pc, kind: .jp)
+
+            if condition == nil {
+              break linear_sweep
+            }
+
+          case .call(.immediate16, _):
+            let jumpTo = instruction.immediate16!
+            if !visitedAddresses.contains(Int(LR35902.romAddress(for: jumpTo, in: cpu.bank))) {
+              jumpAddresses.append(BankedAddress(bank: cpu.bank, address: jumpTo))
+            }
+            registerTransferOfControl(to: jumpTo, in: cpu.bank, from: cpu.pc, kind: .call)
+
+          case .jp(_, nil), .ret:
+            break linear_sweep
+
+          default:
+            break
+          }
+
+          cpu.pc = nextPc
+          previousInstruction = instruction
+        }
+
+        isFirst = false
+      }
+    }
+
   }
 }

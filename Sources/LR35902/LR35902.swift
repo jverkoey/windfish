@@ -44,26 +44,26 @@ public final class LR35902 {
       .map { UInt16($0 * restartSize)..<UInt16($0 * restartSize + restartSize) }
     rstAddresses.forEach {
       disassembly.setLabel(at: $0.lowerBound, in: 0x00, named: "RST_\($0.lowerBound.hexString)")
-      disassemble(range: $0, inBank: 0)
+      disassembly.disassemble(range: $0, inBank: 0, cpu: self)
     }
 
     disassembly.setLabel(at: 0x0040, in: 0x00, named: "VBlankInterrupt")
-    disassemble(range: 0x0040..<0x0048, inBank: 0)
+    disassembly.disassemble(range: 0x0040..<0x0048, inBank: 0, cpu: self)
 
     disassembly.setLabel(at: 0x0048, in: 0x00, named: "LCDCInterrupt")
-    disassemble(range: 0x0048..<0x0050, inBank: 0)
+    disassembly.disassemble(range: 0x0048..<0x0050, inBank: 0, cpu: self)
 
     disassembly.setLabel(at: 0x0050, in: 0x00, named: "TimerOverflowInterrupt")
-    disassemble(range: 0x0050..<0x0058, inBank: 0)
+    disassembly.disassemble(range: 0x0050..<0x0058, inBank: 0, cpu: self)
 
     disassembly.setLabel(at: 0x0058, in: 0x00, named: "SerialTransferCompleteInterrupt")
-    disassemble(range: 0x0058..<0x0060, inBank: 0)
+    disassembly.disassemble(range: 0x0058..<0x0060, inBank: 0, cpu: self)
 
     disassembly.setLabel(at: 0x0060, in: 0x00, named: "JoypadTransitionInterrupt")
-    disassemble(range: 0x0060..<0x0068, inBank: 0)
+    disassembly.disassemble(range: 0x0060..<0x0068, inBank: 0, cpu: self)
 
     disassembly.setLabel(at: 0x0100, in: 0x00, named: "Boot")
-    disassemble(range: 0x0100..<0x104, inBank: 0)
+    disassembly.disassemble(range: 0x0100..<0x104, inBank: 0, cpu: self)
 
     disassembly.setLabel(at: 0x0104, in: 0x00, named: "HeaderLogo")
     disassembly.setData(at: 0x0104..<0x0134, in: 0x00)
