@@ -71,7 +71,7 @@ extension LR35902.Disassembly {
       }
     }
   }
-  public func writeTo(directory: String, cpu: LR35902) throws {
+  public func writeTo(directory: String) throws {
     let fm = FileManager.default
     let directoryUrl = URL(fileURLWithPath: directory)
     try fm.createDirectory(at: directoryUrl, withIntermediateDirectories: true, attributes: nil)
@@ -101,10 +101,10 @@ clean:
 
     let gameHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("game.asm").path)
 
-    if !cpu.disassembly.globals.isEmpty {
+    if !globals.isEmpty {
       let variablesHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("variables.asm").path)
 
-      variablesHandle.write(cpu.disassembly.globals.sorted { $0.0 < $1.0 }.map { address, name in
+      variablesHandle.write(globals.sorted { $0.0 < $1.0 }.map { address, name in
         "\(name) EQU $\(address.hexString)"
       }.joined(separator: "\n\n").data(using: .utf8)!)
 
@@ -150,12 +150,12 @@ clean:
 
       while cpu.pc < end {
         var lineGroup: [Line] = []
-        if let preComment = cpu.disassembly.preComment(at: cpu.pc, in: bank) {
+        if let preComment = preComment(at: cpu.pc, in: bank) {
           lineGroup.append(.empty)
           lineGroup.append(.preComment(preComment))
         }
-        if let label = cpu.disassembly.label(at: cpu.pc, in: bank) {
-          if let transfersOfControl = cpu.disassembly.transfersOfControl(at: cpu.pc, in: bank) {
+        if let label = label(at: cpu.pc, in: bank) {
+          if let transfersOfControl = transfersOfControl(at: cpu.pc, in: bank) {
             lineGroup.append(.transferOfControl(transfersOfControl, label))
           } else {
             lineGroup.append(.empty)
@@ -163,10 +163,10 @@ clean:
           }
         }
 
-        if instructionsToDecode > 0, let instruction = cpu.disassembly.instruction(at: cpu.pc, in: bank) {
+        if instructionsToDecode > 0, let instruction = instruction(at: cpu.pc, in: bank) {
           instructionsToDecode -= 1
 
-          if let bankChange = cpu.disassembly.bankChange(at: cpu.pc, in: bank) {
+          if let bankChange = bankChange(at: cpu.pc, in: bank) {
             cpu.bank = bankChange
           }
 
@@ -174,7 +174,7 @@ clean:
           let index = LR35902.romAddress(for: cpu.pc, in: bank)
           let instructionWidth = LR35902.instructionWidths[instruction.spec]!
           let bytes = cpu[index..<(index + UInt32(instructionWidth))]
-          lineGroup.append(.instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: cpu), cpu.pc, bytes))
+          lineGroup.append(.instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: self), cpu.pc, bytes))
 
           cpu.pc += instructionWidth
 
@@ -196,7 +196,7 @@ clean:
           // Is this the beginning of a macro?
           let asInstruction = MacroLine.instruction(instruction)
           let asAny = MacroLine.any(instruction.spec)
-          if macroNode == nil, let child = cpu.disassembly.macroTree.children[asInstruction] ?? cpu.disassembly.macroTree.children[asAny] {
+          if macroNode == nil, let child = macroTree.children[asInstruction] ?? macroTree.children[asAny] {
             flush()
             lineBufferAddress = cpu.pc - instructionWidth
             macroNode = child
@@ -229,7 +229,7 @@ clean:
                   lines.append(contentsOf: zip(code, instructions).map { spec, instruction in
                     var macroInstruction = instruction.0
                     macroInstruction.spec = spec
-                    let macroAssembly = RGBDSAssembly.assembly(for: macroInstruction, with: cpu)
+                    let macroAssembly = RGBDSAssembly.assembly(for: macroInstruction, with: self)
                     return .macroInstruction(macroInstruction, macroAssembly)
                   })
                   lines.append(.macroTerminator)
@@ -296,14 +296,14 @@ clean:
           // Accumulate bytes until the next instruction or transfer of control.
           var accumulator: [UInt8] = []
           let initialPc = cpu.pc
-          let initialType = cpu.disassembly.type(of: cpu.pc, in: bank)
+          let initialType = type(of: cpu.pc, in: bank)
           repeat {
             accumulator.append(cpu[cpu.pc, cpu.bank])
             cpu.pc += 1
           } while cpu.pc < end
-            && (instructionsToDecode == 0 || cpu.disassembly.instruction(at: cpu.pc, in: bank) == nil)
-            && cpu.disassembly.label(at: cpu.pc, in: bank) == nil
-            && cpu.disassembly.type(of: cpu.pc, in: bank) == initialType
+            && (instructionsToDecode == 0 || instruction(at: cpu.pc, in: bank) == nil)
+            && label(at: cpu.pc, in: bank) == nil
+            && type(of: cpu.pc, in: bank) == initialType
 
           // Dump the bytes in blocks of 8.
           if initialType == .text {

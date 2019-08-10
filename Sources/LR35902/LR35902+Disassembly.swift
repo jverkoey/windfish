@@ -5,6 +5,83 @@ extension LR35902 {
   /// A class that owns and manages disassembly information for a given ROM.
   public class Disassembly {
 
+    let cpu: LR35902
+    public init(rom: Data) {
+      cpu = LR35902(rom: rom)
+
+      // Restart addresses
+      let numberOfRestartAddresses = 8
+      let restartSize = 8
+      let rstAddresses = (0..<numberOfRestartAddresses)
+        .map { UInt16($0 * restartSize)..<UInt16($0 * restartSize + restartSize) }
+      rstAddresses.forEach {
+        setLabel(at: $0.lowerBound, in: 0x00, named: "RST_\($0.lowerBound.hexString)")
+        disassemble(range: $0, inBank: 0)
+      }
+
+      setLabel(at: 0x0040, in: 0x00, named: "VBlankInterrupt")
+      disassemble(range: 0x0040..<0x0048, inBank: 0)
+
+      setLabel(at: 0x0048, in: 0x00, named: "LCDCInterrupt")
+      disassemble(range: 0x0048..<0x0050, inBank: 0)
+
+      setLabel(at: 0x0050, in: 0x00, named: "TimerOverflowInterrupt")
+      disassemble(range: 0x0050..<0x0058, inBank: 0)
+
+      setLabel(at: 0x0058, in: 0x00, named: "SerialTransferCompleteInterrupt")
+      disassemble(range: 0x0058..<0x0060, inBank: 0)
+
+      setLabel(at: 0x0060, in: 0x00, named: "JoypadTransitionInterrupt")
+      disassemble(range: 0x0060..<0x0068, inBank: 0)
+
+      setLabel(at: 0x0100, in: 0x00, named: "Boot")
+      disassemble(range: 0x0100..<0x104, inBank: 0)
+
+      setLabel(at: 0x0104, in: 0x00, named: "HeaderLogo")
+      setData(at: 0x0104..<0x0134, in: 0x00)
+
+      setLabel(at: 0x0134, in: 0x00, named: "HeaderTitle")
+      setText(at: 0x0134..<0x0143, in: 0x00)
+
+      setLabel(at: 0x0143, in: 0x00, named: "HeaderIsColorGB")
+      setData(at: 0x0143, in: 0x00)
+
+      setLabel(at: 0x0144, in: 0x00, named: "HeaderNewLicenseeCode")
+      setData(at: 0x0144..<0x0146, in: 0x00)
+
+      setLabel(at: 0x0146, in: 0x00, named: "HeaderSGBFlag")
+      setData(at: 0x0146, in: 0x00)
+
+      setLabel(at: 0x0147, in: 0x00, named: "HeaderCartridgeType")
+      setData(at: 0x0147, in: 0x00)
+
+      setLabel(at: 0x0148, in: 0x00, named: "HeaderROMSize")
+      setData(at: 0x0148, in: 0x00)
+
+      setLabel(at: 0x0149, in: 0x00, named: "HeaderRAMSize")
+      setData(at: 0x0149, in: 0x00)
+
+      setLabel(at: 0x014A, in: 0x00, named: "HeaderDestinationCode")
+      setData(at: 0x014A, in: 0x00)
+
+      setLabel(at: 0x014B, in: 0x00, named: "HeaderOldLicenseeCode")
+      setData(at: 0x014B, in: 0x00)
+
+      setLabel(at: 0x014C, in: 0x00, named: "HeaderMaskROMVersion")
+      setData(at: 0x014C, in: 0x00)
+
+      setLabel(at: 0x014D, in: 0x00, named: "HeaderComplementCheck")
+      setData(at: 0x014D, in: 0x00)
+
+      setLabel(at: 0x014E, in: 0x00, named: "HeaderGlobalChecksum")
+      setData(at: 0x014E..<0x0150, in: 0x00)
+
+      createGlobal(at: 0xA000, named: "CARTRAM")
+      createGlobal(at: 0xFF47, named: "rBGP")
+      createGlobal(at: 0xFF48, named: "rOBP0")
+      createGlobal(at: 0xFF49, named: "rOBP1")
+    }
+
     // MARK: - Transfers of control
 
     public struct TransferOfControl: Hashable {
@@ -171,7 +248,7 @@ extension LR35902 {
     }
     public let macroTree = MacroNode()
 
-    public func disassemble(range: Range<UInt16>, inBank bankInitial: UInt8, cpu: LR35902) {
+    public func disassemble(range: Range<UInt16>, inBank bankInitial: UInt8) {
       var jumpAddresses: [BankedAddress] = []
       jumpAddresses.append(BankedAddress(bank: bankInitial, address: range.lowerBound))
 
