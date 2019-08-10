@@ -29,5 +29,5 @@ public func line<T: FixedWidthInteger>(_ code: String, address: T, comment: Stri
 }
 
 public func line<T: FixedWidthInteger>(_ code: String, address: T, bytes: Data) -> String {
-  return "\(codeColumn("    \(code)")) ; $\(address.hexString): \(bytes.map { "$\($0)" }.joined(separator: " "))"
+  return "\(codeColumn("    \(code)")) ; $\(address.hexString): \(bytes.map { "$\($0.hexString)" }.joined(separator: " "))"
 }

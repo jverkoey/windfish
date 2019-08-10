@@ -129,24 +129,23 @@ extension LR35902 {
 
     // MARK: - Macros
 
-    public func defineMacro(named name: String, instructions: [InstructionSpec]) {
-      macros[name] = instructions
-
-      instructions.reduce(macroTree, { node, spec in
+    public func defineMacro(named name: String,
+                            instructions: [InstructionSpec],
+                            assemblyGenerator: @escaping ([Instruction]) -> String) {
+      let leaf = instructions.reduce(macroTree, { node, spec in
         let child = node.children[spec, default: MacroNode()]
         node.children[spec] = child
         return child
-      }).macro = name
+      })
+      leaf.macro = name
+      leaf.assemblyGenerator = assemblyGenerator
     }
-    private var macros: [String: [InstructionSpec]] = [:]
 
-    private class MacroNode {
+    public class MacroNode {
       var children: [InstructionSpec: MacroNode] = [:]
       var macro: String?
-      init(macro: String? = nil) {
-        self.macro = macro
-      }
+      var assemblyGenerator: (([Instruction]) -> String)?
     }
-    private let macroTree = MacroNode()
+    public let macroTree = MacroNode()
   }
 }

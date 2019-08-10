@@ -1,7 +1,7 @@
 import Foundation
 
 extension LR35902 {
-  public struct Instruction {
+  public struct Instruction: Equatable {
     public let spec: InstructionSpec
     public let width: UInt16
     public let immediate8: UInt8?

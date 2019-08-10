@@ -14,12 +14,11 @@ private func write(_ string: String, fileHandle: FileHandle) {
   fileHandle.write("\(string)\n".data(using: .utf8)!)
 }
 
-private func line(_ transfersOfControl: Set<LR35902.Disassembly.TransferOfControl>, cpu: LR35902) -> String {
+private func line(_ transfersOfControl: Set<LR35902.Disassembly.TransferOfControl>, label: String) -> String {
   let sources = transfersOfControl
     .sorted(by: { $0.sourceAddress < $1.sourceAddress })
     .map { "\($0.kind) @ $\($0.sourceAddress.hexString)" }
     .joined(separator: ", ")
-  let label = cpu.disassembly.label(at: cpu.pc, in: cpu.bank)!
   return line("\(label):", comment: "Sources: \(sources)")
 }
 
@@ -34,6 +33,14 @@ extension FileManager {
 }
 
 extension LR35902.Disassembly {
+  enum Line: Equatable {
+    case empty
+    case preComment(String)
+    case label(String)
+    case transferOfControl(Set<TransferOfControl>, String)
+    case instruction(LR35902.Instruction, String, UInt16, Data)
+    case macro(String, UInt16, Data)
+  }
   public func writeTo(directory: String, cpu: LR35902) throws {
     let fm = FileManager.default
     let directoryUrl = URL(fileURLWithPath: directory)
@@ -93,31 +100,44 @@ clean:
       cpu.bank = bank
       let end: UInt16 = (bank == 0) ? 0x4000 : 0x8000
 
-      var lineBuffer: [String] = []
-      lineBuffer.append("")
+      var lineBufferAddress: UInt16 = cpu.pc
+      var lineBuffer: [Line] = []
+      lineBuffer.append(.empty)
+      var macroNode: MacroNode? = nil
 
       let flush = {
-        var lastLine: String?
-        lineBuffer.forEach { line in
-          if let lastLine = lastLine, lastLine.isEmpty && line.isEmpty {
+        var lastLine: Line?
+        lineBuffer.forEach { thisLine in
+          if let lastLine = lastLine, lastLine == .empty && thisLine == .empty {
             return
           }
-          write(line, fileHandle: fileHandle)
-          lastLine = line
+          switch thisLine {
+          case .empty:                             write("", fileHandle: fileHandle)
+          case let .label(label):                  write("\(label):", fileHandle: fileHandle)
+          case let .preComment(comment):           write(line(comment: comment), fileHandle: fileHandle)
+          case let .transferOfControl(toc, label): write(line(toc, label: label), fileHandle: fileHandle)
+          case let .instruction(_, assembly, address, bytes): write(line(assembly, address: address, bytes: bytes), fileHandle: fileHandle)
+          case let .macro(assembly, address, bytes): write(line(assembly, address: address, bytes: bytes), fileHandle: fileHandle)
+          }
+          lastLine = thisLine
         }
         lineBuffer.removeAll()
+        macroNode = nil
       }
 
       while cpu.pc < end {
+        var lineGroup: [Line] = []
         if let preComment = cpu.disassembly.preComment(at: cpu.pc, in: bank) {
-          lineBuffer.append("")
-          lineBuffer.append(line(comment: preComment))
+          lineGroup.append(.empty)
+          lineGroup.append(.preComment(preComment))
         }
-        if let transfersOfControl = cpu.disassembly.transfersOfControl(at: cpu.pc, in: bank) {
-          lineBuffer.append(line(transfersOfControl, cpu: cpu))
-        } else if let label = cpu.disassembly.label(at: cpu.pc, in: bank) {
-          lineBuffer.append("")
-          lineBuffer.append("\(label):")
+        if let label = cpu.disassembly.label(at: cpu.pc, in: bank) {
+          if let transfersOfControl = cpu.disassembly.transfersOfControl(at: cpu.pc, in: bank) {
+            lineGroup.append(.transferOfControl(transfersOfControl, label))
+          } else {
+            lineGroup.append(.empty)
+            lineGroup.append(.label(label))
+          }
         }
 
         if instructionsToDecode > 0, let instruction = cpu.disassembly.instruction(at: cpu.pc, in: bank) {
@@ -128,24 +148,61 @@ clean:
           }
 
           // Write the instruction as assembly.
-          let index = LR35902.romAddress(for: cpu.pc, in: cpu.bank)
+          let index = LR35902.romAddress(for: cpu.pc, in: bank)
           let bytes = cpu[index..<(index + UInt32(instruction.width))]
-          lineBuffer.append(line(RGBDSAssembly.assembly(for: instruction, with: cpu), address: cpu.pc, bytes: bytes))
+          lineGroup.append(.instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: cpu), cpu.pc, bytes))
 
           cpu.pc += instruction.width
 
           // Handle context changes.
           switch instruction.spec {
           case .jp, .jr:
-            lineBuffer.append("")
+            lineGroup.append(.empty)
             cpu.bank = bank
           case .ret, .reti:
-            lineBuffer.append("")
-            lineBuffer.append("")
+            lineGroup.append(.empty)
+            lineGroup.append(.empty)
             cpu.bank = bank
           default:
             break
           }
+
+          // Is this the beginning of a macro?
+          if macroNode == nil, let child = cpu.disassembly.macroTree.children[instruction.spec] {
+            flush()
+            lineBufferAddress = cpu.pc - instruction.width
+            macroNode = child
+
+          } else if let macroNodeIterator = macroNode {
+            // Still building the macro.
+            if let child = macroNodeIterator.children[instruction.spec] {
+              macroNode = child
+            } else {
+              if let macro = macroNodeIterator.macro,
+                let assemblyGenerator = macroNodeIterator.assemblyGenerator {
+                let instructions = lineBuffer.compactMap { thisLine -> LR35902.Instruction? in
+                  if case let .instruction(instruction, _, _, _) = thisLine {
+                    return instruction
+                  } else {
+                    return nil
+                  }
+                }
+                let assembly = assemblyGenerator(instructions)
+                print("This is a macro \(macro) \(assembly)")
+                lineBuffer.removeAll()
+
+                let lowerBound = LR35902.romAddress(for: lineBufferAddress, in: bank)
+                let upperBound = LR35902.romAddress(for: cpu.pc - instruction.width, in: bank)
+                let bytes = cpu[lowerBound..<upperBound]
+                lineBuffer.append(.macro("\(macro) \(assembly)", lineBufferAddress, bytes))
+
+                lineBufferAddress = cpu.pc
+              }
+              macroNode = nil
+            }
+          }
+
+          lineBuffer.append(contentsOf: lineGroup)
 
         } else {
           flush()
@@ -178,7 +235,9 @@ clean:
               address += UInt16(chunk.count)
             }
           }
-          lineBuffer.append("")
+
+          lineBuffer.append(.empty)
+          lineBufferAddress = cpu.pc
         }
       }
 
