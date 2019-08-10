@@ -129,9 +129,24 @@ extension LR35902 {
 
     // MARK: - Macros
 
-    public func defineMacro(named: String, instructions: [InstructionSpec]) {
-      macros[named] = instructions
+    public func defineMacro(named name: String, instructions: [InstructionSpec]) {
+      macros[name] = instructions
+
+      instructions.reduce(macroTree, { node, spec in
+        let child = node.children[spec, default: MacroNode()]
+        node.children[spec] = child
+        return child
+      }).macro = name
     }
     private var macros: [String: [InstructionSpec]] = [:]
+
+    private class MacroNode {
+      var children: [InstructionSpec: MacroNode] = [:]
+      var macro: String?
+      init(macro: String? = nil) {
+        self.macro = macro
+      }
+    }
+    private let macroTree = MacroNode()
   }
 }
