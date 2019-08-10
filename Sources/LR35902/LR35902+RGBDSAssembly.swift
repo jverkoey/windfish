@@ -181,7 +181,11 @@ public final class RGBDSAssembly {
       } else {
         return "sp+$\(instruction.immediate8!.hexString)"
       }
-    default:                    return "\(operand)"
+    case .a, .af, .b, .c, .bc, .d, .e, .de, .h, .l, .hl, .sp: return "\(operand)"
+    case .zero8:
+      preconditionFailure("Unable to print out a zero8")
+    case let .macro(text):
+      return text
     }
   }
 }

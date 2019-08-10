@@ -59,7 +59,7 @@ extension LR35902 {
   }
 
   /// Possible operands in LR35902's instruction set.
-  public enum Operand {
+  public enum Operand: Hashable {
     case a, af
     case b, c, bc, bcAddress
     case d, e, de, deAddress
@@ -74,6 +74,8 @@ extension LR35902 {
     case ffimmediate8Address, ffccAddress
 
     case zero8
+
+    case macro(String) // For macro use only
   }
 
   /// Possible conditions in LR35902's instruction set.

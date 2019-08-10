@@ -2,7 +2,7 @@ import Foundation
 
 extension LR35902 {
   public struct Instruction: Hashable, Equatable {
-    public let spec: InstructionSpec
+    public var spec: InstructionSpec
     public let immediate8: UInt8?
     public let immediate16: UInt16?
 

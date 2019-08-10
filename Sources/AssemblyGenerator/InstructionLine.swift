@@ -24,6 +24,10 @@ public func line<T: FixedWidthInteger>(_ code: String, address: T) -> String {
   return "\(column) ; $\(address.hexString)"
 }
 
+public func line(_ code: String) -> String {
+  return "\(codeColumn("    \(code)"))"
+}
+
 public func line<T: FixedWidthInteger>(_ code: String, address: T, comment: String) -> String {
   return "\(codeColumn("    \(code)")) ; $\(address.hexString) \(comment)"
 }

@@ -33,13 +33,30 @@ extension FileManager {
 }
 
 extension LR35902.Disassembly {
-  enum Line: Equatable {
+  enum Line: Equatable, CustomStringConvertible {
     case empty
     case preComment(String)
     case label(String)
     case transferOfControl(Set<TransferOfControl>, String)
     case instruction(LR35902.Instruction, String, UInt16, Data)
+    case macroInstruction(LR35902.Instruction, String)
     case macro(String, UInt16, Data)
+    case macroDefinition(String)
+    case macroTerminator
+
+    var description: String {
+      switch self {
+      case .empty:                             return ""
+      case let .label(label):                  return "\(label):"
+      case let .preComment(comment):           return line(comment: comment)
+      case let .transferOfControl(toc, label): return line(toc, label: label)
+      case let .instruction(_, assembly, address, bytes): return line(assembly, address: address, bytes: bytes)
+      case let .macroInstruction(_, assembly): return line(assembly)
+      case let .macro(assembly, address, bytes): return line(assembly, address: address, bytes: bytes)
+      case let .macroDefinition(name):         return "\(name): MACRO"
+      case let .macroTerminator:               return line("ENDM")
+      }
+    }
   }
   public func writeTo(directory: String, cpu: LR35902) throws {
     let fm = FileManager.default
@@ -67,6 +84,8 @@ clean:
 
 """.data(using: .utf8)!)
 
+    var macrosHandle: FileHandle? = nil
+
     let gameHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("game.asm").path)
 
     if !cpu.disassembly.variables.isEmpty {
@@ -78,12 +97,6 @@ clean:
 
       gameHandle.write("INCLUDE \"variables.asm\"\n".data(using: .utf8)!)
     }
-
-    gameHandle.write(
-      ((UInt8(0)..<UInt8(cpu.numberOfBanks))
-        .map { "INCLUDE \"bank_\($0.hexString).asm\"" }
-        .joined(separator: "\n") + "\n")
-        .data(using: .utf8)!)
 
     var instructionsToDecode = Int.max
 
@@ -105,22 +118,19 @@ clean:
       lineBuffer.append(.empty)
       var macroNode: MacroNode? = nil
 
-      let flush = {
+      let writeLinesToFile: ([Line], FileHandle) -> Void = { lines, fileHandle in
         var lastLine: Line?
-        lineBuffer.forEach { thisLine in
+        lines.forEach { thisLine in
           if let lastLine = lastLine, lastLine == .empty && thisLine == .empty {
             return
           }
-          switch thisLine {
-          case .empty:                             write("", fileHandle: fileHandle)
-          case let .label(label):                  write("\(label):", fileHandle: fileHandle)
-          case let .preComment(comment):           write(line(comment: comment), fileHandle: fileHandle)
-          case let .transferOfControl(toc, label): write(line(toc, label: label), fileHandle: fileHandle)
-          case let .instruction(_, assembly, address, bytes): write(line(assembly, address: address, bytes: bytes), fileHandle: fileHandle)
-          case let .macro(assembly, address, bytes): write(line(assembly, address: address, bytes: bytes), fileHandle: fileHandle)
-          }
+          write(thisLine.description, fileHandle: fileHandle)
           lastLine = thisLine
         }
+      }
+
+      let flush = {
+        writeLinesToFile(lineBuffer, fileHandle)
         lineBuffer.removeAll()
         macroNode = nil
       }
@@ -170,20 +180,20 @@ clean:
 
           // Is this the beginning of a macro?
           let asInstruction = MacroLine.instruction(instruction)
-          let asWildcard = MacroLine.wildcard(instruction.spec)
-          if macroNode == nil,
-              let child = cpu.disassembly.macroTree.children[asInstruction] ?? cpu.disassembly.macroTree.children[asWildcard] {
+          let asAny = MacroLine.any(instruction.spec)
+          if macroNode == nil, let child = cpu.disassembly.macroTree.children[asInstruction] ?? cpu.disassembly.macroTree.children[asAny] {
             flush()
             lineBufferAddress = cpu.pc - instructionWidth
             macroNode = child
 
           } else if let macroNodeIterator = macroNode {
             // Still building the macro.
-            if let child = macroNodeIterator.children[asInstruction] ?? macroNodeIterator.children[asWildcard] {
+            if let child = macroNodeIterator.children[asInstruction] ?? macroNodeIterator.children[asAny] {
               macroNode = child
             } else {
               if let macro = macroNodeIterator.macro,
-                let arguments = macroNodeIterator.arguments {
+                let arguments = macroNodeIterator.arguments,
+                let code = macroNodeIterator.code {
                 let instructions = lineBuffer.compactMap { thisLine -> LR35902.Instruction? in
                   if case let .instruction(instruction, _, _, _) = thisLine {
                     return instruction
@@ -191,13 +201,35 @@ clean:
                     return nil
                   }
                 }
-                let assembly = arguments(instructions).joined(separator: ", ")
-                lineBuffer.removeAll()
+
+                if !macroNodeIterator.hasWritten {
+                  if macrosHandle == nil {
+                    macrosHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("macros.asm").path)
+                    gameHandle.write("INCLUDE \"macros.asm\"\n".data(using: .utf8)!)
+                  }
+
+                  var lines: [Line] = []
+                  lines.append(.empty)
+                  lines.append(.macroDefinition(macro))
+                  lines.append(contentsOf: zip(code, instructions).map { spec, instruction in
+                    var macroInstruction = instruction
+                    macroInstruction.spec = spec
+                    return .macroInstruction(macroInstruction, RGBDSAssembly.assembly(for: macroInstruction, with: cpu))
+                  })
+                  lines.append(.macroTerminator)
+                  writeLinesToFile(lines, macrosHandle!)
+
+                  macroNodeIterator.hasWritten = true
+                }
+
+                let macroOperands = arguments(instructions).joined(separator: ", ")
 
                 let lowerBound = LR35902.romAddress(for: lineBufferAddress, in: bank)
                 let upperBound = LR35902.romAddress(for: cpu.pc - instructionWidth, in: bank)
                 let bytes = cpu[lowerBound..<upperBound]
-                lineBuffer.append(.macro("\(macro) \(assembly)", lineBufferAddress, bytes))
+
+                lineBuffer.removeAll()
+                lineBuffer.append(.macro("\(macro) \(macroOperands)", lineBufferAddress, bytes))
 
                 lineBufferAddress = cpu.pc
               }
@@ -247,5 +279,11 @@ clean:
 
       flush()
     }
+
+    gameHandle.write(
+      ((UInt8(0)..<UInt8(cpu.numberOfBanks))
+        .map { "INCLUDE \"bank_\($0.hexString).asm\"" }
+        .joined(separator: "\n") + "\n")
+        .data(using: .utf8)!)
   }
 }
