@@ -88,29 +88,36 @@ clean:
       } else {
         write("SECTION \"ROM Bank \(bank.hexString)\", ROMX[$4000], BANK[$\(bank.hexString)]", fileHandle: fileHandle)
       }
-      write("", fileHandle: fileHandle)
 
       cpu.pc = (bank == 0) ? 0x0000 : 0x4000
       cpu.bank = bank
       let end: UInt16 = (bank == 0) ? 0x4000 : 0x8000
 
-      var didJustWriteNewline = true
+      var lineBuffer: [String] = []
+      lineBuffer.append("")
+
+      let flush = {
+        var lastLine: String?
+        lineBuffer.forEach { line in
+          if let lastLine = lastLine, lastLine.isEmpty && line.isEmpty {
+            return
+          }
+          write(line, fileHandle: fileHandle)
+          lastLine = line
+        }
+        lineBuffer.removeAll()
+      }
 
       while cpu.pc < end {
         if let preComment = cpu.disassembly.preComment(at: cpu.pc, in: bank) {
-          write("", fileHandle: fileHandle)
-          write(line(comment: preComment), fileHandle: fileHandle)
-          didJustWriteNewline = false
+          lineBuffer.append("")
+          lineBuffer.append(line(comment: preComment))
         }
         if let transfersOfControl = cpu.disassembly.transfersOfControl(at: cpu.pc, in: bank) {
-          write(line(transfersOfControl, cpu: cpu), fileHandle: fileHandle)
-          didJustWriteNewline = false
+          lineBuffer.append(line(transfersOfControl, cpu: cpu))
         } else if let label = cpu.disassembly.label(at: cpu.pc, in: bank) {
-          if !didJustWriteNewline {
-            write("", fileHandle: fileHandle)
-          }
-          write("\(label):", fileHandle: fileHandle)
-          didJustWriteNewline = false
+          lineBuffer.append("")
+          lineBuffer.append("\(label):")
         }
 
         if instructionsToDecode > 0, let instruction = cpu.disassembly.instruction(at: cpu.pc, in: bank) {
@@ -123,26 +130,26 @@ clean:
           // Write the instruction as assembly.
           let index = LR35902.romAddress(for: cpu.pc, in: cpu.bank)
           let bytes = cpu[index..<(index + UInt32(instruction.width))]
-          write(line(RGBDSAssembly.assembly(for: instruction, with: cpu), address: cpu.pc, bytes: bytes), fileHandle: fileHandle)
+          lineBuffer.append(line(RGBDSAssembly.assembly(for: instruction, with: cpu), address: cpu.pc, bytes: bytes))
 
           cpu.pc += instruction.width
 
           // Handle context changes.
           switch instruction.spec {
           case .jp, .jr:
-            write("", fileHandle: fileHandle)
-            didJustWriteNewline = true
+            lineBuffer.append("")
             cpu.bank = bank
           case .ret, .reti:
-            write("", fileHandle: fileHandle)
-            write("", fileHandle: fileHandle)
-            didJustWriteNewline = true
+            lineBuffer.append("")
+            lineBuffer.append("")
             cpu.bank = bank
           default:
             break
           }
 
         } else {
+          flush()
+
           cpu.bank = bank
 
           // Accumulate bytes until the next instruction or transfer of control.
@@ -171,10 +178,11 @@ clean:
               address += UInt16(chunk.count)
             }
           }
-          write("", fileHandle: fileHandle)
-          didJustWriteNewline = true
+          lineBuffer.append("")
         }
       }
+
+      flush()
     }
   }
 }
