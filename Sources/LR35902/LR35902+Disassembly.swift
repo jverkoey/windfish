@@ -97,8 +97,7 @@ extension LR35902 {
 
     func registerTransferOfControl(to pc: UInt16, in bank: UInt8, from fromPc: UInt16, kind: TransferOfControl.Kind) {
       let index = romAddress(for: pc, in: bank)
-      transfers[index, default: Set()]
-        .insert(TransferOfControl(sourceAddress: fromPc, kind: kind))
+      transfers[index, default: Set()].insert(TransferOfControl(sourceAddress: fromPc, kind: kind))
       if labels[index] == nil
         // Don't create a label in the middle of an instruction.
         && (!code.contains(Int(index)) || instruction(at: pc, in: bank) != nil) {
@@ -250,12 +249,18 @@ extension LR35902 {
     }
     public let macroTree = MacroNode()
 
+    private struct DisassemblyIntent: Hashable {
+      let bank: UInt8
+      let address: UInt16
+    }
+
     public func disassemble(range: Range<UInt16>, inBank bankInitial: UInt8, function: String? = nil) {
-      var jumpAddresses: [BankedAddress] = []
-      jumpAddresses.append(BankedAddress(bank: bankInitial, address: range.lowerBound))
+      var jumpAddresses: [DisassemblyIntent] = []
+      jumpAddresses.append(DisassemblyIntent(bank: bankInitial, address: range.lowerBound))
 
       var visitedAddresses = IndexSet()
       var isFirst = true
+      var functionAddresses = IndexSet()
 
       while !jumpAddresses.isEmpty {
         let address = jumpAddresses.removeFirst()
@@ -324,7 +329,13 @@ extension LR35902 {
           let nextPc = cpu.pc + instructionWidth
 
           let lowerBound = Int(LR35902.romAddress(for: cpu.pc, in: cpu.bank))
-          visitedAddresses.insert(integersIn: lowerBound..<(lowerBound + Int(instructionWidth)))
+          let instructionRange = lowerBound..<(lowerBound + Int(instructionWidth))
+          visitedAddresses.insert(integersIn: instructionRange)
+          functionAddresses.insert(integersIn: instructionRange)
+
+          // TODO: Rename labels if within a function.
+          // Identify the range of the function, track which labels we added, and then rename all labels
+          // within the scope of the function.
 
           switch spec {
           case .ld(.immediate16address, .a):
@@ -335,12 +346,12 @@ extension LR35902 {
 
               cpu.bank = previousInstruction.immediate8!
             }
-            break
+
           case .jr(.immediate8signed, let condition):
             let relativeJumpAmount = Int8(bitPattern: instruction.immediate8!)
             let jumpTo = nextPc.advanced(by: Int(relativeJumpAmount))
             if !visitedAddresses.contains(Int(LR35902.romAddress(for: jumpTo, in: cpu.bank))) {
-              jumpAddresses.append(BankedAddress(bank: cpu.bank, address: jumpTo))
+              jumpAddresses.append(DisassemblyIntent(bank: cpu.bank, address: jumpTo))
             }
             registerTransferOfControl(to: jumpTo, in: cpu.bank, from: cpu.pc, kind: .jr)
 
@@ -351,7 +362,7 @@ extension LR35902 {
           case .jp(.immediate16, let condition):
             let jumpTo = instruction.immediate16!
             if !visitedAddresses.contains(Int(LR35902.romAddress(for: jumpTo, in: cpu.bank))) {
-              jumpAddresses.append(BankedAddress(bank: cpu.bank, address: jumpTo))
+              jumpAddresses.append(DisassemblyIntent(bank: cpu.bank, address: jumpTo))
             }
             registerTransferOfControl(to: jumpTo, in: cpu.bank, from: cpu.pc, kind: .jp)
 
@@ -362,7 +373,7 @@ extension LR35902 {
           case .call(.immediate16, _):
             let jumpTo = instruction.immediate16!
             if !visitedAddresses.contains(Int(LR35902.romAddress(for: jumpTo, in: cpu.bank))) {
-              jumpAddresses.append(BankedAddress(bank: cpu.bank, address: jumpTo))
+              jumpAddresses.append(DisassemblyIntent(bank: cpu.bank, address: jumpTo))
             }
             registerTransferOfControl(to: jumpTo, in: cpu.bank, from: cpu.pc, kind: .call)
 
@@ -378,6 +389,19 @@ extension LR35902 {
         }
 
         isFirst = false
+      }
+      if let function = function {
+        let functionStartAddress = Int(LR35902.romAddress(for: range.lowerBound, in: bankInitial))
+        if let functionRange = visitedAddresses.rangeView.first(where: { $0.lowerBound == functionStartAddress }),
+           case .ret = instructionMap[UInt32(functionRange.upperBound - 1)]?.spec {
+          // functionRange is confirmed to be a contiguous block of memory for which we can rewrite labels.
+          let labelAddresses = functionRange.dropFirst().filter { labels[UInt32($0)] != nil }.map { UInt32($0) }
+          labelAddresses.forEach {
+            let bank = UInt8($0 / LR35902.bankSize)
+            let address = $0 % LR35902.bankSize + ((bank > 0) ? UInt32(0x4000) : UInt32(0x0000))
+            labels[$0] = "\(function).\(bank.hexString)_\(UInt16(address).hexString)"
+          }
+        }
       }
     }
 

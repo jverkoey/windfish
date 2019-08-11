@@ -34,10 +34,5 @@ public final class LR35902 {
     return UInt8(UInt32(rom.count) / LR35902.bankSize)
   }
 
-  struct BankedAddress: Hashable {
-    let bank: UInt8
-    let address: UInt16
-  }
-
   static let bankSize: UInt32 = 0x4000
 }
