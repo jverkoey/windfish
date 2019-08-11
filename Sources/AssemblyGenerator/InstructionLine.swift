@@ -32,6 +32,6 @@ public func line<T: FixedWidthInteger>(_ code: String, address: T, comment: Stri
   return "\(codeColumn("    \(code)")) ; $\(address.hexString) \(comment)"
 }
 
-public func line<T: FixedWidthInteger>(_ code: String, address: T, bytes: Data) -> String {
-  return "\(codeColumn("    \(code)")) ; $\(address.hexString): \(bytes.map { "$\($0.hexString)" }.joined(separator: " "))"
+public func line<T: FixedWidthInteger>(_ code: String, address: T, bank: UInt8, bytes: Data) -> String {
+  return "\(codeColumn("    \(code)")) ; $\(address.hexString) (\(bank.hexString)): \(bytes.map { "$\($0.hexString)" }.joined(separator: " "))"
 }
