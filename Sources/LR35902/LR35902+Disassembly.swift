@@ -180,15 +180,23 @@ extension LR35902 {
     public func function(startingAt pc: UInt16, in bank: UInt8) -> String? {
       return functions[romAddress(for: pc, in: bank)]
     }
+    public func scope(at pc: UInt16, in bank: UInt8) -> String? {
+      return scopes[romAddress(for: pc, in: bank)]
+    }
 
     public func defineFunction(startingAt pc: UInt16, in bank: UInt8, named name: String) {
+      setLabel(at: pc, in: bank, named: name)
       functions[romAddress(for: pc, in: bank)] = name
 
-      setLabel(at: pc, in: bank, named: name)
       let upperBound: UInt16 = (bank == 0) ? 0x4000 : 0x8000
-      disassemble(range: pc..<upperBound, inBank: bank, function: name)
+      let functionScope = disassemble(range: pc..<upperBound, inBank: bank, function: name).rangeView.first!
+
+      for address in functionScope {
+        scopes[UInt32(address)] = name
+      }
     }
     private var functions: [UInt32: String] = [:]
+    private var scopes: [UInt32: String] = [:]
 
     // MARK: - Labels
 
@@ -273,7 +281,8 @@ extension LR35902 {
       var sourceAddress: UInt16?
     }
 
-    public func disassemble(range: Range<UInt16>, inBank bankInitial: UInt8, function: String? = nil) {
+    @discardableResult
+    public func disassemble(range: Range<UInt16>, inBank bankInitial: UInt8, function: String? = nil) -> IndexSet {
       var allVisitedAddresses = IndexSet()
       var isFirst = true
 
@@ -426,45 +435,49 @@ extension LR35902 {
         }
       }
 
-      // Rewrite function labels.
+      // Compute scope and rewrite function labels if we're a function.
 
-      if let function = function {
-        let functionRuns = runs.filter { run in
-          // Always include the initial run.
-          guard let sourceInstruction = run.sourceInstruction else {
-            return true
-          }
-
-          // Ignore empty runs.
-          guard let visitedRange = run.visitedRange,
-                !visitedRange.isEmpty else {
-            return false
-          }
-
-          // Filter out calls.
-          if case .call = sourceInstruction.spec {
-            return false
-          }
-
-          // Filter out runs spawned from calls.
-          // TODO: This would be more efficient if we could traverse the run tree top-down rather than bottom-up.
-          // Consider adding a "child runs" property to Run and allowing the Run structure to maintain the hierarchy
-          // instead.
-          var runIterator = run
-          while let runAncestor = runIterator.sourceRun {
-            if let sourceInstruction = runAncestor.sourceInstruction,
-              case .call = sourceInstruction.spec {
-              return false
-            }
-            runIterator = runAncestor
-          }
-
-          // Keep everything else.
+      let functionRuns = runs.filter { run in
+        // Always include the initial run.
+        guard let sourceInstruction = run.sourceInstruction else {
           return true
         }
 
+        // Ignore empty runs.
+        guard let visitedRange = run.visitedRange,
+              !visitedRange.isEmpty else {
+          return false
+        }
+
+        // Filter out calls.
+        if case .call = sourceInstruction.spec {
+          return false
+        }
+
+        // Filter out runs spawned from calls.
+        // TODO: This would be more efficient if we could traverse the run tree top-down rather than bottom-up.
+        // Consider adding a "child runs" property to Run and allowing the Run structure to maintain the hierarchy
+        // instead.
+        var runIterator = run
+        while let runAncestor = runIterator.sourceRun {
+          if let sourceInstruction = runAncestor.sourceInstruction,
+            case .call = sourceInstruction.spec {
+            return false
+          }
+          runIterator = runAncestor
+        }
+
+        // Keep everything else.
+        return true
+      }
+
+      var functionScope = IndexSet()
+      functionRuns.forEach { run in
+        functionScope.insert(integersIn: Int(run.visitedRange!.lowerBound)..<Int(run.visitedRange!.upperBound))
+      }
+
+      if let function = function {
         functionRuns.forEach { run in
-          // functionRange is confirmed to be a contiguous block of memory for which we can rewrite labels.
           let labelAddresses = run.visitedRange!.dropLast().filter { $0 != range.lowerBound && labels[$0] != nil }
           labelAddresses.forEach {
             let bank = UInt8($0 / LR35902.bankSize)
@@ -480,7 +493,6 @@ extension LR35902 {
             return false
           }
         }
-
         runsWithReturns.forEach { run in
           let returnLabelAddress = run.visitedRange!.upperBound - 1
           if labels[returnLabelAddress] != nil {
@@ -488,6 +500,8 @@ extension LR35902 {
           }
         }
       }
+
+      return functionScope
     }
   }
 }
