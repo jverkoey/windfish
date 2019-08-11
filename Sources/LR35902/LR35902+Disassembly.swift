@@ -85,19 +85,19 @@ extension LR35902 {
     // MARK: - Transfers of control
 
     struct TransferOfControl: Hashable {
-      enum Kind {
-        case jr, jp, call
-      }
       let sourceAddress: UInt16
-      let kind: Kind
+      let sourceInstructionSpec: InstructionSpec
     }
     func transfersOfControl(at pc: UInt16, in bank: UInt8) -> Set<TransferOfControl>? {
       return transfers[romAddress(for: pc, in: bank)]
     }
 
-    func registerTransferOfControl(to pc: UInt16, in bank: UInt8, from fromPc: UInt16, kind: TransferOfControl.Kind) {
+    func registerTransferOfControl(to pc: UInt16, in bank: UInt8, from fromPc: UInt16, instructionSpec: InstructionSpec) {
       let index = romAddress(for: pc, in: bank)
-      transfers[index, default: Set()].insert(TransferOfControl(sourceAddress: fromPc, kind: kind))
+      let transfer = TransferOfControl(sourceAddress: fromPc, sourceInstructionSpec: instructionSpec)
+      transfers[index, default: Set()].insert(transfer)
+
+      // Create a label if one doesn't exist.
       if labels[index] == nil
         // Don't create a label in the middle of an instruction.
         && (!code.contains(Int(index)) || instruction(at: pc, in: bank) != nil) {
@@ -254,23 +254,72 @@ extension LR35902 {
       let address: UInt16
     }
 
+    private class Run {
+      let startAddress: UInt16
+      let endAddress: UInt16?
+      let bank: UInt8
+      let function: String?
+      init(from startAddress: UInt16, inBank bank: UInt8, upTo endAddress: UInt16? = nil, function: String? = nil) {
+        self.startAddress = startAddress
+        self.endAddress = endAddress
+        self.bank = bank
+        self.function = function
+      }
+
+      var visitedRange: Range<UInt32>?
+
+      var sourceRun: Run? = nil
+      var sourceInstruction: LR35902.Instruction?
+      var sourceAddress: UInt16?
+    }
+
     public func disassemble(range: Range<UInt16>, inBank bankInitial: UInt8, function: String? = nil) {
-      var jumpAddresses: [DisassemblyIntent] = []
-      jumpAddresses.append(DisassemblyIntent(bank: bankInitial, address: range.lowerBound))
-
-      var visitedAddresses = IndexSet()
+      var allVisitedAddresses = IndexSet()
       var isFirst = true
-      var functionAddresses = IndexSet()
 
-      while !jumpAddresses.isEmpty {
-        let address = jumpAddresses.removeFirst()
-        cpu.bank = address.bank
-        cpu.pc = address.address
+      var runQueue: [Run] = [
+        Run(from: range.lowerBound, inBank: bankInitial, upTo: range.upperBound, function: function)
+      ]
+      var runs: [Run] = []
 
-        let pcIsValidForBank: () -> Bool = {
-          let pc = self.cpu.pc
-          let bank = self.cpu.bank
-          return (bank == 0 && pc < 0x4000) || (bank != 0 && pc < 0x8000)
+      let pcIsValidForBank: () -> Bool = {
+        let pc = self.cpu.pc
+        let bank = self.cpu.bank
+        return (bank == 0 && pc < 0x4000) || (bank != 0 && pc < 0x8000)
+      }
+
+      let queueRun: (Run, UInt16, UInt16, UInt8, LR35902.Instruction) -> Void = { fromRun, fromAddress, toAddress, bank, instruction in
+        if !allVisitedAddresses.contains(Int(LR35902.romAddress(for: toAddress, in: bank))) {
+          let run = Run(from: toAddress, inBank: bank)
+          run.sourceInstruction = instruction
+          run.sourceAddress = fromAddress
+          run.sourceRun = fromRun
+          runQueue.append(run)
+        }
+        self.registerTransferOfControl(to: toAddress, in: bank, from: fromAddress, instructionSpec: instruction.spec)
+      }
+
+      while !runQueue.isEmpty {
+        let run = runQueue.removeFirst()
+        runs.append(run)
+
+        if allVisitedAddresses.contains(Int(LR35902.romAddress(for: run.startAddress, in: run.bank))) {
+          // We've already visited this instruction, so we can skip it.
+          continue
+        }
+
+        // Initialize the CPU
+        cpu.bank = run.bank
+        cpu.pc = run.startAddress
+
+        let advance: (UInt16) -> Void = { amount in
+          let lowerBound = LR35902.romAddress(for: self.cpu.pc, in: self.cpu.bank)
+          let instructionRange = Int(lowerBound)..<Int(lowerBound + UInt32(amount))
+          run.visitedRange = UInt32(run.startAddress)..<UInt32(instructionRange.upperBound)
+
+          allVisitedAddresses.insert(integersIn: instructionRange)
+
+          self.cpu.pc += amount
         }
 
         var previousInstruction: Instruction? = nil
@@ -283,14 +332,14 @@ extension LR35902 {
           var operandWidth: UInt16
           switch spec {
           case .invalid:
-            cpu.pc += 1
+            advance(1)
             continue
 
           case .cb:
             let byteCB = Int(cpu[cpu.pc + 1, cpu.bank])
             let cbInstruction = LR35902.instructionTableCB[byteCB]
             if case .invalid = spec {
-              cpu.pc += 2
+              advance(2)
               continue
             }
             spec = cbInstruction
@@ -304,14 +353,16 @@ extension LR35902 {
             break
           }
 
+          let instructionAddress = cpu.pc
+          let instructionBank = cpu.bank
           let instructionWidth = opcodeWidth + operandWidth
           let instruction: Instruction
           switch operandWidth {
           case 1:
-            instruction = Instruction(spec: spec, immediate8: cpu[cpu.pc + opcodeWidth, cpu.bank])
+            instruction = Instruction(spec: spec, immediate8: cpu[instructionAddress + opcodeWidth, instructionBank])
           case 2:
-            let low = UInt16(cpu[cpu.pc + opcodeWidth, cpu.bank])
-            let high = UInt16(cpu[cpu.pc + opcodeWidth + 1, cpu.bank]) << 8
+            let low = UInt16(cpu[instructionAddress + opcodeWidth, instructionBank])
+            let high = UInt16(cpu[instructionAddress + opcodeWidth + 1, instructionBank]) << 8
             let immediate16 = high | low
             instruction = Instruction(spec: spec, immediate16: immediate16)
           default:
@@ -320,62 +371,45 @@ extension LR35902 {
 
           // STOP must be followed by 0
           if case .stop = spec, instruction.immediate8 != 0 {
-            cpu.pc += 1
+            advance(1)
             continue
           }
 
-          register(instruction: instruction, at: cpu.pc, in: cpu.bank)
-
-          let nextPc = cpu.pc + instructionWidth
-
-          let lowerBound = Int(LR35902.romAddress(for: cpu.pc, in: cpu.bank))
-          let instructionRange = lowerBound..<(lowerBound + Int(instructionWidth))
-          visitedAddresses.insert(integersIn: instructionRange)
-          functionAddresses.insert(integersIn: instructionRange)
-
-          // TODO: Rename labels if within a function.
-          // Identify the range of the function, track which labels we added, and then rename all labels
-          // within the scope of the function.
+          register(instruction: instruction, at: instructionAddress, in: instructionBank)
+          advance(instructionWidth)
 
           switch spec {
           case .ld(.immediate16address, .a):
             if (0x2000..<0x4000).contains(instruction.immediate16!),
               let previousInstruction = previousInstruction,
               case .ld(.a, .immediate8) = previousInstruction.spec {
-              register(bankChange: previousInstruction.immediate8!, at: cpu.pc, in: cpu.bank)
+              register(bankChange: previousInstruction.immediate8!, at: instructionAddress, in: instructionBank)
 
               cpu.bank = previousInstruction.immediate8!
             }
 
           case .jr(.immediate8signed, let condition):
             let relativeJumpAmount = Int8(bitPattern: instruction.immediate8!)
-            let jumpTo = nextPc.advanced(by: Int(relativeJumpAmount))
-            if !visitedAddresses.contains(Int(LR35902.romAddress(for: jumpTo, in: cpu.bank))) {
-              jumpAddresses.append(DisassemblyIntent(bank: cpu.bank, address: jumpTo))
-            }
-            registerTransferOfControl(to: jumpTo, in: cpu.bank, from: cpu.pc, kind: .jr)
+            let jumpTo = cpu.pc.advanced(by: Int(relativeJumpAmount))
+            queueRun(run, instructionAddress, jumpTo, instructionBank, instruction)
 
+            // An unconditional jr is the end of the run.
             if condition == nil {
               break linear_sweep
             }
 
           case .jp(.immediate16, let condition):
             let jumpTo = instruction.immediate16!
-            if !visitedAddresses.contains(Int(LR35902.romAddress(for: jumpTo, in: cpu.bank))) {
-              jumpAddresses.append(DisassemblyIntent(bank: cpu.bank, address: jumpTo))
-            }
-            registerTransferOfControl(to: jumpTo, in: cpu.bank, from: cpu.pc, kind: .jp)
+            queueRun(run, instructionAddress, jumpTo, instructionBank, instruction)
 
+            // An unconditional jp is the end of the run.
             if condition == nil {
               break linear_sweep
             }
 
           case .call(.immediate16, _):
             let jumpTo = instruction.immediate16!
-            if !visitedAddresses.contains(Int(LR35902.romAddress(for: jumpTo, in: cpu.bank))) {
-              jumpAddresses.append(DisassemblyIntent(bank: cpu.bank, address: jumpTo))
-            }
-            registerTransferOfControl(to: jumpTo, in: cpu.bank, from: cpu.pc, kind: .call)
+            queueRun(run, instructionAddress, jumpTo, instructionBank, instruction)
 
           case .jp(_, nil), .ret:
             break linear_sweep
@@ -384,27 +418,71 @@ extension LR35902 {
             break
           }
 
-          cpu.pc = nextPc
           previousInstruction = instruction
         }
 
-        isFirst = false
+        if isFirst {
+          isFirst = false
+        }
       }
 
       // Rewrite function labels.
+
       if let function = function {
-        let functionStartAddress = Int(LR35902.romAddress(for: range.lowerBound, in: bankInitial))
-        if let functionRange = visitedAddresses.rangeView.first(where: { $0.lowerBound == functionStartAddress }),
-           case .ret = instructionMap[UInt32(functionRange.upperBound - 1)]?.spec {
+        let functionRuns = runs.filter { run in
+          // Always include the initial run.
+          guard let sourceInstruction = run.sourceInstruction else {
+            return true
+          }
+
+          // Ignore empty runs.
+          guard let visitedRange = run.visitedRange,
+                !visitedRange.isEmpty else {
+            return false
+          }
+
+          // Filter out calls.
+          if case .call = sourceInstruction.spec {
+            return false
+          }
+
+          // Filter out runs spawned from calls.
+          // TODO: This would be more efficient if we could traverse the run tree top-down rather than bottom-up.
+          // Consider adding a "child runs" property to Run and allowing the Run structure to maintain the hierarchy
+          // instead.
+          var runIterator = run
+          while let runAncestor = runIterator.sourceRun {
+            if let sourceInstruction = runAncestor.sourceInstruction,
+              case .call = sourceInstruction.spec {
+              return false
+            }
+            runIterator = runAncestor
+          }
+
+          // Keep everything else.
+          return true
+        }
+
+        functionRuns.forEach { run in
           // functionRange is confirmed to be a contiguous block of memory for which we can rewrite labels.
-          let labelAddresses = functionRange.dropFirst().dropLast().filter { labels[UInt32($0)] != nil }.map { UInt32($0) }
+          let labelAddresses = run.visitedRange!.dropLast().filter { $0 != range.lowerBound && labels[$0] != nil }
           labelAddresses.forEach {
             let bank = UInt8($0 / LR35902.bankSize)
             let address = $0 % LR35902.bankSize + ((bank > 0) ? UInt32(0x4000) : UInt32(0x0000))
             labels[$0] = "\(function).\(bank.hexString)_\(UInt16(address).hexString)"
           }
+        }
 
-          let returnLabelAddress = UInt32(functionRange.upperBound - 1)
+        let runsWithReturns = functionRuns.filter {
+          if case .ret = instructionMap[$0.visitedRange!.upperBound - 1]?.spec {
+            return true
+          } else {
+            return false
+          }
+        }
+
+        runsWithReturns.forEach { run in
+          let returnLabelAddress = run.visitedRange!.upperBound - 1
           if labels[returnLabelAddress] != nil {
             labels[returnLabelAddress] = "\(function).return"
           }

@@ -17,7 +17,7 @@ private func write(_ string: String, fileHandle: FileHandle) {
 private func line(_ transfersOfControl: Set<LR35902.Disassembly.TransferOfControl>, label: String) -> String {
   let sources = transfersOfControl
     .sorted(by: { $0.sourceAddress < $1.sourceAddress })
-    .map { "\($0.kind) @ $\($0.sourceAddress.hexString)" }
+    .map { "\($0.sourceInstructionSpec.opcode) @ $\($0.sourceAddress.hexString)" }
     .joined(separator: ", ")
   return line("\(label):", comment: "Sources: \(sources)")
 }
