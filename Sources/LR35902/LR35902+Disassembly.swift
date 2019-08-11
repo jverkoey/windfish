@@ -397,11 +397,16 @@ extension LR35902 {
         if let functionRange = visitedAddresses.rangeView.first(where: { $0.lowerBound == functionStartAddress }),
            case .ret = instructionMap[UInt32(functionRange.upperBound - 1)]?.spec {
           // functionRange is confirmed to be a contiguous block of memory for which we can rewrite labels.
-          let labelAddresses = functionRange.dropFirst().filter { labels[UInt32($0)] != nil }.map { UInt32($0) }
+          let labelAddresses = functionRange.dropFirst().dropLast().filter { labels[UInt32($0)] != nil }.map { UInt32($0) }
           labelAddresses.forEach {
             let bank = UInt8($0 / LR35902.bankSize)
             let address = $0 % LR35902.bankSize + ((bank > 0) ? UInt32(0x4000) : UInt32(0x0000))
             labels[$0] = "\(function).\(bank.hexString)_\(UInt16(address).hexString)"
+          }
+
+          let returnLabelAddress = UInt32(functionRange.upperBound - 1)
+          if labels[returnLabelAddress] != nil {
+            labels[returnLabelAddress] = "\(function).return"
           }
         }
       }
