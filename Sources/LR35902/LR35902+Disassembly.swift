@@ -390,6 +390,8 @@ extension LR35902 {
 
         isFirst = false
       }
+
+      // Rewrite function labels.
       if let function = function {
         let functionStartAddress = Int(LR35902.romAddress(for: range.lowerBound, in: bankInitial))
         if let functionRange = visitedAddresses.rangeView.first(where: { $0.lowerBound == functionStartAddress }),
@@ -404,6 +406,5 @@ extension LR35902 {
         }
       }
     }
-
   }
 }
