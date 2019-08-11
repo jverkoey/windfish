@@ -17,11 +17,14 @@ disassembly.setPreComment(at: 0x015D, in: 0x00, text: "Clears 6144 bytes of vide
 disassembly.defineFunction(startingAt: 0x07B9, in: 0x00, named: "SetBank")
 disassembly.defineFunction(startingAt: 0x2881, in: 0x00, named: "LCDOff")
 disassembly.defineFunction(startingAt: 0x28A8, in: 0x00, named: "FillBGWith7F")
+disassembly.defineFunction(startingAt: 0x28C5, in: 0x00, named: "CopyMemoryRegion")
 disassembly.defineFunction(startingAt: 0x28F2, in: 0x00, named: "CopyBackgroundData")
+disassembly.defineFunction(startingAt: 0x298A, in: 0x00, named: "ClearHRAM")
+disassembly.defineFunction(startingAt: 0x2999, in: 0x00, named: "ClearMemoryRegion")
 disassembly.defineFunction(startingAt: 0x2B6B, in: 0x00, named: "LoadInitialTiles")
 
 // MARK: - Bank 1 functions
-disassembly.defineFunction(startingAt: 0x2999, in: 0x00, named: "ClearMemoryRegion")
+disassembly.defineFunction(startingAt: 0x40CE, in: 0x01, named: "LCDOn")
 disassembly.defineFunction(startingAt: 0x46DD, in: 0x01, named: "InitSave")
 disassembly.defineFunction(startingAt: 0x460F, in: 0x01, named: "InitSaves")
 disassembly.defineFunction(startingAt: 0x7D19, in: 0x01, named: "CopyDMATransferToHRAM")
@@ -38,6 +41,18 @@ disassembly.defineMacro(named: "callcb", instructions: [
 ], validArgumentValues: [
   1: IndexSet(integersIn: 0x4000..<0x8000)
 ])
+
+//disassembly.defineMacro(named: "copyregion", instructions: [
+//  .any(.ld(.hl, .immediate16)),
+//  .any(.ld(.de, .immediate16)),
+//  .any(.ld(.bc, .immediate16)),
+//  .instruction(.init(spec: .call(.immediate16), immediate16: 0x28C5)),
+//], code: [
+//  .ld(.hl, .arg(1)),
+//  .ld(.de, .arg(2)),
+//  .ld(.bc, .arg(3)),
+//  .call(.immediate16),
+//], validArgumentValues: [:])
 
 disassembly.createGlobal(at: 0xA100, named: "SAVEFILES")
 

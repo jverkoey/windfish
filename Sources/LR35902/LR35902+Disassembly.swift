@@ -190,7 +190,6 @@ extension LR35902 {
 
       let upperBound: UInt16 = (bank == 0) ? 0x4000 : 0x8000
       let functionScope = disassemble(range: pc..<upperBound, inBank: bank, function: name).rangeView.first!
-
       for address in functionScope {
         scopes[UInt32(address)] = name
       }
@@ -262,49 +261,23 @@ extension LR35902 {
       let address: UInt16
     }
 
-    private class Run {
-      let startAddress: UInt16
-      let endAddress: UInt16?
-      let bank: UInt8
-      let function: String?
-      init(from startAddress: UInt16, inBank bank: UInt8, upTo endAddress: UInt16? = nil, function: String? = nil) {
-        self.startAddress = startAddress
-        self.endAddress = endAddress
-        self.bank = bank
-        self.function = function
-      }
-
-      var visitedRange: Range<UInt32>?
-
-      var sourceRun: Run? = nil
-      var sourceInstruction: LR35902.Instruction?
-      var sourceAddress: UInt16?
-    }
-
     @discardableResult
     public func disassemble(range: Range<UInt16>, inBank bankInitial: UInt8, function: String? = nil) -> IndexSet {
-      var allVisitedAddresses = IndexSet()
-      var isFirst = true
+      var visitedAddresses = IndexSet()
 
-      var runQueue: [Run] = [
-        Run(from: range.lowerBound, inBank: bankInitial, upTo: range.upperBound, function: function)
-      ]
+      let firstRun = Run(from: range.lowerBound, inBank: bankInitial, upTo: range.upperBound, function: function)
+      var runQueue: [Run] = [firstRun]
       var runs: [Run] = []
 
-      let pcIsValidForBank: () -> Bool = {
-        let pc = self.cpu.pc
-        let bank = self.cpu.bank
-        return (bank == 0 && pc < 0x4000) || (bank != 0 && pc < 0x8000)
-      }
-
       let queueRun: (Run, UInt16, UInt16, UInt8, LR35902.Instruction) -> Void = { fromRun, fromAddress, toAddress, bank, instruction in
-        if !allVisitedAddresses.contains(Int(LR35902.romAddress(for: toAddress, in: bank))) {
-          let run = Run(from: toAddress, inBank: bank)
-          run.sourceInstruction = instruction
-          run.sourceAddress = fromAddress
-          run.sourceRun = fromRun
-          runQueue.append(run)
-        }
+        let run = Run(from: toAddress, inBank: bank)
+        run.invocationInstruction = instruction
+        run.invocationAddress = fromAddress
+        run.parent = fromRun
+        runQueue.append(run)
+
+        fromRun.children.append(run)
+
         self.registerTransferOfControl(to: toAddress, in: bank, from: fromAddress, instructionSpec: instruction.spec)
       }
 
@@ -312,7 +285,7 @@ extension LR35902 {
         let run = runQueue.removeFirst()
         runs.append(run)
 
-        if allVisitedAddresses.contains(Int(LR35902.romAddress(for: run.startAddress, in: run.bank))) {
+        if visitedAddresses.contains(Int(LR35902.romAddress(for: run.startAddress, in: run.bank))) {
           // We've already visited this instruction, so we can skip it.
           continue
         }
@@ -326,13 +299,13 @@ extension LR35902 {
           let instructionRange = Int(lowerBound)..<Int(lowerBound + UInt32(amount))
           run.visitedRange = UInt32(run.startAddress)..<UInt32(instructionRange.upperBound)
 
-          allVisitedAddresses.insert(integersIn: instructionRange)
+          visitedAddresses.insert(integersIn: instructionRange)
 
           self.cpu.pc += amount
         }
 
         var previousInstruction: Instruction? = nil
-        linear_sweep: while (isFirst && cpu.pc < range.upperBound) || (!isFirst && pcIsValidForBank()) {
+        linear_sweep: while !run.hasReachedEnd(with: cpu) {
           let byte = Int(cpu[cpu.pc, cpu.bank])
 
           var spec = LR35902.instructionTable[byte]
@@ -429,17 +402,13 @@ extension LR35902 {
 
           previousInstruction = instruction
         }
-
-        if isFirst {
-          isFirst = false
-        }
       }
 
       // Compute scope and rewrite function labels if we're a function.
 
       let functionRuns = runs.filter { run in
         // Always include the initial run.
-        guard let sourceInstruction = run.sourceInstruction else {
+        guard let sourceInstruction = run.invocationInstruction else {
           return true
         }
 
@@ -459,8 +428,8 @@ extension LR35902 {
         // Consider adding a "child runs" property to Run and allowing the Run structure to maintain the hierarchy
         // instead.
         var runIterator = run
-        while let runAncestor = runIterator.sourceRun {
-          if let sourceInstruction = runAncestor.sourceInstruction,
+        while let runAncestor = runIterator.parent {
+          if let sourceInstruction = runAncestor.invocationInstruction,
             case .call = sourceInstruction.spec {
             return false
           }
