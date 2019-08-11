@@ -9,9 +9,9 @@ disassembly.setLabel(at: 0x0003, in: 0x00, named: "DEBUG_TOOL")
 disassembly.setData(at: 0x0003, in: 0x00)
 
 disassembly.setLabel(at: 0x0150, in: 0x00, named: "Main")
-disassembly.setLabel(at: 0x2881, in: 0x00, named: "LCDOff")
 disassembly.setPreComment(at: 0x0156, in: 0x00, text: "Reset the palette registers to zero.")
 
+disassembly.defineFunction(startingAt: 0x2881, in: 0x00, named: "LCDOff")
 disassembly.defineFunction(startingAt: 0x46DD, in: 0x01, named: "InitSave")
 disassembly.defineFunction(startingAt: 0x460F, in: 0x01, named: "InitSaves")
 

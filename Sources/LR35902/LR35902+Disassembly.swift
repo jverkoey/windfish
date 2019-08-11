@@ -469,7 +469,7 @@ extension LR35902 {
           labelAddresses.forEach {
             let bank = UInt8($0 / LR35902.bankSize)
             let address = $0 % LR35902.bankSize + ((bank > 0) ? UInt32(0x4000) : UInt32(0x0000))
-            labels[$0] = "\(function).\(bank.hexString)_\(UInt16(address).hexString)"
+            labels[$0] = "\(function).fn_\(bank.hexString)_\(UInt16(address).hexString)"
           }
         }
 

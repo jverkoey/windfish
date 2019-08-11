@@ -45,6 +45,14 @@ private func extractArgs(from statement: RGBDSAssembly.Statement, using spec: LR
   return args
 }
 
+func prettify(_ label: String) -> String {
+  let parts = label.components(separatedBy: ".")
+  if parts.count == 1 {
+    return label
+  }
+  return ".\(parts.last!)"
+}
+
 extension LR35902.Disassembly {
   enum Line: Equatable, CustomStringConvertible {
     case empty
@@ -60,9 +68,9 @@ extension LR35902.Disassembly {
     var description: String {
       switch self {
       case .empty:                             return ""
-      case let .label(label):                  return "\(label):"
+      case let .label(label):                  return "\(prettify(label)):"
       case let .preComment(comment):           return line(comment: comment)
-      case let .transferOfControl(toc, label): return line(toc, label: label)
+      case let .transferOfControl(toc, label): return line(toc, label: prettify(label))
       case let .instruction(_, assembly, address, bank, bytes): return line(assembly.description, address: address, bank: bank, bytes: bytes)
       case let .macroInstruction(_, assembly): return line(assembly.description)
       case let .macro(assembly, address, bank, bytes): return line(assembly, address: address, bank: bank, bytes: bytes)
