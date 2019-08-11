@@ -178,19 +178,6 @@ clean:
 
           cpu.pc += instructionWidth
 
-          // Handle context changes.
-          switch instruction.spec {
-          case .jp, .jr:
-            lineGroup.append(.empty)
-            cpu.bank = bank
-          case .ret, .reti:
-            lineGroup.append(.empty)
-            lineGroup.append(.empty)
-            cpu.bank = bank
-          default:
-            break
-          }
-
           // TODO: Start a macro descent for every instruction.
 
           // Is this the beginning of a macro?
@@ -283,6 +270,19 @@ clean:
               }
               macroNode = nil
             }
+          }
+
+          // Handle context changes.
+          switch instruction.spec {
+          case .jp, .jr:
+            lineGroup.append(.empty)
+            cpu.bank = bank
+          case .ret, .reti:
+            lineGroup.append(.empty)
+            lineGroup.append(.empty)
+            cpu.bank = bank
+          default:
+            break
           }
 
           lineBuffer.append(contentsOf: lineGroup)
