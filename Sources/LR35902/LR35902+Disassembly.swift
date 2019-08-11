@@ -265,16 +265,15 @@ extension LR35902 {
     public func disassemble(range: Range<UInt16>, inBank bankInitial: UInt8, function: String? = nil) -> IndexSet {
       var visitedAddresses = IndexSet()
 
-      let firstRun = Run(from: range.lowerBound, inBank: bankInitial, upTo: range.upperBound, function: function)
-      var runQueue: [Run] = [firstRun]
-      var runs: [Run] = []
+      let runQueue = RunQueue()
+      runQueue.add(Run(from: range.lowerBound, inBank: bankInitial, upTo: range.upperBound, function: function))
 
       let queueRun: (Run, UInt16, UInt16, UInt8, LR35902.Instruction) -> Void = { fromRun, fromAddress, toAddress, bank, instruction in
         let run = Run(from: toAddress, inBank: bank)
         run.invocationInstruction = instruction
         run.invocationAddress = fromAddress
         run.parent = fromRun
-        runQueue.append(run)
+        runQueue.add(run)
 
         fromRun.children.append(run)
 
@@ -282,8 +281,7 @@ extension LR35902 {
       }
 
       while !runQueue.isEmpty {
-        let run = runQueue.removeFirst()
-        runs.append(run)
+        let run = runQueue.dequeue()
 
         if visitedAddresses.contains(Int(LR35902.romAddress(for: run.startAddress, in: run.bank))) {
           // We've already visited this instruction, so we can skip it.
@@ -406,7 +404,7 @@ extension LR35902 {
 
       // Compute scope and rewrite function labels if we're a function.
 
-      let functionRuns = runs.filter { run in
+      let functionRuns = runQueue.history.filter { run in
         // Always include the initial run.
         guard let sourceInstruction = run.invocationInstruction else {
           return true
