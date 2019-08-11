@@ -287,6 +287,12 @@ clean:
 
           lineBuffer.append(contentsOf: lineGroup)
 
+          // Immediately start looking for the next macro.
+          if macroNode == nil, let child = macroTree.children[asInstruction] ?? macroTree.children[asAny] {
+            lineBufferAddress = cpu.pc - instructionWidth
+            macroNode = child
+          }
+
         } else {
           lineBuffer.append(contentsOf: lineGroup)
           flush()
