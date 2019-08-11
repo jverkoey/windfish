@@ -55,6 +55,7 @@ func prettify(_ label: String) -> String {
 
 extension LR35902.Disassembly {
   enum Line: Equatable, CustomStringConvertible {
+    case newline
     case empty
     case preComment(String)
     case label(String)
@@ -67,6 +68,7 @@ extension LR35902.Disassembly {
 
     var description: String {
       switch self {
+      case .newline:                           return ""
       case .empty:                             return ""
       case let .label(label):                  return "\(prettify(label)):"
       case let .preComment(comment):           return line(comment: comment)
@@ -286,7 +288,7 @@ clean:
             lineGroup.append(.empty)
             cpu.bank = bank
           case .ret, .reti:
-            lineGroup.append(.empty)
+            lineGroup.append(.newline)
             lineGroup.append(.empty)
             cpu.bank = bank
           default:
