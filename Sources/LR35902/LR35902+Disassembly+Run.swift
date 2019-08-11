@@ -20,6 +20,9 @@ extension LR35902.Disassembly {
     weak var parent: Run? = nil
     var children: [Run] = []
 
+    var invocationInstruction: LR35902.Instruction?
+    var invocationAddress: UInt16?
+
     func hasReachedEnd(with cpu: LR35902) -> Bool {
       let pc = cpu.pc
       let bank = cpu.bank
@@ -28,8 +31,5 @@ extension LR35902.Disassembly {
       }
       return (bank == 0 && pc >= 0x4000) || (bank != 0 && pc >= 0x8000)
     }
-
-    var invocationInstruction: LR35902.Instruction?
-    var invocationAddress: UInt16?
   }
 }
