@@ -56,6 +56,4 @@ disassembly.defineMacro(named: "callcb", instructions: [
 
 disassembly.createGlobal(at: 0xA100, named: "SAVEFILES")
 
-print(disassembly.scope(at: 0x05C3, in: 0))
-
 try disassembly.writeTo(directory: "/Users/featherless/workbench/gbdis/disassembly")

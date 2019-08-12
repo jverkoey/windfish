@@ -401,7 +401,7 @@ extension LR35902 {
 
       // Compute scope and rewrite function labels if we're a function.
 
-      for runGroup in firstRun.runGroups().prefix(3) {
+      for runGroup in firstRun.runGroups() {
         // Calculate scope.
         var runScope = IndexSet()
         runGroup.forEach { run in
@@ -448,7 +448,6 @@ extension LR35902 {
               if labels[index] == "toc_00_05C0.fn_00_0688" {
                 print("\(runScope)")
               }
-              print(labels[index])
             }
           }
         }
