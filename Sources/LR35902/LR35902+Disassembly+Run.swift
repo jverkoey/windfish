@@ -31,5 +31,44 @@ extension LR35902.Disassembly {
       }
       return (bank == 0 && pc >= 0x4000) || (bank != 0 && pc >= 0x8000)
     }
+
+    /**
+     Break runs apart into logical call groups.
+     */
+    func runGroups() -> [[Run]] {
+      var runGroups: [[Run]] = []
+
+      // Runs that are the beginning of a run group.
+      var seenRuns = 0
+      var runGroupQueue = [self]
+      while !runGroupQueue.isEmpty {
+        let run = runGroupQueue.removeFirst()
+        var runGroup = [run]
+        seenRuns += 1
+
+        var descendantQueue = run.children
+        while !descendantQueue.isEmpty {
+          let descendant = descendantQueue.removeFirst()
+          if case .call = descendant.invocationInstruction?.spec {
+            // Calls mark the start of new run groups.
+            runGroupQueue.append(descendant)
+          } else {
+            // Everything else is part of the current group.
+            runGroup.append(descendant)
+            seenRuns += 1
+
+            // Including any of its descendants.
+            descendantQueue.append(contentsOf: descendant.children)
+          }
+        }
+
+        runGroups.append(runGroup)
+      }
+
+      // Sanity check that we didn't miss a run.
+      assert(seenRuns == (runGroups.reduce(0) { $0 + $1.count }))
+
+      return runGroups
+    }
   }
 }

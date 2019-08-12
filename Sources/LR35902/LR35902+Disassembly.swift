@@ -189,10 +189,7 @@ extension LR35902 {
       functions[romAddress(for: pc, in: bank)] = name
 
       let upperBound: UInt16 = (bank == 0) ? 0x4000 : 0x8000
-      let functionScope = disassemble(range: pc..<upperBound, inBank: bank, function: name).rangeView.first!
-      for address in functionScope {
-        scopes[UInt32(address)] = name
-      }
+      disassemble(range: pc..<upperBound, inBank: bank, function: name)
     }
     private var functions: [UInt32: String] = [:]
     private var scopes: [UInt32: String] = [:]
@@ -262,11 +259,12 @@ extension LR35902 {
     }
 
     @discardableResult
-    public func disassemble(range: Range<UInt16>, inBank bankInitial: UInt8, function: String? = nil) -> IndexSet {
+    public func disassemble(range: Range<UInt16>, inBank bankInitial: UInt8, function: String? = nil) {
       var visitedAddresses = IndexSet()
 
       let runQueue = RunQueue()
-      runQueue.add(Run(from: range.lowerBound, inBank: bankInitial, upTo: range.upperBound, function: function))
+      let firstRun = Run(from: range.lowerBound, inBank: bankInitial, upTo: range.upperBound, function: function)
+      runQueue.add(firstRun)
 
       let queueRun: (Run, UInt16, UInt16, UInt8, LR35902.Instruction) -> Void = { fromRun, fromAddress, toAddress, bank, instruction in
         let run = Run(from: toAddress, inBank: bank)
@@ -391,7 +389,7 @@ extension LR35902 {
             let jumpTo = instruction.immediate16!
             queueRun(run, instructionAddress, jumpTo, instructionBank, instruction)
 
-          case .jp(_, nil), .ret:
+          case .jp(_, nil), .ret, .reti:
             break linear_sweep
 
           default:
@@ -404,71 +402,39 @@ extension LR35902 {
 
       // Compute scope and rewrite function labels if we're a function.
 
-      let functionRuns = runQueue.history.filter { run in
-        // Always include the initial run.
-        guard let sourceInstruction = run.invocationInstruction else {
-          return true
-        }
-
-        // Ignore empty runs.
-        guard let visitedRange = run.visitedRange,
-              !visitedRange.isEmpty else {
-          return false
-        }
-
-        // Filter out calls.
-        if case .call = sourceInstruction.spec {
-          return false
-        }
-
-        // Filter out runs spawned from calls.
-        // TODO: This would be more efficient if we could traverse the run tree top-down rather than bottom-up.
-        // Consider adding a "child runs" property to Run and allowing the Run structure to maintain the hierarchy
-        // instead.
-        var runIterator = run
-        while let runAncestor = runIterator.parent {
-          if let sourceInstruction = runAncestor.invocationInstruction,
-            case .call = sourceInstruction.spec {
-            return false
+      for runGroup in firstRun.runGroups() {
+        // Calculate scope.
+        var runScope = IndexSet()
+        runGroup.forEach { run in
+          if let visitedRange = run.visitedRange {
+            runScope.insert(integersIn: Int(visitedRange.lowerBound)..<Int(visitedRange.upperBound))
           }
-          runIterator = runAncestor
         }
 
-        // Keep everything else.
-        return true
+        // If the scope has a name, then map the scope and labels to that name.
+        let entryRun = runGroup.first!
+        if let runGroupName = labels[LR35902.romAddress(for: entryRun.startAddress, in: entryRun.bank)] {
+          for address in runScope {
+            scopes[UInt32(address)] = runGroupName
+          }
+
+          let initialContiguousScope = runScope.rangeView.first!
+          initialContiguousScope.dropFirst().forEach {
+            let index = UInt32($0)
+            guard labels[index] != nil else {
+              return
+            }
+            if case .ret = instructionMap[index]?.spec {
+              labels[index] = "\(runGroupName).return"
+            } else {
+              let bank = UInt8(index / LR35902.bankSize)
+              let address = index % LR35902.bankSize + ((bank > 0) ? UInt32(0x4000) : UInt32(0x0000))
+              labels[index] = "\(runGroupName).fn_\(bank.hexString)_\(UInt16(address).hexString)"
+            }
+          }
+        }
+        break
       }
-
-      var functionScope = IndexSet()
-      functionRuns.forEach { run in
-        functionScope.insert(integersIn: Int(run.visitedRange!.lowerBound)..<Int(run.visitedRange!.upperBound))
-      }
-
-      if let function = function {
-        functionRuns.forEach { run in
-          let labelAddresses = run.visitedRange!.dropLast().filter { $0 != range.lowerBound && labels[$0] != nil }
-          labelAddresses.forEach {
-            let bank = UInt8($0 / LR35902.bankSize)
-            let address = $0 % LR35902.bankSize + ((bank > 0) ? UInt32(0x4000) : UInt32(0x0000))
-            labels[$0] = "\(function).fn_\(bank.hexString)_\(UInt16(address).hexString)"
-          }
-        }
-
-        let runsWithReturns = functionRuns.filter {
-          if case .ret = instructionMap[$0.visitedRange!.upperBound - 1]?.spec {
-            return true
-          } else {
-            return false
-          }
-        }
-        runsWithReturns.forEach { run in
-          let returnLabelAddress = run.visitedRange!.upperBound - 1
-          if labels[returnLabelAddress] != nil {
-            labels[returnLabelAddress] = "\(function).return"
-          }
-        }
-      }
-
-      return functionScope
     }
   }
 }
