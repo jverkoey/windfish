@@ -78,7 +78,12 @@ public final class RGBDSAssembly {
         if disassembly.transfersOfControl(at: instruction.immediate16!, in: disassembly.cpu.bank) != nil {
           var addressLabel: String
           if let label = disassembly.label(at: instruction.immediate16!, in: disassembly.cpu.bank) {
-            addressLabel = label
+            if let scope = disassembly.scope(at: disassembly.cpu.pc, in: disassembly.cpu.bank),
+              label.starts(with: "\(scope).") {
+              addressLabel = label.replacingOccurrences(of: "\(scope).", with: ".")
+            } else {
+              addressLabel = label
+            }
           } else {
             addressLabel = "$\(instruction.immediate16!.hexString)"
           }

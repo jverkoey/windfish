@@ -258,7 +258,6 @@ extension LR35902 {
       let address: UInt16
     }
 
-    @discardableResult
     public func disassemble(range: Range<UInt16>, inBank bankInitial: UInt8, function: String? = nil) {
       var visitedAddresses = IndexSet()
 
@@ -402,7 +401,7 @@ extension LR35902 {
 
       // Compute scope and rewrite function labels if we're a function.
 
-      for runGroup in firstRun.runGroups() {
+      for runGroup in firstRun.runGroups().prefix(3) {
         // Calculate scope.
         var runScope = IndexSet()
         runGroup.forEach { run in
@@ -411,29 +410,48 @@ extension LR35902 {
           }
         }
 
+        // Nothing to do for empty runs.
+        if runScope.isEmpty {
+          continue
+        }
+
         // If the scope has a name, then map the scope and labels to that name.
         let entryRun = runGroup.first!
-        if let runGroupName = labels[LR35902.romAddress(for: entryRun.startAddress, in: entryRun.bank)] {
-          for address in runScope {
-            scopes[UInt32(address)] = runGroupName
-          }
+        let runStartAddress = LR35902.romAddress(for: entryRun.startAddress, in: entryRun.bank)
+        if let runGroupName = labels[runStartAddress] {
 
-          let initialContiguousScope = runScope.rangeView.first!
-          initialContiguousScope.dropFirst().forEach {
-            let index = UInt32($0)
-            guard labels[index] != nil else {
-              return
+          if let runScope = runScope.rangeView.first(where: { $0.lowerBound == runStartAddress }) {
+            for address in runScope {
+              scopes[UInt32(address)] = runGroupName
             }
-            if case .ret = instructionMap[index]?.spec {
-              labels[index] = "\(runGroupName).return"
-            } else {
-              let bank = UInt8(index / LR35902.bankSize)
-              let address = index % LR35902.bankSize + ((bank > 0) ? UInt32(0x4000) : UInt32(0x0000))
-              labels[index] = "\(runGroupName).fn_\(bank.hexString)_\(UInt16(address).hexString)"
+
+            var firstReturnIndex: UInt32? = nil
+
+            runScope.dropFirst().forEach {
+              let index = UInt32($0)
+              guard labels[index] != nil else {
+                return
+              }
+              if case .ret = instructionMap[index]?.spec {
+                if let firstReturnIndex = firstReturnIndex {
+                  labels[index] = "\(runGroupName).return_\(UInt16(index % LR35902.bankSize).hexString)"
+                  labels[firstReturnIndex] = "\(runGroupName).return_\(UInt16(firstReturnIndex % LR35902.bankSize).hexString)"
+                } else {
+                  labels[index] = "\(runGroupName).return"
+                  firstReturnIndex = index
+                }
+              } else {
+                let bank = UInt8(index / LR35902.bankSize)
+                let address = index % LR35902.bankSize + ((bank > 0) ? UInt32(0x4000) : UInt32(0x0000))
+                labels[index] = "\(runGroupName).fn_\(bank.hexString)_\(UInt16(address).hexString)"
+              }
+              if labels[index] == "toc_00_05C0.fn_00_0688" {
+                print("\(runScope)")
+              }
+              print(labels[index])
             }
           }
         }
-        break
       }
     }
   }
