@@ -78,7 +78,7 @@ public final class RGBDSAssembly {
         if disassembly.transfersOfControl(at: instruction.immediate16!, in: disassembly.cpu.bank) != nil {
           var addressLabel: String
           if let label = disassembly.label(at: instruction.immediate16!, in: disassembly.cpu.bank) {
-            if let scope = disassembly.scope(at: disassembly.cpu.pc, in: disassembly.cpu.bank),
+            if let scope = disassembly.contiguousScope(at: disassembly.cpu.pc, in: disassembly.cpu.bank),
               label.starts(with: "\(scope).") {
               addressLabel = label.replacingOccurrences(of: "\(scope).", with: ".")
             } else {
@@ -99,7 +99,7 @@ public final class RGBDSAssembly {
         if disassembly.transfersOfControl(at: jumpAddress, in: disassembly.cpu.bank) != nil {
           var addressLabel: String
           if let label = disassembly.label(at: jumpAddress, in: disassembly.cpu.bank) {
-            if let scope = disassembly.scope(at: disassembly.cpu.pc, in: disassembly.cpu.bank),
+            if let scope = disassembly.contiguousScope(at: disassembly.cpu.pc, in: disassembly.cpu.bank),
               label.starts(with: "\(scope).") {
               addressLabel = label.replacingOccurrences(of: "\(scope).", with: ".")
             } else {

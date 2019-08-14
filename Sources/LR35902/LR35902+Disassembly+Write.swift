@@ -60,9 +60,9 @@ extension LR35902.Disassembly {
     case preComment(String)
     case label(String)
     case transferOfControl(Set<TransferOfControl>, String)
-    case instruction(LR35902.Instruction, RGBDSAssembly.Statement, UInt16, UInt8, Data)
+    case instruction(LR35902.Instruction, RGBDSAssembly.Statement, UInt16, UInt8, Set<String>, Data)
     case macroInstruction(LR35902.Instruction, RGBDSAssembly.Statement)
-    case macro(String, UInt16, UInt8, Data)
+    case macro(String, UInt16, UInt8, Set<String>, Data)
     case macroDefinition(String)
     case macroTerminator
 
@@ -73,9 +73,9 @@ extension LR35902.Disassembly {
       case let .label(label):                  return "\(prettify(label)):"
       case let .preComment(comment):           return line(comment: comment)
       case let .transferOfControl(toc, label): return line(toc, label: prettify(label))
-      case let .instruction(_, assembly, address, bank, bytes): return line(assembly.description, address: address, bank: bank, bytes: bytes)
+      case let .instruction(_, assembly, address, bank, scope, bytes): return line(assembly.description, address: address, bank: bank, scope: scope, bytes: bytes)
       case let .macroInstruction(_, assembly): return line(assembly.description)
-      case let .macro(assembly, address, bank, bytes): return line(assembly, address: address, bank: bank, bytes: bytes)
+      case let .macro(assembly, address, bank, scope, bytes): return line(assembly, address: address, bank: bank, scope: scope, bytes: bytes)
       case let .macroDefinition(name):         return "\(name): MACRO"
       case .macroTerminator:                   return line("ENDM")
       }
@@ -184,7 +184,8 @@ clean:
           let index = LR35902.romAddress(for: cpu.pc, in: bank)
           let instructionWidth = LR35902.instructionWidths[instruction.spec]!
           let bytes = cpu[index..<(index + UInt32(instructionWidth))]
-          lineGroup.append(.instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: self), cpu.pc, cpu.bank, bytes))
+          let instructionScope = scope(at: cpu.pc, in: bank)
+          lineGroup.append(.instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: self), cpu.pc, cpu.bank, instructionScope, bytes))
 
           cpu.pc += instructionWidth
 
@@ -207,7 +208,7 @@ clean:
                 let code = macroNodeIterator.code,
                 let validArgumentValues = macroNodeIterator.validArgumentValues {
                 let instructions = lineBuffer.compactMap { thisLine -> (LR35902.Instruction, RGBDSAssembly.Statement)? in
-                  if case let .instruction(instruction, assembly, _, _, _) = thisLine {
+                  if case let .instruction(instruction, assembly, _, _, _, _) = thisLine {
                     return (instruction, assembly)
                   } else {
                     return nil
@@ -273,7 +274,8 @@ clean:
 
                   let firstInstruction = lineBuffer.firstIndex { line in if case .instruction = line { return true } else { return false} }
                   lineBuffer.removeLast(lineBuffer.count - firstInstruction!)
-                  lineBuffer.append(.macro("\(macro) \(macroArgs)", lineBufferAddress, cpu.bank, bytes))
+                  let macroScope = scope(at: lineBufferAddress, in: bank)
+                  lineBuffer.append(.macro("\(macro) \(macroArgs)", lineBufferAddress, cpu.bank, macroScope, bytes))
 
                   lineBufferAddress = cpu.pc
                 }

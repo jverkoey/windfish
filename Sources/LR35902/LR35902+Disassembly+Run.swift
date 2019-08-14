@@ -38,7 +38,7 @@ extension LR35902.Disassembly {
     func runGroups() -> [[Run]] {
       var runGroups: [[Run]] = []
 
-      // Runs that are the beginning of a run group.
+      // Runs that are the beginning of a call group.
       var seenRuns = 0
       var runGroupQueue = [self]
       while !runGroupQueue.isEmpty {

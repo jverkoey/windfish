@@ -180,8 +180,11 @@ extension LR35902 {
     public func function(startingAt pc: UInt16, in bank: UInt8) -> String? {
       return functions[romAddress(for: pc, in: bank)]
     }
-    public func scope(at pc: UInt16, in bank: UInt8) -> String? {
-      return scopes[romAddress(for: pc, in: bank)]
+    public func scope(at pc: UInt16, in bank: UInt8) -> Set<String> {
+      return scopes[romAddress(for: pc, in: bank), default: Set()]
+    }
+    public func contiguousScope(at pc: UInt16, in bank: UInt8) -> String? {
+      return contiguousScopes[romAddress(for: pc, in: bank)]
     }
 
     public func defineFunction(startingAt pc: UInt16, in bank: UInt8, named name: String) {
@@ -192,7 +195,8 @@ extension LR35902 {
       disassemble(range: pc..<upperBound, inBank: bank, function: name)
     }
     private var functions: [UInt32: String] = [:]
-    private var scopes: [UInt32: String] = [:]
+    private var scopes: [UInt32: Set<String>] = [:]
+    private var contiguousScopes: [UInt32: String] = [:]
 
     // MARK: - Labels
 
@@ -420,9 +424,14 @@ extension LR35902 {
         let runStartAddress = LR35902.romAddress(for: entryRun.startAddress, in: entryRun.bank)
         if let runGroupName = labels[runStartAddress] {
 
+          runScope.forEach { address in
+            scopes[UInt32(address), default: Set()].insert(runGroupName)
+          }
+
+          // Get the first contiguous block of scope.
           if let runScope = runScope.rangeView.first(where: { $0.lowerBound == runStartAddress }) {
             for address in runScope {
-              scopes[UInt32(address)] = runGroupName
+              contiguousScopes[UInt32(address)] = runGroupName
             }
 
             var firstReturnIndex: UInt32? = nil
@@ -444,9 +453,6 @@ extension LR35902 {
                 let bank = UInt8(index / LR35902.bankSize)
                 let address = index % LR35902.bankSize + ((bank > 0) ? UInt32(0x4000) : UInt32(0x0000))
                 labels[index] = "\(runGroupName).fn_\(bank.hexString)_\(UInt16(address).hexString)"
-              }
-              if labels[index] == "toc_00_05C0.fn_00_0688" {
-                print("\(runScope)")
               }
             }
           }
