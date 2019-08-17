@@ -3,6 +3,20 @@ import XCTest
 
 final class LR35902InstructionTests: XCTestCase {
 
+  func test_assembly_nop() throws {
+    let data = RGBDSAssembler.assemble(assembly: """
+    nop
+    nop
+""")
+    let disassembly = LR35902.Disassembly(rom: data)
+    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
+
+    XCTAssertEqual(try XCTUnwrap(disassembly.instruction(at: 0x0000, in: 0x00)),
+                   LR35902.Instruction(spec: .nop))
+    XCTAssertEqual(try XCTUnwrap(disassembly.instruction(at: 0x0001, in: 0x00)),
+                   LR35902.Instruction(spec: .nop))
+  }
+
   func test_nop() throws {
     let data = Data([0])
     let disassembly = LR35902.Disassembly(rom: data)

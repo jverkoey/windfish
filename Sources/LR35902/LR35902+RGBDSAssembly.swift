@@ -122,7 +122,7 @@ public final class RGBDSAssembly {
         } else {
           addressLabel = "[$\(instruction.immediate16!.hexString)]"
         }
-        return [addressLabel, describe(for: instruction, operand: operand2)]
+        return [addressLabel, operand(for: instruction, operand: operand2)]
 
       case let LR35902.InstructionSpec.ld(operand1, operand2) where operand2 == .immediate16address:
         var addressLabel: String
@@ -131,7 +131,7 @@ public final class RGBDSAssembly {
         } else {
           addressLabel = "[$\(instruction.immediate16!.hexString)]"
         }
-        return [describe(for: instruction, operand: operand1), addressLabel]
+        return [operand(for: instruction, operand: operand1), addressLabel]
 
       case let LR35902.InstructionSpec.ld(operand1, operand2) where operand1 == .ffimmediate8Address:
         var addressLabel: String
@@ -140,7 +140,7 @@ public final class RGBDSAssembly {
         } else {
           addressLabel = "[$FF\(instruction.immediate8!.hexString)]"
         }
-        return [addressLabel, describe(for: instruction, operand: operand2)]
+        return [addressLabel, operand(for: instruction, operand: operand2)]
 
       case let LR35902.InstructionSpec.ld(operand1, operand2) where operand2 == .ffimmediate8Address:
         var addressLabel: String
@@ -149,7 +149,7 @@ public final class RGBDSAssembly {
         } else {
           addressLabel = "[$FF\(instruction.immediate8!.hexString)]"
         }
-        return [describe(for: instruction, operand: operand1), addressLabel]
+        return [operand(for: instruction, operand: operand1), addressLabel]
 
       case let LR35902.InstructionSpec.ld(operand1, operand2) where operand2 == .immediate16:
         var addressLabel: String
@@ -158,37 +158,37 @@ public final class RGBDSAssembly {
         } else {
           addressLabel = "$\(instruction.immediate16!.hexString)"
         }
-        return [describe(for: instruction, operand: operand1), addressLabel]
+        return [operand(for: instruction, operand: operand1), addressLabel]
 
       default:
         break
       }
     }
-    return describe(for: instruction, spec: instruction.spec)
+    return operands(for: instruction, spec: instruction.spec)
   }
 
-  private static func describe(for instruction: LR35902.Instruction, spec: LR35902.InstructionSpec) -> [String]? {
+  private static func operands(for instruction: LR35902.Instruction, spec: LR35902.InstructionSpec) -> [String]? {
     let mirror = Mirror(reflecting: spec)
-    guard let operands = mirror.children.first else {
+    guard let operandReflection = mirror.children.first else {
       return nil
     }
-    switch operands.value {
+    switch operandReflection.value {
     case let childInstruction as LR35902.InstructionSpec:
-      return describe(for: instruction, spec: childInstruction)
+      return operands(for: instruction, spec: childInstruction)
     case let tuple as (LR35902.Operand, LR35902.Condition?):
       if let condition = tuple.1 {
-        return ["\(condition)", describe(for: instruction, operand: tuple.0)]
+        return ["\(condition)", operand(for: instruction, operand: tuple.0)]
       } else {
-        return [describe(for: instruction, operand: tuple.0)]
+        return [operand(for: instruction, operand: tuple.0)]
       }
     case let condition as LR35902.Condition:
       return ["\(condition)"]
     case let tuple as (LR35902.Operand, LR35902.Operand):
-      return [describe(for: instruction, operand: tuple.0), describe(for: instruction, operand: tuple.1)]
+      return [operand(for: instruction, operand: tuple.0), operand(for: instruction, operand: tuple.1)]
     case let tuple as (LR35902.Bit, LR35902.Operand):
-      return ["\(tuple.0.rawValue)", describe(for: instruction, operand: tuple.1)]
-    case let operand as LR35902.Operand:
-      return [describe(for: instruction, operand: operand)]
+      return ["\(tuple.0.rawValue)", operand(for: instruction, operand: tuple.1)]
+    case let operandValue as LR35902.Operand:
+      return [operand(for: instruction, operand: operandValue)]
     case let address as LR35902.RestartAddress:
       return ["\(address)".replacingOccurrences(of: "x", with: "$")]
     default:
@@ -196,7 +196,7 @@ public final class RGBDSAssembly {
     }
   }
 
-  private static func describe(for instruction: LR35902.Instruction, operand: LR35902.Operand) -> String {
+  private static func operand(for instruction: LR35902.Instruction, operand: LR35902.Operand) -> String {
     switch operand {
     case .immediate8:           return "$\(instruction.immediate8!.hexString)"
     case .immediate8signed:
