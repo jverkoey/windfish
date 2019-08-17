@@ -187,7 +187,11 @@ extension LR35902 {
       return functions[romAddress(for: pc, in: bank)]
     }
     public func scope(at pc: UInt16, in bank: UInt8) -> Set<String> {
-      return scopes[romAddress(for: pc, in: bank), default: Set()]
+      let address = romAddress(for: pc, in: bank)
+      let intersectingScopes = scopes.filter { iterator in
+        iterator.value.contains(Int(address))
+      }
+      return Set(intersectingScopes.keys)
     }
     public func contiguousScope(at pc: UInt16, in bank: UInt8) -> String? {
       return contiguousScopes[romAddress(for: pc, in: bank)]
@@ -201,8 +205,8 @@ extension LR35902 {
       disassemble(range: pc..<upperBound, inBank: bank, function: name)
     }
     private var functions: [UInt32: String] = [:]
-    private var scopes: [UInt32: Set<String>] = [:]
     private var contiguousScopes: [UInt32: String] = [:]
+    private var scopes: [String: IndexSet] = [:]
 
     // MARK: - Labels
 
@@ -434,10 +438,7 @@ extension LR35902 {
         let entryRun = runGroup.first!
         let runStartAddress = LR35902.romAddress(for: entryRun.startAddress, in: entryRun.bank)
         if let runGroupName = labels[runStartAddress] {
-
-          runScope.forEach { address in
-            scopes[UInt32(address), default: Set()].insert(runGroupName)
-          }
+          scopes[runGroupName, default: IndexSet()].formUnion(runScope)
 
           // Get the first contiguous block of scope.
           if let runScope = runScope.rangeView.first(where: { $0.lowerBound == runStartAddress }) {
