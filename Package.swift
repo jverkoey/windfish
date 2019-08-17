@@ -15,8 +15,8 @@ let package = Package(
       name: "gbdis",
       dependencies: ["LR35902", "FixedWidthInteger"]),
     .testTarget(
-      name: "gbdisTests",
-      dependencies: ["gbdis"]),
+      name: "LR35902Tests",
+      dependencies: ["LR35902"]),
 
     .target(
       name: "LR35902",

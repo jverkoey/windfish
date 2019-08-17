@@ -8,7 +8,9 @@ extension LR35902 {
     let cpu: LR35902
     public init(rom: Data) {
       cpu = LR35902(rom: rom)
+    }
 
+    public func disassembleAsGameboyCartridge() {
       // Restart addresses
       let numberOfRestartAddresses = 8
       let restartSize = 8

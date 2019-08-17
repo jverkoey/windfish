@@ -5,6 +5,8 @@ let data = try Data(contentsOf: URL(fileURLWithPath: "/Users/featherless/workben
 
 let disassembly = LR35902.Disassembly(rom: data)
 
+disassembly.disassembleAsGameboyCartridge()
+
 disassembly.setLabel(at: 0x0003, in: 0x00, named: "DEBUG_TOOL")
 disassembly.setData(at: 0x0003, in: 0x00)
 
