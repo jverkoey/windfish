@@ -78,7 +78,15 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
     return []
   }
   var binaryOperands: [UInt8] = []
-  for (index, child) in Mirror(reflecting: operands.value).children.enumerated() {
+
+  let children: Mirror.Children
+  let reflectedChildren = Mirror(reflecting: operands.value).children
+  if reflectedChildren.count > 0 {
+    children = reflectedChildren
+  } else {
+    children = Mirror.Children([(label: nil, value: operands.value)])
+  }
+  for (index, child) in children.enumerated() {
     switch child.value {
     case LR35902.Operand.immediate16:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {

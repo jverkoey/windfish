@@ -298,4 +298,32 @@ class RGBDAssembler: XCTestCase {
       0x0000: LR35902.Instruction(spec: .ld(.ffimmediate8Address, .a), immediate8: 0xA0),
     ])
   }
+
+  func test_ret_z() throws {
+    let assembler = RGBDSAssembler()
+    let errors = assembler.assemble(assembly: """
+    ret z
+""")
+    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
+    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+
+    XCTAssertEqual(errors, [])
+    XCTAssertEqual(disassembly.instructionMap, [
+      0x0000: LR35902.Instruction(spec: .ret(.z)),
+    ])
+  }
+
+  func test_sub_imm8() throws {
+    let assembler = RGBDSAssembler()
+    let errors = assembler.assemble(assembly: """
+    sub 5
+""")
+    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
+    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+
+    XCTAssertEqual(errors, [])
+    XCTAssertEqual(disassembly.instructionMap, [
+      0x0000: LR35902.Instruction(spec: .sub(.immediate8), immediate8: 5),
+    ])
+  }
 }
