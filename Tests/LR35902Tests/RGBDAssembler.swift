@@ -8,6 +8,7 @@ class RGBDAssembler: XCTestCase {
     let errors = assembler.assemble(assembly: """
     nop nop
 """)
+
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
 
@@ -20,6 +21,7 @@ class RGBDAssembler: XCTestCase {
 ; This is a comment-only line
     nop nop
 """)
+
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
 
@@ -31,12 +33,12 @@ class RGBDAssembler: XCTestCase {
     let errors = assembler.assemble(assembly: """
     nop
 """)
+
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
 
     XCTAssertTrue(errors.isEmpty)
-    XCTAssertEqual(try XCTUnwrap(disassembly.instruction(at: 0x0000, in: 0x00)),
-                   LR35902.Instruction(spec: .nop))
+    XCTAssertEqual(disassembly.instructionMap, [0x0000: LR35902.Instruction(spec: .nop)])
   }
 
   func test_nop_2() throws {
@@ -49,10 +51,10 @@ class RGBDAssembler: XCTestCase {
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
 
     XCTAssertTrue(errors.isEmpty)
-    XCTAssertEqual(try XCTUnwrap(disassembly.instruction(at: 0x0000, in: 0x00)),
-                   LR35902.Instruction(spec: .nop))
-    XCTAssertEqual(try XCTUnwrap(disassembly.instruction(at: 0x0001, in: 0x00)),
-                   LR35902.Instruction(spec: .nop))
+    XCTAssertEqual(disassembly.instructionMap, [
+      0x0000: LR35902.Instruction(spec: .nop),
+      0x0001: LR35902.Instruction(spec: .nop)
+    ])
   }
 
   func test_ld_bc_imm16() throws {
@@ -64,8 +66,26 @@ class RGBDAssembler: XCTestCase {
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
 
     XCTAssertTrue(errors.isEmpty)
-    XCTAssertEqual(try XCTUnwrap(disassembly.instruction(at: 0x0000, in: 0x00)),
-                   LR35902.Instruction(spec: .ld(.bc, .immediate16), immediate16: 0x1234))
+
+    XCTAssertEqual(disassembly.instructionMap, [
+      0x0000: LR35902.Instruction(spec: .ld(.bc, .immediate16), immediate16: 0x1234)
+    ])
+  }
+
+  func test_ld_bc_imm16_nop() throws {
+    let assembler = RGBDSAssembler()
+    let errors = assembler.assemble(assembly: """
+    ld bc, $1234
+    nop
+""")
+    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
+    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+
+    XCTAssertTrue(errors.isEmpty)
+    XCTAssertEqual(disassembly.instructionMap, [
+      0x0000: LR35902.Instruction(spec: .ld(.bc, .immediate16), immediate16: 0x1234),
+      0x0003: LR35902.Instruction(spec: .nop)
+    ])
   }
 
 }

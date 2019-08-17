@@ -126,7 +126,7 @@ extension LR35902 {
 
       code.insert(integersIn: Int(address)..<(Int(address) + Int(LR35902.instructionWidths[instruction.spec]!)))
     }
-    private var instructionMap: [UInt32: Instruction] = [:]
+    var instructionMap: [UInt32: Instruction] = [:]
 
     // MARK: - Data segments
 
