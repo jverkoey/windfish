@@ -39,6 +39,61 @@ private func createRepresentation(from statement: RGBDSAssembly.Statement) -> St
   }
 }
 
+protocol BitPatternInitializable {
+  associatedtype CompanionType
+  init(bitPattern x: CompanionType)
+}
+
+extension UInt16: BitPatternInitializable {
+  typealias CompanionType = Int16
+}
+
+extension Int16: BitPatternInitializable {
+  typealias CompanionType = UInt16
+}
+
+extension UInt8: BitPatternInitializable {
+  typealias CompanionType = Int8
+}
+
+extension Int8: BitPatternInitializable {
+  typealias CompanionType = UInt8
+}
+
+private func cast<T: UnsignedInteger, negT: SignedInteger>(string: String, negativeType: negT.Type)
+  throws -> T
+  where T: FixedWidthInteger, negT: FixedWidthInteger, T: BitPatternInitializable, T.CompanionType == negT {
+  var value = string
+  let isNegative = value.starts(with: "-")
+  if isNegative {
+    value = String(value.dropFirst(1))
+  }
+
+  var numericPart: String
+  var radix: Int
+  if value.starts(with: "$") {
+    numericPart = String(value.dropFirst())
+    radix = 16
+  } else if value.starts(with: "0x") {
+    numericPart = String(value.dropFirst(2))
+    radix = 16
+  } else {
+    numericPart = value
+    radix = 10
+  }
+
+  if isNegative {
+    guard let negativeValue = negT(numericPart, radix: radix) else {
+      throw RGBDSAssembler.Error(lineNumber: nil, error: "Unable to represent \(value) as a UInt16")
+    }
+    return T(bitPattern: -negativeValue)
+  } else if let numericValue = T(numericPart, radix: radix) {
+    return numericValue
+  }
+
+  throw RGBDSAssembler.Error(lineNumber: nil, error: "Unable to represent \(value) as a UInt16")
+}
+
 private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, using spec: LR35902.InstructionSpec) throws -> [UInt8] {
   guard let operands = Mirror(reflecting: spec).children.first else {
     return []
@@ -48,20 +103,16 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
     switch child.value {
     case LR35902.Operand.immediate16:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
-        if value.starts(with: "$") {
-          guard var numericValue = UInt16(value.dropFirst(), radix: 16) else {
-            throw RGBDSAssembler.Error(lineNumber: nil, error: "Unable to represent \(value) as a UInt16")
-          }
-          withUnsafeBytes(of: &numericValue) { buffer in
-            binaryOperands.append(contentsOf: Data(buffer))
-          }
-        } else if value.starts(with: "0x") {
-          guard var numericValue = UInt16(value.dropFirst(2), radix: 16) else {
-            throw RGBDSAssembler.Error(lineNumber: nil, error: "Unable to represent \(value) as a UInt16")
-          }
-          withUnsafeBytes(of: &numericValue) { buffer in
-            binaryOperands.append(contentsOf: Data(buffer))
-          }
+        var numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
+        withUnsafeBytes(of: &numericValue) { buffer in
+          binaryOperands.append(contentsOf: Data(buffer))
+        }
+      }
+    case LR35902.Operand.immediate8:
+      if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
+        var numericValue: UInt8 = try cast(string: value, negativeType: Int8.self)
+        withUnsafeBytes(of: &numericValue) { buffer in
+          binaryOperands.append(contentsOf: Data(buffer))
         }
       }
     default:
