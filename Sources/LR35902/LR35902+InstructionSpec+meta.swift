@@ -70,12 +70,16 @@ extension LR35902.Operand {
 
   var representation: String {
     switch self {
-    case .hlAddress, .bcAddress,
-         .immediate8, .immediate8signed,
-         .immediate16, .immediate16address,
-         .spPlusImmediate8Signed,
-         .ffimmediate8Address:
-      return "numeric"
+    case .hlAddress:
+      return "[hl]"
+    case .bcAddress:
+      return "[bc]"
+    case .immediate16address:
+      return "[#]"
+    case .ffimmediate8Address:
+      return "[FF#]"
+    case .immediate8, .immediate8signed, .immediate16:
+      return "#"
     default:
       return "\(self)"
     }

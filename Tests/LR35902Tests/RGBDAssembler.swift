@@ -65,7 +65,7 @@ class RGBDAssembler: XCTestCase {
 
     XCTAssertTrue(errors.isEmpty)
     XCTAssertEqual(try XCTUnwrap(disassembly.instruction(at: 0x0000, in: 0x00)),
-                   LR35902.Instruction(spec: .nop))
+                   LR35902.Instruction(spec: .ld(.bc, .immediate16), immediate16: 0x1234))
   }
 
 }
