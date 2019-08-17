@@ -98,9 +98,17 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
           binaryOperands.append(contentsOf: Data(buffer))
         }
       }
+    case LR35902.Operand.ffimmediate8Address:
+      if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
+        let numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self)
+        var lowerByteValue = UInt8(numericValue & 0xFF)
+        withUnsafeBytes(of: &lowerByteValue) { buffer in
+          binaryOperands.append(contentsOf: Data(buffer))
+        }
+      }
     case LR35902.Operand.immediate16address:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
-        var numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast()), negativeType: Int16.self)
+        var numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self)
         withUnsafeBytes(of: &numericValue) { buffer in
           binaryOperands.append(contentsOf: Data(buffer))
         }
@@ -140,13 +148,27 @@ public final class RGBDSAssembler {
       let statement = createStatement(from: code)
       let representation = createRepresentation(from: statement)
 
-      guard let spec = RGBDSAssembler.representations[representation] else {
+      guard let specs = RGBDSAssembler.representations[representation] else {
         errors.append(Error(lineNumber: lineNumber, error: "Invalid instruction: \(code)"))
         return
       }
 
       do {
-        let operandsAsBinary = try extractOperandsAsBinary(from: statement, using: spec)
+
+        let spec: LR35902.InstructionSpec
+        let operandsAsBinary: [UInt8]
+        if specs.count > 1 {
+          let specsAndBinary: Zip2Sequence<[LR35902.InstructionSpec], [[UInt8]]> = try zip(specs, specs.map({ spec in
+            try extractOperandsAsBinary(from: statement, using: spec)
+          }))
+          (spec, operandsAsBinary) = specsAndBinary.sorted(by: { pair1, pair2 in
+            pair1.1.count < pair2.1.count
+          })[0]
+        } else {
+          spec = specs[0]
+          operandsAsBinary = try extractOperandsAsBinary(from: statement, using: spec)
+        }
+
         self.buffer.append(contentsOf: RGBDSAssembler.instructionOpcodeBinary[spec]!)
         self.buffer.append(contentsOf: operandsAsBinary)
 
@@ -164,21 +186,19 @@ public final class RGBDSAssembler {
     return errors
   }
 
-  static var representations: [String: LR35902.InstructionSpec] = {
-    var representations: [String: LR35902.InstructionSpec] = [:]
+  static var representations: [String: [LR35902.InstructionSpec]] = {
+    var representations: [String: [LR35902.InstructionSpec]] = [:]
     LR35902.instructionTable.forEach { spec in
       if case .invalid = spec {
         return
       }
-      assert(representations[spec.representation] == nil, "Unexpected collision.")
-      representations[spec.representation] = spec
+      representations[spec.representation, default: []].append(spec)
     }
     LR35902.instructionTableCB.forEach { spec in
       if case .invalid = spec {
         return
       }
-      assert(representations[spec.representation] == nil, "Unexpected collision.")
-      representations[spec.representation] = spec
+      representations[spec.representation, default: []].append(spec)
     }
     return representations
   }()

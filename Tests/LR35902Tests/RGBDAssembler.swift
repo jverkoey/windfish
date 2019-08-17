@@ -284,4 +284,18 @@ class RGBDAssembler: XCTestCase {
       0x0000: LR35902.Instruction(spec: .jr(.immediate8signed), immediate8: 3),
     ])
   }
+
+  func test_ld_ffimm8_a() throws {
+    let assembler = RGBDSAssembler()
+    let errors = assembler.assemble(assembly: """
+    ld [$FFA0], a
+""")
+    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
+    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+
+    XCTAssertEqual(errors, [])
+    XCTAssertEqual(disassembly.instructionMap, [
+      0x0000: LR35902.Instruction(spec: .ld(.ffimmediate8Address, .a), immediate8: 0xA0),
+    ])
+  }
 }

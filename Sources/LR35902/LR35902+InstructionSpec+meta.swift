@@ -77,7 +77,7 @@ extension LR35902.Operand {
     case .immediate16address:
       return "[#]"
     case .ffimmediate8Address:
-      return "[FF#]"
+      return "[#]"
     case .immediate8, .immediate8signed, .immediate16:
       return "#"
     default:
