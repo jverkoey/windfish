@@ -2,7 +2,54 @@ import Foundation
 
 import FixedWidthInteger
 
+private func codeAndComments(from line: String) -> (code: String?, comment: String?) {
+  let parts = line.components(separatedBy: ";")
+  return (code: parts[0], comment: parts[1...].joined(separator: ";"))
+}
+
 public final class RGBDSAssembler {
+
+  public init() {
+  }
+
+  public var buffer = Data()
+
+  public struct Error: Equatable {
+    let lineNumber: Int
+    let error: String
+  }
+
+  public func assemble(assembly: String) -> [Error] {
+    var lineNumber = 1
+    var errors: [Error] = []
+
+    assembly.enumerateLines { (line, stop) in
+      defer {
+        lineNumber += 1
+      }
+
+      let lineContent = line.trimmingCharacters(in: .whitespaces)
+      let code = codeAndComments(from: lineContent).code
+
+      // If we're an opcode...
+      if let codeParts = code?.components(separatedBy: " ") {
+        if let opcode = codeParts.first?.lowercased(),
+          let specs = RGBDSAssembler.instructionOpcodeAssembly[String(opcode)] {
+          if specs.count == 1 {
+            let spec = specs.first!
+            if spec.operandWidth == 0 {
+              if codeParts.count > 1 {
+                errors.append(Error(lineNumber: lineNumber, error: "Unexpected operand for \(opcode)"))
+              } else {
+                self.buffer.append(contentsOf: RGBDSAssembler.instructionOpcodeBinary[spec]!)
+              }
+            }
+          }
+        }
+      }
+    }
+    return errors
+  }
 
   static var instructionOpcodeAssembly: [String: [LR35902.InstructionSpec]] = {
     var assembly: [String: [LR35902.InstructionSpec]] = [:]
@@ -26,24 +73,4 @@ public final class RGBDSAssembler {
     return binary
   }()
 
-  static func assemble(assembly: String) -> Data {
-    var buffer = Data()
-    assembly.enumerateLines { (line, stop) in
-      let lineContent = line.trimmingCharacters(in: .whitespaces)
-      let lineParts = lineContent.split(separator: " ")
-
-      // If we're an opcode...
-      let opcode = lineParts.first!.lowercased()
-      if let specs = instructionOpcodeAssembly[String(opcode)] {
-        if specs.count == 1 {
-          let spec = specs.first!
-          if spec.operandWidth == 0 {
-            buffer.append(contentsOf: instructionOpcodeBinary[spec]!)
-          }
-        }
-      }
-    }
-
-    return buffer
-  }
 }
