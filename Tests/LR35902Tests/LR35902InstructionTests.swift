@@ -21,13 +21,31 @@ final class LR35902InstructionTests: XCTestCase {
     XCTAssertEqual(instruction, LR35902.Instruction(spec: .ld(.bc, .immediate16), immediate16: 0x3412))
   }
 
-  func test_ld_bcAdd_a() throws {
+  func test_ld_bcadd_a() throws {
     let data = Data([0x02])
     let disassembly = LR35902.Disassembly(rom: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     let instruction = try XCTUnwrap(disassembly.instruction(at: 0x0000, in: 0x00))
     XCTAssertEqual(instruction, LR35902.Instruction(spec: .ld(.bcAddress, .a)))
+  }
+
+  func test_inc_bc() throws {
+    let data = Data([0x03])
+    let disassembly = LR35902.Disassembly(rom: data)
+    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
+
+    let instruction = try XCTUnwrap(disassembly.instruction(at: 0x0000, in: 0x00))
+    XCTAssertEqual(instruction, LR35902.Instruction(spec: .inc(.bc)))
+  }
+  
+  func test_inc_b() throws {
+    let data = Data([0x04])
+    let disassembly = LR35902.Disassembly(rom: data)
+    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
+
+    let instruction = try XCTUnwrap(disassembly.instruction(at: 0x0000, in: 0x00))
+    XCTAssertEqual(instruction, LR35902.Instruction(spec: .inc(.b)))
   }
 }
 
