@@ -26,10 +26,16 @@ private func createStatement(from code: String) -> RGBDSAssembly.Statement {
   }
 }
 
+private func isNumber(_ string: String) -> Bool {
+  return string.hasPrefix("$") || string.hasPrefix("0x") || Int(string) != nil
+}
+
 private func createRepresentation(from statement: RGBDSAssembly.Statement) -> String {
   if let operands: [String] = statement.operands?.map({ operand in
-    if operand.starts(with: "$") || operand.starts(with: "0x") || Int(operand) != nil {
+    if isNumber(operand) {
       return "#"
+    } else if operand.hasPrefix("[") && operand.hasSuffix("]") && isNumber(String(operand.dropFirst().dropLast())) {
+      return "[#]"
     }
     return operand
   }) {
@@ -111,6 +117,13 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
     case LR35902.Operand.immediate8:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
         var numericValue: UInt8 = try cast(string: value, negativeType: Int8.self)
+        withUnsafeBytes(of: &numericValue) { buffer in
+          binaryOperands.append(contentsOf: Data(buffer))
+        }
+      }
+    case LR35902.Operand.immediate16address:
+      if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
+        var numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast()), negativeType: Int16.self)
         withUnsafeBytes(of: &numericValue) { buffer in
           binaryOperands.append(contentsOf: Data(buffer))
         }

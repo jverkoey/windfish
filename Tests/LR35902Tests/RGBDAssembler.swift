@@ -228,4 +228,18 @@ class RGBDAssembler: XCTestCase {
       0x0000: LR35902.Instruction(spec: .ld(.b, .immediate8), immediate8: 255),
     ])
   }
+
+  func test_ld_imm16addr_sp() throws {
+    let assembler = RGBDSAssembler()
+    let errors = assembler.assemble(assembly: """
+    ld [$1234], sp
+""")
+    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
+    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+
+    XCTAssertEqual(errors, [])
+    XCTAssertEqual(disassembly.instructionMap, [
+      0x0000: LR35902.Instruction(spec: .ld(.immediate16address, .sp), immediate16: 0x1234),
+    ])
+  }
 }
