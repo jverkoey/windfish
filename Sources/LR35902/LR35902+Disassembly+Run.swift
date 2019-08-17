@@ -29,7 +29,10 @@ extension LR35902.Disassembly {
       if let endAddress = endAddress {
         return cpu.pc >= endAddress
       }
-      return (bank == 0 && pc >= 0x4000) || (bank != 0 && pc >= 0x8000)
+      return
+        (bank == 0 && pc >= 0x4000)
+        || (bank != 0 && pc >= 0x8000)
+        || LR35902.romAddress(for: cpu.pc, in: cpu.bank) >= cpu.romSize
     }
 
     /**

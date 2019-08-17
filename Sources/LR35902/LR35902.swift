@@ -8,6 +8,9 @@ public final class LR35902 {
     self.rom = rom
   }
   private let rom: Data
+  var romSize: UInt32 {
+    return UInt32(rom.count)
+  }
 
   // MARK: - Accessing ROM data
 

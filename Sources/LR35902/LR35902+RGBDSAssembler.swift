@@ -114,9 +114,12 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
           binaryOperands.append(contentsOf: Data(buffer))
         }
       }
-    case LR35902.Operand.immediate8:
+    case LR35902.Operand.immediate8, LR35902.Operand.immediate8signed:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
         var numericValue: UInt8 = try cast(string: value, negativeType: Int8.self)
+        if case .jr = spec {
+          numericValue = numericValue.advanced(by: -2)
+        }
         withUnsafeBytes(of: &numericValue) { buffer in
           binaryOperands.append(contentsOf: Data(buffer))
         }
