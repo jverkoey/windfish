@@ -47,13 +47,21 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
   for (index, child) in Mirror(reflecting: operands.value).children.enumerated() {
     switch child.value {
     case LR35902.Operand.immediate16:
-      if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String,
-        value.starts(with: "$") {
-        guard var numericValue = UInt16(value.dropFirst(), radix: 16) else {
-          throw RGBDSAssembler.Error(lineNumber: nil, error: "Unable to represent \(value) as a UInt16")
-        }
-        withUnsafeBytes(of: &numericValue) { buffer in
-          binaryOperands.append(contentsOf: Data(buffer))
+      if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
+        if value.starts(with: "$") {
+          guard var numericValue = UInt16(value.dropFirst(), radix: 16) else {
+            throw RGBDSAssembler.Error(lineNumber: nil, error: "Unable to represent \(value) as a UInt16")
+          }
+          withUnsafeBytes(of: &numericValue) { buffer in
+            binaryOperands.append(contentsOf: Data(buffer))
+          }
+        } else if value.starts(with: "0x") {
+          guard var numericValue = UInt16(value.dropFirst(2), radix: 16) else {
+            throw RGBDSAssembler.Error(lineNumber: nil, error: "Unable to represent \(value) as a UInt16")
+          }
+          withUnsafeBytes(of: &numericValue) { buffer in
+            binaryOperands.append(contentsOf: Data(buffer))
+          }
         }
       }
     default:
