@@ -2,9 +2,29 @@ import Foundation
 
 import FixedWidthInteger
 
+extension StringProtocol {
+  fileprivate func trimmed() -> String {
+    return self.trimmingCharacters(in: .whitespaces)
+  }
+}
+
 private func codeAndComments(from line: String) -> (code: String?, comment: String?) {
-  let parts = line.components(separatedBy: ";")
-  return (code: parts[0], comment: parts[1...].joined(separator: ";"))
+  let parts = line.split(separator: ";", maxSplits: 1, omittingEmptySubsequences: false)
+  return (code: parts.first?.trimmed(), comment: parts.last?.trimmed())
+}
+
+private func opcodeAndOperands(from code: String) -> (opcode: String, operands: [String]) {
+  let opcodeAndOperands = code.split(separator: " ", maxSplits: 1)
+
+  let opcode = opcodeAndOperands[0].lowercased()
+  let operands: [String]
+  if opcodeAndOperands.count > 1 {
+    operands = opcodeAndOperands[1].components(separatedBy: ",").map { $0.trimmed() }
+  } else {
+    operands = []
+  }
+
+  return (opcode: opcode, operands: operands)
 }
 
 public final class RGBDSAssembler {
@@ -28,38 +48,48 @@ public final class RGBDSAssembler {
         lineNumber += 1
       }
 
-      let lineContent = line.trimmingCharacters(in: .whitespaces)
-      let code = codeAndComments(from: lineContent).code
-
-      // If we're an opcode...
-      if let codeParts = code?.components(separatedBy: " ") {
-        if let opcode = codeParts.first?.lowercased(),
-          let specs = RGBDSAssembler.instructionOpcodeAssembly[String(opcode)] {
-          if specs.count == 1 {
-            let spec = specs.first!
-            if spec.operandWidth == 0 {
-              if codeParts.count > 1 {
-                errors.append(Error(lineNumber: lineNumber, error: "Unexpected operand for \(opcode)"))
-              } else {
-                self.buffer.append(contentsOf: RGBDSAssembler.instructionOpcodeBinary[spec]!)
-              }
-            }
-          }
-        }
+      guard let code = codeAndComments(from: line).code, code.count > 0 else {
+        return
       }
+
+      let (opcode, operands) = opcodeAndOperands(from: code)
+
+      guard let spec = RGBDSAssembler.representations[String(opcode)] else {
+        return
+      }
+
+      print(spec)
+//
+//      if specs.count == 1 {
+//        let spec = specs.first!
+//        if spec.operandWidth == 0 {
+//          guard operands.count == 0 else {
+//            errors.append(Error(lineNumber: lineNumber, error: "Unexpected operand for \(opcode)"))
+//            return
+//          }
+//
+//          self.buffer.append(contentsOf: RGBDSAssembler.instructionOpcodeBinary[spec]!)
+//
+//        } else {
+////            assertionFailure("Unhandled")
+//        }
+//
+//      } else {
+////          assertionFailure("Unhandled")
+//      }
     }
     return errors
   }
 
-  static var instructionOpcodeAssembly: [String: [LR35902.InstructionSpec]] = {
-    var assembly: [String: [LR35902.InstructionSpec]] = [:]
+  static var representations: [String: LR35902.InstructionSpec] = {
+    var representations: [String: LR35902.InstructionSpec] = [:]
     LR35902.instructionTable.forEach { spec in
-      assembly[spec.opcode, default: []].append(spec)
+      representations[spec.representation] = spec
     }
     LR35902.instructionTableCB.forEach { spec in
-      assembly[spec.opcode, default: []].append(spec)
+      representations[spec.representation] = spec
     }
-    return assembly
+    return representations
   }()
 
   static var instructionOpcodeBinary: [LR35902.InstructionSpec: [UInt8]] = {
