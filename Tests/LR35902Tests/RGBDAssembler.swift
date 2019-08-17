@@ -11,7 +11,7 @@ class RGBDAssembler: XCTestCase {
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [RGBDSAssembler.Error(lineNumber: 1, error: "Unexpected operand for nop")])
+    XCTAssertEqual(errors, [RGBDSAssembler.Error(lineNumber: 1, error: "Invalid instruction: nop nop")])
   }
 
   func test_nop_failsWithExtraOperandAtCorrectLine() throws {
@@ -23,7 +23,7 @@ class RGBDAssembler: XCTestCase {
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [RGBDSAssembler.Error(lineNumber: 2, error: "Unexpected operand for nop")])
+    XCTAssertEqual(errors, [RGBDSAssembler.Error(lineNumber: 2, error: "Invalid instruction: nop nop")])
   }
 
   func test_nop_1() throws {

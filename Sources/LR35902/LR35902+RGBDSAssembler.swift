@@ -27,6 +27,21 @@ private func opcodeAndOperands(from code: String) -> (opcode: String, operands: 
   return (opcode: opcode, operands: operands)
 }
 
+private func representation(from code: String) -> String {
+  let codeParts = opcodeAndOperands(from: code)
+  let operands: [String] = codeParts.operands.map { operand in
+    if operand.starts(with: "$") || operand.starts(with: "0x") {
+      return "numeric"
+    }
+    return operand
+  }
+  if operands.count > 0 {
+    return "\(codeParts.opcode) \(operands.joined(separator: ", "))"
+  } else {
+    return codeParts.opcode
+  }
+}
+
 public final class RGBDSAssembler {
 
   public init() {
@@ -52,9 +67,10 @@ public final class RGBDSAssembler {
         return
       }
 
-      let (opcode, operands) = opcodeAndOperands(from: code)
+      let codeRepresentation = representation(from: code)
 
-      guard let spec = RGBDSAssembler.representations[String(opcode)] else {
+      guard let spec = RGBDSAssembler.representations[codeRepresentation] else {
+        errors.append(Error(lineNumber: lineNumber, error: "Invalid instruction: \(code)"))
         return
       }
 
