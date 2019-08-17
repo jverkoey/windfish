@@ -114,6 +114,12 @@ extension LR35902 {
 
     func register(instruction: Instruction, at pc: UInt16, in bank: UInt8) {
       let address = romAddress(for: pc, in: bank)
+
+      // Avoid overlapping instructions.
+      if code.contains(Int(address)) && instructionMap[address] == nil {
+        return
+      }
+
       instructionMap[address] = instruction
 
       code.insert(integersIn: Int(address)..<(Int(address) + Int(LR35902.instructionWidths[instruction.spec]!)))
@@ -201,7 +207,12 @@ extension LR35902 {
     // MARK: - Labels
 
     public func label(at pc: UInt16, in bank: UInt8) -> String? {
-      return labels[romAddress(for: pc, in: bank)]
+      let index = romAddress(for: pc, in: bank)
+      // Don't return labels that point to the middle of instructions.
+      if code.contains(Int(index)) && instructionMap[index] == nil {
+        return nil
+      }
+      return labels[index]
     }
 
     public func setLabel(at pc: UInt16, in bank: UInt8, named name: String) {
