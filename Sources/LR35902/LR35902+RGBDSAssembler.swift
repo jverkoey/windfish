@@ -39,27 +39,6 @@ private func createRepresentation(from statement: RGBDSAssembly.Statement) -> St
   }
 }
 
-protocol BitPatternInitializable {
-  associatedtype CompanionType
-  init(bitPattern x: CompanionType)
-}
-
-extension UInt16: BitPatternInitializable {
-  typealias CompanionType = Int16
-}
-
-extension Int16: BitPatternInitializable {
-  typealias CompanionType = UInt16
-}
-
-extension UInt8: BitPatternInitializable {
-  typealias CompanionType = Int8
-}
-
-extension Int8: BitPatternInitializable {
-  typealias CompanionType = UInt8
-}
-
 private func cast<T: UnsignedInteger, negT: SignedInteger>(string: String, negativeType: negT.Type)
   throws -> T
   where T: FixedWidthInteger, negT: FixedWidthInteger, T: BitPatternInitializable, T.CompanionType == negT {
