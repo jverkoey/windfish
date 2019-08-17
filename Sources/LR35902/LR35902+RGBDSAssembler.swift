@@ -2,12 +2,6 @@ import Foundation
 
 import FixedWidthInteger
 
-extension StringProtocol {
-  fileprivate func trimmed() -> String {
-    return self.trimmingCharacters(in: .whitespaces)
-  }
-}
-
 private func codeAndComments(from line: String) -> (code: String?, comment: String?) {
   let parts = line.split(separator: ";", maxSplits: 1, omittingEmptySubsequences: false)
   return (code: parts.first?.trimmed(), comment: parts.last?.trimmed())
