@@ -118,7 +118,8 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
         var numericValue: UInt8 = try cast(string: value, negativeType: Int8.self)
         if case .jr = spec {
-          numericValue = numericValue.advanced(by: -2)
+          // Relative jumps in assembly are written from the point of view of the instruction's beginning.
+          numericValue = numericValue.advanced(by: -Int(LR35902.instructionWidths[spec]!))
         }
         withUnsafeBytes(of: &numericValue) { buffer in
           binaryOperands.append(contentsOf: Data(buffer))
