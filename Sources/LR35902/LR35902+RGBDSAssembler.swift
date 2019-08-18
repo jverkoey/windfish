@@ -30,6 +30,8 @@ private func createRepresentation(from statement: RGBDSAssembly.Statement) -> St
       return "#"
     } else if operand.hasPrefix("[") && operand.hasSuffix("]") && isNumber(String(operand.dropFirst().dropLast())) {
       return "[#]"
+    } else if operand.hasPrefix("sp+") {
+      return "sp+#"
     }
     return operand
   }) {
@@ -129,7 +131,7 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
         var numericValue: UInt8 = try cast(string: value, negativeType: Int8.self)
         if case .jr = spec {
           // Relative jumps in assembly are written from the point of view of the instruction's beginning.
-          numericValue = numericValue.advanced(by: -Int(LR35902.instructionWidths[spec]!))
+          numericValue = numericValue.subtractingReportingOverflow(UInt8(LR35902.instructionWidths[spec]!)).partialValue
         }
         withUnsafeBytes(of: &numericValue) { buffer in
           binaryOperands.append(contentsOf: Data(buffer))
@@ -143,6 +145,13 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
         }
         var lowerByteValue = UInt8(numericValue & 0xFF)
         withUnsafeBytes(of: &lowerByteValue) { buffer in
+          binaryOperands.append(contentsOf: Data(buffer))
+        }
+      }
+    case LR35902.Operand.spPlusImmediate8Signed:
+      if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
+        var numericValue: UInt8 = try cast(string: String(value.dropFirst(3).trimmed()), negativeType: Int8.self)
+        withUnsafeBytes(of: &numericValue) { buffer in
           binaryOperands.append(contentsOf: Data(buffer))
         }
       }

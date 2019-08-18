@@ -78,6 +78,8 @@ extension LR35902.Operand {
       return "[#]"
     case .ffimmediate8Address:
       return "[#]"
+    case .spPlusImmediate8Signed:
+      return "sp+#"
     case .immediate8, .immediate8signed, .immediate16:
       return "#"
     default:
