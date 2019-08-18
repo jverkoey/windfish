@@ -51,8 +51,8 @@ extension LR35902.InstructionSpec {
       return "\(opcode) \(operand.representation)"
     case let condition as LR35902.Condition:
       return "\(opcode) \(condition)"
-    case let restartAddress as (LR35902.RestartAddress):
-      return "\(opcode) \(restartAddress)"
+    case is LR35902.RestartAddress:
+      return "\(opcode) #"
     default:
       return opcode
     }

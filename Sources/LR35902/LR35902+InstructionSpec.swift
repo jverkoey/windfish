@@ -89,15 +89,15 @@ extension LR35902 {
   }
 
   /// Possible rst addresses in LR35902's instruction set.
-  public enum RestartAddress {
-    case x00
-    case x08
-    case x10
-    case x18
-    case x20
-    case x28
-    case x30
-    case x38
+  public enum RestartAddress: UInt8 {
+    case x00 = 0x00
+    case x08 = 0x08
+    case x10 = 0x10
+    case x18 = 0x18
+    case x20 = 0x20
+    case x28 = 0x28
+    case x30 = 0x30
+    case x38 = 0x38
   }
 
   /// Possible bits in LR35902's instruction set.

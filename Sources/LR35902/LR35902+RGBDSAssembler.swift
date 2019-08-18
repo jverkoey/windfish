@@ -73,7 +73,7 @@ private func cast<T: UnsignedInteger, negT: SignedInteger>(string: String, negat
   throw RGBDSAssembler.Error(lineNumber: nil, error: "Unable to represent \(value) as a UInt16")
 }
 
-private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, using spec: LR35902.InstructionSpec) throws -> [UInt8] {
+private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, using spec: LR35902.InstructionSpec) throws -> [UInt8]? {
   guard let operands = Mirror(reflecting: spec).children.first else {
     return []
   }
@@ -88,6 +88,13 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
   }
   for (index, child) in children.enumerated() {
     switch child.value {
+    case let restartAddress as LR35902.RestartAddress:
+      if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
+        let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
+        if numericValue != restartAddress.rawValue {
+          return nil
+        }
+      }
     case LR35902.Operand.immediate16:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
         var numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
@@ -166,15 +173,21 @@ public final class RGBDSAssembler {
         let spec: LR35902.InstructionSpec
         let operandsAsBinary: [UInt8]
         if specs.count > 1 {
-          let specsAndBinary: Zip2Sequence<[LR35902.InstructionSpec], [[UInt8]]> = try zip(specs, specs.map({ spec in
+          let specsAndBinary: [(LR35902.InstructionSpec, [UInt8])] = try zip(specs, specs.map({ spec in
             try extractOperandsAsBinary(from: statement, using: spec)
-          }))
+          })).compactMap { result in
+            if let binary = result.1 {
+              return (result.0, binary)
+            } else {
+              return nil
+            }
+          }
           (spec, operandsAsBinary) = specsAndBinary.sorted(by: { pair1, pair2 in
             pair1.1.count < pair2.1.count
           })[0]
         } else {
           spec = specs[0]
-          operandsAsBinary = try extractOperandsAsBinary(from: statement, using: spec)
+          operandsAsBinary = try extractOperandsAsBinary(from: statement, using: spec)!
         }
 
         self.buffer.append(contentsOf: RGBDSAssembler.instructionOpcodeBinary[spec]!)
