@@ -116,6 +116,9 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
     case LR35902.Operand.ffimmediate8Address:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
         let numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self)
+        if (numericValue & 0xFF00) != 0xFF00 {
+          return nil
+        }
         var lowerByteValue = UInt8(numericValue & 0xFF)
         withUnsafeBytes(of: &lowerByteValue) { buffer in
           binaryOperands.append(contentsOf: Data(buffer))
