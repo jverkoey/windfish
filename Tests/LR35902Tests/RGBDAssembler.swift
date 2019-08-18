@@ -450,10 +450,34 @@ class RGBDAssembler: XCTestCase {
       let disassembly = LR35902.Disassembly(rom: assembler.buffer)
       disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
 
-      if !errors.isEmpty || disassembly.instructionMap[0x0000]?.spec != spec {
-        print("Hi")
+      XCTAssertEqual(errors, [], "Spec: \(spec)")
+      XCTAssertEqual(disassembly.instructionMap[0x0000]?.spec, spec)
+    }
+
+    for spec in LR35902.instructionTableCB {
+      guard spec != .invalid else {
+        continue
       }
-      XCTAssertEqual(errors, [])
+      let representation = spec.representation
+
+      let assembly: String
+      switch spec {
+      case .ld(.ffimmediate8Address, _), .ld(_, .ffimmediate8Address):
+        assembly = representation.replacingOccurrences(of: "#", with: "$FF00")
+      case let .rst(address):
+        assembly = representation.replacingOccurrences(of: "#", with: "\(address.rawValue)")
+      case let .cb(.bit(bit, _)), let .cb(.res(bit, _)), let .cb(.set(bit, _)):
+        assembly = representation.replacingOccurrences(of: "#", with: "\(bit.rawValue)")
+      default:
+        assembly = representation.replacingOccurrences(of: "#", with: "0")
+      }
+
+      let assembler = RGBDSAssembler()
+      let errors = assembler.assemble(assembly: assembly)
+      let disassembly = LR35902.Disassembly(rom: assembler.buffer)
+      disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+
+      XCTAssertEqual(errors, [], "Spec: \(spec)")
       XCTAssertEqual(disassembly.instructionMap[0x0000]?.spec, spec)
     }
   }
