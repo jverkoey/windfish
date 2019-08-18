@@ -281,7 +281,7 @@ class RGBDAssembler: XCTestCase {
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .jr(.immediate8signed), immediate8: 3),
+      0x0000: LR35902.Instruction(spec: .jr(nil, .immediate8signed), immediate8: 3),
     ])
   }
 
@@ -396,4 +396,38 @@ class RGBDAssembler: XCTestCase {
       0x0000: LR35902.Instruction(spec: .cb(.set(.b6, .hlAddress))),
     ])
   }
+
+  func test_jr_cond() throws {
+    let assembler = RGBDSAssembler()
+    let errors = assembler.assemble(assembly: """
+    jr nz, 5
+""")
+    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
+    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+
+    XCTAssertEqual(errors, [])
+    XCTAssertEqual(disassembly.instructionMap, [
+      0x0000: LR35902.Instruction(spec: .jr(.nz, .immediate8signed), immediate8: 3),
+    ])
+  }
+
+//  func test_allInstructions() throws {
+//    for spec in LR35902.instructionTable {
+//      guard spec != .invalid else {
+//        continue
+//      }
+//      let assembly = spec.representation.replacingOccurrences(of: "#", with: "0x12")
+//
+//      let assembler = RGBDSAssembler()
+//      let errors = assembler.assemble(assembly: assembly)
+//      let disassembly = LR35902.Disassembly(rom: assembler.buffer)
+//      disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+//
+//      if !errors.isEmpty {
+//        print("Hi")
+//      }
+//      XCTAssertEqual(errors, [])
+//      XCTAssertEqual(disassembly.instructionMap[0x0000]?.spec, spec)
+//    }
+//  }
 }

@@ -74,6 +74,9 @@ private func cast<T: UnsignedInteger, negT: SignedInteger>(string: String, negat
 }
 
 private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, using spec: LR35902.InstructionSpec) throws -> [UInt8]? {
+  if case LR35902.InstructionSpec.stop = spec {
+    return [0x00]
+  }
   guard let operands = Mirror(reflecting: spec).children.first else {
     return []
   }
@@ -89,7 +92,16 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
   } else {
     children = Mirror.Children([(label: nil, value: operands.value)])
   }
-  for (index, child) in children.enumerated() {
+  var index = 0
+  for child in children {
+    // Any isn't nullable, even though it might represent a null value (e.g. a .jr(nil, .immediate8) spec with an
+    // optional first argument), so we need to use Optional<Any>.none to represent an optional argument in this case.
+    if case Optional<Any>.none = child.value {
+      continue
+    }
+    defer {
+      index += 1
+    }
     switch child.value {
     case let restartAddress as LR35902.RestartAddress:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
@@ -194,6 +206,9 @@ public final class RGBDSAssembler {
             } else {
               return nil
             }
+          }
+          if specsAndBinary.count == 0 {
+            throw Error(lineNumber: lineNumber, error: "No valid instruction found for \(code)")
           }
           (spec, operandsAsBinary) = specsAndBinary.sorted(by: { pair1, pair2 in
             pair1.1.count < pair2.1.count

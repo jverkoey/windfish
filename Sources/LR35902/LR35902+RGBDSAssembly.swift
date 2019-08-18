@@ -73,8 +73,8 @@ public final class RGBDSAssembly {
   private static func operands(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil) -> [String]? {
     if let disassembly = disassembly {
       switch instruction.spec {
-      case let LR35902.InstructionSpec.jp(operand, condition) where operand == .immediate16,
-           let LR35902.InstructionSpec.call(operand, condition) where operand == .immediate16:
+      case let LR35902.InstructionSpec.jp(condition, operand) where operand == .immediate16,
+           let LR35902.InstructionSpec.call(condition, operand) where operand == .immediate16:
         if disassembly.transfersOfControl(at: instruction.immediate16!, in: disassembly.cpu.bank) != nil {
           var addressLabel: String
           if let label = disassembly.label(at: instruction.immediate16!, in: disassembly.cpu.bank) {
@@ -94,7 +94,7 @@ public final class RGBDSAssembly {
           }
         }
 
-      case let LR35902.InstructionSpec.jr(operand, condition) where operand == .immediate8signed:
+      case let LR35902.InstructionSpec.jr(condition, operand) where operand == .immediate8signed:
         let jumpAddress = (disassembly.cpu.pc + LR35902.instructionWidths[instruction.spec]!).advanced(by: Int(Int8(bitPattern: instruction.immediate8!)))
         if disassembly.transfersOfControl(at: jumpAddress, in: disassembly.cpu.bank) != nil {
           var addressLabel: String
@@ -175,11 +175,11 @@ public final class RGBDSAssembly {
     switch operandReflection.value {
     case let childInstruction as LR35902.InstructionSpec:
       return operands(for: instruction, spec: childInstruction)
-    case let tuple as (LR35902.Operand, LR35902.Condition?):
-      if let condition = tuple.1 {
-        return ["\(condition)", operand(for: instruction, operand: tuple.0)]
+    case let tuple as (LR35902.Condition?, LR35902.Operand):
+      if let condition = tuple.0 {
+        return ["\(condition)", operand(for: instruction, operand: tuple.1)]
       } else {
-        return [operand(for: instruction, operand: tuple.0)]
+        return [operand(for: instruction, operand: tuple.1)]
       }
     case let condition as LR35902.Condition:
       return ["\(condition)"]

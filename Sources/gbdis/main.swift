@@ -35,11 +35,11 @@ disassembly.defineFunction(startingAt: 0x7D19, in: 0x01, named: "CopyDMATransfer
 disassembly.defineMacro(named: "callcb", instructions: [
   .any(.ld(.a, .immediate8)),
   .instruction(.init(spec: .ld(.immediate16address, .a), immediate16: 0x2100)),
-  .any(.call(.immediate16))
+  .any(.call(nil, .immediate16))
 ], code: [
   .ld(.a, .macro("bank(\\1)")),
   .ld(.immediate16address, .a),
-  .call(.arg(1))
+  .call(nil, .arg(1))
 ], validArgumentValues: [
   1: IndexSet(integersIn: 0x4000..<0x8000)
 ])

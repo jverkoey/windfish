@@ -30,11 +30,11 @@ extension LR35902 {
     case rra, rrca
 
     // Jumps
-    case jr(Operand, Condition? = nil)
-    case jp(Operand, Condition? = nil)
+    case jr(Condition? = nil, Operand)
+    case jp(Condition? = nil, Operand)
 
     // Calls and returns
-    case call(Operand, Condition? = nil)
+    case call(Condition? = nil, Operand)
     case ret(Condition? = nil), reti
 
     // Restarts

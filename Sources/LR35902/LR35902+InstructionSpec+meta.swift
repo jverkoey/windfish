@@ -18,8 +18,8 @@ extension LR35902.InstructionSpec {
     switch operands.value {
     case let childInstruction as LR35902.InstructionSpec:
       return childInstruction.operandWidth
-    case let tuple as (LR35902.Operand, LR35902.Condition?):
-      return tuple.0.width
+    case let tuple as (LR35902.Condition?, LR35902.Operand):
+      return tuple.1.width
     case let tuple as (LR35902.Operand, LR35902.Operand):
       return tuple.0.width + tuple.1.width
     case let tuple as (LR35902.Bit, LR35902.Operand):
@@ -37,11 +37,11 @@ extension LR35902.InstructionSpec {
     switch operands.value {
     case let childInstruction as LR35902.InstructionSpec:
       return childInstruction.representation
-    case let tuple as (LR35902.Operand, LR35902.Condition?):
-      if let condition = tuple.1 {
-        return "\(opcode) \(condition), \(tuple.0.representation)"
+    case let tuple as (LR35902.Condition?, LR35902.Operand):
+      if let condition = tuple.0 {
+        return "\(opcode) \(condition), \(tuple.1.representation)"
       } else {
-        return "\(opcode) \(tuple.0.representation)"
+        return "\(opcode) \(tuple.1.representation)"
       }
     case let tuple as (LR35902.Operand, LR35902.Operand):
       return "\(opcode) \(tuple.0.representation), \(tuple.1.representation)"

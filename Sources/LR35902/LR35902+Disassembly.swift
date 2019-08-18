@@ -386,7 +386,7 @@ extension LR35902 {
               cpu.bank = previousInstruction.immediate8!
             }
 
-          case .jr(.immediate8signed, let condition):
+          case .jr(let condition, .immediate8signed):
             let relativeJumpAmount = Int8(bitPattern: instruction.immediate8!)
             let jumpTo = cpu.pc.advanced(by: Int(relativeJumpAmount))
             queueRun(run, instructionAddress, jumpTo, instructionBank, instruction)
@@ -396,7 +396,7 @@ extension LR35902 {
               break linear_sweep
             }
 
-          case .jp(.immediate16, let condition):
+          case .jp(let condition, .immediate16):
             let jumpTo = instruction.immediate16!
             queueRun(run, instructionAddress, jumpTo, instructionBank, instruction)
 
@@ -405,7 +405,7 @@ extension LR35902 {
               break linear_sweep
             }
 
-          case .call(.immediate16, _):
+          case .call(_, .immediate16):
             let jumpTo = instruction.immediate16!
             queueRun(run, instructionAddress, jumpTo, instructionBank, instruction)
 

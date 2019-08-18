@@ -37,7 +37,16 @@ private func extractArgs(from statement: RGBDSAssembly.Statement, using spec: LR
     return [:]
   }
   var args: [Int: String] = [:]
-  for (index, child) in Mirror(reflecting: operands.value).children.enumerated() {
+  var index = 0
+  for child in Mirror(reflecting: operands.value).children {
+    // Any isn't nullable, even though it might represent a null value (e.g. a .jr(nil, .immediate8) spec with an
+    // optional first argument), so we need to use Optional<Any>.none to represent an optional argument in this case.
+    if case Optional<Any>.none = child.value {
+      continue
+    }
+    defer {
+      index += 1
+    }
     if case let LR35902.Operand.arg(argumentNumber) = child.value {
       args[argumentNumber] = Mirror(reflecting: statement).descendant(1, 0, index) as? String
     }
