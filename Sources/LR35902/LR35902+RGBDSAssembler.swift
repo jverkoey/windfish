@@ -77,6 +77,9 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
   guard let operands = Mirror(reflecting: spec).children.first else {
     return []
   }
+  if let subSpec = operands.value as? LR35902.InstructionSpec {
+    return try extractOperandsAsBinary(from: statement, using: subSpec)
+  }
   var binaryOperands: [UInt8] = []
 
   let children: Mirror.Children
@@ -92,6 +95,13 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
         let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
         if numericValue != restartAddress.rawValue {
+          return nil
+        }
+      }
+    case let bit as LR35902.Bit:
+      if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
+        let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
+        if numericValue != bit.rawValue {
           return nil
         }
       }

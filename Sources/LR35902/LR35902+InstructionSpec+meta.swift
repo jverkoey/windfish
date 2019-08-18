@@ -46,7 +46,7 @@ extension LR35902.InstructionSpec {
     case let tuple as (LR35902.Operand, LR35902.Operand):
       return "\(opcode) \(tuple.0.representation), \(tuple.1.representation)"
     case let tuple as (LR35902.Bit, LR35902.Operand):
-      return "\(opcode) \(tuple.0.rawValue), \(tuple.1)"
+      return "\(opcode) #, \(tuple.1)"
     case let operand as LR35902.Operand:
       return "\(opcode) \(operand.representation)"
     case let condition as LR35902.Condition:

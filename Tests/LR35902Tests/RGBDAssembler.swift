@@ -368,4 +368,18 @@ class RGBDAssembler: XCTestCase {
       0x0000: LR35902.Instruction(spec: .cb(.rlc(.b))),
     ])
   }
+
+  func test_bit_2_b() throws {
+    let assembler = RGBDSAssembler()
+    let errors = assembler.assemble(assembly: """
+    bit 2, b
+""")
+    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
+    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+
+    XCTAssertEqual(errors, [])
+    XCTAssertEqual(disassembly.instructionMap, [
+      0x0000: LR35902.Instruction(spec: .cb(.bit(.b2, .b))),
+    ])
+  }
 }
