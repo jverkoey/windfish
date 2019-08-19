@@ -1,5 +1,8 @@
 import Foundation
 
+/**
+ A representation of an instruction's width.
+ */
 public struct CPUInstructionWidth<T: BinaryInteger> {
   public let opcode: T
   public let operand: T
@@ -12,8 +15,8 @@ public struct CPUInstructionWidth<T: BinaryInteger> {
 /**
  Calculates the widths for all of the given instructions.
  */
-public func widths<T: CPUInstructionSpec>(for instructionSet: [T]) -> [T: CPUInstructionWidth<T.InstructionWidthType>] {
-  var widths: [T: CPUInstructionWidth<T.InstructionWidthType>] = [:]
+public func widths<T>(for instructionSet: [T]) -> [T: CPUInstructionWidth<T.WidthType>] where T: CPUInstructionSpec {
+  var widths: [T: CPUInstructionWidth<T.WidthType>] = [:]
   instructionSet.forEach { spec in
     widths[spec] = CPUInstructionWidth(opcode: spec.opcodeWidth, operand: spec.operandWidth)
   }
@@ -24,7 +27,7 @@ extension CPUInstructionSpec {
   /**
    Extracts the opcode width by adding up recursive specifications.
    */
-  public var opcodeWidth: InstructionWidthType {
+  public var opcodeWidth: WidthType {
     guard let operands = Mirror(reflecting: self).children.first else {
       return 1
     }
@@ -36,7 +39,7 @@ extension CPUInstructionSpec {
     }
   }
 
-  public var instructionWidth: InstructionWidthType {
+  public var instructionWidth: WidthType {
     return opcodeWidth + operandWidth
   }
 }
