@@ -32,11 +32,16 @@ extension FileManager {
   }
 }
 
-private func extractArgs(from statement: RGBDSAssembly.Statement, using spec: LR35902.InstructionSpec) -> [Int: String] {
+private func visit(statement: RGBDSAssembly.Statement,
+                   using spec: LR35902.InstructionSpec,
+                   visitor: (Any?, (() -> String?)?) -> Void) {
   guard let operands = Mirror(reflecting: spec).children.first else {
-    return [:]
+    visitor(nil, nil)
+    return
   }
-  var args: [Int: String] = [:]
+  if let subSpec = operands.value as? LR35902.InstructionSpec {
+    visit(statement: statement, using: subSpec, visitor: visitor)
+  }
   var index = 0
   for child in Mirror(reflecting: operands.value).children {
     // Any isn't nullable, even though it might represent a null value (e.g. a .jr(nil, .immediate8) spec with an
@@ -47,8 +52,22 @@ private func extractArgs(from statement: RGBDSAssembly.Statement, using spec: LR
     defer {
       index += 1
     }
-    if case let LR35902.Operand.arg(argumentNumber) = child.value {
-      args[argumentNumber] = Mirror(reflecting: statement).descendant(1, 0, index) as? String
+
+    visitor(child.value, {
+      Mirror(reflecting: statement).descendant(1, 0, index) as? String
+    })
+  }
+}
+
+private func extractArgs(from statement: RGBDSAssembly.Statement, using spec: LR35902.InstructionSpec) -> [Int: String] {
+  var args: [Int: String] = [:]
+  visit(statement: statement, using: spec) { (operand, extractor) in
+    guard let operand = operand, let extractor = extractor else {
+      return
+    }
+
+    if case let LR35902.Operand.arg(argumentNumber) = operand {
+      args[argumentNumber] = extractor()
     }
   }
   return args
