@@ -1,7 +1,19 @@
 import Foundation
 
 extension LR35902.InstructionSpec {
-  var operandWidth: UInt16 {
+  public var opcodeWidth: UInt16 {
+    guard let operands = Mirror(reflecting: self).children.first else {
+      return 1
+    }
+    switch operands.value {
+    case let childInstruction as LR35902.InstructionSpec:
+      return 1 + childInstruction.opcodeWidth
+    default:
+      return 1
+    }
+  }
+
+  public var operandWidth: UInt16 {
     guard let operands = Mirror(reflecting: self).children.first else {
       return 0
     }
@@ -20,7 +32,7 @@ extension LR35902.InstructionSpec {
     }
   }
 
-  var representation: String {
+  public var representation: String {
     guard let operands = Mirror(reflecting: self).children.first else {
       return opcode
     }

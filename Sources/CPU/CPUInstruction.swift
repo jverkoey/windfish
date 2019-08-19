@@ -7,5 +7,11 @@ public protocol CPUInstruction: Hashable {
 }
 
 public protocol CPUInstructionSpec: Hashable {
+  associatedtype InstructionWidthType: BinaryInteger
   var opcode: String { get }
+  
+  var opcodeWidth: InstructionWidthType { get }
+  var operandWidth: InstructionWidthType { get }
+
+  var representation: String { get }
 }
