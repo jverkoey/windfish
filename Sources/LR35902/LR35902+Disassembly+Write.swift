@@ -210,7 +210,7 @@ clean:
 
           // Write the instruction as assembly.
           let index = LR35902.romAddress(for: cpu.pc, in: bank)
-          let instructionWidth = LR35902.instructionWidths[instruction.spec]!
+          let instructionWidth = LR35902.instructionWidths[instruction.spec]!.total
           let bytes = cpu[index..<(index + UInt32(instructionWidth))]
           let instructionScope = scope(at: cpu.pc, in: bank)
           lineGroup.append(.instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: self), cpu.pc, cpu.bank, instructionScope, bytes))

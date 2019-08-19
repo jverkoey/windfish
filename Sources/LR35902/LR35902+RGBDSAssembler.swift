@@ -131,7 +131,7 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
         var numericValue: UInt8 = try cast(string: value, negativeType: Int8.self)
         if case .jr = spec {
           // Relative jumps in assembly are written from the point of view of the instruction's beginning.
-          numericValue = numericValue.subtractingReportingOverflow(UInt8(LR35902.instructionWidths[spec]!)).partialValue
+          numericValue = numericValue.subtractingReportingOverflow(UInt8(LR35902.instructionWidths[spec]!.total)).partialValue
         }
         withUnsafeBytes(of: &numericValue) { buffer in
           binaryOperands.append(contentsOf: Data(buffer))

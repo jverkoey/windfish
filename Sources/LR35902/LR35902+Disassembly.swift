@@ -124,7 +124,7 @@ extension LR35902 {
 
       instructionMap[address] = instruction
 
-      code.insert(integersIn: Int(address)..<(Int(address) + Int(LR35902.instructionWidths[instruction.spec]!)))
+      code.insert(integersIn: Int(address)..<(Int(address) + Int(LR35902.instructionWidths[instruction.spec]!.total)))
     }
     var instructionMap: [UInt32: Instruction] = [:]
 
@@ -326,8 +326,6 @@ extension LR35902 {
 
           var spec = LR35902.instructionTable[byte]
 
-          var opcodeWidth: UInt16
-          var operandWidth: UInt16
           switch spec {
           case .invalid:
             advance(1)
@@ -342,25 +340,21 @@ extension LR35902 {
             }
             spec = cbInstruction
 
-            opcodeWidth = 2
-            operandWidth = operandWidthsCB[byteCB]
-
           default:
-            opcodeWidth = 1
-            operandWidth = operandWidths[byte]
             break
           }
 
+          let instructionWidth = LR35902.instructionWidths[spec]!
+
           let instructionAddress = cpu.pc
           let instructionBank = cpu.bank
-          let instructionWidth = opcodeWidth + operandWidth
           let instruction: Instruction
-          switch operandWidth {
+          switch instructionWidth.operand {
           case 1:
-            instruction = Instruction(spec: spec, imm8: cpu[instructionAddress + opcodeWidth, instructionBank])
+            instruction = Instruction(spec: spec, imm8: cpu[instructionAddress + instructionWidth.opcode, instructionBank])
           case 2:
-            let low = UInt16(cpu[instructionAddress + opcodeWidth, instructionBank])
-            let high = UInt16(cpu[instructionAddress + opcodeWidth + 1, instructionBank]) << 8
+            let low = UInt16(cpu[instructionAddress + instructionWidth.opcode, instructionBank])
+            let high = UInt16(cpu[instructionAddress + instructionWidth.opcode + 1, instructionBank]) << 8
             let immediate16 = high | low
             instruction = Instruction(spec: spec, imm16: immediate16)
           default:
@@ -374,7 +368,7 @@ extension LR35902 {
           }
 
           register(instruction: instruction, at: instructionAddress, in: instructionBank)
-          advance(instructionWidth)
+          advance(instructionWidth.total)
 
           switch spec {
           case .ld(.imm16addr, .a):

@@ -95,7 +95,7 @@ public final class RGBDSAssembly {
         }
 
       case let LR35902.InstructionSpec.jr(condition, operand) where operand == .simm8:
-        let jumpAddress = (disassembly.cpu.pc + LR35902.instructionWidths[instruction.spec]!).advanced(by: Int(Int8(bitPattern: instruction.imm8!)))
+        let jumpAddress = (disassembly.cpu.pc + LR35902.instructionWidths[instruction.spec]!.total).advanced(by: Int(Int8(bitPattern: instruction.imm8!)))
         if disassembly.transfersOfControl(at: jumpAddress, in: disassembly.cpu.bank) != nil {
           var addressLabel: String
           if let label = disassembly.label(at: jumpAddress, in: disassembly.cpu.bank) {
