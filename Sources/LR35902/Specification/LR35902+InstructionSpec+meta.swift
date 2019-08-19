@@ -2,22 +2,16 @@ import Foundation
 
 extension LR35902.InstructionSpec {
   public var operandWidth: UInt16 {
-    guard let operands = Mirror(reflecting: self).children.first else {
-      return 0
+    var width: UInt16 = 0
+    self.visit { (value, _) in
+      switch value {
+      case let numeric as LR35902.Numeric:
+        width += numeric.width
+      default:
+        break
+      }
     }
-    switch operands.value {
-    case let childInstruction as LR35902.InstructionSpec:
-      return childInstruction.operandWidth
-    case let tuple as (LR35902.Condition?, LR35902.Numeric):
-      return tuple.1.width
-    case let tuple as (LR35902.Numeric, LR35902.Numeric):
-      return tuple.0.width + tuple.1.width
-    case let tuple as (LR35902.Bit, LR35902.Numeric):
-      return tuple.1.width
-    case let operand as LR35902.Numeric:
-      return operand.width
-    default: return 0
-    }
+    return width
   }
 
   public var representation: String {
