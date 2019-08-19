@@ -5,23 +5,23 @@ extension LR35902 {
   /// The specification for an LR35902's instruction set.
   public indirect enum InstructionSpec: CPUInstructionSpec {
     // Loads
-    case ld(Operand, Operand), ldi(Operand, Operand), ldd(Operand, Operand)
+    case ld(Numeric, Numeric), ldi(Numeric, Numeric), ldd(Numeric, Numeric)
 
     // Stack manipulation
-    case push(Operand), pop(Operand)
+    case push(Numeric), pop(Numeric)
 
     // 8- and 16-bit arithmetic
-    case add(Operand), add(Operand, Operand), adc(Operand)
-    case sub(Operand), sub(Operand, Operand), sbc(Operand)
-    case and(Operand), or(Operand), xor(Operand)
-    case cp(Operand)
-    case inc(Operand), dec(Operand)
+    case add(Numeric), add(Numeric, Numeric), adc(Numeric)
+    case sub(Numeric), sub(Numeric, Numeric), sbc(Numeric)
+    case and(Numeric), or(Numeric), xor(Numeric)
+    case cp(Numeric)
+    case inc(Numeric), dec(Numeric)
 
     // Carry flag
     case ccf, scf
 
     // Program execution
-    case nop, stop(Operand), halt
+    case nop, stop(Numeric), halt
 
     // Interrupts
     case di, ei
@@ -31,11 +31,11 @@ extension LR35902 {
     case rra, rrca
 
     // Jumps
-    case jr(Condition? = nil, Operand)
-    case jp(Condition? = nil, Operand)
+    case jr(Condition? = nil, Numeric)
+    case jp(Condition? = nil, Numeric)
 
     // Calls and returns
-    case call(Condition? = nil, Operand)
+    case call(Condition? = nil, Numeric)
     case ret(Condition? = nil), reti
 
     // Restarts
@@ -49,18 +49,18 @@ extension LR35902 {
 
     // 0xCB prefix
     case cb(InstructionSpec)
-    case rlc(Operand), rrc(Operand)
-    case rl(Operand), rr(Operand)
-    case sla(Operand), sra(Operand)
-    case swap(Operand), srl(Operand)
-    case bit(Bit, Operand), res(Bit, Operand), set(Bit, Operand)
+    case rlc(Numeric), rrc(Numeric)
+    case rl(Numeric), rr(Numeric)
+    case sla(Numeric), sra(Numeric)
+    case swap(Numeric), srl(Numeric)
+    case bit(Bit, Numeric), res(Bit, Numeric), set(Bit, Numeric)
 
     // Invalid opcode
     case invalid
   }
 
-  /// Possible operands in LR35902's instruction set.
-  public enum Operand: Hashable {
+  /// Numeric operands in LR35902's instruction set.
+  public enum Numeric: Hashable {
     case a, af
     case b, c, bc, bcaddr
     case d, e, de, deaddr

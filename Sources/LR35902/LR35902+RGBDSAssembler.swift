@@ -119,14 +119,14 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
           return nil
         }
       }
-    case LR35902.Operand.imm16:
+    case LR35902.Numeric.imm16:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
         var numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
         withUnsafeBytes(of: &numericValue) { buffer in
           binaryOperands.append(contentsOf: Data(buffer))
         }
       }
-    case LR35902.Operand.imm8, LR35902.Operand.simm8:
+    case LR35902.Numeric.imm8, LR35902.Numeric.simm8:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
         var numericValue: UInt8 = try cast(string: value, negativeType: Int8.self)
         if case .jr = spec {
@@ -137,7 +137,7 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
           binaryOperands.append(contentsOf: Data(buffer))
         }
       }
-    case LR35902.Operand.ffimm8addr:
+    case LR35902.Numeric.ffimm8addr:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
         let numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self)
         if (numericValue & 0xFF00) != 0xFF00 {
@@ -148,14 +148,14 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
           binaryOperands.append(contentsOf: Data(buffer))
         }
       }
-    case LR35902.Operand.sp_plus_simm8:
+    case LR35902.Numeric.sp_plus_simm8:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
         var numericValue: UInt8 = try cast(string: String(value.dropFirst(3).trimmed()), negativeType: Int8.self)
         withUnsafeBytes(of: &numericValue) { buffer in
           binaryOperands.append(contentsOf: Data(buffer))
         }
       }
-    case LR35902.Operand.imm16addr:
+    case LR35902.Numeric.imm16addr:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
         var numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self)
         withUnsafeBytes(of: &numericValue) { buffer in

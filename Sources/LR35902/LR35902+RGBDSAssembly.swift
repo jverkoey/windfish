@@ -175,7 +175,7 @@ public final class RGBDSAssembly {
     switch operandReflection.value {
     case let childInstruction as LR35902.InstructionSpec:
       return operands(for: instruction, spec: childInstruction)
-    case let tuple as (LR35902.Condition?, LR35902.Operand):
+    case let tuple as (LR35902.Condition?, LR35902.Numeric):
       if let condition = tuple.0 {
         return ["\(condition)", operand(for: instruction, operand: tuple.1)]
       } else {
@@ -183,11 +183,11 @@ public final class RGBDSAssembly {
       }
     case let condition as LR35902.Condition:
       return ["\(condition)"]
-    case let tuple as (LR35902.Operand, LR35902.Operand):
+    case let tuple as (LR35902.Numeric, LR35902.Numeric):
       return [operand(for: instruction, operand: tuple.0), operand(for: instruction, operand: tuple.1)]
-    case let tuple as (LR35902.Bit, LR35902.Operand):
+    case let tuple as (LR35902.Bit, LR35902.Numeric):
       return ["\(tuple.0.rawValue)", operand(for: instruction, operand: tuple.1)]
-    case let operandValue as LR35902.Operand:
+    case let operandValue as LR35902.Numeric:
       return [operand(for: instruction, operand: operandValue)]
     case let address as LR35902.RestartAddress:
       return ["\(address)".replacingOccurrences(of: "x", with: "$")]
@@ -196,7 +196,7 @@ public final class RGBDSAssembly {
     }
   }
 
-  private static func operand(for instruction: LR35902.Instruction, operand: LR35902.Operand) -> String {
+  private static func operand(for instruction: LR35902.Instruction, operand: LR35902.Numeric) -> String {
     switch operand {
     case .imm8:           return "$\(instruction.imm8!.hexString)"
     case .simm8:

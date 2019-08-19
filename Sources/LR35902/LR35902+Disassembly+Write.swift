@@ -66,7 +66,7 @@ private func extractArgs(from statement: RGBDSAssembly.Statement, using spec: LR
       return
     }
 
-    if case let LR35902.Operand.arg(argumentNumber) = operand {
+    if case let LR35902.Numeric.arg(argumentNumber) = operand {
       args[argumentNumber] = extractor()
     }
   }

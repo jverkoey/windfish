@@ -8,13 +8,13 @@ extension LR35902.InstructionSpec {
     switch operands.value {
     case let childInstruction as LR35902.InstructionSpec:
       return childInstruction.operandWidth
-    case let tuple as (LR35902.Condition?, LR35902.Operand):
+    case let tuple as (LR35902.Condition?, LR35902.Numeric):
       return tuple.1.width
-    case let tuple as (LR35902.Operand, LR35902.Operand):
+    case let tuple as (LR35902.Numeric, LR35902.Numeric):
       return tuple.0.width + tuple.1.width
-    case let tuple as (LR35902.Bit, LR35902.Operand):
+    case let tuple as (LR35902.Bit, LR35902.Numeric):
       return tuple.1.width
-    case let operand as LR35902.Operand:
+    case let operand as LR35902.Numeric:
       return operand.width
     default: return 0
     }
@@ -27,17 +27,17 @@ extension LR35902.InstructionSpec {
     switch operands.value {
     case let childInstruction as LR35902.InstructionSpec:
       return childInstruction.representation
-    case let tuple as (LR35902.Condition?, LR35902.Operand):
+    case let tuple as (LR35902.Condition?, LR35902.Numeric):
       if let condition = tuple.0 {
         return "\(opcode) \(condition), \(tuple.1.representation)"
       } else {
         return "\(opcode) \(tuple.1.representation)"
       }
-    case let tuple as (LR35902.Operand, LR35902.Operand):
+    case let tuple as (LR35902.Numeric, LR35902.Numeric):
       return "\(opcode) \(tuple.0.representation), \(tuple.1.representation)"
-    case let tuple as (LR35902.Bit, LR35902.Operand):
+    case let tuple as (LR35902.Bit, LR35902.Numeric):
       return "\(opcode) #, \(tuple.1.representation)"
-    case let operand as LR35902.Operand:
+    case let operand as LR35902.Numeric:
       return "\(opcode) \(operand.representation)"
     case let condition as LR35902.Condition:
       return "\(opcode) \(condition)"
@@ -49,7 +49,7 @@ extension LR35902.InstructionSpec {
   }
 }
 
-extension LR35902.Operand {
+extension LR35902.Numeric {
   var width: UInt16 {
     switch self {
     case .sp_plus_simm8, .imm8, .simm8, .ffimm8addr, .zeroimm8: return 1
