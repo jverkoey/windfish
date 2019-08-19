@@ -1,16 +1,6 @@
 import Foundation
 
 extension LR35902.InstructionSpec {
-  var opcode: String {
-    if let child = Mirror(reflecting: self).children.first {
-      if let childInstruction = child.value as? LR35902.InstructionSpec {
-        return childInstruction.opcode
-      }
-      return child.label!
-    } else {
-      return "\("\(self)".split(separator: ".").last!)"
-    }
-  }
   var operandWidth: UInt16 {
     guard let operands = Mirror(reflecting: self).children.first else {
       return 0
