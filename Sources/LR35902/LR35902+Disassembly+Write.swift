@@ -32,15 +32,13 @@ extension FileManager {
   }
 }
 
-private func visit(statement: RGBDSAssembly.Statement,
-                   using spec: LR35902.InstructionSpec,
-                   visitor: (Any?, (() -> String?)?) -> Void) {
+private func visit(spec: LR35902.InstructionSpec, visitor: (Any?, Int?) -> Void) {
   guard let operands = Mirror(reflecting: spec).children.first else {
     visitor(nil, nil)
     return
   }
   if let subSpec = operands.value as? LR35902.InstructionSpec {
-    visit(statement: statement, using: subSpec, visitor: visitor)
+    visit(spec: subSpec, visitor: visitor)
   }
   var index = 0
   for child in Mirror(reflecting: operands.value).children {
@@ -53,21 +51,19 @@ private func visit(statement: RGBDSAssembly.Statement,
       index += 1
     }
 
-    visitor(child.value, {
-      Mirror(reflecting: statement).descendant(1, 0, index) as? String
-    })
+    visitor(child.value, index)
   }
 }
 
 private func extractArgs(from statement: RGBDSAssembly.Statement, using spec: LR35902.InstructionSpec) -> [Int: String] {
   var args: [Int: String] = [:]
-  visit(statement: statement, using: spec) { (operand, extractor) in
-    guard let operand = operand, let extractor = extractor else {
+  visit(spec: spec) { (operand, index) in
+    guard let operand = operand, let index = index else {
       return
     }
 
     if case let LR35902.Numeric.arg(argumentNumber) = operand {
-      args[argumentNumber] = extractor()
+      args[argumentNumber] = Mirror(reflecting: statement).descendant(1, 0, index) as? String
     }
   }
   return args
