@@ -1,8 +1,9 @@
 import Foundation
+import CPU
 
 extension LR35902 {
   /// A concrete representation of a single LR35902 instruction.
-  public struct Instruction: Hashable, Equatable {
+  public struct Instruction: CPUInstruction {
     public var spec: InstructionSpec
 
     /// Only one of these immediate values may be associated with a given instruction.

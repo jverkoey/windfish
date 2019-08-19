@@ -1,8 +1,9 @@
 import Foundation
+import CPU
 
 extension LR35902 {
   /// The specification for an LR35902's instruction set.
-  public indirect enum InstructionSpec: Equatable, Hashable {
+  public indirect enum InstructionSpec: CPUInstructionSpec {
     // Loads
     case ld(Operand, Operand), ldi(Operand, Operand), ldd(Operand, Operand)
 
