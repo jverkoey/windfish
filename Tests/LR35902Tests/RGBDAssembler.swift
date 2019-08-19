@@ -85,7 +85,7 @@ class RGBDAssembler: XCTestCase {
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.bc, .immediate16), immediate16: 0x1234)
+      0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), imm16: 0x1234)
     ])
   }
 
@@ -99,7 +99,7 @@ class RGBDAssembler: XCTestCase {
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.bc, .immediate16), immediate16: 0x1234)
+      0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), imm16: 0x1234)
     ])
   }
 
@@ -114,7 +114,7 @@ class RGBDAssembler: XCTestCase {
     XCTAssertTrue(errors.isEmpty)
 
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.bc, .immediate16), immediate16: 1234)
+      0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), imm16: 1234)
     ])
   }
 
@@ -129,7 +129,7 @@ class RGBDAssembler: XCTestCase {
     XCTAssertEqual(errors, [])
 
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.bc, .immediate16), immediate16: UInt16(bitPattern: -1234))
+      0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), imm16: UInt16(bitPattern: -1234))
     ])
   }
 
@@ -144,7 +144,7 @@ class RGBDAssembler: XCTestCase {
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.bc, .immediate16), immediate16: 0x1234),
+      0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), imm16: 0x1234),
       0x0003: LR35902.Instruction(spec: .nop)
     ])
   }
@@ -183,7 +183,7 @@ class RGBDAssembler: XCTestCase {
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.bcAddress, .a)),
+      0x0000: LR35902.Instruction(spec: .ld(.bcaddr, .a)),
     ])
   }
 
@@ -211,7 +211,7 @@ class RGBDAssembler: XCTestCase {
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.b, .immediate8), immediate8: 255),
+      0x0000: LR35902.Instruction(spec: .ld(.b, .imm8), imm8: 255),
     ])
   }
 
@@ -225,7 +225,7 @@ class RGBDAssembler: XCTestCase {
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.b, .immediate8), immediate8: 255),
+      0x0000: LR35902.Instruction(spec: .ld(.b, .imm8), imm8: 255),
     ])
   }
 
@@ -239,7 +239,7 @@ class RGBDAssembler: XCTestCase {
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.immediate16address, .sp), immediate16: 0x1234),
+      0x0000: LR35902.Instruction(spec: .ld(.imm16addr, .sp), imm16: 0x1234),
     ])
   }
 
@@ -253,7 +253,7 @@ class RGBDAssembler: XCTestCase {
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.a, .bcAddress)),
+      0x0000: LR35902.Instruction(spec: .ld(.a, .bcaddr)),
     ])
   }
 
@@ -281,7 +281,7 @@ class RGBDAssembler: XCTestCase {
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .jr(nil, .immediate8signed), immediate8: 3),
+      0x0000: LR35902.Instruction(spec: .jr(nil, .simm8), imm8: 3),
     ])
   }
 
@@ -295,7 +295,7 @@ class RGBDAssembler: XCTestCase {
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.ffimmediate8Address, .a), immediate8: 0xA0),
+      0x0000: LR35902.Instruction(spec: .ld(.ffimm8addr, .a), imm8: 0xA0),
     ])
   }
 
@@ -309,7 +309,7 @@ class RGBDAssembler: XCTestCase {
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.immediate16address, .a), immediate16: 0xFAA0),
+      0x0000: LR35902.Instruction(spec: .ld(.imm16addr, .a), imm16: 0xFAA0),
     ])
   }
 
@@ -337,7 +337,7 @@ class RGBDAssembler: XCTestCase {
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .sub(.immediate8), immediate8: 5),
+      0x0000: LR35902.Instruction(spec: .sub(.imm8), imm8: 5),
     ])
   }
 
@@ -393,7 +393,7 @@ class RGBDAssembler: XCTestCase {
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .cb(.set(.b6, .hlAddress))),
+      0x0000: LR35902.Instruction(spec: .cb(.set(.b6, .hladdr))),
     ])
   }
 
@@ -407,7 +407,7 @@ class RGBDAssembler: XCTestCase {
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .jr(.nz, .immediate8signed), immediate8: 3),
+      0x0000: LR35902.Instruction(spec: .jr(.nz, .simm8), imm8: 3),
     ])
   }
 
@@ -421,7 +421,7 @@ class RGBDAssembler: XCTestCase {
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.hl, .spPlusImmediate8Signed), immediate8: 0x05),
+      0x0000: LR35902.Instruction(spec: .ld(.hl, .sp_plus_simm8), imm8: 0x05),
     ])
   }
 
@@ -437,7 +437,7 @@ class RGBDAssembler: XCTestCase {
 
       let assembly: String
       switch spec {
-      case .ld(.ffimmediate8Address, _), .ld(_, .ffimmediate8Address):
+      case .ld(.ffimm8addr, _), .ld(_, .ffimm8addr):
         assembly = representation.replacingOccurrences(of: "#", with: "$FF00")
       case let .rst(address):
         assembly = representation.replacingOccurrences(of: "#", with: "\(address.rawValue)")
@@ -462,7 +462,7 @@ class RGBDAssembler: XCTestCase {
 
       let assembly: String
       switch spec {
-      case .ld(.ffimmediate8Address, _), .ld(_, .ffimmediate8Address):
+      case .ld(.ffimm8addr, _), .ld(_, .ffimm8addr):
         assembly = representation.replacingOccurrences(of: "#", with: "$FF00")
       case let .rst(address):
         assembly = representation.replacingOccurrences(of: "#", with: "\(address.rawValue)")

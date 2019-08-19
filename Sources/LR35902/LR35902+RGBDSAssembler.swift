@@ -96,7 +96,7 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
   }
   var index = 0
   for child in children {
-    // Any isn't nullable, even though it might represent a null value (e.g. a .jr(nil, .immediate8) spec with an
+    // Any isn't nullable, even though it might represent a null value (e.g. a .jr(nil, .imm8) spec with an
     // optional first argument), so we need to use Optional<Any>.none to represent an optional argument in this case.
     if case Optional<Any>.none = child.value {
       continue
@@ -119,14 +119,14 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
           return nil
         }
       }
-    case LR35902.Operand.immediate16:
+    case LR35902.Operand.imm16:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
         var numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
         withUnsafeBytes(of: &numericValue) { buffer in
           binaryOperands.append(contentsOf: Data(buffer))
         }
       }
-    case LR35902.Operand.immediate8, LR35902.Operand.immediate8signed:
+    case LR35902.Operand.imm8, LR35902.Operand.simm8:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
         var numericValue: UInt8 = try cast(string: value, negativeType: Int8.self)
         if case .jr = spec {
@@ -137,7 +137,7 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
           binaryOperands.append(contentsOf: Data(buffer))
         }
       }
-    case LR35902.Operand.ffimmediate8Address:
+    case LR35902.Operand.ffimm8addr:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
         let numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self)
         if (numericValue & 0xFF00) != 0xFF00 {
@@ -148,14 +148,14 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
           binaryOperands.append(contentsOf: Data(buffer))
         }
       }
-    case LR35902.Operand.spPlusImmediate8Signed:
+    case LR35902.Operand.sp_plus_simm8:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
         var numericValue: UInt8 = try cast(string: String(value.dropFirst(3).trimmed()), negativeType: Int8.self)
         withUnsafeBytes(of: &numericValue) { buffer in
           binaryOperands.append(contentsOf: Data(buffer))
         }
       }
-    case LR35902.Operand.immediate16address:
+    case LR35902.Operand.imm16addr:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
         var numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self)
         withUnsafeBytes(of: &numericValue) { buffer in

@@ -18,7 +18,7 @@ final class LR35902InstructionTests: XCTestCase {
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     let instruction = try XCTUnwrap(disassembly.instruction(at: 0x0000, in: 0x00))
-    XCTAssertEqual(instruction, LR35902.Instruction(spec: .ld(.bc, .immediate16), immediate16: 0x3412))
+    XCTAssertEqual(instruction, LR35902.Instruction(spec: .ld(.bc, .imm16), imm16: 0x3412))
   }
 
   func test_ld_bcadd_a() throws {
@@ -27,7 +27,7 @@ final class LR35902InstructionTests: XCTestCase {
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     let instruction = try XCTUnwrap(disassembly.instruction(at: 0x0000, in: 0x00))
-    XCTAssertEqual(instruction, LR35902.Instruction(spec: .ld(.bcAddress, .a)))
+    XCTAssertEqual(instruction, LR35902.Instruction(spec: .ld(.bcaddr, .a)))
   }
 
   func test_inc_bc() throws {

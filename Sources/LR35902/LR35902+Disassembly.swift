@@ -343,11 +343,11 @@ extension LR35902 {
             spec = cbInstruction
 
             opcodeWidth = 2
-            operandWidth = LR35902.operandWidthsCB[byteCB]
+            operandWidth = operandWidthsCB[byteCB]
 
           default:
             opcodeWidth = 1
-            operandWidth = LR35902.operandWidths[byte]
+            operandWidth = operandWidths[byte]
             break
           }
 
@@ -357,18 +357,18 @@ extension LR35902 {
           let instruction: Instruction
           switch operandWidth {
           case 1:
-            instruction = Instruction(spec: spec, immediate8: cpu[instructionAddress + opcodeWidth, instructionBank])
+            instruction = Instruction(spec: spec, imm8: cpu[instructionAddress + opcodeWidth, instructionBank])
           case 2:
             let low = UInt16(cpu[instructionAddress + opcodeWidth, instructionBank])
             let high = UInt16(cpu[instructionAddress + opcodeWidth + 1, instructionBank]) << 8
             let immediate16 = high | low
-            instruction = Instruction(spec: spec, immediate16: immediate16)
+            instruction = Instruction(spec: spec, imm16: immediate16)
           default:
             instruction = Instruction(spec: spec)
           }
 
           // STOP must be followed by 0
-          if case .stop = spec, instruction.immediate8 != 0 {
+          if case .stop = spec, instruction.imm8 != 0 {
             advance(1)
             continue
           }
@@ -377,17 +377,17 @@ extension LR35902 {
           advance(instructionWidth)
 
           switch spec {
-          case .ld(.immediate16address, .a):
-            if (0x2000..<0x4000).contains(instruction.immediate16!),
+          case .ld(.imm16addr, .a):
+            if (0x2000..<0x4000).contains(instruction.imm16!),
               let previousInstruction = previousInstruction,
-              case .ld(.a, .immediate8) = previousInstruction.spec {
-              register(bankChange: previousInstruction.immediate8!, at: instructionAddress, in: instructionBank)
+              case .ld(.a, .imm8) = previousInstruction.spec {
+              register(bankChange: previousInstruction.imm8!, at: instructionAddress, in: instructionBank)
 
-              cpu.bank = previousInstruction.immediate8!
+              cpu.bank = previousInstruction.imm8!
             }
 
-          case .jr(let condition, .immediate8signed):
-            let relativeJumpAmount = Int8(bitPattern: instruction.immediate8!)
+          case .jr(let condition, .simm8):
+            let relativeJumpAmount = Int8(bitPattern: instruction.imm8!)
             let jumpTo = cpu.pc.advanced(by: Int(relativeJumpAmount))
             queueRun(run, instructionAddress, jumpTo, instructionBank, instruction)
 
@@ -396,8 +396,8 @@ extension LR35902 {
               break linear_sweep
             }
 
-          case .jp(let condition, .immediate16):
-            let jumpTo = instruction.immediate16!
+          case .jp(let condition, .imm16):
+            let jumpTo = instruction.imm16!
             queueRun(run, instructionAddress, jumpTo, instructionBank, instruction)
 
             // An unconditional jp is the end of the run.
@@ -405,8 +405,8 @@ extension LR35902 {
               break linear_sweep
             }
 
-          case .call(_, .immediate16):
-            let jumpTo = instruction.immediate16!
+          case .call(_, .imm16):
+            let jumpTo = instruction.imm16!
             queueRun(run, instructionAddress, jumpTo, instructionBank, instruction)
 
           case .jp(_, nil), .ret, .reti:

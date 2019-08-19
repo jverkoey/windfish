@@ -62,25 +62,25 @@ extension LR35902.InstructionSpec {
 extension LR35902.Operand {
   var width: UInt16 {
     switch self {
-    case .spPlusImmediate8Signed, .immediate8, .immediate8signed, .ffimmediate8Address, .zero8: return 1
-    case .immediate16, .immediate16address: return 2
+    case .sp_plus_simm8, .imm8, .simm8, .ffimm8addr, .zeroimm8: return 1
+    case .imm16, .imm16addr: return 2
     default: return 0
     }
   }
 
   var representation: String {
     switch self {
-    case .hlAddress:
+    case .hladdr:
       return "[hl]"
-    case .bcAddress:
+    case .bcaddr:
       return "[bc]"
-    case .immediate16address:
+    case .imm16addr:
       return "[#]"
-    case .ffimmediate8Address:
+    case .ffimm8addr:
       return "[#]"
-    case .spPlusImmediate8Signed:
+    case .sp_plus_simm8:
       return "sp+#"
-    case .immediate8, .immediate8signed, .immediate16:
+    case .imm8, .simm8, .imm16:
       return "#"
     default:
       return "\(self)"

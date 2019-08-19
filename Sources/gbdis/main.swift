@@ -33,27 +33,27 @@ disassembly.defineFunction(startingAt: 0x7D19, in: 0x01, named: "CopyDMATransfer
 
 
 disassembly.defineMacro(named: "callcb", instructions: [
-  .any(.ld(.a, .immediate8)),
-  .instruction(.init(spec: .ld(.immediate16address, .a), immediate16: 0x2100)),
-  .any(.call(nil, .immediate16))
+  .any(.ld(.a, .imm8)),
+  .instruction(.init(spec: .ld(.imm16addr, .a), imm16: 0x2100)),
+  .any(.call(nil, .imm16))
 ], code: [
   .ld(.a, .macro("bank(\\1)")),
-  .ld(.immediate16address, .a),
+  .ld(.imm16addr, .a),
   .call(nil, .arg(1))
 ], validArgumentValues: [
   1: IndexSet(integersIn: 0x4000..<0x8000)
 ])
 
 //disassembly.defineMacro(named: "copyregion", instructions: [
-//  .any(.ld(.hl, .immediate16)),
-//  .any(.ld(.de, .immediate16)),
-//  .any(.ld(.bc, .immediate16)),
-//  .instruction(.init(spec: .call(.immediate16), immediate16: 0x28C5)),
+//  .any(.ld(.hl, .imm16)),
+//  .any(.ld(.de, .imm16)),
+//  .any(.ld(.bc, .imm16)),
+//  .instruction(.init(spec: .call(.imm16), immediate16: 0x28C5)),
 //], code: [
 //  .ld(.hl, .arg(1)),
 //  .ld(.de, .arg(2)),
 //  .ld(.bc, .arg(3)),
-//  .call(.immediate16),
+//  .call(.imm16),
 //], validArgumentValues: [:])
 
 disassembly.createGlobal(at: 0xA100, named: "SAVEFILES")

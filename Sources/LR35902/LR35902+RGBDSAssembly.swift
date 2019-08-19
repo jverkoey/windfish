@@ -73,11 +73,11 @@ public final class RGBDSAssembly {
   private static func operands(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil) -> [String]? {
     if let disassembly = disassembly {
       switch instruction.spec {
-      case let LR35902.InstructionSpec.jp(condition, operand) where operand == .immediate16,
-           let LR35902.InstructionSpec.call(condition, operand) where operand == .immediate16:
-        if disassembly.transfersOfControl(at: instruction.immediate16!, in: disassembly.cpu.bank) != nil {
+      case let LR35902.InstructionSpec.jp(condition, operand) where operand == .imm16,
+           let LR35902.InstructionSpec.call(condition, operand) where operand == .imm16:
+        if disassembly.transfersOfControl(at: instruction.imm16!, in: disassembly.cpu.bank) != nil {
           var addressLabel: String
-          if let label = disassembly.label(at: instruction.immediate16!, in: disassembly.cpu.bank) {
+          if let label = disassembly.label(at: instruction.imm16!, in: disassembly.cpu.bank) {
             if let scope = disassembly.contiguousScope(at: disassembly.cpu.pc, in: disassembly.cpu.bank),
               label.starts(with: "\(scope).") {
               addressLabel = label.replacingOccurrences(of: "\(scope).", with: ".")
@@ -85,7 +85,7 @@ public final class RGBDSAssembly {
               addressLabel = label
             }
           } else {
-            addressLabel = "$\(instruction.immediate16!.hexString)"
+            addressLabel = "$\(instruction.imm16!.hexString)"
           }
           if let condition = condition {
             return ["\(condition)", addressLabel]
@@ -94,8 +94,8 @@ public final class RGBDSAssembly {
           }
         }
 
-      case let LR35902.InstructionSpec.jr(condition, operand) where operand == .immediate8signed:
-        let jumpAddress = (disassembly.cpu.pc + LR35902.instructionWidths[instruction.spec]!).advanced(by: Int(Int8(bitPattern: instruction.immediate8!)))
+      case let LR35902.InstructionSpec.jr(condition, operand) where operand == .simm8:
+        let jumpAddress = (disassembly.cpu.pc + LR35902.instructionWidths[instruction.spec]!).advanced(by: Int(Int8(bitPattern: instruction.imm8!)))
         if disassembly.transfersOfControl(at: jumpAddress, in: disassembly.cpu.bank) != nil {
           var addressLabel: String
           if let label = disassembly.label(at: jumpAddress, in: disassembly.cpu.bank) {
@@ -115,48 +115,48 @@ public final class RGBDSAssembly {
           }
         }
 
-      case let LR35902.InstructionSpec.ld(operand1, operand2) where operand1 == .immediate16address:
+      case let LR35902.InstructionSpec.ld(operand1, operand2) where operand1 == .imm16addr:
         var addressLabel: String
-        if let label = disassembly.label(at: instruction.immediate16!, in: disassembly.cpu.bank) {
+        if let label = disassembly.label(at: instruction.imm16!, in: disassembly.cpu.bank) {
           addressLabel = "[\(label)]"
         } else {
-          addressLabel = "[$\(instruction.immediate16!.hexString)]"
+          addressLabel = "[$\(instruction.imm16!.hexString)]"
         }
         return [addressLabel, operand(for: instruction, operand: operand2)]
 
-      case let LR35902.InstructionSpec.ld(operand1, operand2) where operand2 == .immediate16address:
+      case let LR35902.InstructionSpec.ld(operand1, operand2) where operand2 == .imm16addr:
         var addressLabel: String
-        if let label = disassembly.label(at: instruction.immediate16!, in: disassembly.cpu.bank) {
+        if let label = disassembly.label(at: instruction.imm16!, in: disassembly.cpu.bank) {
           addressLabel = "[\(label)]"
         } else {
-          addressLabel = "[$\(instruction.immediate16!.hexString)]"
+          addressLabel = "[$\(instruction.imm16!.hexString)]"
         }
         return [operand(for: instruction, operand: operand1), addressLabel]
 
-      case let LR35902.InstructionSpec.ld(operand1, operand2) where operand1 == .ffimmediate8Address:
+      case let LR35902.InstructionSpec.ld(operand1, operand2) where operand1 == .ffimm8addr:
         var addressLabel: String
-        if let name = disassembly.globals[0xFF00 | UInt16(instruction.immediate8!)] {
+        if let name = disassembly.globals[0xFF00 | UInt16(instruction.imm8!)] {
           addressLabel = "[\(name)]"
         } else {
-          addressLabel = "[$FF\(instruction.immediate8!.hexString)]"
+          addressLabel = "[$FF\(instruction.imm8!.hexString)]"
         }
         return [addressLabel, operand(for: instruction, operand: operand2)]
 
-      case let LR35902.InstructionSpec.ld(operand1, operand2) where operand2 == .ffimmediate8Address:
+      case let LR35902.InstructionSpec.ld(operand1, operand2) where operand2 == .ffimm8addr:
         var addressLabel: String
-        if let name = disassembly.globals[0xFF00 | UInt16(instruction.immediate8!)] {
+        if let name = disassembly.globals[0xFF00 | UInt16(instruction.imm8!)] {
           addressLabel = "[\(name)]"
         } else {
-          addressLabel = "[$FF\(instruction.immediate8!.hexString)]"
+          addressLabel = "[$FF\(instruction.imm8!.hexString)]"
         }
         return [operand(for: instruction, operand: operand1), addressLabel]
 
-      case let LR35902.InstructionSpec.ld(operand1, operand2) where operand2 == .immediate16:
+      case let LR35902.InstructionSpec.ld(operand1, operand2) where operand2 == .imm16:
         var addressLabel: String
-        if let name = disassembly.globals[instruction.immediate16!] {
+        if let name = disassembly.globals[instruction.imm16!] {
           addressLabel = "\(name)"
         } else {
-          addressLabel = "$\(instruction.immediate16!.hexString)"
+          addressLabel = "$\(instruction.imm16!.hexString)"
         }
         return [operand(for: instruction, operand: operand1), addressLabel]
 
@@ -198,27 +198,27 @@ public final class RGBDSAssembly {
 
   private static func operand(for instruction: LR35902.Instruction, operand: LR35902.Operand) -> String {
     switch operand {
-    case .immediate8:           return "$\(instruction.immediate8!.hexString)"
-    case .immediate8signed:
-      let byte = instruction.immediate8!
+    case .imm8:           return "$\(instruction.imm8!.hexString)"
+    case .simm8:
+      let byte = instruction.imm8!
       if (byte & UInt8(0x80)) != 0 {
         return "@-$\((0xff - byte + 1 - 2).hexString)"
       } else {
         return "@+$\((byte + 2).hexString)"
       }
-    case .immediate16:          return "$\(instruction.immediate16!.hexString)"
-    case .ffimmediate8Address:  return "[$FF\(instruction.immediate8!.hexString)]"
-    case .immediate16address:   return "[$\(instruction.immediate16!.hexString)]"
-    case .bcAddress:            return "[bc]"
-    case .deAddress:            return "[de]"
-    case .hlAddress:            return "[hl]"
-    case .ffccAddress:          return "[$ff00+c]"
-    case .spPlusImmediate8Signed:
-      let signedByte = Int8(bitPattern: instruction.immediate8!)
+    case .imm16:          return "$\(instruction.imm16!.hexString)"
+    case .ffimm8addr:  return "[$FF\(instruction.imm8!.hexString)]"
+    case .imm16addr:   return "[$\(instruction.imm16!.hexString)]"
+    case .bcaddr:            return "[bc]"
+    case .deaddr:            return "[de]"
+    case .hladdr:            return "[hl]"
+    case .ffccaddr:          return "[$ff00+c]"
+    case .sp_plus_simm8:
+      let signedByte = Int8(bitPattern: instruction.imm8!)
       if signedByte < 0 {
-        return "sp-$\((0xff - instruction.immediate8! + 1).hexString)"
+        return "sp-$\((0xff - instruction.imm8! + 1).hexString)"
       } else {
-        return "sp+$\(instruction.immediate8!.hexString)"
+        return "sp+$\(instruction.imm8!.hexString)"
       }
     case .a, .af, .b, .c, .bc, .d, .e, .de, .h, .l, .hl, .sp: return "\(operand)"
 
@@ -227,7 +227,7 @@ public final class RGBDSAssembly {
     case let .arg(number):
       return "\\\(number)"
 
-    case .zero8:
+    case .zeroimm8:
       preconditionFailure("Unable to print out a zero8")
     }
   }

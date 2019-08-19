@@ -61,19 +61,18 @@ extension LR35902 {
   /// Possible operands in LR35902's instruction set.
   public enum Operand: Hashable {
     case a, af
-    case b, c, bc, bcAddress
-    case d, e, de, deAddress
-    case h, l, hl, hlAddress
+    case b, c, bc, bcaddr
+    case d, e, de, deaddr
+    case h, l, hl, hladdr
 
-    case sp
-    case spPlusImmediate8Signed
+    case sp, sp_plus_simm8
 
-    case immediate8, immediate8signed, immediate16
-    case immediate16address
+    case imm8, simm8, imm16
+    case imm16addr
 
-    case ffimmediate8Address, ffccAddress
+    case ffimm8addr, ffccaddr
 
-    case zero8
+    case zeroimm8
 
      // For macro use only
     case macro(String)
