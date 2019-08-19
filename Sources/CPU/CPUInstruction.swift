@@ -39,3 +39,10 @@ public protocol CPUInstructionSpec: Hashable {
    */
   var representation: String { get }
 }
+
+public protocol CPUInstructionImmediate {
+  /**
+   The width of the immediate.
+   */
+  var width: Int { get }
+}

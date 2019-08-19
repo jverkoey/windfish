@@ -4,6 +4,8 @@ import CPU
 extension LR35902 {
   /// The specification for an LR35902's instruction set.
   public indirect enum InstructionSpec: CPUInstructionSpec {
+    public typealias WidthType = UInt16
+
     // Loads
     case ld(Numeric, Numeric), ldi(Numeric, Numeric), ldd(Numeric, Numeric)
 
@@ -60,7 +62,7 @@ extension LR35902 {
   }
 
   /// Numeric operands in LR35902's instruction set.
-  public enum Numeric: Hashable {
+  public enum Numeric: Hashable, CPUInstructionImmediate {
     case a, af
     case b, c, bc, bcaddr
     case d, e, de, deaddr

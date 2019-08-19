@@ -1,19 +1,7 @@
 import Foundation
+import CPU
 
 extension LR35902.InstructionSpec {
-  public var operandWidth: UInt16 {
-    var width: UInt16 = 0
-    self.visit { (value, _) in
-      switch value {
-      case let numeric as LR35902.Numeric:
-        width += numeric.width
-      default:
-        break
-      }
-    }
-    return width
-  }
-
   public var representation: String {
     guard let operands = Mirror(reflecting: self).children.first else {
       return opcode
@@ -44,7 +32,7 @@ extension LR35902.InstructionSpec {
 }
 
 extension LR35902.Numeric {
-  var width: UInt16 {
+  public var width: Int {
     switch self {
     case .sp_plus_simm8, .imm8, .simm8, .ffimm8addr, .zeroimm8: return 1
     case .imm16, .imm16addr: return 2

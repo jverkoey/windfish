@@ -39,6 +39,19 @@ extension CPUInstructionSpec {
     }
   }
 
+  /**
+   Computes the operand width by adding up the width of any immediate operands.
+   */
+  public var operandWidth: WidthType {
+    var width: WidthType = 0
+    visit { (value, _) in
+      if let numeric = value as? CPUInstructionImmediate {
+        width += WidthType(numeric.width)
+      }
+    }
+    return width
+  }
+
   public var instructionWidth: WidthType {
     return opcodeWidth + operandWidth
   }
