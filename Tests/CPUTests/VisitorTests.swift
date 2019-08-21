@@ -11,9 +11,6 @@ struct TestInstruction: CPUInstruction {
     case sub(Spec)
 
     typealias WidthType = UInt16
-    var representation: String {
-      return ""
-    }
   }
 
   enum Operand: Equatable {

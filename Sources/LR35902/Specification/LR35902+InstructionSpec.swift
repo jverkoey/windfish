@@ -83,7 +83,7 @@ extension LR35902 {
   }
 
   /// Possible conditions in LR35902's instruction set.
-  public enum Condition: CPUInstructionOperandRepresentable {
+  public enum Condition {
     case nz
     case z
     case nc

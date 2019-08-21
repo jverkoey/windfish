@@ -21,7 +21,14 @@ extension CPUInstructionSpec {
       }
 
       if let representable = unboxedValue as? CPUInstructionOperandRepresentable {
-        operands.append(representable.representation)
+        switch representable.representation {
+        case .numeric:
+          operands.append("#")
+        case .address:
+          operands.append("[#]")
+        case let .specific(string):
+          operands.append(string)
+        }
       } else {
         operands.append("\(unboxedValue)")
       }

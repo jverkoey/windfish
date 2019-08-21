@@ -47,13 +47,32 @@ public protocol CPUInstructionImmediate {
   var width: Int { get }
 }
 
+/**
+ An abstract representation of an instruction's operand.
+ */
 public protocol CPUInstructionOperandRepresentable {
   /**
-   An abstract representation of this instruction operand in assembly.
-
-   The following wildcards are permitted:
-
-   - #: Any numeric value.
+   The operand's abstract representation.
    */
-  var representation: String { get }
+  var representation: CPUInstructionOperandRepresentation { get }
+}
+
+/**
+ Possible types of abstract representations for instruction operands.
+ */
+public enum CPUInstructionOperandRepresentation {
+  /**
+   A numeric representation.
+   */
+  case numeric
+
+  /**
+   An address representation.
+   */
+  case address
+
+  /**
+   A specific representation.
+   */
+  case specific(String)
 }
