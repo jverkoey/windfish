@@ -333,7 +333,7 @@ extension LR35902 {
       while !runQueue.isEmpty {
         let run = runQueue.dequeue()
 
-        if visitedAddresses.contains(Int(cartAddress(for: run.startAddress, in: run.initialBank)!)) {
+        if visitedAddresses.contains(Int(run.cartStartAddress)) {
           // We've already visited this instruction, so we can skip it.
           continue
         }
@@ -464,7 +464,7 @@ extension LR35902 {
 
         // If the scope has a name, then map the scope and labels to that name.
         let entryRun = runGroup.first!
-        let runStartAddress = cartAddress(for: entryRun.startAddress, in: entryRun.initialBank)!
+        let runStartAddress = entryRun.cartStartAddress
         if let runGroupName = labels[runStartAddress] {
           scopes[runGroupName, default: IndexSet()].formUnion(runScope)
 
