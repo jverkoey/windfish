@@ -227,8 +227,8 @@ extension LR35902 {
       disassemble(range: pc..<upperBound, inBank: bank)
     }
     private var functions: [CartridgeAddress: String] = [:]
-    private var contiguousScopes: [CartridgeAddress: String] = [:]
-    private var scopes: [String: IndexSet] = [:]
+    var contiguousScopes: [CartridgeAddress: String] = [:]
+    var scopes: [String: IndexSet] = [:]
 
     // MARK: - Labels
 
@@ -249,7 +249,7 @@ extension LR35902 {
       }
       labels[cartAddress] = name
     }
-    private var labels: [CartridgeAddress: String] = [:]
+    var labels: [CartridgeAddress: String] = [:]
 
     // MARK: - Globals
 
@@ -445,58 +445,7 @@ extension LR35902 {
         }
       }
 
-      // Compute scope and rewrite function labels if we're a function.
-
-      for runGroup in firstRun.runGroups() {
-        // Calculate scope.
-        var runScope = IndexSet()
-        runGroup.forEach { run in
-          if let visitedRange = run.visitedRange {
-            runScope.insert(integersIn: Int(visitedRange.lowerBound)..<Int(visitedRange.upperBound))
-          }
-        }
-
-        // Nothing to do for empty runs.
-        if runScope.isEmpty {
-          continue
-        }
-
-        // If the scope has a name, then map the scope and labels to that name.
-        let entryRun = runGroup.first!
-        let runStartAddress = entryRun.cartStartAddress
-        if let runGroupName = labels[runStartAddress] {
-          scopes[runGroupName, default: IndexSet()].formUnion(runScope)
-
-          // Get the first contiguous block of scope.
-          if let runScope = runScope.rangeView.first(where: { $0.lowerBound == runStartAddress }) {
-            for address in runScope {
-              contiguousScopes[CartridgeAddress(address)] = runGroupName
-            }
-
-            var firstReturnIndex: CartridgeAddress? = nil
-
-            runScope.dropFirst().forEach {
-              let index = CartridgeAddress($0)
-              guard labels[index] != nil else {
-                return
-              }
-              if case .ret = instructionMap[index]?.spec {
-                if let firstReturnIndex = firstReturnIndex {
-                  labels[index] = "\(runGroupName).return_\(Address(index % bankSize).hexString)"
-                  labels[firstReturnIndex] = "\(runGroupName).return_\(Address(firstReturnIndex % bankSize).hexString)"
-                } else {
-                  labels[index] = "\(runGroupName).return"
-                  firstReturnIndex = index
-                }
-              } else {
-                let bank = Bank(index / bankSize)
-                let address = index % bankSize + CartridgeAddress((bank > 0) ? 0x4000 : 0x0000)
-                labels[index] = "\(runGroupName).fn_\(bank.hexString)_\(Address(address).hexString)"
-              }
-            }
-          }
-        }
-      }
+      rewriteScopes(firstRun)
     }
   }
 }
