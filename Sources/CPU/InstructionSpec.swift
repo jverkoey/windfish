@@ -1,18 +1,9 @@
 import Foundation
 
 /**
- A generic instruction type backed by a specification.
- */
-public protocol CPUInstruction: Hashable {
-  associatedtype SpecType: CPUInstructionSpec
-
-  var spec: SpecType { get }
-}
-
-/**
  An instruction specification defines the shape of the instruction.
  */
-public protocol CPUInstructionSpec: Hashable {
+public protocol InstructionSpec: Hashable {
   associatedtype WidthType: BinaryInteger
 
   /**
@@ -40,7 +31,10 @@ public protocol CPUInstructionSpec: Hashable {
   var representation: String { get }
 }
 
-public protocol CPUInstructionImmediate {
+/**
+ An instruction operand that has a width.
+ */
+public protocol InstructionOperandWithBinaryFootprint {
   /**
    The width of the immediate.
    */
@@ -50,17 +44,17 @@ public protocol CPUInstructionImmediate {
 /**
  An abstract representation of an instruction's operand.
  */
-public protocol CPUInstructionOperandRepresentable {
+public protocol InstructionOperandAssemblyRepresentable {
   /**
    The operand's abstract representation.
    */
-  var representation: CPUInstructionOperandRepresentation { get }
+  var representation: InstructionOperandAssemblyRepresentation { get }
 }
 
 /**
  Possible types of abstract representations for instruction operands.
  */
-public enum CPUInstructionOperandRepresentation {
+public enum InstructionOperandAssemblyRepresentation {
   /**
    A numeric representation.
    */

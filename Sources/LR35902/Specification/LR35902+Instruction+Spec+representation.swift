@@ -2,7 +2,7 @@ import Foundation
 import CPU
 
 extension LR35902.Instruction.Numeric {
-  public var representation: CPUInstructionOperandRepresentation {
+  public var representation: CPU.InstructionOperandAssemblyRepresentation {
     switch self {
     case .bcaddr:
       return .specific("[bc]")
@@ -23,13 +23,13 @@ extension LR35902.Instruction.Numeric {
 }
 
 extension LR35902.Instruction.RestartAddress {
-  public var representation: CPUInstructionOperandRepresentation {
+  public var representation: CPU.InstructionOperandAssemblyRepresentation {
     return .numeric
   }
 }
 
 extension LR35902.Instruction.Bit {
-  public var representation: CPUInstructionOperandRepresentation {
+  public var representation: CPU.InstructionOperandAssemblyRepresentation {
     return .numeric
   }
 }

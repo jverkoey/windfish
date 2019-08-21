@@ -1,6 +1,6 @@
 import Foundation
 
-extension CPUInstructionSpec {
+extension InstructionSpec {
   /**
    Returns a generic representation of the instruction by visiting each of the operands and returning their representable versions.
    */
@@ -14,7 +14,7 @@ extension CPUInstructionSpec {
         return
       }
 
-      if let representable = value as? CPUInstructionOperandRepresentable {
+      if let representable = value as? InstructionOperandAssemblyRepresentable {
         switch representable.representation {
         case .numeric:
           operands.append("#")

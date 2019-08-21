@@ -1,10 +1,10 @@
 import XCTest
 @testable import CPU
 
-struct TestInstruction: CPUInstruction {
+struct TestInstruction: Instruction {
   var spec: TestInstruction.Spec
 
-  indirect enum Spec: CPUInstructionSpec, Equatable {
+  indirect enum Spec: InstructionSpec, Equatable {
     case nop
     case ld(Operand)
     case ld(Operand, Operand)
@@ -13,12 +13,12 @@ struct TestInstruction: CPUInstruction {
     typealias WidthType = UInt16
   }
 
-  enum Operand: Equatable, CPUInstructionOperandRepresentable {
+  enum Operand: Equatable, InstructionOperandAssemblyRepresentable {
     case imm8
     case imm16
     case a
 
-    var representation: CPUInstructionOperandRepresentation {
+    var representation: InstructionOperandAssemblyRepresentation {
       switch self {
       case .imm8, .imm16:
         return .numeric

@@ -1,6 +1,6 @@
 import Cocoa
 
-extension CPUInstructionSpec {
+extension InstructionSpec {
   /**
    Invokes a visitor for each operand of the subspec.
 

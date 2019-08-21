@@ -3,7 +3,7 @@ import CPU
 
 extension LR35902.Instruction {
   /// The specification for an LR35902's instruction set.
-  public indirect enum Spec: CPUInstructionSpec {
+  public indirect enum Spec: CPU.InstructionSpec {
     public typealias WidthType = UInt16
 
     // Loads
@@ -62,7 +62,7 @@ extension LR35902.Instruction {
   }
 
   /// Numeric operands in LR35902's instruction set.
-  public enum Numeric: Hashable, CPUInstructionImmediate, CPUInstructionOperandRepresentable {
+  public enum Numeric: Hashable, CPU.InstructionOperandWithBinaryFootprint, CPU.InstructionOperandAssemblyRepresentable {
     case a, af
     case b, c, bc, bcaddr
     case d, e, de, deaddr
@@ -91,7 +91,7 @@ extension LR35902.Instruction {
   }
 
   /// Possible rst addresses in LR35902's instruction set.
-  public enum RestartAddress: UInt8, CPUInstructionOperandRepresentable {
+  public enum RestartAddress: UInt8, CPU.InstructionOperandAssemblyRepresentable {
     case x00 = 0x00
     case x08 = 0x08
     case x10 = 0x10
@@ -103,7 +103,7 @@ extension LR35902.Instruction {
   }
 
   /// Possible bits in LR35902's instruction set.
-  public enum Bit: UInt8, CPUInstructionOperandRepresentable {
+  public enum Bit: UInt8, CPU.InstructionOperandAssemblyRepresentable {
     case b0 = 0
     case b1 = 1
     case b2 = 2

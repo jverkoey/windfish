@@ -1,6 +1,6 @@
 import Foundation
 
-extension CPUInstructionSpec {
+extension InstructionSpec {
   /**
    Extracts the opcode from the name of the first part of the spec.
    */

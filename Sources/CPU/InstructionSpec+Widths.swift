@@ -3,7 +3,7 @@ import Foundation
 /**
  A representation of an instruction's width.
  */
-public struct CPUInstructionWidth<T: BinaryInteger> {
+public struct InstructionWidth<T: BinaryInteger> {
   public let opcode: T
   public let operand: T
 
@@ -15,15 +15,15 @@ public struct CPUInstructionWidth<T: BinaryInteger> {
 /**
  Calculates the widths for all of the given instructions.
  */
-public func widths<T>(for instructionSet: [T]) -> [T: CPUInstructionWidth<T.WidthType>] where T: CPUInstructionSpec {
-  var widths: [T: CPUInstructionWidth<T.WidthType>] = [:]
+public func widths<T>(for instructionSet: [T]) -> [T: InstructionWidth<T.WidthType>] where T: InstructionSpec {
+  var widths: [T: InstructionWidth<T.WidthType>] = [:]
   instructionSet.forEach { spec in
-    widths[spec] = CPUInstructionWidth(opcode: spec.opcodeWidth, operand: spec.operandWidth)
+    widths[spec] = InstructionWidth(opcode: spec.opcodeWidth, operand: spec.operandWidth)
   }
   return widths
 }
 
-extension CPUInstructionSpec {
+extension InstructionSpec {
   /**
    Extracts the opcode width by adding up recursive specifications.
    */
@@ -45,7 +45,7 @@ extension CPUInstructionSpec {
   public var operandWidth: WidthType {
     var width: WidthType = 0
     visit { (value, _) in
-      if let numeric = value as? CPUInstructionImmediate {
+      if let numeric = value as? InstructionOperandWithBinaryFootprint {
         width += WidthType(numeric.width)
       }
     }
