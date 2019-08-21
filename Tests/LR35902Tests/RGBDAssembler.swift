@@ -2,7 +2,6 @@ import XCTest
 @testable import LR35902
 
 class RGBDAssembler: XCTestCase {
-
   func test_nop_failsWithExtraOperand() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """

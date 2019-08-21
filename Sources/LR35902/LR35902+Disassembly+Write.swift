@@ -182,7 +182,7 @@ clean:
           }
 
           // Write the instruction as assembly.
-          let index = LR35902.cartAddress(for: cpu.pc, in: bank)
+          let index = LR35902.cartAddress(for: cpu.pc, in: bank)!
           let instructionWidth = LR35902.Instruction.widths[instruction.spec]!.total
           let bytes = cpu[index..<(index + LR35902.CartridgeAddress(instructionWidth))]
           let instructionScope = scope(at: cpu.pc, in: bank)
@@ -267,8 +267,8 @@ clean:
                 }
 
                 if firstInvalidArgument == nil {
-                  let lowerBound = LR35902.cartAddress(for: lineBufferAddress, in: bank)
-                  let upperBound = LR35902.cartAddress(for: cpu.pc - instructionWidth, in: bank)
+                  let lowerBound = LR35902.cartAddress(for: lineBufferAddress, in: bank)!
+                  let upperBound = LR35902.cartAddress(for: cpu.pc - instructionWidth, in: bank)!
                   let bytes = cpu[lowerBound..<upperBound]
 
                   let macroArgs = arguments.keys.sorted().map { arguments[$0]! }.joined(separator: ", ")

@@ -19,7 +19,7 @@ public final class LR35902 {
   // MARK: - Accessing ROM data
 
   public subscript(pc: Address, bank: Bank) -> UInt8 {
-    return cartridge[Int(LR35902.cartAddress(for: pc, in: bank))]
+    return cartridge[Int(LR35902.cartAddress(for: pc, in: bank)!)]
   }
 
   public subscript(range: Range<CartridgeAddress>) -> Data {
@@ -29,7 +29,10 @@ public final class LR35902 {
   /// Returns a cartridge address for the given program counter and bank.
   /// - Parameter pc: The program counter's location.
   /// - Parameter bank: The current bank.
-  public static func cartAddress(for pc: Address, in bank: Bank) -> CartridgeAddress {
+  public static func cartAddress(for pc: Address, in bank: Bank) -> CartridgeAddress? {
+    guard pc <= 0x8000 else {
+      return nil // Anything above 0x8000 is not addressable from the cartridge.
+    }
     if pc < 0x4000 {
       return CartridgeAddress(pc)
     } else {
@@ -50,7 +53,7 @@ public final class LR35902 {
     return
       ((bank == 0 && pc < 0x4000)
         || (bank != 0 && pc < 0x8000))
-        && LR35902.cartAddress(for: pc, in: bank) < cartridgeSize
+        && LR35902.cartAddress(for: pc, in: bank)! < cartridgeSize
   }
 
   public var numberOfBanks: Bank {
