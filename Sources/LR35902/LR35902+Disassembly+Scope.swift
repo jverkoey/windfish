@@ -25,13 +25,13 @@ extension LR35902.Disassembly {
         continue
       }
       for address in contiguousScope {
-        contiguousScopes[LR35902.CartridgeAddress(address)] = runGroupName
+        contiguousScopes[LR35902.CartridgeLocation(address)] = runGroupName
       }
 
       // Rewrite local labels within the function's first contiguous block of scope.
-      var firstReturnLocation: LR35902.CartridgeAddress? = nil
+      var firstReturnLocation: LR35902.CartridgeLocation? = nil
       contiguousScope.dropFirst().forEach {
-        let cartLocation = LR35902.CartridgeAddress($0)
+        let cartLocation = LR35902.CartridgeLocation($0)
         guard labels[cartLocation] != nil else {
           return
         }
@@ -45,7 +45,7 @@ extension LR35902.Disassembly {
           }
         } else {
           let bank = LR35902.Bank(cartLocation / LR35902.bankSize)
-          let address = cartLocation % LR35902.bankSize + LR35902.CartridgeAddress((bank > 0) ? 0x4000 : 0x0000)
+          let address = cartLocation % LR35902.bankSize + LR35902.CartridgeLocation((bank > 0) ? 0x4000 : 0x0000)
           labels[cartLocation] = "\(runGroupName).fn_\(bank.hexString)_\(LR35902.Address(address).hexString)"
         }
       }

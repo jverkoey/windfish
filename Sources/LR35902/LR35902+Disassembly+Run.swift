@@ -3,8 +3,8 @@ import Disassembler
 
 extension LR35902.Disassembly {
   final class Run: Disassembler.Run {
-    let startAddress: LR35902.CartridgeAddress
-    let endAddress: LR35902.CartridgeAddress?
+    let startAddress: LR35902.CartridgeLocation
+    let endAddress: LR35902.CartridgeLocation?
     let initialBank: LR35902.Bank
 
     init(from startAddress: LR35902.Address, initialBank: LR35902.Bank, upTo endAddress: LR35902.Address? = nil) {
@@ -17,7 +17,7 @@ extension LR35902.Disassembly {
       self.initialBank = initialBank
     }
 
-    var visitedRange: Range<LR35902.CartridgeAddress>?
+    var visitedRange: Range<LR35902.CartridgeLocation>?
 
     var children: [Run] = []
 

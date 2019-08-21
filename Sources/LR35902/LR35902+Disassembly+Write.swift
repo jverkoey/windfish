@@ -184,7 +184,7 @@ clean:
           // Write the instruction as assembly.
           let index = LR35902.cartAddress(for: cpu.pc, in: bank)!
           let instructionWidth = LR35902.Instruction.widths[instruction.spec]!.total
-          let bytes = cpu[index..<(index + LR35902.CartridgeAddress(instructionWidth))]
+          let bytes = cpu[index..<(index + LR35902.CartridgeLocation(instructionWidth))]
           let instructionScope = scope(at: cpu.pc, in: bank)
           lineGroup.append(.instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: self), cpu.pc, cpu.bank, instructionScope, bytes))
 

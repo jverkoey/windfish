@@ -110,7 +110,7 @@ extension LR35902 {
         labels[index] = RGBDSAssembly.defaultLabel(at: pc, in: bank)
       }
     }
-    private var transfers: [CartridgeAddress: Set<TransferOfControl>] = [:]
+    private var transfers: [CartridgeLocation: Set<TransferOfControl>] = [:]
 
     // MARK: - Instructions
 
@@ -130,7 +130,7 @@ extension LR35902 {
 
       code.insert(integersIn: Int(address)..<(Int(address) + Int(Instruction.widths[instruction.spec]!.total)))
     }
-    var instructionMap: [CartridgeAddress: Instruction] = [:]
+    var instructionMap: [CartridgeLocation: Instruction] = [:]
 
     // MARK: - Data segments
 
@@ -160,7 +160,7 @@ extension LR35902 {
     func register(bankChange: Bank, at pc: Address, in bank: Bank) {
       bankChanges[cartAddress(for: pc, in: bank)!] = bankChange
     }
-    private var bankChanges: [CartridgeAddress: Bank] = [:]
+    private var bankChanges: [CartridgeLocation: Bank] = [:]
 
     // MARK: - Regions
 
@@ -226,12 +226,12 @@ extension LR35902 {
       let upperBound: Address = (bank == 0) ? 0x4000 : 0x8000
       disassemble(range: pc..<upperBound, inBank: bank)
     }
-    private var functions: [CartridgeAddress: String] = [:]
+    private var functions: [CartridgeLocation: String] = [:]
 
     func expandScope(forLabel label: String, scope: IndexSet) {
       scopes[label, default: IndexSet()].formUnion(scope)
     }
-    var contiguousScopes: [CartridgeAddress: String] = [:]
+    var contiguousScopes: [CartridgeLocation: String] = [:]
     private var scopes: [String: IndexSet] = [:]
 
     // MARK: - Labels
@@ -253,7 +253,7 @@ extension LR35902 {
       }
       labels[cartAddress] = name
     }
-    var labels: [CartridgeAddress: String] = [:]
+    var labels: [CartridgeLocation: String] = [:]
 
     // MARK: - Globals
 
@@ -276,7 +276,7 @@ extension LR35902 {
       }
       preComments[cartAddress] = text
     }
-    private var preComments: [CartridgeAddress: String] = [:]
+    private var preComments: [CartridgeLocation: String] = [:]
 
     // MARK: - Macros
 
@@ -348,9 +348,9 @@ extension LR35902 {
 
         let advance: (Address) -> Void = { amount in
           let currentCartAddress = cartAddress(for: self.cpu.pc, in: self.cpu.bank)!
-          run.visitedRange = run.startAddress..<(currentCartAddress + CartridgeAddress(amount))
+          run.visitedRange = run.startAddress..<(currentCartAddress + CartridgeLocation(amount))
 
-          visitedAddresses.insert(integersIn: Int(currentCartAddress)..<Int(currentCartAddress + CartridgeAddress(amount)))
+          visitedAddresses.insert(integersIn: Int(currentCartAddress)..<Int(currentCartAddress + CartridgeLocation(amount)))
 
           self.cpu.pc += amount
         }
