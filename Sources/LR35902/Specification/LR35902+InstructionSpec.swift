@@ -62,7 +62,7 @@ extension LR35902 {
   }
 
   /// Numeric operands in LR35902's instruction set.
-  public enum Numeric: Hashable, CPUInstructionImmediate {
+  public enum Numeric: Hashable, CPUInstructionImmediate, CPUInstructionOperandRepresentable {
     case a, af
     case b, c, bc, bcaddr
     case d, e, de, deaddr
@@ -83,7 +83,7 @@ extension LR35902 {
   }
 
   /// Possible conditions in LR35902's instruction set.
-  public enum Condition {
+  public enum Condition: CPUInstructionOperandRepresentable {
     case nz
     case z
     case nc
@@ -91,7 +91,7 @@ extension LR35902 {
   }
 
   /// Possible rst addresses in LR35902's instruction set.
-  public enum RestartAddress: UInt8 {
+  public enum RestartAddress: UInt8, CPUInstructionOperandRepresentable {
     case x00 = 0x00
     case x08 = 0x08
     case x10 = 0x10
@@ -103,7 +103,7 @@ extension LR35902 {
   }
 
   /// Possible bits in LR35902's instruction set.
-  public enum Bit: UInt8 {
+  public enum Bit: UInt8, CPUInstructionOperandRepresentable {
     case b0 = 0
     case b1 = 1
     case b2 = 2

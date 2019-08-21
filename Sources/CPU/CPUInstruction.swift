@@ -46,3 +46,14 @@ public protocol CPUInstructionImmediate {
    */
   var width: Int { get }
 }
+
+public protocol CPUInstructionOperandRepresentable {
+  /**
+   An abstract representation of this instruction operand in assembly.
+
+   The following wildcards are permitted:
+
+   - #: Any numeric value.
+   */
+  var representation: String { get }
+}

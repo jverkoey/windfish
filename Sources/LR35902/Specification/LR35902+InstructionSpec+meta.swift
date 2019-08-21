@@ -1,36 +1,6 @@
 import Foundation
 import CPU
 
-extension LR35902.InstructionSpec {
-  public var representation: String {
-    guard let operands = Mirror(reflecting: self).children.first else {
-      return opcode
-    }
-    switch operands.value {
-    case let childInstruction as LR35902.InstructionSpec:
-      return childInstruction.representation
-    case let tuple as (LR35902.Condition?, LR35902.Numeric):
-      if let condition = tuple.0 {
-        return "\(opcode) \(condition), \(tuple.1.representation)"
-      } else {
-        return "\(opcode) \(tuple.1.representation)"
-      }
-    case let tuple as (LR35902.Numeric, LR35902.Numeric):
-      return "\(opcode) \(tuple.0.representation), \(tuple.1.representation)"
-    case let tuple as (LR35902.Bit, LR35902.Numeric):
-      return "\(opcode) #, \(tuple.1.representation)"
-    case let operand as LR35902.Numeric:
-      return "\(opcode) \(operand.representation)"
-    case let condition as LR35902.Condition:
-      return "\(opcode) \(condition)"
-    case is LR35902.RestartAddress:
-      return "\(opcode) #"
-    default:
-      return opcode
-    }
-  }
-}
-
 extension LR35902.Numeric {
   public var width: Int {
     switch self {
@@ -40,7 +10,7 @@ extension LR35902.Numeric {
     }
   }
 
-  var representation: String {
+  public var representation: String {
     switch self {
     case .hladdr:
       return "[hl]"
@@ -57,5 +27,23 @@ extension LR35902.Numeric {
     default:
       return "\(self)"
     }
+  }
+}
+
+extension LR35902.Condition {
+  public var representation: String {
+    return "\(self)"
+  }
+}
+
+extension LR35902.RestartAddress {
+  public var representation: String {
+    return "#"
+  }
+}
+
+extension LR35902.Bit {
+  public var representation: String {
+    return "#"
   }
 }
