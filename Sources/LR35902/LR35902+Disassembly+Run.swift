@@ -4,12 +4,16 @@ import Disassembler
 extension LR35902.Disassembly {
   class Run {
     let cartStartAddress: LR35902.CartridgeAddress
-    let endAddress: LR35902.Address?
+    let endAddress: LR35902.CartridgeAddress?
     let initialBank: LR35902.Bank
 
     init(from startAddress: LR35902.Address, initialBank: LR35902.Bank, upTo endAddress: LR35902.Address? = nil) {
       self.cartStartAddress = LR35902.cartAddress(for: startAddress, in: initialBank)!
-      self.endAddress = endAddress
+      if let endAddress = endAddress {
+        self.endAddress = LR35902.cartAddress(for: endAddress - 1, in: initialBank)!
+      } else {
+        self.endAddress = nil
+      }
       self.initialBank = initialBank
     }
 
@@ -21,7 +25,7 @@ extension LR35902.Disassembly {
 
     func hasReachedEnd(with cpu: LR35902) -> Bool {
       if let endAddress = endAddress {
-        return cpu.pc >= endAddress
+        return cpu.pc > LR35902.addressAndBank(from: endAddress).address
       }
       return false
     }
