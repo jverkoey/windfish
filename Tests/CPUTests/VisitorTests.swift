@@ -13,10 +13,19 @@ struct TestInstruction: CPUInstruction {
     typealias WidthType = UInt16
   }
 
-  enum Operand: Equatable {
+  enum Operand: Equatable, CPUInstructionOperandRepresentable {
     case imm8
     case imm16
     case a
+
+    var representation: CPUInstructionOperandRepresentation {
+      switch self {
+      case .imm8, .imm16:
+        return .numeric
+      default:
+        return .specific("\(self)")
+      }
+    }
   }
 }
 
@@ -89,5 +98,12 @@ class VisitorTests: XCTestCase {
     XCTAssertEqual(visitedOperands, [.a, .imm8])
     XCTAssertEqual(visitedIndices, [0, 1])
     XCTAssertEqual(visitCount, 2)
+  }
+
+  func testRepresentation() throws {
+    XCTAssertEqual(TestInstruction.Spec.nop.representation, "nop")
+    XCTAssertEqual(TestInstruction.Spec.ld(.a, .imm8).representation, "ld a, #")
+    XCTAssertEqual(TestInstruction.Spec.sub(.ld(.imm8, .a)).representation, "ld #, a")
+    XCTAssertEqual(TestInstruction.Spec.sub(.ld(.a)).representation, "ld a")
   }
 }
