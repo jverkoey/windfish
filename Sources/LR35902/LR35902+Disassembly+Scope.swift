@@ -11,13 +11,16 @@ extension LR35902.Disassembly {
         continue
       }
 
+      // Expand scopes for the label.
+      // TODO: This doesn't work well if the labels change after the scope has been defined.
       let scope = runGroup.scope
       if scope.isEmpty {
         continue
       }
       expandScope(forLabel: runGroupName, scope: scope)
 
-      // Get the first contiguous block of scope.
+      // Define the initial contiguous scope for the rungroup's label.
+      // This allows functions to rewrite local labels as relative labels.
       guard let contiguousScope = runGroup.firstContiguousScopeRange else {
         continue
       }
@@ -25,25 +28,25 @@ extension LR35902.Disassembly {
         contiguousScopes[LR35902.CartridgeAddress(address)] = runGroupName
       }
 
-      var firstReturnIndex: LR35902.CartridgeAddress? = nil
-
+      // Rewrite local labels within the function's first contiguous block of scope.
+      var firstReturnLocation: LR35902.CartridgeAddress? = nil
       contiguousScope.dropFirst().forEach {
-        let index = LR35902.CartridgeAddress($0)
-        guard labels[index] != nil else {
+        let cartLocation = LR35902.CartridgeAddress($0)
+        guard labels[cartLocation] != nil else {
           return
         }
-        if case .ret = instructionMap[index]?.spec {
-          if let firstReturnIndex = firstReturnIndex {
-            labels[index] = "\(runGroupName).return_\(LR35902.Address(index % LR35902.bankSize).hexString)"
-            labels[firstReturnIndex] = "\(runGroupName).return_\(LR35902.Address(firstReturnIndex % LR35902.bankSize).hexString)"
+        if case .ret = instructionMap[cartLocation]?.spec {
+          if let firstReturnIndex = firstReturnLocation {
+            labels[cartLocation] = "\(runGroupName).return_\(LR35902.addressAndBank(from: cartLocation).address.hexString)"
+            labels[firstReturnIndex] = "\(runGroupName).return_\(LR35902.addressAndBank(from: firstReturnIndex).address.hexString)"
           } else {
-            labels[index] = "\(runGroupName).return"
-            firstReturnIndex = index
+            labels[cartLocation] = "\(runGroupName).return"
+            firstReturnLocation = cartLocation
           }
         } else {
-          let bank = LR35902.Bank(index / LR35902.bankSize)
-          let address = index % LR35902.bankSize + LR35902.CartridgeAddress((bank > 0) ? 0x4000 : 0x0000)
-          labels[index] = "\(runGroupName).fn_\(bank.hexString)_\(LR35902.Address(address).hexString)"
+          let bank = LR35902.Bank(cartLocation / LR35902.bankSize)
+          let address = cartLocation % LR35902.bankSize + LR35902.CartridgeAddress((bank > 0) ? 0x4000 : 0x0000)
+          labels[cartLocation] = "\(runGroupName).fn_\(bank.hexString)_\(LR35902.Address(address).hexString)"
         }
       }
     }
