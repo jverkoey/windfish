@@ -5,12 +5,12 @@ extension LR35902.Disassembly {
   class Run {
     let startAddress: LR35902.Address
     let endAddress: LR35902.Address?
-    let bank: LR35902.Bank
+    let initialBank: LR35902.Bank
 
-    init(from startAddress: LR35902.Address, inBank bank: LR35902.Bank, upTo endAddress: LR35902.Address? = nil) {
+    init(from startAddress: LR35902.Address, initialBank: LR35902.Bank, upTo endAddress: LR35902.Address? = nil) {
       self.startAddress = startAddress
       self.endAddress = endAddress
-      self.bank = bank
+      self.initialBank = initialBank
     }
 
     var visitedRange: Range<LR35902.CartridgeAddress>?

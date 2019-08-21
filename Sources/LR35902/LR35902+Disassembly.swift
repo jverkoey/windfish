@@ -314,14 +314,14 @@ extension LR35902 {
       var visitedAddresses = IndexSet()
 
       var runQueue = Disassembler.Queue<LR35902.Disassembly.Run>()
-      let firstRun = Run(from: range.lowerBound, inBank: bankInitial, upTo: range.upperBound)
+      let firstRun = Run(from: range.lowerBound, initialBank: bankInitial, upTo: range.upperBound)
       runQueue.add(firstRun)
 
       let queueRun: (Run, Address, Address, Bank, Instruction) -> Void = { fromRun, fromAddress, toAddress, bank, instruction in
         if toAddress > 0x8000 {
           return // We can't disassemble in-memory regions.
         }
-        let run = Run(from: toAddress, inBank: bank)
+        let run = Run(from: toAddress, initialBank: bank)
         run.invocationInstruction = instruction
         runQueue.add(run)
 
@@ -333,13 +333,13 @@ extension LR35902 {
       while !runQueue.isEmpty {
         let run = runQueue.dequeue()
 
-        if visitedAddresses.contains(Int(cartAddress(for: run.startAddress, in: run.bank)!)) {
+        if visitedAddresses.contains(Int(cartAddress(for: run.startAddress, in: run.initialBank)!)) {
           // We've already visited this instruction, so we can skip it.
           continue
         }
 
         // Initialize the CPU
-        cpu.bank = run.bank
+        cpu.bank = run.initialBank
         cpu.pc = run.startAddress
 
         let advance: (Address) -> Void = { amount in
@@ -464,7 +464,7 @@ extension LR35902 {
 
         // If the scope has a name, then map the scope and labels to that name.
         let entryRun = runGroup.first!
-        let runStartAddress = cartAddress(for: entryRun.startAddress, in: entryRun.bank)!
+        let runStartAddress = cartAddress(for: entryRun.startAddress, in: entryRun.initialBank)!
         if let runGroupName = labels[runStartAddress] {
           scopes[runGroupName, default: IndexSet()].formUnion(runScope)
 
