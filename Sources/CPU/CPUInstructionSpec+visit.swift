@@ -16,6 +16,7 @@ extension CPUInstructionSpec {
     }
     if let subSpec = operands.value as? Self {
       subSpec.visit(visitor: visitor)
+      return
     }
     let children: Mirror.Children
     let reflectedChildren = Mirror(reflecting: operands.value).children
@@ -31,11 +32,8 @@ extension CPUInstructionSpec {
       if case Optional<Any>.none = child.value {
         continue
       }
-      defer {
-        index += 1
-      }
-
       visitor(child.value, index)
+      index += 1
     }
   }
 }
