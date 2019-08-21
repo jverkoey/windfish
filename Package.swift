@@ -39,7 +39,7 @@ let package = Package(
 
     .target(
       name: "Disassembler",
-      dependencies: []),
+      dependencies: ["CPU"]),
   ]
 )
 
