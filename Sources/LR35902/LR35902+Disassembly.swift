@@ -204,7 +204,7 @@ extension LR35902 {
       functions[romAddress(for: pc, in: bank)] = name
 
       let upperBound: UInt16 = (bank == 0) ? 0x4000 : 0x8000
-      disassemble(range: pc..<upperBound, inBank: bank, function: name)
+      disassemble(range: pc..<upperBound, inBank: bank)
     }
     private var functions: [UInt32: String] = [:]
     private var contiguousScopes: [UInt32: String] = [:]
@@ -279,11 +279,11 @@ extension LR35902 {
       let address: UInt16
     }
 
-    public func disassemble(range: Range<UInt16>, inBank bankInitial: UInt8, function: String? = nil) {
+    public func disassemble(range: Range<UInt16>, inBank bankInitial: UInt8) {
       var visitedAddresses = IndexSet()
 
       let runQueue = RunQueue()
-      let firstRun = Run(from: range.lowerBound, inBank: bankInitial, upTo: range.upperBound, function: function)
+      let firstRun = Run(from: range.lowerBound, inBank: bankInitial, upTo: range.upperBound)
       runQueue.add(firstRun)
 
       let queueRun: (Run, UInt16, UInt16, UInt8, Instruction) -> Void = { fromRun, fromAddress, toAddress, bank, instruction in

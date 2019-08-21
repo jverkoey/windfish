@@ -5,14 +5,11 @@ extension LR35902.Disassembly {
     let startAddress: UInt16
     let endAddress: UInt16?
     let bank: UInt8
-    let function: String?
 
-    // TODO: Remove need for function because any run should be treatable as a "function" in retrospect.
-    init(from startAddress: UInt16, inBank bank: UInt8, upTo endAddress: UInt16? = nil, function: String? = nil) {
+    init(from startAddress: UInt16, inBank bank: UInt8, upTo endAddress: UInt16? = nil) {
       self.startAddress = startAddress
       self.endAddress = endAddress
       self.bank = bank
-      self.function = function
     }
 
     var visitedRange: Range<UInt32>?
