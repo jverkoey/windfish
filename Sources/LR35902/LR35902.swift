@@ -37,6 +37,15 @@ public final class LR35902 {
     }
   }
 
+  /// Returns a cartridge address for the given program counter and bank.
+  /// - Parameter pc: The program counter's location.
+  /// - Parameter bank: The current bank.
+  public static func addressAndBank(from cartAddress: CartridgeAddress) -> (address: Address, bank: Bank) {
+    let bank = Bank(cartAddress / bankSize)
+    let address = Address(cartAddress % bankSize + CartridgeAddress((bank > 0) ? 0x4000 : 0x0000))
+    return (address: address, bank: bank)
+  }
+
   func pcIsValid() -> Bool {
     return
       ((bank == 0 && pc < 0x4000)
