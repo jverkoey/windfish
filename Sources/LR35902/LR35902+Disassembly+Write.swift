@@ -61,9 +61,9 @@ extension LR35902.Disassembly {
     case preComment(String)
     case label(String)
     case transferOfControl(Set<TransferOfControl>, String)
-    case instruction(LR35902.Instruction, RGBDSAssembly.Statement, UInt16, UInt8, Set<String>, Data)
+    case instruction(LR35902.Instruction, RGBDSAssembly.Statement, LR35902.Address, LR35902.Bank, Set<String>, Data)
     case macroInstruction(LR35902.Instruction, RGBDSAssembly.Statement)
-    case macro(String, UInt16, UInt8, Set<String>, Data)
+    case macro(String, LR35902.Address, LR35902.Bank, Set<String>, Data)
     case macroDefinition(String)
     case macroTerminator
 
@@ -135,9 +135,9 @@ clean:
 
       cpu.pc = (bank == 0) ? 0x0000 : 0x4000
       cpu.bank = bank
-      let end: UInt16 = (bank == 0) ? 0x4000 : 0x8000
+      let end: LR35902.Address = (bank == 0) ? 0x4000 : 0x8000
 
-      var lineBufferAddress: UInt16 = cpu.pc
+      var lineBufferAddress: LR35902.Address = cpu.pc
       var lineBuffer: [Line] = []
       lineBuffer.append(.empty)
       var macroNode: MacroNode? = nil
@@ -184,7 +184,7 @@ clean:
           // Write the instruction as assembly.
           let index = LR35902.cartAddress(for: cpu.pc, in: bank)
           let instructionWidth = LR35902.Instruction.widths[instruction.spec]!.total
-          let bytes = cpu[index..<(index + UInt32(instructionWidth))]
+          let bytes = cpu[index..<(index + LR35902.CartridgeAddress(instructionWidth))]
           let instructionScope = scope(at: cpu.pc, in: bank)
           lineGroup.append(.instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: self), cpu.pc, cpu.bank, instructionScope, bytes))
 
@@ -260,7 +260,7 @@ clean:
                   }
                   assert(argumentValue.hasPrefix("$"), "Can only validate hex values.")
                   if argumentValue.hasPrefix("$") {
-                    let number = Int(UInt16(argumentValue.dropFirst(), radix: 16)!)
+                    let number = Int(LR35902.Address(argumentValue.dropFirst(), radix: 16)!)
                     return !validArgumentValues[argumentNumber]!.contains(number)
                   }
                   return false
@@ -335,7 +335,7 @@ clean:
               let displayableBytes = chunk.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
               let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
               write(line(instruction, address: address, comment: "|\(bytesAsCharacters)|"), fileHandle: fileHandle)
-              address += UInt16(chunk.count)
+              address += LR35902.Address(chunk.count)
             }
           }
 

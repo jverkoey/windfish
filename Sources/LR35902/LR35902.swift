@@ -13,7 +13,7 @@ public final class LR35902 {
   }
   private let cartridge: Data
   var cartridgeSize: CartridgeAddress {
-    return UInt32(cartridge.count)
+    return CartridgeAddress(cartridge.count)
   }
 
   // MARK: - Accessing ROM data
@@ -45,7 +45,7 @@ public final class LR35902 {
   }
 
   public var numberOfBanks: Bank {
-    return UInt8(UInt32(cartridge.count) / LR35902.bankSize)
+    return Bank(CartridgeAddress(cartridge.count) / LR35902.bankSize)
   }
 
   static let bankSize: CartridgeAddress = 0x4000

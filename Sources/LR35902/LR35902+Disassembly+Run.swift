@@ -2,22 +2,22 @@ import Foundation
 
 extension LR35902.Disassembly {
   class Run {
-    let startAddress: UInt16
-    let endAddress: UInt16?
-    let bank: UInt8
+    let startAddress: LR35902.Address
+    let endAddress: LR35902.Address?
+    let bank: LR35902.Bank
 
-    init(from startAddress: UInt16, inBank bank: UInt8, upTo endAddress: UInt16? = nil) {
+    init(from startAddress: LR35902.Address, inBank bank: LR35902.Bank, upTo endAddress: LR35902.Address? = nil) {
       self.startAddress = startAddress
       self.endAddress = endAddress
       self.bank = bank
     }
 
-    var visitedRange: Range<UInt32>?
+    var visitedRange: Range<LR35902.CartridgeAddress>?
 
     var children: [Run] = []
 
     var invocationInstruction: LR35902.Instruction?
-    var invocationAddress: UInt16?
+    var invocationAddress: LR35902.Address?
 
     func hasReachedEnd(with cpu: LR35902) -> Bool {
       if let endAddress = endAddress {

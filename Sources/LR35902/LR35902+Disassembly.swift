@@ -15,7 +15,7 @@ extension LR35902 {
       let numberOfRestartAddresses = 8
       let restartSize = 8
       let rstAddresses = (0..<numberOfRestartAddresses)
-        .map { UInt16($0 * restartSize)..<UInt16($0 * restartSize + restartSize) }
+        .map { Address($0 * restartSize)..<Address($0 * restartSize + restartSize) }
       rstAddresses.forEach {
         setLabel(at: $0.lowerBound, in: 0x00, named: "RST_\($0.lowerBound.hexString)")
         disassemble(range: $0, inBank: 0)
@@ -87,14 +87,14 @@ extension LR35902 {
     // MARK: - Transfers of control
 
     struct TransferOfControl: Hashable {
-      let sourceAddress: UInt16
+      let sourceAddress: Address
       let sourceInstructionSpec: Instruction.Spec
     }
-    func transfersOfControl(at pc: UInt16, in bank: UInt8) -> Set<TransferOfControl>? {
+    func transfersOfControl(at pc: Address, in bank: Bank) -> Set<TransferOfControl>? {
       return transfers[cartAddress(for: pc, in: bank)]
     }
 
-    func registerTransferOfControl(to pc: UInt16, in bank: UInt8, from fromPc: UInt16, spec: Instruction.Spec) {
+    func registerTransferOfControl(to pc: Address, in bank: Bank, from fromPc: Address, spec: Instruction.Spec) {
       let index = cartAddress(for: pc, in: bank)
       let transfer = TransferOfControl(sourceAddress: fromPc, sourceInstructionSpec: spec)
       transfers[index, default: Set()].insert(transfer)
@@ -106,15 +106,15 @@ extension LR35902 {
         labels[index] = RGBDSAssembly.defaultLabel(at: pc, in: bank)
       }
     }
-    private var transfers: [UInt32: Set<TransferOfControl>] = [:]
+    private var transfers: [CartridgeAddress: Set<TransferOfControl>] = [:]
 
     // MARK: - Instructions
 
-    func instruction(at pc: UInt16, in bank: UInt8) -> Instruction? {
+    func instruction(at pc: Address, in bank: Bank) -> Instruction? {
       return instructionMap[cartAddress(for: pc, in: bank)]
     }
 
-    func register(instruction: Instruction, at pc: UInt16, in bank: UInt8) {
+    func register(instruction: Instruction, at pc: Address, in bank: Bank) {
       let address = cartAddress(for: pc, in: bank)
 
       // Avoid overlapping instructions.
@@ -126,14 +126,14 @@ extension LR35902 {
 
       code.insert(integersIn: Int(address)..<(Int(address) + Int(Instruction.widths[instruction.spec]!.total)))
     }
-    var instructionMap: [UInt32: Instruction] = [:]
+    var instructionMap: [CartridgeAddress: Instruction] = [:]
 
     // MARK: - Data segments
 
-    public func setData(at address: UInt16, in bank: UInt8) {
+    public func setData(at address: Address, in bank: Bank) {
       data.insert(Int(cartAddress(for: address, in: bank)))
     }
-    public func setData(at range: Range<UInt16>, in bank: UInt8) {
+    public func setData(at range: Range<Address>, in bank: Bank) {
       let lowerBound = cartAddress(for: range.lowerBound, in: bank)
       let upperBound = cartAddress(for: range.upperBound, in: bank)
       data.insert(integersIn: Int(lowerBound)..<Int(upperBound))
@@ -141,7 +141,7 @@ extension LR35902 {
 
     // MARK: - Text segments
 
-    public func setText(at range: Range<UInt16>, in bank: UInt8) {
+    public func setText(at range: Range<Address>, in bank: Bank) {
       let lowerBound = cartAddress(for: range.lowerBound, in: bank)
       let upperBound = cartAddress(for: range.upperBound, in: bank)
       text.insert(integersIn: Int(lowerBound)..<Int(upperBound))
@@ -149,14 +149,14 @@ extension LR35902 {
 
     // MARK: - Bank changes
 
-    public func bankChange(at pc: UInt16, in bank: UInt8) -> UInt8? {
+    public func bankChange(at pc: Address, in bank: Bank) -> Bank? {
       return bankChanges[cartAddress(for: pc, in: bank)]
     }
 
-    func register(bankChange: UInt8, at pc: UInt16, in bank: UInt8) {
+    func register(bankChange: Bank, at pc: Address, in bank: Bank) {
       bankChanges[cartAddress(for: pc, in: bank)] = bankChange
     }
-    private var bankChanges: [UInt32: UInt8] = [:]
+    private var bankChanges: [CartridgeAddress: Bank] = [:]
 
     // MARK: - Regions
 
@@ -166,7 +166,7 @@ extension LR35902 {
       case data
       case text
     }
-    public func type(of address: UInt16, in bank: UInt8) -> ByteType {
+    public func type(of address: Address, in bank: Bank) -> ByteType {
       let index = Int(cartAddress(for: address, in: bank))
       if code.contains(index) {
         return .code
@@ -185,34 +185,34 @@ extension LR35902 {
 
     // MARK: - Functions
 
-    public func function(startingAt pc: UInt16, in bank: UInt8) -> String? {
+    public func function(startingAt pc: Address, in bank: Bank) -> String? {
       return functions[cartAddress(for: pc, in: bank)]
     }
-    public func scope(at pc: UInt16, in bank: UInt8) -> Set<String> {
+    public func scope(at pc: Address, in bank: Bank) -> Set<String> {
       let address = cartAddress(for: pc, in: bank)
       let intersectingScopes = scopes.filter { iterator in
         iterator.value.contains(Int(address))
       }
       return Set(intersectingScopes.keys)
     }
-    public func contiguousScope(at pc: UInt16, in bank: UInt8) -> String? {
+    public func contiguousScope(at pc: Address, in bank: Bank) -> String? {
       return contiguousScopes[cartAddress(for: pc, in: bank)]
     }
 
-    public func defineFunction(startingAt pc: UInt16, in bank: UInt8, named name: String) {
+    public func defineFunction(startingAt pc: Address, in bank: Bank, named name: String) {
       setLabel(at: pc, in: bank, named: name)
       functions[cartAddress(for: pc, in: bank)] = name
 
-      let upperBound: UInt16 = (bank == 0) ? 0x4000 : 0x8000
+      let upperBound: Address = (bank == 0) ? 0x4000 : 0x8000
       disassemble(range: pc..<upperBound, inBank: bank)
     }
-    private var functions: [UInt32: String] = [:]
-    private var contiguousScopes: [UInt32: String] = [:]
+    private var functions: [CartridgeAddress: String] = [:]
+    private var contiguousScopes: [CartridgeAddress: String] = [:]
     private var scopes: [String: IndexSet] = [:]
 
     // MARK: - Labels
 
-    public func label(at pc: UInt16, in bank: UInt8) -> String? {
+    public func label(at pc: Address, in bank: Bank) -> String? {
       let index = cartAddress(for: pc, in: bank)
       // Don't return labels that point to the middle of instructions.
       if code.contains(Int(index)) && instructionMap[index] == nil {
@@ -221,27 +221,27 @@ extension LR35902 {
       return labels[index]
     }
 
-    public func setLabel(at pc: UInt16, in bank: UInt8, named name: String) {
+    public func setLabel(at pc: Address, in bank: Bank, named name: String) {
       labels[cartAddress(for: pc, in: bank)] = name
     }
-    private var labels: [UInt32: String] = [:]
+    private var labels: [CartridgeAddress: String] = [:]
 
     // MARK: - Globals
 
-    public func createGlobal(at address: UInt16, named name: String) {
+    public func createGlobal(at address: Address, named name: String) {
       globals[address] = name
     }
-    var globals: [UInt16: String] = [:]
+    var globals: [Address: String] = [:]
 
     // MARK: - Comments
 
-    public func preComment(at address: UInt16, in bank: UInt8) -> String? {
+    public func preComment(at address: Address, in bank: Bank) -> String? {
       return preComments[cartAddress(for: address, in: bank)]
     }
-    public func setPreComment(at address: UInt16, in bank: UInt8, text: String) {
+    public func setPreComment(at address: Address, in bank: Bank, text: String) {
       preComments[cartAddress(for: address, in: bank)] = text
     }
-    private var preComments: [UInt32: String] = [:]
+    private var preComments: [CartridgeAddress: String] = [:]
 
     // MARK: - Macros
 
@@ -275,18 +275,18 @@ extension LR35902 {
     public let macroTree = MacroNode()
 
     private struct DisassemblyIntent: Hashable {
-      let bank: UInt8
-      let address: UInt16
+      let bank: Bank
+      let address: Address
     }
 
-    public func disassemble(range: Range<UInt16>, inBank bankInitial: UInt8) {
+    public func disassemble(range: Range<Address>, inBank bankInitial: Bank) {
       var visitedAddresses = IndexSet()
 
       let runQueue = RunQueue()
       let firstRun = Run(from: range.lowerBound, inBank: bankInitial, upTo: range.upperBound)
       runQueue.add(firstRun)
 
-      let queueRun: (Run, UInt16, UInt16, UInt8, Instruction) -> Void = { fromRun, fromAddress, toAddress, bank, instruction in
+      let queueRun: (Run, Address, Address, Bank, Instruction) -> Void = { fromRun, fromAddress, toAddress, bank, instruction in
         let run = Run(from: toAddress, inBank: bank)
         run.invocationInstruction = instruction
         run.invocationAddress = fromAddress
@@ -309,10 +309,10 @@ extension LR35902 {
         cpu.bank = run.bank
         cpu.pc = run.startAddress
 
-        let advance: (UInt16) -> Void = { amount in
+        let advance: (Address) -> Void = { amount in
           let lowerBound = cartAddress(for: self.cpu.pc, in: self.cpu.bank)
-          let instructionRange = Int(lowerBound)..<Int(lowerBound + UInt32(amount))
-          run.visitedRange = UInt32(run.startAddress)..<UInt32(instructionRange.upperBound)
+          let instructionRange = Int(lowerBound)..<Int(lowerBound + CartridgeAddress(amount))
+          run.visitedRange = CartridgeAddress(run.startAddress)..<CartridgeAddress(instructionRange.upperBound)
 
           visitedAddresses.insert(integersIn: instructionRange)
 
@@ -352,8 +352,8 @@ extension LR35902 {
           case 1:
             instruction = Instruction(spec: spec, imm8: cpu[instructionAddress + instructionWidth.opcode, instructionBank])
           case 2:
-            let low = UInt16(cpu[instructionAddress + instructionWidth.opcode, instructionBank])
-            let high = UInt16(cpu[instructionAddress + instructionWidth.opcode + 1, instructionBank]) << 8
+            let low = Address(cpu[instructionAddress + instructionWidth.opcode, instructionBank])
+            let high = Address(cpu[instructionAddress + instructionWidth.opcode + 1, instructionBank]) << 8
             let immediate16 = high | low
             instruction = Instruction(spec: spec, imm16: immediate16)
           default:
@@ -438,28 +438,28 @@ extension LR35902 {
           // Get the first contiguous block of scope.
           if let runScope = runScope.rangeView.first(where: { $0.lowerBound == runStartAddress }) {
             for address in runScope {
-              contiguousScopes[UInt32(address)] = runGroupName
+              contiguousScopes[CartridgeAddress(address)] = runGroupName
             }
 
-            var firstReturnIndex: UInt32? = nil
+            var firstReturnIndex: CartridgeAddress? = nil
 
             runScope.dropFirst().forEach {
-              let index = UInt32($0)
+              let index = CartridgeAddress($0)
               guard labels[index] != nil else {
                 return
               }
               if case .ret = instructionMap[index]?.spec {
                 if let firstReturnIndex = firstReturnIndex {
-                  labels[index] = "\(runGroupName).return_\(UInt16(index % bankSize).hexString)"
-                  labels[firstReturnIndex] = "\(runGroupName).return_\(UInt16(firstReturnIndex % bankSize).hexString)"
+                  labels[index] = "\(runGroupName).return_\(Address(index % bankSize).hexString)"
+                  labels[firstReturnIndex] = "\(runGroupName).return_\(Address(firstReturnIndex % bankSize).hexString)"
                 } else {
                   labels[index] = "\(runGroupName).return"
                   firstReturnIndex = index
                 }
               } else {
-                let bank = UInt8(index / bankSize)
-                let address = index % bankSize + ((bank > 0) ? UInt32(0x4000) : UInt32(0x0000))
-                labels[index] = "\(runGroupName).fn_\(bank.hexString)_\(UInt16(address).hexString)"
+                let bank = Bank(index / bankSize)
+                let address = index % bankSize + CartridgeAddress((bank > 0) ? 0x4000 : 0x0000)
+                labels[index] = "\(runGroupName).fn_\(bank.hexString)_\(Address(address).hexString)"
               }
             }
           }

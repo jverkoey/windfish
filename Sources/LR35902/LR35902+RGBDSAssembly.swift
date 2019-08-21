@@ -60,7 +60,7 @@ public final class RGBDSAssembly {
     return "\(opcode) \(operand)"
   }
 
-  public static func defaultLabel(at pc: UInt16, in bank: UInt8) -> String? {
+  public static func defaultLabel(at pc: LR35902.Address, in bank: LR35902.Bank) -> String? {
     if pc < 0x4000 {
       return "toc_00_\(pc.hexString)"
     } else if pc < 0x8000 {
