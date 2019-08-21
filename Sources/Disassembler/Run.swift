@@ -27,16 +27,16 @@ public struct RunGroup<T: Run> {
   }
 
   /**
-   Returns a composite index set of the ranges visited by the runs in this group.
+   Returns all of the ranges visited by the runs in this group.
+
+   - Note: Runs are not an ideal representation of the call graph because runs intentionally do not recurse on themselves.
+   A more ideal representation for scope calculation would be a legitimiate call graph that annotates, for a given instruction, all
+   of the reachable transfers of control. This graph could then reasonably be walked each time we want to calculate scope.
    */
   public func scope() -> IndexSet {
-    var scope = IndexSet()
-    runs.forEach { run in
-      if let visitedRange = run.visitedRange {
-        scope.insert(integersIn: Int(visitedRange.lowerBound)..<Int(visitedRange.upperBound))
-      }
+    return runs.compactMap { $0.visitedRange }.reduce(into: IndexSet()) { (accumulator, visitedRange) in
+      accumulator.insert(integersIn: Int(visitedRange.lowerBound)..<Int(visitedRange.upperBound))
     }
-    return scope
   }
 }
 
