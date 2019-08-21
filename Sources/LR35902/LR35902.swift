@@ -30,8 +30,10 @@ public final class LR35902 {
   /// - Parameter pc: The program counter's location.
   /// - Parameter bank: The current bank.
   public static func cartAddress(for pc: Address, in bank: Bank) -> CartridgeAddress? {
-    guard pc <= 0x8000 else {
-      return nil // Anything above 0x8000 is not addressable from the cartridge.
+    // Bank 0 is permanently addressable from 0x0000...0x3FFF.
+    // All other banks map from 0x4000...0x7FFF
+    guard (bank == 0 && pc < 0x4000) || (bank > 0 && pc < 0x8000) else {
+      return nil
     }
     if pc < 0x4000 {
       return CartridgeAddress(pc)
