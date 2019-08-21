@@ -283,7 +283,7 @@ extension LR35902 {
     public func disassemble(range: Range<Address>, inBank bankInitial: Bank) {
       var visitedAddresses = IndexSet()
 
-      let runQueue = Disassembler.Queue<LR35902.Disassembly.Run>()
+      var runQueue = Disassembler.Queue<LR35902.Disassembly.Run>()
       let firstRun = Run(from: range.lowerBound, inBank: bankInitial, upTo: range.upperBound)
       runQueue.add(firstRun)
 

@@ -1,21 +1,21 @@
 import Foundation
 
-public class Queue<T> {
+public struct Queue<T> {
   public init() {
   }
 
-  public func add(_ run: T) {
-    runQueue.append(run)
+  public mutating func add(_ run: T) {
+    queue.append(run)
   }
 
-  public func dequeue() -> T {
-    return runQueue.removeFirst()
+  public mutating func dequeue() -> T {
+    return queue.removeFirst()
   }
 
   public var isEmpty: Bool {
-    return runQueue.isEmpty
+    return queue.isEmpty
   }
 
   // TODO: Explore more optimal queue structures.
-  private var runQueue: [T] = []
+  private var queue: [T] = []
 }
