@@ -320,7 +320,7 @@ extension LR35902 {
         }
 
         var previousInstruction: Instruction? = nil
-        linear_sweep: while !run.hasReachedEnd(with: cpu) {
+        linear_sweep: while !run.hasReachedEnd(with: cpu) && cpu.pcIsValid() {
           let byte = Int(cpu[cpu.pc, cpu.bank])
 
           var spec = Instruction.table[byte]

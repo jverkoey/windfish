@@ -23,7 +23,7 @@ extension LR35902.Disassembly {
       if let endAddress = endAddress {
         return cpu.pc >= endAddress
       }
-      return !cpu.pcIsValid()
+      return false
     }
 
     /**
