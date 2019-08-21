@@ -18,7 +18,6 @@ extension LR35902.Disassembly {
     var children: [Run] = []
 
     var invocationInstruction: LR35902.Instruction?
-    var invocationAddress: LR35902.Address?
 
     func hasReachedEnd(with cpu: LR35902) -> Bool {
       if let endAddress = endAddress {

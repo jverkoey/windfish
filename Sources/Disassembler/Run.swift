@@ -15,7 +15,6 @@ public final class Run<TAddress: BinaryInteger, TInstruction: Instruction> {
   var children: [Run] = []
 
   var invocationInstruction: TInstruction?
-  var invocationAddress: TAddress?
 
   /**
    Breaks this run apart into logical call groups.
