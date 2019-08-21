@@ -1,35 +1,39 @@
 import Foundation
 
 public final class LR35902 {
-  public var pc: UInt16 = 0
-  public var bank: UInt8 = 0
+  public typealias Address = UInt16
+  public typealias Bank = UInt8
+  public typealias CartridgeAddress = UInt32
 
-  public init(rom: Data) {
-    self.rom = rom
+  public var pc: Address = 0
+  public var bank: Bank = 0
+
+  public init(cartridge: Data) {
+    self.cartridge = cartridge
   }
-  private let rom: Data
-  var romSize: UInt32 {
-    return UInt32(rom.count)
+  private let cartridge: Data
+  var cartridgeSize: CartridgeAddress {
+    return UInt32(cartridge.count)
   }
 
   // MARK: - Accessing ROM data
 
-  public subscript(pc: UInt16, bank: UInt8) -> UInt8 {
-    return rom[Int(LR35902.romAddress(for: pc, in: bank))]
+  public subscript(pc: Address, bank: Bank) -> UInt8 {
+    return cartridge[Int(LR35902.cartAddress(for: pc, in: bank))]
   }
 
-  public subscript(range: Range<UInt32>) -> Data {
-    return rom[range]
+  public subscript(range: Range<CartridgeAddress>) -> Data {
+    return cartridge[range]
   }
 
-  /// Returns a ROM address for the given program counter and bank.
+  /// Returns a cartridge address for the given program counter and bank.
   /// - Parameter pc: The program counter's location.
   /// - Parameter bank: The current bank.
-  public static func romAddress(for pc: UInt16, in bank: UInt8) -> UInt32 {
+  public static func cartAddress(for pc: Address, in bank: Bank) -> CartridgeAddress {
     if pc < 0x4000 {
-      return UInt32(pc)
+      return CartridgeAddress(pc)
     } else {
-      return UInt32(bank) * bankSize + UInt32(pc - 0x4000)
+      return CartridgeAddress(bank) * bankSize + CartridgeAddress(pc - 0x4000)
     }
   }
 
@@ -37,12 +41,12 @@ public final class LR35902 {
     return
       ((bank == 0 && pc < 0x4000)
         || (bank != 0 && pc < 0x8000))
-        && LR35902.romAddress(for: pc, in: bank) < romSize
+        && LR35902.cartAddress(for: pc, in: bank) < cartridgeSize
   }
 
-  public var numberOfBanks: UInt8 {
-    return UInt8(UInt32(rom.count) / LR35902.bankSize)
+  public var numberOfBanks: Bank {
+    return UInt8(UInt32(cartridge.count) / LR35902.bankSize)
   }
 
-  static let bankSize: UInt32 = 0x4000
+  static let bankSize: CartridgeAddress = 0x4000
 }
