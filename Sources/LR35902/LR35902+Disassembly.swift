@@ -343,11 +343,10 @@ extension LR35902 {
         cpu.pc = LR35902.addressAndBank(from: run.cartStartAddress).address
 
         let advance: (Address) -> Void = { amount in
-          let lowerBound = cartAddress(for: self.cpu.pc, in: self.cpu.bank)!
-          let instructionRange = Int(lowerBound)..<Int(lowerBound + CartridgeAddress(amount))
-          run.visitedRange = CartridgeAddress(run.startAddress)..<CartridgeAddress(instructionRange.upperBound)
+          let currentCartAddress = cartAddress(for: self.cpu.pc, in: self.cpu.bank)!
+          run.visitedRange = run.cartStartAddress..<(currentCartAddress + CartridgeAddress(amount))
 
-          visitedAddresses.insert(integersIn: instructionRange)
+          visitedAddresses.insert(integersIn: Int(currentCartAddress)..<Int(currentCartAddress + CartridgeAddress(amount)))
 
           self.cpu.pc += amount
         }
