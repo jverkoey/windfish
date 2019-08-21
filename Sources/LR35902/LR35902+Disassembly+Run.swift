@@ -1,7 +1,8 @@
 import Foundation
+import Disassembler
 
 extension LR35902.Disassembly {
-  class Run {
+  class Run: Disassembler.Run {
     let startAddress: LR35902.Address
     let endAddress: LR35902.Address?
     let bank: LR35902.Bank

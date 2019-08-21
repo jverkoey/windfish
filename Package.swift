@@ -20,7 +20,7 @@ let package = Package(
 
     .target(
       name: "LR35902",
-      dependencies: ["FixedWidthInteger", "AssemblyGenerator", "CPU"]),
+      dependencies: ["FixedWidthInteger", "AssemblyGenerator", "CPU", "Disassembler"]),
 
     .target(
       name: "AssemblyGenerator",
@@ -36,6 +36,10 @@ let package = Package(
     .testTarget(
       name: "CPUTests",
       dependencies: ["CPU"]),
+
+    .target(
+      name: "Disassembler",
+      dependencies: []),
   ]
 )
 
