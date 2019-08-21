@@ -169,9 +169,13 @@ extension LR35902 {
       case code
       case data
       case text
+      case ram
     }
     public func type(of address: Address, in bank: Bank) -> ByteType {
-      let index = Int(cartAddress(for: address, in: bank)!)
+      guard let cartAddress = cartAddress(for: address, in: bank) else {
+        return .ram
+      }
+      let index = Int(cartAddress)
       if code.contains(index) {
         return .code
       } else if data.contains(index) {
@@ -190,22 +194,34 @@ extension LR35902 {
     // MARK: - Functions
 
     public func function(startingAt pc: Address, in bank: Bank) -> String? {
-      return functions[cartAddress(for: pc, in: bank)!]
+      guard let cartAddress = cartAddress(for: pc, in: bank) else {
+        return nil
+      }
+      return functions[cartAddress]
     }
     public func scope(at pc: Address, in bank: Bank) -> Set<String> {
-      let address = cartAddress(for: pc, in: bank)!
+      guard let cartAddress = cartAddress(for: pc, in: bank) else {
+        return Set()
+      }
       let intersectingScopes = scopes.filter { iterator in
-        iterator.value.contains(Int(address))
+        iterator.value.contains(Int(cartAddress))
       }
       return Set(intersectingScopes.keys)
     }
     public func contiguousScope(at pc: Address, in bank: Bank) -> String? {
-      return contiguousScopes[cartAddress(for: pc, in: bank)!]
+      guard let cartAddress = cartAddress(for: pc, in: bank) else {
+        return nil
+      }
+      return contiguousScopes[cartAddress]
     }
 
     public func defineFunction(startingAt pc: Address, in bank: Bank, named name: String) {
+      guard let cartAddress = cartAddress(for: pc, in: bank) else {
+        preconditionFailure("Attempting to set label in non-cart addressable location.")
+      }
+
       setLabel(at: pc, in: bank, named: name)
-      functions[cartAddress(for: pc, in: bank)!] = name
+      functions[cartAddress] = name
 
       let upperBound: Address = (bank == 0) ? 0x4000 : 0x8000
       disassemble(range: pc..<upperBound, inBank: bank)
@@ -228,7 +244,10 @@ extension LR35902 {
     }
 
     public func setLabel(at pc: Address, in bank: Bank, named name: String) {
-      labels[cartAddress(for: pc, in: bank)!] = name
+      guard let cartAddress = cartAddress(for: pc, in: bank) else {
+        preconditionFailure("Attempting to set label in non-cart addressable location.")
+      }
+      labels[cartAddress] = name
     }
     private var labels: [CartridgeAddress: String] = [:]
 
@@ -242,10 +261,16 @@ extension LR35902 {
     // MARK: - Comments
 
     public func preComment(at address: Address, in bank: Bank) -> String? {
-      return preComments[cartAddress(for: address, in: bank)!]
+      guard let cartAddress = cartAddress(for: address, in: bank) else {
+        return nil
+      }
+      return preComments[cartAddress]
     }
     public func setPreComment(at address: Address, in bank: Bank, text: String) {
-      preComments[cartAddress(for: address, in: bank)!] = text
+      guard let cartAddress = cartAddress(for: address, in: bank) else {
+        preconditionFailure("Attempting to set pre-comment in non-cart addressable location.")
+      }
+      preComments[cartAddress] = text
     }
     private var preComments: [CartridgeAddress: String] = [:]
 
