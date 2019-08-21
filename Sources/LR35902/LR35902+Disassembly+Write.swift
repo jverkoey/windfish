@@ -32,14 +32,14 @@ extension FileManager {
   }
 }
 
-private func extractArgs(from statement: RGBDSAssembly.Statement, using spec: LR35902.InstructionSpec) -> [Int: String] {
+private func extractArgs(from statement: RGBDSAssembly.Statement, using spec: LR35902.Instruction.Spec) -> [Int: String] {
   var args: [Int: String] = [:]
   spec.visit { (operand, index) in
     guard let operand = operand, let index = index else {
       return
     }
 
-    if case let LR35902.Numeric.arg(argumentNumber) = operand {
+    if case let LR35902.Instruction.Numeric.arg(argumentNumber) = operand {
       args[argumentNumber] = Mirror(reflecting: statement).descendant(1, 0, index) as? String
     }
   }
@@ -183,7 +183,7 @@ clean:
 
           // Write the instruction as assembly.
           let index = LR35902.romAddress(for: cpu.pc, in: bank)
-          let instructionWidth = LR35902.instructionWidths[instruction.spec]!.total
+          let instructionWidth = LR35902.Instruction.widths[instruction.spec]!.total
           let bytes = cpu[index..<(index + UInt32(instructionWidth))]
           let instructionScope = scope(at: cpu.pc, in: bank)
           lineGroup.append(.instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: self), cpu.pc, cpu.bank, instructionScope, bytes))

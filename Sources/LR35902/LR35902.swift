@@ -29,7 +29,7 @@ public final class LR35902 {
     if pc < 0x4000 {
       return UInt32(pc)
     } else {
-      return UInt32(bank) * LR35902.bankSize + UInt32(pc - 0x4000)
+      return UInt32(bank) * bankSize + UInt32(pc - 0x4000)
     }
   }
 

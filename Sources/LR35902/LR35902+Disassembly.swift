@@ -88,15 +88,15 @@ extension LR35902 {
 
     struct TransferOfControl: Hashable {
       let sourceAddress: UInt16
-      let sourceInstructionSpec: InstructionSpec
+      let sourceInstructionSpec: Instruction.Spec
     }
     func transfersOfControl(at pc: UInt16, in bank: UInt8) -> Set<TransferOfControl>? {
       return transfers[romAddress(for: pc, in: bank)]
     }
 
-    func registerTransferOfControl(to pc: UInt16, in bank: UInt8, from fromPc: UInt16, instructionSpec: InstructionSpec) {
+    func registerTransferOfControl(to pc: UInt16, in bank: UInt8, from fromPc: UInt16, spec: Instruction.Spec) {
       let index = romAddress(for: pc, in: bank)
-      let transfer = TransferOfControl(sourceAddress: fromPc, sourceInstructionSpec: instructionSpec)
+      let transfer = TransferOfControl(sourceAddress: fromPc, sourceInstructionSpec: spec)
       transfers[index, default: Set()].insert(transfer)
 
       // Create a label if one doesn't exist.
@@ -124,7 +124,7 @@ extension LR35902 {
 
       instructionMap[address] = instruction
 
-      code.insert(integersIn: Int(address)..<(Int(address) + Int(LR35902.instructionWidths[instruction.spec]!.total)))
+      code.insert(integersIn: Int(address)..<(Int(address) + Int(Instruction.widths[instruction.spec]!.total)))
     }
     var instructionMap: [UInt32: Instruction] = [:]
 
@@ -246,12 +246,12 @@ extension LR35902 {
     // MARK: - Macros
 
     public enum MacroLine: Hashable {
-      case any(InstructionSpec)
+      case any(Instruction.Spec)
       case instruction(Instruction)
     }
     public func defineMacro(named name: String,
                             instructions: [MacroLine],
-                            code: [InstructionSpec],
+                            code: [Instruction.Spec],
                             validArgumentValues: [Int: IndexSet]) {
       let leaf = instructions.reduce(macroTree, { node, spec in
         let child = node.children[spec, default: MacroNode()]
@@ -267,7 +267,7 @@ extension LR35902 {
     public class MacroNode {
       var children: [MacroLine: MacroNode] = [:]
       var macro: String?
-      var code: [InstructionSpec]?
+      var code: [Instruction.Spec]?
       var macroLines: [MacroLine]?
       var validArgumentValues: [Int: IndexSet]?
       var hasWritten = false
@@ -286,7 +286,7 @@ extension LR35902 {
       let firstRun = Run(from: range.lowerBound, inBank: bankInitial, upTo: range.upperBound, function: function)
       runQueue.add(firstRun)
 
-      let queueRun: (Run, UInt16, UInt16, UInt8, LR35902.Instruction) -> Void = { fromRun, fromAddress, toAddress, bank, instruction in
+      let queueRun: (Run, UInt16, UInt16, UInt8, Instruction) -> Void = { fromRun, fromAddress, toAddress, bank, instruction in
         let run = Run(from: toAddress, inBank: bank)
         run.invocationInstruction = instruction
         run.invocationAddress = fromAddress
@@ -295,13 +295,13 @@ extension LR35902 {
 
         fromRun.children.append(run)
 
-        self.registerTransferOfControl(to: toAddress, in: bank, from: fromAddress, instructionSpec: instruction.spec)
+        self.registerTransferOfControl(to: toAddress, in: bank, from: fromAddress, spec: instruction.spec)
       }
 
       while !runQueue.isEmpty {
         let run = runQueue.dequeue()
 
-        if visitedAddresses.contains(Int(LR35902.romAddress(for: run.startAddress, in: run.bank))) {
+        if visitedAddresses.contains(Int(romAddress(for: run.startAddress, in: run.bank))) {
           // We've already visited this instruction, so we can skip it.
           continue
         }
@@ -311,7 +311,7 @@ extension LR35902 {
         cpu.pc = run.startAddress
 
         let advance: (UInt16) -> Void = { amount in
-          let lowerBound = LR35902.romAddress(for: self.cpu.pc, in: self.cpu.bank)
+          let lowerBound = romAddress(for: self.cpu.pc, in: self.cpu.bank)
           let instructionRange = Int(lowerBound)..<Int(lowerBound + UInt32(amount))
           run.visitedRange = UInt32(run.startAddress)..<UInt32(instructionRange.upperBound)
 
@@ -324,7 +324,7 @@ extension LR35902 {
         linear_sweep: while !run.hasReachedEnd(with: cpu) {
           let byte = Int(cpu[cpu.pc, cpu.bank])
 
-          var spec = LR35902.instructionTable[byte]
+          var spec = Instruction.table[byte]
 
           switch spec {
           case .invalid:
@@ -333,7 +333,7 @@ extension LR35902 {
 
           case .cb:
             let byteCB = Int(cpu[cpu.pc + 1, cpu.bank])
-            let cbInstruction = LR35902.instructionTableCB[byteCB]
+            let cbInstruction = Instruction.tableCB[byteCB]
             if case .invalid = spec {
               advance(2)
               continue
@@ -344,7 +344,7 @@ extension LR35902 {
             break
           }
 
-          let instructionWidth = LR35902.instructionWidths[spec]!
+          let instructionWidth = Instruction.widths[spec]!
 
           let instructionAddress = cpu.pc
           let instructionBank = cpu.bank
@@ -432,7 +432,7 @@ extension LR35902 {
 
         // If the scope has a name, then map the scope and labels to that name.
         let entryRun = runGroup.first!
-        let runStartAddress = LR35902.romAddress(for: entryRun.startAddress, in: entryRun.bank)
+        let runStartAddress = romAddress(for: entryRun.startAddress, in: entryRun.bank)
         if let runGroupName = labels[runStartAddress] {
           scopes[runGroupName, default: IndexSet()].formUnion(runScope)
 
@@ -451,15 +451,15 @@ extension LR35902 {
               }
               if case .ret = instructionMap[index]?.spec {
                 if let firstReturnIndex = firstReturnIndex {
-                  labels[index] = "\(runGroupName).return_\(UInt16(index % LR35902.bankSize).hexString)"
-                  labels[firstReturnIndex] = "\(runGroupName).return_\(UInt16(firstReturnIndex % LR35902.bankSize).hexString)"
+                  labels[index] = "\(runGroupName).return_\(UInt16(index % bankSize).hexString)"
+                  labels[firstReturnIndex] = "\(runGroupName).return_\(UInt16(firstReturnIndex % bankSize).hexString)"
                 } else {
                   labels[index] = "\(runGroupName).return"
                   firstReturnIndex = index
                 }
               } else {
-                let bank = UInt8(index / LR35902.bankSize)
-                let address = index % LR35902.bankSize + ((bank > 0) ? UInt32(0x4000) : UInt32(0x0000))
+                let bank = UInt8(index / bankSize)
+                let address = index % bankSize + ((bank > 0) ? UInt32(0x4000) : UInt32(0x0000))
                 labels[index] = "\(runGroupName).fn_\(bank.hexString)_\(UInt16(address).hexString)"
               }
             }

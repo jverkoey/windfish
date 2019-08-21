@@ -1,9 +1,9 @@
 import Foundation
 import CPU
 
-extension LR35902 {
+extension LR35902.Instruction {
   /// The specification for an LR35902's instruction set.
-  public indirect enum InstructionSpec: CPUInstructionSpec {
+  public indirect enum Spec: CPUInstructionSpec {
     public typealias WidthType = UInt16
 
     // Loads
@@ -50,7 +50,7 @@ extension LR35902 {
     case cpl
 
     // 0xCB prefix
-    case cb(InstructionSpec)
+    case cb(Spec)
     case rlc(Numeric), rrc(Numeric)
     case rl(Numeric), rr(Numeric)
     case sla(Numeric), sra(Numeric)

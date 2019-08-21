@@ -426,7 +426,7 @@ class RGBDAssembler: XCTestCase {
   }
 
   func test_allInstructions() throws {
-    for spec in LR35902.instructionTable {
+    for spec in LR35902.Instruction.table {
       guard spec != .invalid else {
         continue
       }
@@ -454,7 +454,7 @@ class RGBDAssembler: XCTestCase {
       XCTAssertEqual(disassembly.instructionMap[0x0000]?.spec, spec)
     }
 
-    for spec in LR35902.instructionTableCB {
+    for spec in LR35902.Instruction.tableCB {
       guard spec != .invalid else {
         continue
       }
