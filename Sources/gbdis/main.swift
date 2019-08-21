@@ -30,6 +30,7 @@ disassembly.defineFunction(startingAt: 0x40CE, in: 0x01, named: "LCDOn")
 disassembly.defineFunction(startingAt: 0x46DD, in: 0x01, named: "InitSave")
 disassembly.defineFunction(startingAt: 0x460F, in: 0x01, named: "InitSaves")
 disassembly.defineFunction(startingAt: 0x7D19, in: 0x01, named: "CopyDMATransferToHRAM")
+disassembly.defineFunction(startingAt: 0x7D27, in: 0x01, named: "DMATransfer")
 
 
 disassembly.defineMacro(named: "callcb", instructions: [
