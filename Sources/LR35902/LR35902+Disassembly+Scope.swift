@@ -10,24 +10,24 @@ extension LR35902.Disassembly {
         continue
       }
 
-      let runScope = runGroup.scope()
-      if runScope.isEmpty {
+      let scope = runGroup.scope()
+      if scope.isEmpty {
         continue
       }
 
       let runStartAddress = firstRun.startAddress
       if let runGroupName = labels[runStartAddress] {
-        scopes[runGroupName, default: IndexSet()].formUnion(runScope)
+        expandScope(forLabel: runGroupName, scope: scope)
 
         // Get the first contiguous block of scope.
-        if let runScope = runScope.rangeView.first(where: { $0.lowerBound == runStartAddress }) {
-          for address in runScope {
+        if let contiguousScope = scope.rangeView.first(where: { $0.lowerBound == runStartAddress }) {
+          for address in contiguousScope {
             contiguousScopes[LR35902.CartridgeAddress(address)] = runGroupName
           }
 
           var firstReturnIndex: LR35902.CartridgeAddress? = nil
 
-          runScope.dropFirst().forEach {
+          contiguousScope.dropFirst().forEach {
             let index = LR35902.CartridgeAddress($0)
             guard labels[index] != nil else {
               return

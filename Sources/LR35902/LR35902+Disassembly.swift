@@ -227,8 +227,12 @@ extension LR35902 {
       disassemble(range: pc..<upperBound, inBank: bank)
     }
     private var functions: [CartridgeAddress: String] = [:]
+
+    func expandScope(forLabel label: String, scope: IndexSet) {
+      scopes[label, default: IndexSet()].formUnion(scope)
+    }
     var contiguousScopes: [CartridgeAddress: String] = [:]
-    var scopes: [String: IndexSet] = [:]
+    private var scopes: [String: IndexSet] = [:]
 
     // MARK: - Labels
 
