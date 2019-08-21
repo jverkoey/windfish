@@ -13,7 +13,7 @@ extension LR35902.Instruction.Numeric {
     case .imm16addr, .ffimm8addr:
       return .address
     case .sp_plus_simm8:
-      return .specific("sp+#")
+      return .stackPointerOffset
     case .imm8, .simm8, .imm16:
       return .numeric
     default:

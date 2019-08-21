@@ -72,6 +72,11 @@ public enum CPUInstructionOperandRepresentation {
   case address
 
   /**
+   A stack pointer offset representation.
+   */
+  case stackPointerOffset
+
+  /**
    A specific representation.
    */
   case specific(String)

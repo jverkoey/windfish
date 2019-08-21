@@ -7,30 +7,26 @@ extension CPUInstructionSpec {
   public var representation: String {
     var operands: [String] = []
     visit { (value, _) in
-      guard let value = value else {
+      // Optional operands are provided by the visitor as boxed optional types represented as an Any.
+      // We can't cast an Any to an Any? using the as? operator, so perform an explicit Optional-type unboxing instead:
+      guard let valueUnboxed = value,
+        case Optional<Any>.some(let value) = valueUnboxed else {
         return
       }
 
-      // Optional operands are provided by the visitor as boxed optional types represented as an Any.
-      // We can't cast an Any to an Any? using the as? operator, so perform an explicit Optional-type unboxing instead:
-      var unboxedValue: Any
-      if case Optional<Any>.some(let unboxed) = value {
-        unboxedValue = unboxed
-      } else {
-        unboxedValue = value
-      }
-
-      if let representable = unboxedValue as? CPUInstructionOperandRepresentable {
+      if let representable = value as? CPUInstructionOperandRepresentable {
         switch representable.representation {
         case .numeric:
           operands.append("#")
         case .address:
           operands.append("[#]")
+        case .stackPointerOffset:
+          operands.append("sp+#")
         case let .specific(string):
           operands.append(string)
         }
       } else {
-        operands.append("\(unboxedValue)")
+        operands.append("\(value)")
       }
     }
     var representationParts = [opcode]
