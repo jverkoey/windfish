@@ -5,6 +5,7 @@ public protocol Run {
   associatedtype AddressT: BinaryInteger
   associatedtype InstructionT: Instruction
 
+  var startAddress: AddressT { get }
   var visitedRange: Range<AddressT>? { get }
 
   var invocationInstruction: InstructionT? { get }
@@ -15,7 +16,7 @@ public protocol Run {
   var children: [Self] { get }
 }
 
-public struct RunGroup<T: Run> {
+public final class RunGroup<T: Run> {
   init(runs: [T]) {
     self.runs = runs
   }
@@ -27,17 +28,36 @@ public struct RunGroup<T: Run> {
   }
 
   /**
+   The run group's starting address.
+   */
+  public lazy var startAddress: T.AddressT? = {
+    guard let firstRun = runs.first else {
+      return nil
+    }
+    return firstRun.startAddress
+  }()
+
+  /**
    Returns all of the ranges visited by the runs in this group.
 
    - Note: Runs are not an ideal representation of the call graph because runs intentionally do not recurse on themselves.
    A more ideal representation for scope calculation would be a legitimiate call graph that annotates, for a given instruction, all
    of the reachable transfers of control. This graph could then reasonably be walked each time we want to calculate scope.
    */
-  public func scope() -> IndexSet {
+  public lazy var scope: IndexSet = {
     return runs.compactMap { $0.visitedRange }.reduce(into: IndexSet()) { (accumulator, visitedRange) in
       accumulator.insert(integersIn: Int(visitedRange.lowerBound)..<Int(visitedRange.upperBound))
     }
-  }
+  }()
+
+  public lazy var firstContiguousScopeRange: Range<T.AddressT>? = {
+    guard let startAddress = startAddress,
+      let range = scope.rangeView.first(where: { $0.lowerBound == Int(startAddress) }) else {
+      return nil
+    }
+    return Range<T.AddressT>(uncheckedBounds: (T.AddressT(range.lowerBound),
+                                               T.AddressT(range.upperBound)))
+  }()
 }
 
 extension Run {
