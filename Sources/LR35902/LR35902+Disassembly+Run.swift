@@ -14,7 +14,6 @@ extension LR35902.Disassembly {
 
     var visitedRange: Range<UInt32>?
 
-    weak var parent: Run? = nil
     var children: [Run] = []
 
     var invocationInstruction: LR35902.Instruction?

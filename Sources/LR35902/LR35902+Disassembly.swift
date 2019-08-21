@@ -290,7 +290,6 @@ extension LR35902 {
         let run = Run(from: toAddress, inBank: bank)
         run.invocationInstruction = instruction
         run.invocationAddress = fromAddress
-        run.parent = fromRun
         runQueue.add(run)
 
         fromRun.children.append(run)
