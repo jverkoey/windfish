@@ -1,26 +1,25 @@
 import Foundation
 import CPU
 
-public final class Run<TAddress: BinaryInteger, TInstruction: Instruction> {
-  let startAddress: TAddress
-  let endAddress: TAddress?
+public protocol Run {
+  associatedtype InstructionT: Instruction
 
-  public init(from startAddress: TAddress, upTo endAddress: TAddress? = nil) {
-    self.startAddress = startAddress
-    self.endAddress = endAddress
-  }
-
-  var visitedRange: Range<TAddress>?
-
-  var children: [Run] = []
-
-  var invocationInstruction: TInstruction?
+  var invocationInstruction: InstructionT? { get }
 
   /**
-   Breaks this run apart into logical call groups.
+   Runs that were invoked within this run via a control transfer.
    */
-  func runGroups() -> [[Run]] {
-    var runGroups: [[Run]] = []
+  var children: [Self] { get }
+}
+
+extension Run {
+  /**
+   Breaks this run apart into call groups.
+
+   - Returns: a collection of arrays of Runs, where each array of Runs is part of a single call invocation.
+   */
+  public func runGroups() -> [[Self]] {
+    var runGroups: [[Self]] = []
 
     var sanityCheckSeenRuns = 0
 

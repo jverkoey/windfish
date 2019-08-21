@@ -2,14 +2,14 @@ import Foundation
 import Disassembler
 
 extension LR35902.Disassembly {
-  class Run {
+  final class Run: Disassembler.Run {
     let cartStartAddress: LR35902.CartridgeAddress
     let endAddress: LR35902.CartridgeAddress?
     let initialBank: LR35902.Bank
 
     init(from startAddress: LR35902.Address, initialBank: LR35902.Bank, upTo endAddress: LR35902.Address? = nil) {
       self.cartStartAddress = LR35902.cartAddress(for: startAddress, in: initialBank)!
-      if let endAddress = endAddress {
+      if let endAddress = endAddress, endAddress > 0 {
         self.endAddress = LR35902.cartAddress(for: endAddress - 1, in: initialBank)!
       } else {
         self.endAddress = nil
@@ -28,45 +28,6 @@ extension LR35902.Disassembly {
         return cpu.pc > LR35902.addressAndBank(from: endAddress).address
       }
       return false
-    }
-
-    /**
-     Breaks this run apart into logical call groups.
-     */
-    func runGroups() -> [[Run]] {
-      var runGroups: [[Run]] = []
-
-      var sanityCheckSeenRuns = 0
-
-      var runGroupQueue = [self]
-      while !runGroupQueue.isEmpty {
-        let run = runGroupQueue.removeFirst()
-        var runGroup = [run]
-
-        sanityCheckSeenRuns += 1
-
-        var descendantQueue = run.children
-        while !descendantQueue.isEmpty {
-          let descendant = descendantQueue.removeFirst()
-          if case .call = descendant.invocationInstruction?.spec.category {
-            // Calls mark the start of a new run group.
-            runGroupQueue.append(descendant)
-          } else {
-            // Everything else is part of the current group...
-            runGroup.append(descendant)
-            // ...including any of its descendants.
-            descendantQueue.append(contentsOf: descendant.children)
-
-            sanityCheckSeenRuns += 1
-          }
-        }
-
-        runGroups.append(runGroup)
-      }
-
-      assert(sanityCheckSeenRuns == (runGroups.reduce(0) { $0 + $1.count }))
-
-      return runGroups
     }
   }
 }
