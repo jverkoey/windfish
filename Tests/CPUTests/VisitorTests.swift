@@ -11,6 +11,10 @@ struct TestInstruction: Instruction {
     case sub(Spec)
 
     typealias WidthType = UInt16
+
+    var category: InstructionCategory? {
+      return nil
+    }
   }
 
   enum Operand: Equatable, InstructionOperandAssemblyRepresentable {

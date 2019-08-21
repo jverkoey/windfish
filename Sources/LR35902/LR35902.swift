@@ -33,6 +33,13 @@ public final class LR35902 {
     }
   }
 
+  func pcIsValid() -> Bool {
+    return
+      ((bank == 0 && pc < 0x4000)
+        || (bank != 0 && pc < 0x8000))
+        && LR35902.romAddress(for: pc, in: bank) < romSize
+  }
+
   public var numberOfBanks: UInt8 {
     return UInt8(UInt32(rom.count) / LR35902.bankSize)
   }

@@ -22,6 +22,11 @@ public protocol InstructionSpec: Hashable {
   var opcode: String { get }
 
   /**
+   The category this instruction's opcode falls under, if any.
+   */
+  var category: InstructionCategory? { get }
+
+  /**
    An abstract representation of this instruction in assembly.
 
    The following wildcards are permitted:
@@ -29,6 +34,10 @@ public protocol InstructionSpec: Hashable {
    - #: Any numeric value.
    */
   var representation: String { get }
+}
+
+public enum InstructionCategory {
+  case call
 }
 
 /**

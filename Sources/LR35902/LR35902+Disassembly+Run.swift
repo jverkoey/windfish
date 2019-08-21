@@ -21,52 +21,47 @@ extension LR35902.Disassembly {
     var invocationAddress: UInt16?
 
     func hasReachedEnd(with cpu: LR35902) -> Bool {
-      let pc = cpu.pc
-      let bank = cpu.bank
       if let endAddress = endAddress {
         return cpu.pc >= endAddress
       }
-      return
-        (bank == 0 && pc >= 0x4000)
-        || (bank != 0 && pc >= 0x8000)
-        || LR35902.romAddress(for: cpu.pc, in: cpu.bank) >= cpu.romSize
+      return !cpu.pcIsValid()
     }
 
     /**
-     Break runs apart into logical call groups.
+     Breaks this run apart into logical call groups.
      */
     func runGroups() -> [[Run]] {
       var runGroups: [[Run]] = []
 
-      // Runs that are the beginning of a call group.
-      var seenRuns = 0
+      var sanityCheckSeenRuns = 0
+
       var runGroupQueue = [self]
       while !runGroupQueue.isEmpty {
         let run = runGroupQueue.removeFirst()
         var runGroup = [run]
-        seenRuns += 1
+
+        sanityCheckSeenRuns += 1
 
         var descendantQueue = run.children
         while !descendantQueue.isEmpty {
           let descendant = descendantQueue.removeFirst()
-          if case .call = descendant.invocationInstruction?.spec {
-            // Calls mark the start of new run groups.
+          if case .call = descendant.invocationInstruction?.spec.category {
+            // Calls mark the start of a new run group.
             runGroupQueue.append(descendant)
           } else {
-            // Everything else is part of the current group.
+            // Everything else is part of the current group...
             runGroup.append(descendant)
-            seenRuns += 1
-
-            // Including any of its descendants.
+            // ...including any of its descendants.
             descendantQueue.append(contentsOf: descendant.children)
+
+            sanityCheckSeenRuns += 1
           }
         }
 
         runGroups.append(runGroup)
       }
 
-      // Sanity check that we didn't miss a run.
-      assert(seenRuns == (runGroups.reduce(0) { $0 + $1.count }))
+      assert(sanityCheckSeenRuns == (runGroups.reduce(0) { $0 + $1.count }))
 
       return runGroups
     }
