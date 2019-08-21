@@ -65,4 +65,22 @@ class AddressConversionTests: XCTestCase {
     XCTAssertEqual(addressAndBank.bank, 0)
     XCTAssertEqual(cartAddress, 0x2000)
   }
+
+  func testAddressAndBankEndOfBank0() throws {
+    let addressAndBank = LR35902.addressAndBank(from: 0x3FFF)
+    XCTAssertEqual(addressAndBank.address, 0x3FFF)
+    XCTAssertEqual(addressAndBank.bank, 0)
+  }
+
+  func testAddressAndBankBeginningOfBank1() throws {
+    let addressAndBank = LR35902.addressAndBank(from: 0x4000)
+    XCTAssertEqual(addressAndBank.address, 0x4000)
+    XCTAssertEqual(addressAndBank.bank, 1)
+  }
+
+  func testAddressAndBankBeginningOfBank2() throws {
+    let addressAndBank = LR35902.addressAndBank(from: 0x8000)
+    XCTAssertEqual(addressAndBank.address, 0x4000)
+    XCTAssertEqual(addressAndBank.bank, 2)
+  }
 }
