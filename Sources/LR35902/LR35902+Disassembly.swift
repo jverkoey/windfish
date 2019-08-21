@@ -333,18 +333,18 @@ extension LR35902 {
       while !runQueue.isEmpty {
         let run = runQueue.dequeue()
 
-        if visitedAddresses.contains(Int(run.cartStartAddress)) {
+        if visitedAddresses.contains(Int(run.startAddress)) {
           // We've already visited this instruction, so we can skip it.
           continue
         }
 
         // Initialize the CPU
         cpu.bank = run.initialBank
-        cpu.pc = LR35902.addressAndBank(from: run.cartStartAddress).address
+        cpu.pc = LR35902.addressAndBank(from: run.startAddress).address
 
         let advance: (Address) -> Void = { amount in
           let currentCartAddress = cartAddress(for: self.cpu.pc, in: self.cpu.bank)!
-          run.visitedRange = run.cartStartAddress..<(currentCartAddress + CartridgeAddress(amount))
+          run.visitedRange = run.startAddress..<(currentCartAddress + CartridgeAddress(amount))
 
           visitedAddresses.insert(integersIn: Int(currentCartAddress)..<Int(currentCartAddress + CartridgeAddress(amount)))
 

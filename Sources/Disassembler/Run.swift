@@ -2,7 +2,10 @@ import Foundation
 import CPU
 
 public protocol Run {
+  associatedtype AddressT: BinaryInteger
   associatedtype InstructionT: Instruction
+
+  var visitedRange: Range<AddressT>? { get }
 
   var invocationInstruction: InstructionT? { get }
 
@@ -12,14 +15,39 @@ public protocol Run {
   var children: [Self] { get }
 }
 
+public struct RunGroup<T: Run> {
+  init(runs: [T]) {
+    self.runs = runs
+  }
+
+  fileprivate let runs: [T]
+
+  public var first: T? {
+    return runs.first
+  }
+
+  /**
+   Returns a composite index set of the ranges visited by the runs in this group.
+   */
+  public func scope() -> IndexSet {
+    var scope = IndexSet()
+    runs.forEach { run in
+      if let visitedRange = run.visitedRange {
+        scope.insert(integersIn: Int(visitedRange.lowerBound)..<Int(visitedRange.upperBound))
+      }
+    }
+    return scope
+  }
+}
+
 extension Run {
   /**
    Breaks this run apart into call groups.
 
    - Returns: a collection of arrays of Runs, where each array of Runs is part of a single call invocation.
    */
-  public func runGroups() -> [[Self]] {
-    var runGroups: [[Self]] = []
+  public func runGroups() -> [RunGroup<Self>] {
+    var runGroups: [RunGroup<Self>] = []
 
     var sanityCheckSeenRuns = 0
 
@@ -46,10 +74,10 @@ extension Run {
         }
       }
 
-      runGroups.append(runGroup)
+      runGroups.append(RunGroup<Self>(runs: runGroup))
     }
 
-    assert(sanityCheckSeenRuns == (runGroups.reduce(0) { $0 + $1.count }))
+    assert(sanityCheckSeenRuns == (runGroups.reduce(0) { $0 + $1.runs.count }))
 
     return runGroups
   }

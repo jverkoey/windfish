@@ -3,12 +3,12 @@ import Disassembler
 
 extension LR35902.Disassembly {
   final class Run: Disassembler.Run {
-    let cartStartAddress: LR35902.CartridgeAddress
+    let startAddress: LR35902.CartridgeAddress
     let endAddress: LR35902.CartridgeAddress?
     let initialBank: LR35902.Bank
 
     init(from startAddress: LR35902.Address, initialBank: LR35902.Bank, upTo endAddress: LR35902.Address? = nil) {
-      self.cartStartAddress = LR35902.cartAddress(for: startAddress, in: initialBank)!
+      self.startAddress = LR35902.cartAddress(for: startAddress, in: initialBank)!
       if let endAddress = endAddress, endAddress > 0 {
         self.endAddress = LR35902.cartAddress(for: endAddress - 1, in: initialBank)!
       } else {

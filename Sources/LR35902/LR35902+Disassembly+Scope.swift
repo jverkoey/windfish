@@ -6,22 +6,16 @@ extension LR35902.Disassembly {
     // Compute scope and rewrite function labels if we're a function.
 
     for runGroup in run.runGroups() {
-      // Calculate scope.
-      var runScope = IndexSet()
-      runGroup.forEach { run in
-        if let visitedRange = run.visitedRange {
-          runScope.insert(integersIn: Int(visitedRange.lowerBound)..<Int(visitedRange.upperBound))
-        }
+      guard let firstRun = runGroup.first else {
+        continue
       }
 
-      // Nothing to do for empty runs.
+      let runScope = runGroup.scope()
       if runScope.isEmpty {
         continue
       }
 
-      // If the scope has a name, then map the scope and labels to that name.
-      let entryRun = runGroup.first!
-      let runStartAddress = entryRun.cartStartAddress
+      let runStartAddress = firstRun.startAddress
       if let runGroupName = labels[runStartAddress] {
         scopes[runGroupName, default: IndexSet()].formUnion(runScope)
 
