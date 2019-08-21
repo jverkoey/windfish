@@ -340,7 +340,7 @@ extension LR35902 {
 
         // Initialize the CPU
         cpu.bank = run.initialBank
-        cpu.pc = run.startAddress
+        cpu.pc = LR35902.addressAndBank(from: run.cartStartAddress).address
 
         let advance: (Address) -> Void = { amount in
           let lowerBound = cartAddress(for: self.cpu.pc, in: self.cpu.bank)!
