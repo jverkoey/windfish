@@ -51,6 +51,16 @@ disassembly.defineMacro(named: "callcb", instructions: [
   1: IndexSet(integersIn: 0x4000..<0x8000)
 ])
 
+disassembly.defineMacro(named: "modifySave", instructions: [
+  .any(.ld(.a, .imm8)),
+  .any(.ld(.imm16addr, .a))
+  ], code: [
+    .ld(.a, .arg(2)),
+    .ld(.arg(1), .a)
+  ], validArgumentValues: [
+    1: IndexSet(integersIn: 0xA100..<0xAB8F)
+])
+
 //disassembly.defineMacro(named: "copyregion", instructions: [
 //  .any(.ld(.hl, .imm16)),
 //  .any(.ld(.de, .imm16)),

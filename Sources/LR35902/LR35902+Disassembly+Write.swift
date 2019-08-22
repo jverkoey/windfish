@@ -258,12 +258,14 @@ clean:
                   guard validArgumentValues[argumentNumber] != nil else {
                     return false
                   }
-                  assert(argumentValue.hasPrefix("$"), "Can only validate hex values.")
                   if argumentValue.hasPrefix("$") {
                     let number = Int(LR35902.Address(argumentValue.dropFirst(), radix: 16)!)
                     return !validArgumentValues[argumentNumber]!.contains(number)
+                  } else if argumentValue.hasPrefix("[$") && argumentValue.hasSuffix("]") {
+                    let number = Int(LR35902.Address(argumentValue.dropFirst(2).dropLast(), radix: 16)!)
+                    return !validArgumentValues[argumentNumber]!.contains(number)
                   }
-                  return false
+                  preconditionFailure("Unhandled.")
                 }
 
                 if firstInvalidArgument == nil {
