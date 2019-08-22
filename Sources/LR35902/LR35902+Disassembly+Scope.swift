@@ -30,11 +30,8 @@ extension LR35902.Disassembly {
 
       // Rewrite local labels within the function's first contiguous block of scope.
       var firstReturnLocation: LR35902.CartridgeLocation? = nil
-      contiguousScope.dropFirst().forEach {
+      labelAddresses(in: contiguousScope.dropFirst()).forEach {
         let cartLocation = LR35902.CartridgeLocation($0)
-        guard labels[cartLocation] != nil else {
-          return
-        }
         if case .ret = instructionMap[cartLocation]?.spec {
           if let firstReturnIndex = firstReturnLocation {
             labels[cartLocation] = "\(runGroupName).return_\(LR35902.addressAndBank(from: cartLocation).address.hexString)"

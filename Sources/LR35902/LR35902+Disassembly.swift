@@ -247,6 +247,12 @@ extension LR35902 {
       return labels[index]
     }
 
+    func labelAddresses(in range: Range<CartridgeLocation>) -> [CartridgeLocation] {
+      return range.filter {
+        labels[$0] != nil
+      }
+    }
+
     public func setLabel(at pc: Address, in bank: Bank, named name: String) {
       guard let cartAddress = cartAddress(for: pc, in: bank) else {
         preconditionFailure("Attempting to set label in non-cart addressable location.")
