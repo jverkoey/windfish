@@ -43,6 +43,11 @@ disassembly.defineFunction(startingAt: 0x7D27, in: 0x01, named: "DMATransfer")
 // MARK: - Bank 27
 disassembly.defineFunction(startingAt: 0x4006, in: 0x1b, named: "AudioStep1b_Launcher")
 disassembly.defineFunction(startingAt: 0x401e, in: 0x1b, named: "AudioStep1b_Start")
+disassembly.defineFunction(startingAt: 0x4037, in: 0x1b, named: "CheckAudioSelection")
+disassembly.defineFunction(startingAt: 0x42ae, in: 0x1b, named: "CheckAndResetAudio_Variant1")
+disassembly.defineFunction(startingAt: 0x40ef, in: 0x1b, named: "CheckAndResetAudio_Variant2")
+//disassembly.defineFunction(startingAt: 0x4275, in: 0x1b, named: "SelectAudioTerminals")
+//disassembly.defineFunction(startingAt: 0x4392, in: 0x1b, named: "LoadHLIndirectToB")
 
 // MARK: - Bank 31
 disassembly.defineFunction(startingAt: 0x4000, in: 0x1f, named: "EnableSound")
