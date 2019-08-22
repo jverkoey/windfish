@@ -231,6 +231,11 @@ extension LR35902 {
     func expandScope(forLabel label: String, scope: IndexSet) {
       scopes[label, default: IndexSet()].formUnion(scope)
     }
+    func setContiguousScope(forLabel label: String, range: Range<CartridgeLocation>) {
+      for location in range {
+        contiguousScopes[location] = label
+      }
+    }
     var contiguousScopes: [CartridgeLocation: String] = [:]
     private var scopes: [String: IndexSet] = [:]
 
@@ -247,7 +252,7 @@ extension LR35902 {
       return labels[index]
     }
 
-    func labelAddresses(in range: Range<CartridgeLocation>) -> [CartridgeLocation] {
+    func labelLocations(in range: Range<CartridgeLocation>) -> [CartridgeLocation] {
       return range.filter {
         labels[$0] != nil
       }

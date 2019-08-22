@@ -1,7 +1,6 @@
 import Foundation
 
 extension LR35902.Disassembly {
-
   func rewriteScopes(_ run: LR35902.Disassembly.Run) {
     // Compute scope and rewrite function labels if we're a function.
 
@@ -13,6 +12,7 @@ extension LR35902.Disassembly {
 
       // Expand scopes for the label.
       // TODO: This doesn't work well if the labels change after the scope has been defined.
+      // TODO: Labels should be annotable with a name and a scope independently.
       let scope = runGroup.scope
       if scope.isEmpty {
         continue
@@ -24,26 +24,30 @@ extension LR35902.Disassembly {
       guard let contiguousScope = runGroup.firstContiguousScopeRange else {
         continue
       }
-      for address in contiguousScope {
-        contiguousScopes[LR35902.CartridgeLocation(address)] = runGroupName
-      }
+      setContiguousScope(forLabel: runGroupName, range: contiguousScope)
 
-      // Rewrite local labels within the function's first contiguous block of scope.
-      let labelAddresses = self.labelAddresses(in: contiguousScope.dropFirst())
-      for cartLocation in labelAddresses {
-        let addressAndBank = LR35902.addressAndBank(from: cartLocation)
-        labels[cartLocation] = "\(runGroupName).fn_\(addressAndBank.bank.hexString)_\(addressAndBank.address.hexString)"
-      }
+      let labelLocations = self.labelLocations(in: contiguousScope.dropFirst())
 
-      // Rewrite return labels within the function's first contiguous block of scope.
-      let returnLabelAddresses = labelAddresses.filter { instructionMap[$0]?.spec.category == .ret }
-      let hasManyReturns = returnLabelAddresses.count > 1
-      for cartLocation in returnLabelAddresses {
-        if hasManyReturns {
-          labels[cartLocation] = "\(runGroupName).return_\(LR35902.addressAndBank(from: cartLocation).address.hexString)"
-        } else {
-          labels[cartLocation] = "\(runGroupName).return"
-        }
+      rewriteLabels(at: labelLocations, with: runGroupName)
+      rewriteReturnLabels(at: labelLocations, with: runGroupName)
+    }
+  }
+
+  private func rewriteLabels(at locations: [LR35902.CartridgeLocation], with scope: String) {
+    for cartLocation in locations {
+      let addressAndBank = LR35902.addressAndBank(from: cartLocation)
+      labels[cartLocation] = "\(scope).fn_\(addressAndBank.bank.hexString)_\(addressAndBank.address.hexString)"
+    }
+  }
+
+  private func rewriteReturnLabels(at locations: [LR35902.CartridgeLocation], with scope: String) {
+    let returnLabelAddresses = locations.filter { instructionMap[$0]?.spec.category == .ret }
+    let hasManyReturns = returnLabelAddresses.count > 1
+    for cartLocation in returnLabelAddresses {
+      if hasManyReturns {
+        labels[cartLocation] = "\(scope).return_\(LR35902.addressAndBank(from: cartLocation).address.hexString)"
+      } else {
+        labels[cartLocation] = "\(scope).return"
       }
     }
   }
