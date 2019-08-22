@@ -40,6 +40,10 @@ disassembly.defineFunction(startingAt: 0x460F, in: 0x01, named: "InitSaves")
 disassembly.defineFunction(startingAt: 0x7D19, in: 0x01, named: "CopyDMATransferToHRAM")
 disassembly.defineFunction(startingAt: 0x7D27, in: 0x01, named: "DMATransfer")
 
+// MARK: - Bank 27
+disassembly.defineFunction(startingAt: 0x4006, in: 0x1b, named: "AudioStep1b_Launcher")
+disassembly.defineFunction(startingAt: 0x401e, in: 0x1b, named: "AudioStep1b_Start")
+
 // MARK: - Bank 31
 disassembly.defineFunction(startingAt: 0x4000, in: 0x1f, named: "EnableSound")
 disassembly.defineFunction(startingAt: 0x4006, in: 0x1f, named: "PlayAudioStep_Launcher")
