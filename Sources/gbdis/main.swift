@@ -49,6 +49,12 @@ disassembly.defineFunction(startingAt: 0x40ef, in: 0x1b, named: "CheckAndResetAu
 //disassembly.defineFunction(startingAt: 0x4275, in: 0x1b, named: "SelectAudioTerminals")
 //disassembly.defineFunction(startingAt: 0x4392, in: 0x1b, named: "LoadHLIndirectToB")
 
+disassembly.setLabel(at: 0x415d, in: 0x1b, named: "AudioData")
+for i in LR35902.Address(0)..<LR35902.Address(32) {
+  // TODO: Allow data to be grouped.
+  disassembly.setData(at: (0x415d + i * 6)..<(0x415d + (i + 1) * 6), in: 0x1b)
+}
+
 // MARK: - Bank 31
 disassembly.defineFunction(startingAt: 0x4000, in: 0x1f, named: "EnableSound")
 disassembly.defineFunction(startingAt: 0x4006, in: 0x1f, named: "PlayAudioStep_Launcher")
