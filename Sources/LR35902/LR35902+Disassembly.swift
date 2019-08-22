@@ -13,10 +13,9 @@ extension LR35902 {
 
     public func disassembleAsGameboyCartridge() {
       // Restart addresses
-      let numberOfRestartAddresses = 8
-      let restartSize = 8
-      let rstAddresses = (0..<numberOfRestartAddresses)
-        .map { Address($0 * restartSize)..<Address($0 * restartSize + restartSize) }
+      let numberOfRestartAddresses: Address = 8
+      let restartSize: Address = 8
+      let rstAddresses = (0..<numberOfRestartAddresses).map { ($0 * restartSize)..<($0 * restartSize + restartSize) }
       rstAddresses.forEach {
         setLabel(at: $0.lowerBound, in: 0x00, named: "RST_\($0.lowerBound.hexString)")
         disassemble(range: $0, inBank: 0)
