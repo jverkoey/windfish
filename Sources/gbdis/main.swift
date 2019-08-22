@@ -42,9 +42,20 @@ disassembly.defineFunction(startingAt: 0x7D27, in: 0x01, named: "DMATransfer")
 
 // MARK: - Bank 31
 disassembly.defineFunction(startingAt: 0x4000, in: 0x1f, named: "EnableSound")
-disassembly.setLabel(at: 0x53E6, in: 0x1f, named: "ClearActiveSquareSound")
+disassembly.defineFunction(startingAt: 0x4006, in: 0x1f, named: "PlayAudioStep_Launcher")
+disassembly.setLabel(at: 0x401e, in: 0x1f, named: "PlayAudioStep_Start")
+
+disassembly.defineFunction(startingAt: 0x4204, in: 0x1f, named: "InitSquareSound")
+disassembly.setLabel(at: 0x53e6, in: 0x1f, named: "ClearActiveSquareSound")
+
+disassembly.defineFunction(startingAt: 0x53ed, in: 0x1f, named: "InitWaveSound")
 disassembly.setLabel(at: 0x6385, in: 0x1f, named: "ClearActiveWaveSound")
-disassembly.setLabel(at: 0x7A28, in: 0x1f, named: "ClearActiveNoiseSound")
+
+disassembly.defineFunction(startingAt: 0x64e8, in: 0x1f, named: "InitNoiseSound")
+disassembly.setLabel(at: 0x650e, in: 0x1f, named: "_InitNoiseSoundNoNoiseSound")
+disassembly.setLabel(at: 0x7a28, in: 0x1f, named: "ClearActiveNoiseSound")
+
+disassembly.setLabel(at: 0x7a60, in: 0x1f, named: "_ShiftHL")
 
 
 disassembly.defineMacro(named: "callcb", instructions: [
