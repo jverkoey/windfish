@@ -7,6 +7,10 @@ let disassembly = LR35902.Disassembly(rom: data)
 
 disassembly.disassembleAsGameboyCartridge()
 
+disassembly.createGlobal(at: 0xA100, named: "SAVEFILES")
+disassembly.createGlobal(at: 0xDB95, named: "wGameMode")
+disassembly.createGlobal(at: 0xDB96, named: "wGameSubMode")
+
 disassembly.setLabel(at: 0x0003, in: 0x00, named: "DEBUG_TOOL")
 disassembly.setData(at: 0x0003, in: 0x00)
 
@@ -56,7 +60,5 @@ disassembly.defineMacro(named: "callcb", instructions: [
 //  .ld(.bc, .arg(3)),
 //  .call(.imm16),
 //], validArgumentValues: [:])
-
-disassembly.createGlobal(at: 0xA100, named: "SAVEFILES")
 
 try disassembly.writeTo(directory: "/Users/featherless/workbench/gbdis/disassembly")

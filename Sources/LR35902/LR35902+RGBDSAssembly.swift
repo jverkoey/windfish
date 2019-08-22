@@ -119,6 +119,8 @@ public final class RGBDSAssembly {
         var addressLabel: String
         if let label = disassembly.label(at: instruction.imm16!, in: disassembly.cpu.bank) {
           addressLabel = "[\(label)]"
+        } else if let global = disassembly.globals[instruction.imm16!] {
+          addressLabel = "[\(global)]"
         } else {
           addressLabel = "[$\(instruction.imm16!.hexString)]"
         }
@@ -128,6 +130,8 @@ public final class RGBDSAssembly {
         var addressLabel: String
         if let label = disassembly.label(at: instruction.imm16!, in: disassembly.cpu.bank) {
           addressLabel = "[\(label)]"
+        } else if let global = disassembly.globals[instruction.imm16!] {
+          addressLabel = "[\(global)]"
         } else {
           addressLabel = "[$\(instruction.imm16!.hexString)]"
         }
@@ -137,6 +141,8 @@ public final class RGBDSAssembly {
         var addressLabel: String
         if let name = disassembly.globals[0xFF00 | UInt16(instruction.imm8!)] {
           addressLabel = "[\(name)]"
+        } else if let global = disassembly.globals[0xFF00 | UInt16(instruction.imm8!)] {
+          addressLabel = "[\(global)]"
         } else {
           addressLabel = "[$FF\(instruction.imm8!.hexString)]"
         }
@@ -146,6 +152,8 @@ public final class RGBDSAssembly {
         var addressLabel: String
         if let name = disassembly.globals[0xFF00 | UInt16(instruction.imm8!)] {
           addressLabel = "[\(name)]"
+        } else if let global = disassembly.globals[0xFF00 | UInt16(instruction.imm8!)] {
+          addressLabel = "[\(global)]"
         } else {
           addressLabel = "[$FF\(instruction.imm8!.hexString)]"
         }
@@ -153,6 +161,7 @@ public final class RGBDSAssembly {
 
       case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .imm16:
         var addressLabel: String
+        // TODO: These aren't always necessarily globals.
         if let name = disassembly.globals[instruction.imm16!] {
           addressLabel = "\(name)"
         } else {
