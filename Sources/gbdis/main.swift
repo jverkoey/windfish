@@ -8,6 +8,8 @@ let disassembly = LR35902.Disassembly(rom: data)
 disassembly.disassembleAsGameboyCartridge()
 
 disassembly.createGlobal(at: 0xA100, named: "SAVEFILES")
+disassembly.createGlobal(at: 0xC124, named: "wRoomTransitionState")
+disassembly.createGlobal(at: 0xC125, named: "wRoomTransitionDirection")
 disassembly.createGlobal(at: 0xDB95, named: "wGameMode")
 disassembly.createGlobal(at: 0xDB96, named: "wGameSubMode")
 

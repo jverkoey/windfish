@@ -267,6 +267,7 @@ extension LR35902 {
 
     // MARK: - Globals
 
+    // TODO: Allow defining variable types, e.g. enums with well-understood values.
     public func createGlobal(at address: Address, named name: String) {
       globals[address] = name
     }
