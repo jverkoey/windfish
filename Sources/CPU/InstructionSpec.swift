@@ -38,6 +38,7 @@ public protocol InstructionSpec: Hashable {
 
 public enum InstructionCategory {
   case call
+  case ret
 }
 
 /**

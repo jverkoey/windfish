@@ -29,24 +29,22 @@ extension LR35902.Disassembly {
       }
 
       // Rewrite local labels within the function's first contiguous block of scope.
-      var firstReturnLocation: LR35902.CartridgeLocation? = nil
-      labelAddresses(in: contiguousScope.dropFirst()).forEach {
-        let cartLocation = LR35902.CartridgeLocation($0)
-        if case .ret = instructionMap[cartLocation]?.spec {
-          if let firstReturnIndex = firstReturnLocation {
-            labels[cartLocation] = "\(runGroupName).return_\(LR35902.addressAndBank(from: cartLocation).address.hexString)"
-            labels[firstReturnIndex] = "\(runGroupName).return_\(LR35902.addressAndBank(from: firstReturnIndex).address.hexString)"
-          } else {
-            labels[cartLocation] = "\(runGroupName).return"
-            firstReturnLocation = cartLocation
-          }
+      let labelAddresses = self.labelAddresses(in: contiguousScope.dropFirst())
+      for cartLocation in labelAddresses {
+        let addressAndBank = LR35902.addressAndBank(from: cartLocation)
+        labels[cartLocation] = "\(runGroupName).fn_\(addressAndBank.bank.hexString)_\(addressAndBank.address.hexString)"
+      }
+
+      // Rewrite return labels within the function's first contiguous block of scope.
+      let returnLabelAddresses = labelAddresses.filter { instructionMap[$0]?.spec.category == .ret }
+      let hasManyReturns = returnLabelAddresses.count > 1
+      for cartLocation in returnLabelAddresses {
+        if hasManyReturns {
+          labels[cartLocation] = "\(runGroupName).return_\(LR35902.addressAndBank(from: cartLocation).address.hexString)"
         } else {
-          let bank = LR35902.Bank(cartLocation / LR35902.bankSize)
-          let address = cartLocation % LR35902.bankSize + LR35902.CartridgeLocation((bank > 0) ? 0x4000 : 0x0000)
-          labels[cartLocation] = "\(runGroupName).fn_\(bank.hexString)_\(LR35902.Address(address).hexString)"
+          labels[cartLocation] = "\(runGroupName).return"
         }
       }
     }
   }
-
 }
