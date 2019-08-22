@@ -7,11 +7,13 @@ let disassembly = LR35902.Disassembly(rom: data)
 
 disassembly.disassembleAsGameboyCartridge()
 
-disassembly.createGlobal(at: 0xA100, named: "SAVEFILES")
-disassembly.createGlobal(at: 0xC124, named: "wRoomTransitionState")
-disassembly.createGlobal(at: 0xC125, named: "wRoomTransitionDirection")
-disassembly.createGlobal(at: 0xDB95, named: "wGameMode")
-disassembly.createGlobal(at: 0xDB96, named: "wGameSubMode")
+disassembly.createGlobal(at: 0xa100, named: "SAVEFILES")
+disassembly.createGlobal(at: 0xc124, named: "wRoomTransitionState")
+disassembly.createGlobal(at: 0xc125, named: "wRoomTransitionDirection")
+disassembly.createGlobal(at: 0xd369, named: "wAudioData")
+disassembly.createGlobal(at: 0xd379, named: "wAudioSelection")
+disassembly.createGlobal(at: 0xdb95, named: "wGameMode")
+disassembly.createGlobal(at: 0xdb96, named: "wGameSubMode")
 
 // MARK: - Bank 0
 // TODO: Define this as a variable.
@@ -22,6 +24,7 @@ disassembly.defineFunction(startingAt: 0x0150, in: 0x00, named: "Main")
 disassembly.setPreComment(at: 0x0156, in: 0x00, text: "Reset the palette registers to zero.")
 disassembly.setPreComment(at: 0x015D, in: 0x00, text: "Clears 6144 bytes of video ram. Graphics vram location for OBJ and BG tiles start at $8000 and end at $97FF; for a total of 0x1800 bytes.")
 disassembly.defineFunction(startingAt: 0x07B9, in: 0x00, named: "SetBank")
+disassembly.defineFunction(startingAt: 0x0844, in: 0x00, named: "PlayAudioStep")
 disassembly.defineFunction(startingAt: 0x2881, in: 0x00, named: "LCDOff")
 disassembly.defineFunction(startingAt: 0x28A8, in: 0x00, named: "FillBGWith7F")
 disassembly.defineFunction(startingAt: 0x28C5, in: 0x00, named: "CopyMemoryRegion")
@@ -38,6 +41,7 @@ disassembly.defineFunction(startingAt: 0x7D19, in: 0x01, named: "CopyDMATransfer
 disassembly.defineFunction(startingAt: 0x7D27, in: 0x01, named: "DMATransfer")
 
 // MARK: - Bank 31
+disassembly.defineFunction(startingAt: 0x4000, in: 0x1f, named: "EnableSound")
 disassembly.setLabel(at: 0x53E6, in: 0x1f, named: "ClearActiveSquareSound")
 disassembly.setLabel(at: 0x6385, in: 0x1f, named: "ClearActiveWaveSound")
 disassembly.setLabel(at: 0x7A28, in: 0x1f, named: "ClearActiveNoiseSound")
