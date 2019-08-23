@@ -29,6 +29,9 @@ disassembly.createGlobal(at: 0xd379, named: "wAudioSelection")
 disassembly.createGlobal(at: 0xdb95, named: "wGameMode")
 disassembly.createGlobal(at: 0xdb96, named: "wGameSubMode")
 disassembly.createGlobal(at: 0xdbaf, named: "wCurrentBank")
+disassembly.createGlobal(at: 0xffa9, named: "hWindowY")
+disassembly.createGlobal(at: 0xffaa, named: "hWindowX")
+disassembly.createGlobal(at: 0xfff7, named: "hMapID")
 
 // MARK: - Bank 0 (00)
 // TODO: Define this as a variable.

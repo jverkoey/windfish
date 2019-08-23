@@ -20,7 +20,7 @@ extension InstructionSpec {
     }
     let children: Mirror.Children
     let reflectedChildren = Mirror(reflecting: operands.value).children
-    if reflectedChildren.count > 0 {
+    if reflectedChildren.count > 1 {
       children = reflectedChildren
     } else {
       children = Mirror.Children([(label: nil, value: operands.value)])

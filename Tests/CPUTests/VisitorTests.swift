@@ -4,7 +4,7 @@ import XCTest
 struct TestInstruction: Instruction {
   var spec: TestInstruction.Spec
 
-  indirect enum Spec: InstructionSpec, Equatable {
+  indirect enum Spec: InstructionSpec, Hashable {
     case nop
     case ld(Operand)
     case ld(Operand, Operand)
@@ -17,10 +17,11 @@ struct TestInstruction: Instruction {
     }
   }
 
-  enum Operand: Equatable, InstructionOperandAssemblyRepresentable {
+  enum Operand: Hashable, InstructionOperandAssemblyRepresentable {
     case imm8
     case imm16
     case a
+    case arg(Int)
 
     var representation: InstructionOperandAssemblyRepresentation {
       switch self {
@@ -109,5 +110,6 @@ class VisitorTests: XCTestCase {
     XCTAssertEqual(TestInstruction.Spec.ld(.a, .imm8).representation, "ld a, #")
     XCTAssertEqual(TestInstruction.Spec.sub(.ld(.imm8, .a)).representation, "ld #, a")
     XCTAssertEqual(TestInstruction.Spec.sub(.ld(.a)).representation, "ld a")
+    XCTAssertEqual(TestInstruction.Spec.ld(.arg(1)).representation, "ld arg(1)")
   }
 }

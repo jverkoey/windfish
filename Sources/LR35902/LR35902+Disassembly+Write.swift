@@ -300,10 +300,11 @@ clean:
 
                   let macroArgs = arguments.keys.sorted().map { arguments[$0]! }.joined(separator: ", ")
 
-                  let firstInstruction = lineBuffer.firstIndex { line in if case .instruction = line { return true } else { return false} }
-                  lineBuffer.removeLast(lineBuffer.count - firstInstruction!)
+                  let firstInstruction = lineBuffer.firstIndex { line in if case .instruction = line { return true } else { return false} }!
+                  let lastInstruction = lineBuffer.lastIndex { line in if case .instruction = line { return true } else { return false} }!
                   let macroScope = scope(at: lineBufferAddress, in: bank)
-                  lineBuffer.append(.macro("\(macro) \(macroArgs)", lineBufferAddress, cpu.bank, macroScope, bytes))
+                  lineBuffer.replaceSubrange(firstInstruction...lastInstruction,
+                                             with: [.macro("\(macro) \(macroArgs)", lineBufferAddress, cpu.bank, macroScope, bytes)])
 
                   lineBufferAddress = cpu.pc
                 } else {

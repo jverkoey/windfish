@@ -145,6 +145,16 @@ extension LR35902 {
       createGlobal(at: 0xff80, named: "gbHRAM")
       createGlobal(at: 0xffff, named: "gbIE")
 
+      defineMacro(named: "jumpIfGte", instructions: [
+        .any(.ld(.a, .ffimm8addr)),
+        .any(.cp(.imm8)),
+        .any(.jr(.nc, .simm8)),
+      ], code: [
+        .ld(.a, .arg(1)),
+        .cp(.arg(2)),
+        .jr(.nc, .arg(3)),
+      ])
+
       defineMacro(named: "copyMemory", instructions: [
         .any(.ld(.a, .imm16addr)),
         .any(.ld(.imm16addr, .a)),
