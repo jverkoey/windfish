@@ -297,8 +297,8 @@ extension LR35902 {
     }
     public func defineMacro(named name: String,
                             instructions: [MacroLine],
-                            code: [Instruction.Spec],
-                            validArgumentValues: [Int: IndexSet]) {
+                            code: [Instruction.Spec]? = nil,
+                            validArgumentValues: [Int: IndexSet]? = nil) {
       let leaf = instructions.reduce(macroTree, { node, spec in
         let child = node.children[spec, default: MacroNode()]
         node.children[spec] = child

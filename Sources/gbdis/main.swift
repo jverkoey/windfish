@@ -95,6 +95,12 @@ disassembly.defineMacro(named: "modifySave", instructions: [
     1: IndexSet(integersIn: 0xA100..<0xAB8F)
 ])
 
+disassembly.defineMacro(named: "resetAudio", instructions: [
+  .instruction(.init(spec: .xor(.a))),
+  .instruction(.init(spec: .ld(.imm16addr, .a), imm16: 0xd361)),
+  .instruction(.init(spec: .ld(.imm16addr, .a), imm16: 0xd371)),
+])
+
 //disassembly.defineMacro(named: "copyregion", instructions: [
 //  .any(.ld(.hl, .imm16)),
 //  .any(.ld(.de, .imm16)),

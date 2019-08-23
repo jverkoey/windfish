@@ -206,13 +206,24 @@ clean:
               macroNode = child
             } else {
               if let macro = macroNodeIterator.macro,
-                let code = macroNodeIterator.code,
-                let validArgumentValues = macroNodeIterator.validArgumentValues {
+                let macroLines = macroNodeIterator.macroLines {
                 let instructions = lineBuffer.compactMap { thisLine -> (LR35902.Instruction, RGBDSAssembly.Statement)? in
                   if case let .instruction(instruction, assembly, _, _, _, _) = thisLine {
                     return (instruction, assembly)
                   } else {
                     return nil
+                  }
+                }
+
+                var code: [LR35902.Instruction.Spec]
+                if let macroCode = macroNodeIterator.code {
+                  code = macroCode
+                } else {
+                  code = macroLines.map {
+                    if case .instruction(let instruction) = $0 {
+                      return instruction.spec
+                    }
+                    preconditionFailure("Unhandled")
                   }
                 }
 
@@ -254,21 +265,27 @@ clean:
                   })
                 })
 
-                let firstInvalidArgument = rawArguments.first { argumentNumber, argumentValue in
-                  guard validArgumentValues[argumentNumber] != nil else {
-                    return false
+                var isValid: Bool
+                if let validArgumentValues = macroNodeIterator.validArgumentValues {
+                  let firstInvalidArgument = rawArguments.first { argumentNumber, argumentValue in
+                    guard validArgumentValues[argumentNumber] != nil else {
+                      return false
+                    }
+                    if argumentValue.hasPrefix("$") {
+                      let number = Int(LR35902.Address(argumentValue.dropFirst(), radix: 16)!)
+                      return !validArgumentValues[argumentNumber]!.contains(number)
+                    } else if argumentValue.hasPrefix("[$") && argumentValue.hasSuffix("]") {
+                      let number = Int(LR35902.Address(argumentValue.dropFirst(2).dropLast(), radix: 16)!)
+                      return !validArgumentValues[argumentNumber]!.contains(number)
+                    }
+                    preconditionFailure("Unhandled.")
                   }
-                  if argumentValue.hasPrefix("$") {
-                    let number = Int(LR35902.Address(argumentValue.dropFirst(), radix: 16)!)
-                    return !validArgumentValues[argumentNumber]!.contains(number)
-                  } else if argumentValue.hasPrefix("[$") && argumentValue.hasSuffix("]") {
-                    let number = Int(LR35902.Address(argumentValue.dropFirst(2).dropLast(), radix: 16)!)
-                    return !validArgumentValues[argumentNumber]!.contains(number)
-                  }
-                  preconditionFailure("Unhandled.")
+                  isValid = firstInvalidArgument == nil
+                } else {
+                  isValid = true
                 }
 
-                if firstInvalidArgument == nil {
+                if isValid {
                   let lowerBound = LR35902.cartAddress(for: lineBufferAddress, in: bank)!
                   let upperBound = LR35902.cartAddress(for: cpu.pc - instructionWidth, in: bank)!
                   let bytes = cpu[lowerBound..<upperBound]

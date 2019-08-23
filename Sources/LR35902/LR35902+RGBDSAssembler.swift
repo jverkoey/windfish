@@ -75,17 +75,19 @@ private func cast<T: UnsignedInteger, negT: SignedInteger>(string: String, negat
   throw RGBDSAssembler.Error(lineNumber: nil, error: "Unable to represent \(value) as a UInt16")
 }
 
-private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, using spec: LR35902.Instruction.Spec) throws -> [UInt8]? {
+private func instruction(from statement: RGBDSAssembly.Statement, using spec: LR35902.Instruction.Spec) throws -> LR35902.Instruction? {
   if case LR35902.Instruction.Spec.stop = spec {
-    return [0x00]
+    return .init(spec: spec, imm8: 0)
   }
-  guard let operands = Mirror(reflecting: spec).children.first else {
-    return []
+  guard var operands = Mirror(reflecting: spec).children.first else {
+    return .init(spec: spec)
   }
-  if let subSpec = operands.value as? LR35902.Instruction.Spec {
-    return try extractOperandsAsBinary(from: statement, using: subSpec)
+  while let subSpec = operands.value as? LR35902.Instruction.Spec {
+    guard let subOperands = Mirror(reflecting: subSpec).children.first else {
+      return .init(spec: spec)
+    }
+    operands = subOperands
   }
-  var binaryOperands: [UInt8] = []
 
   let children: Mirror.Children
   let reflectedChildren = Mirror(reflecting: operands.value).children
@@ -121,10 +123,8 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
       }
     case LR35902.Instruction.Numeric.imm16:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
-        var numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
-        withUnsafeBytes(of: &numericValue) { buffer in
-          binaryOperands.append(contentsOf: Data(buffer))
-        }
+        let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
+        return .init(spec: spec, imm16: numericValue)
       }
     case LR35902.Instruction.Numeric.imm8, LR35902.Instruction.Numeric.simm8:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
@@ -133,9 +133,7 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
           // Relative jumps in assembly are written from the point of view of the instruction's beginning.
           numericValue = numericValue.subtractingReportingOverflow(UInt8(LR35902.Instruction.widths[spec]!.total)).partialValue
         }
-        withUnsafeBytes(of: &numericValue) { buffer in
-          binaryOperands.append(contentsOf: Data(buffer))
-        }
+        return .init(spec: spec, imm8: numericValue)
       }
     case LR35902.Instruction.Numeric.ffimm8addr:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
@@ -143,30 +141,24 @@ private func extractOperandsAsBinary(from statement: RGBDSAssembly.Statement, us
         if (numericValue & 0xFF00) != 0xFF00 {
           return nil
         }
-        var lowerByteValue = UInt8(numericValue & 0xFF)
-        withUnsafeBytes(of: &lowerByteValue) { buffer in
-          binaryOperands.append(contentsOf: Data(buffer))
-        }
+        let lowerByteValue = UInt8(numericValue & 0xFF)
+        return .init(spec: spec, imm8: lowerByteValue)
       }
     case LR35902.Instruction.Numeric.sp_plus_simm8:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
-        var numericValue: UInt8 = try cast(string: String(value.dropFirst(3).trimmed()), negativeType: Int8.self)
-        withUnsafeBytes(of: &numericValue) { buffer in
-          binaryOperands.append(contentsOf: Data(buffer))
-        }
+        let numericValue: UInt8 = try cast(string: String(value.dropFirst(3).trimmed()), negativeType: Int8.self)
+        return .init(spec: spec, imm8: numericValue)
       }
     case LR35902.Instruction.Numeric.imm16addr:
       if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
-        var numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self)
-        withUnsafeBytes(of: &numericValue) { buffer in
-          binaryOperands.append(contentsOf: Data(buffer))
-        }
+        let numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self)
+        return .init(spec: spec, imm16: numericValue)
       }
     default:
       break
     }
   }
-  return binaryOperands
+  return .init(spec: spec)
 }
 
 public final class RGBDSAssembler {
@@ -181,6 +173,7 @@ public final class RGBDSAssembler {
     let error: String
   }
 
+  // TODO: Allow generation of list of instructions instead of just data.
   public func assemble(assembly: String) -> [Error] {
     var lineNumber = 1
     var errors: [Error] = []
@@ -203,32 +196,24 @@ public final class RGBDSAssembler {
       }
 
       do {
-
-        let spec: LR35902.Instruction.Spec
-        let operandsAsBinary: [UInt8]
-        if specs.count > 1 {
-          let specsAndBinary: [(LR35902.Instruction.Spec, [UInt8])] = try zip(specs, specs.map({ spec in
-            try extractOperandsAsBinary(from: statement, using: spec)
-          })).compactMap { result in
-            if let binary = result.1 {
-              return (result.0, binary)
-            } else {
-              return nil
-            }
-          }
-          if specsAndBinary.count == 0 {
-            throw Error(lineNumber: lineNumber, error: "No valid instruction found for \(code)")
-          }
-          (spec, operandsAsBinary) = specsAndBinary.sorted(by: { pair1, pair2 in
-            pair1.1.count < pair2.1.count
-          })[0]
-        } else {
-          spec = specs[0]
-          operandsAsBinary = try extractOperandsAsBinary(from: statement, using: spec)!
+        let instructions: [LR35902.Instruction] = try specs.compactMap { spec in
+          try instruction(from: statement, using: spec)
         }
+        guard instructions.count > 0 else {
+          throw Error(lineNumber: lineNumber, error: "No valid instruction found for \(code)")
+        }
+        let shortestInstruction = instructions.sorted(by: { pair1, pair2 in
+          pair1.spec.instructionWidth < pair2.spec.instructionWidth
+        })[0]
 
-        self.buffer.append(contentsOf: RGBDSAssembler.instructionOpcodeBinary[spec]!)
-        self.buffer.append(contentsOf: operandsAsBinary)
+        self.buffer.append(contentsOf: RGBDSAssembler.instructionOpcodeBinary[shortestInstruction.spec]!)
+        if let imm8 = shortestInstruction.imm8 {
+          self.buffer.append(contentsOf: [imm8])
+        } else if var imm16 = shortestInstruction.imm16 {
+          withUnsafeBytes(of: &imm16) { buffer in
+            self.buffer.append(contentsOf: Data(buffer))
+          }
+        }
 
       } catch let error as RGBDSAssembler.Error {
         if error.lineNumber == nil {
@@ -236,9 +221,7 @@ public final class RGBDSAssembler {
         } else {
           errors.append(error)
         }
-        return
       } catch {
-        return
       }
     }
     return errors
