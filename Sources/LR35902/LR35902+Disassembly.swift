@@ -149,7 +149,7 @@ extension LR35902 {
     // MARK: - Transfers of control
 
     struct TransferOfControl: Hashable {
-      let sourceAddress: Address
+      let sourceLocation: CartridgeLocation
       let sourceInstructionSpec: Instruction.Spec
     }
     func transfersOfControl(at pc: Address, in bank: Bank) -> Set<TransferOfControl>? {
@@ -161,7 +161,8 @@ extension LR35902 {
 
     func registerTransferOfControl(to pc: Address, in bank: Bank, from fromPc: Address, spec: Instruction.Spec) {
       let index = cartAddress(for: pc, in: bank)!
-      let transfer = TransferOfControl(sourceAddress: fromPc, sourceInstructionSpec: spec)
+      let fromLocation = cartAddress(for: fromPc, in: bank)!
+      let transfer = TransferOfControl(sourceLocation: fromLocation, sourceInstructionSpec: spec)
       transfers[index, default: Set()].insert(transfer)
 
       // Create a label if one doesn't exist.

@@ -16,8 +16,11 @@ private func write(_ string: String, fileHandle: FileHandle) {
 
 private func line(_ transfersOfControl: Set<LR35902.Disassembly.TransferOfControl>, label: String) -> String {
   let sources = transfersOfControl
-    .sorted(by: { $0.sourceAddress < $1.sourceAddress })
-    .map { "\($0.sourceInstructionSpec.opcode) @ $\($0.sourceAddress.hexString)" }
+    .sorted(by: { $0.sourceLocation < $1.sourceLocation })
+    .map {
+      let (address, _) = LR35902.addressAndBank(from: $0.sourceLocation)
+      return "\($0.sourceInstructionSpec.opcode) @ $\(address.hexString)"
+    }
     .joined(separator: ", ")
   return line("\(label):", comment: "Sources: \(sources)")
 }

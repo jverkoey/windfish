@@ -30,6 +30,7 @@ extension LR35902.Disassembly {
 
       rewriteLabels(at: labelLocations, with: runGroupName)
       rewriteReturnLabels(at: labelLocations, with: runGroupName)
+      rewriteLoopLabels(in: contiguousScope.dropFirst(), with: runGroupName)
     }
   }
 
@@ -51,4 +52,61 @@ extension LR35902.Disassembly {
       }
     }
   }
+
+  private func rewriteLoopLabels(in scope: Range<LR35902.CartridgeLocation>, with scopeName: String) {
+    guard !scopeName.contains(".") else {
+      return
+    }
+
+    let tocs: [(destination: LR35902.CartridgeLocation, tocs: Set<TransferOfControl>)] = scope.compactMap {
+      let (address, bank) = LR35902.addressAndBank(from: $0)
+      if let toc = transfersOfControl(at: address, in: bank) {
+        return ($0, toc)
+      } else {
+        return nil
+      }
+    }
+    let backwardTocs: [(source: LR35902.CartridgeLocation, destination: LR35902.CartridgeLocation)] = tocs.reduce(into: [], { (accumulator, element) in
+      let tocsInThisScope = element.tocs.filter {
+        scope.contains($0.sourceLocation) && element.destination < $0.sourceLocation && labels[element.destination] != nil
+      }
+      for toc in tocsInThisScope {
+        if case .jr(let condition, _) = instructionMap[toc.sourceLocation]?.spec,
+          condition != nil {
+          accumulator.append((toc.sourceLocation, element.destination))
+        }
+      }
+    })
+    if backwardTocs.isEmpty {
+      return
+    }
+    // Loops do not include other unconditional transfers of control.
+    let loops = backwardTocs.filter {
+      let loopRange = ($0.destination..<$0.source)
+      let tocsWithinLoop = tocs.flatMap {
+        $0.tocs.filter { loopRange.contains($0.sourceLocation) }.map { $0.sourceInstructionSpec }
+      }
+      return !tocsWithinLoop.contains {
+        switch $0 {
+        case .jp(let condition, _), .ret(let condition):
+          return condition == nil
+        default:
+          return false
+        }
+      }
+    }
+    if loops.isEmpty {
+      return
+    }
+    let destinations = Set(loops.map { $0.destination })
+    let hasManyDestinations = destinations.count > 1
+    for cartLocation in destinations {
+      if hasManyDestinations {
+        labels[cartLocation] = "\(scopeName).loop_\(LR35902.addressAndBank(from: cartLocation).address.hexString)"
+      } else {
+        labels[cartLocation] = "\(scopeName).loop"
+      }
+    }
+  }
+
 }
