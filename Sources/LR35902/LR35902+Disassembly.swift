@@ -144,6 +144,22 @@ extension LR35902 {
       createGlobal(at: 0xff77, named: "gbPCM34")
       createGlobal(at: 0xff80, named: "gbHRAM")
       createGlobal(at: 0xffff, named: "gbIE")
+
+      defineMacro(named: "copyMemory", instructions: [
+        .any(.ld(.a, .imm16addr)),
+        .any(.ld(.imm16addr, .a)),
+      ], code: [
+        .ld(.a, .arg(1)),
+        .ld(.arg(2), .a),
+      ])
+
+      defineMacro(named: "copyMemoryFF", instructions: [
+        .any(.ld(.a, .ffimm8addr)),
+        .any(.ld(.ffimm8addr, .a)),
+      ], code: [
+        .ld(.a, .arg(1)),
+        .ld(.arg(2), .a),
+      ])
     }
 
     // MARK: - Transfers of control
