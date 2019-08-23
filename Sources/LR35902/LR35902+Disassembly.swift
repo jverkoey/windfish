@@ -78,17 +78,20 @@ extension LR35902 {
       setLabel(at: 0x014E, in: 0x00, named: "HeaderGlobalChecksum")
       setData(at: 0x014E..<0x0150, in: 0x00)
 
-      createGlobal(at: 0xA000, named: "CARTRAM")
-      createGlobal(at: 0xFF47, named: "rBGP")
-      createGlobal(at: 0xFF48, named: "rOBP0")
-      createGlobal(at: 0xFF49, named: "rOBP1")
-      createGlobal(at: 0xFF10, named: "rAUD1SWEEP")
-      createGlobal(at: 0xFF12, named: "rAUD1ENV")
-      createGlobal(at: 0xFF13, named: "rAUD1LOW")
-      createGlobal(at: 0xFF14, named: "rAUD1HIGH")
-      createGlobal(at: 0xFF17, named: "rAUD2ENV")
-      createGlobal(at: 0xFF19, named: "rAUD2HIGH")
-      createGlobal(at: 0xFF1a, named: "rAUD3ENA")
+      createGlobal(at: 0xA000, named: "gbCARTRAM")
+
+      createGlobal(at: 0x8000, named: "gbVRAM")
+      createGlobal(at: 0x8800, named: "gbBGCHARDAT")
+      createGlobal(at: 0xFF47, named: "gbBGP")
+      createGlobal(at: 0xFF48, named: "gbOBP0")
+      createGlobal(at: 0xFF49, named: "gbOBP1")
+      createGlobal(at: 0xFF10, named: "gbAUD1SWEEP")
+      createGlobal(at: 0xFF12, named: "gbAUD1ENV")
+      createGlobal(at: 0xFF13, named: "gbAUD1LOW")
+      createGlobal(at: 0xFF14, named: "gbAUD1HIGH")
+      createGlobal(at: 0xFF17, named: "gbAUD2ENV")
+      createGlobal(at: 0xFF19, named: "gbAUD2HIGH")
+      createGlobal(at: 0xFF1a, named: "gbAUD3ENA")
     }
 
     // MARK: - Transfers of control

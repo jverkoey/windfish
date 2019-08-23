@@ -161,12 +161,12 @@ public final class RGBDSAssembly {
 
       case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .imm16:
         var addressLabel: String
-        // TODO: These aren't always necessarily globals.
-        if let name = disassembly.globals[instruction.imm16!] {
-          addressLabel = "\(name)"
-        } else {
-          addressLabel = "$\(instruction.imm16!.hexString)"
-        }
+        // TODO: These are only globals if they're referenced as an address in a subsequent instruction.
+//        if let name = disassembly.globals[instruction.imm16!] {
+//          addressLabel = "\(name)"
+//        } else {
+        addressLabel = "$\(instruction.imm16!.hexString)"
+//        }
         return [operand(for: instruction, operand: operand1), addressLabel]
 
       default:
