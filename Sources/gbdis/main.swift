@@ -85,6 +85,14 @@ disassembly.setLabel(at: 0x7a60, in: 0x1f, named: "_ShiftHL")
 disassembly.defineFunction(startingAt: 0x7f80, in: 0x1f, named: "SoundUnknown1")
 
 
+disassembly.defineMacro(named: "changebank", instructions: [
+  .any(.ld(.a, .imm8)),
+  .instruction(.init(spec: .ld(.imm16addr, .a), imm16: 0x2100)),
+], code: [
+  .ld(.a, .arg(1)),
+  .ld(.imm16addr, .a),
+])
+
 disassembly.defineMacro(named: "callcb", instructions: [
   .any(.ld(.a, .imm8)),
   .instruction(.init(spec: .ld(.imm16addr, .a), imm16: 0x2100)),

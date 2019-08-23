@@ -301,6 +301,8 @@ clean:
                   lineBuffer.append(.macro("\(macro) \(macroArgs)", lineBufferAddress, cpu.bank, macroScope, bytes))
 
                   lineBufferAddress = cpu.pc
+                } else {
+                  flush()
                 }
               } else {
                 flush()
