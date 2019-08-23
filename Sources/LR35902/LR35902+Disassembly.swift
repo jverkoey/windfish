@@ -212,11 +212,21 @@ extension LR35902 {
 
     // MARK: - Text segments
 
-    public func setText(at range: Range<Address>, in bank: Bank) {
+    public func setText(at range: Range<Address>, in bank: Bank, lineLength: Int? = nil) {
       let lowerBound = cartAddress(for: range.lowerBound, in: bank)!
       let upperBound = cartAddress(for: range.upperBound, in: bank)!
       text.insert(integersIn: Int(lowerBound)..<Int(upperBound))
+      if let lineLength = lineLength {
+        textLengths[lowerBound..<upperBound] = lineLength
+      }
     }
+    func lineLengthOfText(at address: Address, in bank: Bank) -> Int? {
+      let location = cartAddress(for: address, in: bank)!
+      return textLengths.first { pair in
+        pair.0.contains(location)
+      }?.value
+    }
+    private var textLengths: [Range<CartridgeLocation>: Int] = [:]
 
     // MARK: - Bank changes
 

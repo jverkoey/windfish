@@ -355,7 +355,8 @@ clean:
           // Dump the bytes in blocks of 8.
           if initialType == .text {
             var chunkPc = initialPc
-            for chunk in accumulator.chunked(into: 254) {
+            let lineLength = lineLengthOfText(at: initialPc, in: bank) ?? 254
+            for chunk in accumulator.chunked(into: lineLength) {
               write(line(RGBDSAssembly.text(for: chunk), address: chunkPc), fileHandle: fileHandle)
               chunkPc += LR35902.Address(chunk.count)
             }

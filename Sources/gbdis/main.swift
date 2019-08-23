@@ -9,8 +9,12 @@ func extractText(from range: Range<LR35902.CartridgeLocation>) {
   let parts = data[range].split(separator: 0xff, maxSplits: .max, omittingEmptySubsequences: false)
   let addressAndBank = LR35902.addressAndBank(from: range.lowerBound)
   var offset: LR35902.Address = addressAndBank.address
-  for part in parts {
-    disassembly.setText(at: offset..<(offset + LR35902.Address(part.count)), in: addressAndBank.bank)
+  for (index, part) in parts.enumerated() {
+    let textRange = offset..<(offset + LR35902.Address(part.count))
+    disassembly.setText(at: textRange, in: addressAndBank.bank, lineLength: 16)
+    if index != parts.endIndex {
+      disassembly.setData(at: textRange.upperBound, in: addressAndBank.bank)
+    }
     offset += LR35902.Address(part.count + 1)
   }
 }
