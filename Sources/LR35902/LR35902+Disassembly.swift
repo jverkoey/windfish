@@ -185,7 +185,7 @@ extension LR35902 {
           .jr(.nz, .arg(3)),
       ])
 
-      defineMacro(named: "setH", instructions: [
+      defineMacro(named: "assignH", instructions: [
         .any(.ld(.a, .imm8)),
         .any(.ld(.ffimm8addr, .a)),
       ], code: [
@@ -193,13 +193,13 @@ extension LR35902 {
         .ld(.arg(1), .a),
       ])
 
-//      defineMacro(named: "set", instructions: [
-//        .any(.ld(.a, .imm8)),
-//        .any(.ld(.imm16addr, .a)),
-//      ], code: [
-//        .ld(.a, .arg(2)),
-//        .ld(.arg(1), .a),
-//      ])
+      defineMacro(named: "assign", instructions: [
+        .any(.ld(.a, .imm8)),
+        .any(.ld(.imm16addr, .a)),
+      ], code: [
+        .ld(.a, .arg(2)),
+        .ld(.arg(1), .a),
+      ])
 
       defineMacro(named: "copyMemory", instructions: [
         .any(.ld(.a, .imm16addr)),
@@ -460,10 +460,7 @@ extension LR35902 {
         node.children[spec] = child
         return child
       })
-      leaf.macro = name
-      leaf.code = code
-      leaf.macroLines = instructions
-      leaf.validArgumentValues = validArgumentValues
+      leaf.macros.append(.init(name: name, macroLines: instructions, code: code, validArgumentValues: validArgumentValues))
     }
     public func defineMacro(named name: String, template: String) {
       let assembler = RGBDSAssembler()
@@ -474,13 +471,23 @@ extension LR35902 {
       defineMacro(named: name, instructions: assembler.instructions.map { .instruction($0) })
     }
 
-    public class MacroNode {
-      var children: [MacroLine: MacroNode] = [:]
-      var macro: String?
-      var code: [Instruction.Spec]?
-      var macroLines: [MacroLine]?
-      var validArgumentValues: [Int: IndexSet]?
+    public final class Macro {
+      let name: String
+      let macroLines: [MacroLine]
+      let code: [Instruction.Spec]?
+      let validArgumentValues: [Int: IndexSet]?
       var hasWritten = false
+
+      init(name: String, macroLines: [MacroLine], code: [Instruction.Spec]?, validArgumentValues: [Int: IndexSet]?) {
+        self.name = name
+        self.macroLines = macroLines
+        self.code = code
+        self.validArgumentValues = validArgumentValues
+      }
+    }
+    public final class MacroNode {
+      var children: [MacroLine: MacroNode] = [:]
+      var macros: [Macro] = []
     }
     public let macroTree = MacroNode()
 

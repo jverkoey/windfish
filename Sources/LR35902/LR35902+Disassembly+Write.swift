@@ -213,8 +213,7 @@ clean:
               macroNode = child
             } else {
               // No further nodes to be traversed; is this the end of a macro?
-              if let macro = macroNodeIterator.macro,
-                let macroLines = macroNodeIterator.macroLines {
+              if !macroNodeIterator.macros.isEmpty {
                 let instructions = lineBuffer.compactMap { thisLine -> (LR35902.Instruction, RGBDSAssembly.Statement)? in
                   if case let .instruction(instruction, assembly, _, _, _, _) = thisLine {
                     return (instruction, assembly)
@@ -223,59 +222,44 @@ clean:
                   }
                 }
 
-                var code: [LR35902.Instruction.Spec]
-                if let macroCode = macroNodeIterator.code {
-                  code = macroCode
-                } else {
-                  code = macroLines.map {
-                    if case .instruction(let instruction) = $0 {
-                      return instruction.spec
+                let macros: [(macro: LR35902.Disassembly.Macro, code: [LR35902.Instruction.Spec], arguments: [Int: String], rawArguments: [Int: String])] = macroNodeIterator.macros.map { macro in
+
+                  var code: [LR35902.Instruction.Spec]
+                  if let macroCode = macro.code {
+                    code = macroCode
+                  } else {
+                    code = macro.macroLines.map {
+                      if case .instruction(let instruction) = $0 {
+                        return instruction.spec
+                      }
+                      preconditionFailure("Unhandled")
                     }
-                    preconditionFailure("Unhandled")
                   }
+                  // Extract the arguments.
+                  let arguments: [Int: String] = zip(code, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
+                    let args = extractArgs(from: zipped.1.1, using: zipped.0)
+                    return iter.merging(args, uniquingKeysWith: { first, second in
+                      assert(first == second, "Mismatch in arguments")
+                      return first
+                    })
+                  })
+
+                  let rawArguments: [Int: String] = zip(code, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
+                    let args = extractArgs(from: RGBDSAssembly.assembly(for: zipped.1.0), using: zipped.0)
+                    return iter.merging(args, uniquingKeysWith: { first, second in
+                      assert(first == second, "Mismatch in arguments")
+                      return first
+                    })
+                  })
+
+                  return (macro: macro, code: code, arguments: arguments, rawArguments: rawArguments)
                 }
 
-                if !macroNodeIterator.hasWritten {
-                  if macrosHandle == nil {
-                    macrosHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("macros.asm").path)
-                    gameHandle.write("INCLUDE \"macros.asm\"\n".data(using: .utf8)!)
+                var validMacros = macros.filter { macro in
+                  guard let validArgumentValues = macro.macro.validArgumentValues else {
+                    return true
                   }
-
-                  var lines: [Line] = []
-                  lines.append(.empty)
-                  lines.append(.macroDefinition(macro))
-                  lines.append(contentsOf: zip(code, instructions).map { spec, instruction in
-                    var macroInstruction = instruction.0
-                    macroInstruction.spec = spec
-                    let macroAssembly = RGBDSAssembly.assembly(for: macroInstruction, with: self)
-                    return .macroInstruction(macroInstruction, macroAssembly)
-                  })
-                  lines.append(.macroTerminator)
-                  writeLinesToFile(lines, macrosHandle!)
-
-                  macroNodeIterator.hasWritten = true
-                }
-
-                // Extract the arguments.
-                let arguments: [Int: String] = zip(code, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
-                  let args = extractArgs(from: zipped.1.1, using: zipped.0)
-                  return iter.merging(args, uniquingKeysWith: { first, second in
-                    assert(first == second, "Mismatch in arguments")
-                    return first
-                  })
-                })
-
-                let rawArguments: [Int: String] = zip(code, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
-                  let args = extractArgs(from: RGBDSAssembly.assembly(for: zipped.1.0), using: zipped.0)
-                  return iter.merging(args, uniquingKeysWith: { first, second in
-                    assert(first == second, "Mismatch in arguments")
-                    return first
-                  })
-                })
-
-                var isValid: Bool
-                if let validArgumentValues = macroNodeIterator.validArgumentValues {
-                  let firstInvalidArgument = rawArguments.first { argumentNumber, argumentValue in
+                  let firstInvalidArgument = macro.rawArguments.first { argumentNumber, argumentValue in
                     guard validArgumentValues[argumentNumber] != nil else {
                       return false
                     }
@@ -288,17 +272,45 @@ clean:
                     }
                     preconditionFailure("Unhandled.")
                   }
-                  isValid = firstInvalidArgument == nil
-                } else {
-                  isValid = true
+                  return firstInvalidArgument == nil
                 }
 
-                if isValid {
+                if validMacros.count > 1 {
+                  // Try filtering to macros that have validation.
+                  validMacros = validMacros.filter { macro in
+                    macro.macro.validArgumentValues != nil
+                  }
+                }
+
+                precondition(validMacros.count <= 1, "More than one macro matched.")
+
+                if let macro = validMacros.first {
+                  if !macro.macro.hasWritten {
+                    if macrosHandle == nil {
+                      macrosHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("macros.asm").path)
+                      gameHandle.write("INCLUDE \"macros.asm\"\n".data(using: .utf8)!)
+                    }
+
+                    var lines: [Line] = []
+                    lines.append(.empty)
+                    lines.append(.macroDefinition(macro.macro.name))
+                    lines.append(contentsOf: zip(macro.code, instructions).map { spec, instruction in
+                      var macroInstruction = instruction.0
+                      macroInstruction.spec = spec
+                      let macroAssembly = RGBDSAssembly.assembly(for: macroInstruction, with: self)
+                      return .macroInstruction(macroInstruction, macroAssembly)
+                    })
+                    lines.append(.macroTerminator)
+                    writeLinesToFile(lines, macrosHandle!)
+
+                    macro.macro.hasWritten = true
+                  }
+
                   let lowerBound = LR35902.cartAddress(for: lineBufferAddress, in: bank)!
                   let upperBound = LR35902.cartAddress(for: cpu.pc - instructionWidth, in: bank)!
                   let bytes = cpu[lowerBound..<upperBound]
 
-                  let macroArgs = arguments.keys.sorted().map { arguments[$0]! }.joined(separator: ", ")
+                  let macroArgs = macro.arguments.keys.sorted().map { macro.arguments[$0]! }.joined(separator: ", ")
 
                   let firstInstruction = lineBuffer.firstIndex { line in if case .instruction = line { return true } else { return false} }!
                   let lastInstruction = lineBuffer.lastIndex { line in if case .instruction = line { return true } else { return false} }!
@@ -310,7 +322,7 @@ clean:
                   }
                   let macroScope = scope(at: lineBufferAddress, in: bank)
                   lineBuffer.replaceSubrange(firstInstruction...lastInstruction,
-                                             with: [.macro("\(macro) \(macroArgs)", lineBufferAddress, bank, macroScope, bytes)])
+                                             with: [.macro("\(macro.macro.name) \(macroArgs)", lineBufferAddress, bank, macroScope, bytes)])
 
                   lineBufferAddress = cpu.pc
                 } else {
