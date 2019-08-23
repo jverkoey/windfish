@@ -82,6 +82,13 @@ extension LR35902 {
       createGlobal(at: 0xFF47, named: "rBGP")
       createGlobal(at: 0xFF48, named: "rOBP0")
       createGlobal(at: 0xFF49, named: "rOBP1")
+      createGlobal(at: 0xFF10, named: "rAUD1SWEEP")
+      createGlobal(at: 0xFF12, named: "rAUD1ENV")
+      createGlobal(at: 0xFF13, named: "rAUD1LOW")
+      createGlobal(at: 0xFF14, named: "rAUD1HIGH")
+      createGlobal(at: 0xFF17, named: "rAUD2ENV")
+      createGlobal(at: 0xFF19, named: "rAUD2HIGH")
+      createGlobal(at: 0xFF1a, named: "rAUD3ENA")
     }
 
     // MARK: - Transfers of control
@@ -308,6 +315,14 @@ extension LR35902 {
       leaf.code = code
       leaf.macroLines = instructions
       leaf.validArgumentValues = validArgumentValues
+    }
+    public func defineMacro(named name: String, template: String) {
+      let assembler = RGBDSAssembler()
+      let errors = assembler.assemble(assembly: template)
+      guard errors.isEmpty else {
+        preconditionFailure("\(errors)")
+      }
+      defineMacro(named: name, instructions: assembler.instructions.map { .instruction($0) })
     }
 
     public class MacroNode {

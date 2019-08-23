@@ -95,11 +95,71 @@ disassembly.defineMacro(named: "modifySave", instructions: [
     1: IndexSet(integersIn: 0xA100..<0xAB8F)
 ])
 
-disassembly.defineMacro(named: "resetAudio", instructions: [
-  .instruction(.init(spec: .xor(.a))),
-  .instruction(.init(spec: .ld(.imm16addr, .a), imm16: 0xd361)),
-  .instruction(.init(spec: .ld(.imm16addr, .a), imm16: 0xd371)),
-])
+disassembly.defineMacro(named: "resetAudio", template: """
+xor  a
+ld   [$D361], a
+ld   [$D371], a
+ld   [$D31F], a
+
+ld   [$D32F], a
+ld   [$D33F], a
+
+ld   [$D39E], a
+ld   [$D39F], a
+
+ld   [$D3D9], a
+ld   [$D3DA], a
+
+ld   [$D3B6], a
+ld   [$D3B7], a
+ld   [$D3B8], a
+ld   [$D3B9], a
+ld   [$D3BA], a
+ld   [$D3BB], a
+
+ld   [$D394], a
+ld   [$D395], a
+ld   [$D396], a
+
+ld   [$D390], a
+ld   [$D391], a
+ld   [$D392], a
+
+ld   [$D3C6], a
+ld   [$D3C7], a
+ld   [$D3C8], a
+
+ld   [$D3A0], a
+ld   [$D3A1], a
+ld   [$D3A2], a
+
+ld   [$D3CD], a
+
+ld   [$D3D6], a
+ld   [$D3D7], a
+ld   [$D3D8], a
+
+ld   [$D3DC], a
+
+ld   [$D3E7], a
+
+ld   [$D3E2], a
+ld   [$D3E3], a
+ld   [$D3E4], a
+
+ld   a, %00001000
+ld   [$FF12], a
+ld   [$FF17], a
+
+ld   a, %10000000
+ld   [$FF14], a
+ld   [$FF19], a
+
+xor  a
+ld   [$FF10], a
+
+ld   [$ff1a], a
+""")
 
 //disassembly.defineMacro(named: "copyregion", instructions: [
 //  .any(.ld(.hl, .imm16)),

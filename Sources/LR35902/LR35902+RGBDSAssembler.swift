@@ -21,7 +21,7 @@ private func createStatement(from code: String) -> RGBDSAssembly.Statement {
 }
 
 private func isNumber(_ string: String) -> Bool {
-  return string.hasPrefix("$") || string.hasPrefix("0x") || Int(string) != nil
+  return string.hasPrefix("$") || string.hasPrefix("0x") || string.hasPrefix("%") || Int(string) != nil
 }
 
 private func createRepresentation(from statement: RGBDSAssembly.Statement) -> String {
@@ -58,6 +58,9 @@ private func cast<T: UnsignedInteger, negT: SignedInteger>(string: String, negat
   } else if value.starts(with: "0x") {
     numericPart = String(value.dropFirst(2))
     radix = 16
+  } else if value.starts(with: "%") {
+    numericPart = String(value.dropFirst())
+    radix = 2
   } else {
     numericPart = value
     radix = 10
@@ -168,6 +171,10 @@ public final class RGBDSAssembler {
 
   public var buffer = Data()
 
+  // TODO: Allow comments to be represented in the assembly as well for use in macros.
+  // This will need to become an enum of comments, newlines, or instructions.
+  public var instructions: [LR35902.Instruction] = []
+
   public struct Error: Swift.Error, Equatable {
     let lineNumber: Int?
     let error: String
@@ -205,6 +212,8 @@ public final class RGBDSAssembler {
         let shortestInstruction = instructions.sorted(by: { pair1, pair2 in
           pair1.spec.instructionWidth < pair2.spec.instructionWidth
         })[0]
+
+        self.instructions.append(shortestInstruction)
 
         self.buffer.append(contentsOf: RGBDSAssembler.instructionOpcodeBinary[shortestInstruction.spec]!)
         if let imm8 = shortestInstruction.imm8 {
