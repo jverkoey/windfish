@@ -7,9 +7,10 @@ let disassembly = LR35902.Disassembly(rom: data)
 
 func extractText(from range: Range<LR35902.CartridgeLocation>) {
   let parts = data[range].split(separator: 0xff, maxSplits: .max, omittingEmptySubsequences: false)
-  var offset: LR35902.Address = LR35902.addressAndBank(from: range.lowerBound).address
+  let addressAndBank = LR35902.addressAndBank(from: range.lowerBound)
+  var offset: LR35902.Address = addressAndBank.address
   for part in parts {
-    disassembly.setText(at: offset..<(offset + LR35902.Address(part.count)), in: 0x09)
+    disassembly.setText(at: offset..<(offset + LR35902.Address(part.count)), in: addressAndBank.bank)
     offset += LR35902.Address(part.count + 1)
   }
 }
@@ -25,7 +26,7 @@ disassembly.createGlobal(at: 0xdb95, named: "wGameMode")
 disassembly.createGlobal(at: 0xdb96, named: "wGameSubMode")
 disassembly.createGlobal(at: 0xdbaf, named: "wCurrentBank")
 
-// MARK: - Bank 0 (00
+// MARK: - Bank 0 (00)
 // TODO: Define this as a variable.
 disassembly.setLabel(at: 0x0003, in: 0x00, named: "DEBUG_TOOL")
 disassembly.setData(at: 0x0003, in: 0x00)
@@ -65,6 +66,16 @@ disassembly.setData(at: 0x4000..<(0x4000 + 0x0400), in: 0x0c)
 disassembly.setData(at: 0x4800..<(0x4800 + 0x1000), in: 0x0c)
 disassembly.setData(at: 0x47a0..<(0x47a0 + 0x0020), in: 0x0c)
 
+// MARK: - Bank 20 (14)
+extractText(from: LR35902.cartAddress(for: 0x5c00, in: 0x14)!..<LR35902.cartAddress(for: 0x79cd, in: 0x14)!)
+
+// MARK: - Bank 22 (16)
+extractText(from: LR35902.cartAddress(for: 0x5700, in: 0x16)!..<LR35902.cartAddress(for: 0x7ff0, in: 0x16)!)
+
+// MARK: - Bank 23 (17)
+disassembly.setLabel(at: 0x4099, in: 0x17, named: "CreditsText")
+disassembly.setText(at: 0x4099..<0x42fd, in: 0x17)
+
 // MARK: - Bank 27 (1b)
 disassembly.defineFunction(startingAt: 0x4006, in: 0x1b, named: "AudioStep1b_Launcher")
 disassembly.defineFunction(startingAt: 0x401e, in: 0x1b, named: "AudioStep1b_Start")
@@ -79,6 +90,12 @@ for i in LR35902.Address(0)..<LR35902.Address(32) {
   // TODO: Allow data to be grouped.
   disassembly.setData(at: (0x415d + i * 6)..<(0x415d + (i + 1) * 6), in: 0x1b)
 }
+
+// MARK: - Bank 28 (1c)
+extractText(from: LR35902.cartAddress(for: 0x4a00, in: 0x1c)!..<LR35902.cartAddress(for: 0x7360, in: 0x1c)!)
+
+// MARK: - Bank 28 (1d)
+extractText(from: LR35902.cartAddress(for: 0x4000, in: 0x1d)!..<LR35902.cartAddress(for: 0x7FB6, in: 0x1d)!)
 
 // MARK: - Bank 31 (1f)
 disassembly.defineFunction(startingAt: 0x4000, in: 0x1f, named: "EnableSound")
