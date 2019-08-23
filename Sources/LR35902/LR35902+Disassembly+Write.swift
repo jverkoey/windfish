@@ -357,17 +357,18 @@ clean:
             var chunkPc = initialPc
             let lineLength = lineLengthOfText(at: initialPc, in: bank) ?? 254
             for chunk in accumulator.chunked(into: lineLength) {
-              write(line(RGBDSAssembly.text(for: chunk), address: chunkPc), fileHandle: fileHandle)
+              write(line(RGBDSAssembly.text(for: chunk), address: chunkPc, addressType: "text"), fileHandle: fileHandle)
               chunkPc += LR35902.Address(chunk.count)
             }
 
           } else {
+            let addressType = initialType == .data ? "data" : nil
             var address = initialPc
             for chunk in accumulator.chunked(into: 8) {
               let instruction = RGBDSAssembly.assembly(for: chunk)
               let displayableBytes = chunk.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
               let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
-              write(line(instruction, address: address, comment: "|\(bytesAsCharacters)|"), fileHandle: fileHandle)
+              write(line(instruction, address: address, addressType: addressType, comment: "|\(bytesAsCharacters)|"), fileHandle: fileHandle)
               address += LR35902.Address(chunk.count)
             }
           }
