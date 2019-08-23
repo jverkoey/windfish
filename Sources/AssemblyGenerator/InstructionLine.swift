@@ -17,10 +17,10 @@ public func line(_ code: String, comment: String) -> String {
 }
 
 public func line<T: FixedWidthInteger>(_ code: String, address: T) -> String {
-  let column = codeColumn("    \(code)")
-  if code.count > column.count {
+  if code.count + 4 > codeWidth {
     return "\(codeColumn("")) ; $\(address.hexString)\n    \(code)"
   }
+  let column = codeColumn("    \(code)")
   return "\(column) ; $\(address.hexString)"
 }
 

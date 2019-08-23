@@ -5,6 +5,15 @@ let data = try Data(contentsOf: URL(fileURLWithPath: "/Users/featherless/workben
 
 let disassembly = LR35902.Disassembly(rom: data)
 
+func extractText(from range: Range<LR35902.CartridgeLocation>) {
+  let parts = data[range].split(separator: 0xff, maxSplits: .max, omittingEmptySubsequences: false)
+  var offset: LR35902.Address = LR35902.addressAndBank(from: range.lowerBound).address
+  for part in parts {
+    disassembly.setText(at: offset..<(offset + LR35902.Address(part.count)), in: 0x09)
+    offset += LR35902.Address(part.count + 1)
+  }
+}
+
 disassembly.disassembleAsGameboyCartridge()
 
 disassembly.createGlobal(at: 0xa100, named: "SAVEFILES")
@@ -46,6 +55,10 @@ disassembly.defineFunction(startingAt: 0x7D27, in: 0x01, named: "DMATransfer")
 // MARK: - Bank 5 (05)
 disassembly.setData(at: 0x5919..<(0x5919 + 0x0010), in: 0x05)
 disassembly.setData(at: 0x5939..<(0x5939 + 0x0010), in: 0x05)
+
+// MARK: - Bank 9 (09)
+extractText(from: LR35902.cartAddress(for: 0x6700, in: 0x09)!..<LR35902.cartAddress(for: 0x6d9f, in: 0x09)!)
+extractText(from: LR35902.cartAddress(for: 0x7d00, in: 0x09)!..<LR35902.cartAddress(for: 0x7eef, in: 0x09)!)
 
 // MARK: - Bank 12 (0c)
 disassembly.setData(at: 0x4000..<(0x4000 + 0x0400), in: 0x0c)

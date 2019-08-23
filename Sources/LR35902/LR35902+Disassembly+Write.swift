@@ -354,7 +354,11 @@ clean:
 
           // Dump the bytes in blocks of 8.
           if initialType == .text {
-            write(line(RGBDSAssembly.text(for: accumulator), address: initialPc), fileHandle: fileHandle)
+            var chunkPc = initialPc
+            for chunk in accumulator.chunked(into: 254) {
+              write(line(RGBDSAssembly.text(for: chunk), address: chunkPc), fileHandle: fileHandle)
+              chunkPc += LR35902.Address(chunk.count)
+            }
 
           } else {
             var address = initialPc
