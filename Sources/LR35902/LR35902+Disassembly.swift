@@ -133,7 +133,11 @@ extension LR35902 {
     // MARK: - Instructions
 
     func instruction(at pc: Address, in bank: Bank) -> Instruction? {
-      return instructionMap[cartAddress(for: pc, in: bank)!]
+      let location = cartAddress(for: pc, in: bank)!
+      guard code.contains(Int(location)) else {
+        return nil
+      }
+      return instructionMap[location]
     }
 
     func register(instruction: Instruction, at pc: Address, in bank: Bank) {
@@ -158,7 +162,9 @@ extension LR35902 {
     public func setData(at range: Range<Address>, in bank: Bank) {
       let lowerBound = cartAddress(for: range.lowerBound, in: bank)!
       let upperBound = cartAddress(for: range.upperBound, in: bank)!
-      data.insert(integersIn: Int(lowerBound)..<Int(upperBound))
+      let range = Int(lowerBound)..<Int(upperBound)
+      data.insert(integersIn: range)
+      code.remove(integersIn: range)
     }
 
     // MARK: - Text segments
