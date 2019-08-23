@@ -416,7 +416,12 @@ extension LR35902 {
       guard let cartAddress = cartAddress(for: pc, in: bank) else {
         preconditionFailure("Attempting to set label in non-cart addressable location.")
       }
-      labels[cartAddress] = name
+      if let label = labels[cartAddress],
+        label.contains(".") && !name.contains(".") {
+        labels[cartAddress] = "\(label.split(separator: ".").first!).\(name)"
+      } else {
+        labels[cartAddress] = name
+      }
     }
     var labels: [CartridgeLocation: String] = [:]
 
