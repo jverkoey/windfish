@@ -78,20 +78,29 @@ extension LR35902 {
       setLabel(at: 0x014E, in: 0x00, named: "HeaderGlobalChecksum")
       setData(at: 0x014E..<0x0150, in: 0x00)
 
-      createGlobal(at: 0xA000, named: "gbCARTRAM")
-
       createGlobal(at: 0x8000, named: "gbVRAM")
       createGlobal(at: 0x8800, named: "gbBGCHARDAT")
-      createGlobal(at: 0xFF47, named: "gbBGP")
-      createGlobal(at: 0xFF48, named: "gbOBP0")
-      createGlobal(at: 0xFF49, named: "gbOBP1")
-      createGlobal(at: 0xFF10, named: "gbAUD1SWEEP")
-      createGlobal(at: 0xFF12, named: "gbAUD1ENV")
-      createGlobal(at: 0xFF13, named: "gbAUD1LOW")
-      createGlobal(at: 0xFF14, named: "gbAUD1HIGH")
-      createGlobal(at: 0xFF17, named: "gbAUD2ENV")
-      createGlobal(at: 0xFF19, named: "gbAUD2HIGH")
-      createGlobal(at: 0xFF1a, named: "gbAUD3ENA")
+      createGlobal(at: 0x9800, named: "gbBGDAT0")
+      createGlobal(at: 0x9c00, named: "gbBGDAT1")
+      createGlobal(at: 0xa000, named: "gbCARTRAM")
+      createGlobal(at: 0xc000, named: "gbRAM")
+      createGlobal(at: 0xfe00, named: "gbOAMRAM")
+      createGlobal(at: 0xff00, named: "gbP1")
+      createGlobal(at: 0xff01, named: "gbSB")
+      createGlobal(at: 0xff02, named: "gbSC")
+      createGlobal(at: 0xff04, named: "gbDIV")
+      createGlobal(at: 0xff30, named: "gbAUD3WAVERAM")
+      createGlobal(at: 0xff10, named: "gbAUD1SWEEP")
+      createGlobal(at: 0xff12, named: "gbAUD1ENV")
+      createGlobal(at: 0xff13, named: "gbAUD1LOW")
+      createGlobal(at: 0xff14, named: "gbAUD1HIGH")
+      createGlobal(at: 0xff17, named: "gbAUD2ENV")
+      createGlobal(at: 0xff19, named: "gbAUD2HIGH")
+      createGlobal(at: 0xff1a, named: "gbAUD3ENA")
+      createGlobal(at: 0xff47, named: "gbBGP")
+      createGlobal(at: 0xff48, named: "gbOBP0")
+      createGlobal(at: 0xff49, named: "gbOBP1")
+      createGlobal(at: 0xff80, named: "gbHRAM")
     }
 
     // MARK: - Transfers of control
@@ -279,6 +288,7 @@ extension LR35902 {
 
     // TODO: Allow defining variable types, e.g. enums with well-understood values.
     public func createGlobal(at address: Address, named name: String) {
+      precondition(globals[address] == nil, "Global already exists at \(address).")
       globals[address] = name
     }
     var globals: [Address: String] = [:]
