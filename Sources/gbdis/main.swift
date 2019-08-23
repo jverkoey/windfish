@@ -14,8 +14,9 @@ disassembly.createGlobal(at: 0xd369, named: "wAudioData")
 disassembly.createGlobal(at: 0xd379, named: "wAudioSelection")
 disassembly.createGlobal(at: 0xdb95, named: "wGameMode")
 disassembly.createGlobal(at: 0xdb96, named: "wGameSubMode")
+disassembly.createGlobal(at: 0xdbaf, named: "wCurrentBank")
 
-// MARK: - Bank 0
+// MARK: - Bank 0 (00
 // TODO: Define this as a variable.
 disassembly.setLabel(at: 0x0003, in: 0x00, named: "DEBUG_TOOL")
 disassembly.setData(at: 0x0003, in: 0x00)
@@ -33,14 +34,23 @@ disassembly.defineFunction(startingAt: 0x298A, in: 0x00, named: "ClearHRAM")
 disassembly.defineFunction(startingAt: 0x2999, in: 0x00, named: "ClearMemoryRegion")
 disassembly.defineFunction(startingAt: 0x2B6B, in: 0x00, named: "LoadInitialTiles")
 
-// MARK: - Bank 1
+// MARK: - Bank 1 (01)
 disassembly.defineFunction(startingAt: 0x40CE, in: 0x01, named: "LCDOn")
 disassembly.defineFunction(startingAt: 0x46DD, in: 0x01, named: "InitSave")
 disassembly.defineFunction(startingAt: 0x460F, in: 0x01, named: "InitSaves")
 disassembly.defineFunction(startingAt: 0x7D19, in: 0x01, named: "CopyDMATransferToHRAM")
 disassembly.defineFunction(startingAt: 0x7D27, in: 0x01, named: "DMATransfer")
 
-// MARK: - Bank 27
+// MARK: - Bank 5 (05)
+disassembly.setData(at: 0x5919..<(0x5919 + 0x0010), in: 0x05)
+disassembly.setData(at: 0x5939..<(0x5939 + 0x0010), in: 0x05)
+
+// MARK: - Bank 12 (0c)
+disassembly.setData(at: 0x4000..<(0x4000 + 0x0400), in: 0x0c)
+disassembly.setData(at: 0x4800..<(0x4800 + 0x1000), in: 0x0c)
+disassembly.setData(at: 0x47a0..<(0x47a0 + 0x0020), in: 0x0c)
+
+// MARK: - Bank 27 (1b)
 disassembly.defineFunction(startingAt: 0x4006, in: 0x1b, named: "AudioStep1b_Launcher")
 disassembly.defineFunction(startingAt: 0x401e, in: 0x1b, named: "AudioStep1b_Start")
 disassembly.defineFunction(startingAt: 0x4037, in: 0x1b, named: "CheckAudioSelection")
@@ -55,7 +65,7 @@ for i in LR35902.Address(0)..<LR35902.Address(32) {
   disassembly.setData(at: (0x415d + i * 6)..<(0x415d + (i + 1) * 6), in: 0x1b)
 }
 
-// MARK: - Bank 31
+// MARK: - Bank 31 (1f)
 disassembly.defineFunction(startingAt: 0x4000, in: 0x1f, named: "EnableSound")
 disassembly.defineFunction(startingAt: 0x4006, in: 0x1f, named: "PlayAudioStep_Launcher")
 disassembly.setLabel(at: 0x401e, in: 0x1f, named: "PlayAudioStep_Start")
@@ -72,6 +82,8 @@ disassembly.setLabel(at: 0x7a28, in: 0x1f, named: "ClearActiveNoiseSound")
 
 disassembly.setLabel(at: 0x7a60, in: 0x1f, named: "_ShiftHL")
 
+disassembly.defineFunction(startingAt: 0x7f80, in: 0x1f, named: "SoundUnknown1")
+
 
 disassembly.defineMacro(named: "callcb", instructions: [
   .any(.ld(.a, .imm8)),
@@ -83,6 +95,18 @@ disassembly.defineMacro(named: "callcb", instructions: [
   .call(nil, .arg(1))
 ], validArgumentValues: [
   1: IndexSet(integersIn: 0x4000..<0x8000)
+])
+
+disassembly.defineMacro(named: "copyRegion", instructions: [
+  .any(.ld(.hl, .imm16)),
+  .any(.ld(.de, .imm16)),
+  .any(.ld(.bc, .imm16)),
+  .instruction(.init(spec: .call(nil, .imm16), imm16: 0x28C5)),
+], code: [
+  .ld(.hl, .arg(1)),
+  .ld(.de, .arg(3)),
+  .ld(.bc, .arg(2)),
+  .call(nil, .imm16),
 ])
 
 disassembly.defineMacro(named: "modifySave", instructions: [

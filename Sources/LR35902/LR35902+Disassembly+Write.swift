@@ -160,6 +160,7 @@ clean:
       }
 
       while cpu.pc < end {
+        var isLabeled = false
         var lineGroup: [Line] = []
         if let preComment = preComment(at: cpu.pc, in: bank) {
           lineGroup.append(.empty)
@@ -172,6 +173,7 @@ clean:
             lineGroup.append(.empty)
             lineGroup.append(.label(label))
           }
+          isLabeled = true
         }
 
         if instructionsToDecode > 0, let instruction = instruction(at: cpu.pc, in: bank) {
@@ -201,10 +203,11 @@ clean:
             macroNode = child
 
           } else if let macroNodeIterator = macroNode {
-            // Still building the macro.
-            if let child = macroNodeIterator.children[asInstruction] ?? macroNodeIterator.children[asAny] {
+            // Only descend the tree if we're not a label.
+            if !isLabeled, let child = macroNodeIterator.children[asInstruction] ?? macroNodeIterator.children[asAny] {
               macroNode = child
             } else {
+              // No further nodes to be traversed; is this the end of a macro?
               if let macro = macroNodeIterator.macro,
                 let macroLines = macroNodeIterator.macroLines {
                 let instructions = lineBuffer.compactMap { thisLine -> (LR35902.Instruction, RGBDSAssembly.Statement)? in
@@ -299,6 +302,8 @@ clean:
 
                   lineBufferAddress = cpu.pc
                 }
+              } else {
+                flush()
               }
               macroNode = nil
             }
