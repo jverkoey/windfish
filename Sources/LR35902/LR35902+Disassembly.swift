@@ -165,6 +165,42 @@ extension LR35902 {
           .jr(.c, .arg(3)),
       ])
 
+      defineMacro(named: "jumpIfEq", instructions: [
+        .any(.ld(.a, .ffimm8addr)),
+        .any(.cp(.imm8)),
+        .any(.jr(.z, .simm8)),
+        ], code: [
+          .ld(.a, .arg(1)),
+          .cp(.arg(2)),
+          .jr(.z, .arg(3)),
+      ])
+
+      defineMacro(named: "jumpIfNe", instructions: [
+        .any(.ld(.a, .ffimm8addr)),
+        .any(.cp(.imm8)),
+        .any(.jr(.nz, .simm8)),
+        ], code: [
+          .ld(.a, .arg(1)),
+          .cp(.arg(2)),
+          .jr(.nz, .arg(3)),
+      ])
+
+      defineMacro(named: "setH", instructions: [
+        .any(.ld(.a, .imm8)),
+        .any(.ld(.ffimm8addr, .a)),
+      ], code: [
+        .ld(.a, .arg(2)),
+        .ld(.arg(1), .a),
+      ])
+
+//      defineMacro(named: "set", instructions: [
+//        .any(.ld(.a, .imm8)),
+//        .any(.ld(.imm16addr, .a)),
+//      ], code: [
+//        .ld(.a, .arg(2)),
+//        .ld(.arg(1), .a),
+//      ])
+
       defineMacro(named: "copyMemory", instructions: [
         .any(.ld(.a, .imm16addr)),
         .any(.ld(.imm16addr, .a)),
@@ -173,7 +209,7 @@ extension LR35902 {
         .ld(.arg(2), .a),
       ])
 
-      defineMacro(named: "copyMemoryFF", instructions: [
+      defineMacro(named: "copyMemoryH", instructions: [
         .any(.ld(.a, .ffimm8addr)),
         .any(.ld(.ffimm8addr, .a)),
       ], code: [
