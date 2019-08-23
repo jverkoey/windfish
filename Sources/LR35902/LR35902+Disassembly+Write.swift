@@ -123,6 +123,7 @@ clean:
     }
 
     var instructionsToDecode = Int.max
+    var instructionsDecoded = 0
 
     for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
       let fileHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("bank_\(bank.hexString).asm").path)
@@ -178,6 +179,7 @@ clean:
 
         if instructionsToDecode > 0, let instruction = instruction(at: cpu.pc, in: bank) {
           instructionsToDecode -= 1
+          instructionsDecoded += 1
 
           if let bankChange = bankChange(at: cpu.pc, in: bank) {
             cpu.bank = bankChange
@@ -378,5 +380,7 @@ clean:
         .map { "INCLUDE \"bank_\($0.hexString).asm\"" }
         .joined(separator: "\n") + "\n")
         .data(using: .utf8)!)
+
+    print("Instructions decoded: \(instructionsDecoded)")
   }
 }
