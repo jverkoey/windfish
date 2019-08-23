@@ -155,6 +155,16 @@ extension LR35902 {
         .jr(.nc, .arg(3)),
       ])
 
+      defineMacro(named: "jumpIfLt", instructions: [
+        .any(.ld(.a, .ffimm8addr)),
+        .any(.cp(.imm8)),
+        .any(.jr(.c, .simm8)),
+        ], code: [
+          .ld(.a, .arg(1)),
+          .cp(.arg(2)),
+          .jr(.c, .arg(3)),
+      ])
+
       defineMacro(named: "copyMemory", instructions: [
         .any(.ld(.a, .imm16addr)),
         .any(.ld(.imm16addr, .a)),

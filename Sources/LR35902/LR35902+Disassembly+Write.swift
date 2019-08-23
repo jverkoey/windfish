@@ -302,9 +302,15 @@ clean:
 
                   let firstInstruction = lineBuffer.firstIndex { line in if case .instruction = line { return true } else { return false} }!
                   let lastInstruction = lineBuffer.lastIndex { line in if case .instruction = line { return true } else { return false} }!
+                  let bank: LR35902.Bank
+                  if case let .instruction(_, _, _, instructionBank, _, _) = lineBuffer[lastInstruction] {
+                    bank = instructionBank
+                  } else {
+                    bank = cpu.bank
+                  }
                   let macroScope = scope(at: lineBufferAddress, in: bank)
                   lineBuffer.replaceSubrange(firstInstruction...lastInstruction,
-                                             with: [.macro("\(macro) \(macroArgs)", lineBufferAddress, cpu.bank, macroScope, bytes)])
+                                             with: [.macro("\(macro) \(macroArgs)", lineBufferAddress, bank, macroScope, bytes)])
 
                   lineBufferAddress = cpu.pc
                 } else {
@@ -319,9 +325,11 @@ clean:
 
           // Handle context changes.
           switch instruction.spec {
-          case .jp, .jr:
+          case .jp(let condition, _), .jr(let condition, _):
             lineGroup.append(.empty)
-            cpu.bank = bank
+            if condition == nil {
+              cpu.bank = bank
+            }
           case .ret, .reti:
             lineGroup.append(.newline)
             lineGroup.append(.empty)
