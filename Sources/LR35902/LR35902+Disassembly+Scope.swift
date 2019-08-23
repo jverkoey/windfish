@@ -29,8 +29,9 @@ extension LR35902.Disassembly {
       let labelLocations = self.labelLocations(in: contiguousScope.dropFirst())
 
       rewriteLabels(at: labelLocations, with: runGroupName)
-      rewriteReturnLabels(at: labelLocations, with: runGroupName)
       rewriteLoopLabels(in: contiguousScope.dropFirst(), with: runGroupName)
+      rewriteElseLabels(in: contiguousScope.dropFirst(), with: runGroupName)
+      rewriteReturnLabels(at: labelLocations, with: runGroupName)
     }
   }
 
@@ -105,6 +106,44 @@ extension LR35902.Disassembly {
         labels[cartLocation] = "\(scopeName).loop_\(LR35902.addressAndBank(from: cartLocation).address.hexString)"
       } else {
         labels[cartLocation] = "\(scopeName).loop"
+      }
+    }
+  }
+
+  private func rewriteElseLabels(in scope: Range<LR35902.CartridgeLocation>, with scopeName: String) {
+    guard !scopeName.contains(".") else {
+      return
+    }
+
+    let tocs: [(destination: LR35902.CartridgeLocation, tocs: Set<TransferOfControl>)] = scope.compactMap {
+      let (address, bank) = LR35902.addressAndBank(from: $0)
+      if let toc = transfersOfControl(at: address, in: bank) {
+        return ($0, toc)
+      } else {
+        return nil
+      }
+    }
+    let forwardTocs: [(source: LR35902.CartridgeLocation, destination: LR35902.CartridgeLocation)] = tocs.reduce(into: [], { (accumulator, element) in
+      let tocsInThisScope = element.tocs.filter {
+        scope.contains($0.sourceLocation) && element.destination > $0.sourceLocation && labels[element.destination] != nil
+      }
+      for toc in tocsInThisScope {
+        if case .jr(let condition, _) = instructionMap[toc.sourceLocation]?.spec,
+          condition != nil {
+          accumulator.append((toc.sourceLocation, element.destination))
+        }
+      }
+    })
+    if forwardTocs.isEmpty {
+      return
+    }
+    let destinations = Set(forwardTocs.map { $0.destination })
+    let hasManyDestinations = destinations.count > 1
+    for cartLocation in destinations {
+      if hasManyDestinations {
+        labels[cartLocation] = "\(scopeName).else_\(LR35902.addressAndBank(from: cartLocation).address.hexString)"
+      } else {
+        labels[cartLocation] = "\(scopeName).else"
       }
     }
   }
