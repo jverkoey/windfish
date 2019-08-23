@@ -21,16 +21,15 @@ public func line(comment: String) -> String {
 }
 
 public func line(_ code: String, comment: String) -> String {
-  return "\(codeColumn(code)) ; \(comment)"
+  if code.count > codeWidth {
+    return "\(codeColumn("")) ; \(comment)\n\(code)"
+  } else {
+    return "\(codeColumn(code)) ; \(comment)"
+  }
 }
 
 public func line<T: FixedWidthInteger>(_ code: String, address: T, addressType: String?) -> String {
-  let aAndT = addressAndType(address, type: addressType)
-  if code.count + 4 > codeWidth {
-    return "\(codeColumn("")) ; \(aAndT)\n    \(code)"
-  }
-  let column = codeColumn("    \(code)")
-  return "\(column) ; \(aAndT)"
+  return line("    \(code)", comment: addressAndType(address, type: addressType))
 }
 
 public func line(_ code: String) -> String {
@@ -39,13 +38,13 @@ public func line(_ code: String) -> String {
 
 public func line<T: FixedWidthInteger>(_ code: String, address: T, addressType: String?, comment: String) -> String {
   let aAndT = addressAndType(address, type: addressType)
-  return "\(codeColumn("    \(code)")) ; \(aAndT) \(comment)"
+  return line("    \(code)", comment: "\(aAndT) \(comment)")
 }
 
 public func line<T: FixedWidthInteger>(_ code: String, address: T, bank: UInt8, scope: Set<String>, bytes: Data) -> String {
   if !scope.isEmpty {
-    return "\(codeColumn("    \(code)")) ; $\(address.hexString) (\(bank.hexString)): \(scope.sorted().joined(separator: ", ")) \(bytes.map { "$\($0.hexString)" }.joined(separator: " "))"
+    return line("    \(code)", comment: "$\(address.hexString) (\(bank.hexString)): \(scope.sorted().joined(separator: ", ")) \(bytes.map { "$\($0.hexString)" }.joined(separator: " "))")
   } else {
-    return "\(codeColumn("    \(code)")) ; $\(address.hexString) (\(bank.hexString)): \(bytes.map { "$\($0.hexString)" }.joined(separator: " "))"
+    return line("    \(code)", comment: "$\(address.hexString) (\(bank.hexString)): \(bytes.map { "$\($0.hexString)" }.joined(separator: " "))")
   }
 }
