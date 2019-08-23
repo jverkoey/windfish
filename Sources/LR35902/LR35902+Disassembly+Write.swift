@@ -386,5 +386,7 @@ clean:
         .data(using: .utf8)!)
 
     print("Instructions decoded: \(instructionsDecoded)")
+
+    print("Disassembled: \(Double(knownLocations().count * 100) / Double(cpu.cartridgeSize))%")
   }
 }

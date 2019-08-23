@@ -258,6 +258,10 @@ extension LR35902 {
     private var data = IndexSet()
     private var text = IndexSet()
 
+    public func knownLocations() -> IndexSet {
+      return code.union(data).union(text)
+    }
+
     // MARK: - Functions
 
     public func function(startingAt pc: Address, in bank: Bank) -> String? {
