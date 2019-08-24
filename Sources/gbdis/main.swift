@@ -19,6 +19,9 @@ func extractText(from range: Range<LR35902.CartridgeLocation>) {
   }
 }
 
+disassembly.setData(at: 0x0004..<0x0008, in: 0x00)
+disassembly.setData(at: 0x0008..<0x0040, in: 0x00)
+
 disassembly.disassembleAsGameboyCartridge()
 
 disassembly.createGlobal(at: 0xa100, named: "SAVEFILES")
@@ -47,9 +50,6 @@ disassembly.createGlobal(at: 0xfffd, named: "hDidRenderFrame")
 // MARK: - Bank 0 (00)
 // TODO: Define this as a variable.
 disassembly.createGlobal(at: 0x0003, named: "DEBUG_TOOL", dataType: "bool")
-
-disassembly.setData(at: 0x0004..<0x0008, in: 0x00)
-disassembly.setData(at: 0x0008..<0x0040, in: 0x00)
 
 disassembly.defineFunction(startingAt: 0x0150, in: 0x00, named: "Main")
 disassembly.setPreComment(at: 0x0156, in: 0x00, text: "Reset the palette registers to zero.")

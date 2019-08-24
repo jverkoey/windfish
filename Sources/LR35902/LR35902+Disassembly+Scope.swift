@@ -32,6 +32,8 @@ extension LR35902.Disassembly {
       rewriteLoopLabels(in: contiguousScope.dropFirst(), with: runGroupName)
       rewriteElseLabels(in: contiguousScope.dropFirst(), with: runGroupName)
       rewriteReturnLabels(at: labelLocations, with: runGroupName)
+
+      inferVariableTypes(in: contiguousScope)
     }
   }
 
@@ -148,4 +150,18 @@ extension LR35902.Disassembly {
     }
   }
 
+  private func inferVariableTypes(in range: Range<LR35902.CartridgeLocation>) {
+//    var (pc, bank) = LR35902.addressAndBank(from: range.lowerBound)
+//    while pc < range.upperBound {
+//      guard let instruction = self.instruction(at: pc, in: bank) else {
+//        pc += 1
+//        continue
+//      }
+//
+//      switch instruction.spec {
+//      default:
+//        pc += LR35902.Instruction.widths[instruction.spec]!.total
+//      }
+//    }
+  }
 }
