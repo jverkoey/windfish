@@ -51,24 +51,15 @@ public final class RunGroup<T: Run> {
   }()
 
   public lazy var firstContiguousScopeRange: Range<T.AddressT>? = {
-//
-//    if let startAddress = startAddress {
-//      if let range = scope.rangeView.first(where: { $0.lowerBound == Int(startAddress) }) {
-//        return Range<T.AddressT>(uncheckedBounds: (T.AddressT(range.lowerBound),
-//                                                   T.AddressT(range.upperBound)))
-//      } else if let range = scope.rangeView.first(where: { $0.contains(Int(startAddress)) }) {
-//        return Range<T.AddressT>(uncheckedBounds: (startAddress,
-//                                                   T.AddressT(range.upperBound)))
-//      }
-//    }
-//    return nil
-
-    guard let startAddress = startAddress,
-      let range = scope.rangeView.first(where: { $0.lowerBound == Int(startAddress) }) else {
-      return nil
+    if let startAddress = startAddress {
+      if let range = scope.rangeView.first(where: { $0.lowerBound == Int(startAddress) }) {
+        return Range<T.AddressT>(uncheckedBounds: (T.AddressT(range.lowerBound),
+                                                   T.AddressT(range.upperBound)))
+      } else if let range = scope.rangeView.first(where: { $0.contains(Int(startAddress)) }) {
+        return Range<T.AddressT>(uncheckedBounds: (startAddress, T.AddressT(range.upperBound)))
+      }
     }
-    return Range<T.AddressT>(uncheckedBounds: (T.AddressT(range.lowerBound),
-                                               T.AddressT(range.upperBound)))
+    return nil
   }()
 }
 

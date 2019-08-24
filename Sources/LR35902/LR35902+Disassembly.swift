@@ -471,11 +471,12 @@ extension LR35902 {
       }
       return Set(intersectingScopes.keys)
     }
-    public func contiguousScope(at pc: Address, in bank: Bank) -> String? {
+    public func contiguousScope(at pc: Address, in bank: Bank) -> Set<String> {
       guard let cartAddress = cartAddress(for: pc, in: bank) else {
-        return nil
+        return Set()
       }
-      return contiguousScopes[cartAddress]
+      let labels = contiguousScopes.filter { label, scope in scope.contains(cartAddress) }.keys
+      return Set(labels)
     }
 
     public func defineFunction(startingAt pc: Address, in bank: Bank, named name: String) {
@@ -495,11 +496,9 @@ extension LR35902 {
       scopes[label, default: IndexSet()].formUnion(scope)
     }
     func setContiguousScope(forLabel label: String, range: Range<CartridgeLocation>) {
-      for location in range {
-        contiguousScopes[location] = label
-      }
+      contiguousScopes[label] = range
     }
-    var contiguousScopes: [CartridgeLocation: String] = [:]
+    var contiguousScopes: [String: Range<CartridgeLocation>] = [:]
     private var scopes: [String: IndexSet] = [:]
 
     // MARK: - Labels

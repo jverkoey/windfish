@@ -41,8 +41,8 @@ public func line<T: FixedWidthInteger>(_ code: String, address: T, addressType: 
   return line("    \(code)", comment: "\(aAndT) \(comment)")
 }
 
-public func line<T: FixedWidthInteger>(_ code: String, address: T, bank: UInt8, scope: String?, bytes: Data) -> String {
-  if let scope = scope {
+public func line<T: FixedWidthInteger>(_ code: String, address: T, bank: UInt8, scope: String, bytes: Data) -> String {
+  if !scope.isEmpty {
     return line("    \(code)", comment: "$\(address.hexString) (\(bank.hexString)): \(scope) \(bytes.map { "$\($0.hexString)" }.joined(separator: " "))")
   } else {
     return line("    \(code)", comment: "$\(address.hexString) (\(bank.hexString)): \(bytes.map { "$\($0.hexString)" }.joined(separator: " "))")
