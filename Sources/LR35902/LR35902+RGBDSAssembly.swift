@@ -170,6 +170,29 @@ public final class RGBDSAssembly {
         }
         return [operand(for: instruction, operand: operand1), addressLabel]
 
+      case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .imm8:
+        let value: String
+        let location = LR35902.cartAddress(for: disassembly.cpu.pc, in: disassembly.cpu.bank)!
+        if let type = disassembly.typeAtLocation[location],
+          let dataType = disassembly.dataTypes[type] {
+          switch dataType.interpretation {
+          case .bitmask:
+            let imm8 = instruction.imm8!
+            let bitmaskValues = dataType.namedValues.filter { value, _ in
+              if imm8 == 0 {
+                return value == 0
+              }
+              return value != 0 && (imm8 & value) == value
+            }.values
+            value = bitmaskValues.sorted().joined(separator: " | ")
+          case .enumerated:
+            preconditionFailure("Not implemented")
+          }
+        } else {
+          value = "$\(instruction.imm8!.hexString)"
+        }
+        return [operand(for: instruction, operand: operand1), value]
+
       default:
         break
       }

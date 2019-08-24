@@ -581,6 +581,10 @@ extension LR35902 {
     }
     var dataTypes: [String: Datatype] = [:]
 
+    public func setType(at address: LR35902.Address, in bank: LR35902.Bank, to type: String) {
+      precondition(dataTypes[type] != nil, "\(type) is not a known type.")
+      typeAtLocation[LR35902.cartAddress(for: address, in: bank)!] = type
+    }
     var typeAtLocation: [LR35902.CartridgeLocation: String] = [:]
 
     // MARK: - Comments
