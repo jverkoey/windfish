@@ -22,6 +22,16 @@ extension LR35902 {
       }
 
       createDatatype(named: "bool", namedValues: [0: "false", 1: "true"])
+      createDatatype(named: "STATF", namedValues: [
+        0b0100_0000: "STATF_LYC",
+        0b0010_0000: "STATF_MODE10",
+        0b0001_0000: "STATF_MODE01",
+        0b0000_1000: "STATF_MODE00",
+        0b0000_0100: "STATF_LYCF",
+        0b0000_0010: "STATF_OAM",
+        0b0000_0001: "STATF_VB",
+        0b0000_0000: "STATF_HB"
+      ], interpretation: .bitmask)
 
       setLabel(at: 0x0040, in: 0x00, named: "VBlankInterrupt")
       disassemble(range: 0x0040..<0x0048, inBank: 0)
@@ -118,7 +128,7 @@ extension LR35902 {
       createGlobal(at: 0xff26, named: "gbAUDENA")
       createGlobal(at: 0xff30, named: "gbAUD3WAVERAM")
       createGlobal(at: 0xff40, named: "gbLCDC")
-      createGlobal(at: 0xff41, named: "gbSTAT")
+      createGlobal(at: 0xff41, named: "gbSTAT", dataType: "STATF")
       createGlobal(at: 0xff42, named: "gbSCY")
       createGlobal(at: 0xff43, named: "gbSCX")
       createGlobal(at: 0xff44, named: "gbLY")
@@ -556,11 +566,20 @@ extension LR35902 {
     }
     var globals: [Address: Global] = [:]
 
-    public func createDatatype(named name: String, namedValues: [UInt8: String]) {
-      precondition(dataTypes[name] == nil, "Data type \(name) already exists.")
-      dataTypes[name] = namedValues
+    public struct Datatype {
+      let namedValues: [UInt8: String]
+      let interpretation: Interpretation
+
+      public enum Interpretation {
+        case enumerated
+        case bitmask
+      }
     }
-    var dataTypes: [String: [UInt8: String]] = [:]
+    public func createDatatype(named name: String, namedValues: [UInt8: String], interpretation: Datatype.Interpretation = .enumerated) {
+      precondition(dataTypes[name] == nil, "Data type \(name) already exists.")
+      dataTypes[name] = Datatype(namedValues: namedValues, interpretation: interpretation)
+    }
+    var dataTypes: [String: Datatype] = [:]
 
     // MARK: - Comments
 

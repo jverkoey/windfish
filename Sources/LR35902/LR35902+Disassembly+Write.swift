@@ -141,10 +141,19 @@ clean:
 
       for dataType in dataTypes.sorted(by: { $0.0 < $1.0 }) {
         handle.write("; Type: \(dataType.key)\n".data(using: .utf8)!)
-        handle.write(dataType.value.sorted(by: { $0.key < $1.key }).map {
-          "\($0.value) EQU \($0.key)"
+        let namedValues = dataType.value.namedValues.sorted(by: { $0.key < $1.key })
+        let longestVariable = namedValues.reduce(0) { (currentMax, next) in
+          max(currentMax, next.value.count)
+        }
+        handle.write(namedValues.map {
+          switch dataType.value.interpretation {
+          case .enumerated:
+            return "\($0.value.padding(toLength: longestVariable, withPad: " ", startingAt: 0)) EQU \($0.key)"
+          case .bitmask:
+            return "\($0.value.padding(toLength: longestVariable, withPad: " ", startingAt: 0)) EQU %\($0.key.binaryString)"
+          }
         }.joined(separator: "\n").data(using: .utf8)!)
-        handle.write("\n".data(using: .utf8)!)
+        handle.write("\n\n".data(using: .utf8)!)
       }
 
       gameHandle.write("INCLUDE \"datatypes.asm\"\n".data(using: .utf8)!)
@@ -463,7 +472,7 @@ clean:
           if let global = global,
             let dataType = global.dataType,
             let type = dataTypes[dataType],
-            let value = type[accumulator.last!] {
+            let value = type.namedValues[accumulator.last!] {
             globalValue = value
             accumulator.removeLast()
           } else {
