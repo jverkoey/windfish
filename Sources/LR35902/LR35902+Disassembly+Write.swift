@@ -132,8 +132,8 @@ clean:
     if !globals.isEmpty {
       let variablesHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("variables.asm").path)
 
-      variablesHandle.write(globals.filter { $0.key >= 0x8000 }.sorted { $0.0 < $1.0 }.map { address, name in
-        "\(name) EQU $\(address.hexString)"
+      variablesHandle.write(globals.filter { $0.key >= 0x8000 }.sorted { $0.0 < $1.0 }.map { address, global in
+        "\(global.name) EQU $\(address.hexString)"
       }.joined(separator: "\n\n").data(using: .utf8)!)
 
       gameHandle.write("INCLUDE \"variables.asm\"\n".data(using: .utf8)!)

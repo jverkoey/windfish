@@ -118,54 +118,50 @@ public final class RGBDSAssembly {
       case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand1 == .imm16addr:
         var addressLabel: String
         if let label = disassembly.label(at: instruction.imm16!, in: disassembly.cpu.bank) {
-          addressLabel = "[\(label)]"
+          addressLabel = label
         } else if let global = disassembly.globals[instruction.imm16!] {
-          addressLabel = "[\(global)]"
+          addressLabel = global.name
         } else {
-          addressLabel = "[$\(instruction.imm16!.hexString)]"
+          addressLabel = "$\(instruction.imm16!.hexString)"
         }
-        return [addressLabel, operand(for: instruction, operand: operand2)]
+        return ["[\(addressLabel)]", operand(for: instruction, operand: operand2)]
 
       case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .imm16addr:
         var addressLabel: String
         if let label = disassembly.label(at: instruction.imm16!, in: disassembly.cpu.bank) {
-          addressLabel = "[\(label)]"
+          addressLabel = label
         } else if let global = disassembly.globals[instruction.imm16!] {
-          addressLabel = "[\(global)]"
+          addressLabel = global.name
         } else {
-          addressLabel = "[$\(instruction.imm16!.hexString)]"
+          addressLabel = "$\(instruction.imm16!.hexString)"
         }
-        return [operand(for: instruction, operand: operand1), addressLabel]
+        return [operand(for: instruction, operand: operand1), "[\(addressLabel)]"]
 
       case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand1 == .ffimm8addr:
         var addressLabel: String
-        if let name = disassembly.globals[0xFF00 | UInt16(instruction.imm8!)] {
-          addressLabel = "[\(name)]"
-        } else if let global = disassembly.globals[0xFF00 | UInt16(instruction.imm8!)] {
-          addressLabel = "[\(global)]"
+        if let global = disassembly.globals[0xFF00 | UInt16(instruction.imm8!)] {
+          addressLabel = global.name
         } else {
-          addressLabel = "[$FF\(instruction.imm8!.hexString)]"
+          addressLabel = "$FF\(instruction.imm8!.hexString)"
         }
-        return [addressLabel, operand(for: instruction, operand: operand2)]
+        return ["[\(addressLabel)]", operand(for: instruction, operand: operand2)]
 
       case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .ffimm8addr:
         var addressLabel: String
-        if let name = disassembly.globals[0xFF00 | UInt16(instruction.imm8!)] {
-          addressLabel = "[\(name)]"
-        } else if let global = disassembly.globals[0xFF00 | UInt16(instruction.imm8!)] {
-          addressLabel = "[\(global)]"
+        if let global = disassembly.globals[0xFF00 | UInt16(instruction.imm8!)] {
+          addressLabel = global.name
         } else {
-          addressLabel = "[$FF\(instruction.imm8!.hexString)]"
+          addressLabel = "$FF\(instruction.imm8!.hexString)"
         }
-        return [operand(for: instruction, operand: operand1), addressLabel]
+        return [operand(for: instruction, operand: operand1), "[\(addressLabel)]"]
 
       case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .imm16:
         var addressLabel: String
         // TODO: These are only globals if they're referenced as an address in a subsequent instruction.
-        if operand1 == .hl, let name = disassembly.globals[instruction.imm16!] {
-          addressLabel = "\(name)"
+        if operand1 == .hl, let name = disassembly.globals[instruction.imm16!]?.name {
+          addressLabel = name
         } else {
-        addressLabel = "$\(instruction.imm16!.hexString)"
+          addressLabel = "$\(instruction.imm16!.hexString)"
         }
         return [operand(for: instruction, operand: operand1), addressLabel]
 

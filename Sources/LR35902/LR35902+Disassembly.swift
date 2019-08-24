@@ -514,7 +514,7 @@ extension LR35902 {
     // TODO: Allow defining variable types, e.g. enums with well-understood values.
     public func createGlobal(at address: Address, named name: String, dataType: String? = nil) {
       precondition(globals[address] == nil, "Global already exists at \(address).")
-      globals[address] = name
+      globals[address] = Global(name: name, dataType: dataType)
 
       precondition(address < 0x4000 || address >= 0x8000, "Cannot set globals in switchable banks.")
 
@@ -523,7 +523,15 @@ extension LR35902 {
         setData(at: address, in: 0)
       }
     }
-    var globals: [Address: String] = [:]
+    final class Global {
+      let name: String
+      let dataType: String?
+      init(name: String, dataType: String? = nil) {
+        self.name = name
+        self.dataType = dataType
+      }
+    }
+    var globals: [Address: Global] = [:]
 
     public func createDatatype(named name: String, namedValues: [UInt8: String]) {
       precondition(dataTypes[name] == nil, "Data type \(name) already exists.")
