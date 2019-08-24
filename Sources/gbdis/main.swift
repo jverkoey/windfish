@@ -24,6 +24,36 @@ disassembly.setData(at: 0x0008..<0x0040, in: 0x00)
 
 disassembly.disassembleAsGameboyCartridge()
 
+disassembly.createDatatype(named: "GAMEMODE", enumeration: [
+  0x00: "GAMEMODE_INTRO",
+  0x01: "GAMEMODE_CREDITS",
+  0x02: "GAMEMODE_FILE_SELECT",
+  0x03: "GAMEMODE_FILE_NEW",
+  0x04: "GAMEMODE_FILE_DELETE",
+  0x05: "GAMEMODE_FILE_COPY",
+  0x06: "GAMEMODE_FILE_SAVE",
+  0x07: "GAMEMODE_MINI_MAP",
+  0x08: "GAMEMODE_PEACH_PIC",
+  0x09: "GAMEMODE_MARIN_BEACH",
+  0x0a: "GAMEMODE_WF_MURAL",
+  0x0b: "GAMEMODE_WORLD",
+  0x0c: "GAMEMODE_INVENTORY",
+  0x0d: "GAMEMODE_PHOTO_ALBUM",
+  0x0e: "GAMEMODE_PHOTO_DIZZY_LINK",
+  0x0f: "GAMEMODE_PHOTO_NICE_LINK",
+  0x10: "GAMEMODE_PHOTO_MARIN_CLIFF",
+  0x11: "GAMEMODE_PHOTO_MARIN_WELL",
+  0x12: "GAMEMODE_PHOTO_MABE",
+  0x13: "GAMEMODE_PHOTO_ULRIRA",
+  0x14: "GAMEMODE_PHOTO_BOW_WOW",
+  0x15: "GAMEMODE_PHOTO_THIEF",
+  0x16: "GAMEMODE_PHOTO_FISHERMAN",
+  0x17: "GAMEMODE_PHOTO_ZORA",
+  0x18: "GAMEMODE_PHOTO_KANALET",
+  0x19: "GAMEMODE_PHOTO_GHOST",
+  0x20: "GAMEMODE_PHOTO_BRIDGE",
+])
+
 disassembly.createGlobal(at: 0xa100, named: "SAVEFILES")
 disassembly.createGlobal(at: 0xc124, named: "wRoomTransitionState")
 disassembly.createGlobal(at: 0xc125, named: "wRoomTransitionDirection")
@@ -35,7 +65,7 @@ disassembly.createGlobal(at: 0xd369, named: "wAudioData")
 disassembly.createGlobal(at: 0xd379, named: "wAudioSelection")
 disassembly.createGlobal(at: 0xd6fe, named: "wTileMapToLoad")
 disassembly.createGlobal(at: 0xd6ff, named: "wBGMapToLoad")
-disassembly.createGlobal(at: 0xdb95, named: "wGameMode")
+disassembly.createGlobal(at: 0xdb95, named: "wGameMode", dataType: "GAMEMODE")
 disassembly.createGlobal(at: 0xdb96, named: "wGameSubMode")
 disassembly.createGlobal(at: 0xdbaf, named: "wCurrentBank")
 disassembly.createGlobal(at: 0xff96, named: "hBaseScrollX")
@@ -46,7 +76,9 @@ disassembly.createGlobal(at: 0xffb5, named: "hButtonsInactiveDelay", dataType: "
 disassembly.createGlobal(at: 0xffe7, named: "hFrameCounter")
 disassembly.createGlobal(at: 0xffd1, named: "hNeedsRenderingFrame")
 disassembly.createGlobal(at: 0xfff7, named: "hMapID")
-disassembly.createGlobal(at: 0xfffd, named: "hDidRenderFrame")
+disassembly.createGlobal(at: 0xfffd, named: "hDidRenderFrame", dataType: "bool")
+
+disassembly.setType(at: 0x1E2, in: 0x00, to: "GAMEMODE")
 
 // MARK: - Bank 0 (00)
 // TODO: Define this as a variable.

@@ -75,6 +75,42 @@ public final class RGBDSAssembly {
     }
   }
 
+  private static func typedOperand(for imm8: UInt8, with disassembly: LR35902.Disassembly?) -> String? {
+    guard let disassembly = disassembly else {
+      return nil
+    }
+    let location = LR35902.cartAddress(for: disassembly.cpu.pc, in: disassembly.cpu.bank)!
+    if let type = disassembly.typeAtLocation[location],
+      let dataType = disassembly.dataTypes[type] {
+      switch dataType.interpretation {
+      case .bitmask:
+        let bitmaskValues = dataType.namedValues.filter { value, _ in
+          if imm8 == 0 {
+            return value == 0
+          }
+          return value != 0 && (imm8 & value) == value
+        }.values
+        return bitmaskValues.sorted().joined(separator: " | ")
+
+      case .enumerated:
+        let possibleValues = dataType.namedValues.filter { value, _ in value == imm8 }.values
+        precondition(possibleValues.count <= 1, "Multiple possible values found.")
+        return possibleValues.first!
+
+      case .any:
+        switch dataType.representation {
+        case .binary:
+          return "%\(imm8.binaryString)"
+        case .decimal:
+          return "\(imm8)"
+        case .hexadecimal:
+          return "$\(imm8.hexString)"
+        }
+      }
+    }
+    return nil
+  }
+
   private static func operands(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil) -> [String]? {
     if let disassembly = disassembly {
       switch instruction.spec {
@@ -129,7 +165,7 @@ public final class RGBDSAssembly {
         } else {
           addressLabel = "$\(instruction.imm16!.hexString)"
         }
-        return ["[\(addressLabel)]", operand(for: instruction, operand: operand2)]
+        return ["[\(addressLabel)]", operand(for: instruction, operand: operand2, with: disassembly)]
 
       case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .imm16addr:
         var addressLabel: String
@@ -140,7 +176,7 @@ public final class RGBDSAssembly {
         } else {
           addressLabel = "$\(instruction.imm16!.hexString)"
         }
-        return [operand(for: instruction, operand: operand1), "[\(addressLabel)]"]
+        return [operand(for: instruction, operand: operand1, with: disassembly), "[\(addressLabel)]"]
 
       case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand1 == .ffimm8addr:
         var addressLabel: String
@@ -149,7 +185,7 @@ public final class RGBDSAssembly {
         } else {
           addressLabel = "$FF\(instruction.imm8!.hexString)"
         }
-        return ["[\(addressLabel)]", operand(for: instruction, operand: operand2)]
+        return ["[\(addressLabel)]", operand(for: instruction, operand: operand2, with: disassembly)]
 
       case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .ffimm8addr:
         var addressLabel: String
@@ -158,7 +194,7 @@ public final class RGBDSAssembly {
         } else {
           addressLabel = "$FF\(instruction.imm8!.hexString)"
         }
-        return [operand(for: instruction, operand: operand1), "[\(addressLabel)]"]
+        return [operand(for: instruction, operand: operand1, with: disassembly), "[\(addressLabel)]"]
 
       case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .imm16:
         var addressLabel: String
@@ -168,73 +204,38 @@ public final class RGBDSAssembly {
         } else {
           addressLabel = "$\(instruction.imm16!.hexString)"
         }
-        return [operand(for: instruction, operand: operand1), addressLabel]
-
-      case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .imm8:
-        let value: String
-        let location = LR35902.cartAddress(for: disassembly.cpu.pc, in: disassembly.cpu.bank)!
-        if let type = disassembly.typeAtLocation[location],
-          let dataType = disassembly.dataTypes[type] {
-          let imm8 = instruction.imm8!
-          switch dataType.interpretation {
-          case .bitmask:
-            let bitmaskValues = dataType.namedValues.filter { value, _ in
-              if imm8 == 0 {
-                return value == 0
-              }
-              return value != 0 && (imm8 & value) == value
-            }.values
-            value = bitmaskValues.sorted().joined(separator: " | ")
-            
-          case .enumerated:
-            let possibleValues = dataType.namedValues.filter { value, _ in value == imm8 }.values
-            precondition(possibleValues.count <= 1, "Multiple possible values found.")
-            value = possibleValues.first!
-
-          case .any:
-            switch dataType.representation {
-            case .binary:
-              value = "%\(imm8.binaryString)"
-            case .decimal:
-              value = "\(imm8)"
-            case .hexadecimal:
-              value = "$\(imm8.hexString)"
-            }
-          }
-        } else {
-          value = "$\(instruction.imm8!.hexString)"
-        }
-        return [operand(for: instruction, operand: operand1), value]
+        return [operand(for: instruction, operand: operand1, with: disassembly), addressLabel]
 
       default:
         break
       }
     }
-    return operands(for: instruction, spec: instruction.spec)
+    return operands(for: instruction, spec: instruction.spec, with: disassembly)
   }
 
-  private static func operands(for instruction: LR35902.Instruction, spec: LR35902.Instruction.Spec) -> [String]? {
+  private static func operands(for instruction: LR35902.Instruction, spec: LR35902.Instruction.Spec, with disassembly: LR35902.Disassembly?) -> [String]? {
     let mirror = Mirror(reflecting: spec)
     guard let operandReflection = mirror.children.first else {
       return nil
     }
     switch operandReflection.value {
     case let childInstruction as LR35902.Instruction.Spec:
-      return operands(for: instruction, spec: childInstruction)
+      return operands(for: instruction, spec: childInstruction, with: disassembly)
     case let tuple as (LR35902.Instruction.Condition?, LR35902.Instruction.Numeric):
       if let condition = tuple.0 {
-        return ["\(condition)", operand(for: instruction, operand: tuple.1)]
+        return ["\(condition)", operand(for: instruction, operand: tuple.1, with: disassembly)]
       } else {
-        return [operand(for: instruction, operand: tuple.1)]
+        return [operand(for: instruction, operand: tuple.1, with: disassembly)]
       }
     case let condition as LR35902.Instruction.Condition:
       return ["\(condition)"]
     case let tuple as (LR35902.Instruction.Numeric, LR35902.Instruction.Numeric):
-      return [operand(for: instruction, operand: tuple.0), operand(for: instruction, operand: tuple.1)]
+      return [operand(for: instruction, operand: tuple.0, with: disassembly),
+              operand(for: instruction, operand: tuple.1, with: disassembly)]
     case let tuple as (LR35902.Instruction.Bit, LR35902.Instruction.Numeric):
-      return ["\(tuple.0.rawValue)", operand(for: instruction, operand: tuple.1)]
+      return ["\(tuple.0.rawValue)", operand(for: instruction, operand: tuple.1, with: disassembly)]
     case let operandValue as LR35902.Instruction.Numeric:
-      return [operand(for: instruction, operand: operandValue)]
+      return [operand(for: instruction, operand: operandValue, with: disassembly)]
     case let address as LR35902.Instruction.RestartAddress:
       return ["\(address)".replacingOccurrences(of: "x", with: "$")]
     default:
@@ -242,9 +243,14 @@ public final class RGBDSAssembly {
     }
   }
 
-  private static func operand(for instruction: LR35902.Instruction, operand: LR35902.Instruction.Numeric) -> String {
+  private static func operand(for instruction: LR35902.Instruction, operand: LR35902.Instruction.Numeric, with disassembly: LR35902.Disassembly?) -> String {
     switch operand {
-    case .imm8:           return "$\(instruction.imm8!.hexString)"
+    case .imm8:
+      if let typedValue = typedOperand(for: instruction.imm8!, with: disassembly) {
+        return typedValue
+      } else {
+        return "$\(instruction.imm8!.hexString)"
+      }
     case .simm8:
       let byte = instruction.imm8!
       if (byte & UInt8(0x80)) != 0 {
