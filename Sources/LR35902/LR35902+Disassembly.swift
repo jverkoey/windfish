@@ -145,7 +145,7 @@ extension LR35902 {
       createGlobal(at: 0xff80, named: "gbHRAM")
       createGlobal(at: 0xffff, named: "gbIE")
 
-      defineMacro(named: "ifHLt", instructions: [
+      defineMacro(named: "ifHGte", instructions: [
         .any(.ld(.a, .ffimm8addr)),
         .any(.cp(.imm8)),
         .any(.jr(.nc, .simm8)),
@@ -155,7 +155,7 @@ extension LR35902 {
         .jr(.nc, .arg(3)),
       ])
 
-      defineMacro(named: "ifHGte", instructions: [
+      defineMacro(named: "ifHLt", instructions: [
         .any(.ld(.a, .ffimm8addr)),
         .any(.cp(.imm8)),
         .any(.jr(.c, .simm8)),
@@ -165,7 +165,15 @@ extension LR35902 {
           .jr(.c, .arg(3)),
       ])
 
-      defineMacro(named: "ifHNe", instructions: [
+      defineMacro(named: "_ifLt", instructions: [
+        .any(.cp(.imm8)),
+        .any(.jr(.c, .simm8)),
+        ], code: [
+          .cp(.arg(1)),
+          .jr(.c, .arg(2)),
+      ])
+
+      defineMacro(named: "ifHEq", instructions: [
         .any(.ld(.a, .ffimm8addr)),
         .any(.cp(.imm8)),
         .any(.jr(.z, .simm8)),
@@ -175,7 +183,7 @@ extension LR35902 {
           .jr(.z, .arg(3)),
       ])
 
-      defineMacro(named: "ifHEq", instructions: [
+      defineMacro(named: "ifHNe", instructions: [
         .any(.ld(.a, .ffimm8addr)),
         .any(.cp(.imm8)),
         .any(.jr(.nz, .simm8)),
@@ -185,7 +193,15 @@ extension LR35902 {
           .jr(.nz, .arg(3)),
       ])
 
-      defineMacro(named: "ifLt", instructions: [
+      defineMacro(named: "_ifNe", instructions: [
+        .any(.cp(.imm8)),
+        .any(.jr(.nz, .simm8)),
+        ], code: [
+          .cp(.arg(1)),
+          .jr(.nz, .arg(2)),
+      ])
+
+      defineMacro(named: "ifGte", instructions: [
         .any(.ld(.a, .imm16addr)),
         .any(.cp(.imm8)),
         .any(.jr(.nc, .simm8)),
@@ -195,7 +211,7 @@ extension LR35902 {
           .jr(.nc, .arg(3)),
       ])
 
-      defineMacro(named: "ifGte", instructions: [
+      defineMacro(named: "ifLt", instructions: [
         .any(.ld(.a, .imm16addr)),
         .any(.cp(.imm8)),
         .any(.jr(.c, .simm8)),
@@ -205,7 +221,7 @@ extension LR35902 {
           .jr(.c, .arg(3)),
       ])
 
-      defineMacro(named: "ifNe", instructions: [
+      defineMacro(named: "ifEq", instructions: [
         .any(.ld(.a, .imm16addr)),
         .any(.cp(.imm8)),
         .any(.jr(.z, .simm8)),
@@ -215,7 +231,7 @@ extension LR35902 {
           .jr(.z, .arg(3)),
       ])
 
-      defineMacro(named: "ifEq", instructions: [
+      defineMacro(named: "ifNe", instructions: [
         .any(.ld(.a, .imm16addr)),
         .any(.cp(.imm8)),
         .any(.jr(.nz, .simm8)),
@@ -225,7 +241,7 @@ extension LR35902 {
           .jr(.nz, .arg(3)),
       ])
 
-      defineMacro(named: "ifNotZero", instructions: [
+      defineMacro(named: "ifZero", instructions: [
         .any(.ld(.a, .imm16addr)),
         .any(.and(.a)),
         .any(.jr(.z, .simm8)),
@@ -235,7 +251,7 @@ extension LR35902 {
           .jr(.z, .arg(2)),
       ])
 
-      defineMacro(named: "ifZero", instructions: [
+      defineMacro(named: "ifNotZero", instructions: [
         .any(.ld(.a, .imm16addr)),
         .any(.and(.a)),
         .any(.jr(.nz, .simm8)),
@@ -476,6 +492,8 @@ extension LR35902 {
       guard let cartAddress = cartAddress(for: pc, in: bank) else {
         preconditionFailure("Attempting to set label in non-cart addressable location.")
       }
+      // TODO: Need to separate scope regions from literal names so that scopes can be re-named.
+      // Notably, scope names should be nil unless a name is explicitly given.
       if let label = labels[cartAddress],
         label.contains(".") && !name.contains(".") {
         labels[cartAddress] = "\(label.split(separator: ".").first!).\(name)"
