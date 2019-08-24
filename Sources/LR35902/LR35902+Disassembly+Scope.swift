@@ -160,11 +160,36 @@ extension LR35902.Disassembly {
       let sourceLocation: LR35902.CartridgeLocation
     }
     var a: RegisterState<UInt8>?
+    var b: RegisterState<UInt8>?
+    var d: RegisterState<UInt8>?
+    var e: RegisterState<UInt8>?
     var bc: RegisterState<UInt16>?
     var hl: RegisterState<UInt16>?
     var sp: RegisterState<UInt16>?
     var next: [LR35902.CartridgeLocation] = []
     var ram: [LR35902.Address: RegisterState<UInt8>] = [:]
+
+    subscript(numeric: LR35902.Instruction.Numeric) -> RegisterState<UInt8>? {
+      get {
+        switch numeric {
+        case .a: return a
+        case .b: return b
+        case .d: return d
+        case .e: return e
+        default: return nil
+        }
+      }
+      set {
+        switch numeric {
+        case .a: a = newValue
+        case .b: b = newValue
+        case .d: d = newValue
+        case .e: e = newValue
+        default:
+          break
+        }
+      }
+    }
   }
 
   private func inferVariableTypes(in range: Range<LR35902.CartridgeLocation>) {
@@ -176,6 +201,10 @@ extension LR35902.Disassembly {
     // TODO: Store this globally.
     var states: [LR35902.CartridgeLocation: CPUState] = [:]
 
+    if range.contains(LR35902.cartAddress(for: 0x03E6, in: 0x00)!) {
+      print("Hi")
+    }
+
     while pc < upperBoundPc {
       guard let instruction = self.instruction(at: pc, in: bank) else {
         pc += 1
@@ -184,24 +213,22 @@ extension LR35902.Disassembly {
 
       let location = LR35902.cartAddress(for: pc, in: bank)!
 
-      if range.lowerBound == 0x0150 && pc >= 0x017D {
+      if pc == 0x03E2 {
         print(pc.hexString)
         let a = 5
       }
 
       switch instruction.spec {
-      case .ld(.a, .imm8):
-        state.a = .init(value: .value(instruction.imm8!), sourceLocation: location)
-        break
+      case .ld(let numeric, .imm8):
+        state[numeric] = .init(value: .value(instruction.imm8!), sourceLocation: location)
+      case .ld(.a, .e):
+        state.a = state.e
       case .ld(.a, .imm16addr):
         state.a = .init(value: .variable(instruction.imm16!), sourceLocation: location)
-        break
       case .ld(.bc, .imm16):
         state.bc = .init(value: .value(instruction.imm16!), sourceLocation: location)
-        break
       case .ld(.hl, .imm16):
         state.hl = .init(value: .value(instruction.imm16!), sourceLocation: location)
-        break
       case .ld(.ffimm8addr, .a):
         let address = 0xFF00 | LR35902.Address(instruction.imm8!)
         if let global = globals[address],
@@ -210,13 +237,23 @@ extension LR35902.Disassembly {
           typeAtLocation[sourceLocation] = dataType
         }
         state.ram[address] = state.a
-        break
+      case .cp(_):
+        if case .variable(let address) = state.a?.value,
+          let global = globals[address],
+          let dataType = global.dataType {
+          typeAtLocation[location] = dataType
+        }
       case .xor(.a):
         state.a = .init(value: .value(0), sourceLocation: location)
-        break
       case .ld(.sp, .imm16):
         state.sp = .init(value: .value(instruction.imm16!), sourceLocation: location)
-        break
+      case .reti, .ret:
+        state.a = nil
+        state.bc = nil
+        state.hl = nil
+        state.sp = nil
+        state.ram.removeAll()
+
       // TODO: For calls, we need to look up the affected registers and arguments.
       default:
         break

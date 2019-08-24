@@ -95,7 +95,10 @@ public final class RGBDSAssembly {
       case .enumerated:
         let possibleValues = dataType.namedValues.filter { value, _ in value == imm8 }.values
         precondition(possibleValues.count <= 1, "Multiple possible values found.")
-        return possibleValues.first!
+        if let value = possibleValues.first {
+          return value
+        }
+        fallthrough
 
       case .any:
         switch dataType.representation {
