@@ -46,8 +46,7 @@ disassembly.createGlobal(at: 0xfffd, named: "hDidRenderFrame")
 
 // MARK: - Bank 0 (00)
 // TODO: Define this as a variable.
-disassembly.setLabel(at: 0x0003, in: 0x00, named: "DEBUG_TOOL")
-disassembly.setData(at: 0x0003, in: 0x00)
+disassembly.createGlobal(at: 0x0003, named: "DEBUG_TOOL")
 
 disassembly.setData(at: 0x0008..<0x0040, in: 0x00)
 
@@ -248,17 +247,5 @@ ld   [$FF10], a
 
 ld   [$ff1a], a
 """)
-
-//disassembly.defineMacro(named: "copyregion", instructions: [
-//  .any(.ld(.hl, .imm16)),
-//  .any(.ld(.de, .imm16)),
-//  .any(.ld(.bc, .imm16)),
-//  .instruction(.init(spec: .call(.imm16), immediate16: 0x28C5)),
-//], code: [
-//  .ld(.hl, .arg(1)),
-//  .ld(.de, .arg(2)),
-//  .ld(.bc, .arg(3)),
-//  .call(.imm16),
-//], validArgumentValues: [:])
 
 try disassembly.writeTo(directory: "/Users/featherless/workbench/gbdis/disassembly")

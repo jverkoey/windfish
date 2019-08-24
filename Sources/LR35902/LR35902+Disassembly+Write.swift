@@ -115,6 +115,20 @@ clean:
 
     let gameHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("game.asm").path)
 
+    if !dataTypes.isEmpty {
+      let handle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("datatypes.asm").path)
+
+      for dataType in dataTypes.sorted(by: { $0.0 < $1.0 }) {
+        handle.write("; Type: \(dataType.key)\n".data(using: .utf8)!)
+        handle.write(dataType.value.map {
+          "\($0.value) EQU \($0.key)"
+        }.joined(separator: "\n").data(using: .utf8)!)
+        handle.write("\n".data(using: .utf8)!)
+      }
+
+      gameHandle.write("INCLUDE \"datatypes.asm\"\n".data(using: .utf8)!)
+    }
+
     if !globals.isEmpty {
       let variablesHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("variables.asm").path)
 

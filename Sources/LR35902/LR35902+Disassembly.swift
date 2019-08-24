@@ -21,6 +21,8 @@ extension LR35902 {
         disassemble(range: $0, inBank: 0)
       }
 
+      createDatatype(named: "bool", namedValues: [0: "false", 1: "true"])
+
       setLabel(at: 0x0040, in: 0x00, named: "VBlankInterrupt")
       disassemble(range: 0x0040..<0x0048, inBank: 0)
 
@@ -511,10 +513,21 @@ extension LR35902 {
 
     // TODO: Allow defining variable types, e.g. enums with well-understood values.
     public func createGlobal(at address: Address, named name: String) {
-      precondition(globals[address] == nil, "Global already exists at \(address).")
-      globals[address] = name
+      if address < 0x4000 {
+        setLabel(at: address, in: 0, named: name)
+        setData(at: address, in: 0)
+      } else {
+        precondition(globals[address] == nil, "Global already exists at \(address).")
+        globals[address] = name
+      }
     }
     var globals: [Address: String] = [:]
+
+    public func createDatatype(named name: String, namedValues: [UInt8: String]) {
+      precondition(dataTypes[name] == nil, "Data type \(name) already exists.")
+      dataTypes[name] = namedValues
+    }
+    var dataTypes: [String: [UInt8: String]] = [:]
 
     // MARK: - Comments
 
