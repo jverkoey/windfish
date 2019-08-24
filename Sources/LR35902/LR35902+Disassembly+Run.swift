@@ -7,6 +7,7 @@ extension LR35902.Disassembly {
     let endAddress: LR35902.CartridgeLocation?
     let initialBank: LR35902.Bank
 
+    // TODO: Accept a CartridgeLocation here instead.
     init(from startAddress: LR35902.Address, initialBank: LR35902.Bank, upTo endAddress: LR35902.Address? = nil) {
       self.startAddress = LR35902.cartAddress(for: startAddress, in: initialBank)!
       if let endAddress = endAddress, endAddress > 0 {

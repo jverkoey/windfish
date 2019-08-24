@@ -534,6 +534,9 @@ extension LR35902 {
     // TODO: Allow defining variable types, e.g. enums with well-understood values.
     public func createGlobal(at address: Address, named name: String, dataType: String? = nil) {
       precondition(globals[address] == nil, "Global already exists at \(address).")
+      if let dataType = dataType {
+        precondition(dataTypes[dataType] != nil, "Data type is not registered.")
+      }
       globals[address] = Global(name: name, dataType: dataType)
 
       precondition(address < 0x4000 || address >= 0x8000, "Cannot set globals in switchable banks.")
@@ -636,6 +639,9 @@ extension LR35902 {
       let queueRun: (Run, Address, Address, Bank, Instruction) -> Void = { fromRun, fromAddress, toAddress, bank, instruction in
         if toAddress > 0x8000 {
           return // We can't disassemble in-memory regions.
+        }
+        guard LR35902.cartAddress(for: toAddress, in: bank) != nil else {
+          return // We aren't sure which bank we're in, so we can't safely disassemble it.
         }
         let run = Run(from: toAddress, initialBank: bank)
         run.invocationInstruction = instruction
@@ -750,7 +756,7 @@ extension LR35902 {
             let jumpTo = instruction.imm16!
             queueRun(run, instructionAddress, jumpTo, instructionBank, instruction)
 
-          case .jp(_, nil), .ret, .reti:
+          case .jp(_, nil), .ret(nil), .reti:
             break linear_sweep
 
           default:

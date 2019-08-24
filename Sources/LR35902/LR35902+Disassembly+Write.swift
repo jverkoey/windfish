@@ -414,7 +414,13 @@ clean:
             if condition == nil {
               cpu.bank = bank
             }
-          case .ret, .reti:
+          case .ret(let condition):
+            lineGroup.append(.newline)
+            if condition == nil {
+              lineGroup.append(.empty)
+              cpu.bank = bank
+            }
+          case .reti:
             lineGroup.append(.newline)
             lineGroup.append(.empty)
             cpu.bank = bank
@@ -440,16 +446,32 @@ clean:
           var accumulator: [UInt8] = []
           let initialPc = cpu.pc
           let initialType = type(of: cpu.pc, in: bank)
+          var global: Global?
           repeat {
+            if cpu.pc < 0x4000 {
+              global = globals[cpu.pc]
+            }
             accumulator.append(cpu[cpu.pc, cpu.bank])
             cpu.pc += 1
           } while cpu.pc < end
             && (instructionsToDecode == 0 || instruction(at: cpu.pc, in: bank) == nil)
             && label(at: cpu.pc, in: bank) == nil
             && type(of: cpu.pc, in: bank) == initialType
+            && global == nil
 
+          let globalValue: String?
+          if let global = global,
+            let dataType = global.dataType,
+            let type = dataTypes[dataType],
+            let value = type[accumulator.last!] {
+            globalValue = value
+            accumulator.removeLast()
+          } else {
+            globalValue = nil
+          }
+
+          var chunkPc = initialPc
           if initialType == .text {
-            var chunkPc = initialPc
             let lineLength = lineLengthOfText(at: initialPc, in: bank) ?? 254
             for chunk in accumulator.chunked(into: lineLength) {
               write(line(RGBDSAssembly.text(for: chunk), address: chunkPc, addressType: "text"), fileHandle: fileHandle)
@@ -458,14 +480,19 @@ clean:
           } else {
             // Dump the bytes in blocks of 8.
             let addressType = initialType == .data ? "data" : nil
-            var address = initialPc
             for chunk in accumulator.chunked(into: 8) {
               let instruction = RGBDSAssembly.assembly(for: chunk)
               let displayableBytes = chunk.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
               let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
-              write(line(instruction, address: address, addressType: addressType, comment: "|\(bytesAsCharacters)|"), fileHandle: fileHandle)
-              address += LR35902.Address(chunk.count)
+              write(line(instruction, address: chunkPc, addressType: addressType, comment: "|\(bytesAsCharacters)|"), fileHandle: fileHandle)
+              chunkPc += LR35902.Address(chunk.count)
             }
+          }
+
+          if let global = global,
+            let dataType = global.dataType,
+            let globalValue = globalValue {
+            write(line(RGBDSAssembly.assembly(for: globalValue), address: chunkPc, addressType: dataType), fileHandle: fileHandle)
           }
 
           lineBuffer.append(.empty)

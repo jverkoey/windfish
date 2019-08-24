@@ -46,8 +46,9 @@ disassembly.createGlobal(at: 0xfffd, named: "hDidRenderFrame")
 
 // MARK: - Bank 0 (00)
 // TODO: Define this as a variable.
-disassembly.createGlobal(at: 0x0003, named: "DEBUG_TOOL")
+disassembly.createGlobal(at: 0x0003, named: "DEBUG_TOOL", dataType: "bool")
 
+disassembly.setData(at: 0x0004..<0x0008, in: 0x00)
 disassembly.setData(at: 0x0008..<0x0040, in: 0x00)
 
 disassembly.defineFunction(startingAt: 0x0150, in: 0x00, named: "Main")

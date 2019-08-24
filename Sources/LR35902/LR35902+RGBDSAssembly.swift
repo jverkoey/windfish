@@ -26,7 +26,7 @@ public final class RGBDSAssembly {
 
   static func assembly(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil) -> Statement {
     if let operands = operands(for: instruction, with: disassembly) {
-      return Statement(opcode: instruction.spec.opcode, operands: operands)
+      return Statement(opcode: instruction.spec.opcode, operands: operands.filter { $0.count > 0 })
     } else {
       return Statement(opcode: instruction.spec.opcode)
     }
@@ -36,6 +36,11 @@ public final class RGBDSAssembly {
     let opcode = "db".padding(toLength: maxOpcodeNameLength, withPad: " ", startingAt: 0)
     let operand = bytes.map { "$\($0.hexString)" }.joined(separator: ", ")
     return "\(opcode) \(operand)"
+  }
+
+  public static func assembly(for value: String) -> String {
+    let opcode = "db".padding(toLength: maxOpcodeNameLength, withPad: " ", startingAt: 0)
+    return "\(opcode) \(value)"
   }
 
   public static func text(for bytes: [UInt8]) -> String {
@@ -233,7 +238,7 @@ public final class RGBDSAssembly {
       return "\\\(number)"
 
     case .zeroimm8:
-      preconditionFailure("Unable to print out a zero8")
+      return ""
     }
   }
 }
