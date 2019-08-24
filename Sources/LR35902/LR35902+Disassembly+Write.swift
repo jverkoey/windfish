@@ -64,9 +64,9 @@ extension LR35902.Disassembly {
     case preComment(String)
     case label(String)
     case transferOfControl(Set<TransferOfControl>, String)
-    case instruction(LR35902.Instruction, RGBDSAssembly.Statement, LR35902.Address, LR35902.Bank, Set<String>, Data)
+    case instruction(LR35902.Instruction, RGBDSAssembly.Statement, LR35902.Address, LR35902.Bank, String?, Data)
     case macroInstruction(LR35902.Instruction, RGBDSAssembly.Statement)
-    case macro(String, LR35902.Address, LR35902.Bank, Set<String>, Data)
+    case macro(String, LR35902.Address, LR35902.Bank, String?, Data)
     case macroDefinition(String)
     case macroTerminator
 
@@ -192,7 +192,7 @@ clean:
           let index = LR35902.cartAddress(for: cpu.pc, in: bank)!
           let instructionWidth = LR35902.Instruction.widths[instruction.spec]!.total
           let bytes = cpu[index..<(index + LR35902.CartridgeLocation(instructionWidth))]
-          let instructionScope = scope(at: cpu.pc, in: bank)
+          let instructionScope = contiguousScope(at: cpu.pc, in: bank)
           lineGroup.append(.instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: self), cpu.pc, cpu.bank, instructionScope, bytes))
 
           cpu.pc += instructionWidth
@@ -320,7 +320,7 @@ clean:
                   } else {
                     bank = cpu.bank
                   }
-                  let macroScope = scope(at: lineBufferAddress, in: bank)
+                  let macroScope = contiguousScope(at: lineBufferAddress, in: bank)
                   lineBuffer.replaceSubrange(firstInstruction...lastInstruction,
                                              with: [.macro("\(macro.macro.name) \(macroArgs)", lineBufferAddress, bank, macroScope, bytes)])
 

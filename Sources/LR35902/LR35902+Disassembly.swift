@@ -494,6 +494,10 @@ extension LR35902 {
       }
       // TODO: Need to separate scope regions from literal names so that scopes can be re-named.
       // Notably, scope names should be nil unless a name is explicitly given.
+      /*if !name.contains("."),
+        let scope = contiguousScope(at: pc, in: bank) {
+        labels[cartAddress] = "\(scope).\(name)"
+      } else*/
       if let label = labels[cartAddress],
         label.contains(".") && !name.contains(".") {
         labels[cartAddress] = "\(label.split(separator: ".").first!).\(name)"
