@@ -32,6 +32,7 @@ extension LR35902 {
         0b0000_0001: "STATF_VB",
         0b0000_0000: "STATF_HB"
       ])
+      createDatatype(named: "decimal", representation: .decimal)
 
       setLabel(at: 0x0040, in: 0x00, named: "VBlankInterrupt")
       disassemble(range: 0x0040..<0x0048, inBank: 0)

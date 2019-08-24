@@ -140,6 +140,9 @@ clean:
       let handle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("datatypes.asm").path)
 
       for dataType in dataTypes.sorted(by: { $0.0 < $1.0 }) {
+        guard !dataType.value.namedValues.isEmpty else {
+          continue
+        }
         handle.write("; Type: \(dataType.key)\n".data(using: .utf8)!)
         let namedValues = dataType.value.namedValues.sorted(by: { $0.key < $1.key })
         let longestVariable = namedValues.reduce(0) { (currentMax, next) in
