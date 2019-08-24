@@ -120,7 +120,7 @@ clean:
 
       for dataType in dataTypes.sorted(by: { $0.0 < $1.0 }) {
         handle.write("; Type: \(dataType.key)\n".data(using: .utf8)!)
-        handle.write(dataType.value.map {
+        handle.write(dataType.value.sorted(by: { $0.key < $1.key }).map {
           "\($0.value) EQU \($0.key)"
         }.joined(separator: "\n").data(using: .utf8)!)
         handle.write("\n".data(using: .utf8)!)
@@ -132,7 +132,7 @@ clean:
     if !globals.isEmpty {
       let variablesHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("variables.asm").path)
 
-      variablesHandle.write(globals.sorted { $0.0 < $1.0 }.map { address, name in
+      variablesHandle.write(globals.filter { $0.key >= 0x8000 }.sorted { $0.0 < $1.0 }.map { address, name in
         "\(name) EQU $\(address.hexString)"
       }.joined(separator: "\n\n").data(using: .utf8)!)
 

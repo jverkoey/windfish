@@ -512,13 +512,15 @@ extension LR35902 {
     // MARK: - Globals
 
     // TODO: Allow defining variable types, e.g. enums with well-understood values.
-    public func createGlobal(at address: Address, named name: String) {
+    public func createGlobal(at address: Address, named name: String, dataType: String? = nil) {
+      precondition(globals[address] == nil, "Global already exists at \(address).")
+      globals[address] = name
+
+      precondition(address < 0x4000 || address >= 0x8000, "Cannot set globals in switchable banks.")
+
       if address < 0x4000 {
         setLabel(at: address, in: 0, named: name)
         setData(at: address, in: 0)
-      } else {
-        precondition(globals[address] == nil, "Global already exists at \(address).")
-        globals[address] = name
       }
     }
     var globals: [Address: String] = [:]
