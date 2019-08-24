@@ -150,18 +150,94 @@ extension LR35902.Disassembly {
     }
   }
 
+  private struct CPUState {
+    enum RegisterValue<T: BinaryInteger> {
+      case variable(LR35902.Address)
+      case value(T)
+    }
+    struct RegisterState<T: BinaryInteger> {
+      let value: RegisterValue<T>
+      let sourceLocation: LR35902.CartridgeLocation
+    }
+    var a: RegisterState<UInt8>?
+    var bc: RegisterState<UInt16>?
+    var hl: RegisterState<UInt16>?
+    var sp: RegisterState<UInt16>?
+    var next: [LR35902.CartridgeLocation] = []
+    var ram: [LR35902.Address: RegisterState<UInt8>] = [:]
+  }
+
   private func inferVariableTypes(in range: Range<LR35902.CartridgeLocation>) {
-//    var (pc, bank) = LR35902.addressAndBank(from: range.lowerBound)
-//    while pc < range.upperBound {
-//      guard let instruction = self.instruction(at: pc, in: bank) else {
-//        pc += 1
-//        continue
-//      }
-//
-//      switch instruction.spec {
-//      default:
-//        pc += LR35902.Instruction.widths[instruction.spec]!.total
-//      }
-//    }
+    return
+    var (pc, bank) = LR35902.addressAndBank(from: range.lowerBound)
+    let upperBoundPc = LR35902.addressAndBank(from: range.upperBound).address
+
+    var state = CPUState()
+
+    // TODO: Store this globally.
+    var states: [LR35902.CartridgeLocation: CPUState] = [:]
+
+    while pc < upperBoundPc {
+      guard let instruction = self.instruction(at: pc, in: bank) else {
+        pc += 1
+        continue
+      }
+
+      let location = LR35902.cartAddress(for: pc, in: bank)!
+
+      if range.lowerBound == 0x0150 && pc >= 0x017D {
+        print(pc.hexString)
+        let a = 5
+      }
+
+      switch instruction.spec {
+      case .ld(.a, .imm8):
+        state.a = .init(value: .value(instruction.imm8!), sourceLocation: location)
+        break
+      case .ld(.a, .imm16addr):
+        state.a = .init(value: .variable(instruction.imm16!), sourceLocation: location)
+        break
+      case .ld(.bc, .imm16):
+        state.bc = .init(value: .value(instruction.imm16!), sourceLocation: location)
+        break
+      case .ld(.hl, .imm16):
+        state.hl = .init(value: .value(instruction.imm16!), sourceLocation: location)
+        break
+      case .ld(.ffimm8addr, .a):
+        let address = 0xFF00 | LR35902.Address(instruction.imm8!)
+        if let global = globals[address],
+          let dataType = global.dataType,
+          let sourceLocation = state.a?.sourceLocation {
+          typeAtLocation[sourceLocation] = dataType
+        }
+        state.ram[address] = state.a
+        break
+      case .xor(.a):
+        state.a = .init(value: .value(0), sourceLocation: location)
+        break
+      case .ld(.sp, .imm16):
+        state.sp = .init(value: .value(instruction.imm16!), sourceLocation: location)
+        break
+      // TODO: For calls, we need to look up the affected registers and arguments.
+      default:
+        break
+      }
+
+      let width = LR35902.Instruction.widths[instruction.spec]!.total
+
+      var thisState = state
+      thisState.next = [location + LR35902.CartridgeLocation(width)]
+      states[location] = thisState
+
+      if range.lowerBound == 0x0150 {
+        let a = 5
+      }
+
+      pc += width
+    }
+
+    if range.lowerBound == 0x0150 {
+      print(states)
+    }
   }
 }

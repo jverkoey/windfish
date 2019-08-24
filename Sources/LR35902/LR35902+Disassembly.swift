@@ -581,6 +581,8 @@ extension LR35902 {
     }
     var dataTypes: [String: Datatype] = [:]
 
+    var typeAtLocation: [LR35902.CartridgeLocation: String] = [:]
+
     // MARK: - Comments
 
     public func preComment(at address: Address, in bank: Bank) -> String? {
