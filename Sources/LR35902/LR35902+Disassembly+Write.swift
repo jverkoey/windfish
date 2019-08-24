@@ -1,4 +1,5 @@
 import Foundation
+import CPU
 
 import AssemblyGenerator
 
@@ -49,6 +50,24 @@ private func extractArgs(from statement: RGBDSAssembly.Statement, using spec: LR
   return args
 }
 
+private func extractArgTypes(from instruction: LR35902.Instruction.Spec, using spec: LR35902.Instruction.Spec) -> [Int: String] {
+  var args: [Int: String] = [:]
+  spec.visit { (operand, index) in
+    guard let operand = operand, let index = index else {
+      return
+    }
+
+    if case LR35902.Instruction.Numeric.arg(let argNumber) = operand {
+      if let operand = Mirror(reflecting: instruction).descendant(0, index) {
+        args[argNumber] = "\(operand)"
+      } else if let operand = Mirror(reflecting: instruction).descendant(index) {
+        args[argNumber] = "\(operand)"
+      }
+    }
+  }
+  return args
+}
+
 func prettify(_ label: String) -> String {
   let parts = label.components(separatedBy: ".")
   if parts.count == 1 {
@@ -61,6 +80,7 @@ extension LR35902.Disassembly {
   enum Line: Equatable, CustomStringConvertible {
     case newline
     case empty
+    case macroComment(String)
     case preComment(String)
     case label(String)
     case transferOfControl(Set<TransferOfControl>, String)
@@ -75,6 +95,7 @@ extension LR35902.Disassembly {
       case .newline:                           return ""
       case .empty:                             return ""
       case let .label(label):                  return "\(prettify(label)):"
+      case let .macroComment(comment):         return "; \(comment)"
       case let .preComment(comment):           return line(comment: comment)
       case let .transferOfControl(toc, label): return line(toc, label: prettify(label))
       case let .instruction(_, assembly, address, bank, scope, bytes): return line(assembly.description, address: address, bank: bank, scope: scope, bytes: bytes)
@@ -307,6 +328,43 @@ clean:
 
                     var lines: [Line] = []
                     lines.append(.empty)
+                    if !macro.arguments.isEmpty {
+                      lines.append(.macroComment("Arguments:"))
+
+                      let macroSpecs: [LR35902.Instruction.Spec] = macro.macro.macroLines.map {
+                        switch $0 {
+                        case .instruction(let instruction):
+                          return instruction.spec
+                        case .any(let spec):
+                          return spec
+                        }
+                      }
+
+                      let argumentTypes: [Int: String] = zip(macro.code, macroSpecs).reduce([:], { (iter, zipped) -> [Int: String] in
+                        let args = extractArgTypes(from: zipped.1, using: zipped.0)
+                        return iter.merging(args, uniquingKeysWith: { first, second in
+                          assert(first == second, "Mismatch in arguments")
+                          return first
+                        })
+                      })
+
+                      for argNumber in macro.arguments.keys.sorted() {
+                        let argType: String
+                        if let type = argumentTypes[argNumber] {
+                          argType = " type: \(type)"
+                        } else {
+                          argType = ""
+                        }
+                        if let validation = macro.macro.validArgumentValues?[argNumber] {
+                          let ranges = validation.rangeView.map {
+                            "$\(LR35902.Address($0.lowerBound).hexString)..<$\(LR35902.Address($0.upperBound).hexString)"
+                          }.joined(separator: ", ")
+                          lines.append(.macroComment("- \(argNumber)\(argType): valid values in \(ranges)"))
+                        } else {
+                          lines.append(.macroComment("- \(argNumber)\(argType)"))
+                        }
+                      }
+                    }
                     lines.append(.macroDefinition(macro.macro.name))
                     lines.append(contentsOf: zip(macro.code, instructions).map { spec, instruction in
                       var macroInstruction = instruction.0
