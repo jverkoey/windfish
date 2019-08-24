@@ -168,7 +168,6 @@ extension LR35902.Disassembly {
   }
 
   private func inferVariableTypes(in range: Range<LR35902.CartridgeLocation>) {
-    return
     var (pc, bank) = LR35902.addressAndBank(from: range.lowerBound)
     let upperBoundPc = LR35902.addressAndBank(from: range.upperBound).address
 
@@ -234,10 +233,6 @@ extension LR35902.Disassembly {
       }
 
       pc += width
-    }
-
-    if range.lowerBound == 0x0150 {
-      print(states)
     }
   }
 }

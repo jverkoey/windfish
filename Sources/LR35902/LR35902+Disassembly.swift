@@ -21,8 +21,8 @@ extension LR35902 {
         disassemble(range: $0, inBank: 0)
       }
 
-      createDatatype(named: "bool", namedValues: [0: "false", 1: "true"])
-      createDatatype(named: "STATF", namedValues: [
+      createDatatype(named: "bool", enumeration: [0: "false", 1: "true"], representation: .decimal)
+      createDatatype(named: "STATF", bitmask: [
         0b0100_0000: "STATF_LYC",
         0b0010_0000: "STATF_MODE10",
         0b0001_0000: "STATF_MODE01",
@@ -31,7 +31,7 @@ extension LR35902 {
         0b0000_0010: "STATF_OAM",
         0b0000_0001: "STATF_VB",
         0b0000_0000: "STATF_HB"
-      ], interpretation: .bitmask)
+      ])
 
       setLabel(at: 0x0040, in: 0x00, named: "VBlankInterrupt")
       disassemble(range: 0x0040..<0x0048, inBank: 0)
@@ -155,7 +155,7 @@ extension LR35902 {
       createGlobal(at: 0xff76, named: "gbPCM12")
       createGlobal(at: 0xff77, named: "gbPCM34")
       createGlobal(at: 0xff80, named: "gbHRAM")
-      createGlobal(at: 0xffff, named: "gbIE")
+      createGlobal(at: 0xffff, named: "gbIE", dataType: "bool")
 
       defineMacro(named: "ifHGte", instructions: [
         .any(.ld(.a, .ffimm8addr)),
@@ -569,15 +569,31 @@ extension LR35902 {
     public struct Datatype {
       let namedValues: [UInt8: String]
       let interpretation: Interpretation
+      let representation: Representation
 
       public enum Interpretation {
+        case any
         case enumerated
         case bitmask
       }
+
+      public enum Representation {
+        case decimal
+        case hexadecimal
+        case binary
+      }
     }
-    public func createDatatype(named name: String, namedValues: [UInt8: String], interpretation: Datatype.Interpretation = .enumerated) {
+    public func createDatatype(named name: String, enumeration: [UInt8: String], representation: Datatype.Representation = .hexadecimal) {
       precondition(dataTypes[name] == nil, "Data type \(name) already exists.")
-      dataTypes[name] = Datatype(namedValues: namedValues, interpretation: interpretation)
+      dataTypes[name] = Datatype(namedValues: enumeration, interpretation: .enumerated, representation: representation)
+    }
+    public func createDatatype(named name: String, bitmask: [UInt8: String], representation: Datatype.Representation = .binary) {
+      precondition(dataTypes[name] == nil, "Data type \(name) already exists.")
+      dataTypes[name] = Datatype(namedValues: bitmask, interpretation: .bitmask, representation: representation)
+    }
+    public func createDatatype(named name: String, representation: Datatype.Representation) {
+      precondition(dataTypes[name] == nil, "Data type \(name) already exists.")
+      dataTypes[name] = Datatype(namedValues: [:], interpretation: .any, representation: representation)
     }
     var dataTypes: [String: Datatype] = [:]
 

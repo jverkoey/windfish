@@ -60,7 +60,6 @@ disassembly.setPreComment(at: 0x01b7, in: 0x00, text: "Load a with a value that 
 disassembly.setLabel(at: 0x01aa, in: 0x00, named: "Main.renderLoop_setScrollY")
 disassembly.setLabel(at: 0x01be, in: 0x00, named: "defaultShakeBehavior")
 disassembly.setLabel(at: 0x01c4, in: 0x00, named: "setScrollY")
-disassembly.setType(at: 0x017d, in: 0x00, to: "STATF")
 disassembly.defineFunction(startingAt: 0x07B9, in: 0x00, named: "SetBank")
 disassembly.defineFunction(startingAt: 0x0844, in: 0x00, named: "PlayAudioStep")
 disassembly.defineFunction(startingAt: 0x2881, in: 0x00, named: "LCDOff")

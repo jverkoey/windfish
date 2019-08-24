@@ -146,12 +146,17 @@ clean:
           max(currentMax, next.value.count)
         }
         handle.write(namedValues.map {
-          switch dataType.value.interpretation {
-          case .enumerated:
-            return "\($0.value.padding(toLength: longestVariable, withPad: " ", startingAt: 0)) EQU \($0.key)"
-          case .bitmask:
-            return "\($0.value.padding(toLength: longestVariable, withPad: " ", startingAt: 0)) EQU %\($0.key.binaryString)"
+          let name = $0.value.padding(toLength: longestVariable, withPad: " ", startingAt: 0)
+          let value: String
+          switch dataType.value.representation {
+          case .binary:
+            value = "%\($0.key.binaryString)"
+          case .decimal:
+            value = "\($0.key)"
+          case .hexadecimal:
+            value = "$\($0.key.hexString)"
           }
+          return "\(name) EQU \(value)"
         }.joined(separator: "\n").data(using: .utf8)!)
         handle.write("\n\n".data(using: .utf8)!)
       }
