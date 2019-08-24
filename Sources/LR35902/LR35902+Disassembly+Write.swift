@@ -390,7 +390,6 @@ clean:
             && label(at: cpu.pc, in: bank) == nil
             && type(of: cpu.pc, in: bank) == initialType
 
-          // Dump the bytes in blocks of 8.
           if initialType == .text {
             var chunkPc = initialPc
             let lineLength = lineLengthOfText(at: initialPc, in: bank) ?? 254
@@ -398,8 +397,8 @@ clean:
               write(line(RGBDSAssembly.text(for: chunk), address: chunkPc, addressType: "text"), fileHandle: fileHandle)
               chunkPc += LR35902.Address(chunk.count)
             }
-
           } else {
+            // Dump the bytes in blocks of 8.
             let addressType = initialType == .data ? "data" : nil
             var address = initialPc
             for chunk in accumulator.chunked(into: 8) {
