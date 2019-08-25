@@ -518,13 +518,36 @@ clean:
           }
 
           var chunkPc = initialPc
-          if initialType == .text {
+          switch initialType {
+          case .text:
             let lineLength = lineLengthOfText(at: initialPc, in: bank) ?? 254
             for chunk in accumulator.chunked(into: lineLength) {
               write(line(RGBDSAssembly.text(for: chunk), address: chunkPc, addressType: "text"), fileHandle: fileHandle)
               chunkPc += LR35902.Address(chunk.count)
             }
-          } else {
+          case .jumpTable:
+            let jumpTablePrefix = labels[LR35902.cartAddress(for: initialPc, in: bank)!]
+            for (index, pair) in accumulator.chunked(into: 2).enumerated() {
+              let address = (LR35902.Address(pair[1]) << 8) | LR35902.Address(pair[0])
+              let jumpLocation: String
+              if let location = LR35902.safeCartAddress(for: address, in: bank),
+                let label = labels[location] {
+                jumpLocation = label
+              } else {
+                jumpLocation = "$\(address.hexString)"
+              }
+              let label: String
+              if let jumpTablePrefix = jumpTablePrefix {
+                label = ".\(jumpTablePrefix.split(separator: ".").last!)_\(index)"
+              } else {
+                label = "._\(index)"
+              }
+              let bytes = cpu[LR35902.cartAddress(for: chunkPc, in: bank)!..<(LR35902.cartAddress(for: chunkPc, in: bank)! + 2)]
+              write(line("\(label) dw \(jumpLocation)", comment: "$\(chunkPc.hexString) (jumpTable) \(bytes.map { "$\($0.hexString)" }.joined(separator: " "))"), fileHandle: fileHandle)
+              chunkPc += LR35902.Address(pair.count)
+            }
+            break
+          default:
             // Dump the bytes in blocks of 8.
             let addressType = initialType == .data ? "data" : nil
             for chunk in accumulator.chunked(into: 8) {

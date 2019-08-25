@@ -381,7 +381,6 @@ extension LR35902 {
       for index in instructionRange.dropFirst() {
         let location = LR35902.CartridgeLocation(index)
         instructionMap[location] = nil
-        labels[location] = nil
       }
 
       code.insert(integersIn: instructionRange)
@@ -391,12 +390,19 @@ extension LR35902 {
     // MARK: - Data segments
 
     public func setData(at address: Address, in bank: Bank) {
-      data.insert(Int(cartAddress(for: address, in: bank)!))
+      setData(at: address..<(address+1), in: bank)
     }
     public func setData(at range: Range<Address>, in bank: Bank) {
       let lowerBound = cartAddress(for: range.lowerBound, in: bank)!
       let upperBound = cartAddress(for: range.upperBound, in: bank)!
-      dataRanges.insert(lowerBound..<upperBound)
+      let cartRange = lowerBound..<upperBound
+      dataRanges.insert(cartRange)
+
+      // Shorten any contiguous scopes that contain this data.
+      let overlappingScopes = contiguousScopes.filter { $0.value.overlaps(cartRange) }
+      for (key, scope) in overlappingScopes {
+        contiguousScopes[key] = scope.lowerBound..<min(scope.upperBound, cartRange.lowerBound)
+      }
 
       let range = Int(lowerBound)..<Int(upperBound)
       data.insert(integersIn: range)
@@ -404,11 +410,26 @@ extension LR35902 {
       code.remove(integersIn: range)
       for index in range.dropFirst() {
         let location = LR35902.CartridgeLocation(index)
-        instructionMap[location] = nil
+        if let instruction = instructionMap[location] {
+          instructionMap[location] = nil
+          let end = Int(location + LR35902.CartridgeLocation(LR35902.Instruction.widths[instruction.spec]!.total))
+          if end > range.upperBound {
+            code.remove(integersIn: range.upperBound..<end)
+          }
+        }
         labels[location] = nil
       }
     }
     var dataRanges = Set<Range<CartridgeLocation>>()
+
+    public func setJumpTable(at range: Range<Address>, in bank: Bank) {
+      let lowerBound = cartAddress(for: range.lowerBound, in: bank)!
+      let upperBound = cartAddress(for: range.upperBound, in: bank)!
+      jumpTables.insert(lowerBound..<upperBound)
+
+      setData(at: range, in: bank)
+    }
+    var jumpTables = Set<Range<CartridgeLocation>>()
 
     // MARK: - Text segments
 
@@ -445,6 +466,7 @@ extension LR35902 {
       case unknown
       case code
       case data
+      case jumpTable
       case text
       case ram
     }
@@ -455,6 +477,8 @@ extension LR35902 {
       let index = Int(cartAddress)
       if code.contains(index) {
         return .code
+      } else if jumpTables.contains(where: { $0.contains(cartAddress) }) {
+        return .jumpTable
       } else if data.contains(index) {
         return .data
       } else if text.contains(index) {
@@ -555,6 +579,7 @@ extension LR35902 {
       guard let cartAddress = safeCartAddress(for: pc, in: bank) else {
         preconditionFailure("Attempting to set label in non-cart addressable location.")
       }
+
       // TODO: Need to separate scope regions from literal names so that scopes can be re-named.
       // Notably, scope names should be nil unless a name is explicitly given.
       let scopedLabel: String

@@ -25,16 +25,21 @@ func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902
   jumpTableIndex += 1
   // RST $00 invocations are followed by a 2 byte jump address.
   disassembly.setLabel(at: range.lowerBound, in: bank, named: "jumpTable\(jumpTableIndex)")
-  // TODO: Allow data ranges to specify a line length.
-  disassembly.setData(at: range, in: bank)
+  disassembly.setJumpTable(at: range, in: bank)
 
   for location in stride(from: LR35902.cartAddress(for: range.lowerBound, in: bank)!, to: LR35902.cartAddress(for: range.upperBound, in: bank)!, by: 2) {
     let lowByte = data[Int(location)]
     let highByte = data[Int(location + 1)]
     let address: LR35902.Address = (LR35902.Address(highByte) << 8) | LR35902.Address(lowByte)
     if address < 0x8000 {
-      let definitionAddress = LR35902.addressAndBank(from: location).address
-      disassembly.defineFunction(startingAt: address, in: bank, named: "JumpTable_\(address.hexString)_\(definitionAddress.hexString)")
+//      let definitionAddress = LR35902.addressAndBank(from: location).address
+      let safeBank: LR35902.Bank
+      if address > 0x4000 && bank == 0 {
+        safeBank = 1
+      } else {
+        safeBank = bank
+      }
+      disassembly.defineFunction(startingAt: address, in: bank, named: "JumpTable_\(address.hexString)_\(safeBank.hexString)")
     }
   }
 }
@@ -147,7 +152,7 @@ disassembleJumpTable(within: 0x0ad2..<0x0aea, in: 0x00)
 disassembleJumpTable(within: 0x0c82..<0x0c8c, in: 0x00)
 disassembleJumpTable(within: 0x0d33..<0x0d4f, in: 0x00)
 disassembleJumpTable(within: 0x1b6e..<0x1b90, in: 0x00)
-disassembleJumpTable(within: 0x215f..<0x217f, in: 0x00)
+disassembleJumpTable(within: 0x215f..<0x217d, in: 0x00)
 disassembleJumpTable(within: 0x4322..<0x4332, in: 0x01)
 
 disassembly.disassembleAsGameboyCartridge()
