@@ -35,7 +35,13 @@ func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902
     let highByte = data[Int(location + 1)]
     let address: LR35902.Address = (LR35902.Address(highByte) << 8) | LR35902.Address(lowByte)
     if address < 0x8000 {
-      disassembly.defineFunction(startingAt: address, in: selectedBank, named: "JumpTable_\(address.hexString)_\(selectedBank.hexString)")
+      let effectiveBank: LR35902.Bank
+      if address < 0x4000 {
+        effectiveBank = 0
+      } else {
+        effectiveBank = selectedBank
+      }
+      disassembly.defineFunction(startingAt: address, in: selectedBank, named: "JumpTable_\(address.hexString)_\(effectiveBank.hexString)")
     }
   }
 }
@@ -167,15 +173,8 @@ disassembleJumpTable(within: 0x1b6e..<0x1b90, in: 0x00, selectedBank: 0x00)
 
 disassembleJumpTable(within: 0x0ad2..<0x0aea, in: 0x00, selectedBank: 0x00)
 disassembleJumpTable(within: 0x215f..<0x217d, in: 0x00, selectedBank: 0x00)
-//disassembleJumpTable(within: 0x0d33..<0x0d4f, in: 0x00)
-//disassembleJumpTable(within: 0x30fb..<0x310d, in: 0x00)
-//disassembleJumpTable(within: 0x3114..<0x3138, in: 0x00)
-//disassembleJumpTable(within: 0x4322..<0x4332, in: 0x01)
 
-// Entity tables
-//disassembleJumpTable(within: 0x392b..<(0x392b + 5 * 2), in: 0x00, selectedBank: 0x03)
-//disassembleJumpTable(within: 0x3953..<(0x3953 + 16 * 2), in: 0x00, selectedBank: 0x03)
-//disassembleJumpTable(within: 0x4976..<0x4B48, in: 0x03)
+//disassembleJumpTable(within: 0x4322..<0x4332, in: 0x01, selectedBank: 0x01)
 
 disassembly.disassembleAsGameboyCartridge()
 

@@ -411,7 +411,9 @@ extension LR35902 {
       // Shorten any contiguous scopes that contain this data.
       let overlappingScopes = contiguousScopes.filter { $0.value.overlaps(cartRange) }
       for (key, scope) in overlappingScopes {
-        contiguousScopes[key] = scope.lowerBound..<min(scope.upperBound, cartRange.lowerBound)
+        if cartRange.lowerBound < scope.upperBound {
+          contiguousScopes[key] = scope.lowerBound..<cartRange.lowerBound
+        }
       }
 
       let range = Int(lowerBound)..<Int(upperBound)

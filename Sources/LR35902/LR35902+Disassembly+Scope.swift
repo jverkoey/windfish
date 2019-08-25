@@ -61,11 +61,12 @@ extension LR35902.Disassembly {
     let returnLabelAddresses = locations.filter { instructionMap[$0]?.spec.category == .ret }
     let hasManyReturns = returnLabelAddresses.count > 1
     for cartLocation in returnLabelAddresses {
-      if hasManyReturns {
-        labels[cartLocation] = "\(scope).return_\(LR35902.addressAndBank(from: cartLocation).address.hexString)"
-      } else {
-        labels[cartLocation] = "\(scope).return"
-      }
+//      if hasManyReturns {
+      let addressAndBank = LR35902.addressAndBank(from: cartLocation)
+      labels[cartLocation] = "\(scope).return_\(addressAndBank.address.hexString)_\(addressAndBank.bank.hexString)"
+//      } else {
+//        labels[cartLocation] = "\(scope).return"
+//      }
     }
   }
 
@@ -117,11 +118,12 @@ extension LR35902.Disassembly {
     let destinations = Set(loops.map { $0.destination })
     let hasManyDestinations = destinations.count > 1
     for cartLocation in destinations {
-      if hasManyDestinations {
-        labels[cartLocation] = "\(scopeName).loop_\(LR35902.addressAndBank(from: cartLocation).address.hexString)"
-      } else {
-        labels[cartLocation] = "\(scopeName).loop"
-      }
+//      if hasManyDestinations {
+      let addressAndBank = LR35902.addressAndBank(from: cartLocation)
+      labels[cartLocation] = "\(scopeName).loop_\(addressAndBank.address.hexString)_\(addressAndBank.bank.hexString)"
+//      } else {
+//        labels[cartLocation] = "\(scopeName).loop"
+//      }
     }
   }
 
@@ -155,11 +157,12 @@ extension LR35902.Disassembly {
     let destinations = Set(forwardTocs.map { $0.destination })
     let hasManyDestinations = destinations.count > 1
     for cartLocation in destinations {
-      if hasManyDestinations {
-        labels[cartLocation] = "\(scopeName).else_\(LR35902.addressAndBank(from: cartLocation).address.hexString)"
-      } else {
-        labels[cartLocation] = "\(scopeName).else"
-      }
+//      if hasManyDestinations {
+      let addressAndBank = LR35902.addressAndBank(from: cartLocation)
+      labels[cartLocation] = "\(scopeName).else_\(addressAndBank.address.hexString)_\(addressAndBank.bank.hexString)"
+//      } else {
+//        labels[cartLocation] = "\(scopeName).else"
+//      }
     }
   }
 
