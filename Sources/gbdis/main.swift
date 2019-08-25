@@ -128,10 +128,13 @@ disassembly.register(bankChange: 0x08, at: 0x2E71, in: 0x00)
 //  print("disassembly.register(bankChange: 0x\(args[1]!.dropFirst()), at: 0x\((address + 5).hexString), in: 0x\(bank.hexString))")
 //}
 
+// MARK: - Jump tables
+
 disassembleJumpTable(within: 0x04b3..<0x04F5, in: 0x00)
 disassembleJumpTable(within: 0x0ad2..<0x0aea, in: 0x00)
 disassembleJumpTable(within: 0x1b6e..<0x1b90, in: 0x00)
 disassembleJumpTable(within: 0x215f..<0x217f, in: 0x00)
+disassembleJumpTable(within: 0x4322..<0x4332, in: 0x01)
 
 disassembly.disassembleAsGameboyCartridge()
 

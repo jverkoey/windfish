@@ -375,8 +375,14 @@ extension LR35902 {
       }
 
       instructionMap[address] = instruction
+      let instructionRange = Int(address)..<(Int(address) + Int(Instruction.widths[instruction.spec]!.total))
 
-      code.insert(integersIn: Int(address)..<(Int(address) + Int(Instruction.widths[instruction.spec]!.total)))
+      // Remove any overlapping instructions.
+      for location in instructionRange.dropFirst() {
+        instructionMap[LR35902.CartridgeLocation(location)] = nil
+      }
+
+      code.insert(integersIn: instructionRange)
     }
     var instructionMap: [CartridgeLocation: Instruction] = [:]
 
