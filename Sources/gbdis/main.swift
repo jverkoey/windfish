@@ -120,54 +120,59 @@ disassembly.register(bankChange: 0x17, at: 0x0B0D, in: 0x00)
 disassembly.register(bankChange: 0x01, at: 0x0B50, in: 0x14)
 disassembly.register(bankChange: 0x02, at: 0x0B58, in: 0x00)
 disassembly.register(bankChange: 0x02, at: 0x0BCF, in: 0x00)
-disassembly.register(bankChange: 0x19, at: 0x0BFA, in: 0x00)
-disassembly.register(bankChange: 0x02, at: 0x0C05, in: 0x00)
-disassembly.register(bankChange: 0x14, at: 0x0C2F, in: 0x00)
-disassembly.register(bankChange: 0x0F, at: 0x0C37, in: 0x00)
+disassembly.register(bankChange: 0x19, at: 0x0BFA, in: 0x02)
+disassembly.register(bankChange: 0x02, at: 0x0C05, in: 0x19)
+disassembly.register(bankChange: 0x14, at: 0x0C2F, in: 0x02)
+disassembly.register(bankChange: 0x0F, at: 0x0C37, in: 0x14)
 disassembly.register(bankChange: 0x19, at: 0x0D54, in: 0x00)
 disassembly.register(bankChange: 0x01, at: 0x0D5C, in: 0x00)
 disassembly.register(bankChange: 0x02, at: 0x0D64, in: 0x00)
+disassembly.register(bankChange: 0x02, at: 0x120B, in: 0x00)
 disassembly.register(bankChange: 0x02, at: 0x14F0, in: 0x00)
-disassembly.register(bankChange: 0x02, at: 0x1518, in: 0x00)
+disassembly.register(bankChange: 0x02, at: 0x1518, in: 0x02)
 disassembly.register(bankChange: 0x04, at: 0x15F2, in: 0x00)
 disassembly.register(bankChange: 0x14, at: 0x167D, in: 0x00)
-disassembly.register(bankChange: 0x02, at: 0x16C5, in: 0x00)
+disassembly.register(bankChange: 0x02, at: 0x16C5, in: 0x14)
+disassembly.register(bankChange: 0x03, at: 0x20D2, in: 0x00)
 disassembly.register(bankChange: 0x02, at: 0x265A, in: 0x00)
 disassembly.register(bankChange: 0x01, at: 0x289D, in: 0x00)
 disassembly.register(bankChange: 0x0C, at: 0x2B70, in: 0x00)
-disassembly.register(bankChange: 0x0C, at: 0x2B81, in: 0x00)
-disassembly.register(bankChange: 0x01, at: 0x2B9E, in: 0x00)
+disassembly.register(bankChange: 0x0C, at: 0x2B81, in: 0x0C)
+disassembly.register(bankChange: 0x01, at: 0x2B9E, in: 0x0C)
 disassembly.register(bankChange: 0x0F, at: 0x2BA7, in: 0x00)
-disassembly.register(bankChange: 0x0F, at: 0x2BB8, in: 0x00)
+disassembly.register(bankChange: 0x0F, at: 0x2BB8, in: 0x0F)
 disassembly.register(bankChange: 0x01, at: 0x2BC9, in: 0x00)
-disassembly.register(bankChange: 0x0D, at: 0x2BDB, in: 0x00)
+disassembly.register(bankChange: 0x0D, at: 0x2BDB, in: 0x01)
 disassembly.register(bankChange: 0x12, at: 0x2C30, in: 0x01)
-disassembly.register(bankChange: 0x0C, at: 0x2C47, in: 0x01)
+disassembly.register(bankChange: 0x0C, at: 0x2C47, in: 0x12)
 disassembly.register(bankChange: 0x0C, at: 0x2C83, in: 0x00)
 disassembly.register(bankChange: 0x01, at: 0x2CC7, in: 0x00)
-disassembly.register(bankChange: 0x10, at: 0x2CD8, in: 0x00)
+disassembly.register(bankChange: 0x10, at: 0x2CD8, in: 0x01)
 disassembly.register(bankChange: 0x0F, at: 0x2CF5, in: 0x00)
 disassembly.register(bankChange: 0x0C, at: 0x2D06, in: 0x00)
 disassembly.register(bankChange: 0x10, at: 0x2D30, in: 0x00)
 disassembly.register(bankChange: 0x10, at: 0x2D5B, in: 0x00)
 disassembly.register(bankChange: 0x0F, at: 0x2D78, in: 0x00)
 disassembly.register(bankChange: 0x08, at: 0x2E71, in: 0x00)
+disassembly.register(bankChange: 0x01, at: 0x381E, in: 0x00)
 disassembly.register(bankChange: 0x02, at: 0x38B0, in: 0x00)
 disassembly.register(bankChange: 0x19, at: 0x38F7, in: 0x00)
 disassembly.register(bankChange: 0x14, at: 0x391B, in: 0x00)
-disassembly.register(bankChange: 0x03, at: 0x3923, in: 0x00)
+disassembly.register(bankChange: 0x03, at: 0x3923, in: 0x14)
+disassembly.register(bankChange: 0x02, at: 0x3E82, in: 0x00)
+disassembly.register(bankChange: 0x03, at: 0x7301, in: 0x03)
 
 // Generates the block of code above.
 // TODO: Ideally macros could be detected during disassembly phase, not just when writing.
-//disassembly.defineMacro(named: "_changebank", instructions: [
-//  .any(.ld(.a, .imm8)),
-//  .instruction(.init(spec: .call(nil, .imm16), imm16: 0x07b9))
-//], code: [
-//  .ld(.a, .arg(1)),
-//  .call(nil, .imm16),
-//]) { args, address, bank in
-//  print("disassembly.register(bankChange: 0x\(args[1]!.dropFirst()), at: 0x\((address + 5).hexString), in: 0x\(bank.hexString))")
-//}
+disassembly.defineMacro(named: "_changebank", instructions: [
+  .any(.ld(.a, .imm8)),
+  .instruction(.init(spec: .call(nil, .imm16), imm16: 0x07b9))
+], code: [
+  .ld(.a, .arg(1)),
+  .call(nil, .imm16),
+]) { args, address, bank in
+  print("disassembly.register(bankChange: 0x\(args[1]!.dropFirst()), at: 0x\((address + 5).hexString), in: 0x\(bank.hexString))")
+}
 
 // MARK: - Jump tables
 
@@ -183,7 +188,7 @@ disassembleJumpTable(within: 0x0c82..<0x0C8C, in: 0x00, selectedBank: 0x01)
 disassembleJumpTable(within: 0x0d33..<0x0d49, in: 0x00, selectedBank: 0x03)  // TODO: This may be called with different banks.
 disassembleJumpTable(within: 0x30fb..<0x310d, in: 0x00, selectedBank: 0x00)
 disassembleJumpTable(within: 0x3114..<0x3138, in: 0x00, selectedBank: 0x00)
-//disassembleJumpTable(within: 0x392b..<0x3945, in: 0x00, selectedBank: 0x00)
+disassembleJumpTable(within: 0x392b..<0x393d, in: 0x00, selectedBank: 0x03)
 //disassembleJumpTable(within: 0x3952..<0x3954, in: 0x00, selectedBank: 0x00)
 
 disassembly.disassembleAsGameboyCartridge()
