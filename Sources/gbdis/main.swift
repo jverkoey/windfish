@@ -182,7 +182,7 @@ disassembleJumpTable(within: 0x4322..<0x4332, in: 0x01, selectedBank: 0x01)
 disassembleJumpTable(within: 0x0c82..<0x0C8C, in: 0x00, selectedBank: 0x01)
 disassembleJumpTable(within: 0x0d33..<0x0d49, in: 0x00, selectedBank: 0x03)  // TODO: This may be called with different banks.
 disassembleJumpTable(within: 0x30fb..<0x310d, in: 0x00, selectedBank: 0x00)
-//disassembleJumpTable(within: 0x3114..<0x3138, in: 0x00, selectedBank: 0x00)
+disassembleJumpTable(within: 0x3114..<0x3138, in: 0x00, selectedBank: 0x00)
 //disassembleJumpTable(within: 0x392b..<0x3945, in: 0x00, selectedBank: 0x00)
 //disassembleJumpTable(within: 0x3952..<0x3954, in: 0x00, selectedBank: 0x00)
 
