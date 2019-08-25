@@ -801,7 +801,7 @@ extension LR35902 {
             let jumpTo = instruction.imm16!
             queueRun(run, instructionAddress, jumpTo, instructionBank, instruction)
 
-          case .jp(_, nil), .ret(nil), .reti:
+          case .jp(nil, _), .ret(nil), .reti:
             break linear_sweep
 
           default:

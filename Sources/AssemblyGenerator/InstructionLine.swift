@@ -17,7 +17,13 @@ private func codeColumn(_ code: String) -> String {
 }
 
 public func line(comment: String) -> String {
-  return "    ; \(comment)"
+  var lines: [String] = []
+  comment.enumerateLines { line, _ in
+    lines.append(line)
+  }
+  return lines.map {
+    "    ; \($0)"
+  }.joined(separator: "\n")
 }
 
 public func line(_ code: String, comment: String) -> String {

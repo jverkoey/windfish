@@ -45,7 +45,14 @@ extension LR35902.Disassembly {
   private func rewriteLabels(at locations: [LR35902.CartridgeLocation], with scope: String) {
     for cartLocation in locations {
       let addressAndBank = LR35902.addressAndBank(from: cartLocation)
-      labels[cartLocation] = "\(scope).fn_\(addressAndBank.bank.hexString)_\(addressAndBank.address.hexString)"
+      // TODO: We need to be able to separate the desire for a label to be at a location from the suggested name for it.
+      if let existingLabel = labels[cartLocation],
+        let suffix = existingLabel.split(separator: ".").last,
+        !suffix.hasPrefix("toc_") {
+        labels[cartLocation] = "\(scope).\(suffix)"
+      } else {
+        labels[cartLocation] = "\(scope).fn_\(addressAndBank.bank.hexString)_\(addressAndBank.address.hexString)"
+      }
     }
   }
 

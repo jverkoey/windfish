@@ -77,6 +77,10 @@ disassembly.createGlobal(at: 0xffd1, named: "hNeedsRenderingFrame")
 disassembly.createGlobal(at: 0xfff7, named: "hMapID")
 disassembly.createGlobal(at: 0xfffd, named: "hDidRenderFrame", dataType: "bool")
 
+// RST $00 invocations are followed by a 2 byte jump address.
+disassembly.setLabel(at: 0x04b3, in: 0x00, named: "jumpTable1")
+//disassembly.setData(at: 0x04b3..<0x04F5, in: 0x00)
+
 disassembly.disassembleAsGameboyCartridge()
 
 // MARK: - Bank 0 (00)
@@ -84,12 +88,24 @@ disassembly.disassembleAsGameboyCartridge()
 disassembly.defineFunction(startingAt: 0x0150, in: 0x00, named: "Main")
 disassembly.setPreComment(at: 0x0156, in: 0x00, text: "Reset the palette registers to zero.")
 disassembly.setPreComment(at: 0x015D, in: 0x00, text: "Clears 6144 bytes of video ram. Graphics vram location for OBJ and BG tiles start at $8000 and end at $97FF; for a total of 0x1800 bytes.")
-disassembly.setLabel(at: 0x03bd, in: 0x00, named: "waitForNextFrame")
 disassembly.setLabel(at: 0x01a6, in: 0x00, named: "frameDidRender")
 disassembly.setPreComment(at: 0x01b7, in: 0x00, text: "Load a with a value that is non-zero every other frame.")
 disassembly.setLabel(at: 0x01aa, in: 0x00, named: "Main.renderLoop_setScrollY")
 disassembly.setLabel(at: 0x01be, in: 0x00, named: "defaultShakeBehavior")
 disassembly.setLabel(at: 0x01c4, in: 0x00, named: "setScrollY")
+disassembly.setLabel(at: 0x01f5, in: 0x00, named: "playAudio")
+disassembly.setLabel(at: 0x01fb, in: 0x00, named: "skipAudio")
+disassembly.setPreComment(at: 0x2872, in: 0x00, text: """
+hl = address after rst $00 invocation
+hl += [0, a << 1]
+hl = [ram[hl + 1], ram[hl]]
+jp hl
+""")
+disassembly.defineFunction(startingAt: 0x2872, in: 0x00, named: "JumpTable")
+disassembly.setLabel(at: 0x03bd, in: 0x00, named: "waitForNextFrame")
+disassembly.defineFunction(startingAt: 0x04a1, in: 0x00, named: "LoadMapData")
+disassembly.setLabel(at: 0x04f5, in: 0x00, named: "loadMapZero")
+disassembly.setLabel(at: 0x0516, in: 0x00, named: "cleanupAndReturn")
 disassembly.defineFunction(startingAt: 0x07B9, in: 0x00, named: "SetBank")
 disassembly.defineFunction(startingAt: 0x0844, in: 0x00, named: "PlayAudioStep")
 disassembly.defineFunction(startingAt: 0x2881, in: 0x00, named: "LCDOff")
