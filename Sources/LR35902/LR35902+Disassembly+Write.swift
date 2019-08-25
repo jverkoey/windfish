@@ -487,8 +487,6 @@ clean:
           lineBuffer.append(contentsOf: lineGroup)
           flush()
 
-          cpu.bank = bank
-
           // Accumulate bytes until the next instruction or transfer of control.
           var accumulator: [UInt8] = []
           let initialPc = cpu.pc
@@ -498,7 +496,7 @@ clean:
             if cpu.pc < 0x4000 {
               global = globals[cpu.pc]
             }
-            accumulator.append(cpu[cpu.pc, cpu.bank])
+            accumulator.append(cpu[cpu.pc, bank])
             cpu.pc += 1
           } while cpu.pc < end
             && (instructionsToDecode == 0 || instruction(at: cpu.pc, in: bank) == nil)
@@ -529,7 +527,7 @@ clean:
             for (index, pair) in accumulator.chunked(into: 2).enumerated() {
               let address = (LR35902.Address(pair[1]) << 8) | LR35902.Address(pair[0])
               let jumpLocation: String
-              if let location = LR35902.safeCartAddress(for: address, in: bank),
+              if let location = LR35902.safeCartAddress(for: address, in: cpu.bank),
                 let label = labels[location] {
                 jumpLocation = label
               } else {
@@ -560,6 +558,7 @@ clean:
 
           lineBuffer.append(.empty)
           lineBufferAddress = cpu.pc
+          cpu.bank = bank
         }
       }
 

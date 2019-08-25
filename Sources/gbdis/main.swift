@@ -21,23 +21,28 @@ func extractText(from range: Range<LR35902.CartridgeLocation>) {
 
 var jumpTableIndex = 0
 
-func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902.Bank) {
+func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902.Bank, selectedBank: LR35902.Bank? = nil) {
+  assert((range.upperBound - range.lowerBound) < 256)
   jumpTableIndex += 1
-  // RST $00 invocations are followed by a 2 byte jump address.
   disassembly.setJumpTable(at: range, in: bank)
 
+  if let selectedBank = selectedBank {
+    disassembly.register(bankChange: selectedBank, at: range.lowerBound - 1, in: bank)
+  }
   for location in stride(from: LR35902.cartAddress(for: range.lowerBound, in: bank)!, to: LR35902.cartAddress(for: range.upperBound, in: bank)!, by: 2) {
     let lowByte = data[Int(location)]
     let highByte = data[Int(location + 1)]
     let address: LR35902.Address = (LR35902.Address(highByte) << 8) | LR35902.Address(lowByte)
     if address < 0x8000 {
       let safeBank: LR35902.Bank
-      if address > 0x4000 && bank == 0 {
+      if let selectedBank = selectedBank {
+        safeBank = selectedBank
+      } else if address > 0x4000 && bank == 0 {
         safeBank = 1
       } else {
         safeBank = bank
       }
-      disassembly.defineFunction(startingAt: address, in: bank, named: "JumpTable_\(address.hexString)_\(safeBank.hexString)")
+      disassembly.defineFunction(startingAt: address, in: safeBank, named: "JumpTable_\(address.hexString)_\(safeBank.hexString)")
     }
   }
 }
@@ -110,7 +115,21 @@ disassembly.createGlobal(at: 0xfffd, named: "hDidRenderFrame", dataType: "bool")
 disassembly.register(bankChange: 0x01, at: 0x03AF, in: 0x00)
 disassembly.register(bankChange: 0x17, at: 0x0B0D, in: 0x00)
 disassembly.register(bankChange: 0x01, at: 0x0B50, in: 0x14)
+disassembly.register(bankChange: 0x02, at: 0x0B58, in: 0x00)
+disassembly.register(bankChange: 0x02, at: 0x0BCF, in: 0x00)
+disassembly.register(bankChange: 0x19, at: 0x0BFA, in: 0x00)
+disassembly.register(bankChange: 0x02, at: 0x0C05, in: 0x00)
+disassembly.register(bankChange: 0x14, at: 0x0C2F, in: 0x00)
 disassembly.register(bankChange: 0x0F, at: 0x0C37, in: 0x00)
+disassembly.register(bankChange: 0x19, at: 0x0D54, in: 0x00)
+disassembly.register(bankChange: 0x01, at: 0x0D5C, in: 0x00)
+disassembly.register(bankChange: 0x02, at: 0x0D64, in: 0x00)
+disassembly.register(bankChange: 0x02, at: 0x14F0, in: 0x00)
+disassembly.register(bankChange: 0x02, at: 0x1518, in: 0x00)
+disassembly.register(bankChange: 0x04, at: 0x15F2, in: 0x00)
+disassembly.register(bankChange: 0x14, at: 0x167D, in: 0x00)
+disassembly.register(bankChange: 0x02, at: 0x16C5, in: 0x00)
+disassembly.register(bankChange: 0x02, at: 0x265A, in: 0x00)
 disassembly.register(bankChange: 0x01, at: 0x289D, in: 0x00)
 disassembly.register(bankChange: 0x0C, at: 0x2B70, in: 0x00)
 disassembly.register(bankChange: 0x0C, at: 0x2B81, in: 0x00)
@@ -130,6 +149,10 @@ disassembly.register(bankChange: 0x10, at: 0x2D30, in: 0x00)
 disassembly.register(bankChange: 0x10, at: 0x2D5B, in: 0x00)
 disassembly.register(bankChange: 0x0F, at: 0x2D78, in: 0x00)
 disassembly.register(bankChange: 0x08, at: 0x2E71, in: 0x00)
+disassembly.register(bankChange: 0x02, at: 0x38B0, in: 0x00)
+disassembly.register(bankChange: 0x19, at: 0x38F7, in: 0x00)
+disassembly.register(bankChange: 0x14, at: 0x391B, in: 0x00)
+disassembly.register(bankChange: 0x03, at: 0x3923, in: 0x00)
 
 // Generates the block of code above.
 // TODO: Ideally macros could be detected during disassembly phase, not just when writing.
@@ -151,6 +174,10 @@ disassembleJumpTable(within: 0x0c82..<0x0c8c, in: 0x00)
 disassembleJumpTable(within: 0x0d33..<0x0d4f, in: 0x00)
 disassembleJumpTable(within: 0x1b6e..<0x1b90, in: 0x00)
 disassembleJumpTable(within: 0x215f..<0x217d, in: 0x00)
+disassembleJumpTable(within: 0x30fb..<0x310d, in: 0x00)
+disassembleJumpTable(within: 0x3114..<0x3138, in: 0x00)
+//disassembleJumpTable(within: 0x392b..<0x393D, in: 0x00, selectedBank: 0x03)
+//disassembleJumpTable(within: 0x3953..<(0x3953 + 16 * 2), in: 0x00, selectedBank: 0x03)
 disassembleJumpTable(within: 0x4322..<0x4332, in: 0x01)
 
 disassembly.disassembleAsGameboyCartridge()
