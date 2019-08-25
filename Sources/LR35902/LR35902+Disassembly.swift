@@ -349,8 +349,9 @@ extension LR35902 {
       // Create a label if one doesn't exist.
       if labels[index] == nil
         // Don't create a label in the middle of an instruction.
-        && (!code.contains(Int(index)) || instruction(at: pc, in: bank) != nil) {
-        labels[index] = RGBDSAssembly.defaultLabel(at: pc, in: bank)
+        && (!code.contains(Int(index)) || instruction(at: pc, in: bank) != nil),
+        let label = RGBDSAssembly.defaultLabel(at: pc, in: bank) {
+        setLabel(at: pc, in: bank, named: label)
       }
     }
     private var transfers: [CartridgeLocation: Set<TransferOfControl>] = [:]
@@ -471,6 +472,14 @@ extension LR35902 {
       }
       return Set(intersectingScopes.keys)
     }
+
+    public func contentContiguousScope(at pc: Address, in bank: Bank) -> Set<String> {
+      guard let cartAddress = cartAddress(for: pc, in: bank) else {
+        return Set()
+      }
+      let labels = contiguousScopes.filter { label, scope in scope.dropFirst().contains(cartAddress) }.keys
+      return Set(labels)
+    }
     public func contiguousScope(at pc: Address, in bank: Bank) -> Set<String> {
       guard let cartAddress = cartAddress(for: pc, in: bank) else {
         return Set()
@@ -527,15 +536,20 @@ extension LR35902 {
       }
       // TODO: Need to separate scope regions from literal names so that scopes can be re-named.
       // Notably, scope names should be nil unless a name is explicitly given.
-      /*if !name.contains("."),
-        let scope = contiguousScope(at: pc, in: bank) {
-        labels[cartAddress] = "\(scope).\(name)"
-      } else*/
-      if let label = labels[cartAddress],
-        label.contains(".") && !name.contains(".") {
-        labels[cartAddress] = "\(label.split(separator: ".").first!).\(name)"
+      let scopedLabel: String
+      if !name.contains("."),
+        contentContiguousScope(at: pc, in: bank).count == 1,
+        let scope = contentContiguousScope(at: pc, in: bank).first {
+        scopedLabel = "\(scope).\(name)"
       } else {
-        labels[cartAddress] = name
+        scopedLabel = name
+      }
+
+      if let label = labels[cartAddress],
+        label.contains(".") && !scopedLabel.contains(".") {
+        labels[cartAddress] = "\(label.split(separator: ".").first!).\(scopedLabel)"
+      } else {
+        labels[cartAddress] = scopedLabel
       }
     }
     var labels: [CartridgeLocation: String] = [:]
