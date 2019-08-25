@@ -591,8 +591,8 @@ extension LR35902 {
         scope1.lowerBound < scope2.lowerBound
       }).first {
         let addressAndBank = LR35902.addressAndBank(from: firstScope.lowerBound)
-        if let firstScopeLabel = label(at: addressAndBank.address, in: addressAndBank.bank) {
-          return  "\(firstScopeLabel).\(name)"
+        if let firstScopeLabel = label(at: addressAndBank.address, in: addressAndBank.bank)?.components(separatedBy: ".").first {
+          return "\(firstScopeLabel).\(name)"
         }
       }
 
@@ -606,6 +606,7 @@ extension LR35902 {
     }
 
     public func setLabel(at pc: Address, in bank: Bank, named name: String) {
+      precondition(!name.contains("."), "Labels cannot contain dots.")
       guard let cartAddress = safeCartAddress(for: pc, in: bank) else {
         preconditionFailure("Attempting to set label in non-cart addressable location.")
       }
