@@ -660,6 +660,7 @@ extension LR35902 {
     }
     public func createDatatype(named name: String, enumeration: [UInt8: String], representation: Datatype.Representation = .hexadecimal) {
       precondition(dataTypes[name] == nil, "Data type \(name) already exists.")
+      assert(Set(enumeration.values).count == enumeration.count, "There exist duplicate enumeration names.")
       dataTypes[name] = Datatype(namedValues: enumeration, interpretation: .enumerated, representation: representation)
     }
     public func createDatatype(named name: String, bitmask: [UInt8: String], representation: Datatype.Representation = .binary) {

@@ -198,14 +198,17 @@ extension LR35902.Disassembly {
         state.bc = .init(value: .value(instruction.imm16!), sourceLocation: location)
       case .ld(.hl, .imm16):
         state.hl = .init(value: .value(instruction.imm16!), sourceLocation: location)
-      case .ld(.ffimm8addr, .a):
+      case .ld(let numeric, .ffimm8addr):
+        let address = 0xFF00 | LR35902.Address(instruction.imm8!)
+        state[numeric] = .init(value: .variable(address), sourceLocation: location)
+      case .ld(.ffimm8addr, let numeric):
         let address = 0xFF00 | LR35902.Address(instruction.imm8!)
         if let global = globals[address],
           let dataType = global.dataType,
           let sourceLocation = state.a?.sourceLocation {
           typeAtLocation[sourceLocation] = dataType
         }
-        state.ram[address] = state.a
+        state.ram[address] = state[numeric]
       case .cp(_):
         if case .variable(let address) = state.a?.value,
           let global = globals[address],
@@ -214,6 +217,14 @@ extension LR35902.Disassembly {
         }
       case .xor(.a):
         state.a = .init(value: .value(0), sourceLocation: location)
+      case .and(let numeric):
+        if case .value(let dst) = state.a?.value,
+          case .value(let src) = state[numeric]?.value {
+          state.a = .init(value: .value(dst & src), sourceLocation: location)
+          // TODO: Compute the flag bits.
+        } else {
+          state.a = nil
+        }
       case .ld(.sp, .imm16):
         state.sp = .init(value: .value(instruction.imm16!), sourceLocation: location)
       case .reti, .ret:
