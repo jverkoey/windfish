@@ -169,15 +169,15 @@ disassembly.register(bankChange: 0x03, at: 0x3923, in: 0x00)
 
 // MARK: - Jump tables
 
-disassembleJumpTable(within: 0x04b3..<0x04F5, in: 0x00)
-disassembleJumpTable(within: 0x0ad2..<0x0aea, in: 0x00)
-disassembleJumpTable(within: 0x0c82..<0x0c8c, in: 0x00)
-disassembleJumpTable(within: 0x0d33..<0x0d4f, in: 0x00)
-disassembleJumpTable(within: 0x1b6e..<0x1b90, in: 0x00)
-disassembleJumpTable(within: 0x215f..<0x217d, in: 0x00)
-disassembleJumpTable(within: 0x30fb..<0x310d, in: 0x00)
-disassembleJumpTable(within: 0x3114..<0x3138, in: 0x00)
-disassembleJumpTable(within: 0x4322..<0x4332, in: 0x01)
+//disassembleJumpTable(within: 0x04b3..<0x04F5, in: 0x00)
+//disassembleJumpTable(within: 0x0ad2..<0x0aea, in: 0x00)
+//disassembleJumpTable(within: 0x0c82..<0x0c8c, in: 0x00)
+//disassembleJumpTable(within: 0x0d33..<0x0d4f, in: 0x00)
+//disassembleJumpTable(within: 0x1b6e..<0x1b90, in: 0x00)
+//disassembleJumpTable(within: 0x215f..<0x217d, in: 0x00)
+//disassembleJumpTable(within: 0x30fb..<0x310d, in: 0x00)
+//disassembleJumpTable(within: 0x3114..<0x3138, in: 0x00)
+//disassembleJumpTable(within: 0x4322..<0x4332, in: 0x01)
 
 // Entity tables
 //disassembleJumpTable(within: 0x392b..<(0x392b + 5 * 2), in: 0x00, selectedBank: 0x03)
