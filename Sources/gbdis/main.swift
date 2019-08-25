@@ -22,7 +22,7 @@ func extractText(from range: Range<LR35902.CartridgeLocation>) {
 var jumpTableIndex = 0
 
 func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902.Bank, selectedBank: LR35902.Bank? = nil) {
-  assert((range.upperBound - range.lowerBound) < 256)
+//  assert((range.upperBound - range.lowerBound) <= 256)
   jumpTableIndex += 1
   disassembly.setJumpTable(at: range, in: bank)
 
@@ -176,9 +176,12 @@ disassembleJumpTable(within: 0x1b6e..<0x1b90, in: 0x00)
 disassembleJumpTable(within: 0x215f..<0x217d, in: 0x00)
 disassembleJumpTable(within: 0x30fb..<0x310d, in: 0x00)
 disassembleJumpTable(within: 0x3114..<0x3138, in: 0x00)
-//disassembleJumpTable(within: 0x392b..<0x393D, in: 0x00, selectedBank: 0x03)
-//disassembleJumpTable(within: 0x3953..<(0x3953 + 16 * 2), in: 0x00, selectedBank: 0x03)
 disassembleJumpTable(within: 0x4322..<0x4332, in: 0x01)
+
+// Entity tables
+//disassembleJumpTable(within: 0x392b..<(0x392b + 5 * 2), in: 0x00, selectedBank: 0x03)
+//disassembleJumpTable(within: 0x3953..<(0x3953 + 16 * 2), in: 0x00, selectedBank: 0x03)
+//disassembleJumpTable(within: 0x4976..<0x4B48, in: 0x03)
 
 disassembly.disassembleAsGameboyCartridge()
 

@@ -527,8 +527,7 @@ clean:
             for (index, pair) in accumulator.chunked(into: 2).enumerated() {
               let address = (LR35902.Address(pair[1]) << 8) | LR35902.Address(pair[0])
               let jumpLocation: String
-              if let location = LR35902.safeCartAddress(for: address, in: cpu.bank),
-                let label = labels[location] {
+              if let label = label(at: address, in: cpu.bank) {
                 jumpLocation = label
               } else {
                 jumpLocation = "$\(address.hexString)"
