@@ -413,6 +413,9 @@ clean:
                   lineBuffer.replaceSubrange(firstInstruction...lastInstruction,
                                              with: [.macro("\(macro.macro.name) \(macroArgs)", lineBufferAddress, bank, macroScope.sorted().joined(separator: ", "), bytes)])
 
+                  if let action = macro.macro.action {
+                    action(macro.arguments, lineBufferAddress, bank)
+                  }
                   lineBufferAddress = cpu.pc
                 } else {
                   flush()

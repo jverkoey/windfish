@@ -92,14 +92,41 @@ disassembly.createGlobal(at: 0xffd1, named: "hNeedsRenderingFrame")
 disassembly.createGlobal(at: 0xfff7, named: "hMapID")
 disassembly.createGlobal(at: 0xfffd, named: "hDidRenderFrame", dataType: "bool")
 
-disassembly.register(bankChange: 0x01, at: 0x03af, in: 0x00)
-disassembly.register(bankChange: 0x01, at: 0x0b50, in: 0x00)
-disassembly.register(bankChange: 0x17, at: 0x0b0d, in: 0x00)
-disassembly.register(bankChange: 0x0f, at: 0x0c37, in: 0x00)
-disassembly.register(bankChange: 0x01, at: 0x289d, in: 0x00)
-disassembly.register(bankChange: 0x0c, at: 0x2b70, in: 0x00)
-disassembly.register(bankChange: 0x0c, at: 0x2B81, in: 0x00)
+disassembly.register(bankChange: 0x01, at: 0x03AF, in: 0x00)
+disassembly.register(bankChange: 0x17, at: 0x0B0D, in: 0x00)
+disassembly.register(bankChange: 0x01, at: 0x0B50, in: 0x14)
+disassembly.register(bankChange: 0x0F, at: 0x0C37, in: 0x00)
+disassembly.register(bankChange: 0x01, at: 0x289D, in: 0x00)
+disassembly.register(bankChange: 0x0C, at: 0x2B70, in: 0x00)
+disassembly.register(bankChange: 0x0C, at: 0x2B81, in: 0x00)
 disassembly.register(bankChange: 0x01, at: 0x2B9E, in: 0x00)
+disassembly.register(bankChange: 0x0F, at: 0x2BA7, in: 0x00)
+disassembly.register(bankChange: 0x0F, at: 0x2BB8, in: 0x00)
+disassembly.register(bankChange: 0x01, at: 0x2BC9, in: 0x00)
+disassembly.register(bankChange: 0x0D, at: 0x2BDB, in: 0x00)
+disassembly.register(bankChange: 0x12, at: 0x2C30, in: 0x01)
+disassembly.register(bankChange: 0x0C, at: 0x2C47, in: 0x01)
+disassembly.register(bankChange: 0x0C, at: 0x2C83, in: 0x00)
+disassembly.register(bankChange: 0x01, at: 0x2CC7, in: 0x00)
+disassembly.register(bankChange: 0x10, at: 0x2CD8, in: 0x00)
+disassembly.register(bankChange: 0x0F, at: 0x2CF5, in: 0x00)
+disassembly.register(bankChange: 0x0C, at: 0x2D06, in: 0x00)
+disassembly.register(bankChange: 0x10, at: 0x2D30, in: 0x00)
+disassembly.register(bankChange: 0x10, at: 0x2D5B, in: 0x00)
+disassembly.register(bankChange: 0x0F, at: 0x2D78, in: 0x00)
+disassembly.register(bankChange: 0x08, at: 0x2E71, in: 0x00)
+
+// Generates the block of code above.
+// TODO: Ideally macros could be detected during disassembly phase, not just when writing.
+//disassembly.defineMacro(named: "_changebank", instructions: [
+//  .any(.ld(.a, .imm8)),
+//  .instruction(.init(spec: .call(nil, .imm16), imm16: 0x07b9))
+//], code: [
+//  .ld(.a, .arg(1)),
+//  .call(nil, .imm16),
+//]) { args, address, bank in
+//  print("disassembly.register(bankChange: 0x\(args[1]!.dropFirst()), at: 0x\((address + 5).hexString), in: 0x\(bank.hexString))")
+//}
 
 disassembleJumpTable(within: 0x04b3..<0x04F5, in: 0x00)
 disassembleJumpTable(within: 0x0ad2..<0x0aea, in: 0x00)

@@ -629,13 +629,14 @@ extension LR35902 {
     public func defineMacro(named name: String,
                             instructions: [MacroLine],
                             code: [Instruction.Spec]? = nil,
-                            validArgumentValues: [Int: IndexSet]? = nil) {
+                            validArgumentValues: [Int: IndexSet]? = nil,
+                            action: (([Int: String], LR35902.Address, LR35902.Bank) -> Void)? = nil) {
       let leaf = instructions.reduce(macroTree, { node, spec in
         let child = node.children[spec, default: MacroNode()]
         node.children[spec] = child
         return child
       })
-      leaf.macros.append(.init(name: name, macroLines: instructions, code: code, validArgumentValues: validArgumentValues))
+      leaf.macros.append(.init(name: name, macroLines: instructions, code: code, validArgumentValues: validArgumentValues, action: action))
     }
     public func defineMacro(named name: String, template: String) {
       let assembler = RGBDSAssembler()
@@ -651,13 +652,15 @@ extension LR35902 {
       let macroLines: [MacroLine]
       let code: [Instruction.Spec]?
       let validArgumentValues: [Int: IndexSet]?
+      let action: (([Int: String], LR35902.Address, LR35902.Bank) -> Void)?
       var hasWritten = false
 
-      init(name: String, macroLines: [MacroLine], code: [Instruction.Spec]?, validArgumentValues: [Int: IndexSet]?) {
+      init(name: String, macroLines: [MacroLine], code: [Instruction.Spec]?, validArgumentValues: [Int: IndexSet]?, action: (([Int: String], LR35902.Address, LR35902.Bank) -> Void)?) {
         self.name = name
         self.macroLines = macroLines
         self.code = code
         self.validArgumentValues = validArgumentValues
+        self.action = action
       }
     }
     public final class MacroNode {
