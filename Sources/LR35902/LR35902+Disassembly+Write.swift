@@ -526,7 +526,6 @@ clean:
               chunkPc += LR35902.Address(chunk.count)
             }
           case .jumpTable:
-            let jumpTablePrefix = labels[LR35902.cartAddress(for: initialPc, in: bank)!]
             for (index, pair) in accumulator.chunked(into: 2).enumerated() {
               let address = (LR35902.Address(pair[1]) << 8) | LR35902.Address(pair[0])
               let jumpLocation: String
@@ -536,14 +535,8 @@ clean:
               } else {
                 jumpLocation = "$\(address.hexString)"
               }
-              let label: String
-              if let jumpTablePrefix = jumpTablePrefix {
-                label = ".\(jumpTablePrefix.split(separator: ".").last!)_\(index)"
-              } else {
-                label = "._\(index)"
-              }
               let bytes = cpu[LR35902.cartAddress(for: chunkPc, in: bank)!..<(LR35902.cartAddress(for: chunkPc, in: bank)! + 2)]
-              write(line("\(label) dw \(jumpLocation)", comment: "$\(chunkPc.hexString) (jumpTable) \(bytes.map { "$\($0.hexString)" }.joined(separator: " "))"), fileHandle: fileHandle)
+              write(line("dw \(jumpLocation)", address: chunkPc, addressType: "jumpTable [\(index)]", comment: "\(bytes.map { "$\($0.hexString)" }.joined(separator: " "))"), fileHandle: fileHandle)
               chunkPc += LR35902.Address(pair.count)
             }
             break
