@@ -883,6 +883,10 @@ extension LR35902 {
           case .jp(nil, _), .ret(nil), .reti:
             break linear_sweep
 
+            // TODO: This is specific to the rom; make it possible to pull this out.
+          case .rst(.x00):
+            break linear_sweep
+
           default:
             break
           }
