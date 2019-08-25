@@ -196,6 +196,16 @@ extension LR35902 {
           .jr(.z, .arg(3)),
       ])
 
+      defineMacro(named: "ifHEqJp", instructions: [
+        .any(.ld(.a, .ffimm8addr)),
+        .any(.cp(.imm8)),
+        .any(.jp(.z, .imm16)),
+      ], code: [
+        .ld(.a, .arg(1)),
+        .cp(.arg(2)),
+        .jp(.z, .arg(3)),
+      ])
+
       defineMacro(named: "ifHNe", instructions: [
         .any(.ld(.a, .ffimm8addr)),
         .any(.cp(.imm8)),
