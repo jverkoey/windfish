@@ -215,6 +215,194 @@ clean:
         macroNode = nil
       }
 
+      let initialCheckMacro: (LR35902.Instruction) -> MacroNode? = { instruction in
+        let asInstruction = MacroLine.instruction(instruction)
+        let asAny = MacroLine.any(instruction.spec)
+        if macroNode == nil, let child = self.macroTree.children[asInstruction] ?? self.macroTree.children[asAny] {
+          return child
+        } else {
+          return nil
+        }
+      }
+
+      let checkMacro: (LR35902.Instruction, Bool) throws -> Void = { instruction, isLabeled in
+        // Is this the beginning of a macro?
+        let instructionWidth = LR35902.Instruction.widths[instruction.spec]!.total
+        let asInstruction = MacroLine.instruction(instruction)
+        let asAny = MacroLine.any(instruction.spec)
+        if let child = initialCheckMacro(instruction) {
+          flush()
+          lineBufferAddress = self.cpu.pc - instructionWidth
+          macroNode = child
+        } else if let macroNodeIterator = macroNode {
+          // Only descend the tree if we're not a label.
+          if !isLabeled, let child = macroNodeIterator.children[asInstruction] ?? macroNodeIterator.children[asAny] {
+            macroNode = child
+          } else {
+            // No further nodes to be traversed; is this the end of a macro?
+            if !macroNodeIterator.macros.isEmpty {
+              let instructions = lineBuffer.compactMap { thisLine -> (LR35902.Instruction, RGBDSAssembly.Statement)? in
+                if case let .instruction(instruction, assembly, _, _, _, _) = thisLine {
+                  return (instruction, assembly)
+                } else {
+                  return nil
+                }
+              }
+
+              let macros: [(macro: LR35902.Disassembly.Macro, code: [LR35902.Instruction.Spec], arguments: [Int: String], rawArguments: [Int: String])] = macroNodeIterator.macros.map { macro in
+
+                var code: [LR35902.Instruction.Spec]
+                if let macroCode = macro.code {
+                  code = macroCode
+                } else {
+                  code = macro.macroLines.map {
+                    if case .instruction(let instruction) = $0 {
+                      return instruction.spec
+                    }
+                    preconditionFailure("Unhandled")
+                  }
+                }
+                // Extract the arguments.
+                let arguments: [Int: String] = zip(code, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
+                  let args = extractArgs(from: zipped.1.1, using: zipped.0)
+                  return iter.merging(args, uniquingKeysWith: { first, second in
+                    assert(first == second, "Mismatch in arguments")
+                    return first
+                  })
+                })
+
+                let rawArguments: [Int: String] = zip(code, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
+                  let args = extractArgs(from: RGBDSAssembly.assembly(for: zipped.1.0), using: zipped.0)
+                  return iter.merging(args, uniquingKeysWith: { first, second in
+                    assert(first == second, "Mismatch in arguments")
+                    return first
+                  })
+                })
+
+                return (macro: macro, code: code, arguments: arguments, rawArguments: rawArguments)
+              }
+
+              var validMacros = macros.filter { macro in
+                guard let validArgumentValues = macro.macro.validArgumentValues else {
+                  return true
+                }
+                let firstInvalidArgument = macro.rawArguments.first { argumentNumber, argumentValue in
+                  guard validArgumentValues[argumentNumber] != nil else {
+                    return false
+                  }
+                  if argumentValue.hasPrefix("$") {
+                    let number = Int(LR35902.Address(argumentValue.dropFirst(), radix: 16)!)
+                    return !validArgumentValues[argumentNumber]!.contains(number)
+                  } else if argumentValue.hasPrefix("[$") && argumentValue.hasSuffix("]") {
+                    let number = Int(LR35902.Address(argumentValue.dropFirst(2).dropLast(), radix: 16)!)
+                    return !validArgumentValues[argumentNumber]!.contains(number)
+                  }
+                  preconditionFailure("Unhandled.")
+                }
+                return firstInvalidArgument == nil
+              }
+
+              if validMacros.count > 1 {
+                // Try filtering to macros that have validation.
+                validMacros = validMacros.filter { macro in
+                  macro.macro.validArgumentValues != nil
+                }
+              }
+
+              precondition(validMacros.count <= 1, "More than one macro matched.")
+
+              if let macro = validMacros.first {
+                if !macro.macro.hasWritten {
+                  if macrosHandle == nil {
+                    macrosHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("macros.asm").path)
+                    gameHandle.write("INCLUDE \"macros.asm\"\n".data(using: .utf8)!)
+                  }
+
+                  var lines: [Line] = []
+                  lines.append(.empty)
+                  if !macro.arguments.isEmpty {
+                    lines.append(.macroComment("Arguments:"))
+
+                    let macroSpecs: [LR35902.Instruction.Spec] = macro.macro.macroLines.map {
+                      switch $0 {
+                      case .instruction(let instruction):
+                        return instruction.spec
+                      case .any(let spec):
+                        return spec
+                      }
+                    }
+
+                    let argumentTypes: [Int: String] = zip(macro.code, macroSpecs).reduce([:], { (iter, zipped) -> [Int: String] in
+                      let args = extractArgTypes(from: zipped.1, using: zipped.0)
+                      return iter.merging(args, uniquingKeysWith: { first, second in
+                        assert(first == second, "Mismatch in arguments")
+                        return first
+                      })
+                    })
+
+                    for argNumber in macro.arguments.keys.sorted() {
+                      let argType: String
+                      if let type = argumentTypes[argNumber] {
+                        argType = " type: \(type)"
+                      } else {
+                        argType = ""
+                      }
+                      if let validation = macro.macro.validArgumentValues?[argNumber] {
+                        let ranges = validation.rangeView.map {
+                          "$\(LR35902.Address($0.lowerBound).hexString)..<$\(LR35902.Address($0.upperBound).hexString)"
+                        }.joined(separator: ", ")
+                        lines.append(.macroComment("- \(argNumber)\(argType): valid values in \(ranges)"))
+                      } else {
+                        lines.append(.macroComment("- \(argNumber)\(argType)"))
+                      }
+                    }
+                  }
+                  lines.append(.macroDefinition(macro.macro.name))
+                  lines.append(contentsOf: zip(macro.code, instructions).map { spec, instruction in
+                    var macroInstruction = instruction.0
+                    macroInstruction.spec = spec
+                    let macroAssembly = RGBDSAssembly.assembly(for: macroInstruction, with: self)
+                    return .macroInstruction(macroInstruction, macroAssembly)
+                  })
+                  lines.append(.macroTerminator)
+                  writeLinesToFile(lines, macrosHandle!)
+
+                  macro.macro.hasWritten = true
+                }
+
+                let lowerBound = LR35902.cartAddress(for: lineBufferAddress, in: bank)!
+                let upperBound = LR35902.cartAddress(for: self.cpu.pc - instructionWidth, in: bank)!
+                let bytes = self.cpu[lowerBound..<upperBound]
+
+                let macroArgs = macro.arguments.keys.sorted().map { macro.arguments[$0]! }.joined(separator: ", ")
+
+                let firstInstruction = lineBuffer.firstIndex { line in if case .instruction = line { return true } else { return false} }!
+                let lastInstruction = lineBuffer.lastIndex { line in if case .instruction = line { return true } else { return false} }!
+                let bank: LR35902.Bank
+                if case let .instruction(_, _, _, instructionBank, _, _) = lineBuffer[lastInstruction] {
+                  bank = instructionBank
+                } else {
+                  bank = self.cpu.bank
+                }
+                let macroScope = self.contiguousScope(at: lineBufferAddress, in: bank)
+                lineBuffer.replaceSubrange(firstInstruction...lastInstruction,
+                                           with: [.macro("\(macro.macro.name) \(macroArgs)", lineBufferAddress, bank, macroScope.sorted().joined(separator: ", "), bytes)])
+
+                if let action = macro.macro.action {
+                  action(macro.arguments, lineBufferAddress, bank)
+                }
+                lineBufferAddress = self.cpu.pc
+              } else {
+                flush()
+              }
+            } else {
+              flush()
+            }
+            macroNode = nil
+          }
+        }
+      }
+
       while cpu.pc < end {
         var isLabeled = false
         var lineGroup: [Line] = []
@@ -251,181 +439,7 @@ clean:
 
           // TODO: Start a macro descent for every instruction.
 
-          // Is this the beginning of a macro?
-          let asInstruction = MacroLine.instruction(instruction)
-          let asAny = MacroLine.any(instruction.spec)
-          if macroNode == nil, let child = macroTree.children[asInstruction] ?? macroTree.children[asAny] {
-            flush()
-            lineBufferAddress = cpu.pc - instructionWidth
-            macroNode = child
-
-          } else if let macroNodeIterator = macroNode {
-            // Only descend the tree if we're not a label.
-            if !isLabeled, let child = macroNodeIterator.children[asInstruction] ?? macroNodeIterator.children[asAny] {
-              macroNode = child
-            } else {
-              // No further nodes to be traversed; is this the end of a macro?
-              if !macroNodeIterator.macros.isEmpty {
-                let instructions = lineBuffer.compactMap { thisLine -> (LR35902.Instruction, RGBDSAssembly.Statement)? in
-                  if case let .instruction(instruction, assembly, _, _, _, _) = thisLine {
-                    return (instruction, assembly)
-                  } else {
-                    return nil
-                  }
-                }
-
-                let macros: [(macro: LR35902.Disassembly.Macro, code: [LR35902.Instruction.Spec], arguments: [Int: String], rawArguments: [Int: String])] = macroNodeIterator.macros.map { macro in
-
-                  var code: [LR35902.Instruction.Spec]
-                  if let macroCode = macro.code {
-                    code = macroCode
-                  } else {
-                    code = macro.macroLines.map {
-                      if case .instruction(let instruction) = $0 {
-                        return instruction.spec
-                      }
-                      preconditionFailure("Unhandled")
-                    }
-                  }
-                  // Extract the arguments.
-                  let arguments: [Int: String] = zip(code, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
-                    let args = extractArgs(from: zipped.1.1, using: zipped.0)
-                    return iter.merging(args, uniquingKeysWith: { first, second in
-                      assert(first == second, "Mismatch in arguments")
-                      return first
-                    })
-                  })
-
-                  let rawArguments: [Int: String] = zip(code, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
-                    let args = extractArgs(from: RGBDSAssembly.assembly(for: zipped.1.0), using: zipped.0)
-                    return iter.merging(args, uniquingKeysWith: { first, second in
-                      assert(first == second, "Mismatch in arguments")
-                      return first
-                    })
-                  })
-
-                  return (macro: macro, code: code, arguments: arguments, rawArguments: rawArguments)
-                }
-
-                var validMacros = macros.filter { macro in
-                  guard let validArgumentValues = macro.macro.validArgumentValues else {
-                    return true
-                  }
-                  let firstInvalidArgument = macro.rawArguments.first { argumentNumber, argumentValue in
-                    guard validArgumentValues[argumentNumber] != nil else {
-                      return false
-                    }
-                    if argumentValue.hasPrefix("$") {
-                      let number = Int(LR35902.Address(argumentValue.dropFirst(), radix: 16)!)
-                      return !validArgumentValues[argumentNumber]!.contains(number)
-                    } else if argumentValue.hasPrefix("[$") && argumentValue.hasSuffix("]") {
-                      let number = Int(LR35902.Address(argumentValue.dropFirst(2).dropLast(), radix: 16)!)
-                      return !validArgumentValues[argumentNumber]!.contains(number)
-                    }
-                    preconditionFailure("Unhandled.")
-                  }
-                  return firstInvalidArgument == nil
-                }
-
-                if validMacros.count > 1 {
-                  // Try filtering to macros that have validation.
-                  validMacros = validMacros.filter { macro in
-                    macro.macro.validArgumentValues != nil
-                  }
-                }
-
-                precondition(validMacros.count <= 1, "More than one macro matched.")
-
-                if let macro = validMacros.first {
-                  if !macro.macro.hasWritten {
-                    if macrosHandle == nil {
-                      macrosHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("macros.asm").path)
-                      gameHandle.write("INCLUDE \"macros.asm\"\n".data(using: .utf8)!)
-                    }
-
-                    var lines: [Line] = []
-                    lines.append(.empty)
-                    if !macro.arguments.isEmpty {
-                      lines.append(.macroComment("Arguments:"))
-
-                      let macroSpecs: [LR35902.Instruction.Spec] = macro.macro.macroLines.map {
-                        switch $0 {
-                        case .instruction(let instruction):
-                          return instruction.spec
-                        case .any(let spec):
-                          return spec
-                        }
-                      }
-
-                      let argumentTypes: [Int: String] = zip(macro.code, macroSpecs).reduce([:], { (iter, zipped) -> [Int: String] in
-                        let args = extractArgTypes(from: zipped.1, using: zipped.0)
-                        return iter.merging(args, uniquingKeysWith: { first, second in
-                          assert(first == second, "Mismatch in arguments")
-                          return first
-                        })
-                      })
-
-                      for argNumber in macro.arguments.keys.sorted() {
-                        let argType: String
-                        if let type = argumentTypes[argNumber] {
-                          argType = " type: \(type)"
-                        } else {
-                          argType = ""
-                        }
-                        if let validation = macro.macro.validArgumentValues?[argNumber] {
-                          let ranges = validation.rangeView.map {
-                            "$\(LR35902.Address($0.lowerBound).hexString)..<$\(LR35902.Address($0.upperBound).hexString)"
-                          }.joined(separator: ", ")
-                          lines.append(.macroComment("- \(argNumber)\(argType): valid values in \(ranges)"))
-                        } else {
-                          lines.append(.macroComment("- \(argNumber)\(argType)"))
-                        }
-                      }
-                    }
-                    lines.append(.macroDefinition(macro.macro.name))
-                    lines.append(contentsOf: zip(macro.code, instructions).map { spec, instruction in
-                      var macroInstruction = instruction.0
-                      macroInstruction.spec = spec
-                      let macroAssembly = RGBDSAssembly.assembly(for: macroInstruction, with: self)
-                      return .macroInstruction(macroInstruction, macroAssembly)
-                    })
-                    lines.append(.macroTerminator)
-                    writeLinesToFile(lines, macrosHandle!)
-
-                    macro.macro.hasWritten = true
-                  }
-
-                  let lowerBound = LR35902.cartAddress(for: lineBufferAddress, in: bank)!
-                  let upperBound = LR35902.cartAddress(for: cpu.pc - instructionWidth, in: bank)!
-                  let bytes = cpu[lowerBound..<upperBound]
-
-                  let macroArgs = macro.arguments.keys.sorted().map { macro.arguments[$0]! }.joined(separator: ", ")
-
-                  let firstInstruction = lineBuffer.firstIndex { line in if case .instruction = line { return true } else { return false} }!
-                  let lastInstruction = lineBuffer.lastIndex { line in if case .instruction = line { return true } else { return false} }!
-                  let bank: LR35902.Bank
-                  if case let .instruction(_, _, _, instructionBank, _, _) = lineBuffer[lastInstruction] {
-                    bank = instructionBank
-                  } else {
-                    bank = cpu.bank
-                  }
-                  let macroScope = contiguousScope(at: lineBufferAddress, in: bank)
-                  lineBuffer.replaceSubrange(firstInstruction...lastInstruction,
-                                             with: [.macro("\(macro.macro.name) \(macroArgs)", lineBufferAddress, bank, macroScope.sorted().joined(separator: ", "), bytes)])
-
-                  if let action = macro.macro.action {
-                    action(macro.arguments, lineBufferAddress, bank)
-                  }
-                  lineBufferAddress = cpu.pc
-                } else {
-                  flush()
-                }
-              } else {
-                flush()
-              }
-              macroNode = nil
-            }
-          }
+          try checkMacro(instruction, isLabeled)
 
           // Handle context changes.
           switch instruction.spec {
@@ -451,8 +465,8 @@ clean:
           lineBuffer.append(contentsOf: lineGroup)
 
           // Immediately start looking for the next macro.
-          if macroNode == nil, let child = macroTree.children[asInstruction] ?? macroTree.children[asAny] {
-            lineBufferAddress = cpu.pc - instructionWidth
+          if let child = initialCheckMacro(instruction) {
+            lineBufferAddress = self.cpu.pc - instructionWidth
             macroNode = child
           }
 

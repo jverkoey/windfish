@@ -144,6 +144,7 @@ disassembly.register(bankChange: 0x08, at: 0x2E71, in: 0x00)
 
 disassembleJumpTable(within: 0x04b3..<0x04F5, in: 0x00)
 disassembleJumpTable(within: 0x0ad2..<0x0aea, in: 0x00)
+disassembleJumpTable(within: 0x0c82..<0x0c8c, in: 0x00)
 disassembleJumpTable(within: 0x0d33..<0x0d4f, in: 0x00)
 disassembleJumpTable(within: 0x1b6e..<0x1b90, in: 0x00)
 disassembleJumpTable(within: 0x215f..<0x217f, in: 0x00)
@@ -253,6 +254,10 @@ disassembly.setLabel(at: 0x7a28, in: 0x1f, named: "ClearActiveNoiseSound")
 disassembly.setLabel(at: 0x7a60, in: 0x1f, named: "_ShiftHL")
 
 disassembly.defineFunction(startingAt: 0x7f80, in: 0x1f, named: "SoundUnknown1")
+
+disassembly.defineMacro(named: "jumpTable", instructions: [
+  .instruction(.init(spec: .rst(.x00))),
+])
 
 
 disassembly.defineMacro(named: "changebank", instructions: [
