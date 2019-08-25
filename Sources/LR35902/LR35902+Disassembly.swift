@@ -9,17 +9,6 @@ extension LR35902 {
     let cpu: LR35902
     public init(rom: Data) {
       cpu = LR35902(cartridge: rom)
-    }
-
-    public func disassembleAsGameboyCartridge() {
-      // Restart addresses
-      let numberOfRestartAddresses: Address = 8
-      let restartSize: Address = 8
-      let rstAddresses = (0..<numberOfRestartAddresses).map { ($0 * restartSize)..<($0 * restartSize + restartSize) }
-      rstAddresses.forEach {
-        setLabel(at: $0.lowerBound, in: 0x00, named: "RST_\($0.lowerBound.hexString)")
-        disassemble(range: $0, inBank: 0)
-      }
 
       createDatatype(named: "bool", enumeration: [0: "false", 1: "true"], representation: .decimal)
       createDatatype(named: "STATF", bitmask: [
@@ -33,6 +22,17 @@ extension LR35902 {
         0b0000_0000: "STATF_HB"
       ])
       createDatatype(named: "decimal", representation: .decimal)
+    }
+
+    public func disassembleAsGameboyCartridge() {
+      // Restart addresses
+      let numberOfRestartAddresses: Address = 8
+      let restartSize: Address = 8
+      let rstAddresses = (0..<numberOfRestartAddresses).map { ($0 * restartSize)..<($0 * restartSize + restartSize) }
+      rstAddresses.forEach {
+        setLabel(at: $0.lowerBound, in: 0x00, named: "RST_\($0.lowerBound.hexString)")
+        disassemble(range: $0, inBank: 0)
+      }
 
       setLabel(at: 0x0040, in: 0x00, named: "VBlankInterrupt")
       disassemble(range: 0x0040..<0x0048, inBank: 0)

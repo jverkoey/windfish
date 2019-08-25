@@ -16,12 +16,16 @@ public protocol Run {
   var children: [Self] { get }
 }
 
-public final class RunGroup<T: Run> {
+public final class RunGroup<T: Run>: Sequence {
   init(runs: [T]) {
     self.runs = runs
   }
 
   fileprivate let runs: [T]
+
+  public func makeIterator() -> IndexingIterator<[T]> {
+    return runs.makeIterator()
+  }
 
   public var first: T? {
     return runs.first

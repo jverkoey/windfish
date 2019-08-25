@@ -245,7 +245,7 @@ clean:
           let instructionWidth = LR35902.Instruction.widths[instruction.spec]!.total
           let bytes = cpu[index..<(index + LR35902.CartridgeLocation(instructionWidth))]
           let instructionScope = contiguousScope(at: cpu.pc, in: bank)
-          lineGroup.append(.instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: self), cpu.pc, cpu.bank, instructionScope.joined(separator: ", "), bytes))
+          lineGroup.append(.instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: self), cpu.pc, cpu.bank, instructionScope.sorted().joined(separator: ", "), bytes))
 
           cpu.pc += instructionWidth
 
@@ -411,7 +411,7 @@ clean:
                   }
                   let macroScope = contiguousScope(at: lineBufferAddress, in: bank)
                   lineBuffer.replaceSubrange(firstInstruction...lastInstruction,
-                                             with: [.macro("\(macro.macro.name) \(macroArgs)", lineBufferAddress, bank, macroScope.joined(separator: ", "), bytes)])
+                                             with: [.macro("\(macro.macro.name) \(macroArgs)", lineBufferAddress, bank, macroScope.sorted().joined(separator: ", "), bytes)])
 
                   lineBufferAddress = cpu.pc
                 } else {

@@ -19,11 +19,6 @@ func extractText(from range: Range<LR35902.CartridgeLocation>) {
   }
 }
 
-disassembly.setData(at: 0x0004..<0x0008, in: 0x00)
-disassembly.setData(at: 0x0008..<0x0040, in: 0x00)
-
-disassembly.disassembleAsGameboyCartridge()
-
 disassembly.createDatatype(named: "GAMEMODE", enumeration: [
   0x00: "GAMEMODE_INTRO",
   0x01: "GAMEMODE_CREDITS",
@@ -54,6 +49,10 @@ disassembly.createDatatype(named: "GAMEMODE", enumeration: [
   0x20: "GAMEMODE_PHOTO_BRIDGE",
 ])
 
+disassembly.setData(at: 0x0004..<0x0008, in: 0x00)
+disassembly.setData(at: 0x0008..<0x0040, in: 0x00)
+
+disassembly.createGlobal(at: 0x0003, named: "DEBUG_TOOL", dataType: "bool")
 disassembly.createGlobal(at: 0xa100, named: "SAVEFILES")
 disassembly.createGlobal(at: 0xc124, named: "wRoomTransitionState")
 disassembly.createGlobal(at: 0xc125, named: "wRoomTransitionDirection")
@@ -78,11 +77,9 @@ disassembly.createGlobal(at: 0xffd1, named: "hNeedsRenderingFrame")
 disassembly.createGlobal(at: 0xfff7, named: "hMapID")
 disassembly.createGlobal(at: 0xfffd, named: "hDidRenderFrame", dataType: "bool")
 
-disassembly.setType(at: 0x1E2, in: 0x00, to: "GAMEMODE")
+disassembly.disassembleAsGameboyCartridge()
 
 // MARK: - Bank 0 (00)
-// TODO: Define this as a variable.
-disassembly.createGlobal(at: 0x0003, named: "DEBUG_TOOL", dataType: "bool")
 
 disassembly.defineFunction(startingAt: 0x0150, in: 0x00, named: "Main")
 disassembly.setPreComment(at: 0x0156, in: 0x00, text: "Reset the palette registers to zero.")

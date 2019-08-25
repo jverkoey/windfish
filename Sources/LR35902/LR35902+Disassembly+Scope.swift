@@ -5,6 +5,13 @@ extension LR35902.Disassembly {
     // Compute scope and rewrite function labels if we're a function.
 
     for runGroup in run.runGroups() {
+      // TODO: We should do this after all disassembly has been done and before writing to disk.
+      for run in runGroup {
+        guard let visitedRange = run.visitedRange else {
+          continue
+        }
+        inferVariableTypes(in: visitedRange)
+      }
       guard let runStartAddress = runGroup.startAddress,
         let runGroupName = labels[runStartAddress] else {
         continue
@@ -32,8 +39,6 @@ extension LR35902.Disassembly {
       rewriteLoopLabels(in: contiguousScope.dropFirst(), with: runGroupName)
       rewriteElseLabels(in: contiguousScope.dropFirst(), with: runGroupName)
       rewriteReturnLabels(at: labelLocations, with: runGroupName)
-
-      inferVariableTypes(in: contiguousScope)
     }
   }
 
@@ -201,10 +206,6 @@ extension LR35902.Disassembly {
     // TODO: Store this globally.
     var states: [LR35902.CartridgeLocation: CPUState] = [:]
 
-    if range.contains(LR35902.cartAddress(for: 0x03E6, in: 0x00)!) {
-      print("Hi")
-    }
-
     while pc < upperBoundPc {
       guard let instruction = self.instruction(at: pc, in: bank) else {
         pc += 1
@@ -212,11 +213,6 @@ extension LR35902.Disassembly {
       }
 
       let location = LR35902.cartAddress(for: pc, in: bank)!
-
-      if pc == 0x03E2 {
-        print(pc.hexString)
-        let a = 5
-      }
 
       switch instruction.spec {
       case .ld(let numeric, .imm8):
@@ -264,10 +260,6 @@ extension LR35902.Disassembly {
       var thisState = state
       thisState.next = [location + LR35902.CartridgeLocation(width)]
       states[location] = thisState
-
-      if range.lowerBound == 0x0150 {
-        let a = 5
-      }
 
       pc += width
     }
