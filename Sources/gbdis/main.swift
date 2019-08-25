@@ -24,7 +24,6 @@ var jumpTableIndex = 0
 func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902.Bank) {
   jumpTableIndex += 1
   // RST $00 invocations are followed by a 2 byte jump address.
-  disassembly.setLabel(at: range.lowerBound, in: bank, named: "jumpTable\(jumpTableIndex)")
   disassembly.setJumpTable(at: range, in: bank)
 
   for location in stride(from: LR35902.cartAddress(for: range.lowerBound, in: bank)!, to: LR35902.cartAddress(for: range.upperBound, in: bank)!, by: 2) {
@@ -32,7 +31,6 @@ func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902
     let highByte = data[Int(location + 1)]
     let address: LR35902.Address = (LR35902.Address(highByte) << 8) | LR35902.Address(lowByte)
     if address < 0x8000 {
-//      let definitionAddress = LR35902.addressAndBank(from: location).address
       let safeBank: LR35902.Bank
       if address > 0x4000 && bank == 0 {
         safeBank = 1
