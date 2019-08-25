@@ -42,6 +42,10 @@ public final class LR35902 {
     }
   }
 
+  public static func safeCartAddress(for pc: Address, in bank: Bank) -> CartridgeLocation? {
+    return cartAddress(for: pc, in: (bank == 0) ? 1 : bank)
+  }
+
   /// Returns a cartridge address for the given program counter and bank.
   /// - Parameter pc: The program counter's location.
   /// - Parameter bank: The current bank.

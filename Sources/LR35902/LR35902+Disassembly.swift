@@ -378,8 +378,10 @@ extension LR35902 {
       let instructionRange = Int(address)..<(Int(address) + Int(Instruction.widths[instruction.spec]!.total))
 
       // Remove any overlapping instructions.
-      for location in instructionRange.dropFirst() {
-        instructionMap[LR35902.CartridgeLocation(location)] = nil
+      for index in instructionRange.dropFirst() {
+        let location = LR35902.CartridgeLocation(index)
+        instructionMap[location] = nil
+        labels[location] = nil
       }
 
       code.insert(integersIn: instructionRange)
@@ -394,10 +396,19 @@ extension LR35902 {
     public func setData(at range: Range<Address>, in bank: Bank) {
       let lowerBound = cartAddress(for: range.lowerBound, in: bank)!
       let upperBound = cartAddress(for: range.upperBound, in: bank)!
+      dataRanges.insert(lowerBound..<upperBound)
+
       let range = Int(lowerBound)..<Int(upperBound)
       data.insert(integersIn: range)
+      text.remove(integersIn: range)
       code.remove(integersIn: range)
+      for index in range.dropFirst() {
+        let location = LR35902.CartridgeLocation(index)
+        instructionMap[location] = nil
+        labels[location] = nil
+      }
     }
+    var dataRanges = Set<Range<CartridgeLocation>>()
 
     // MARK: - Text segments
 
@@ -495,14 +506,14 @@ extension LR35902 {
     }
 
     public func defineFunction(startingAt pc: Address, in bank: Bank, named name: String) {
-      guard let cartAddress = cartAddress(for: pc, in: bank) else {
+      guard let cartAddress = safeCartAddress(for: pc, in: bank) else {
         preconditionFailure("Attempting to set label in non-cart addressable location.")
       }
 
       setLabel(at: pc, in: bank, named: name)
       functions[cartAddress] = name
 
-      let upperBound: Address = (bank == 0) ? 0x4000 : 0x8000
+      let upperBound: Address = (pc < 0x4000) ? 0x4000 : 0x8000
       disassemble(range: pc..<upperBound, inBank: bank)
     }
     private var functions: [CartridgeLocation: String] = [:]
@@ -527,6 +538,10 @@ extension LR35902 {
       if code.contains(Int(index)) && instructionMap[index] == nil {
         return nil
       }
+      // Don't return labels that point to the middle of data.
+      if data.contains(Int(index)) && dataRanges.contains(where: { $0.dropFirst().contains(index) }) {
+        return nil
+      }
       return labels[index]
     }
 
@@ -537,7 +552,7 @@ extension LR35902 {
     }
 
     public func setLabel(at pc: Address, in bank: Bank, named name: String) {
-      guard let cartAddress = cartAddress(for: pc, in: bank) else {
+      guard let cartAddress = safeCartAddress(for: pc, in: bank) else {
         preconditionFailure("Attempting to set label in non-cart addressable location.")
       }
       // TODO: Need to separate scope regions from literal names so that scopes can be re-named.

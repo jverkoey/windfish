@@ -19,9 +19,12 @@ func extractText(from range: Range<LR35902.CartridgeLocation>) {
   }
 }
 
+var jumpTableIndex = 0
+
 func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902.Bank) {
+  jumpTableIndex += 1
   // RST $00 invocations are followed by a 2 byte jump address.
-  disassembly.setLabel(at: range.lowerBound, in: bank, named: "jumpTable")
+  disassembly.setLabel(at: range.lowerBound, in: bank, named: "jumpTable\(jumpTableIndex)")
   // TODO: Allow data ranges to specify a line length.
   disassembly.setData(at: range, in: bank)
 
@@ -29,8 +32,10 @@ func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902
     let lowByte = data[Int(location)]
     let highByte = data[Int(location + 1)]
     let address: LR35902.Address = (LR35902.Address(highByte) << 8) | LR35902.Address(lowByte)
-    let definitionAddress = LR35902.addressAndBank(from: location).address
-    disassembly.defineFunction(startingAt: address, in: bank, named: "JumpTable_\(address.hexString)_\(definitionAddress.hexString)")
+    if address < 0x8000 {
+      let definitionAddress = LR35902.addressAndBank(from: location).address
+      disassembly.defineFunction(startingAt: address, in: bank, named: "JumpTable_\(address.hexString)_\(definitionAddress.hexString)")
+    }
   }
 }
 
@@ -65,7 +70,14 @@ disassembly.createDatatype(named: "GAMEMODE", enumeration: [
 ])
 
 disassembly.setData(at: 0x0004..<0x0008, in: 0x00)
-disassembly.setData(at: 0x0008..<0x0040, in: 0x00)
+
+let numberOfRestartAddresses: LR35902.Address = 8
+let restartSize: LR35902.Address = 8
+let rstAddresses = (1..<numberOfRestartAddresses).map { ($0 * restartSize)..<($0 * restartSize + restartSize) }
+rstAddresses.forEach {
+  disassembly.setData(at: $0, in: 0x00)
+}
+
 
 disassembly.createGlobal(at: 0x0003, named: "DEBUG_TOOL", dataType: "bool")
 disassembly.createGlobal(at: 0xa100, named: "SAVEFILES")
@@ -132,6 +144,7 @@ disassembly.register(bankChange: 0x08, at: 0x2E71, in: 0x00)
 
 disassembleJumpTable(within: 0x04b3..<0x04F5, in: 0x00)
 disassembleJumpTable(within: 0x0ad2..<0x0aea, in: 0x00)
+disassembleJumpTable(within: 0x0d33..<0x0d4f, in: 0x00)
 disassembleJumpTable(within: 0x1b6e..<0x1b90, in: 0x00)
 disassembleJumpTable(within: 0x215f..<0x217f, in: 0x00)
 disassembleJumpTable(within: 0x4322..<0x4332, in: 0x01)
