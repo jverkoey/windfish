@@ -41,6 +41,9 @@ func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902
       } else {
         effectiveBank = selectedBank
       }
+      if effectiveBank == 0 && address >= 0x4000 {
+        continue // Don't disassemble if we're not confident what the bank is.
+      }
       disassembly.defineFunction(startingAt: address, in: selectedBank, named: "JumpTable_\(address.hexString)_\(effectiveBank.hexString)")
     }
   }
@@ -177,7 +180,7 @@ disassembleJumpTable(within: 0x215f..<0x217d, in: 0x00, selectedBank: 0x00)
 disassembleJumpTable(within: 0x4322..<0x4332, in: 0x01, selectedBank: 0x01)
 
 disassembleJumpTable(within: 0x0c82..<0x0C8C, in: 0x00, selectedBank: 0x01)
-//disassembleJumpTable(within: 0x0d32..<0x0d49, in: 0x00, selectedBank: 0x00)
+//disassembleJumpTable(within: 0x0d33..<0x0d49, in: 0x00, selectedBank: 0x00)
 //disassembleJumpTable(within: 0x304a..<0x310d, in: 0x00, selectedBank: 0x00)
 //disassembleJumpTable(within: 0x3114..<0x3138, in: 0x00, selectedBank: 0x00)
 //disassembleJumpTable(within: 0x392b..<0x3945, in: 0x00, selectedBank: 0x00)
