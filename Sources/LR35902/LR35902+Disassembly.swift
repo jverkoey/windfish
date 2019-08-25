@@ -412,11 +412,11 @@ extension LR35902 {
 
     // MARK: - Bank changes
 
-    public func bankChange(at pc: Address, in bank: Bank) -> Bank? {
+    func bankChange(at pc: Address, in bank: Bank) -> Bank? {
       return bankChanges[cartAddress(for: pc, in: bank)!]
     }
 
-    func register(bankChange: Bank, at pc: Address, in bank: Bank) {
+    public func register(bankChange: Bank, at pc: Address, in bank: Bank) {
       bankChanges[cartAddress(for: pc, in: bank)!] = bankChange
     }
     private var bankChanges: [CartridgeLocation: Bank] = [:]
@@ -743,6 +743,10 @@ extension LR35902 {
           }
 
           let instructionWidth = Instruction.widths[spec]!
+
+          if let bankChange = bankChange(at: cpu.pc, in: cpu.bank) {
+            cpu.bank = bankChange
+          }
 
           let instructionAddress = cpu.pc
           let instructionBank = cpu.bank

@@ -92,11 +92,17 @@ disassembly.createGlobal(at: 0xffd1, named: "hNeedsRenderingFrame")
 disassembly.createGlobal(at: 0xfff7, named: "hMapID")
 disassembly.createGlobal(at: 0xfffd, named: "hDidRenderFrame", dataType: "bool")
 
+disassembly.register(bankChange: 0x01, at: 0x03af, in: 0x00)
+disassembly.register(bankChange: 0x01, at: 0x0b50, in: 0x00)
+disassembly.register(bankChange: 0x17, at: 0x0b0d, in: 0x00)
+//disassembly.register(bankChange: 0x0f, at: 0x0c37, in: 0x00)
+//disassembly.register(bankChange: 0x01, at: 0x289d, in: 0x00)
+//disassembly.register(bankChange: 0x0c, at: 0x2b70, in: 0x00)
+//disassembly.register(bankChange: 0x0c, at: 0x2B81, in: 0x00)
+//disassembly.register(bankChange: 0x01, at: 0x2B9E, in: 0x00)
+
 disassembleJumpTable(within: 0x04b3..<0x04F5, in: 0x00)
 disassembleJumpTable(within: 0x0ad2..<0x0aea, in: 0x00)
-// TODO: Add a way to annotate which bank is being used at a given instruction, or get the type inferrer to detect
-// when banks change in a variadic manner. See $0B08..<0B0D for an example of when this fails.
-disassembly.defineFunction(startingAt: 0x482a, in: 0x17, named: "Unknown_482a_17")
 
 disassembly.disassembleAsGameboyCartridge()
 
