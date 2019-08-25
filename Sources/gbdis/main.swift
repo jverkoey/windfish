@@ -19,6 +19,16 @@ func extractText(from range: Range<LR35902.CartridgeLocation>) {
   }
 }
 
+func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902.Bank) {
+  for location in stride(from: LR35902.cartAddress(for: range.lowerBound, in: bank)!, to: LR35902.cartAddress(for: range.upperBound, in: bank)!, by: 2) {
+    let lowByte = data[Int(location)]
+    let highByte = data[Int(location + 1)]
+    let address: LR35902.Address = (LR35902.Address(highByte) << 8) | LR35902.Address(lowByte)
+    let definitionAddress = LR35902.addressAndBank(from: location).address
+    disassembly.defineFunction(startingAt: address, in: bank, named: "JumpTable_\(address.hexString)_\(definitionAddress.hexString)")
+  }
+}
+
 disassembly.createDatatype(named: "GAMEMODE", enumeration: [
   0x00: "GAMEMODE_INTRO",
   0x01: "GAMEMODE_CREDITS",
@@ -79,7 +89,9 @@ disassembly.createGlobal(at: 0xfffd, named: "hDidRenderFrame", dataType: "bool")
 
 // RST $00 invocations are followed by a 2 byte jump address.
 disassembly.setLabel(at: 0x04b3, in: 0x00, named: "jumpTable1")
-//disassembly.setData(at: 0x04b3..<0x04F5, in: 0x00)
+// TODO: Allow data ranges to specify a line length.
+disassembly.setData(at: 0x04b3..<0x04F5, in: 0x00)
+disassembleJumpTable(within: 0x04b3..<0x04F5, in: 0x00)
 
 disassembly.disassembleAsGameboyCartridge()
 
