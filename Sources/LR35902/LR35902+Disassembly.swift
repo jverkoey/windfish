@@ -790,7 +790,8 @@ extension LR35902 {
 
         var previousInstruction: Instruction? = nil
         linear_sweep: while !run.hasReachedEnd(with: cpu) && cpu.pcIsValid() {
-          if data.contains(Int(LR35902.cartAddress(for: cpu.pc, in: cpu.bank)!)) {
+          if data.contains(Int(LR35902.cartAddress(for: cpu.pc, in: cpu.bank)!))
+           || text.contains(Int(LR35902.cartAddress(for: cpu.pc, in: cpu.bank)!)) {
             advance(1)
             continue
           }

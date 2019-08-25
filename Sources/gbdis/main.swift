@@ -26,23 +26,16 @@ func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902
   jumpTableIndex += 1
   disassembly.setJumpTable(at: range, in: bank)
 
-  if let selectedBank = selectedBank {
-    disassembly.register(bankChange: selectedBank, at: range.lowerBound - 1, in: bank)
+  guard let selectedBank = selectedBank else {
+    return
   }
+  disassembly.register(bankChange: selectedBank, at: range.lowerBound - 1, in: bank)
   for location in stride(from: LR35902.cartAddress(for: range.lowerBound, in: bank)!, to: LR35902.cartAddress(for: range.upperBound, in: bank)!, by: 2) {
     let lowByte = data[Int(location)]
     let highByte = data[Int(location + 1)]
     let address: LR35902.Address = (LR35902.Address(highByte) << 8) | LR35902.Address(lowByte)
     if address < 0x8000 {
-      let safeBank: LR35902.Bank
-      if let selectedBank = selectedBank {
-        safeBank = selectedBank
-      } else if address > 0x4000 && bank == 0 {
-        safeBank = 1
-      } else {
-        safeBank = bank
-      }
-      disassembly.defineFunction(startingAt: address, in: safeBank, named: "JumpTable_\(address.hexString)_\(safeBank.hexString)")
+      disassembly.defineFunction(startingAt: address, in: selectedBank, named: "JumpTable_\(address.hexString)_\(selectedBank.hexString)")
     }
   }
 }
@@ -169,7 +162,7 @@ disassembly.register(bankChange: 0x03, at: 0x3923, in: 0x00)
 
 // MARK: - Jump tables
 
-//disassembleJumpTable(within: 0x04b3..<0x04F5, in: 0x00)
+disassembleJumpTable(within: 0x04b3..<0x04F5, in: 0x00, selectedBank: 0x00)
 //disassembleJumpTable(within: 0x0ad2..<0x0aea, in: 0x00)
 //disassembleJumpTable(within: 0x0c82..<0x0c8c, in: 0x00)
 //disassembleJumpTable(within: 0x0d33..<0x0d4f, in: 0x00)
