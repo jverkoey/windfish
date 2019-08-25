@@ -496,6 +496,7 @@ extension LR35902 {
       scopes[label, default: IndexSet()].formUnion(scope)
     }
     func setContiguousScope(forLabel label: String, range: Range<CartridgeLocation>) {
+      assert(!label.contains("."))
       contiguousScopes[label] = range
     }
     var contiguousScopes: [String: Range<CartridgeLocation>] = [:]

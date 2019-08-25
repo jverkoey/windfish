@@ -13,7 +13,8 @@ extension LR35902.Disassembly {
         inferVariableTypes(in: visitedRange)
       }
       guard let runStartAddress = runGroup.startAddress,
-        let runGroupName = labels[runStartAddress] else {
+        let runGroupLabel = labels[runStartAddress],
+        let runGroupName = runGroupLabel.components(separatedBy: ".").first else {
         continue
       }
 
