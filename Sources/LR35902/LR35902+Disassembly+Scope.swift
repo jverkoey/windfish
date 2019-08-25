@@ -32,49 +32,25 @@ extension LR35902.Disassembly {
       guard let contiguousScope = runGroup.firstContiguousScopeRange else {
         continue
       }
-      setContiguousScope(forLabel: runGroupName, range: contiguousScope)
+      addContiguousScope(range: contiguousScope)
 
       let labelLocations = self.labelLocations(in: contiguousScope.dropFirst())
 
-      rewriteLabels(at: labelLocations, with: runGroupName)
-      rewriteLoopLabels(in: contiguousScope.dropFirst(), with: runGroupName)
-      rewriteElseLabels(in: contiguousScope.dropFirst(), with: runGroupName)
-      rewriteReturnLabels(at: labelLocations, with: runGroupName)
+      rewriteLoopLabels(in: contiguousScope.dropFirst())
+      rewriteElseLabels(in: contiguousScope.dropFirst())
+      rewriteReturnLabels(at: labelLocations)
     }
   }
 
-  private func rewriteLabels(at locations: [LR35902.CartridgeLocation], with scope: String) {
-    for cartLocation in locations {
-      let addressAndBank = LR35902.addressAndBank(from: cartLocation)
-      // TODO: We need to be able to separate the desire for a label to be at a location from the suggested name for it.
-      if let existingLabel = labels[cartLocation],
-        let suffix = existingLabel.split(separator: ".").last,
-        !suffix.hasPrefix("toc_") {
-        labels[cartLocation] = "\(scope).\(suffix)"
-      } else {
-        labels[cartLocation] = "\(scope).fn_\(addressAndBank.bank.hexString)_\(addressAndBank.address.hexString)"
-      }
-    }
-  }
-
-  private func rewriteReturnLabels(at locations: [LR35902.CartridgeLocation], with scope: String) {
+  private func rewriteReturnLabels(at locations: [LR35902.CartridgeLocation]) {
     let returnLabelAddresses = locations.filter { instructionMap[$0]?.spec.category == .ret }
-    let hasManyReturns = returnLabelAddresses.count > 1
     for cartLocation in returnLabelAddresses {
-//      if hasManyReturns {
       let addressAndBank = LR35902.addressAndBank(from: cartLocation)
-      labels[cartLocation] = "\(scope).return_\(addressAndBank.address.hexString)_\(addressAndBank.bank.hexString)"
-//      } else {
-//        labels[cartLocation] = "\(scope).return"
-//      }
+      labels[cartLocation] = "return_\(addressAndBank.address.hexString)_\(addressAndBank.bank.hexString)"
     }
   }
 
-  private func rewriteLoopLabels(in scope: Range<LR35902.CartridgeLocation>, with scopeName: String) {
-    guard !scopeName.contains(".") else {
-      return
-    }
-
+  private func rewriteLoopLabels(in scope: Range<LR35902.CartridgeLocation>) {
     let tocs: [(destination: LR35902.CartridgeLocation, tocs: Set<TransferOfControl>)] = scope.compactMap {
       let (address, bank) = LR35902.addressAndBank(from: $0)
       if let toc = transfersOfControl(at: address, in: bank) {
@@ -116,22 +92,13 @@ extension LR35902.Disassembly {
       return
     }
     let destinations = Set(loops.map { $0.destination })
-    let hasManyDestinations = destinations.count > 1
     for cartLocation in destinations {
-//      if hasManyDestinations {
       let addressAndBank = LR35902.addressAndBank(from: cartLocation)
-      labels[cartLocation] = "\(scopeName).loop_\(addressAndBank.address.hexString)_\(addressAndBank.bank.hexString)"
-//      } else {
-//        labels[cartLocation] = "\(scopeName).loop"
-//      }
+      labels[cartLocation] = "loop_\(addressAndBank.address.hexString)_\(addressAndBank.bank.hexString)"
     }
   }
 
-  private func rewriteElseLabels(in scope: Range<LR35902.CartridgeLocation>, with scopeName: String) {
-    guard !scopeName.contains(".") else {
-      return
-    }
-
+  private func rewriteElseLabels(in scope: Range<LR35902.CartridgeLocation>) {
     let tocs: [(destination: LR35902.CartridgeLocation, tocs: Set<TransferOfControl>)] = scope.compactMap {
       let (address, bank) = LR35902.addressAndBank(from: $0)
       if let toc = transfersOfControl(at: address, in: bank) {
@@ -155,14 +122,9 @@ extension LR35902.Disassembly {
       return
     }
     let destinations = Set(forwardTocs.map { $0.destination })
-    let hasManyDestinations = destinations.count > 1
     for cartLocation in destinations {
-//      if hasManyDestinations {
       let addressAndBank = LR35902.addressAndBank(from: cartLocation)
-      labels[cartLocation] = "\(scopeName).else_\(addressAndBank.address.hexString)_\(addressAndBank.bank.hexString)"
-//      } else {
-//        labels[cartLocation] = "\(scopeName).else"
-//      }
+      labels[cartLocation] = "else_\(addressAndBank.address.hexString)_\(addressAndBank.bank.hexString)"
     }
   }
 

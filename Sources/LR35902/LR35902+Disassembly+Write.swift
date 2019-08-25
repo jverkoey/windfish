@@ -388,9 +388,9 @@ clean:
             } else {
               bank = self.cpu.bank
             }
-            let macroScope = self.contiguousScope(at: lineBufferAddress, in: bank)
+            let macroScopes = self.labeledContiguousScopes(at: lineBufferAddress, in: bank).map { $0.label }
             lineBuffer.replaceSubrange(firstInstruction...lastInstruction,
-                                       with: [.macro("\(macro.macro.name) \(macroArgs)", lineBufferAddress, bank, macroScope.sorted().joined(separator: ", "), bytes)])
+                                       with: [.macro("\(macro.macro.name) \(macroArgs)", lineBufferAddress, bank, macroScopes.sorted().joined(separator: ", "), bytes)])
 
             if let action = macro.macro.action {
               action(macro.arguments, lineBufferAddress, bank)
@@ -434,7 +434,7 @@ clean:
           let index = LR35902.cartAddress(for: cpu.pc, in: bank)!
           let instructionWidth = LR35902.Instruction.widths[instruction.spec]!.total
           let bytes = cpu[index..<(index + LR35902.CartridgeLocation(instructionWidth))]
-          let instructionScope = contiguousScope(at: cpu.pc, in: bank)
+          let instructionScope = labeledContiguousScopes(at: cpu.pc, in: bank).map { $0.label }
           lineGroup.append(.instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: self), cpu.pc, cpu.bank, instructionScope.sorted().joined(separator: ", "), bytes))
 
           cpu.pc += instructionWidth

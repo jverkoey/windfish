@@ -409,10 +409,11 @@ extension LR35902 {
       dataRanges.insert(cartRange)
 
       // Shorten any contiguous scopes that contain this data.
-      let overlappingScopes = contiguousScopes.filter { $0.value.overlaps(cartRange) }
-      for (key, scope) in overlappingScopes {
+      let overlappingScopes = contiguousScopes.filter { $0.overlaps(cartRange) }
+      for scope in overlappingScopes {
         if cartRange.lowerBound < scope.upperBound {
-          contiguousScopes[key] = scope.lowerBound..<cartRange.lowerBound
+          contiguousScopes.remove(scope)
+          contiguousScopes.insert(scope.lowerBound..<cartRange.lowerBound)
         }
       }
 
@@ -526,20 +527,25 @@ extension LR35902 {
       return Set(intersectingScopes.keys)
     }
 
-    public func contentContiguousScope(at pc: Address, in bank: Bank) -> Set<String> {
+    public func contiguousScopes(at pc: Address, in bank: Bank) -> Set<Range<CartridgeLocation>> {
       guard let cartAddress = cartAddress(for: pc, in: bank) else {
         return Set()
       }
-      let labels = contiguousScopes.filter { label, scope in scope.dropFirst().contains(cartAddress) }.keys
-      return Set(labels)
+      return contiguousScopes.filter { scope in scope.contains(cartAddress) }
     }
-    public func contiguousScope(at pc: Address, in bank: Bank) -> Set<String> {
-      guard let cartAddress = cartAddress(for: pc, in: bank) else {
-        return Set()
+    public func labeledContiguousScopes(at pc: Address, in bank: Bank) -> [(label: String, scope: Range<CartridgeLocation>)] {
+      return contiguousScopes(at: pc, in: bank).compactMap {
+        let addressAndBank = LR35902.addressAndBank(from: $0.lowerBound)
+        guard let label = label(at: addressAndBank.address, in: addressAndBank.bank) else {
+          return nil
+        }
+        return (label, $0)
       }
-      let labels = contiguousScopes.filter { label, scope in scope.contains(cartAddress) }.keys
-      return Set(labels)
     }
+    func addContiguousScope(range: Range<CartridgeLocation>) {
+      contiguousScopes.insert(range)
+    }
+    var contiguousScopes = Set<Range<CartridgeLocation>>()
 
     public func defineFunction(startingAt pc: Address, in bank: Bank, named name: String) {
       guard let cartAddress = safeCartAddress(for: pc, in: bank) else {
@@ -557,11 +563,6 @@ extension LR35902 {
     func expandScope(forLabel label: String, scope: IndexSet) {
       scopes[label, default: IndexSet()].formUnion(scope)
     }
-    func setContiguousScope(forLabel label: String, range: Range<CartridgeLocation>) {
-      assert(!label.contains("."))
-      contiguousScopes[label] = range
-    }
-    var contiguousScopes: [String: Range<CartridgeLocation>] = [:]
     private var scopes: [String: IndexSet] = [:]
 
     // MARK: - Labels
@@ -578,7 +579,24 @@ extension LR35902 {
       if data.contains(Int(index)) && dataRanges.contains(where: { $0.dropFirst().contains(index) }) {
         return nil
       }
-      return labels[index]
+
+      guard let name = labels[index] else {
+        return nil
+      }
+
+      let scopes = contiguousScopes(at: pc, in: bank)
+      if let firstScope = scopes.filter({ scope -> Bool in
+        scope.lowerBound != index // Ignore ourself.
+      }).sorted(by: { (scope1, scope2) -> Bool in
+        scope1.lowerBound < scope2.lowerBound
+      }).first {
+        let addressAndBank = LR35902.addressAndBank(from: firstScope.lowerBound)
+        if let firstScopeLabel = label(at: addressAndBank.address, in: addressAndBank.bank) {
+          return  "\(firstScopeLabel).\(name)"
+        }
+      }
+
+      return name
     }
 
     func labelLocations(in range: Range<CartridgeLocation>) -> [CartridgeLocation] {
@@ -591,24 +609,7 @@ extension LR35902 {
       guard let cartAddress = safeCartAddress(for: pc, in: bank) else {
         preconditionFailure("Attempting to set label in non-cart addressable location.")
       }
-
-      // TODO: Need to separate scope regions from literal names so that scopes can be re-named.
-      // Notably, scope names should be nil unless a name is explicitly given.
-      let scopedLabel: String
-      if !name.contains("."),
-        contentContiguousScope(at: pc, in: bank).count == 1,
-        let scope = contentContiguousScope(at: pc, in: bank).first {
-        scopedLabel = "\(scope).\(name)"
-      } else {
-        scopedLabel = name
-      }
-
-      if let label = labels[cartAddress],
-        label.contains(".") && !scopedLabel.contains(".") {
-        labels[cartAddress] = "\(label.split(separator: ".").first!).\(scopedLabel)"
-      } else {
-        labels[cartAddress] = scopedLabel
-      }
+      labels[cartAddress] = name
     }
     var labels: [CartridgeLocation: String] = [:]
 
