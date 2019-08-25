@@ -20,6 +20,11 @@ func extractText(from range: Range<LR35902.CartridgeLocation>) {
 }
 
 func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902.Bank) {
+  // RST $00 invocations are followed by a 2 byte jump address.
+  disassembly.setLabel(at: range.lowerBound, in: bank, named: "jumpTable")
+  // TODO: Allow data ranges to specify a line length.
+  disassembly.setData(at: range, in: bank)
+
   for location in stride(from: LR35902.cartAddress(for: range.lowerBound, in: bank)!, to: LR35902.cartAddress(for: range.upperBound, in: bank)!, by: 2) {
     let lowByte = data[Int(location)]
     let highByte = data[Int(location + 1)]
@@ -87,11 +92,11 @@ disassembly.createGlobal(at: 0xffd1, named: "hNeedsRenderingFrame")
 disassembly.createGlobal(at: 0xfff7, named: "hMapID")
 disassembly.createGlobal(at: 0xfffd, named: "hDidRenderFrame", dataType: "bool")
 
-// RST $00 invocations are followed by a 2 byte jump address.
-disassembly.setLabel(at: 0x04b3, in: 0x00, named: "jumpTable1")
-// TODO: Allow data ranges to specify a line length.
-disassembly.setData(at: 0x04b3..<0x04F5, in: 0x00)
 disassembleJumpTable(within: 0x04b3..<0x04F5, in: 0x00)
+disassembleJumpTable(within: 0x0ad2..<0x0aea, in: 0x00)
+// TODO: Add a way to annotate which bank is being used at a given instruction, or get the type inferrer to detect
+// when banks change in a variadic manner. See $0B08..<0B0D for an example of when this fails.
+disassembly.defineFunction(startingAt: 0x482a, in: 0x17, named: "Unknown_482a_17")
 
 disassembly.disassembleAsGameboyCartridge()
 
