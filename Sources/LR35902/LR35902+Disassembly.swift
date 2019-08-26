@@ -740,6 +740,7 @@ extension LR35902 {
       guard let cartAddress = cartAddress(for: pc, in: bank) else {
         return Set()
       }
+      // TODO(perf): This is accounting for 11.5% of runtime costs.
       return contiguousScopes.filter { scope in scope.contains(cartAddress) }
     }
     public func labeledContiguousScopes(at pc: Address, in bank: Bank) -> [(label: String, scope: Range<CartridgeLocation>)] {
@@ -781,10 +782,11 @@ extension LR35902 {
         return nil
       }
       // Don't return labels that point to the middle of instructions.
-      if code.contains(Int(index)) && instructionMap[index] == nil {
+      if instructionMap[index] == nil && code.contains(Int(index)) {
         return nil
       }
       // Don't return labels that point to the middle of data.
+      // TODO(perf): This is 6.6% of costs.
       if data.contains(Int(index)) && dataRanges.contains(where: { $0.dropFirst().contains(index) }) {
         return nil
       }
