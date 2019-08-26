@@ -368,13 +368,30 @@ extension LR35902 {
         .ld(.arg(2), .a),
       ])
 
-      defineMacro(named: "copyMemoryH", instructions: [
+      defineMacro(named: "copyMemoryHH", instructions: [
         .any(.ld(.a, .ffimm8addr)),
         .any(.ld(.ffimm8addr, .a)),
       ], code: [
         .ld(.a, .arg(1)),
         .ld(.arg(2), .a),
       ])
+
+      defineMacro(named: "copyMemory_H", instructions: [
+        .any(.ld(.a, .imm16addr)),
+        .any(.ld(.ffimm8addr, .a)),
+        ], code: [
+          .ld(.a, .arg(1)),
+          .ld(.arg(2), .a),
+      ])
+
+      defineMacro(named: "copyMemoryH_", instructions: [
+        .any(.ld(.a, .ffimm8addr)),
+        .any(.ld(.imm16addr, .a)),
+        ], code: [
+          .ld(.a, .arg(1)),
+          .ld(.arg(2), .a),
+      ])
+
     }
 
     // MARK: - Transfers of control
