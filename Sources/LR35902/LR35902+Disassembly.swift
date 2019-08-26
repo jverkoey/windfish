@@ -374,6 +374,26 @@ extension LR35902 {
         .jp(.nz, .arg(2)),
       ])
 
+      defineMacro(named: "ifHLAddrNotZero", instructions: [
+        .any(.ld(.a, .hladdr)),
+        .any(.and(.a)),
+        .any(.jr(.nz, .simm8)),
+      ], code: [
+        .ld(.a, .hladdr),
+        .and(.a),
+        .jr(.nz, .arg(1)),
+      ])
+
+      defineMacro(named: "ifHLAddrNotZero_", instructions: [
+        .any(.ld(.a, .hladdr)),
+        .any(.and(.a)),
+        .any(.jp(.nz, .simm8)),
+      ], code: [
+        .ld(.a, .hladdr),
+        .and(.a),
+        .jp(.nz, .arg(1)),
+      ])
+
       defineMacro(named: "assignH", instructions: [
         .any(.ld(.a, .imm8)),
         .any(.ld(.ffimm8addr, .a)),
