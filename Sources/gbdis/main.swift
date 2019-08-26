@@ -420,6 +420,7 @@ disassembleJumpTable(within: 0x4187..<0x4191, in: 0x01, selectedBank: 0x01)
 disassembleJumpTable(within: 0x5378..<0x5392, in: 0x02, selectedBank: 0x02)
 disassembleJumpTable(within: 0x5b2f..<0x5b3f, in: 0x02, selectedBank: 0x02)
 disassembleJumpTable(within: 0x5d45..<0x5d63, in: 0x02, selectedBank: 0x02)
+disassembleJumpTable(within: 0x6b4e..<0x6b56, in: 0x02, selectedBank: 0x02)
 
 // MARK: - Entity table.
 
