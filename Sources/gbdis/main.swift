@@ -23,7 +23,8 @@ var jumpTableIndex = 0
 
 func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902.Bank,
                           selectedBank: LR35902.Bank? = nil,
-                          bankTable: [UInt8: LR35902.Bank]? = nil) {
+                          bankTable: [UInt8: LR35902.Bank]? = nil,
+                          functionNames: [UInt8: String]? = nil) {
 //  assert((range.upperBound - range.lowerBound) <= 256)
   jumpTableIndex += 1
   disassembly.setJumpTable(at: range, in: bank)
@@ -47,11 +48,12 @@ func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902
     let highByte = data[Int(location + 1)]
     let address: LR35902.Address = (LR35902.Address(highByte) << 8) | LR35902.Address(lowByte)
     if address < 0x8000 {
+      let index = UInt8((location - cartRange.lowerBound) / 2)
       let effectiveBank: LR35902.Bank
       if address < 0x4000 {
         effectiveBank = 0
       } else {
-        guard let selectedBank = bankSelector(UInt8((location - cartRange.lowerBound) / 2)) else {
+        guard let selectedBank = bankSelector(index) else {
           continue
         }
         let addressAndBank = LR35902.addressAndBank(from: location)
@@ -61,8 +63,13 @@ func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902
       if effectiveBank == 0 && address >= 0x4000 {
         continue // Don't disassemble if we're not confident what the bank is.
       }
-      disassembly.defineFunction(startingAt: address, in: effectiveBank,
-                                 named: "JumpTable_\(address.hexString)_\(effectiveBank.hexString)")
+      let name: String
+      if let functionName = functionNames?[index] {
+        name = functionName
+      } else {
+        name = "JumpTable_\(address.hexString)_\(effectiveBank.hexString)"
+      }
+      disassembly.defineFunction(startingAt: address, in: effectiveBank, named: name)
     }
   }
 }
@@ -147,6 +154,7 @@ disassembly.createDatatype(named: "ENTITY", enumeration: [
   0x2F: "ENTITY_DROPPABLE_FAIRY",
   0x30: "ENTITY_KEY_DROP_POINT",
   0x31: "ENTITY_SWORD",
+  0x32: "ENTITY_32",
   0x33: "ENTITY_PIECE_OF_POWER",
   0x34: "ENTITY_GUARDIAN_ACORN",
   0x35: "ENTITY_HEART_PIECE",
@@ -172,6 +180,7 @@ disassembly.createDatatype(named: "ENTITY", enumeration: [
   0x49: "ENTITY_MOVING_BLOCK_BOTTOM_RIGHT",
   0x4A: "ENTITY_COLOR_DUNGEON_BOOK",
   0x4B: "ENTITY_POT",
+  0x4C: "ENTITY_4C",
   0x4D: "ENTITY_SHOP_OWNER",
   0x4F: "ENTITY_TRENDY_GAME_OWNER",
   0x50: "ENTITY_BOO_BUDDY",
@@ -182,6 +191,7 @@ disassembly.createDatatype(named: "ENTITY", enumeration: [
   0x55: "ENTITY_BOUNCING_BOMBITE",
   0x56: "ENTITY_TIMER_BOMBITE",
   0x57: "ENTITY_PAIRODD",
+  0x58: "ENTITY_58",
   0x59: "ENTITY_MOLDORM",
   0x5A: "ENTITY_FACADE",
   0x5B: "ENTITY_SLIME_EYE",
@@ -193,8 +203,11 @@ disassembly.createDatatype(named: "ENTITY", enumeration: [
   0x61: "ENTITY_WARP",
   0x62: "ENTITY_HOT_HEAD",
   0x63: "ENTITY_EVIL_EAGLE",
+  0x64: "ENTITY_64",
   0x65: "ENTITY_ANGLER_FISH",
   0x66: "ENTITY_CRYSTAL_SWITCH",
+  0x67: "ENTITY_67",
+  0x68: "ENTITY_68",
   0x69: "ENTITY_MOVING_BLOCK_MOVER",
   0x6A: "ENTITY_RAFT_OWNER",
   0x6B: "ENTITY_TEXT_DEBUGGER",
@@ -230,6 +243,8 @@ disassembly.createDatatype(named: "ENTITY", enumeration: [
   0x89: "ENTITY_HINOX",
   0x8A: "ENTITY_TILE_GLINT_SHOWN",
   0x8B: "ENTITY_TILE_GLINT_HIDDEN",
+  0x8C: "ENTITY_8C",
+  0x8D: "ENTITY_8D",
   0x8E: "ENTITY_CUE_BALL",
   0x8F: "ENTITY_MASKED_MIMIC_GORIYA",
   0x90: "ENTITY_THREE_OF_A_KIND",
@@ -239,6 +254,7 @@ disassembly.createDatatype(named: "ENTITY", enumeration: [
   0x94: "ENTITY_KANALET_BOMBABLE_WALL",
   0x95: "ENTITY_RICHARD",
   0x96: "ENTITY_RICHARD_FROG",
+  0x97: "ENTITY_97",
   0x98: "ENTITY_HORSE_PIECE",
   0x99: "ENTITY_WATER_TEKTITE",
   0x9A: "ENTITY_FLYING_TILES",
@@ -255,6 +271,7 @@ disassembly.createDatatype(named: "ENTITY", enumeration: [
   0xA5: "ENTITY_SIDE_VIEW_PLATFORM",
   0xA6: "ENTITY_SIDE_VIEW_WEIGHTS",
   0xA7: "ENTITY_SMASHABLE_PILLAR",
+  0xA8: "ENTITY_A8",
   0xA9: "ENTITY_BLOOPER",
   0xAA: "ENTITY_CHEEP_CHEEP_HORIZONTAL",
   0xAB: "ENTITY_CHEEP_CHEEP_VERTICAL",
@@ -335,6 +352,11 @@ disassembly.createDatatype(named: "ENTITY", enumeration: [
   0xF8: "ENTITY_GIANT_BUZZ_BLOB",
   0xF9: "ENTITY_COLOR_DUNGEON_BOSS",
   0xFA: "ENTITY_PHOTOGRAPHER_RELATED",
+  0xFB: "ENTITY_FB",
+  0xFC: "ENTITY_FC",
+  0xFD: "ENTITY_FD",
+  0xFE: "ENTITY_FE",
+  0xFF: "ENTITY_FF",
 ])
 
 disassembly.setData(at: 0x0004..<0x0008, in: 0x00)
@@ -421,6 +443,9 @@ disassembly.register(bankChange: 0x03, at: 0x3923, in: 0x14)
 disassembly.register(bankChange: 0x02, at: 0x3E82, in: 0x00)
 disassembly.register(bankChange: 0x03, at: 0x7301, in: 0x03)
 
+// Additional bank changes.
+disassembly.register(bankChange: 0x15, at: 0x3DD5, in: 0x00)
+
 // Generates the block of code above.
 // TODO: Ideally macros could be detected during disassembly phase, not just when writing.
 disassembly.defineMacro(named: "_changebank", instructions: [
@@ -452,6 +477,7 @@ disassembleJumpTable(within: 0x392b..<0x393d, in: 0x00, selectedBank: 0x03)
 // MARK: - Entity table.
 
 var entityJumpTableBanks: [UInt8: LR35902.Bank] = [:]
+var jumpTableFunctions: [UInt8: String] = [:]
 for (value, name) in disassembly.valuesForDatatype(named: "ENTITY")! {
   let address = 0x4000 + LR35902.Address(value)
   disassembly.setLabel(at: address, in: 0x03, named: "\(name)_bank")
@@ -460,11 +486,12 @@ for (value, name) in disassembly.valuesForDatatype(named: "ENTITY")! {
   let entityBankLocation = LR35902.cartAddress(for: address, in: 0x03)!
   let bank = data[Int(entityBankLocation)]
   entityJumpTableBanks[value] = bank
+  jumpTableFunctions[value] = "JumpTable_\(name)"
 }
 
 disassembly.register(bankChange: 0x03, at: 0x3945, in: 0x00)
 disassembly.register(bankChange: 0x00, at: 0x3951, in: 0x00)
-//disassembleJumpTable(within: 0x3953..<(0x3953 + 0xFA), in: 0x00, bankTable: entityJumpTableBanks)
+disassembleJumpTable(within: 0x3953..<(0x3953 + 0xFF * 2), in: 0x00, bankTable: entityJumpTableBanks, functionNames: jumpTableFunctions)
 
 disassembly.disassembleAsGameboyCartridge()
 
