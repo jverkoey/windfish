@@ -10,7 +10,17 @@ extension LR35902 {
     public init(rom: Data) {
       cpu = LR35902(cartridge: rom)
 
-      createDatatype(named: "bool", enumeration: [0: "false", 1: "true"], representation: .decimal)
+      createDatatype(named: "LCDCF", bitmask: [
+        0b0000_0000: "LCDCF_OFF",
+        0b1000_0000: "LCDCF_ON",
+        0b0100_0000: "LCDCF_TILEMAP_9C00",
+        0b0010_0000: "LCDCF_WINDOW_ON",
+        0b0001_0000: "LCDCF_BG_CHAR_8000",
+        0b0000_1000: "LCDCF_BG_TILE_9C00",
+        0b0000_0100: "LCDCF_OBJ_16_16",
+        0b0000_0010: "LCDCF_OBJ_DISPLAY",
+        0b0000_0001: "LCDCF_BG_DISPLAY",
+      ])
       createDatatype(named: "STATF", bitmask: [
         0b0100_0000: "STATF_LYC",
         0b0010_0000: "STATF_MODE10",
@@ -21,6 +31,7 @@ extension LR35902 {
         0b0000_0001: "STATF_VB",
         0b0000_0000: "STATF_HB"
       ])
+      createDatatype(named: "bool", enumeration: [0: "false", 1: "true"], representation: .decimal)
       createDatatype(named: "decimal", representation: .decimal)
       createDatatype(named: "binary", representation: .binary)
     }
@@ -129,12 +140,12 @@ extension LR35902 {
       createGlobal(at: 0xff25, named: "gbAUDTERM")
       createGlobal(at: 0xff26, named: "gbAUDENA")
       createGlobal(at: 0xff30, named: "gbAUD3WAVERAM")
-      createGlobal(at: 0xff40, named: "gbLCDC")
+      createGlobal(at: 0xff40, named: "gbLCDC", dataType: "LCDCF")
       createGlobal(at: 0xff41, named: "gbSTAT", dataType: "STATF")
-      createGlobal(at: 0xff42, named: "gbSCY")
-      createGlobal(at: 0xff43, named: "gbSCX")
-      createGlobal(at: 0xff44, named: "gbLY")
-      createGlobal(at: 0xff45, named: "gbLYC", dataType: "binary")
+      createGlobal(at: 0xff42, named: "gbSCY", dataType: "decimal")
+      createGlobal(at: 0xff43, named: "gbSCX", dataType: "decimal")
+      createGlobal(at: 0xff44, named: "gbLY", dataType: "decimal")
+      createGlobal(at: 0xff45, named: "gbLYC", dataType: "decimal")
       createGlobal(at: 0xff46, named: "gbDMA")
       createGlobal(at: 0xff47, named: "gbBGP")
       createGlobal(at: 0xff48, named: "gbOBP0")
