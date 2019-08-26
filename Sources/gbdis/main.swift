@@ -478,6 +478,7 @@ rstAddresses.forEach {
 
 disassembly.createGlobal(at: 0x0003, named: "DEBUG_TOOL", dataType: "bool")
 disassembly.createGlobal(at: 0xa100, named: "SAVEFILES")
+disassembly.createGlobal(at: 0xc10e, named: "wNPCTilesNeedsUpdate", dataType: "bool")
 disassembly.createGlobal(at: 0xc124, named: "wRoomTransitionState")
 disassembly.createGlobal(at: 0xc125, named: "wRoomTransitionDirection")
 disassembly.createGlobal(at: 0xc155, named: "wScreenShakeHorizontal")
@@ -487,17 +488,25 @@ disassembly.createGlobal(at: 0xc500, named: "wAlternateBackgroundEnabled")
 disassembly.createGlobal(at: 0xd369, named: "wAudioData")
 disassembly.createGlobal(at: 0xd379, named: "wAudioSelection")
 disassembly.createGlobal(at: 0xd46c, named: "wBossDefeated", dataType: "bool")
+disassembly.createGlobal(at: 0xd6fc, named: "wEnginePaused", dataType: "bool")
+disassembly.createGlobal(at: 0xd6fd, named: "wLCDControl", dataType: "LCDCF")
 disassembly.createGlobal(at: 0xd6fe, named: "wTileMapToLoad")
 disassembly.createGlobal(at: 0xd6ff, named: "wBGMapToLoad")
 disassembly.createGlobal(at: 0xdb95, named: "wGameMode", dataType: "GAMEMODE")
 disassembly.createGlobal(at: 0xdb96, named: "wGameSubMode")
 disassembly.createGlobal(at: 0xdbaf, named: "wCurrentBank")
-disassembly.createGlobal(at: 0xff96, named: "hBaseScrollX")
-disassembly.createGlobal(at: 0xff97, named: "hBaseScrollY")
+disassembly.createGlobal(at: 0xff80, named: "hRomBank")
+disassembly.createGlobal(at: 0xff81, named: "hTemp")
+disassembly.createGlobal(at: 0xff82, named: "hCodeTemp")
+disassembly.createGlobal(at: 0xff90, named: "hBGTilesNeedsUpdate", dataType: "bool")
+disassembly.createGlobal(at: 0xff91, named: "hEnemyTilesNeedsUpdate", dataType: "bool")
+disassembly.createGlobal(at: 0xff96, named: "hBaseScrollX", dataType: "decimal")
+disassembly.createGlobal(at: 0xff97, named: "hBaseScrollY", dataType: "decimal")
 disassembly.createGlobal(at: 0xff98, named: "hLinkX", dataType: "decimal")
 disassembly.createGlobal(at: 0xff99, named: "hLinkY", dataType: "decimal")
 disassembly.createGlobal(at: 0xff9a, named: "hLinkXDelta", dataType: "decimal")
 disassembly.createGlobal(at: 0xff9b, named: "hLinkYDelta", dataType: "decimal")
+disassembly.createGlobal(at: 0xff9d, named: "hLinkAnimationState")
 disassembly.createGlobal(at: 0xff9e, named: "hLinkDirection", dataType: "DIRECTION")
 disassembly.createGlobal(at: 0xff9f, named: "hLinkXFinal", dataType: "decimal")
 disassembly.createGlobal(at: 0xffa0, named: "hLinkYFinal", dataType: "decimal")
@@ -505,6 +514,7 @@ disassembly.createGlobal(at: 0xffa9, named: "hWindowY")
 disassembly.createGlobal(at: 0xffaa, named: "hWindowX")
 disassembly.createGlobal(at: 0xffb0, named: "hMusicTrack", dataType: "TRACK")
 disassembly.createGlobal(at: 0xffb5, named: "hButtonsInactiveDelay", dataType: "decimal")
+disassembly.createGlobal(at: 0xffcb, named: "hPressedButtonsMask", dataType: "BUTTON")
 disassembly.createGlobal(at: 0xffd7, named: "hScratchA")
 disassembly.createGlobal(at: 0xffd8, named: "hScratchB")
 disassembly.createGlobal(at: 0xffd9, named: "hScratchC")
@@ -586,11 +596,13 @@ jp hl
 """)
 disassembly.defineFunction(startingAt: 0x2872, in: 0x00, named: "JumpTable")
 disassembly.setLabel(at: 0x03bd, in: 0x00, named: "waitForNextFrame")
+disassembly.setLabel(at: 0x038a, in: 0x00, named: "engineIsPaused")
 disassembly.defineFunction(startingAt: 0x04a1, in: 0x00, named: "LoadMapData")
 disassembly.setLabel(at: 0x04f5, in: 0x00, named: "loadMapZero")
 disassembly.setLabel(at: 0x0516, in: 0x00, named: "cleanupAndReturn")
 disassembly.defineFunction(startingAt: 0x07B9, in: 0x00, named: "SetBank")
 disassembly.defineFunction(startingAt: 0x0844, in: 0x00, named: "PlayAudioStep")
+disassembly.defineFunction(startingAt: 0x27fe, in: 0x00, named: "ReadJoypadState")
 disassembly.defineFunction(startingAt: 0x2881, in: 0x00, named: "LCDOff")
 disassembly.defineFunction(startingAt: 0x28A8, in: 0x00, named: "FillBGWith7F")
 disassembly.defineFunction(startingAt: 0x28C5, in: 0x00, named: "CopyMemoryRegion")
@@ -743,6 +755,26 @@ disassembly.defineMacro(named: "modifySave", instructions: [
     .ld(.arg(1), .a)
   ], validArgumentValues: [
     1: IndexSet(integersIn: 0xA100..<0xAB8F)
+])
+
+disassembly.defineMacro(named: "ifAnyPressed", instructions: [
+  .instruction(.init(spec: .ld(.a, .ffimm8addr), imm8: 0xcb)),
+  .any(.and(.imm8)),
+  .any(.jr(.nz, .simm8)),
+], code: [
+  .ld(.a, .ffimm8addr),
+  .and(.arg(1)),
+  .jr(.nz, .arg(2)),
+])
+
+disassembly.defineMacro(named: "ifNotPressed", instructions: [
+  .instruction(.init(spec: .ld(.a, .ffimm8addr), imm8: 0xcb)),
+  .any(.and(.imm8)),
+  .any(.jr(.z, .simm8)),
+], code: [
+  .ld(.a, .ffimm8addr),
+  .and(.arg(1)),
+  .jr(.z, .arg(2)),
 ])
 
 disassembly.defineMacro(named: "resetAudio", template: """

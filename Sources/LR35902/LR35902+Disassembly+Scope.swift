@@ -306,6 +306,18 @@ extension LR35902.Disassembly {
           state.a = nil
         }
 
+      case .and(.imm8):
+        if case .variable(let address) = state.a?.value,
+          let global = globals[address],
+          let dataType = global.dataType {
+          typeAtLocation[location] = dataType
+        }
+
+        if case .value(let dst) = state.a?.value {
+          state.a = .init(value: .value(dst & instruction.imm8!), sourceLocation: location)
+          // TODO: Compute the flag bits.
+        }
+
       case .ld(.sp, .imm16):
         state.sp = .init(value: .value(instruction.imm16!), sourceLocation: location)
 

@@ -31,6 +31,20 @@ extension LR35902 {
         0b0000_0001: "STATF_VB",
         0b0000_0000: "STATF_HB"
       ])
+      createDatatype(named: "BUTTON", bitmask: [
+        0b0000_0001: "J_RIGHT",
+        0b0000_0010: "J_LEFT",
+        0b0000_0100: "J_UP",
+        0b0000_1000: "J_DOWN",
+        0b0001_0000: "J_A",
+        0b0010_0000: "J_B",
+        0b0100_0000: "J_SELECT",
+        0b1000_0000: "J_START",
+      ])
+      createDatatype(named: "JOYPAD", bitmask: [
+        0b0001_0000: "JOYPAD_DIRECTIONS",
+        0b0010_0000: "JOYPAD_BUTTONS",
+      ])
       createDatatype(named: "bool", enumeration: [0: "false", 1: "true"], representation: .decimal)
       createDatatype(named: "decimal", representation: .decimal)
       createDatatype(named: "binary", representation: .binary)
@@ -110,7 +124,7 @@ extension LR35902 {
       createGlobal(at: 0xa000, named: "gbCARTRAM")
       createGlobal(at: 0xc000, named: "gbRAM")
       createGlobal(at: 0xfe00, named: "gbOAMRAM")
-      createGlobal(at: 0xff00, named: "gbP1")
+      createGlobal(at: 0xff00, named: "gbP1", dataType: "JOYPAD")
       createGlobal(at: 0xff01, named: "gbSB")
       createGlobal(at: 0xff02, named: "gbSC")
       createGlobal(at: 0xff04, named: "gbDIV")
@@ -167,7 +181,7 @@ extension LR35902 {
       createGlobal(at: 0xff70, named: "gbSVBK")
       createGlobal(at: 0xff76, named: "gbPCM12")
       createGlobal(at: 0xff77, named: "gbPCM34")
-      createGlobal(at: 0xff80, named: "gbHRAM")
+//      createGlobal(at: 0xff80, named: "gbHRAM") // TODO: This isn't a global, it's just a region in memory.
       createGlobal(at: 0xffff, named: "gbIE", dataType: "bool")
 
       defineMacro(named: "ifHGte", instructions: [
@@ -414,11 +428,55 @@ extension LR35902 {
         .ld(.arg(1), .a),
       ])
 
+      defineMacro(named: "or__", instructions: [
+        .any(.ld(.a, .imm16addr)),
+        .any(.ld(.hl, .imm16)),
+        .any(.or(.hladdr)),
+      ], code: [
+        .ld(.a, .arg(1)),
+        .ld(.hl, .arg(2)),
+        .or(.hladdr),
+      ])
+
+      defineMacro(named: "orH_", instructions: [
+        .any(.ld(.a, .ffimm8addr)),
+        .any(.ld(.hl, .imm16)),
+        .any(.or(.hladdr)),
+      ], code: [
+        .ld(.a, .arg(1)),
+        .ld(.hl, .arg(2)),
+        .or(.hladdr),
+      ])
+
+      defineMacro(named: "ifAnyH__", instructions: [
+        .any(.ld(.a, .ffimm8addr)),
+        .any(.ld(.hl, .imm16)),
+        .any(.or(.hladdr)),
+        .any(.ld(.hl, .imm16)),
+        .any(.or(.hladdr)),
+        .any(.jr(.nz, .simm8)),
+      ], code: [
+        .ld(.a, .arg(1)),
+        .ld(.hl, .arg(2)),
+        .or(.hladdr),
+        .ld(.hl, .arg(3)),
+        .or(.hladdr),
+        .jr(.nz, .arg(4)),
+      ])
+
       defineMacro(named: "assign", instructions: [
         .any(.ld(.a, .imm8)),
         .any(.ld(.imm16addr, .a)),
       ], code: [
         .ld(.a, .arg(2)),
+        .ld(.arg(1), .a),
+      ])
+
+      defineMacro(named: "clear", instructions: [
+        .any(.xor(.a)),
+        .any(.ld(.imm16addr, .a)),
+      ], code: [
+        .xor(.a),
         .ld(.arg(1), .a),
       ])
 
@@ -855,6 +913,7 @@ extension LR35902 {
       case any(Instruction.Spec)
       case instruction(Instruction)
     }
+    // TODO: Verify that each instruction actually exists in the instruction table.
     public func defineMacro(named name: String,
                             instructions: [MacroLine],
                             code: [Instruction.Spec]? = nil,
