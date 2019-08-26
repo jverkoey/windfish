@@ -866,7 +866,7 @@ extension LR35902 {
             }
           case .ld(.hladdr, .imm8):
             if case .ld(.hl, .imm16) = previousInstruction?.spec,
-              previousInstruction!.imm16 == 0x2100 {
+              (0x2000..<0x4000).contains(previousInstruction!.imm16!) {
               register(bankChange: instruction.imm8!, at: instructionAddress, in: instructionBank)
               cpu.bank = instruction.imm8!
             }
