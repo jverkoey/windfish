@@ -877,7 +877,9 @@ extension LR35902 {
 
           case .jp(let condition, .imm16):
             let jumpTo = instruction.imm16!
-            queueRun(run, instructionAddress, jumpTo, instructionBank, instruction)
+            if jumpTo < 0x4000 || cpu.bank > 0 {
+              queueRun(run, instructionAddress, jumpTo, instructionBank, instruction)
+            }
 
             // An unconditional jp is the end of the run.
             if condition == nil {
@@ -886,7 +888,9 @@ extension LR35902 {
 
           case .call(_, .imm16):
             let jumpTo = instruction.imm16!
-            queueRun(run, instructionAddress, jumpTo, instructionBank, instruction)
+            if jumpTo < 0x4000 || cpu.bank > 0 {
+              queueRun(run, instructionAddress, jumpTo, instructionBank, instruction)
+            }
 
           case .jp(nil, _), .ret(nil), .reti:
             break linear_sweep

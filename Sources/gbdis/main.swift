@@ -464,7 +464,7 @@ for (value, name) in disassembly.valuesForDatatype(named: "ENTITY")! {
 
 disassembly.register(bankChange: 0x03, at: 0x3945, in: 0x00)
 disassembly.register(bankChange: 0x00, at: 0x3951, in: 0x00)
-//disassembleJumpTable(within: 0x3953..<0x39c3, in: 0x00, bankTable: entityJumpTableBanks)
+//disassembleJumpTable(within: 0x3953..<(0x3953 + 0xFA), in: 0x00, bankTable: entityJumpTableBanks)
 
 disassembly.disassembleAsGameboyCartridge()
 
