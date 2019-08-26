@@ -21,16 +21,28 @@ func extractText(from range: Range<LR35902.CartridgeLocation>) {
 
 var jumpTableIndex = 0
 
-func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902.Bank, selectedBank: LR35902.Bank? = nil) {
+func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902.Bank,
+                          selectedBank: LR35902.Bank? = nil,
+                          bankTable: [UInt8: LR35902.Bank]? = nil) {
 //  assert((range.upperBound - range.lowerBound) <= 256)
   jumpTableIndex += 1
   disassembly.setJumpTable(at: range, in: bank)
 
-  guard let selectedBank = selectedBank else {
+  let bankSelector: (UInt8) -> LR35902.Bank?
+  if let selectedBank = selectedBank {
+    disassembly.register(bankChange: selectedBank, at: range.lowerBound - 1, in: bank)
+    bankSelector = { _ in
+      selectedBank
+    }
+  } else if let bankTable = bankTable {
+    bankSelector = {
+      bankTable[$0]
+    }
+  } else {
     return
   }
-  disassembly.register(bankChange: selectedBank, at: range.lowerBound - 1, in: bank)
-  for location in stride(from: LR35902.cartAddress(for: range.lowerBound, in: bank)!, to: LR35902.cartAddress(for: range.upperBound, in: bank)!, by: 2) {
+  let cartRange = LR35902.cartAddress(for: range.lowerBound, in: bank)!..<LR35902.cartAddress(for: range.upperBound, in: bank)!
+  for location in stride(from: cartRange.lowerBound, to: cartRange.upperBound, by: 2) {
     let lowByte = data[Int(location)]
     let highByte = data[Int(location + 1)]
     let address: LR35902.Address = (LR35902.Address(highByte) << 8) | LR35902.Address(lowByte)
@@ -39,12 +51,18 @@ func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902
       if address < 0x4000 {
         effectiveBank = 0
       } else {
+        guard let selectedBank = bankSelector(UInt8((location - cartRange.lowerBound) / 2)) else {
+          continue
+        }
+        let addressAndBank = LR35902.addressAndBank(from: location)
+        disassembly.register(bankChange: selectedBank, at: addressAndBank.address, in: bank)
         effectiveBank = selectedBank
       }
       if effectiveBank == 0 && address >= 0x4000 {
         continue // Don't disassemble if we're not confident what the bank is.
       }
-      disassembly.defineFunction(startingAt: address, in: selectedBank, named: "JumpTable_\(address.hexString)_\(effectiveBank.hexString)")
+      disassembly.defineFunction(startingAt: address, in: effectiveBank,
+                                 named: "JumpTable_\(address.hexString)_\(effectiveBank.hexString)")
     }
   }
 }
@@ -430,7 +448,23 @@ disassembleJumpTable(within: 0x0d33..<0x0d49, in: 0x00, selectedBank: 0x03)  // 
 disassembleJumpTable(within: 0x30fb..<0x310d, in: 0x00, selectedBank: 0x00)
 disassembleJumpTable(within: 0x3114..<0x3138, in: 0x00, selectedBank: 0x00)
 disassembleJumpTable(within: 0x392b..<0x393d, in: 0x00, selectedBank: 0x03)
-//disassembleJumpTable(within: 0x3952..<0x3954, in: 0x00, selectedBank: 0x00)
+
+// MARK: - Entity table.
+
+var entityJumpTableBanks: [UInt8: LR35902.Bank] = [:]
+for (value, name) in disassembly.valuesForDatatype(named: "ENTITY")! {
+  let address = 0x4000 + LR35902.Address(value)
+  disassembly.setLabel(at: address, in: 0x03, named: "\(name)_bank")
+  disassembly.setData(at: address, in: 0x03)
+
+  let entityBankLocation = LR35902.cartAddress(for: address, in: 0x03)!
+  let bank = data[Int(entityBankLocation)]
+  entityJumpTableBanks[value] = bank
+}
+
+disassembly.register(bankChange: 0x03, at: 0x3945, in: 0x00)
+disassembly.register(bankChange: 0x00, at: 0x3951, in: 0x00)
+//disassembleJumpTable(within: 0x3953..<0x3955, in: 0x00, bankTable: entityJumpTableBanks)
 
 disassembly.disassembleAsGameboyCartridge()
 

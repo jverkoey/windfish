@@ -671,6 +671,9 @@ extension LR35902 {
       precondition(dataTypes[name] == nil, "Data type \(name) already exists.")
       dataTypes[name] = Datatype(namedValues: [:], interpretation: .any, representation: representation)
     }
+    public func valuesForDatatype(named name: String) -> [UInt8: String]? {
+      return dataTypes[name]?.namedValues
+    }
     var dataTypes: [String: Datatype] = [:]
 
     public func setType(at address: LR35902.Address, in bank: LR35902.Bank, to type: String) {

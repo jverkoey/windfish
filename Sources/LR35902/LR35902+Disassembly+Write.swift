@@ -527,7 +527,13 @@ clean:
             for (index, pair) in accumulator.chunked(into: 2).enumerated() {
               let address = (LR35902.Address(pair[1]) << 8) | LR35902.Address(pair[0])
               let jumpLocation: String
-              if let label = label(at: address, in: cpu.bank) {
+              let effectiveBank: LR35902.Bank
+              if let changedBank = bankChange(at: chunkPc, in: bank) {
+                effectiveBank = changedBank
+              } else {
+                effectiveBank = cpu.bank
+              }
+              if let label = label(at: address, in: effectiveBank) {
                 jumpLocation = label
               } else {
                 jumpLocation = "$\(address.hexString)"
