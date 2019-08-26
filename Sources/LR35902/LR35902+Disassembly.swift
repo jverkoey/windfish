@@ -350,9 +350,9 @@ extension LR35902 {
       return transfers[cartAddress]
     }
 
-    func registerTransferOfControl(to pc: Address, in bank: Bank, from fromPc: Address, spec: Instruction.Spec) {
+    public func registerTransferOfControl(to pc: Address, in bank: Bank, from fromPc: Address, in fromBank: Bank, spec: Instruction.Spec) {
       let index = cartAddress(for: pc, in: bank)!
-      let fromLocation = cartAddress(for: fromPc, in: bank)!
+      let fromLocation = cartAddress(for: fromPc, in: fromBank)!
       let transfer = TransferOfControl(sourceLocation: fromLocation, sourceInstructionSpec: spec)
       transfers[index, default: Set()].insert(transfer)
 
@@ -772,7 +772,7 @@ extension LR35902 {
 
         fromRun.children.append(run)
 
-        self.registerTransferOfControl(to: toAddress, in: bank, from: fromAddress, spec: instruction.spec)
+        self.registerTransferOfControl(to: toAddress, in: bank, from: fromAddress, in: bank, spec: instruction.spec)
       }
 
       while !runQueue.isEmpty {

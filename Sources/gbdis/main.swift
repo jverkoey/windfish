@@ -50,13 +50,13 @@ func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902
     if address < 0x8000 {
       let index = UInt8((location - cartRange.lowerBound) / 2)
       let effectiveBank: LR35902.Bank
+      let addressAndBank = LR35902.addressAndBank(from: location)
       if address < 0x4000 {
         effectiveBank = 0
       } else {
         guard let selectedBank = bankSelector(index) else {
           continue
         }
-        let addressAndBank = LR35902.addressAndBank(from: location)
         disassembly.register(bankChange: selectedBank, at: addressAndBank.address, in: bank)
         effectiveBank = selectedBank
       }
@@ -69,6 +69,7 @@ func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902
       } else {
         name = "JumpTable_\(address.hexString)_\(effectiveBank.hexString)"
       }
+      disassembly.registerTransferOfControl(to: address, in: effectiveBank, from: addressAndBank.address, in: addressAndBank.bank, spec: .jp(nil, .imm16))
       disassembly.defineFunction(startingAt: address, in: effectiveBank, named: name)
     }
   }
@@ -418,6 +419,7 @@ disassembleJumpTable(within: 0x392b..<0x393d, in: 0x00, selectedBank: 0x03)
 disassembleJumpTable(within: 0x4187..<0x4191, in: 0x01, selectedBank: 0x01)
 disassembleJumpTable(within: 0x5378..<0x5392, in: 0x02, selectedBank: 0x02)
 disassembleJumpTable(within: 0x5b2f..<0x5b3f, in: 0x02, selectedBank: 0x02)
+disassembleJumpTable(within: 0x5d45..<0x5d63, in: 0x02, selectedBank: 0x02)
 
 // MARK: - Entity table.
 
