@@ -91,44 +91,44 @@ public final class RGBDSAssembly {
       return nil
     }
     let location = LR35902.cartAddress(for: disassembly.cpu.pc, in: disassembly.cpu.bank)!
-    if let type = disassembly.typeAtLocation[location],
-      let dataType = disassembly.dataTypes[type] {
-      switch dataType.interpretation {
-      case .bitmask:
-        var namedValues: UInt8 = 0
-        let bitmaskValues = dataType.namedValues.filter { value, _ in
-          if imm8 == 0 {
-            return value == 0
-          }
-          if value != 0 && (imm8 & value) == value {
-            namedValues = namedValues | value
-            return true
-          }
-          return false
-        }.values
-        var parts = bitmaskValues.sorted()
-
-        if namedValues != imm8 {
-          let remainingBits = imm8 & ~(namedValues)
-          parts.append(typedValue(for: remainingBits, with: dataType.representation))
+    guard let type = disassembly.typeAtLocation[location],
+      let dataType = disassembly.dataTypes[type] else {
+      return nil
+    }
+    switch dataType.interpretation {
+    case .bitmask:
+      var namedValues: UInt8 = 0
+      let bitmaskValues = dataType.namedValues.filter { value, _ in
+        if imm8 == 0 {
+          return value == 0
         }
-        return parts.joined(separator: " | ")
-
-      case .enumerated:
-        let possibleValues = dataType.namedValues.filter { value, _ in value == imm8 }.values
-        precondition(possibleValues.count <= 1, "Multiple possible values found.")
-        if let value = possibleValues.first {
-          return value
+        if value != 0 && (imm8 & value) == value {
+          namedValues = namedValues | value
+          return true
         }
+        return false
+      }.values
+      var parts = bitmaskValues.sorted()
 
-      default:
-        break
+      if namedValues != imm8 {
+        let remainingBits = imm8 & ~(namedValues)
+        parts.append(typedValue(for: remainingBits, with: dataType.representation))
+      }
+      return parts.joined(separator: " | ")
+
+    case .enumerated:
+      let possibleValues = dataType.namedValues.filter { value, _ in value == imm8 }.values
+      precondition(possibleValues.count <= 1, "Multiple possible values found.")
+      if let value = possibleValues.first {
+        return value
       }
 
-      // Fall-through case.
-      return typedValue(for: imm8, with: dataType.representation)
+    default:
+      break
     }
-    return nil
+
+    // Fall-through case.
+    return typedValue(for: imm8, with: dataType.representation)
   }
 
   private static func operands(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil) -> [String]? {
