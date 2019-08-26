@@ -464,7 +464,7 @@ for (value, name) in disassembly.valuesForDatatype(named: "ENTITY")! {
 
 disassembly.register(bankChange: 0x03, at: 0x3945, in: 0x00)
 disassembly.register(bankChange: 0x00, at: 0x3951, in: 0x00)
-//disassembleJumpTable(within: 0x3953..<0x3955, in: 0x00, bankTable: entityJumpTableBanks)
+//disassembleJumpTable(within: 0x3953..<0x39c3, in: 0x00, bankTable: entityJumpTableBanks)
 
 disassembly.disassembleAsGameboyCartridge()
 
@@ -584,17 +584,18 @@ disassembly.defineMacro(named: "changebank", instructions: [
   .ld(.imm16addr, .a),
 ])
 
-disassembly.defineMacro(named: "_callcb", instructions: [
-  .any(.ld(.a, .imm8)),
-  .instruction(.init(spec: .call(nil, .imm16), imm16: 0x07b9)),
-  .any(.call(nil, .imm16))
-], code: [
-  .ld(.a, .macro("bank(\\1)")),
-  .call(nil, .imm16),
-  .call(nil, .arg(1))
-], validArgumentValues: [
-  1: IndexSet(integersIn: 0x4000..<0x8000)
-])
+// TODO: Add validation for a label existing for a given argument.
+//disassembly.defineMacro(named: "_callcb", instructions: [
+//  .any(.ld(.a, .imm8)),
+//  .instruction(.init(spec: .call(nil, .imm16), imm16: 0x07b9)),
+//  .any(.call(nil, .imm16))
+//], code: [
+//  .ld(.a, .macro("bank(\\1)")),
+//  .call(nil, .imm16),
+//  .call(nil, .arg(1))
+//], validArgumentValues: [
+//  1: IndexSet(integersIn: 0x4000..<0x8000)
+//])
 
 disassembly.defineMacro(named: "callcb", instructions: [
   .any(.ld(.a, .imm8)),
