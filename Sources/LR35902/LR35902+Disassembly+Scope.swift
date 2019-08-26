@@ -242,6 +242,8 @@ extension LR35902.Disassembly {
       .c,
       .d,
       .e,
+      .h,
+      .l,
     ])
 
     let registers16: Set<LR35902.Instruction.Numeric> = Set([

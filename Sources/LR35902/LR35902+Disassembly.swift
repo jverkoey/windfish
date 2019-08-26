@@ -234,6 +234,46 @@ extension LR35902 {
           .jr(.nc, .arg(3)),
       ])
 
+      defineMacro(named: "returnIfLt", instructions: [
+        .any(.ld(.a, .imm16addr)),
+        .any(.cp(.imm8)),
+        .any(.ret(.c)),
+      ], code: [
+        .ld(.a, .arg(1)),
+        .cp(.arg(2)),
+        .ret(.c),
+      ])
+
+      defineMacro(named: "returnIfGte", instructions: [
+        .any(.ld(.a, .imm16addr)),
+        .any(.cp(.imm8)),
+        .any(.ret(.nc)),
+      ], code: [
+        .ld(.a, .arg(1)),
+        .cp(.arg(2)),
+        .ret(.nc),
+      ])
+
+      defineMacro(named: "returnIfHLt", instructions: [
+        .any(.ld(.a, .ffimm8addr)),
+        .any(.cp(.imm8)),
+        .any(.ret(.c)),
+        ], code: [
+          .ld(.a, .arg(1)),
+          .cp(.arg(2)),
+          .ret(.c),
+      ])
+
+      defineMacro(named: "returnIfHGte", instructions: [
+        .any(.ld(.a, .ffimm8addr)),
+        .any(.cp(.imm8)),
+        .any(.ret(.nc)),
+        ], code: [
+          .ld(.a, .arg(1)),
+          .cp(.arg(2)),
+          .ret(.nc),
+      ])
+
       defineMacro(named: "ifLt", instructions: [
         .any(.ld(.a, .imm16addr)),
         .any(.cp(.imm8)),
