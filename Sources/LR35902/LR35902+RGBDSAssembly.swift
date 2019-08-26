@@ -75,6 +75,17 @@ public final class RGBDSAssembly {
     }
   }
 
+  private static func typedValue(for imm8: UInt8, with representation: LR35902.Disassembly.Datatype.Representation) -> String {
+    switch representation {
+    case .binary:
+      return "%\(imm8.binaryString)"
+    case .decimal:
+      return "\(imm8)"
+    case .hexadecimal:
+      return "$\(imm8.hexString)"
+    }
+  }
+
   private static func typedOperand(for imm8: UInt8, with disassembly: LR35902.Disassembly?) -> String? {
     guard let disassembly = disassembly else {
       return nil
@@ -84,13 +95,24 @@ public final class RGBDSAssembly {
       let dataType = disassembly.dataTypes[type] {
       switch dataType.interpretation {
       case .bitmask:
+        var namedValues: UInt8 = 0
         let bitmaskValues = dataType.namedValues.filter { value, _ in
           if imm8 == 0 {
             return value == 0
           }
-          return value != 0 && (imm8 & value) == value
+          if value != 0 && (imm8 & value) == value {
+            namedValues = namedValues | value
+            return true
+          }
+          return false
         }.values
-        return bitmaskValues.sorted().joined(separator: " | ")
+        var parts = bitmaskValues.sorted()
+
+        if namedValues != imm8 {
+          let remainingBits = imm8 & ~(namedValues)
+          parts.append(typedValue(for: remainingBits, with: dataType.representation))
+        }
+        return parts.joined(separator: " | ")
 
       case .enumerated:
         let possibleValues = dataType.namedValues.filter { value, _ in value == imm8 }.values
@@ -98,18 +120,13 @@ public final class RGBDSAssembly {
         if let value = possibleValues.first {
           return value
         }
-        fallthrough
 
-      case .any:
-        switch dataType.representation {
-        case .binary:
-          return "%\(imm8.binaryString)"
-        case .decimal:
-          return "\(imm8)"
-        case .hexadecimal:
-          return "$\(imm8.hexString)"
-        }
+      default:
+        break
       }
+
+      // Fall-through case.
+      return typedValue(for: imm8, with: dataType.representation)
     }
     return nil
   }
