@@ -139,10 +139,49 @@ extension LR35902.Disassembly {
     }
     var a: RegisterState<UInt8>?
     var b: RegisterState<UInt8>?
+    var c: RegisterState<UInt8>?
     var d: RegisterState<UInt8>?
     var e: RegisterState<UInt8>?
-    var bc: RegisterState<UInt16>?
-    var hl: RegisterState<UInt16>?
+    var h: RegisterState<UInt8>?
+    var l: RegisterState<UInt8>?
+    var bc: RegisterState<UInt16>? {
+      get {
+        if let sourceLocation = b?.sourceLocation,
+          case .value(let b) = b?.value,
+          case .value(let c) = c?.value {
+          return RegisterState<UInt16>(value: .value(UInt16(b) << 8 | UInt16(c)), sourceLocation: sourceLocation)
+        }
+        return _bc
+      }
+      set {
+        if let sourceLocation = newValue?.sourceLocation,
+          case .value(let bc) = newValue?.value {
+          b = .init(value: .value(UInt8(bc >> 8)), sourceLocation: sourceLocation)
+          c = .init(value: .value(UInt8(bc & 0x00FF)), sourceLocation: sourceLocation)
+        }
+        _bc = newValue
+      }
+    }
+    private var _bc: RegisterState<UInt16>?
+    var hl: RegisterState<UInt16>? {
+      get {
+        if let sourceLocation = h?.sourceLocation,
+          case .value(let h) = h?.value,
+          case .value(let l) = l?.value {
+          return RegisterState<UInt16>(value: .value(UInt16(h) << 8 | UInt16(l)), sourceLocation: sourceLocation)
+        }
+        return _hl
+      }
+      set {
+        if let sourceLocation = newValue?.sourceLocation,
+          case .value(let hl) = newValue?.value {
+          h = .init(value: .value(UInt8(hl >> 8)), sourceLocation: sourceLocation)
+          l = .init(value: .value(UInt8(hl & 0x00FF)), sourceLocation: sourceLocation)
+        }
+        _hl = newValue
+      }
+    }
+    private var _hl: RegisterState<UInt16>?
     var sp: RegisterState<UInt16>?
     var next: [LR35902.CartridgeLocation] = []
     var ram: [LR35902.Address: RegisterState<UInt8>] = [:]
@@ -152,6 +191,7 @@ extension LR35902.Disassembly {
         switch numeric {
         case .a: return a
         case .b: return b
+        case .c: return c
         case .d: return d
         case .e: return e
         default: return nil
@@ -161,10 +201,27 @@ extension LR35902.Disassembly {
         switch numeric {
         case .a: a = newValue
         case .b: b = newValue
+        case .c: c = newValue
         case .d: d = newValue
         case .e: e = newValue
-        default:
-          break
+        default: break
+        }
+      }
+    }
+
+    subscript(numeric: LR35902.Instruction.Numeric) -> RegisterState<UInt16>? {
+      get {
+        switch numeric {
+        case .bc: return bc
+        case .hl: return hl
+        default: return nil
+        }
+      }
+      set {
+        switch numeric {
+        case .bc: bc = newValue
+        case .hl: hl = newValue
+        default: break
         }
       }
     }
@@ -179,6 +236,19 @@ extension LR35902.Disassembly {
     // TODO: Store this globally.
     var states: [LR35902.CartridgeLocation: CPUState] = [:]
 
+    let registers8: Set<LR35902.Instruction.Numeric> = Set([
+      .a,
+      .b,
+      .c,
+      .d,
+      .e,
+    ])
+
+    let registers16: Set<LR35902.Instruction.Numeric> = Set([
+      .bc,
+      .hl,
+    ])
+
     while pc < upperBoundPc {
       guard let instruction = self.instruction(at: pc, in: bank) else {
         pc += 1
@@ -188,20 +258,24 @@ extension LR35902.Disassembly {
       let location = LR35902.cartAddress(for: pc, in: bank)!
 
       switch instruction.spec {
-      case .ld(let numeric, .imm8):
-        state[numeric] = .init(value: .value(instruction.imm8!), sourceLocation: location)
-      case .ld(.a, .e):
-        state.a = state.e
-      case .ld(.a, .imm16addr):
-        state.a = .init(value: .variable(instruction.imm16!), sourceLocation: location)
-      case .ld(.bc, .imm16):
-        state.bc = .init(value: .value(instruction.imm16!), sourceLocation: location)
-      case .ld(.hl, .imm16):
-        state.hl = .init(value: .value(instruction.imm16!), sourceLocation: location)
-      case .ld(let numeric, .ffimm8addr):
+      case .ld(let numeric, .imm8) where registers8.contains(numeric):
+        state[numeric] = CPUState.RegisterState<UInt8>(value: .value(instruction.imm8!), sourceLocation: location)
+
+      case .ld(let dst, let src) where registers8.contains(dst) && registers8.contains(src):
+        let srcValue: CPUState.RegisterState<UInt8>? = state[src]
+        state[dst] = srcValue
+
+      case .ld(let dst, .imm16addr) where registers8.contains(dst):
+        state[dst] = CPUState.RegisterState<UInt8>(value: .variable(instruction.imm16!), sourceLocation: location)
+
+      case .ld(let dst, .imm16) where registers16.contains(dst):
+        state[dst] = CPUState.RegisterState<UInt16>(value: .value(instruction.imm16!), sourceLocation: location)
+
+      case .ld(let numeric, .ffimm8addr) where registers8.contains(numeric):
         let address = 0xFF00 | LR35902.Address(instruction.imm8!)
-        state[numeric] = .init(value: .variable(address), sourceLocation: location)
-      case .ld(.ffimm8addr, let numeric):
+        state[numeric] = CPUState.RegisterState<UInt8>(value: .variable(address), sourceLocation: location)
+
+      case .ld(.ffimm8addr, let numeric) where registers8.contains(numeric):
         let address = 0xFF00 | LR35902.Address(instruction.imm8!)
         if let global = globals[address],
           let dataType = global.dataType,
@@ -209,24 +283,30 @@ extension LR35902.Disassembly {
           typeAtLocation[sourceLocation] = dataType
         }
         state.ram[address] = state[numeric]
+
       case .cp(_):
         if case .variable(let address) = state.a?.value,
           let global = globals[address],
           let dataType = global.dataType {
           typeAtLocation[location] = dataType
         }
+
       case .xor(.a):
         state.a = .init(value: .value(0), sourceLocation: location)
-      case .and(let numeric):
+
+      case .and(let numeric) where registers8.contains(numeric):
         if case .value(let dst) = state.a?.value,
-          case .value(let src) = state[numeric]?.value {
+          let register: CPUState.RegisterState<UInt8> = state[numeric],
+          case .value(let src) = register.value {
           state.a = .init(value: .value(dst & src), sourceLocation: location)
           // TODO: Compute the flag bits.
         } else {
           state.a = nil
         }
+
       case .ld(.sp, .imm16):
         state.sp = .init(value: .value(instruction.imm16!), sourceLocation: location)
+
       case .reti, .ret:
         state.a = nil
         state.bc = nil
