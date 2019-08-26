@@ -186,14 +186,24 @@ extension LR35902 {
           .jr(.c, .arg(2)),
       ])
 
-      defineMacro(named: "ifHEq", instructions: [
-        .any(.ld(.a, .ffimm8addr)),
+      defineMacro(named: "ifEq", instructions: [
+        .any(.ld(.a, .imm16addr)),
         .any(.cp(.imm8)),
         .any(.jr(.z, .simm8)),
         ], code: [
           .ld(.a, .arg(1)),
           .cp(.arg(2)),
           .jr(.z, .arg(3)),
+      ])
+
+      defineMacro(named: "ifHEq", instructions: [
+        .any(.ld(.a, .ffimm8addr)),
+        .any(.cp(.imm8)),
+        .any(.jr(.z, .simm8)),
+      ], code: [
+        .ld(.a, .arg(1)),
+        .cp(.arg(2)),
+        .jr(.z, .arg(3)),
       ])
 
       defineMacro(named: "ifHEq_", instructions: [
@@ -302,16 +312,6 @@ extension LR35902 {
           .ld(.a, .arg(1)),
           .cp(.arg(2)),
           .jr(.c, .arg(3)),
-      ])
-
-      defineMacro(named: "ifEq", instructions: [
-        .any(.ld(.a, .imm16addr)),
-        .any(.cp(.imm8)),
-        .any(.jr(.z, .simm8)),
-        ], code: [
-          .ld(.a, .arg(1)),
-          .cp(.arg(2)),
-          .jr(.z, .arg(3)),
       ])
 
       defineMacro(named: "ifZero", instructions: [
