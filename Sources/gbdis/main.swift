@@ -364,6 +364,13 @@ disassembly.createDatatype(named: "ENTITY", enumeration: [
   0xFF: "ENTITY_FF",
 ])
 
+disassembly.createDatatype(named: "DIRECTION", enumeration: [
+  0: "DIRECTION_RIGHT",
+  1: "DIRECTION_LEFT",
+  2: "DIRECTION_UP",
+  3: "DIRECTION_DOWN",
+])
+
 disassembly.setData(at: 0x0004..<0x0008, in: 0x00)
 
 let numberOfRestartAddresses: LR35902.Address = 8
@@ -395,6 +402,7 @@ disassembly.createGlobal(at: 0xff98, named: "hLinkX", dataType: "decimal")
 disassembly.createGlobal(at: 0xff99, named: "hLinkY", dataType: "decimal")
 disassembly.createGlobal(at: 0xff9a, named: "hLinkXDelta", dataType: "decimal")
 disassembly.createGlobal(at: 0xff9b, named: "hLinkYDelta", dataType: "decimal")
+disassembly.createGlobal(at: 0xff9e, named: "hLinkDirection", dataType: "DIRECTION")
 disassembly.createGlobal(at: 0xffa9, named: "hWindowY")
 disassembly.createGlobal(at: 0xffaa, named: "hWindowX")
 disassembly.createGlobal(at: 0xffb5, named: "hButtonsInactiveDelay", dataType: "decimal")
