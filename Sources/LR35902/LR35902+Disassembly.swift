@@ -22,6 +22,7 @@ extension LR35902 {
         0b0000_0000: "STATF_HB"
       ])
       createDatatype(named: "decimal", representation: .decimal)
+      createDatatype(named: "binary", representation: .binary)
     }
 
     public func disassembleAsGameboyCartridge() {
@@ -133,7 +134,7 @@ extension LR35902 {
       createGlobal(at: 0xff42, named: "gbSCY")
       createGlobal(at: 0xff43, named: "gbSCX")
       createGlobal(at: 0xff44, named: "gbLY")
-      createGlobal(at: 0xff45, named: "gbLYC")
+      createGlobal(at: 0xff45, named: "gbLYC", dataType: "binary")
       createGlobal(at: 0xff46, named: "gbDMA")
       createGlobal(at: 0xff47, named: "gbBGP")
       createGlobal(at: 0xff48, named: "gbOBP0")
