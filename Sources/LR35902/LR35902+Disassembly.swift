@@ -864,6 +864,12 @@ extension LR35902 {
 
               cpu.bank = previousInstruction.imm8!
             }
+          case .ld(.hladdr, .imm8):
+            if case .ld(.hl, .imm16) = previousInstruction?.spec,
+              previousInstruction!.imm16 == 0x2100 {
+              register(bankChange: instruction.imm8!, at: instructionAddress, in: instructionBank)
+              cpu.bank = instruction.imm8!
+            }
 
           case .jr(let condition, .simm8):
             let relativeJumpAmount = Int8(bitPattern: instruction.imm8!)

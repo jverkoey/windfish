@@ -134,6 +134,7 @@ disassembly.createDatatype(named: "ENTITY", enumeration: [
   0x1A: "ENTITY_STALFOS_AGGRESSIVE",
   0x1B: "ENTITY_GEL",
   0x1C: "ENTITY_MINI_GEL",
+  0x1D: "ENTITY_1D",
   0x1E: "ENTITY_STALFOS_EVASIVE",
   0x1F: "ENTITY_GIBDO",
   0x20: "ENTITY_HARDHAT_BEETLE",
@@ -182,6 +183,7 @@ disassembly.createDatatype(named: "ENTITY", enumeration: [
   0x4B: "ENTITY_POT",
   0x4C: "ENTITY_4C",
   0x4D: "ENTITY_SHOP_OWNER",
+  0x4E: "ENTITY_4E",
   0x4F: "ENTITY_TRENDY_GAME_OWNER",
   0x50: "ENTITY_BOO_BUDDY",
   0x51: "ENTITY_KNIGHT",
@@ -315,6 +317,8 @@ disassembly.createDatatype(named: "ENTITY", enumeration: [
   0xD1: "ENTITY_ANIMAL_D1",
   0xD2: "ENTITY_ANIMAL_D2",
   0xD3: "ENTITY_BUNNY_D3",
+  0xD4: "ENTITY_D4",
+  0xD5: "ENTITY_D5",
   0xD6: "ENTITY_SIDE_VIEW_POT",
   0xD7: "ENTITY_THWIMP",
   0xD8: "ENTITY_THWOMP",
@@ -435,11 +439,13 @@ disassembly.register(bankChange: 0x10, at: 0x2D30, in: 0x00)
 disassembly.register(bankChange: 0x10, at: 0x2D5B, in: 0x00)
 disassembly.register(bankChange: 0x0F, at: 0x2D78, in: 0x00)
 disassembly.register(bankChange: 0x08, at: 0x2E71, in: 0x00)
+disassembly.register(bankChange: 0x19, at: 0x37FB, in: 0x00)
 disassembly.register(bankChange: 0x01, at: 0x381E, in: 0x00)
 disassembly.register(bankChange: 0x02, at: 0x38B0, in: 0x00)
 disassembly.register(bankChange: 0x19, at: 0x38F7, in: 0x00)
 disassembly.register(bankChange: 0x14, at: 0x391B, in: 0x00)
 disassembly.register(bankChange: 0x03, at: 0x3923, in: 0x14)
+disassembly.register(bankChange: 0x02, at: 0x3E52, in: 0x00)
 disassembly.register(bankChange: 0x02, at: 0x3E82, in: 0x00)
 disassembly.register(bankChange: 0x03, at: 0x7301, in: 0x03)
 
@@ -609,6 +615,14 @@ disassembly.defineMacro(named: "changebank", instructions: [
 ], code: [
   .ld(.a, .arg(1)),
   .ld(.imm16addr, .a),
+])
+
+disassembly.defineMacro(named: "__changebank", instructions: [
+  .instruction(.init(spec: .ld(.hl, .imm16), imm16: 0x2100)),
+  .any(.ld(.hladdr, .imm8)),
+], code: [
+  .ld(.hl, .imm16),
+  .ld(.hladdr, .arg(1))
 ])
 
 // TODO: Add validation for a label existing for a given argument.
