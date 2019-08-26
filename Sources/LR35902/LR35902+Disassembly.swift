@@ -856,6 +856,7 @@ extension LR35902 {
           advance(instructionWidth.total)
 
           switch spec {
+            // TODO: Rewrite these with a macro dector during disassembly time.
           case .ld(.imm16addr, .a):
             if (0x2000..<0x4000).contains(instruction.imm16!),
               let previousInstruction = previousInstruction,
@@ -892,7 +893,15 @@ extension LR35902 {
               break linear_sweep
             }
 
-          case .call(_, .imm16):
+          case .call(let condition, .imm16):
+            // TODO: Allow the user to define macros like this.
+            if condition == nil,
+              instruction.imm16! == 0x07b9,
+              let previousInstruction = previousInstruction,
+              case .ld(.a, .imm8) = previousInstruction.spec {
+              register(bankChange: previousInstruction.imm8!, at: instructionAddress, in: instructionBank)
+              cpu.bank = previousInstruction.imm8!
+            }
             let jumpTo = instruction.imm16!
             if jumpTo < 0x4000 || cpu.bank > 0 {
               queueRun(run, instructionAddress, jumpTo, instructionBank, instruction)
