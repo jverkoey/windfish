@@ -227,6 +227,17 @@ extension LR35902.Disassembly {
     }
   }
 
+  // TODO: Extract this engine into a generic emulator so that the following code can be debugged in an interactive session:
+  /*
+   ; Store the read joypad state into c
+   ld   c, a                                    ; $282A (00): ReadJoypadState $4F
+   ld   a, [hPreviousJoypadState]               ; $282B (00): ReadJoypadState $F0 $CB
+   xor  c                                       ; $282D (00): ReadJoypadState $A9
+   and  c                                       ; $282E (00): ReadJoypadState $A1
+   ld   [hJoypadState], a                       ; $282F (00): ReadJoypadState $E0 $CC
+   ld   a, c                                    ; $2831 (00): ReadJoypadState $79
+   ld   [hPreviousJoypadState], a               ; $2832 (00): ReadJoypadState $E0 $CB
+   */
   private func inferVariableTypes(in range: Range<LR35902.CartridgeLocation>) {
     var (pc, bank) = LR35902.addressAndBank(from: range.lowerBound)
     let upperBoundPc = LR35902.addressAndBank(from: range.upperBound).address

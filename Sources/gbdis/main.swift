@@ -1,6 +1,8 @@
 import Foundation
 import LR35902
 
+
+
 let data = try Data(contentsOf: URL(fileURLWithPath: "/Users/featherless/workbench/awakenlink/rom/LinksAwakening.gb"))
 
 let disassembly = LR35902.Disassembly(rom: data)
