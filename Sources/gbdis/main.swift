@@ -427,6 +427,8 @@ disassembleJumpTable(within: 0x6b9a..<0x6ba2, in: 0x02, selectedBank: 0x02)
 disassembleJumpTable(within: 0x6c1f..<0x6c25, in: 0x02, selectedBank: 0x02)
 disassembleJumpTable(within: 0x7c53..<0x7c5d, in: 0x02, selectedBank: 0x02)
 
+disassembleJumpTable(within: 0x4976..<(0x4976 + 233 * 2), in: 0x03, selectedBank: 0x03)
+
 // MARK: - Entity table.
 
 var entityJumpTableBanks: [UInt8: LR35902.Bank] = [:]
