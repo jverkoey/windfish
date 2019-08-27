@@ -2,11 +2,11 @@ import Foundation
 
 extension LR35902.Disassembly {
   struct CPUState {
-    enum RegisterValue<T: BinaryInteger> {
+    enum RegisterValue<T: BinaryInteger>: Equatable {
       case variable(LR35902.Address)
       case value(T)
     }
-    struct RegisterState<T: BinaryInteger> {
+    struct RegisterState<T: BinaryInteger>: Equatable {
       let value: RegisterValue<T>
       let sourceLocation: LR35902.CartridgeLocation
     }

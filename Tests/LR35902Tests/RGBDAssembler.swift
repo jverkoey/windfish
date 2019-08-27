@@ -501,23 +501,13 @@ class RGBDAssembler: XCTestCase {
     initialState.a = LR35902.Disassembly.CPUState.RegisterState<UInt8>(value: .value(0b0000_1111), sourceLocation: 0)
     initialState.ram[0xffcb] = .init(value: .value(0b0000_1100), sourceLocation: 0)
 
-    disassembly.simulate(range: 0..<LR35902.CartridgeLocation(assembler.buffer.count), initialState: initialState) { instruction, location, state in
-      print("\(location.hexString): \(instruction.spec)")
-      if case .value(let value) = state.a?.value {
-        print("      a: \(value.binaryString)")
-      } else if case .variable(let address) = state.a?.value,
-        case .value(let value) = state.ram[address]?.value {
-        print("      a: [$\(address.hexString)] = \(value.binaryString)")
-      }
-      if case .value(let value) = state.c?.value {
-        print("      c: \(value.binaryString)")
-      }
-      if case .value(let value) = state.ram[0xffcb]?.value {
-        print(" 0xffcb: \(value.binaryString)")
-      }
-      if case .value(let value) = state.ram[0xffcc]?.value {
-        print(" 0xffcc: \(value.binaryString)")
-      }
-    }
+    let states = disassembly.simulate(range: 0..<LR35902.CartridgeLocation(assembler.buffer.count),
+                                      initialState: initialState).sorted(by: { $0.key < $1.key })
+    let lastState = states[states.count - 1]
+
+    XCTAssertEqual(lastState.value.a, .init(value: .value(0b0000_1111), sourceLocation: 0))
+    XCTAssertEqual(lastState.value.c, .init(value: .value(0b0000_1111), sourceLocation: 0))
+    XCTAssertEqual(lastState.value.ram[0xffcb], .init(value: .value(0b0000_1111), sourceLocation: 0))
+    XCTAssertEqual(lastState.value.ram[0xffcc], .init(value: .value(0b0000_0011), sourceLocation: 4))
   }
 }
