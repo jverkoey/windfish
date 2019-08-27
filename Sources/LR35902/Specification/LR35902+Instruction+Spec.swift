@@ -80,6 +80,13 @@ extension LR35902.Instruction {
      // For macro use only
     case macro(String)
     case arg(Int)
+
+    static let registers8: Set<LR35902.Instruction.Numeric> = Set([
+      .a,
+      .b, .c,
+      .d, .e,
+      .h, .l,
+    ])
   }
 
   /// Possible conditions in LR35902's instruction set.

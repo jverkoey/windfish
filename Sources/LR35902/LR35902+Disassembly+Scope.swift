@@ -4,13 +4,51 @@ extension LR35902.Disassembly {
   func rewriteScopes(_ run: LR35902.Disassembly.Run) {
     // Compute scope and rewrite function labels if we're a function.
 
+    let registers8 = LR35902.Instruction.Numeric.registers8
+
     for runGroup in run.runGroups() {
       // TODO: We should do this after all disassembly has been done and before writing to disk.
       for run in runGroup {
         guard let visitedRange = run.visitedRange else {
           continue
         }
-        inferVariableTypes(in: visitedRange)
+
+        inferVariableTypes(in: visitedRange) { instruction, location, state in
+          switch instruction.spec {
+          case .ld(.ffimm8addr, let numeric) where registers8.contains(numeric):
+            let address = 0xFF00 | LR35902.Address(instruction.imm8!)
+            if let global = self.globals[address],
+              let dataType = global.dataType,
+              let sourceLocation = state.a?.sourceLocation {
+              self.typeAtLocation[sourceLocation] = dataType
+            }
+
+          case .cp(_):
+            if case .variable(let address) = state.a?.value,
+              let global = self.globals[address],
+              let dataType = global.dataType {
+              self.typeAtLocation[location] = dataType
+            }
+
+          case .ld(.ffimm8addr, let numeric) where registers8.contains(numeric):
+            let address = 0xFF00 | LR35902.Address(instruction.imm8!)
+            if let global = self.globals[address],
+              let dataType = global.dataType,
+              let sourceLocation = state.a?.sourceLocation {
+              self.typeAtLocation[sourceLocation] = dataType
+            }
+
+          case .and(.imm8):
+            if case .variable(let address) = state.a?.value,
+              let global = self.globals[address],
+              let dataType = global.dataType {
+              self.typeAtLocation[location] = dataType
+            }
+
+          default:
+            break
+          }
+        }
       }
       guard let runStartAddress = runGroup.startAddress,
         let runGroupLabel = labels[runStartAddress],
@@ -238,7 +276,10 @@ extension LR35902.Disassembly {
    ld   a, c                                    ; $2831 (00): ReadJoypadState $79
    ld   [hPreviousJoypadState], a               ; $2832 (00): ReadJoypadState $E0 $CB
    */
-  private func inferVariableTypes(in range: Range<LR35902.CartridgeLocation>) {
+  @discardableResult
+  private func inferVariableTypes(in range: Range<LR35902.CartridgeLocation>,
+                                  step: ((LR35902.Instruction, LR35902.CartridgeLocation, CPUState) -> Void)? = nil)
+      -> [LR35902.CartridgeLocation: CPUState] {
     var (pc, bank) = LR35902.addressAndBank(from: range.lowerBound)
     let upperBoundPc = LR35902.addressAndBank(from: range.upperBound).address
 
@@ -247,16 +288,7 @@ extension LR35902.Disassembly {
     // TODO: Store this globally.
     var states: [LR35902.CartridgeLocation: CPUState] = [:]
 
-    let registers8: Set<LR35902.Instruction.Numeric> = Set([
-      .a,
-      .b,
-      .c,
-      .d,
-      .e,
-      .h,
-      .l,
-    ])
-
+    let registers8 = LR35902.Instruction.Numeric.registers8
     let registers16: Set<LR35902.Instruction.Numeric> = Set([
       .bc,
       .hl,
@@ -290,19 +322,7 @@ extension LR35902.Disassembly {
 
       case .ld(.ffimm8addr, let numeric) where registers8.contains(numeric):
         let address = 0xFF00 | LR35902.Address(instruction.imm8!)
-        if let global = globals[address],
-          let dataType = global.dataType,
-          let sourceLocation = state.a?.sourceLocation {
-          typeAtLocation[sourceLocation] = dataType
-        }
         state.ram[address] = state[numeric]
-
-      case .cp(_):
-        if case .variable(let address) = state.a?.value,
-          let global = globals[address],
-          let dataType = global.dataType {
-          typeAtLocation[location] = dataType
-        }
 
       case .xor(.a):
         state.a = .init(value: .value(0), sourceLocation: location)
@@ -318,12 +338,6 @@ extension LR35902.Disassembly {
         }
 
       case .and(.imm8):
-        if case .variable(let address) = state.a?.value,
-          let global = globals[address],
-          let dataType = global.dataType {
-          typeAtLocation[location] = dataType
-        }
-
         if case .value(let dst) = state.a?.value {
           state.a = .init(value: .value(dst & instruction.imm8!), sourceLocation: location)
           // TODO: Compute the flag bits.
@@ -344,6 +358,8 @@ extension LR35902.Disassembly {
         break
       }
 
+      step?(instruction, location, state)
+
       let width = LR35902.Instruction.widths[instruction.spec]!.total
 
       var thisState = state
@@ -352,5 +368,7 @@ extension LR35902.Disassembly {
 
       pc += width
     }
+
+    return states
   }
 }
