@@ -545,6 +545,12 @@ disassembly.createGlobal(at: 0xfffd, named: "hDidRenderFrame", dataType: "bool")
 
 disassembly.setSoftTerminator(at: 0x05F1, in: 0x00) // This function can't logically proceed past this point.
 
+disassembly.setData(at: 0x57E0..<(0x57E0 + 0x0010), in: 0x0c) // 0x2A37[0x00]
+disassembly.setData(at: 0x7500..<(0x7500 + 0x0040), in: 0x12) // 0x2A48[0x00]
+disassembly.setData(at: 0x7500..<(0x7500 + 0x0200), in: 0x12) // 0x2A59[0x00]
+disassembly.setData(at: 0x4000..<(0x4000 + 0x1800), in: 0x13) // 0x2A26[0x00]
+disassembly.setData(at: 0x6800..<(0x6800 + 0x0800), in: 0x13) // 0x29FA[0x00]
+
 // MARK: - Jump tables
 
 disassembleJumpTable(within: 0x04b3..<0x04F5, in: 0x00, selectedBank: 0x00)
@@ -959,6 +965,30 @@ disassembly.defineMacro(named: "copyRegion", instructions: [
   .ld(.de, .arg(3)),
   .ld(.bc, .arg(2)),
   .call(nil, .imm16),
+])
+
+disassembly.defineMacro(named: "copyRegion_", instructions: [
+  .any(.ld(.hl, .imm16)),
+  .any(.ld(.de, .imm16)),
+  .any(.ld(.bc, .imm16)),
+  .instruction(.init(spec: .jp(nil, .imm16), imm16: 0x28C5)),
+], code: [
+  .ld(.hl, .arg(1)),
+  .ld(.de, .arg(3)),
+  .ld(.bc, .arg(2)),
+  .jp(nil, .imm16),
+])
+
+disassembly.defineMacro(named: "copyRegion__", instructions: [
+  .any(.ld(.de, .imm16)),
+  .any(.ld(.hl, .imm16)),
+  .any(.ld(.bc, .imm16)),
+  .instruction(.init(spec: .jp(nil, .imm16), imm16: 0x28C5)),
+], code: [
+  .ld(.de, .arg(3)),
+  .ld(.hl, .arg(1)),
+  .ld(.bc, .arg(2)),
+  .jp(nil, .imm16),
 ])
 
 disassembly.defineMacro(named: "modifySave", instructions: [
