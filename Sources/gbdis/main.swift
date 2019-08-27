@@ -572,6 +572,7 @@ disassembleJumpTable(within: 0x7c53..<0x7c5d, in: 0x02, selectedBank: 0x02)
 disassembleJumpTable(within: 0x4976..<(0x4976 + 233 * 2), in: 0x03, selectedBank: 0x03)
 disassembleJumpTable(within: 0x5aa6..<0x5ab8, in: 0x03, selectedBank: 0x03)
 disassembleJumpTable(within: 0x5bf5..<0x5bfd, in: 0x03, selectedBank: 0x03)
+disassembleJumpTable(within: 0x5de0..<0x5de6, in: 0x03, selectedBank: 0x03)
 
 // MARK: - Entity table.
 
