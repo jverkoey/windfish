@@ -545,12 +545,40 @@ disassembly.createGlobal(at: 0xfffd, named: "hDidRenderFrame", dataType: "bool")
 
 disassembly.setSoftTerminator(at: 0x05F1, in: 0x00) // This function can't logically proceed past this point.
 
-disassembly.setData(at: 0x5000..<(0x5000 + 0x0800), in: 0x0c) // 0x2A6A[0x00]
-disassembly.setData(at: 0x57E0..<(0x57E0 + 0x0010), in: 0x0c) // 0x2A37[0x00]
-disassembly.setData(at: 0x6000..<(0x6000 + 0x0800), in: 0x12) // 0x2A7B[0x00]
-disassembly.setData(at: 0x7500..<(0x7500 + 0x0200), in: 0x12) // 0x2A59[0x00]
-disassembly.setData(at: 0x4000..<(0x4000 + 0x1800), in: 0x13) // 0x2A26[0x00]
-disassembly.setData(at: 0x6800..<(0x6800 + 0x0800), in: 0x13) // 0x29FA[0x00]
+disassembly.setData(at: 0x4000..<(0x4000 + 0x0400), in: 0x0C)
+disassembly.setData(at: 0x4000..<(0x4000 + 0x0400), in: 0x0F)
+disassembly.setData(at: 0x4000..<(0x4000 + 0x0600), in: 0x0D)
+disassembly.setData(at: 0x4000..<(0x4000 + 0x1000), in: 0x10)
+disassembly.setData(at: 0x4000..<(0x4000 + 0x1800), in: 0x13)
+disassembly.setData(at: 0x4220..<(0x4220 + 0x0020), in: 0x0C)
+disassembly.setData(at: 0x4400..<(0x4400 + 0x0500), in: 0x0F)
+disassembly.setData(at: 0x47A0..<(0x47A0 + 0x0020), in: 0x0C)
+disassembly.setData(at: 0x47C0..<(0x47C0 + 0x0040), in: 0x0C)
+disassembly.setData(at: 0x4800..<(0x4800 + 0x1000), in: 0x0C)
+disassembly.setData(at: 0x4900..<(0x4900 + 0x0700), in: 0x0F)
+disassembly.setData(at: 0x4C00..<(0x4C00 + 0x0400), in: 0x0C)
+disassembly.setData(at: 0x5000..<(0x5000 + 0x0100), in: 0x0C)
+disassembly.setData(at: 0x5000..<(0x5000 + 0x0800), in: 0x0C)
+disassembly.setData(at: 0x5000..<(0x5000 + 0x0800), in: 0x0F)
+disassembly.setData(at: 0x5200..<(0x5200 + 0x0600), in: 0x0C)
+disassembly.setData(at: 0x5400..<(0x5400 + 0x0600), in: 0x10)
+disassembly.setData(at: 0x57E0..<(0x57E0 + 0x0010), in: 0x0C)
+disassembly.setData(at: 0x5800..<(0x5800 + 0x1000), in: 0x13)
+disassembly.setData(at: 0x5919..<(0x5919 + 0x0010), in: 0x05)
+disassembly.setData(at: 0x5939..<(0x5939 + 0x0010), in: 0x05)
+disassembly.setData(at: 0x6000..<(0x6000 + 0x0600), in: 0x10)
+disassembly.setData(at: 0x6000..<(0x6000 + 0x0800), in: 0x0F)
+disassembly.setData(at: 0x6000..<(0x6000 + 0x0800), in: 0x12)
+disassembly.setData(at: 0x6600..<(0x6600 + 0x0080), in: 0x12)
+disassembly.setData(at: 0x6700..<(0x6700 + 0x0400), in: 0x10)
+disassembly.setData(at: 0x6800..<(0x6800 + 0x0400), in: 0x13)
+disassembly.setData(at: 0x6800..<(0x6800 + 0x0800), in: 0x13)
+disassembly.setData(at: 0x6800..<(0x6800 + 0x0800), in: 0x13)
+disassembly.setData(at: 0x7000..<(0x7000 + 0x0800), in: 0x13)
+disassembly.setData(at: 0x7000..<(0x7000 + 0x0800), in: 0x13)
+disassembly.setData(at: 0x7500..<(0x7500 + 0x0040), in: 0x12)
+disassembly.setData(at: 0x7500..<(0x7500 + 0x0200), in: 0x12)
+disassembly.setData(at: 0x7D31..<(0x7D31 + 0x0080), in: 0x01)
 
 // MARK: - Jump tables
 
@@ -902,9 +930,9 @@ disassembly.defineFunction(startingAt: 0x7f80, in: 0x1f, named: "SoundUnknown1")
 
 disassembly.defineMacro(named: "jumpTable", instructions: [
   .instruction(.init(spec: .rst(.x00))),
-]) { args, address, bank in
+]) /*{ args, address, bank in
   print("disassembleJumpTable(within: 0x\((address + 1).hexString)..<0x\((address + 3).hexString), in: 0x\(bank.hexString), selectedBank: 0x\(bank.hexString))")
-}
+}*/
 
 
 disassembly.defineMacro(named: "changebank", instructions: [
@@ -966,7 +994,9 @@ disassembly.defineMacro(named: "copyRegion", instructions: [
   .ld(.de, .arg(3)),
   .ld(.bc, .arg(2)),
   .call(nil, .imm16),
-])
+]) /*{ args, address, bank in
+  print("disassembly.setData(at: \(args[1]!)..<(\(args[1]!) + \(args[2]!)), in: 0x\(bank.hexString))")
+}*/
 
 disassembly.defineMacro(named: "copyRegion_", instructions: [
   .any(.ld(.hl, .imm16)),
@@ -978,7 +1008,9 @@ disassembly.defineMacro(named: "copyRegion_", instructions: [
   .ld(.de, .arg(3)),
   .ld(.bc, .arg(2)),
   .jp(nil, .imm16),
-])
+]) /*{ args, address, bank in
+  print("disassembly.setData(at: \(args[1]!)..<(\(args[1]!) + \(args[2]!)), in: 0x\(bank.hexString))")
+}*/
 
 disassembly.defineMacro(named: "copyRegion__", instructions: [
   .any(.ld(.de, .imm16)),
@@ -990,7 +1022,9 @@ disassembly.defineMacro(named: "copyRegion__", instructions: [
   .ld(.hl, .arg(1)),
   .ld(.bc, .arg(2)),
   .jp(nil, .imm16),
-])
+]) /*{ args, address, bank in
+  print("disassembly.setData(at: \(args[1]!)..<(\(args[1]!) + \(args[2]!)), in: 0x\(bank.hexString))")
+}*/
 
 disassembly.defineMacro(named: "modifySave", instructions: [
   .any(.ld(.a, .imm8)),
