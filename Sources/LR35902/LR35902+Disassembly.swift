@@ -360,6 +360,26 @@ extension LR35902 {
         .jp(.z, .arg(2)),
       ])
 
+      defineMacro(named: "ifBitsNotSet_", instructions: [
+        .any(.ld(.a, .imm16addr)),
+        .any(.and(.imm8)),
+        .any(.jr(.z, .simm8)),
+      ], code: [
+        .ld(.a, .arg(1)),
+        .and(.arg(2)),
+        .jr(.z, .arg(3)),
+      ])
+
+      defineMacro(named: "ifBitsNotSetH", instructions: [
+        .any(.ld(.a, .ffimm8addr)),
+        .any(.and(.imm8)),
+        .any(.jr(.z, .simm8)),
+      ], code: [
+        .ld(.a, .arg(1)),
+        .and(.arg(2)),
+        .jr(.z, .arg(3)),
+      ])
+
       defineMacro(named: "_if", instructions: [
         .any(.ld(.a, .imm16addr)),
         .any(.and(.a)),

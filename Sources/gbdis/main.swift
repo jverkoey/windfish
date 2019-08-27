@@ -373,6 +373,11 @@ disassembly.createDatatype(named: "DIRECTION", enumeration: [
   3: "DIRECTION_DOWN",
 ])
 
+disassembly.createDatatype(named: "ROOM_STATUS", bitmask: [
+  0x00: "ROOM_STATUS_NOT_VISITED",
+  0x80: "ROOM_STATUS_VISITED",
+])
+
 disassembly.createDatatype(named: "TRACK", enumeration: [
   0x00: "TRACK_NONE",
   0x01: "TRACK_TITLE_SCREEN",
@@ -527,6 +532,10 @@ disassembly.createGlobal(at: 0xffeb, named: "hActiveEntityType", dataType: "ENTI
 disassembly.createGlobal(at: 0xffe7, named: "hFrameCounter")
 disassembly.createGlobal(at: 0xffd1, named: "hNeedsRenderingFrame")
 disassembly.createGlobal(at: 0xfff7, named: "hMapID")
+disassembly.createGlobal(at: 0xfff8, named: "hRoomStatus", dataType: "ROOM_STATUS")
+disassembly.createGlobal(at: 0xfff9, named: "hIsSideScrolling")
+disassembly.createGlobal(at: 0xfffa, named: "hLinkRoomPosition", dataType: "decimal")
+disassembly.createGlobal(at: 0xfffb, named: "hLinkFinalRoomPosition", dataType: "decimal")
 disassembly.createGlobal(at: 0xfffd, named: "hDidRenderFrame", dataType: "bool")
 
 // MARK: - Jump tables
@@ -600,6 +609,7 @@ jp hl
 disassembly.defineFunction(startingAt: 0x2872, in: 0x00, named: "JumpTable")
 disassembly.setLabel(at: 0x03bd, in: 0x00, named: "waitForNextFrame")
 disassembly.setLabel(at: 0x038a, in: 0x00, named: "engineIsPaused")
+disassembly.setLabel(at: 0x03a4, in: 0x00, named: "checkEnginePaused")
 disassembly.defineFunction(startingAt: 0x04a1, in: 0x00, named: "LoadMapData")
 disassembly.setLabel(at: 0x04f5, in: 0x00, named: "loadMapZero")
 disassembly.setLabel(at: 0x0516, in: 0x00, named: "cleanupAndReturn")

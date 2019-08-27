@@ -113,12 +113,13 @@ extension LR35902.Disassembly {
    */
   @discardableResult
   func simulate(range: Range<LR35902.CartridgeLocation>,
+                initialState: CPUState = CPUState(),
                 step: ((LR35902.Instruction, LR35902.CartridgeLocation, CPUState) -> Void)? = nil)
     -> [LR35902.CartridgeLocation: CPUState] {
       var (pc, bank) = LR35902.addressAndBank(from: range.lowerBound)
       let upperBoundPc = LR35902.addressAndBank(from: range.upperBound).address
 
-      var state = CPUState()
+      var state = initialState
 
       // TODO: Store this globally.
       var states: [LR35902.CartridgeLocation: CPUState] = [:]
@@ -161,6 +162,19 @@ extension LR35902.Disassembly {
 
         case .xor(.a):
           state.a = .init(value: .value(0), sourceLocation: location)
+
+        case .xor(let numeric) where registers8.contains(numeric):
+          if case .value(let dst) = state.a?.value,
+            let register: CPUState.RegisterState<UInt8> = state[numeric],
+            case .value(let src) = register.value {
+            state.a = .init(value: .value(dst ^ src), sourceLocation: location)
+
+          } else if case .variable(let address) = state.a?.value,
+            case .value(let dst) = state.ram[address]?.value,
+            let register: CPUState.RegisterState<UInt8> = state[numeric],
+            case .value(let src) = register.value {
+            state.a = .init(value: .value(dst ^ src), sourceLocation: location)
+          }
 
         case .and(let numeric) where registers8.contains(numeric):
           if case .value(let dst) = state.a?.value,

@@ -43,6 +43,9 @@ extension LR35902.Disassembly {
               let global = self.globals[address],
               let dataType = global.dataType {
               self.typeAtLocation[location] = dataType
+
+            } else if self.typeAtLocation[location] == nil {
+              self.typeAtLocation[location] = "binary"
             }
 
           default:

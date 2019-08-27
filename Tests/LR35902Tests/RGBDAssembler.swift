@@ -480,4 +480,44 @@ class RGBDAssembler: XCTestCase {
       XCTAssertEqual(disassembly.instructionMap[0x0000]?.spec, spec)
     }
   }
+
+  func testBoo() {
+    let assembler = RGBDSAssembler()
+    let _ = assembler.assemble(assembly: """
+   ld   c, a                                    ; $282A (00): ReadJoypadState $4F
+   ld   a, [$ffcb]               ; $282B (00): ReadJoypadState $F0 $CB
+   xor  c                                       ; $282D (00): ReadJoypadState $A9
+   and  c                                       ; $282E (00): ReadJoypadState $A1
+   ld   [$ffcc], a                       ; $282F (00): ReadJoypadState $E0 $CC
+   ld   a, c                                    ; $2831 (00): ReadJoypadState $79
+   ld   [$ffcb], a               ; $2832 (00): ReadJoypadState $E0 $CB
+""")
+
+    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
+    disassembly.disassemble(range: 0..<LR35902.Address(assembler.buffer.count), inBank: 0x00)
+
+    var initialState = LR35902.Disassembly.CPUState()
+
+    initialState.a = LR35902.Disassembly.CPUState.RegisterState<UInt8>(value: .value(0b0000_1111), sourceLocation: 0)
+    initialState.ram[0xffcb] = .init(value: .value(0b0000_1100), sourceLocation: 0)
+
+    disassembly.simulate(range: 0..<LR35902.CartridgeLocation(assembler.buffer.count), initialState: initialState) { instruction, location, state in
+      print("\(location.hexString): \(instruction.spec)")
+      if case .value(let value) = state.a?.value {
+        print("      a: \(value.binaryString)")
+      } else if case .variable(let address) = state.a?.value,
+        case .value(let value) = state.ram[address]?.value {
+        print("      a: [$\(address.hexString)] = \(value.binaryString)")
+      }
+      if case .value(let value) = state.c?.value {
+        print("      c: \(value.binaryString)")
+      }
+      if case .value(let value) = state.ram[0xffcb]?.value {
+        print(" 0xffcb: \(value.binaryString)")
+      }
+      if case .value(let value) = state.ram[0xffcc]?.value {
+        print(" 0xffcc: \(value.binaryString)")
+      }
+    }
+  }
 }
