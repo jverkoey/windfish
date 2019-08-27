@@ -578,6 +578,12 @@ clean:
 
     print("Instructions decoded: \(instructionsDecoded)")
 
-    print("Disassembled: \(Double(knownLocations().count * 100) / Double(cpu.cartridgeSize))%")
+    let disassembledLocations = knownLocations()
+    print("Disassembled: \(Double(disassembledLocations.count * 100) / Double(cpu.cartridgeSize))%")
+    for bank in 0..<cpu.numberOfBanks {
+      let disassembledBankLocations = disassembledLocations.intersection(IndexSet(integersIn:
+        (Int(bank) * Int(LR35902.bankSize))..<(Int(bank + 1) * Int(LR35902.bankSize))))
+      print("Bank \(bank.hexString): \(Double(disassembledBankLocations.count * 100) / Double(LR35902.bankSize))%")
+    }
   }
 }
