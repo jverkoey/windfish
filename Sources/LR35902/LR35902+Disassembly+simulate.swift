@@ -160,6 +160,17 @@ extension LR35902.Disassembly {
           let address = 0xFF00 | LR35902.Address(instruction.imm8!)
           state.ram[address] = state[numeric]
 
+        case .ldi(.hladdr, .a):
+          if case .value(let dst) = state.hl?.value {
+            let srcValue: CPUState.RegisterState<UInt8>? = state.a
+            state.ram[LR35902.Address(dst)] = srcValue
+          }
+
+        case .ldi(.a, .hladdr):
+          if case .value(let dst) = state.hl?.value {
+            state.a = state.ram[LR35902.Address(dst)]
+          }
+
         case .xor(.a):
           state.a = .init(value: .value(0), sourceLocation: location)
 

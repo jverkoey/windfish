@@ -378,6 +378,11 @@ disassembly.createDatatype(named: "ROOM_STATUS", bitmask: [
   0x80: "ROOM_STATUS_VISITED",
 ])
 
+disassembly.createDatatype(named: "SCROLL_VIEW", enumeration: [
+  0: "SCROLL_VIEW_TOP",
+  2: "SCROLL_VIEW_SIDE",
+])
+
 disassembly.createDatatype(named: "TRACK", enumeration: [
   0x00: "TRACK_NONE",
   0x01: "TRACK_TITLE_SCREEN",
@@ -485,7 +490,7 @@ rstAddresses.forEach {
 
 disassembly.createGlobal(at: 0x0003, named: "DEBUG_TOOL", dataType: "bool")
 disassembly.createGlobal(at: 0xa100, named: "SAVEFILES")
-disassembly.createGlobal(at: 0xc10e, named: "wNPCTilesNeedsUpdate", dataType: "bool")
+disassembly.createGlobal(at: 0xc10e, named: "wNeedsNPCTilesUpdate", dataType: "bool")
 disassembly.createGlobal(at: 0xc124, named: "wRoomTransitionState")
 disassembly.createGlobal(at: 0xc125, named: "wRoomTransitionDirection")
 disassembly.createGlobal(at: 0xc155, named: "wScreenShakeHorizontal")
@@ -505,8 +510,8 @@ disassembly.createGlobal(at: 0xdbaf, named: "wCurrentBank")
 disassembly.createGlobal(at: 0xff80, named: "hRomBank")
 disassembly.createGlobal(at: 0xff81, named: "hTemp")
 disassembly.createGlobal(at: 0xff82, named: "hCodeTemp")
-disassembly.createGlobal(at: 0xff90, named: "hBGTilesNeedsUpdate", dataType: "bool")
-disassembly.createGlobal(at: 0xff91, named: "hEnemyTilesNeedsUpdate", dataType: "bool")
+disassembly.createGlobal(at: 0xff90, named: "hNeedsBGTilesUpdate", dataType: "bool")
+disassembly.createGlobal(at: 0xff91, named: "hNeedsEnemyTilesUpdate", dataType: "bool")
 disassembly.createGlobal(at: 0xff96, named: "hBaseScrollX", dataType: "decimal")
 disassembly.createGlobal(at: 0xff97, named: "hBaseScrollY", dataType: "decimal")
 disassembly.createGlobal(at: 0xff98, named: "hLinkX", dataType: "decimal")
@@ -533,7 +538,7 @@ disassembly.createGlobal(at: 0xffe7, named: "hFrameCounter")
 disassembly.createGlobal(at: 0xffd1, named: "hNeedsRenderingFrame")
 disassembly.createGlobal(at: 0xfff7, named: "hMapID")
 disassembly.createGlobal(at: 0xfff8, named: "hRoomStatus", dataType: "ROOM_STATUS")
-disassembly.createGlobal(at: 0xfff9, named: "hIsSideScrolling")
+disassembly.createGlobal(at: 0xfff9, named: "hIsSideScrolling", dataType: "SCROLL_VIEW")
 disassembly.createGlobal(at: 0xfffa, named: "hLinkRoomPosition", dataType: "decimal")
 disassembly.createGlobal(at: 0xfffb, named: "hLinkFinalRoomPosition", dataType: "decimal")
 disassembly.createGlobal(at: 0xfffd, named: "hDidRenderFrame", dataType: "bool")
