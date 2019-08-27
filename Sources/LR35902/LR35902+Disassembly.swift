@@ -775,6 +775,10 @@ extension LR35902 {
       }
       return Set(intersectingScopes.keys)
     }
+    public func setSoftTerminator(at pc: Address, in bank: Bank) {
+      softTerminators[cartAddress(for: pc, in: bank)!] = true
+    }
+    var softTerminators: [LR35902.CartridgeLocation: Bool] = [:]
 
     public func contiguousScopes(at pc: Address, in bank: Bank) -> Set<Range<CartridgeLocation>> {
       guard let cartAddress = cartAddress(for: pc, in: bank) else {
@@ -1050,6 +1054,10 @@ extension LR35902 {
 
         var previousInstruction: Instruction? = nil
         linear_sweep: while !run.hasReachedEnd(with: cpu) && cpu.pcIsValid() {
+          let location = LR35902.cartAddress(for: cpu.pc, in: cpu.bank)!
+          if softTerminators[location] != nil {
+            break
+          }
           if data.contains(Int(LR35902.cartAddress(for: cpu.pc, in: cpu.bank)!))
            || text.contains(Int(LR35902.cartAddress(for: cpu.pc, in: cpu.bank)!)) {
             advance(1)
