@@ -606,7 +606,8 @@ disassembly.setData(at: 0x7D31..<(0x7D31 + 0x0080), in: 0x01)
 // MARK: - Jump tables
 
 disassembleJumpTable(within: 0x04b3..<0x04F5, in: 0x00, selectedBank: 0x00)
-disassembleJumpTable(within: 0x1b6e..<0x1b90, in: 0x00, selectedBank: 0x00)
+disassembleJumpTable(within: 0x1b6e..<0x1b90, in: 0x00, selectedBank: 0x00,
+                     functionNames: disassembly.valuesForDatatype(named: "ANIMATED_TILES")!)
 
 disassembleJumpTable(within: 0x0ad2..<0x0aea, in: 0x00, selectedBank: 0x00)
 disassembleJumpTable(within: 0x215f..<0x217d, in: 0x00, selectedBank: 0x00)
