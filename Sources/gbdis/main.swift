@@ -67,7 +67,7 @@ func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902
       }
       let name: String
       if let functionName = functionNames?[index] {
-        name = functionName
+        name = "JumpTable_\(functionName)"
       } else {
         name = "JumpTable_\(address.hexString)_\(effectiveBank.hexString)"
       }
@@ -383,6 +383,27 @@ disassembly.createDatatype(named: "SCROLL_VIEW", enumeration: [
   2: "SCROLL_VIEW_SIDE",
 ])
 
+disassembly.createDatatype(named: "ANIMATED_TILES", enumeration: [
+  0x00: "ANIMATED_TILES_NONE",
+  0x01: "ANIMATED_TILES_COUNTER",
+  0x02: "ANIMATED_TILES_TIDE",
+  0x03: "ANIMATED_TILES_VILLAGE",
+  0x04: "ANIMATED_TILES_DUNGEON_1",
+  0x05: "ANIMATED_TILES_UNDERGROUND",
+  0x06: "ANIMATED_TILES_LAVA",
+  0x07: "ANIMATED_TILES_DUNGEON_2",
+  0x08: "ANIMATED_TILES_WARP_TILE",
+  0x09: "ANIMATED_TILES_CURRENTS",
+  0x0A: "ANIMATED_TILES_WATERFALL",
+  0x0B: "ANIMATED_TILES_WATERFALL_SLOW",
+  0x0C: "ANIMATED_TILES_WATER_DUNGEON",
+  0x0D: "ANIMATED_TILES_LIGHT_BEAM",
+  0x0E: "ANIMATED_TILES_CRYSTAL_BLOCK",
+  0x0F: "ANIMATED_TILES_BUBBLES",
+  0x10: "ANIMATED_TILES_WEATHER_VANE",
+  0x11: "ANIMATED_TILES_PHOTO",
+])
+
 disassembly.createDatatype(named: "TRACK", enumeration: [
   0x00: "TRACK_NONE",
   0x01: "TRACK_TITLE_SCREEN",
@@ -507,6 +528,7 @@ disassembly.createGlobal(at: 0xd6ff, named: "wBGMapToLoad")
 disassembly.createGlobal(at: 0xdb95, named: "wGameMode", dataType: "GAMEMODE")
 disassembly.createGlobal(at: 0xdb96, named: "wGameSubMode")
 disassembly.createGlobal(at: 0xdbaf, named: "wCurrentBank")
+
 disassembly.createGlobal(at: 0xff80, named: "hRomBank")
 disassembly.createGlobal(at: 0xff81, named: "hTemp")
 disassembly.createGlobal(at: 0xff82, named: "hCodeTemp")
@@ -522,6 +544,7 @@ disassembly.createGlobal(at: 0xff9d, named: "hLinkAnimationState")
 disassembly.createGlobal(at: 0xff9e, named: "hLinkDirection", dataType: "DIRECTION")
 disassembly.createGlobal(at: 0xff9f, named: "hLinkXFinal", dataType: "decimal")
 disassembly.createGlobal(at: 0xffa0, named: "hLinkYFinal", dataType: "decimal")
+disassembly.createGlobal(at: 0xffa4, named: "hAnimatedTilesGroup", dataType: "ANIMATED_TILES")
 disassembly.createGlobal(at: 0xffa9, named: "hWindowY")
 disassembly.createGlobal(at: 0xffaa, named: "hWindowX")
 disassembly.createGlobal(at: 0xffb0, named: "hMusicTrack", dataType: "TRACK")
@@ -814,7 +837,6 @@ disassembleJumpTable(within: 0x76A8..<0x76AA, in: 0x19, selectedBank: 0x19)
 // MARK: - Entity table.
 
 var entityJumpTableBanks: [UInt8: LR35902.Bank] = [:]
-var jumpTableFunctions: [UInt8: String] = [:]
 for (value, name) in disassembly.valuesForDatatype(named: "ENTITY")! {
   let address = 0x4000 + LR35902.Address(value)
   disassembly.setLabel(at: address, in: 0x03, named: "\(name)_bank")
@@ -823,12 +845,13 @@ for (value, name) in disassembly.valuesForDatatype(named: "ENTITY")! {
   let entityBankLocation = LR35902.cartAddress(for: address, in: 0x03)!
   let bank = data[Int(entityBankLocation)]
   entityJumpTableBanks[value] = bank
-  jumpTableFunctions[value] = "JumpTable_\(name)"
 }
 
 disassembly.register(bankChange: 0x03, at: 0x3945, in: 0x00)
 disassembly.register(bankChange: 0x00, at: 0x3951, in: 0x00)
-disassembleJumpTable(within: 0x3953..<(0x3953 + 0xFF * 2), in: 0x00, bankTable: entityJumpTableBanks, functionNames: jumpTableFunctions)
+disassembleJumpTable(within: 0x3953..<(0x3953 + 0xFF * 2), in: 0x00,
+                     bankTable: entityJumpTableBanks,
+                     functionNames: disassembly.valuesForDatatype(named: "ENTITY")!)
 
 disassembly.disassembleAsGameboyCartridge()
 
