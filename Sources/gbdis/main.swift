@@ -603,6 +603,20 @@ disassembly.createDatatype(named: "ENTITY_STATE", enumeration: [
   8: "ENTITY_STATE_THROWN",
 ])
 
+disassembly.createDatatype(named: "LINK_MOTION", enumeration: [
+  0x00: "LINK_MOTION_INTERACTIVE",
+  0x01: "LINK_MOTION_FALLING_UP",
+  0x02: "LINK_MOTION_JUMPING",
+  0x03: "LINK_MOTION_MAP_FADE_OUT",
+  0x04: "LINK_MOTION_MAP_FADE_IN",
+  0x05: "LINK_MOTION_REVOLVING_DOOR",
+  0x06: "LINK_MOTION_FALLING_DOWN",
+  0x07: "LINK_MOTION_PASS_OUT",
+  0x08: "LINK_MOTION_RECOVER",
+  0x09: "LINK_MOTION_TELEPORT",
+  0x0F: "LINK_MOTION_UNKNOWN",
+])
+
 disassembly.mapCharacter(0x5e, to: "'")
 disassembly.mapCharacter(0xd9, to: "<flower>")
 disassembly.mapCharacter(0xe1, to: "<ribbon>")
@@ -653,6 +667,8 @@ disassembly.createGlobal(at: 0xc106, named: "wIntroBGYOffset", dataType: "decima
 disassembly.createGlobal(at: 0xc108, named: "wNameIndex", dataType: "decimal")
 disassembly.createGlobal(at: 0xc10b, named: "wMusicTrackTiming", dataType: "MUSIC_TIMING")
 disassembly.createGlobal(at: 0xc10e, named: "wNeedsNPCTilesUpdate", dataType: "bool")
+disassembly.createGlobal(at: 0xc114, named: "wNoiseSfxSeaWavesCounter")
+disassembly.createGlobal(at: 0xc11c, named: "wLinkMotionState", dataType: "LINK_MOTION")
 disassembly.createGlobal(at: 0xc124, named: "wRoomTransitionState")
 disassembly.createGlobal(at: 0xc125, named: "wRoomTransitionDirection")
 disassembly.createGlobal(at: 0xc155, named: "wScreenShakeHorizontal")
