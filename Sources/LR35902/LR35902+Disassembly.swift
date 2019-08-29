@@ -10,6 +10,37 @@ extension LR35902 {
     public init(rom: Data) {
       cpu = LR35902(cartridge: rom)
 
+      createDatatype(named: "HW_COLORGAMEBOY", enumeration: [
+        0x00: "not_color_gameboy",
+        0x80: "is_color_gameboy",
+      ])
+      createDatatype(named: "HW_SUPERGAMEBOY", enumeration: [
+        0x00: "not_super_gameboy",
+        0x80: "is_super_gameboy",
+      ])
+      createDatatype(named: "HW_ROMSIZE", enumeration: [
+        0: "romsize_2banks",
+        1: "romsize_4banks",
+        2: "romsize_8banks",
+        3: "romsize_16banks",
+        4: "romsize_32banks",
+        5: "romsize_64banks",
+        6: "romsize_128banks",
+        0x52: "romsize_72banks",
+        0x53: "romsize_80banks",
+        0x54: "romsize_96banks",
+      ])
+      createDatatype(named: "HW_RAMSIZE", enumeration: [
+        0: "ramsize_none",
+        1: "ramsize_1bank",
+        2: "ramsize_1bank_",
+        3: "ramsize_4banks",
+        4: "ramsize_16banks",
+      ])
+      createDatatype(named: "HW_DESTINATIONCODE", enumeration: [
+        0: "destination_japanese",
+        1: "destination_nonjapanese",
+      ])
       createDatatype(named: "LCDCF", bitmask: [
         0b0000_0000: "LCDCF_OFF",
         0b1000_0000: "LCDCF_ON",
@@ -84,26 +115,19 @@ extension LR35902 {
       setLabel(at: 0x0134, in: 0x00, named: "HeaderTitle")
       setText(at: 0x0134..<0x0143, in: 0x00)
 
-      setLabel(at: 0x0143, in: 0x00, named: "HeaderIsColorGB")
-      setData(at: 0x0143, in: 0x00)
+      createGlobal(at: 0x0143, named: "HeaderIsColorGB", dataType: "HW_COLORGAMEBOY")
 
       setLabel(at: 0x0144, in: 0x00, named: "HeaderNewLicenseeCode")
       setData(at: 0x0144..<0x0146, in: 0x00)
 
-      setLabel(at: 0x0146, in: 0x00, named: "HeaderSGBFlag")
-      setData(at: 0x0146, in: 0x00)
+      createGlobal(at: 0x0146, named: "HeaderSGBFlag", dataType: "HW_SUPERGAMEBOY")
 
       setLabel(at: 0x0147, in: 0x00, named: "HeaderCartridgeType")
       setData(at: 0x0147, in: 0x00)
 
-      setLabel(at: 0x0148, in: 0x00, named: "HeaderROMSize")
-      setData(at: 0x0148, in: 0x00)
-
-      setLabel(at: 0x0149, in: 0x00, named: "HeaderRAMSize")
-      setData(at: 0x0149, in: 0x00)
-
-      setLabel(at: 0x014A, in: 0x00, named: "HeaderDestinationCode")
-      setData(at: 0x014A, in: 0x00)
+      createGlobal(at: 0x0148, named: "HeaderROMSize", dataType: "HW_ROMSIZE")
+      createGlobal(at: 0x0149, named: "HeaderRAMSize", dataType: "HW_RAMSIZE")
+      createGlobal(at: 0x014A, named: "HeaderDestinationCode", dataType: "HW_DESTINATIONCODE")
 
       setLabel(at: 0x014B, in: 0x00, named: "HeaderOldLicenseeCode")
       setData(at: 0x014B, in: 0x00)
