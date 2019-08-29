@@ -404,6 +404,92 @@ disassembly.createDatatype(named: "ANIMATED_TILES", enumeration: [
   0x11: "ANIMATED_TILES_PHOTO",
 ])
 
+disassembly.createDatatype(named: "JINGLE", enumeration: [
+  0x01: "JINGLE_TREASURE_FOUND",
+  0x02: "JINGLE_PUZZLE_SOLVED",
+  0x03: "JINGLE_BOW_WOW_CHOMP",
+  0x04: "JINGLE_CHARGING_SWORD",
+  0x05: "JINGLE_POWDER",
+  0x06: "JINGlE_ENNEMY_MORPH_IN",
+  0x07: "JINGLE_SWORD_POKING",
+  0x08: "JINGLE_JUMP_DOWN",
+  0x09: "JINGLE_BUMP",
+  0x0A: "JINGLE_MOVE_SELECTION",
+  0x0B: "JINGLE_HUGE_BUMP",
+  0x0C: "JINGLE_REVOLVING_DOOR",
+  0x0D: "JINGLE_FEATHER_JUMP",
+  0x0E: "JINGLE_WATER_DIVE",
+  0x11: "JINGLE_OPEN_INVENTORY",
+  0x12: "JINGLE_CLOSE_INVENTORY",
+  0x13: "JINGLE_VALIDATE",
+  0x14: "JINGLE_GOT_HEART",
+  0x15: "JINGLE_DIALOG_BREAK",
+  0x17: "JINGLE_GOT_POWER_UP",
+  0x18: "JINGLE_ITEM_FALLING",
+  0x19: "JINGLE_NEW_HEART",
+  0x1D: "JINGLE_WRONG_ANSWER",
+  0x1E: "JINGLE_FOREST_LOST",
+  0x1F: "JINGLE_ENNEMY_MORPH_OUT",
+  0x20: "JINGLE_BIG_BUMP",
+  0x21: "JINGLE_SEAGULL",
+  0x23: "JINGLE_DUNGEON_OPENED",
+  0x24: "JINGLE_JUMP",
+  0x2B: "JINGLE_INSTRUMENT_WARP",
+  0x2C: "JINGLE_MANBO_WARP",
+  0x3C: "JINGLE_ENNEMY_SHRIEK",
+])
+
+disassembly.createDatatype(named: "WAVE", enumeration: [
+  0x01: "WAVE_SFX_SEASHELL",
+  0x02: "WAVE_SFX_ZIP",
+  0x03: "WAVE_SFX_LINK_HURT",
+  0x04: "WAVE_SFX_LOW_HEARTS",
+  0x05: "WAVE_SFX_RUPEE",
+  0x06: "WAVE_SFX_HEART_PICKED_UP",
+  0x07: "WAVE_SFX_BOSS_GRAWL",
+  0x08: "WAVE_SFX_LINK_DIES",
+  0x09: "WAVE_SFX_OCARINA_BALLAD",
+  0x0A: "WAVE_SFX_OCARINA_FROG",
+  0x0B: "WAVE_SFX_OCARINA_MAMBO",
+  0x0C: "WAVE_SFX_LINK_FALLS",
+  0x0F: "WAVE_SFX_TYPEWRITER",
+  0x10: "WAVE_SFX_BOSS_AGONY",
+  0x13: "WAVE_SFX_CUCOO_HURT",
+  0x15: "WAVE_SFX_OCARINA_UNUSED",
+  0x16: "WAVE_SFX_BOSS_HIT",
+  0x18: "WAVE_SFX_CHAIN_CHOMP",
+  0x19: "WAVE_SFX_HOOT",
+  0x1B: "WAVE_SFX_COMPASS",
+])
+
+disassembly.createDatatype(named: "NOISE", enumeration: [
+  0x02: "NOISE_SFX_SWORD_A",
+  0x03: "NOISE_SFX_SPIN_ATTACK",
+  0x04: "NOISE_SFX_DOOR_UNLOCKED",
+  0x05: "NOISE_SFX_RUPEE",
+  0x06: "NOISE_SFX_STAIRS",
+  0x07: "NOISE_SFX_FOOTSTEP",
+  0x09: "NOISE_SFX_POT_SMASHED",
+  0x0A: "NOISE_SFX_SHOOT_ARROW",
+  0x0C: "NOISE_SFX_BOMB_EXPLOSION",
+  0x0D: "NOISE_SFX_MAGIC_ROD",
+  0x0E: "NOISE_SFX_SHOWEL_DIG",
+  0x0F: "NOISE_SFX_SEA_WAVES",
+  0x10: "NOISE_SFX_DOOR_CLOSED",
+  0x11: "NOISE_SFX_BLOCK_RUMBLE",
+  0x13: "NOISE_SFX_ENEMY_DESTROYED",
+  0x14: "NOISE_SFX_SWORD_B",
+  0x15: "NOISE_SFX_SWORD_C",
+  0x16: "NOISE_SFX_DRAW_SHIELD",
+  0x18: "NOISE_SFX_SWORD_D",
+  0x19: "NOISE_SFX_TITLE_APPEARS",
+  0x2A: "NOISE_SFX_DOOR_RUMBLE",
+  0x2B: "NOISE_SFX_ROCK_RUMBLE",
+  0x30: "NOISE_SFX_EAGLE_TOUCHDOWN",
+  0x31: "NOISE_SFX_EAGLE_LIFT_UP",
+
+])
+
 disassembly.createDatatype(named: "TRACK", enumeration: [
   0x00: "TRACK_NONE",
   0x01: "TRACK_TITLE_SCREEN",
@@ -579,9 +665,9 @@ disassembly.createGlobal(at: 0xffeb, named: "hActiveEntityType", dataType: "ENTI
 disassembly.createGlobal(at: 0xffec, named: "wActiveEntityPosY", dataType: "decimal")
 disassembly.createGlobal(at: 0xffee, named: "wActiveEntityPosX", dataType: "decimal")
 disassembly.createGlobal(at: 0xfff0, named: "hActiveEntityWalking", dataType: "bool")
-disassembly.createGlobal(at: 0xfff2, named: "hJingle")
-disassembly.createGlobal(at: 0xfff3, named: "hWaveSfx")
-disassembly.createGlobal(at: 0xfff4, named: "hNoiseSfx")
+disassembly.createGlobal(at: 0xfff2, named: "hJingle", dataType: "JINGLE")
+disassembly.createGlobal(at: 0xfff3, named: "hWaveSfx", dataType: "WAVE")
+disassembly.createGlobal(at: 0xfff4, named: "hNoiseSfx", dataType: "NOISE")
 disassembly.createGlobal(at: 0xfff6, named: "hMapRoom")
 disassembly.createGlobal(at: 0xfff7, named: "hMapID")
 disassembly.createGlobal(at: 0xfff8, named: "hRoomStatus", dataType: "ROOM_STATUS")
