@@ -633,6 +633,13 @@ disassembly.createDatatype(named: "ROOM_TRANSITION", enumeration: [
   5: "ROOM_TRANSITION_SECOND_HALF",
 ])
 
+disassembly.createDatatype(named: "ROOM_TRANSITION_DIRECTION", enumeration: [
+  0: "ROOM_TRANSITION_DIR_RIGHT",
+  1: "ROOM_TRANSITION_DIR_LEFT",
+  2: "ROOM_TRANSITION_DIR_TOP",
+  3: "ROOM_TRANSITION_DIR_BOTTOM",
+])
+
 disassembly.mapCharacter(0x5e, to: "'")
 disassembly.mapCharacter(0xd9, to: "<flower>")
 disassembly.mapCharacter(0xe1, to: "<ribbon>")
@@ -690,10 +697,10 @@ disassembly.createGlobal(at: 0xc121, named: "wUsingSpinAttack", dataType: "bool"
 disassembly.createGlobal(at: 0xc122, named: "wSwordCharge", dataType: "decimal")
 disassembly.createGlobal(at: 0xc123, named: "wLinkWalkingFrameCount", dataType: "decimal")
 disassembly.createGlobal(at: 0xc124, named: "wRoomTransitionState", dataType: "ROOM_TRANSITION")
-disassembly.createGlobal(at: 0xc125, named: "wRoomTransitionDirection")
-disassembly.createGlobal(at: 0xc155, named: "wScreenShakeHorizontal")
-disassembly.createGlobal(at: 0xc156, named: "wScreenShakeVertical")
-disassembly.createGlobal(at: 0xc1bf, named: "wScrollXOffset")
+disassembly.createGlobal(at: 0xc125, named: "wRoomTransitionDirection", dataType: "ROOM_TRANSITION_DIRECTION")
+disassembly.createGlobal(at: 0xc155, named: "wScreenShakeHorizontal", dataType: "decimal")
+disassembly.createGlobal(at: 0xc156, named: "wScreenShakeVertical", dataType: "decimal")
+disassembly.createGlobal(at: 0xc1bf, named: "wScrollXOffset", dataType: "decimal")
 disassembly.createGlobal(at: 0xc280, named: "wEntitiesStateTable", dataType: "ENTITY_STATE")
 (0xc281...0xC28F).forEach {
   disassembly.createGlobal(at: $0, named: "wEntity\(UInt8($0 - 0xc280).hexString)State", dataType: "ENTITY_STATE")
