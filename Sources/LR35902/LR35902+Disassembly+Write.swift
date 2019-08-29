@@ -177,6 +177,16 @@ clean:
       gameHandle.write("INCLUDE \"variables.asm\"\n".data(using: .utf8)!)
     }
 
+    if !characterMap.isEmpty {
+      let charmapHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("charmap.asm").path)
+
+      charmapHandle.write(characterMap.sorted { $0.key < $1.key }.map { value, string in
+        "charmap \"\(string)\", $\(value.hexString)"
+      }.joined(separator: "\n").data(using: .utf8)!)
+
+      gameHandle.write("INCLUDE \"charmap.asm\"\n".data(using: .utf8)!)
+    }
+
     var instructionsToDecode = Int.max
     var instructionsDecoded = 0
 
@@ -531,7 +541,7 @@ clean:
           case .text:
             let lineLength = lineLengthOfText(at: initialPc, in: bank) ?? 254
             for chunk in accumulator.chunked(into: lineLength) {
-              write(line(RGBDSAssembly.text(for: chunk), address: chunkPc, addressType: "text"), fileHandle: fileHandle)
+              write(line(RGBDSAssembly.text(for: chunk, characterMap: characterMap), address: chunkPc, addressType: "text"), fileHandle: fileHandle)
               chunkPc += LR35902.Address(chunk.count)
             }
           case .jumpTable:

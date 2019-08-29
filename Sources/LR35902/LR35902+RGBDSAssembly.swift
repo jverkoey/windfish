@@ -43,22 +43,32 @@ public final class RGBDSAssembly {
     return "\(opcode) \(value)"
   }
 
-  public static func text(for bytes: [UInt8]) -> String {
+  private static func flatten(asciiCodes: [UInt8], characterMap: [UInt8: String]) -> String {
+    return asciiCodes.map {
+      if let string = characterMap[$0] {
+        return string
+      } else {
+        return String(bytes: [$0], encoding: .ascii)!
+      }
+    }.joined()
+  }
+
+  public static func text(for bytes: [UInt8], characterMap: [UInt8: String]) -> String {
     var accumulator: [String] = []
     var asciiCharacterAccumulator: [UInt8] = []
     for byte in bytes {
-      if byte >= 32 && byte <= 126 {
+      if (byte >= 32 && byte <= 126) || characterMap[byte] != nil {
         asciiCharacterAccumulator.append(byte)
       } else {
         if asciiCharacterAccumulator.count > 0 {
-          accumulator.append("\"\(String(bytes: asciiCharacterAccumulator, encoding: .ascii)!)\"")
+          accumulator.append("\"\(flatten(asciiCodes: asciiCharacterAccumulator, characterMap: characterMap))\"")
           asciiCharacterAccumulator.removeAll()
         }
         accumulator.append("$\(byte.hexString)")
       }
     }
     if asciiCharacterAccumulator.count > 0 {
-      accumulator.append("\"\(String(bytes: asciiCharacterAccumulator, encoding: .ascii)!)\"")
+      accumulator.append("\"\(flatten(asciiCodes: asciiCharacterAccumulator, characterMap: characterMap))\"")
     }
     let opcode = "db".padding(toLength: maxOpcodeNameLength, withPad: " ", startingAt: 0)
     let operand = accumulator.joined(separator: ", ")

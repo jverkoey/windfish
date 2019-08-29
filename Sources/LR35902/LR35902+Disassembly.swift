@@ -745,6 +745,11 @@ extension LR35902 {
     }
     private var textLengths: [Range<CartridgeLocation>: Int] = [:]
 
+    public func mapCharacter(_ character: UInt8, to string: String) {
+      characterMap[character] = string
+    }
+    var characterMap: [UInt8: String] = [:]
+
     // MARK: - Bank changes
 
     func bankChange(at pc: Address, in bank: Bank) -> Bank? {

@@ -591,7 +591,35 @@ disassembly.createDatatype(named: "MUSIC_TIMING", enumeration: [
   2: "MUSIC_TIMING_HALF",
 ])
 
-disassembly.setData(at: 0x0004..<0x0008, in: 0x00)
+disassembly.mapCharacter(0x5e, to: "'")
+disassembly.mapCharacter(0xd9, to: "<flower>")
+disassembly.mapCharacter(0xe1, to: "<ribbon>")
+disassembly.mapCharacter(0xda, to: "<footprint>")
+disassembly.mapCharacter(0xdc, to: "<skull>")
+disassembly.mapCharacter(0xdd, to: "<link>")
+disassembly.mapCharacter(0xde, to: "<marin>")
+disassembly.mapCharacter(0xdf, to: "<tarin>")
+disassembly.mapCharacter(0xe0, to: "<yoshi>")
+disassembly.mapCharacter(0xe1, to: "<ribbon>")
+disassembly.mapCharacter(0xe2, to: "<dogfood>")
+disassembly.mapCharacter(0xe3, to: "<bananas>")
+disassembly.mapCharacter(0xe4, to: "<stick>")
+disassembly.mapCharacter(0xe5, to: "<honeycomb>")
+disassembly.mapCharacter(0xe6, to: "<pineapple>")
+disassembly.mapCharacter(0xe7, to: "<flower2>")
+disassembly.mapCharacter(0xe8, to: "<broom>")
+disassembly.mapCharacter(0xe9, to: "<fishhook>")
+disassembly.mapCharacter(0xea, to: "<bra>")
+disassembly.mapCharacter(0xeb, to: "<scale>")
+disassembly.mapCharacter(0xec, to: "<glass>")
+disassembly.mapCharacter(0xed, to: "<letter>")
+disassembly.mapCharacter(0xee, to: "<dpad>")
+disassembly.mapCharacter(0xf0, to: "<up>")
+disassembly.mapCharacter(0xf1, to: "<down>")
+disassembly.mapCharacter(0xf2, to: "<left>")
+disassembly.mapCharacter(0xf3, to: "<right>")
+disassembly.mapCharacter(0xfe, to: "<ask>")
+disassembly.mapCharacter(0xff, to: "@")
 
 let numberOfRestartAddresses: LR35902.Address = 8
 let restartSize: LR35902.Address = 8
@@ -601,7 +629,10 @@ rstAddresses.forEach {
 }
 
 
-disassembly.createGlobal(at: 0x0003, named: "DEBUG_TOOL", dataType: "bool")
+disassembly.createGlobal(at: 0x0003, named: "DEBUG_TOOL1", dataType: "bool")
+disassembly.createGlobal(at: 0x0004, named: "DEBUG_TOOL2", dataType: "bool")
+disassembly.createGlobal(at: 0x0005, named: "DEBUG_TOOL3", dataType: "bool")
+disassembly.setData(at: 0x0006..<0x0008, in: 0x00)
 disassembly.createGlobal(at: 0xa100, named: "SAVEFILES")
 
 disassembly.createGlobal(at: 0xc100, named: "wScrollXOffsetForSection", dataType: "decimal")
