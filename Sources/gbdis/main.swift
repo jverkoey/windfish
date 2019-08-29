@@ -677,6 +677,8 @@ disassembly.createGlobal(at: 0xc10e, named: "wNeedsNPCTilesUpdate", dataType: "b
 disassembly.createGlobal(at: 0xc114, named: "wNoiseSfxSeaWavesCounter")
 disassembly.createGlobal(at: 0xc11c, named: "wLinkMotionState", dataType: "LINK_MOTION")
 disassembly.createGlobal(at: 0xc11f, named: "wLinkGroundStatus", dataType: "LINK_GROUND_STATUS")
+disassembly.createGlobal(at: 0xc121, named: "wUsingSpinAttack", dataType: "bool")
+disassembly.createGlobal(at: 0xc122, named: "wSwordCharge", dataType: "decimal")
 disassembly.createGlobal(at: 0xc124, named: "wRoomTransitionState")
 disassembly.createGlobal(at: 0xc125, named: "wRoomTransitionDirection")
 disassembly.createGlobal(at: 0xc155, named: "wScreenShakeHorizontal")
