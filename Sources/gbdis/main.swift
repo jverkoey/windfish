@@ -545,6 +545,8 @@ disassembly.createGlobal(at: 0xff9e, named: "hLinkDirection", dataType: "DIRECTI
 disassembly.createGlobal(at: 0xff9f, named: "hLinkXFinal", dataType: "decimal")
 disassembly.createGlobal(at: 0xffa0, named: "hLinkYFinal", dataType: "decimal")
 disassembly.createGlobal(at: 0xffa4, named: "hAnimatedTilesGroup", dataType: "ANIMATED_TILES")
+disassembly.createGlobal(at: 0xffa6, named: "hAnimatedTilesFrameCount", dataType: "decimal")
+disassembly.createGlobal(at: 0xffa7, named: "hAnimatedTilesDataOffset")
 disassembly.createGlobal(at: 0xffa9, named: "hWindowY")
 disassembly.createGlobal(at: 0xffaa, named: "hWindowX")
 disassembly.createGlobal(at: 0xffb0, named: "hMusicTrack", dataType: "TRACK")

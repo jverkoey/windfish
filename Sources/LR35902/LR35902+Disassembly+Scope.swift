@@ -41,7 +41,9 @@ extension LR35902.Disassembly {
           case .and(.imm8):
             if case .variable(let address) = state.a?.value,
               let global = self.globals[address],
-              let dataType = global.dataType {
+              let dataType = global.dataType,
+              let type = self.dataTypes[dataType],
+              (!type.namedValues.isEmpty || type.representation == .hexadecimal) {
               self.typeAtLocation[location] = dataType
 
             } else if self.typeAtLocation[location] == nil {
