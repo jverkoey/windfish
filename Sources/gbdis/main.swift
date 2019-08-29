@@ -591,6 +591,18 @@ disassembly.createDatatype(named: "MUSIC_TIMING", enumeration: [
   2: "MUSIC_TIMING_HALF",
 ])
 
+disassembly.createDatatype(named: "ENTITY_STATE", enumeration: [
+  0: "ENTITY_STATE_DISABLED",
+  1: "ENTITY_STATE_DYING",
+  2: "ENTITY_STATE_FALLING",
+  3: "ENTITY_STATE_DESTROYING",
+  4: "ENTITY_STATE_INIT",
+  5: "ENTITY_STATE_ACTIVE",
+  6: "ENTITY_STATE_STUNNED",
+  7: "ENTITY_STATE_LIFTED",
+  8: "ENTITY_STATE_THROWN",
+])
+
 disassembly.mapCharacter(0x5e, to: "'")
 disassembly.mapCharacter(0xd9, to: "<flower>")
 disassembly.mapCharacter(0xe1, to: "<ribbon>")
@@ -646,6 +658,10 @@ disassembly.createGlobal(at: 0xc125, named: "wRoomTransitionDirection")
 disassembly.createGlobal(at: 0xc155, named: "wScreenShakeHorizontal")
 disassembly.createGlobal(at: 0xc156, named: "wScreenShakeVertical")
 disassembly.createGlobal(at: 0xc1bf, named: "wScrollXOffset")
+disassembly.createGlobal(at: 0xc280, named: "wEntitiesStateTable", dataType: "ENTITY_STATE")
+(0xc281...0xC28F).forEach {
+  disassembly.createGlobal(at: $0, named: "wEntity\(UInt8($0 - 0xc280).hexString)State", dataType: "ENTITY_STATE")
+}
 disassembly.createGlobal(at: 0xc500, named: "wAlternateBackgroundEnabled")
 disassembly.createGlobal(at: 0xd369, named: "wAudioData")
 disassembly.createGlobal(at: 0xd379, named: "wAudioSelection")
