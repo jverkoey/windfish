@@ -624,6 +624,15 @@ disassembly.createDatatype(named: "LINK_GROUND_STATUS", enumeration: [
   7: "LINK_GROUND_PIT",
 ])
 
+disassembly.createDatatype(named: "ROOM_TRANSITION", enumeration: [
+  0: "ROOM_TRANSITION_NONE",
+  1: "ROOM_TRANSITION_LOAD_ROOM",
+  2: "ROOM_TRANSITION_LOAD_SPRITES",
+  3: "ROOM_TRANSITION_CONFIGURE_SCROLL",
+  4: "ROOM_TRANSITION_FIRST_HALF",
+  5: "ROOM_TRANSITION_SECOND_HALF",
+])
+
 disassembly.mapCharacter(0x5e, to: "'")
 disassembly.mapCharacter(0xd9, to: "<flower>")
 disassembly.mapCharacter(0xe1, to: "<ribbon>")
@@ -679,7 +688,8 @@ disassembly.createGlobal(at: 0xc11c, named: "wLinkMotionState", dataType: "LINK_
 disassembly.createGlobal(at: 0xc11f, named: "wLinkGroundStatus", dataType: "LINK_GROUND_STATUS")
 disassembly.createGlobal(at: 0xc121, named: "wUsingSpinAttack", dataType: "bool")
 disassembly.createGlobal(at: 0xc122, named: "wSwordCharge", dataType: "decimal")
-disassembly.createGlobal(at: 0xc124, named: "wRoomTransitionState")
+disassembly.createGlobal(at: 0xc123, named: "wLinkWalkingFrameCount", dataType: "decimal")
+disassembly.createGlobal(at: 0xc124, named: "wRoomTransitionState", dataType: "ROOM_TRANSITION")
 disassembly.createGlobal(at: 0xc125, named: "wRoomTransitionDirection")
 disassembly.createGlobal(at: 0xc155, named: "wScreenShakeHorizontal")
 disassembly.createGlobal(at: 0xc156, named: "wScreenShakeVertical")
