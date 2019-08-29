@@ -15,6 +15,16 @@ extension LR35902.Disassembly {
 
         simulate(range: visitedRange) { instruction, location, state in
           switch instruction.spec {
+            // TODO: This only works if we're simulating the run as part of the linear sweep.
+            // TODO: Fold the simulation logic into the linear sweep somehow.
+//          case .ld(.imm16addr, let src) where registers8.contains(src):
+//            if (0x2000..<0x4000).contains(instruction.imm16!),
+//              let srcValue: CPUState.RegisterState<UInt8> = state[src],
+//              case .value(let value) = srcValue.value {
+//              let addressAndBank = LR35902.addressAndBank(from: location)
+//              self.register(bankChange: value, at: addressAndBank.address, in: addressAndBank.bank)
+//            }
+
           case .ld(.ffimm8addr, let numeric) where registers8.contains(numeric):
             let address = 0xFF00 | LR35902.Address(instruction.imm8!)
             if let global = self.globals[address],
@@ -30,12 +40,12 @@ extension LR35902.Disassembly {
               self.typeAtLocation[location] = dataType
             }
 
-          case .ld(.ffimm8addr, let numeric) where registers8.contains(numeric):
+          case .ld(.ffimm8addr, let src) where registers8.contains(src):
             let address = 0xFF00 | LR35902.Address(instruction.imm8!)
             if let global = self.globals[address],
               let dataType = global.dataType,
-              let sourceLocation = state.a?.sourceLocation {
-              self.typeAtLocation[sourceLocation] = dataType
+              let srcValue: CPUState.RegisterState<UInt8> = state[src] {
+              self.typeAtLocation[srcValue.sourceLocation] = dataType
             }
 
           case .and(.imm8):

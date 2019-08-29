@@ -13,7 +13,7 @@ let package = Package(
   targets: [
     .target(
       name: "gbdis",
-      dependencies: ["LR35902", "FixedWidthInteger"]),
+      dependencies: ["LR35902"]),
     .testTarget(
       name: "LR35902Tests",
       dependencies: ["LR35902"]),
