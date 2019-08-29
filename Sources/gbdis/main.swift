@@ -617,6 +617,13 @@ disassembly.createDatatype(named: "LINK_MOTION", enumeration: [
   0x0F: "LINK_MOTION_UNKNOWN",
 ])
 
+disassembly.createDatatype(named: "LINK_GROUND_STATUS", enumeration: [
+  0: "LINK_GROUND_DRY",
+  1: "LINK_GROUND_STEPS",
+  3: "LINK_GROUND_WET_OR_GRASSY",
+  7: "LINK_GROUND_PIT",
+])
+
 disassembly.mapCharacter(0x5e, to: "'")
 disassembly.mapCharacter(0xd9, to: "<flower>")
 disassembly.mapCharacter(0xe1, to: "<ribbon>")
@@ -669,6 +676,7 @@ disassembly.createGlobal(at: 0xc10b, named: "wMusicTrackTiming", dataType: "MUSI
 disassembly.createGlobal(at: 0xc10e, named: "wNeedsNPCTilesUpdate", dataType: "bool")
 disassembly.createGlobal(at: 0xc114, named: "wNoiseSfxSeaWavesCounter")
 disassembly.createGlobal(at: 0xc11c, named: "wLinkMotionState", dataType: "LINK_MOTION")
+disassembly.createGlobal(at: 0xc11f, named: "wLinkGroundStatus", dataType: "LINK_GROUND_STATUS")
 disassembly.createGlobal(at: 0xc124, named: "wRoomTransitionState")
 disassembly.createGlobal(at: 0xc125, named: "wRoomTransitionDirection")
 disassembly.createGlobal(at: 0xc155, named: "wScreenShakeHorizontal")
