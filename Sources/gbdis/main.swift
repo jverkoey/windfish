@@ -585,6 +585,12 @@ disassembly.createDatatype(named: "TRACK", enumeration: [
   0xFF: "TRACK_FF",
 ])
 
+disassembly.createDatatype(named: "MUSIC_TIMING", enumeration: [
+  0: "MUSIC_TIMING_NORMAL",
+  1: "MUSIC_TIMING_DOUBLE",
+  2: "MUSIC_TIMING_HALF",
+])
+
 disassembly.setData(at: 0x0004..<0x0008, in: 0x00)
 
 let numberOfRestartAddresses: LR35902.Address = 8
@@ -597,6 +603,12 @@ rstAddresses.forEach {
 
 disassembly.createGlobal(at: 0x0003, named: "DEBUG_TOOL", dataType: "bool")
 disassembly.createGlobal(at: 0xa100, named: "SAVEFILES")
+
+disassembly.createGlobal(at: 0xc100, named: "wScrollXOffsetForSection", dataType: "decimal")
+disassembly.createGlobal(at: 0xc105, named: "wLCDSectionIndex", dataType: "decimal")
+disassembly.createGlobal(at: 0xc106, named: "wIntroBGYOffset", dataType: "decimal")
+disassembly.createGlobal(at: 0xc108, named: "wNameIndex", dataType: "decimal")
+disassembly.createGlobal(at: 0xc10b, named: "wMusicTrackTiming", dataType: "MUSIC_TIMING")
 disassembly.createGlobal(at: 0xc10e, named: "wNeedsNPCTilesUpdate", dataType: "bool")
 disassembly.createGlobal(at: 0xc124, named: "wRoomTransitionState")
 disassembly.createGlobal(at: 0xc125, named: "wRoomTransitionDirection")

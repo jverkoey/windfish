@@ -25,6 +25,13 @@ extension LR35902.Disassembly {
 //              self.register(bankChange: value, at: addressAndBank.address, in: addressAndBank.bank)
 //            }
 
+          case .ld(.imm16addr, let numeric) where registers8.contains(numeric):
+            if let global = self.globals[instruction.imm16!],
+              let dataType = global.dataType,
+              let sourceLocation = state.a?.sourceLocation {
+              self.typeAtLocation[sourceLocation] = dataType
+            }
+
           case .ld(.ffimm8addr, let numeric) where registers8.contains(numeric):
             let address = 0xFF00 | LR35902.Address(instruction.imm8!)
             if let global = self.globals[address],
