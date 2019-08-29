@@ -253,7 +253,7 @@ clean:
             }
           }
 
-          let macros: [(macro: LR35902.Disassembly.Macro, code: [LR35902.Instruction.Spec], arguments: [Int: String], rawArguments: [Int: String])] = macroNodeIterator.macros.map { macro in
+          let macros: [(macro: LR35902.Disassembly.Macro, code: [LR35902.Instruction.Spec], arguments: [Int: String], rawArguments: [Int: String])] = macroNodeIterator.macros.compactMap { macro in
 
             var code: [LR35902.Instruction.Spec]
             if let macroCode = macro.code {
@@ -267,21 +267,32 @@ clean:
               }
             }
             // Extract the arguments.
+            var anyArgumentMismatches = false
             let arguments: [Int: String] = zip(code, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
               let args = extractArgs(from: zipped.1.1, using: zipped.0)
               return iter.merging(args, uniquingKeysWith: { first, second in
-                assert(first == second, "Mismatch in arguments")
+                if first != second {
+                  anyArgumentMismatches = true
+                }
                 return first
               })
             })
+            if anyArgumentMismatches {
+              return nil
+            }
 
             let rawArguments: [Int: String] = zip(code, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
               let args = extractArgs(from: RGBDSAssembly.assembly(for: zipped.1.0), using: zipped.0)
               return iter.merging(args, uniquingKeysWith: { first, second in
-                assert(first == second, "Mismatch in arguments")
+                if first != second {
+                  anyArgumentMismatches = true
+                }
                 return first
               })
             })
+            if anyArgumentMismatches {
+              return nil
+            }
 
             return (macro: macro, code: code, arguments: arguments, rawArguments: rawArguments)
           }

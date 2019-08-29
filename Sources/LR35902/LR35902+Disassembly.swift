@@ -520,6 +520,16 @@ extension LR35902 {
         .ld(.arg(1), .a),
       ])
 
+      defineMacro(named: "plusEqualH", instructions: [
+        .any(.ld(.a, .ffimm8addr)),
+        .any(.add(.imm8)),
+        .any(.ld(.ffimm8addr, .a)),
+      ], code: [
+        .ld(.a, .arg(1)),
+        .add(.arg(2)),
+        .ld(.arg(1), .a),
+      ])
+
       // TODO: These can't be enabled until we support multiple simultaneous macro checks.
 //      defineMacro(named: "plusEqual", instructions: [
 //        .any(.ld(.hl, .imm16)),
@@ -540,17 +550,17 @@ extension LR35902 {
 //        .ld(.a, .arg(1)),
 //        .add(.hladdr),
 //      ])
-      defineMacro(named: "_plusEqualH", instructions: [
-        .any(.ld(.a, .ffimm8addr)),
-        .any(.ld(.hl, .imm16)),
-        .any(.add(.hladdr)),
-        .any(.ld(.ffimm8addr, .a)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .ld(.hl, .arg(2)),
-        .add(.hladdr),
-        .ld(.arg(1), .a)
-      ])
+//      defineMacro(named: "_plusEqualH", instructions: [
+//        .any(.ld(.a, .ffimm8addr)),
+//        .any(.ld(.hl, .imm16)),
+//        .any(.add(.hladdr)),
+//        .any(.ld(.ffimm8addr, .a)),
+//      ], code: [
+//        .ld(.a, .arg(1)),
+//        .ld(.hl, .arg(2)),
+//        .add(.hladdr),
+//        .ld(.arg(1), .a)
+//      ])
 
       defineMacro(named: "copyMemory", instructions: [
         .any(.ld(.a, .imm16addr)),
