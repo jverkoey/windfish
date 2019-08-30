@@ -651,6 +651,14 @@ disassembly.createDatatype(named: "SWORD_DIRECTION", enumeration: [
   7: "SWORD_DIRECTION_RIGHT_TOP",
 ], representation: .decimal)
 
+disassembly.createDatatype(named: "SWORD_ANIMATION_STATE", enumeration: [
+  0: "SWORD_ANIMATION_NONE",
+  1: "SWORD_ANIMATION_START",
+  2: "SWORD_ANIMATION_MIDDLE",
+  3: "SWORD_ANIMATION_FRONT",
+  4: "SWORD_ANIMATION_END",
+], representation: .decimal)
+
 disassembly.mapCharacter(0x5e, to: "'")
 disassembly.mapCharacter(0xd9, to: "<flower>")
 disassembly.mapCharacter(0xe1, to: "<ribbon>")
@@ -719,6 +727,11 @@ disassembly.createGlobal(at: 0xc12e, named: "wBGOriginHigh")
 disassembly.createGlobal(at: 0xc12f, named: "wBGOriginLow")
 disassembly.createGlobal(at: 0xc133, named: "wCollisionType")
 disassembly.createGlobal(at: 0xc136, named: "wSwordDirection", dataType: "SWORD_DIRECTION")
+disassembly.createGlobal(at: 0xc137, named: "wSwordAnimationState", dataType: "SWORD_ANIMATION_STATE")
+disassembly.createGlobal(at: 0xc13d, named: "wRandomSeed")
+disassembly.createGlobal(at: 0xc143, named: "wIsLinkInTheAir", dataType: "bool")
+disassembly.createGlobal(at: 0xc14a, named: "wIsRunningWithPegasusBoots", dataType: "bool")
+disassembly.createGlobal(at: 0xc14b, named: "wPegasusBootsChargeMeter", dataType: "decimal")
 disassembly.createGlobal(at: 0xc155, named: "wScreenShakeHorizontal", dataType: "decimal")
 disassembly.createGlobal(at: 0xc156, named: "wScreenShakeVertical", dataType: "decimal")
 disassembly.createGlobal(at: 0xc1bf, named: "wScrollXOffset", dataType: "decimal")
