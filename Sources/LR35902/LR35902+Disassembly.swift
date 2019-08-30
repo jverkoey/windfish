@@ -586,6 +586,18 @@ extension LR35902 {
 //        .ld(.arg(1), .a)
 //      ])
 
+      defineMacro(named: "loadHL", instructions: [
+        .any(.ld(.a, .imm16addr)),
+        .any(.ld(.h, .a)),
+        .any(.ld(.a, .imm16addr)),
+        .any(.ld(.l, .a)),
+      ], code: [
+        .ld(.a, .arg(1)),
+        .ld(.h, .a),
+        .ld(.a, .arg(2)),
+        .ld(.l, .a),
+      ])
+
       defineMacro(named: "copyMemory", instructions: [
         .any(.ld(.a, .imm16addr)),
         .any(.ld(.imm16addr, .a)),
