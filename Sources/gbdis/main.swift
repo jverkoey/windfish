@@ -589,7 +589,7 @@ disassembly.createDatatype(named: "MUSIC_TIMING", enumeration: [
   0: "MUSIC_TIMING_NORMAL",
   1: "MUSIC_TIMING_DOUBLE",
   2: "MUSIC_TIMING_HALF",
-])
+], representation: .decimal)
 
 disassembly.createDatatype(named: "ENTITY_STATE", enumeration: [
   0: "ENTITY_STATE_DISABLED",
@@ -601,7 +601,7 @@ disassembly.createDatatype(named: "ENTITY_STATE", enumeration: [
   6: "ENTITY_STATE_STUNNED",
   7: "ENTITY_STATE_LIFTED",
   8: "ENTITY_STATE_THROWN",
-])
+], representation: .decimal)
 
 disassembly.createDatatype(named: "LINK_MOTION", enumeration: [
   0x00: "LINK_MOTION_INTERACTIVE",
@@ -622,7 +622,7 @@ disassembly.createDatatype(named: "LINK_GROUND_STATUS", enumeration: [
   1: "LINK_GROUND_STEPS",
   3: "LINK_GROUND_WET_OR_GRASSY",
   7: "LINK_GROUND_PIT",
-])
+], representation: .decimal)
 
 disassembly.createDatatype(named: "ROOM_TRANSITION", enumeration: [
   0: "ROOM_TRANSITION_NONE",
@@ -631,14 +631,25 @@ disassembly.createDatatype(named: "ROOM_TRANSITION", enumeration: [
   3: "ROOM_TRANSITION_CONFIGURE_SCROLL",
   4: "ROOM_TRANSITION_FIRST_HALF",
   5: "ROOM_TRANSITION_SECOND_HALF",
-])
+], representation: .decimal)
 
 disassembly.createDatatype(named: "ROOM_TRANSITION_DIRECTION", enumeration: [
   0: "ROOM_TRANSITION_DIR_RIGHT",
   1: "ROOM_TRANSITION_DIR_LEFT",
   2: "ROOM_TRANSITION_DIR_TOP",
   3: "ROOM_TRANSITION_DIR_BOTTOM",
-])
+], representation: .decimal)
+
+disassembly.createDatatype(named: "SWORD_DIRECTION", enumeration: [
+  0: "SWORD_DIRECTION_RIGHT",
+  1: "SWORD_DIRECTION_RIGHT_BOTTOM",
+  2: "SWORD_DIRECTION_BOTTOM",
+  3: "SWORD_DIRECTION_LEFT_BOTTOM",
+  4: "SWORD_DIRECTION_LEFT",
+  5: "SWORD_DIRECTION_LEFT_TOP",
+  6: "SWORD_DIRECTION_TOP",
+  7: "SWORD_DIRECTION_RIGHT_TOP",
+], representation: .decimal)
 
 disassembly.mapCharacter(0x5e, to: "'")
 disassembly.mapCharacter(0xd9, to: "<flower>")
@@ -706,6 +717,8 @@ disassembly.createGlobal(at: 0xc12c, named: "wRoomTransitionTargetScrollX", data
 disassembly.createGlobal(at: 0xc12d, named: "wRoomTransitionTargetScrollY", dataType: "decimal")
 disassembly.createGlobal(at: 0xc12e, named: "wBGOriginHigh")
 disassembly.createGlobal(at: 0xc12f, named: "wBGOriginLow")
+disassembly.createGlobal(at: 0xc133, named: "wCollisionType")
+disassembly.createGlobal(at: 0xc136, named: "wSwordDirection", dataType: "SWORD_DIRECTION")
 disassembly.createGlobal(at: 0xc155, named: "wScreenShakeHorizontal", dataType: "decimal")
 disassembly.createGlobal(at: 0xc156, named: "wScreenShakeVertical", dataType: "decimal")
 disassembly.createGlobal(at: 0xc1bf, named: "wScrollXOffset", dataType: "decimal")
