@@ -544,6 +544,14 @@ extension LR35902 {
         .ld(.arg(1), .a),
       ])
 
+      defineMacro(named: "plusPlusHL", instructions: [
+        .any(.ld(.hl, .imm16)),
+        .any(.inc(.hladdr)),
+      ], code: [
+        .ld(.hl, .arg(1)),
+        .inc(.hladdr),
+      ])
+
       defineMacro(named: "plusEqualH", instructions: [
         .any(.ld(.a, .ffimm8addr)),
         .any(.add(.imm8)),

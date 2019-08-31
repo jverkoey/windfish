@@ -732,8 +732,15 @@ disassembly.createGlobal(at: 0xc13d, named: "wRandomSeed")
 disassembly.createGlobal(at: 0xc143, named: "wIsLinkInTheAir", dataType: "bool")
 disassembly.createGlobal(at: 0xc14a, named: "wIsRunningWithPegasusBoots", dataType: "bool")
 disassembly.createGlobal(at: 0xc14b, named: "wPegasusBootsChargeMeter", dataType: "decimal")
+disassembly.createGlobal(at: 0xc14c, named: "wIsShootingArrow", dataType: "bool")
+disassembly.createGlobal(at: 0xc14d, named: "wProjectileCount", dataType: "decimal")
+disassembly.createGlobal(at: 0xc14e, named: "wHasPlacedBomb", dataType: "bool")
+disassembly.createGlobal(at: 0xc14f, named: "wInventoryAppearing", dataType: "bool")
 disassembly.createGlobal(at: 0xc155, named: "wScreenShakeHorizontal", dataType: "decimal")
 disassembly.createGlobal(at: 0xc156, named: "wScreenShakeVertical", dataType: "decimal")
+disassembly.createGlobal(at: 0xc159, named: "wInventoryCursorFrameCounter", dataType: "decimal")
+disassembly.createGlobal(at: 0xc15a, named: "wHasMirrorShield", dataType: "bool")
+disassembly.createGlobal(at: 0xc15b, named: "wIsUsingShield", dataType: "bool")
 disassembly.createGlobal(at: 0xc1bf, named: "wScrollXOffset", dataType: "decimal")
 disassembly.createGlobal(at: 0xc280, named: "wEntitiesStateTable", dataType: "ENTITY_STATE")
 (0xc281...0xC28F).forEach {
@@ -1094,6 +1101,8 @@ for (value, name) in disassembly.valuesForDatatype(named: "ENTITY")! {
   entityJumpTableBanks[value] = bank
 }
 
+disassembly.register(bankChange: 0x08, at: 0x0A09, in: 0x00)
+disassembly.register(bankChange: 0x08, at: 0x0A85, in: 0x00)
 disassembly.register(bankChange: 0x03, at: 0x3945, in: 0x00)
 disassembly.register(bankChange: 0x00, at: 0x3951, in: 0x00)
 disassembleJumpTable(within: 0x3953..<(0x3953 + 0xFF * 2), in: 0x00,
