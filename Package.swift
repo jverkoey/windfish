@@ -9,6 +9,10 @@ let package = Package(
     .executable(
       name: "gbdis",
       targets: ["gbdis"]),
+    .library(
+      name: "LR35902",
+      targets: ["LR35902"]
+    )
   ],
   targets: [
     .target(
