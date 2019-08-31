@@ -82,65 +82,11 @@ extension LR35902 {
     }
 
     public func disassembleAsGameboyCartridge() {
-      // Restart addresses
-      let numberOfRestartAddresses: Address = 8
-      let restartSize: Address = 8
-      let rstAddresses = (0..<numberOfRestartAddresses).map { ($0 * restartSize)..<($0 * restartSize + restartSize) }
-      rstAddresses.forEach {
-        setLabel(at: $0.lowerBound, in: 0x00, named: "RST_\($0.lowerBound.hexString)")
-        disassemble(range: $0, inBank: 0)
-      }
-
-      setLabel(at: 0x0040, in: 0x00, named: "VBlankInterrupt")
-      disassemble(range: 0x0040..<0x0048, inBank: 0)
-
-      setLabel(at: 0x0048, in: 0x00, named: "LCDCInterrupt")
-      disassemble(range: 0x0048..<0x0050, inBank: 0)
-
-      setLabel(at: 0x0050, in: 0x00, named: "TimerOverflowInterrupt")
-      disassemble(range: 0x0050..<0x0058, inBank: 0)
-
-      setLabel(at: 0x0058, in: 0x00, named: "SerialTransferCompleteInterrupt")
-      disassemble(range: 0x0058..<0x0060, inBank: 0)
-
-      setLabel(at: 0x0060, in: 0x00, named: "JoypadTransitionInterrupt")
-      disassemble(range: 0x0060..<0x0068, inBank: 0)
-
-      setLabel(at: 0x0100, in: 0x00, named: "Boot")
-      disassemble(range: 0x0100..<0x104, inBank: 0)
-
-      setLabel(at: 0x0104, in: 0x00, named: "HeaderLogo")
-      setData(at: 0x0104..<0x0134, in: 0x00)
-
-      setLabel(at: 0x0134, in: 0x00, named: "HeaderTitle")
-      setText(at: 0x0134..<0x0143, in: 0x00)
-
       createGlobal(at: 0x0143, named: "HeaderIsColorGB", dataType: "HW_COLORGAMEBOY")
-
-      setLabel(at: 0x0144, in: 0x00, named: "HeaderNewLicenseeCode")
-      setData(at: 0x0144..<0x0146, in: 0x00)
-
       createGlobal(at: 0x0146, named: "HeaderSGBFlag", dataType: "HW_SUPERGAMEBOY")
-
-      setLabel(at: 0x0147, in: 0x00, named: "HeaderCartridgeType")
-      setData(at: 0x0147, in: 0x00)
-
       createGlobal(at: 0x0148, named: "HeaderROMSize", dataType: "HW_ROMSIZE")
       createGlobal(at: 0x0149, named: "HeaderRAMSize", dataType: "HW_RAMSIZE")
       createGlobal(at: 0x014A, named: "HeaderDestinationCode", dataType: "HW_DESTINATIONCODE")
-
-      setLabel(at: 0x014B, in: 0x00, named: "HeaderOldLicenseeCode")
-      setData(at: 0x014B, in: 0x00)
-
-      setLabel(at: 0x014C, in: 0x00, named: "HeaderMaskROMVersion")
-      setData(at: 0x014C, in: 0x00)
-
-      setLabel(at: 0x014D, in: 0x00, named: "HeaderComplementCheck")
-      setData(at: 0x014D, in: 0x00)
-
-      setLabel(at: 0x014E, in: 0x00, named: "HeaderGlobalChecksum")
-      setData(at: 0x014E..<0x0150, in: 0x00)
-
       createGlobal(at: 0x8000, named: "gbVRAM")
       createGlobal(at: 0x8800, named: "gbBGCHARDAT")
       createGlobal(at: 0x9800, named: "gbBGDAT0")
@@ -205,8 +151,60 @@ extension LR35902 {
       createGlobal(at: 0xff70, named: "gbSVBK")
       createGlobal(at: 0xff76, named: "gbPCM12")
       createGlobal(at: 0xff77, named: "gbPCM34")
-//      createGlobal(at: 0xff80, named: "gbHRAM") // TODO: This isn't a global, it's just a region in memory.
+      //      createGlobal(at: 0xff80, named: "gbHRAM") // TODO: This isn't a global, it's just a region in memory.
       createGlobal(at: 0xffff, named: "gbIE", dataType: "bool")
+
+      // Restart addresses
+      let numberOfRestartAddresses: Address = 8
+      let restartSize: Address = 8
+      let rstAddresses = (0..<numberOfRestartAddresses).map { ($0 * restartSize)..<($0 * restartSize + restartSize) }
+      rstAddresses.forEach {
+        setLabel(at: $0.lowerBound, in: 0x00, named: "RST_\($0.lowerBound.hexString)")
+        disassemble(range: $0, inBank: 0)
+      }
+
+      setLabel(at: 0x0040, in: 0x00, named: "VBlankInterrupt")
+      disassemble(range: 0x0040..<0x0048, inBank: 0)
+
+      setLabel(at: 0x0048, in: 0x00, named: "LCDCInterrupt")
+      disassemble(range: 0x0048..<0x0050, inBank: 0)
+
+      setLabel(at: 0x0050, in: 0x00, named: "TimerOverflowInterrupt")
+      disassemble(range: 0x0050..<0x0058, inBank: 0)
+
+      setLabel(at: 0x0058, in: 0x00, named: "SerialTransferCompleteInterrupt")
+      disassemble(range: 0x0058..<0x0060, inBank: 0)
+
+      setLabel(at: 0x0060, in: 0x00, named: "JoypadTransitionInterrupt")
+      disassemble(range: 0x0060..<0x0068, inBank: 0)
+
+      setLabel(at: 0x0100, in: 0x00, named: "Boot")
+      disassemble(range: 0x0100..<0x104, inBank: 0)
+
+      setLabel(at: 0x0104, in: 0x00, named: "HeaderLogo")
+      setData(at: 0x0104..<0x0134, in: 0x00)
+
+      setLabel(at: 0x0134, in: 0x00, named: "HeaderTitle")
+      setText(at: 0x0134..<0x0143, in: 0x00)
+
+      setLabel(at: 0x0144, in: 0x00, named: "HeaderNewLicenseeCode")
+      setData(at: 0x0144..<0x0146, in: 0x00)
+
+
+      setLabel(at: 0x0147, in: 0x00, named: "HeaderCartridgeType")
+      setData(at: 0x0147, in: 0x00)
+
+      setLabel(at: 0x014B, in: 0x00, named: "HeaderOldLicenseeCode")
+      setData(at: 0x014B, in: 0x00)
+
+      setLabel(at: 0x014C, in: 0x00, named: "HeaderMaskROMVersion")
+      setData(at: 0x014C, in: 0x00)
+
+      setLabel(at: 0x014D, in: 0x00, named: "HeaderComplementCheck")
+      setData(at: 0x014D, in: 0x00)
+
+      setLabel(at: 0x014E, in: 0x00, named: "HeaderGlobalChecksum")
+      setData(at: 0x014E..<0x0150, in: 0x00)
 
       defineMacro(named: "ifHGte", instructions: [
         .any(.ld(.a, .ffimm8addr)),
@@ -444,7 +442,7 @@ extension LR35902 {
         .jp(.nz, .arg(2)),
       ])
 
-      defineMacro(named: "ifH_", instructions: [
+      defineMacro(named: "ifH", instructions: [
         .any(.ld(.a, .ffimm8addr)),
         .any(.and(.a)),
         .any(.jr(.nz, .imm16)),
@@ -1024,6 +1022,8 @@ extension LR35902 {
                             code: [Instruction.Spec]? = nil,
                             validArgumentValues: [Int: IndexSet]? = nil,
                             action: (([Int: String], LR35902.Address, LR35902.Bank) -> Void)? = nil) {
+      precondition(!macroNames.contains(name))
+      macroNames.insert(name)
       let leaf = instructions.reduce(macroTree, { node, spec in
         let child = node.children[spec, default: MacroNode()]
         node.children[spec] = child
@@ -1039,6 +1039,7 @@ extension LR35902 {
       }
       defineMacro(named: name, instructions: assembler.instructions.map { .instruction($0) })
     }
+    private var macroNames = Set<String>()
 
     public final class Macro {
       let name: String
