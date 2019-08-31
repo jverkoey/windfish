@@ -1668,4 +1668,24 @@ ld   [$FF10], a
 ld   [$ff1a], a
 """)
 
-try disassembly.writeTo(directory: "/Users/featherless/workbench/gbdis/disassembly")
+let files = try disassembly.generateFiles()
+
+let directory = "/Users/featherless/workbench/gbdis/disassembly"
+let fm = FileManager.default
+let directoryUrl = URL(fileURLWithPath: directory)
+try fm.createDirectory(at: directoryUrl, withIntermediateDirectories: true, attributes: nil)
+
+extension FileManager {
+  fileprivate func restartFile(atPath path: String) throws -> FileHandle {
+    if fileExists(atPath: path) {
+      try removeItem(atPath: path)
+    }
+    createFile(atPath: path, contents: Data(), attributes: nil)
+    return try FileHandle(forWritingTo: URL(fileURLWithPath: path))
+  }
+}
+
+for (file, data) in files {
+  let handle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent(file).path)
+  handle.write(data)
+}

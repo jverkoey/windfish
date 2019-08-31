@@ -11,8 +11,8 @@ extension Array {
   }
 }
 
-private func write(_ string: String, fileHandle: FileHandle) {
-  fileHandle.write("\(string)\n".data(using: .utf8)!)
+private func write(_ string: String) -> Data {
+  return "\(string)\n".data(using: .utf8)!
 }
 
 private func line(_ transfersOfControl: Set<LR35902.Disassembly.TransferOfControl>, label: String) -> String {
@@ -24,16 +24,6 @@ private func line(_ transfersOfControl: Set<LR35902.Disassembly.TransferOfContro
     }
     .joined(separator: ", ")
   return line("\(label):", comment: "Sources: \(sources)")
-}
-
-extension FileManager {
-  fileprivate func restartFile(atPath path: String) throws -> FileHandle {
-    if fileExists(atPath: path) {
-      try removeItem(atPath: path)
-    }
-    createFile(atPath: path, contents: Data(), attributes: nil)
-    return try FileHandle(forWritingTo: URL(fileURLWithPath: path))
-  }
 }
 
 private func extractArgs(from statement: RGBDSAssembly.Statement, using spec: LR35902.Instruction.Spec) -> [Int: String] {
@@ -106,14 +96,9 @@ extension LR35902.Disassembly {
       }
     }
   }
-  public func writeTo(directory: String) throws {
-    let fm = FileManager.default
-    let directoryUrl = URL(fileURLWithPath: directory)
-    try fm.createDirectory(at: directoryUrl, withIntermediateDirectories: true, attributes: nil)
-
-    let makefileHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("Makefile").path)
-
-    makefileHandle.write(
+  public func generateFiles() throws -> [String: Data] {
+    var files: [String: Data] = [:]
+    files["Makefile"] =
 """
 all: game.gb
 
@@ -130,25 +115,23 @@ clean:
 	rm -f game.o game.gb game.sym game.map *.o
 	find . \\( -iname '*.1bpp' -o -iname '*.2bpp' \\) -exec rm {} +
 
-""".data(using: .utf8)!)
+""".data(using: .utf8)!
 
-    var macrosHandle: FileHandle? = nil
-
-    let gameHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("game.asm").path)
+    var gameAsm = Data()
 
     if !dataTypes.isEmpty {
-      let handle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("datatypes.asm").path)
+      var asm = Data(capacity: 1024 * 1024) // 1MB capacity
 
       for dataType in dataTypes.sorted(by: { $0.0 < $1.0 }) {
         guard !dataType.value.namedValues.isEmpty else {
           continue
         }
-        handle.write("; Type: \(dataType.key)\n".data(using: .utf8)!)
+        asm.append("; Type: \(dataType.key)\n".data(using: .utf8)!)
         let namedValues = dataType.value.namedValues.sorted(by: { $0.key < $1.key })
         let longestVariable = namedValues.reduce(0) { (currentMax, next) in
           max(currentMax, next.value.count)
         }
-        handle.write(namedValues.map {
+        asm.append(namedValues.map {
           let name = $0.value.padding(toLength: longestVariable, withPad: " ", startingAt: 0)
           let value: String
           switch dataType.value.representation {
@@ -161,42 +144,50 @@ clean:
           }
           return "\(name) EQU \(value)"
         }.joined(separator: "\n").data(using: .utf8)!)
-        handle.write("\n\n".data(using: .utf8)!)
+        asm.append("\n\n".data(using: .utf8)!)
       }
+      files["datatypes.asm"] = asm
 
-      gameHandle.write("INCLUDE \"datatypes.asm\"\n".data(using: .utf8)!)
+      gameAsm.append("INCLUDE \"datatypes.asm\"\n".data(using: .utf8)!)
     }
 
     if !globals.isEmpty {
-      let variablesHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("variables.asm").path)
+      var asm = Data()
 
-      variablesHandle.write(globals.filter { $0.key >= 0x8000 }.sorted { $0.0 < $1.0 }.map { address, global in
+      asm.append(globals.filter { $0.key >= 0x8000 }.sorted { $0.0 < $1.0 }.map { address, global in
         "\(global.name) EQU $\(address.hexString)"
       }.joined(separator: "\n\n").data(using: .utf8)!)
 
-      gameHandle.write("INCLUDE \"variables.asm\"\n".data(using: .utf8)!)
+      files["variables.asm"] = asm
+      gameAsm.append("INCLUDE \"variables.asm\"\n".data(using: .utf8)!)
     }
 
     if !characterMap.isEmpty {
-      let charmapHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("charmap.asm").path)
+      var asm = Data()
 
-      charmapHandle.write(characterMap.sorted { $0.key < $1.key }.map { value, string in
+      asm.append(characterMap.sorted { $0.key < $1.key }.map { value, string in
         "charmap \"\(string)\", $\(value.hexString)"
       }.joined(separator: "\n").data(using: .utf8)!)
 
-      gameHandle.write("INCLUDE \"charmap.asm\"\n".data(using: .utf8)!)
+      files["charmap.asm"] = asm
+      gameAsm.append("INCLUDE \"charmap.asm\"\n".data(using: .utf8)!)
     }
 
     var instructionsToDecode = Int.max
     var instructionsDecoded = 0
 
+    var macrosAsm: Data? = nil
+
     for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
-      let fileHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("bank_\(bank.hexString).asm").path)
+      var asm = Data()
+      defer {
+        files["bank_\(bank.hexString).asm"] = asm
+      }
 
       if bank == 0 {
-        write("SECTION \"ROM Bank \(bank.hexString)\", ROM0[$\(bank.hexString)]", fileHandle: fileHandle)
+        asm.append(write("SECTION \"ROM Bank \(bank.hexString)\", ROM0[$\(bank.hexString)]"))
       } else {
-        write("SECTION \"ROM Bank \(bank.hexString)\", ROMX[$4000], BANK[$\(bank.hexString)]", fileHandle: fileHandle)
+        asm.append(write("SECTION \"ROM Bank \(bank.hexString)\", ROMX[$4000], BANK[$\(bank.hexString)]"))
       }
 
       cpu.pc = (bank == 0) ? 0x0000 : 0x4000
@@ -208,19 +199,21 @@ clean:
       lineBuffer.append(.empty)
       var macroNode: MacroNode? = nil
 
-      let writeLinesToFile: ([Line], FileHandle) -> Void = { lines, fileHandle in
+      let writeLines: ([Line]) -> Data = { lines in
+        var data = Data()
         var lastLine: Line?
         lines.forEach { thisLine in
           if let lastLine = lastLine, lastLine == .empty && thisLine == .empty {
             return
           }
-          write(thisLine.description, fileHandle: fileHandle)
+          data.append(write(thisLine.description))
           lastLine = thisLine
         }
+        return data
       }
 
       let flush = {
-        writeLinesToFile(lineBuffer, fileHandle)
+        asm.append(writeLines(lineBuffer))
         lineBuffer.removeAll()
         macroNode = nil
       }
@@ -338,9 +331,9 @@ clean:
 
           if let macro = validMacros.first {
             if !macro.macro.hasWritten {
-              if macrosHandle == nil {
-                macrosHandle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent("macros.asm").path)
-                gameHandle.write("INCLUDE \"macros.asm\"\n".data(using: .utf8)!)
+              if macrosAsm == nil {
+                macrosAsm = Data()
+                gameAsm.append("INCLUDE \"macros.asm\"\n".data(using: .utf8)!)
               }
 
               var lines: [Line] = []
@@ -390,7 +383,7 @@ clean:
                 return .macroInstruction(macroInstruction, macroAssembly)
               })
               lines.append(.macroTerminator)
-              writeLinesToFile(lines, macrosHandle!)
+              macrosAsm?.append(writeLines(lines))
 
               macro.macro.hasWritten = true
             }
@@ -541,7 +534,7 @@ clean:
           case .text:
             let lineLength = lineLengthOfText(at: initialPc, in: bank) ?? 254
             for chunk in accumulator.chunked(into: lineLength) {
-              write(line(RGBDSAssembly.text(for: chunk, characterMap: characterMap), address: chunkPc, addressType: "text"), fileHandle: fileHandle)
+              asm.append(write(line(RGBDSAssembly.text(for: chunk, characterMap: characterMap), address: chunkPc, addressType: "text")))
               chunkPc += LR35902.Address(chunk.count)
             }
           case .jumpTable:
@@ -560,7 +553,7 @@ clean:
                 jumpLocation = "$\(address.hexString)"
               }
               let bytes = cpu[LR35902.cartAddress(for: chunkPc, in: bank)!..<(LR35902.cartAddress(for: chunkPc, in: bank)! + 2)]
-              write(line("dw \(jumpLocation)", address: chunkPc, addressType: "jumpTable [\(index)]", comment: "\(bytes.map { "$\($0.hexString)" }.joined(separator: " "))"), fileHandle: fileHandle)
+              asm.append(write(line("dw \(jumpLocation)", address: chunkPc, addressType: "jumpTable [\(index)]", comment: "\(bytes.map { "$\($0.hexString)" }.joined(separator: " "))")))
               chunkPc += LR35902.Address(pair.count)
             }
             break
@@ -571,7 +564,7 @@ clean:
               let instruction = RGBDSAssembly.assembly(for: chunk)
               let displayableBytes = chunk.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
               let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
-              write(line(instruction, address: chunkPc, addressType: addressType, comment: "|\(bytesAsCharacters)|"), fileHandle: fileHandle)
+              asm.append(write(line(instruction, address: chunkPc, addressType: addressType, comment: "|\(bytesAsCharacters)|")))
               chunkPc += LR35902.Address(chunk.count)
             }
           }
@@ -579,7 +572,7 @@ clean:
           if let global = global,
             let dataType = global.dataType,
             let globalValue = globalValue {
-            write(line(RGBDSAssembly.assembly(for: globalValue), address: chunkPc, addressType: dataType), fileHandle: fileHandle)
+            asm.append(write(line(RGBDSAssembly.assembly(for: globalValue), address: chunkPc, addressType: dataType)))
           }
 
           lineBuffer.append(.empty)
@@ -591,11 +584,14 @@ clean:
       flush()
     }
 
-    gameHandle.write(
+    files["macros.asm"] = macrosAsm
+    gameAsm.append(
       ((UInt8(0)..<UInt8(cpu.numberOfBanks))
         .map { "INCLUDE \"bank_\($0.hexString).asm\"" }
         .joined(separator: "\n") + "\n")
         .data(using: .utf8)!)
+
+    files["game.asm"] = gameAsm
 
     print("Instructions decoded: \(instructionsDecoded)")
 
@@ -606,5 +602,6 @@ clean:
         (Int(bank) * Int(LR35902.bankSize))..<(Int(bank + 1) * Int(LR35902.bankSize))))
       print("Bank \(bank.hexString): \(Double(disassembledBankLocations.count * 100) / Double(LR35902.bankSize))%")
     }
+    return files
   }
 }
