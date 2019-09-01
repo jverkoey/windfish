@@ -6,7 +6,7 @@ class AddressConversionTests: XCTestCase {
   func testZero() throws {
     let bank: LR35902.Bank = 0
     let address: LR35902.Address = 0
-    let cartAddress = try XCTUnwrap(LR35902.cartAddress(for: address, in: bank))
+    let cartAddress = LR35902.cartAddress(for: address, in: bank)!
     let addressAndBank = LR35902.addressAndBank(from: cartAddress)
     XCTAssertEqual(addressAndBank.address, address)
     XCTAssertEqual(addressAndBank.bank, bank)
@@ -15,7 +15,7 @@ class AddressConversionTests: XCTestCase {
   func testMiddleOfBank0() throws {
     let bank: LR35902.Bank = 0
     let address: LR35902.Address = 0x2000
-    let cartAddress = try XCTUnwrap(LR35902.cartAddress(for: address, in: bank))
+    let cartAddress = LR35902.cartAddress(for: address, in: bank)!
     let addressAndBank = LR35902.addressAndBank(from: cartAddress)
     XCTAssertEqual(addressAndBank.address, address)
     XCTAssertEqual(addressAndBank.bank, bank)
@@ -24,7 +24,7 @@ class AddressConversionTests: XCTestCase {
   func testEndOfBank0() throws {
     let bank: LR35902.Bank = 0
     let address: LR35902.Address = 0x3FFF
-    let cartAddress = try XCTUnwrap(LR35902.cartAddress(for: address, in: bank))
+    let cartAddress = LR35902.cartAddress(for: address, in: bank)!
     let addressAndBank = LR35902.addressAndBank(from: cartAddress)
     XCTAssertEqual(addressAndBank.address, address)
     XCTAssertEqual(addressAndBank.bank, bank)
@@ -39,7 +39,7 @@ class AddressConversionTests: XCTestCase {
   func testBeginningOfBank1() throws {
     let bank: LR35902.Bank = 1
     let address: LR35902.Address = 0x4000
-    let cartAddress = try XCTUnwrap(LR35902.cartAddress(for: address, in: bank))
+    let cartAddress = LR35902.cartAddress(for: address, in: bank)!
     let addressAndBank = LR35902.addressAndBank(from: cartAddress)
     XCTAssertEqual(addressAndBank.address, address)
     XCTAssertEqual(addressAndBank.bank, bank)
@@ -49,7 +49,7 @@ class AddressConversionTests: XCTestCase {
   func testBeginningOfBank2() throws {
     let bank: LR35902.Bank = 2
     let address: LR35902.Address = 0x4000
-    let cartAddress = try XCTUnwrap(LR35902.cartAddress(for: address, in: bank))
+    let cartAddress = LR35902.cartAddress(for: address, in: bank)!
     let addressAndBank = LR35902.addressAndBank(from: cartAddress)
     XCTAssertEqual(addressAndBank.address, address)
     XCTAssertEqual(addressAndBank.bank, bank)
@@ -59,7 +59,7 @@ class AddressConversionTests: XCTestCase {
   func testBank0WithBank1Selected() throws {
     let bank: LR35902.Bank = 1
     let address: LR35902.Address = 0x2000
-    let cartAddress = try XCTUnwrap(LR35902.cartAddress(for: address, in: bank))
+    let cartAddress = LR35902.cartAddress(for: address, in: bank)!
     let addressAndBank = LR35902.addressAndBank(from: cartAddress)
     XCTAssertEqual(addressAndBank.address, address)
     XCTAssertEqual(addressAndBank.bank, 0)
