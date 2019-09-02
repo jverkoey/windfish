@@ -2,14 +2,35 @@ syntax = "proto3";
 
 package Disassembly;
 
+message Datatype {
+  string name = 1;
+
+  enum Kind {
+    ENUMERATION = 0;
+    BITMASK = 1;
+    ANY = 2;
+  }
+  Kind kind = 2;
+
+  enum Representation {
+    HEXADECIMAL = 0;
+    BINARY = 1;
+    DECIMAL = 2;
+  }
+  Representation representation = 3;
+
+  map<uint64, string> value_names = 4;
+}
+
 message Global {
-  uint64 address = 1;
-  string name = 2;
+  string name = 1;
+  uint64 address = 2;
   string datatype = 3;
 }
 
 message Hints {
   repeated Global globals = 1;
+  repeated Datatype datatypes = 2;
 }
 
 message Request {
