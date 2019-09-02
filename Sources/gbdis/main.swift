@@ -1,8 +1,6 @@
 import Foundation
 import LR35902
 
-
-
 let data = try Data(contentsOf: URL(fileURLWithPath: "/Users/featherless/workbench/awakenlink/rom/LinksAwakening.gb"))
 
 let disassembly = LR35902.Disassembly(rom: data)
@@ -696,383 +694,406 @@ rstAddresses.forEach {
   disassembly.setData(at: $0, in: 0x00)
 }
 
-
-disassembly.createGlobal(at: 0x0003, named: "DEBUG_TOOL1", dataType: "bool")
-disassembly.createGlobal(at: 0x0004, named: "DEBUG_TOOL2", dataType: "bool")
-disassembly.createGlobal(at: 0x0005, named: "DEBUG_TOOL3", dataType: "bool")
 disassembly.setData(at: 0x0006..<0x0008, in: 0x00)
-disassembly.createGlobal(at: 0xa100, named: "SAVEFILES")
 
-disassembly.createGlobal(at: 0xc100, named: "wScrollXOffsetForSection", dataType: "decimal")
-disassembly.createGlobal(at: 0xc105, named: "wLCDSectionIndex", dataType: "decimal")
-disassembly.createGlobal(at: 0xc106, named: "wIntroBGYOffset", dataType: "decimal")
-disassembly.createGlobal(at: 0xc108, named: "wNameIndex", dataType: "decimal")
-disassembly.createGlobal(at: 0xc10b, named: "wMusicTrackTiming", dataType: "MUSIC_TIMING")
-disassembly.createGlobal(at: 0xc10e, named: "wNeedsNPCTilesUpdate", dataType: "bool")
-disassembly.createGlobal(at: 0xc114, named: "wNoiseSfxSeaWavesCounter")
-disassembly.createGlobal(at: 0xc11c, named: "wLinkMotionState", dataType: "LINK_MOTION")
-disassembly.createGlobal(at: 0xc11f, named: "wLinkGroundStatus", dataType: "LINK_GROUND_STATUS")
-disassembly.createGlobal(at: 0xc121, named: "wUsingSpinAttack", dataType: "bool")
-disassembly.createGlobal(at: 0xc122, named: "wSwordCharge", dataType: "decimal")
-disassembly.createGlobal(at: 0xc123, named: "wLinkWalkingFrameCount", dataType: "decimal")
-disassembly.createGlobal(at: 0xc124, named: "wRoomTransitionState", dataType: "ROOM_TRANSITION")
-disassembly.createGlobal(at: 0xc125, named: "wRoomTransitionDirection", dataType: "ROOM_TRANSITION_DIRECTION")
-disassembly.createGlobal(at: 0xc126, named: "wBGUpdateRegionOriginHigh")
-disassembly.createGlobal(at: 0xc127, named: "wBGUpdateRegionOriginLow")
-disassembly.createGlobal(at: 0xc128, named: "wBGUpdateRegionTilesCount")
-disassembly.createGlobal(at: 0xc129, named: "wRoomTransitionFramesBeforeMidScreen", dataType: "decimal")
-disassembly.createGlobal(at: 0xc12c, named: "wRoomTransitionTargetScrollX", dataType: "decimal")
-disassembly.createGlobal(at: 0xc12d, named: "wRoomTransitionTargetScrollY", dataType: "decimal")
-disassembly.createGlobal(at: 0xc12e, named: "wBGOriginHigh")
-disassembly.createGlobal(at: 0xc12f, named: "wBGOriginLow")
-disassembly.createGlobal(at: 0xc133, named: "wCollisionType")
-disassembly.createGlobal(at: 0xc136, named: "wSwordDirection", dataType: "SWORD_DIRECTION")
-disassembly.createGlobal(at: 0xc137, named: "wSwordAnimationState", dataType: "SWORD_ANIMATION_STATE")
-disassembly.createGlobal(at: 0xc13d, named: "wRandomSeed")
-disassembly.createGlobal(at: 0xc143, named: "wIsLinkInTheAir", dataType: "bool")
-disassembly.createGlobal(at: 0xc14a, named: "wIsRunningWithPegasusBoots", dataType: "bool")
-disassembly.createGlobal(at: 0xc14b, named: "wPegasusBootsChargeMeter", dataType: "decimal")
-disassembly.createGlobal(at: 0xc14c, named: "wIsShootingArrow", dataType: "bool")
-disassembly.createGlobal(at: 0xc14d, named: "wProjectileCount", dataType: "decimal")
-disassembly.createGlobal(at: 0xc14e, named: "wHasPlacedBomb", dataType: "bool")
-disassembly.createGlobal(at: 0xc14f, named: "wInventoryAppearing", dataType: "bool")
-disassembly.createGlobal(at: 0xc155, named: "wScreenShakeHorizontal", dataType: "decimal")
-disassembly.createGlobal(at: 0xc156, named: "wScreenShakeVertical", dataType: "decimal")
-disassembly.createGlobal(at: 0xc159, named: "wInventoryCursorFrameCounter", dataType: "decimal")
-disassembly.createGlobal(at: 0xc15a, named: "wHasMirrorShield", dataType: "bool")
-disassembly.createGlobal(at: 0xc15b, named: "wIsUsingShield", dataType: "bool")
+struct DisassemblyHints {
+  struct Global: ExpressibleByStringLiteral {
+    let name: String
+    let dataType: String?
 
-disassembly.createGlobal(at: 0xC166, named: "wLinkPlayingOcarinaCountdown")
-disassembly.createGlobal(at: 0xC169, named: "wNextJingle")
-disassembly.createGlobal(at: 0xC16B, named: "wTransitionSequenceCounter")
-disassembly.createGlobal(at: 0xC16F, named: "wDialogOpenCloseAnimationFrame")
-disassembly.createGlobal(at: 0xC170, named: "wDialogCharacterIndex")
-disassembly.createGlobal(at: 0xC171, named: "wDialogNextCharPosition")
-disassembly.createGlobal(at: 0xC172, named: "wDialogScrollDelay")
-disassembly.createGlobal(at: 0xC173, named: "wDialogIndex")
-disassembly.createGlobal(at: 0xC17B, named: "wFreeMovementMode")
-disassembly.createGlobal(at: 0xC17F, named: "wTransitionGfx")
-disassembly.createGlobal(at: 0xC180, named: "wTransitionGfxFrameCount")
-disassembly.createGlobal(at: 0xC19F, named: "wDialogState")
-disassembly.createGlobal(at: 0xC1A5, named: "wConveyorBeltsCount")
-disassembly.createGlobal(at: 0xC1A9, named: "wDialogGotItem")
-disassembly.createGlobal(at: 0xC1AA, named: "wDialogGotItemCountdown")
-disassembly.createGlobal(at: 0xC1BC, named: "wLoadPreviousMapCountdown")
-disassembly.createGlobal(at: 0xC1C0, named: "wBombArrowCooldown")
-disassembly.createGlobal(at: 0xC200, named: "wEntitiesPosXTable")
-disassembly.createGlobal(at: 0xC201, named: "wEntity1PosX")
-disassembly.createGlobal(at: 0xC202, named: "wEntity2PosX")
-disassembly.createGlobal(at: 0xC203, named: "wEntity3PosX")
-disassembly.createGlobal(at: 0xC204, named: "wEntity4PosX")
-disassembly.createGlobal(at: 0xC205, named: "wEntity5PosX")
-disassembly.createGlobal(at: 0xC206, named: "wEntity6PosX")
-disassembly.createGlobal(at: 0xC207, named: "wEntity7PosX")
-disassembly.createGlobal(at: 0xC208, named: "wEntity8PosX")
-disassembly.createGlobal(at: 0xC209, named: "wEntity9PosX")
-disassembly.createGlobal(at: 0xC20A, named: "wEntityAPosX")
-disassembly.createGlobal(at: 0xC20B, named: "wEntityBPosX")
-disassembly.createGlobal(at: 0xC20C, named: "wEntityCPosX")
-disassembly.createGlobal(at: 0xC20D, named: "wEntityDPosX")
-disassembly.createGlobal(at: 0xC20E, named: "wEntityEPosX")
-disassembly.createGlobal(at: 0xC20F, named: "wEntityFPosX")
-disassembly.createGlobal(at: 0xC210, named: "wEntitiesPosYTable")
-disassembly.createGlobal(at: 0xC211, named: "wEntity1PosY")
-disassembly.createGlobal(at: 0xC212, named: "wEntity2PosY")
-disassembly.createGlobal(at: 0xC213, named: "wEntity3PosY")
-disassembly.createGlobal(at: 0xC214, named: "wEntity4PosY")
-disassembly.createGlobal(at: 0xC215, named: "wEntity5PosY")
-disassembly.createGlobal(at: 0xC216, named: "wEntity6PosY")
-disassembly.createGlobal(at: 0xC217, named: "wEntity7PosY")
-disassembly.createGlobal(at: 0xC218, named: "wEntity8PosY")
-disassembly.createGlobal(at: 0xC219, named: "wEntity9PosY")
-disassembly.createGlobal(at: 0xC21A, named: "wEntityAPosY")
-disassembly.createGlobal(at: 0xC21B, named: "wEntityBPosY")
-disassembly.createGlobal(at: 0xC21C, named: "wEntityCPosY")
-disassembly.createGlobal(at: 0xC21D, named: "wEntityDPosY")
-disassembly.createGlobal(at: 0xC21E, named: "wEntityEPosY")
-disassembly.createGlobal(at: 0xC21F, named: "wEntityFPosY")
-disassembly.createGlobal(at: 0xC220, named: "wEntitiesPosXSignTable")
-disassembly.createGlobal(at: 0xC230, named: "wEntitiesPosYSignTable")
-disassembly.createGlobal(at: 0xC240, named: "wEntitiesSpeedXTable")
-disassembly.createGlobal(at: 0xC241, named: "wEntity1SpeedX")
-disassembly.createGlobal(at: 0xC242, named: "wEntity2SpeedX")
-disassembly.createGlobal(at: 0xC243, named: "wEntity3SpeedX")
-disassembly.createGlobal(at: 0xC244, named: "wEntity4SpeedX")
-disassembly.createGlobal(at: 0xC245, named: "wEntity5SpeedX")
-disassembly.createGlobal(at: 0xC246, named: "wEntity6SpeedX")
-disassembly.createGlobal(at: 0xC247, named: "wEntity7SpeedX")
-disassembly.createGlobal(at: 0xC248, named: "wEntity8SpeedX")
-disassembly.createGlobal(at: 0xC249, named: "wEntity9SpeedX")
-disassembly.createGlobal(at: 0xC24A, named: "wEntityASpeedX")
-disassembly.createGlobal(at: 0xC24B, named: "wEntityBSpeedX")
-disassembly.createGlobal(at: 0xC24C, named: "wEntityCSpeedX")
-disassembly.createGlobal(at: 0xC24D, named: "wEntityDSpeedX")
-disassembly.createGlobal(at: 0xC24E, named: "wEntityESpeedX")
-disassembly.createGlobal(at: 0xC24F, named: "wEntityFSpeedX")
-disassembly.createGlobal(at: 0xC250, named: "wEntitiesSpeedYTable")
-disassembly.createGlobal(at: 0xC251, named: "wEntity1SpeedY")
-disassembly.createGlobal(at: 0xC252, named: "wEntity2SpeedY")
-disassembly.createGlobal(at: 0xC253, named: "wEntity3SpeedY")
-disassembly.createGlobal(at: 0xC254, named: "wEntity4SpeedY")
-disassembly.createGlobal(at: 0xC255, named: "wEntity5SpeedY")
-disassembly.createGlobal(at: 0xC256, named: "wEntity6SpeedY")
-disassembly.createGlobal(at: 0xC257, named: "wEntity7SpeedY")
-disassembly.createGlobal(at: 0xC258, named: "wEntity8SpeedY")
-disassembly.createGlobal(at: 0xC259, named: "wEntity9SpeedY")
-disassembly.createGlobal(at: 0xC25A, named: "wEntityASpeedY")
-disassembly.createGlobal(at: 0xC25B, named: "wEntityBSpeedY")
-disassembly.createGlobal(at: 0xC25C, named: "wEntityCSpeedY")
-disassembly.createGlobal(at: 0xC25D, named: "wEntityDSpeedY")
-disassembly.createGlobal(at: 0xC25E, named: "wEntityESpeedY")
-disassembly.createGlobal(at: 0xC25F, named: "wEntityFSpeedY")
-disassembly.createGlobal(at: 0xC290, named: "wEntitiesWalkingTable")
-disassembly.createGlobal(at: 0xC2A0, named: "wEntitiesCollisionsTable")
-disassembly.createGlobal(at: 0xC2B0, named: "wEntitiesUnknownTableB")
-disassembly.createGlobal(at: 0xC2C0, named: "wEntitiesUnknownTableC")
-disassembly.createGlobal(at: 0xC2D0, named: "wEntitiesUnknownTableD")
-disassembly.createGlobal(at: 0xC2E0, named: "wEntitiesTransitionCountdownTable")
-disassembly.createGlobal(at: 0xC2F0, named: "wEntitiesUnknowTableF")
-disassembly.createGlobal(at: 0xC300, named: "wEntitiesUnknowTableG")
-disassembly.createGlobal(at: 0xC310, named: "wEntitiesPosZTable")
-disassembly.createGlobal(at: 0xC320, named: "wEntitiesSpeedZTable")
-disassembly.createGlobal(at: 0xC360, named: "wEntitiesHealthTable")
-disassembly.createGlobal(at: 0xC3A0, named: "wEntitiesTypeTable")
-disassembly.createGlobal(at: 0xC3B0, named: "wEntitiesUnknownTableG")
-disassembly.createGlobal(at: 0xC3CB, named: "wObjectAffectingBGPalette")
-disassembly.createGlobal(at: 0xC3CC, named: "wBGPaletteEffectAddress")
-disassembly.createGlobal(at: 0xC458, named: "wDroppedItemsCountdown")
-disassembly.createGlobal(at: 0xC460, named: "wEntitiesLoadOrderTable")
-disassembly.createGlobal(at: 0xC5A7, named: "wBossAgonySFXCountdown")
-disassembly.createGlobal(at: 0xC5AA, named: "wEggMazeProgress")
-disassembly.createGlobal(at: 0xC5AB, named: "wDialogSFX")
-disassembly.createGlobal(at: 0xC5AF, named: "wNextWorldMusicTrackCountdown")
-disassembly.createGlobal(at: 0xD000, named: "wIsFileSelectionArrowShifted")
-disassembly.createGlobal(at: 0xD001, named: "wIntroTimer")
-disassembly.createGlobal(at: 0xD002, named: "wIntroSubTimer")
-disassembly.createGlobal(at: 0xD360, named: "wActiveJingle")
-disassembly.createGlobal(at: 0xD368, named: "wActiveMusicTrack")
-disassembly.createGlobal(at: 0xD370, named: "wActiveWaveSfx")
-disassembly.createGlobal(at: 0xD378, named: "wActiveNoiseSfx")
-disassembly.createGlobal(at: 0xD401, named: "wWarp0MapCategory")
-disassembly.createGlobal(at: 0xD402, named: "wWarp0Map")
-disassembly.createGlobal(at: 0xD403, named: "wWarp0Room")
-disassembly.createGlobal(at: 0xD404, named: "wWarp0DestinationX")
-disassembly.createGlobal(at: 0xD405, named: "wWarp0DestinationY")
-disassembly.createGlobal(at: 0xD406, named: "wWarp1MapCategory")
-disassembly.createGlobal(at: 0xD407, named: "wWarp1Map")
-disassembly.createGlobal(at: 0xD408, named: "wWarp1Room")
-disassembly.createGlobal(at: 0xD409, named: "wWarp1DestinationX")
-disassembly.createGlobal(at: 0xD40A, named: "wWarp1DestinationY")
-disassembly.createGlobal(at: 0xD40B, named: "wWarp2MapCategory")
-disassembly.createGlobal(at: 0xD40C, named: "wWarp2Map")
-disassembly.createGlobal(at: 0xD40D, named: "wWarp2Room")
-disassembly.createGlobal(at: 0xD40E, named: "wWarp2DestinationX")
-disassembly.createGlobal(at: 0xD40F, named: "wWarp2DestinationY")
-disassembly.createGlobal(at: 0xD410, named: "wWarp3MapCategory")
-disassembly.createGlobal(at: 0xD411, named: "wWarp3Map")
-disassembly.createGlobal(at: 0xD412, named: "wWarp3Room")
-disassembly.createGlobal(at: 0xD413, named: "wWarp3DestinationX")
-disassembly.createGlobal(at: 0xD414, named: "wWarp3DestinationY")
-disassembly.createGlobal(at: 0xD415, named: "wPieceOfPowerKillCount")
-disassembly.createGlobal(at: 0xD416, named: "wWarp0PositionTileIndex")
-disassembly.createGlobal(at: 0xD417, named: "wWarp1PositionTileIndex")
-disassembly.createGlobal(at: 0xD418, named: "wWarp2PositionTileIndex")
-disassembly.createGlobal(at: 0xD419, named: "wWarp3PositionTileIndex")
-disassembly.createGlobal(at: 0xD462, named: "wCompassSfxCountdown")
-disassembly.createGlobal(at: 0xD47A, named: "wPowerUpHits")
-disassembly.createGlobal(at: 0xD47B, named: "wForceFileSelectionScreenMusic")
-disassembly.createGlobal(at: 0xD47C, named: "wActivePowerUp")
-disassembly.createGlobal(at: 0xD47E, named: "wDidStealItem")
-disassembly.createGlobal(at: 0xD480, named: "wDungeonMinimap")
-disassembly.createGlobal(at: 0xD600, named: "wRequests")
-disassembly.createGlobal(at: 0xD601, named: "wRequestDestinationHigh")
-disassembly.createGlobal(at: 0xD602, named: "wRequestDestinationLow")
-disassembly.createGlobal(at: 0xD603, named: "wRequestLength")
-disassembly.createGlobal(at: 0xD604, named: "wRequestData")
-disassembly.createGlobal(at: 0xD6FA, named: "wRoomSwitchableObject")
-disassembly.createGlobal(at: 0xD700, named: "wRoomObjectsArea")
-disassembly.createGlobal(at: 0xD711, named: "wRoomObjects")
-disassembly.createGlobal(at: 0xD800, named: "wOverworldRoomStatus")
-disassembly.createGlobal(at: 0xD900, named: "wIndoorARoomStatus")
-disassembly.createGlobal(at: 0xDA00, named: "wIndoorBRoomStatus")
-disassembly.createGlobal(at: 0xDB00, named: "wAButtonSlot")
-disassembly.createGlobal(at: 0xDB01, named: "wBButtonSlot")
-disassembly.createGlobal(at: 0xDB02, named: "wInventoryItem1")
-disassembly.createGlobal(at: 0xDB03, named: "wInventoryItem2")
-disassembly.createGlobal(at: 0xDB04, named: "wInventoryItem3")
-disassembly.createGlobal(at: 0xDB05, named: "wInventoryItem4")
-disassembly.createGlobal(at: 0xDB06, named: "wInventoryItem5")
-disassembly.createGlobal(at: 0xDB07, named: "wInventoryItem6")
-disassembly.createGlobal(at: 0xDB08, named: "wInventoryItem7")
-disassembly.createGlobal(at: 0xDB09, named: "wInventoryItem8")
-disassembly.createGlobal(at: 0xDB0A, named: "wInventoryItem9")
-disassembly.createGlobal(at: 0xDB0B, named: "wInventoryItem10")
-disassembly.createGlobal(at: 0xDB0C, named: "wHasFlippers")
-disassembly.createGlobal(at: 0xDB0D, named: "wHasMedicine")
-disassembly.createGlobal(at: 0xDB0E, named: "wTradeSequenceItem")
-disassembly.createGlobal(at: 0xDB0F, named: "wSeashellsCount")
-disassembly.createGlobal(at: 0xDB11, named: "wHasTailKey")
-disassembly.createGlobal(at: 0xDB12, named: "wHasAnglerKey")
-disassembly.createGlobal(at: 0xDB13, named: "wHasFaceKey")
-disassembly.createGlobal(at: 0xDB14, named: "wHasBirdKey")
-disassembly.createGlobal(at: 0xDB15, named: "wGoldenLeavesCount")
-disassembly.createGlobal(at: 0xDB16, named: "wDungeonItemFlags")
-disassembly.createGlobal(at: 0xDB43, named: "wPowerBraceletLevel")
-disassembly.createGlobal(at: 0xDB44, named: "wShieldLevel")
-disassembly.createGlobal(at: 0xDB45, named: "wArrowCount")
-disassembly.createGlobal(at: 0xDB4C, named: "wMagicPowderCount")
-disassembly.createGlobal(at: 0xDB4D, named: "wBombCount")
-disassembly.createGlobal(at: 0xDB4E, named: "wSwordLevel")
-disassembly.createGlobal(at: 0xDB4F, named: "wName")
-disassembly.createGlobal(at: 0xDB56, named: "wIsBowWowFollowingLink")
-disassembly.createGlobal(at: 0xDB57, named: "wDeathCount")
-disassembly.createGlobal(at: 0xDB5A, named: "wHealth")
-disassembly.createGlobal(at: 0xDB5B, named: "wMaxHealth")
-disassembly.createGlobal(at: 0xDB5C, named: "wHeartPiecesCount")
-disassembly.createGlobal(at: 0xDB5D, named: "wRupeeCountHigh")
-disassembly.createGlobal(at: 0xDB5E, named: "wRupeeCountLow")
-disassembly.createGlobal(at: 0xDB5F, named: "wSpawnLocationData")
-disassembly.createGlobal(at: 0xDB60, named: "wSpawnMapId")
-disassembly.createGlobal(at: 0xDB61, named: "wSpawnMapRoom")
-disassembly.createGlobal(at: 0xDB62, named: "wSpawnPositionX")
-disassembly.createGlobal(at: 0xDB63, named: "wSpawnPositionY")
-disassembly.createGlobal(at: 0xDB64, named: "wSpawnIndoorRoom")
-disassembly.createGlobal(at: 0xDB65, named: "wHasInstrument1")
-disassembly.createGlobal(at: 0xDB66, named: "wHasInstrument2")
-disassembly.createGlobal(at: 0xDB67, named: "wHasInstrument3")
-disassembly.createGlobal(at: 0xDB68, named: "wHasInstrument4")
-disassembly.createGlobal(at: 0xDB69, named: "wHasInstrument5")
-disassembly.createGlobal(at: 0xDB6A, named: "wHasInstrument6")
-disassembly.createGlobal(at: 0xDB6B, named: "wHasInstrument7")
-disassembly.createGlobal(at: 0xDB6C, named: "wHasInstrument8")
-disassembly.createGlobal(at: 0xDB6E, named: "wIsThief")
-disassembly.createGlobal(at: 0xDB73, named: "wIsMarinFollowingLink")
-disassembly.createGlobal(at: 0xDB76, named: "wMaxMagicPowder")
-disassembly.createGlobal(at: 0xDB77, named: "wMaxBombs")
-disassembly.createGlobal(at: 0xDB78, named: "wMaxArrows")
-disassembly.createGlobal(at: 0xDB79, named: "wIsGhostFollowingLink")
-disassembly.createGlobal(at: 0xDB7A, named: "wDB7A")
-disassembly.createGlobal(at: 0xDB7B, named: "wIsRoosterFollowingLink")
-disassembly.createGlobal(at: 0xDB90, named: "wAddRupeeBufferHigh")
-disassembly.createGlobal(at: 0xDB91, named: "wAddRupeeBufferLow")
-disassembly.createGlobal(at: 0xDB92, named: "wSubstractRupeeBufferHigh")
-disassembly.createGlobal(at: 0xDB93, named: "wSubstractRupeeBufferLow")
-disassembly.createGlobal(at: 0xDB94, named: "wDB94")
-disassembly.createGlobal(at: 0xDB97, named: "wBGPalette")
-disassembly.createGlobal(at: 0xDB98, named: "wOBJ0Palette")
-disassembly.createGlobal(at: 0xDB99, named: "wOBJ1Palette")
-disassembly.createGlobal(at: 0xDB9A, named: "wWindowY")
-disassembly.createGlobal(at: 0xDB9C, named: "wMapEntranceRoom")
-disassembly.createGlobal(at: 0xDB9D, named: "wMapEntrancePositionX")
-disassembly.createGlobal(at: 0xDB9E, named: "wMapEntrancePositionY")
-disassembly.createGlobal(at: 0xDBA5, named: "wIsIndoor")
-disassembly.createGlobal(at: 0xDBA6, named: "wSaveSlot")
-disassembly.createGlobal(at: 0xDBA7, named: "wSaveFilesCount")
-disassembly.createGlobal(at: 0xDBAE, named: "wIndoorRoom")
-disassembly.createGlobal(at: 0xDBB0, named: "wMinimapLayout")
-disassembly.createGlobal(at: 0xDBB1, named: "wLinkMapEntryPositionX")
-disassembly.createGlobal(at: 0xDBB2, named: "wLinkMapEntryPositionY")
-disassembly.createGlobal(at: 0xDBB5, named: "wKillCount2")
-disassembly.createGlobal(at: 0xDBC9, named: "wTorchesCount")
-disassembly.createGlobal(at: 0xDBCC, named: "wHasDungeonMap")
-disassembly.createGlobal(at: 0xDBCD, named: "wHasDungeonCompass")
-disassembly.createGlobal(at: 0xDBCE, named: "wHasDungeonStoneSlab")
-disassembly.createGlobal(at: 0xDBCF, named: "wHasDungeonBossKey")
-disassembly.createGlobal(at: 0xDBD0, named: "wSmallKeysCount")
-disassembly.createGlobal(at: 0xDC00, named: "wFile1DeathCountHigh")
-disassembly.createGlobal(at: 0xDC01, named: "wFile1DeathCountLow")
-disassembly.createGlobal(at: 0xDC02, named: "wFile2DeathCountHigh")
-disassembly.createGlobal(at: 0xDC03, named: "wFile2DeathCountLow")
-disassembly.createGlobal(at: 0xDC04, named: "wFile3DeathCountHigh")
-disassembly.createGlobal(at: 0xDC05, named: "wFile3DeathCountLow")
-disassembly.createGlobal(at: 0xDC0C, named: "wPhotos1")
-disassembly.createGlobal(at: 0xDC0D, named: "wPhotos2")
-disassembly.createGlobal(at: 0xDC0F, named: "wTunicType")
-disassembly.createGlobal(at: 0xDDD1, named: "wPaletteUnknownA")
-disassembly.createGlobal(at: 0xDDD2, named: "wPaletteToLoadForTileMap")
-disassembly.createGlobal(at: 0xDDD3, named: "wPaletteUnknownC")
-disassembly.createGlobal(at: 0xDDD4, named: "wPaletteUnknownD")
-disassembly.createGlobal(at: 0xDDD5, named: "wPaletteUnknownE")
-disassembly.createGlobal(at: 0xDDE0, named: "wColorDungeonRoomStatus")
+    init(stringLiteral: String) {
+      self.name = stringLiteral
+      self.dataType = nil
+    }
 
+    init(named name: String, dataType: String? = nil) {
+      self.name = name
+      self.dataType = dataType
+    }
+  }
 
-disassembly.createGlobal(at: 0xc1bf, named: "wScrollXOffset", dataType: "decimal")
-disassembly.createGlobal(at: 0xc280, named: "wEntitiesStateTable", dataType: "ENTITY_STATE")
-(0xc281...0xC28F).forEach {
-  disassembly.createGlobal(at: $0, named: "wEntity\(UInt8($0 - 0xc280).hexString)State", dataType: "ENTITY_STATE")
+  var globals: [LR35902.Address: Global] = [:]
 }
-disassembly.createGlobal(at: 0xc500, named: "wAlternateBackgroundEnabled", dataType: "bool")
-disassembly.createGlobal(at: 0xd369, named: "wAudioData")
-disassembly.createGlobal(at: 0xd379, named: "wAudioSelection")
-disassembly.createGlobal(at: 0xd46c, named: "wBossDefeated", dataType: "bool")
-disassembly.createGlobal(at: 0xd6fc, named: "wEnginePaused", dataType: "bool")
-disassembly.createGlobal(at: 0xd6fd, named: "wLCDControl", dataType: "LCDCF")
-disassembly.createGlobal(at: 0xd6fe, named: "wTileMapToLoad")
-disassembly.createGlobal(at: 0xd6ff, named: "wBGMapToLoad")
-disassembly.createGlobal(at: 0xdb95, named: "wGameMode", dataType: "GAMEMODE")
-disassembly.createGlobal(at: 0xdb96, named: "wGameSubMode")
-disassembly.createGlobal(at: 0xdbaf, named: "wCurrentBank")
 
-disassembly.createGlobal(at: 0xff80, named: "hRomBank")
-disassembly.createGlobal(at: 0xff81, named: "hTemp")
-disassembly.createGlobal(at: 0xff82, named: "hCodeTemp")
-disassembly.createGlobal(at: 0xff90, named: "hNeedsBGTilesUpdate", dataType: "bool")
-disassembly.createGlobal(at: 0xff91, named: "hNeedsEnemyTilesUpdate", dataType: "bool")
-disassembly.createGlobal(at: 0xff96, named: "hBaseScrollX", dataType: "decimal")
-disassembly.createGlobal(at: 0xff97, named: "hBaseScrollY", dataType: "decimal")
-disassembly.createGlobal(at: 0xff98, named: "hLinkX", dataType: "decimal")
-disassembly.createGlobal(at: 0xff99, named: "hLinkY", dataType: "decimal")
-disassembly.createGlobal(at: 0xff9a, named: "hLinkXDelta", dataType: "decimal")
-disassembly.createGlobal(at: 0xff9b, named: "hLinkYDelta", dataType: "decimal")
-disassembly.createGlobal(at: 0xff9d, named: "hLinkAnimationState")
-disassembly.createGlobal(at: 0xff9e, named: "hLinkDirection", dataType: "DIRECTION")
-disassembly.createGlobal(at: 0xff9f, named: "hLinkXFinal", dataType: "decimal")
-disassembly.createGlobal(at: 0xffa0, named: "hLinkYFinal", dataType: "decimal")
-disassembly.createGlobal(at: 0xffa4, named: "hAnimatedTilesGroup", dataType: "ANIMATED_TILES")
-disassembly.createGlobal(at: 0xffa6, named: "hAnimatedTilesFrameCount", dataType: "decimal")
-disassembly.createGlobal(at: 0xffa7, named: "hAnimatedTilesDataOffset")
-disassembly.createGlobal(at: 0xffa9, named: "hWindowY")
-disassembly.createGlobal(at: 0xffaa, named: "hWindowX")
-disassembly.createGlobal(at: 0xffb0, named: "hMusicTrack", dataType: "TRACK")
-disassembly.createGlobal(at: 0xffb1, named: "hNextMusicTrack", dataType: "TRACK")
-disassembly.createGlobal(at: 0xffb5, named: "hButtonsInactiveDelay", dataType: "decimal")
-disassembly.createGlobal(at: 0xffbf, named: "hNextWorldMusicTrack", dataType: "TRACK")
-disassembly.createGlobal(at: 0xffc0, named: "hDMARoutine")
-disassembly.createGlobal(at: 0xffcb, named: "hPreviousJoypadState", dataType: "BUTTON")
-disassembly.createGlobal(at: 0xffcc, named: "hJoypadState", dataType: "BUTTON")
-disassembly.createGlobal(at: 0xffcd, named: "hSwordIntersectedAreaY", dataType: "decimal")
-disassembly.createGlobal(at: 0xffce, named: "hSwordIntersectedAreaX", dataType: "decimal")
-disassembly.createGlobal(at: 0xffd1, named: "hNeedsRenderingFrame")
-disassembly.createGlobal(at: 0xffd7, named: "hScratchA")
-disassembly.createGlobal(at: 0xffd8, named: "hScratchB")
-disassembly.createGlobal(at: 0xffd9, named: "hScratchC")
-disassembly.createGlobal(at: 0xffda, named: "hScratchD")
-disassembly.createGlobal(at: 0xffdf, named: "hRoomPaletteBank")
-disassembly.createGlobal(at: 0xffe0, named: "hScratchE")
-disassembly.createGlobal(at: 0xffe1, named: "hScratchF")
-disassembly.createGlobal(at: 0xffe2, named: "hScratchG")
-disassembly.createGlobal(at: 0xffe3, named: "hScratchH")
-disassembly.createGlobal(at: 0xffe4, named: "hScratchI")
-disassembly.createGlobal(at: 0xffe5, named: "hScratchJ")
-disassembly.createGlobal(at: 0xffe6, named: "hFreeWarpDataAddress")
-disassembly.createGlobal(at: 0xffe7, named: "hFrameCounter")
-disassembly.createGlobal(at: 0xffe8, named: "hScratchK")
-disassembly.createGlobal(at: 0xffe9, named: "hScratchL")
-disassembly.createGlobal(at: 0xffea, named: "hActiveEntityState")
-disassembly.createGlobal(at: 0xffeb, named: "hActiveEntityType", dataType: "ENTITY")
-disassembly.createGlobal(at: 0xffec, named: "wActiveEntityPosY", dataType: "decimal")
-disassembly.createGlobal(at: 0xffee, named: "wActiveEntityPosX", dataType: "decimal")
-disassembly.createGlobal(at: 0xfff0, named: "hActiveEntityWalking", dataType: "bool")
-disassembly.createGlobal(at: 0xfff2, named: "hJingle", dataType: "JINGLE")
-disassembly.createGlobal(at: 0xfff3, named: "hWaveSfx", dataType: "WAVE")
-disassembly.createGlobal(at: 0xfff4, named: "hNoiseSfx", dataType: "NOISE")
-disassembly.createGlobal(at: 0xfff6, named: "hMapRoom")
-disassembly.createGlobal(at: 0xfff7, named: "hMapID")
-disassembly.createGlobal(at: 0xfff8, named: "hRoomStatus", dataType: "ROOM_STATUS")
-disassembly.createGlobal(at: 0xfff9, named: "hIsSideScrolling", dataType: "SCROLL_VIEW")
-disassembly.createGlobal(at: 0xfffa, named: "hLinkRoomPosition", dataType: "decimal")
-disassembly.createGlobal(at: 0xfffb, named: "hLinkFinalRoomPosition", dataType: "decimal")
-disassembly.createGlobal(at: 0xfffd, named: "hDidRenderFrame", dataType: "bool")
+var hints = DisassemblyHints()
+
+hints.globals = [
+  0x0003: .init(named: "DEBUG_TOOL1", dataType: "bool"),
+  0x0004: .init(named: "DEBUG_TOOL2", dataType: "bool"),
+  0x0005: .init(named: "DEBUG_TOOL3", dataType: "bool"),
+  0xa100: "SAVEFILES",
+  0xc100: .init(named: "wScrollXOffsetForSection", dataType: "decimal"),
+  0xc105: .init(named: "wLCDSectionIndex", dataType: "decimal"),
+  0xc106: .init(named: "wIntroBGYOffset", dataType: "decimal"),
+  0xc108: .init(named: "wNameIndex", dataType: "decimal"),
+  0xc10b: .init(named: "wMusicTrackTiming", dataType: "MUSIC_TIMING"),
+  0xc10e: .init(named: "wNeedsNPCTilesUpdate", dataType: "bool"),
+  0xc114: "wNoiseSfxSeaWavesCounter",
+  0xc11c: .init(named: "wLinkMotionState", dataType: "LINK_MOTION"),
+  0xc11f: .init(named: "wLinkGroundStatus", dataType: "LINK_GROUND_STATUS"),
+  0xc121: .init(named: "wUsingSpinAttack", dataType: "bool"),
+  0xc122: .init(named: "wSwordCharge", dataType: "decimal"),
+  0xc123: .init(named: "wLinkWalkingFrameCount", dataType: "decimal"),
+  0xc124: .init(named: "wRoomTransitionState", dataType: "ROOM_TRANSITION"),
+  0xc125: .init(named: "wRoomTransitionDirection", dataType: "ROOM_TRANSITION_DIRECTION"),
+  0xc126: "wBGUpdateRegionOriginHigh",
+  0xc127: "wBGUpdateRegionOriginLow",
+  0xc128: "wBGUpdateRegionTilesCount",
+  0xc129: .init(named: "wRoomTransitionFramesBeforeMidScreen", dataType: "decimal"),
+  0xc12c: .init(named: "wRoomTransitionTargetScrollX", dataType: "decimal"),
+  0xc12d: .init(named: "wRoomTransitionTargetScrollY", dataType: "decimal"),
+  0xc12e: "wBGOriginHigh",
+  0xc12f: "wBGOriginLow",
+  0xc133: "wCollisionType",
+  0xc136: .init(named: "wSwordDirection", dataType: "SWORD_DIRECTION"),
+  0xc137: .init(named: "wSwordAnimationState", dataType: "SWORD_ANIMATION_STATE"),
+  0xc13d: "wRandomSeed",
+  0xc143: .init(named: "wIsLinkInTheAir", dataType: "bool"),
+  0xc14a: .init(named: "wIsRunningWithPegasusBoots", dataType: "bool"),
+  0xc14b: .init(named: "wPegasusBootsChargeMeter", dataType: "decimal"),
+  0xc14c: .init(named: "wIsShootingArrow", dataType: "bool"),
+  0xc14d: .init(named: "wProjectileCount", dataType: "decimal"),
+  0xc14e: .init(named: "wHasPlacedBomb", dataType: "bool"),
+  0xc14f: .init(named: "wInventoryAppearing", dataType: "bool"),
+  0xc155: .init(named: "wScreenShakeHorizontal", dataType: "decimal"),
+  0xc156: .init(named: "wScreenShakeVertical", dataType: "decimal"),
+  0xc159: .init(named: "wInventoryCursorFrameCounter", dataType: "decimal"),
+  0xc15a: .init(named: "wHasMirrorShield", dataType: "bool"),
+  0xc15b: .init(named: "wIsUsingShield", dataType: "bool"),
+  0xC166: "wLinkPlayingOcarinaCountdown",
+  0xC169: "wNextJingle",
+  0xC16B: "wTransitionSequenceCounter",
+  0xC16F: "wDialogOpenCloseAnimationFrame",
+  0xC170: "wDialogCharacterIndex",
+  0xC171: "wDialogNextCharPosition",
+  0xC172: "wDialogScrollDelay",
+  0xC173: "wDialogIndex",
+  0xC17B: "wFreeMovementMode",
+  0xC17F: "wTransitionGfx",
+  0xC180: "wTransitionGfxFrameCount",
+  0xC19F: "wDialogState",
+  0xC1A5: "wConveyorBeltsCount",
+  0xC1A9: "wDialogGotItem",
+  0xC1AA: "wDialogGotItemCountdown",
+  0xC1BC: "wLoadPreviousMapCountdown",
+  0xC1C0: "wBombArrowCooldown",
+  0xC200: "wEntitiesPosXTable",
+  0xC201: "wEntity1PosX",
+  0xC202: "wEntity2PosX",
+  0xC203: "wEntity3PosX",
+  0xC204: "wEntity4PosX",
+  0xC205: "wEntity5PosX",
+  0xC206: "wEntity6PosX",
+  0xC207: "wEntity7PosX",
+  0xC208: "wEntity8PosX",
+  0xC209: "wEntity9PosX",
+  0xC20A: "wEntityAPosX",
+  0xC20B: "wEntityBPosX",
+  0xC20C: "wEntityCPosX",
+  0xC20D: "wEntityDPosX",
+  0xC20E: "wEntityEPosX",
+  0xC20F: "wEntityFPosX",
+  0xC210: "wEntitiesPosYTable",
+  0xC211: "wEntity1PosY",
+  0xC212: "wEntity2PosY",
+  0xC213: "wEntity3PosY",
+  0xC214: "wEntity4PosY",
+  0xC215: "wEntity5PosY",
+  0xC216: "wEntity6PosY",
+  0xC217: "wEntity7PosY",
+  0xC218: "wEntity8PosY",
+  0xC219: "wEntity9PosY",
+  0xC21A: "wEntityAPosY",
+  0xC21B: "wEntityBPosY",
+  0xC21C: "wEntityCPosY",
+  0xC21D: "wEntityDPosY",
+  0xC21E: "wEntityEPosY",
+  0xC21F: "wEntityFPosY",
+  0xC220: "wEntitiesPosXSignTable",
+  0xC230: "wEntitiesPosYSignTable",
+  0xC240: "wEntitiesSpeedXTable",
+  0xC241: "wEntity1SpeedX",
+  0xC242: "wEntity2SpeedX",
+  0xC243: "wEntity3SpeedX",
+  0xC244: "wEntity4SpeedX",
+  0xC245: "wEntity5SpeedX",
+  0xC246: "wEntity6SpeedX",
+  0xC247: "wEntity7SpeedX",
+  0xC248: "wEntity8SpeedX",
+  0xC249: "wEntity9SpeedX",
+  0xC24A: "wEntityASpeedX",
+  0xC24B: "wEntityBSpeedX",
+  0xC24C: "wEntityCSpeedX",
+  0xC24D: "wEntityDSpeedX",
+  0xC24E: "wEntityESpeedX",
+  0xC24F: "wEntityFSpeedX",
+  0xC250: "wEntitiesSpeedYTable",
+  0xC251: "wEntity1SpeedY",
+  0xC252: "wEntity2SpeedY",
+  0xC253: "wEntity3SpeedY",
+  0xC254: "wEntity4SpeedY",
+  0xC255: "wEntity5SpeedY",
+  0xC256: "wEntity6SpeedY",
+  0xC257: "wEntity7SpeedY",
+  0xC258: "wEntity8SpeedY",
+  0xC259: "wEntity9SpeedY",
+  0xC25A: "wEntityASpeedY",
+  0xC25B: "wEntityBSpeedY",
+  0xC25C: "wEntityCSpeedY",
+  0xC25D: "wEntityDSpeedY",
+  0xC25E: "wEntityESpeedY",
+  0xC25F: "wEntityFSpeedY",
+  0xC290: "wEntitiesWalkingTable",
+  0xC2A0: "wEntitiesCollisionsTable",
+  0xC2B0: "wEntitiesUnknownTableB",
+  0xC2C0: "wEntitiesUnknownTableC",
+  0xC2D0: "wEntitiesUnknownTableD",
+  0xC2E0: "wEntitiesTransitionCountdownTable",
+  0xC2F0: "wEntitiesUnknowTableF",
+  0xC300: "wEntitiesUnknowTableG",
+  0xC310: "wEntitiesPosZTable",
+  0xC320: "wEntitiesSpeedZTable",
+  0xC360: "wEntitiesHealthTable",
+  0xC3A0: "wEntitiesTypeTable",
+  0xC3B0: "wEntitiesUnknownTableG",
+  0xC3CB: "wObjectAffectingBGPalette",
+  0xC3CC: "wBGPaletteEffectAddress",
+  0xC458: "wDroppedItemsCountdown",
+  0xC460: "wEntitiesLoadOrderTable",
+  0xC5A7: "wBossAgonySFXCountdown",
+  0xC5AA: "wEggMazeProgress",
+  0xC5AB: "wDialogSFX",
+  0xC5AF: "wNextWorldMusicTrackCountdown",
+  0xD000: "wIsFileSelectionArrowShifted",
+  0xD001: "wIntroTimer",
+  0xD002: "wIntroSubTimer",
+  0xD360: "wActiveJingle",
+  0xD368: "wActiveMusicTrack",
+  0xD370: "wActiveWaveSfx",
+  0xD378: "wActiveNoiseSfx",
+  0xD401: "wWarp0MapCategory",
+  0xD402: "wWarp0Map",
+  0xD403: "wWarp0Room",
+  0xD404: "wWarp0DestinationX",
+  0xD405: "wWarp0DestinationY",
+  0xD406: "wWarp1MapCategory",
+  0xD407: "wWarp1Map",
+  0xD408: "wWarp1Room",
+  0xD409: "wWarp1DestinationX",
+  0xD40A: "wWarp1DestinationY",
+  0xD40B: "wWarp2MapCategory",
+  0xD40C: "wWarp2Map",
+  0xD40D: "wWarp2Room",
+  0xD40E: "wWarp2DestinationX",
+  0xD40F: "wWarp2DestinationY",
+  0xD410: "wWarp3MapCategory",
+  0xD411: "wWarp3Map",
+  0xD412: "wWarp3Room",
+  0xD413: "wWarp3DestinationX",
+  0xD414: "wWarp3DestinationY",
+  0xD415: "wPieceOfPowerKillCount",
+  0xD416: "wWarp0PositionTileIndex",
+  0xD417: "wWarp1PositionTileIndex",
+  0xD418: "wWarp2PositionTileIndex",
+  0xD419: "wWarp3PositionTileIndex",
+  0xD462: "wCompassSfxCountdown",
+  0xD47A: "wPowerUpHits",
+  0xD47B: "wForceFileSelectionScreenMusic",
+  0xD47C: "wActivePowerUp",
+  0xD47E: "wDidStealItem",
+  0xD480: "wDungeonMinimap",
+  0xD600: "wRequests",
+  0xD601: "wRequestDestinationHigh",
+  0xD602: "wRequestDestinationLow",
+  0xD603: "wRequestLength",
+  0xD604: "wRequestData",
+  0xD6FA: "wRoomSwitchableObject",
+  0xD700: "wRoomObjectsArea",
+  0xD711: "wRoomObjects",
+  0xD800: "wOverworldRoomStatus",
+  0xD900: "wIndoorARoomStatus",
+  0xDA00: "wIndoorBRoomStatus",
+  0xDB00: "wAButtonSlot",
+  0xDB01: "wBButtonSlot",
+  0xDB02: "wInventoryItem1",
+  0xDB03: "wInventoryItem2",
+  0xDB04: "wInventoryItem3",
+  0xDB05: "wInventoryItem4",
+  0xDB06: "wInventoryItem5",
+  0xDB07: "wInventoryItem6",
+  0xDB08: "wInventoryItem7",
+  0xDB09: "wInventoryItem8",
+  0xDB0A: "wInventoryItem9",
+  0xDB0B: "wInventoryItem10",
+  0xDB0C: "wHasFlippers",
+  0xDB0D: "wHasMedicine",
+  0xDB0E: "wTradeSequenceItem",
+  0xDB0F: "wSeashellsCount",
+  0xDB11: "wHasTailKey",
+  0xDB12: "wHasAnglerKey",
+  0xDB13: "wHasFaceKey",
+  0xDB14: "wHasBirdKey",
+  0xDB15: "wGoldenLeavesCount",
+  0xDB16: "wDungeonItemFlags",
+  0xDB43: "wPowerBraceletLevel",
+  0xDB44: "wShieldLevel",
+  0xDB45: "wArrowCount",
+  0xDB4C: "wMagicPowderCount",
+  0xDB4D: "wBombCount",
+  0xDB4E: "wSwordLevel",
+  0xDB4F: "wName",
+  0xDB56: "wIsBowWowFollowingLink",
+  0xDB57: "wDeathCount",
+  0xDB5A: "wHealth",
+  0xDB5B: "wMaxHealth",
+  0xDB5C: "wHeartPiecesCount",
+  0xDB5D: "wRupeeCountHigh",
+  0xDB5E: "wRupeeCountLow",
+  0xDB5F: "wSpawnLocationData",
+  0xDB60: "wSpawnMapId",
+  0xDB61: "wSpawnMapRoom",
+  0xDB62: "wSpawnPositionX",
+  0xDB63: "wSpawnPositionY",
+  0xDB64: "wSpawnIndoorRoom",
+  0xDB65: "wHasInstrument1",
+  0xDB66: "wHasInstrument2",
+  0xDB67: "wHasInstrument3",
+  0xDB68: "wHasInstrument4",
+  0xDB69: "wHasInstrument5",
+  0xDB6A: "wHasInstrument6",
+  0xDB6B: "wHasInstrument7",
+  0xDB6C: "wHasInstrument8",
+  0xDB6E: "wIsThief",
+  0xDB73: "wIsMarinFollowingLink",
+  0xDB76: "wMaxMagicPowder",
+  0xDB77: "wMaxBombs",
+  0xDB78: "wMaxArrows",
+  0xDB79: "wIsGhostFollowingLink",
+  0xDB7A: "wDB7A",
+  0xDB7B: "wIsRoosterFollowingLink",
+  0xDB90: "wAddRupeeBufferHigh",
+  0xDB91: "wAddRupeeBufferLow",
+  0xDB92: "wSubstractRupeeBufferHigh",
+  0xDB93: "wSubstractRupeeBufferLow",
+  0xDB94: "wDB94",
+  0xDB97: "wBGPalette",
+  0xDB98: "wOBJ0Palette",
+  0xDB99: "wOBJ1Palette",
+  0xDB9A: "wWindowY",
+  0xDB9C: "wMapEntranceRoom",
+  0xDB9D: "wMapEntrancePositionX",
+  0xDB9E: "wMapEntrancePositionY",
+  0xDBA5: "wIsIndoor",
+  0xDBA6: "wSaveSlot",
+  0xDBA7: "wSaveFilesCount",
+  0xDBAE: "wIndoorRoom",
+  0xDBB0: "wMinimapLayout",
+  0xDBB1: "wLinkMapEntryPositionX",
+  0xDBB2: "wLinkMapEntryPositionY",
+  0xDBB5: "wKillCount2",
+  0xDBC9: "wTorchesCount",
+  0xDBCC: "wHasDungeonMap",
+  0xDBCD: "wHasDungeonCompass",
+  0xDBCE: "wHasDungeonStoneSlab",
+  0xDBCF: "wHasDungeonBossKey",
+  0xDBD0: "wSmallKeysCount",
+  0xDC00: "wFile1DeathCountHigh",
+  0xDC01: "wFile1DeathCountLow",
+  0xDC02: "wFile2DeathCountHigh",
+  0xDC03: "wFile2DeathCountLow",
+  0xDC04: "wFile3DeathCountHigh",
+  0xDC05: "wFile3DeathCountLow",
+  0xDC0C: "wPhotos1",
+  0xDC0D: "wPhotos2",
+  0xDC0F: "wTunicType",
+  0xDDD1: "wPaletteUnknownA",
+  0xDDD2: "wPaletteToLoadForTileMap",
+  0xDDD3: "wPaletteUnknownC",
+  0xDDD4: "wPaletteUnknownD",
+  0xDDD5: "wPaletteUnknownE",
+  0xDDE0: "wColorDungeonRoomStatus",
+  0xc1bf: .init(named: "wScrollXOffset", dataType: "decimal"),
+  0xc280: .init(named: "wEntitiesStateTable", dataType: "ENTITY_STATE"),
+  0xc500: .init(named: "wAlternateBackgroundEnabled", dataType: "bool"),
+  0xd369: "wAudioData",
+  0xd379: "wAudioSelection",
+  0xd46c: .init(named: "wBossDefeated", dataType: "bool"),
+  0xd6fc: .init(named: "wEnginePaused", dataType: "bool"),
+  0xd6fd: .init(named: "wLCDControl", dataType: "LCDCF"),
+  0xd6fe: "wTileMapToLoad",
+  0xd6ff: "wBGMapToLoad",
+  0xdb95: .init(named: "wGameMode", dataType: "GAMEMODE"),
+  0xdb96: "wGameSubMode",
+  0xdbaf: "wCurrentBank",
+  0xff80: "hRomBank",
+  0xff81: "hTemp",
+  0xff82: "hCodeTemp",
+  0xff90: .init(named: "hNeedsBGTilesUpdate", dataType: "bool"),
+  0xff91: .init(named: "hNeedsEnemyTilesUpdate", dataType: "bool"),
+  0xff96: .init(named: "hBaseScrollX", dataType: "decimal"),
+  0xff97: .init(named: "hBaseScrollY", dataType: "decimal"),
+  0xff98: .init(named: "hLinkX", dataType: "decimal"),
+  0xff99: .init(named: "hLinkY", dataType: "decimal"),
+  0xff9a: .init(named: "hLinkXDelta", dataType: "decimal"),
+  0xff9b: .init(named: "hLinkYDelta", dataType: "decimal"),
+  0xff9d: "hLinkAnimationState",
+  0xff9e: .init(named: "hLinkDirection", dataType: "DIRECTION"),
+  0xff9f: .init(named: "hLinkXFinal", dataType: "decimal"),
+  0xffa0: .init(named: "hLinkYFinal", dataType: "decimal"),
+  0xffa4: .init(named: "hAnimatedTilesGroup", dataType: "ANIMATED_TILES"),
+  0xffa6: .init(named: "hAnimatedTilesFrameCount", dataType: "decimal"),
+  0xffa7: "hAnimatedTilesDataOffset",
+  0xffa9: "hWindowY",
+  0xffaa: "hWindowX",
+  0xffb0: .init(named: "hMusicTrack", dataType: "TRACK"),
+  0xffb1: .init(named: "hNextMusicTrack", dataType: "TRACK"),
+  0xffb5: .init(named: "hButtonsInactiveDelay", dataType: "decimal"),
+  0xffbf: .init(named: "hNextWorldMusicTrack", dataType: "TRACK"),
+  0xffc0: "hDMARoutine",
+  0xffcb: .init(named: "hPreviousJoypadState", dataType: "BUTTON"),
+  0xffcc: .init(named: "hJoypadState", dataType: "BUTTON"),
+  0xffcd: .init(named: "hSwordIntersectedAreaY", dataType: "decimal"),
+  0xffce: .init(named: "hSwordIntersectedAreaX", dataType: "decimal"),
+  0xffd1: "hNeedsRenderingFrame",
+  0xffd7: "hScratchA",
+  0xffd8: "hScratchB",
+  0xffd9: "hScratchC",
+  0xffda: "hScratchD",
+  0xffdf: "hRoomPaletteBank",
+  0xffe0: "hScratchE",
+  0xffe1: "hScratchF",
+  0xffe2: "hScratchG",
+  0xffe3: "hScratchH",
+  0xffe4: "hScratchI",
+  0xffe5: "hScratchJ",
+  0xffe6: "hFreeWarpDataAddress",
+  0xffe7: "hFrameCounter",
+  0xffe8: "hScratchK",
+  0xffe9: "hScratchL",
+  0xffea: "hActiveEntityState",
+  0xffeb: .init(named: "hActiveEntityType", dataType: "ENTITY"),
+  0xffec: .init(named: "wActiveEntityPosY", dataType: "decimal"),
+  0xffee: .init(named: "wActiveEntityPosX", dataType: "decimal"),
+  0xfff0: .init(named: "hActiveEntityWalking", dataType: "bool"),
+  0xfff2: .init(named: "hJingle", dataType: "JINGLE"),
+  0xfff3: .init(named: "hWaveSfx", dataType: "WAVE"),
+  0xfff4: .init(named: "hNoiseSfx", dataType: "NOISE"),
+  0xfff6: "hMapRoom",
+  0xfff7: "hMapID",
+  0xfff8: .init(named: "hRoomStatus", dataType: "ROOM_STATUS"),
+  0xfff9: .init(named: "hIsSideScrolling", dataType: "SCROLL_VIEW"),
+  0xfffa: .init(named: "hLinkRoomPosition", dataType: "decimal"),
+  0xfffb: .init(named: "hLinkFinalRoomPosition", dataType: "decimal"),
+  0xfffd: .init(named: "hDidRenderFrame", dataType: "bool"),
+]
+
+(0xc281...0xC28F).forEach {
+  hints.globals[$0] = .init(named: "wEntity\(UInt8($0 - 0xc280).hexString)State", dataType: "ENTITY_STATE")
+}
+
+for (address, global) in hints.globals {
+  disassembly.createGlobal(at: address, named: global.name, dataType: global.dataType)
+}
 
 disassembly.setSoftTerminator(at: 0x05F1, in: 0x00) // This function can't logically proceed past this point.
 

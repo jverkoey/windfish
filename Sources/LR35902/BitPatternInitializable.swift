@@ -4,8 +4,8 @@ import Foundation
  Enables generic methods to create Foundation integers from bit pattern representations.
 
  Foundation integer types already implement the bitPattern initializer, but this initializer is
- not exposed via any generic protocols. The result is that it's not possible to initialize a
- Foundation integer in a generic method.
+ not exposed via any generic protocols. This protocol exposes the fact that those initializers
+ exist on Foundation types.
  */
 protocol BitPatternInitializable {
   associatedtype CompanionType

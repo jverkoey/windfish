@@ -931,7 +931,7 @@ extension LR35902 {
     // TODO: Allow defining variable types, e.g. enums with well-understood values.
     public func createGlobal(at address: Address, named name: String, dataType: String? = nil) {
       precondition(globals[address] == nil, "Global already exists at \(address).")
-      if let dataType = dataType {
+      if let dataType = dataType, !dataType.isEmpty {
         precondition(dataTypes[dataType] != nil, "Data type is not registered.")
       }
       globals[address] = Global(name: name, dataType: dataType)

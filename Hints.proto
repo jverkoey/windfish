@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+message Global {
+  int64 address = 1;
+  string name = 2;
+  string datatype = 3;
+}
+
+message Hints {
+  repeated Global globals = 1;
+}
