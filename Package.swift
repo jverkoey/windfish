@@ -22,7 +22,7 @@ let package = Package(
       name: "gbdis",
       dependencies: [
         "LR35902",
-        "DisassemblyHints",
+        "DisassemblyRequest",
       ]),
     .testTarget(
       name: "LR35902Tests",
@@ -55,7 +55,7 @@ let package = Package(
     ),
 
     .target(
-      name: "DisassemblyHints",
+      name: "DisassemblyRequest",
       dependencies: ["SwiftProtobuf"]
     ),
   ]

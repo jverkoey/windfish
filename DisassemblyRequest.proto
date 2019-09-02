@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package Disassembly;
+
 message Global {
   uint64 address = 1;
   string name = 2;
@@ -8,4 +10,9 @@ message Global {
 
 message Hints {
   repeated Global globals = 1;
+}
+
+message Request {
+  Hints hints = 1;
+  bytes binary = 2;
 }
