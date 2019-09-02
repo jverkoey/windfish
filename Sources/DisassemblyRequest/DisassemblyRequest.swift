@@ -1,6 +1,6 @@
 import Foundation
 
-public struct DisassemblyRequest<AddressType: BinaryInteger> {
+public final class DisassemblyRequest<AddressType: BinaryInteger> {
   public init(data: Data) {
     self.data = data
   }
@@ -15,22 +15,22 @@ public struct DisassemblyRequest<AddressType: BinaryInteger> {
     case binary
   }
 
-  public mutating func createDatatype(named name: String, enumeration: [UInt8: String], representation: DatatypeRepresentation = .hexadecimal) {
+  public func createDatatype(named name: String, representation: DatatypeRepresentation = .hexadecimal, enumeration: [UInt8: String]) {
     precondition(Set(enumeration.values).count == enumeration.count, "There exist duplicate enumeration names.")
     createDatatype(named: name, type: Datatype(valueNames: enumeration, kind: .enumeration, representation: representation))
   }
 
-  public mutating func createDatatype(named name: String, bitmask: [UInt8: String], representation: DatatypeRepresentation = .binary) {
+  public func createDatatype(named name: String, representation: DatatypeRepresentation = .binary, bitmask: [UInt8: String]) {
     createDatatype(named: name, type: Datatype(valueNames: bitmask, kind: .bitmask, representation: representation))
   }
 
-  public mutating func createDatatype(named name: String, representation: DatatypeRepresentation) {
+  public func createDatatype(named name: String, representation: DatatypeRepresentation) {
     createDatatype(named: name, type: Datatype(valueNames: [:], kind: .any, representation: representation))
   }
 
   // MARK: Globals
 
-  public mutating func addGlobals(_ globals: [AddressType: String]) {
+  public func addGlobals(_ globals: [AddressType: String]) {
     let globalValues: [AddressType: Global] = globals.mapValues {
       let global = Global(stringLiteral: $0)
       if let dataType = global.dataType, dataTypes[dataType] == nil {
@@ -43,7 +43,7 @@ public struct DisassemblyRequest<AddressType: BinaryInteger> {
     }
   }
 
-  public mutating func addGlobal(at address: AddressType, named name: String) {
+  public func addGlobal(at address: AddressType, named name: String) {
     addGlobals([address: name])
   }
 
@@ -112,7 +112,7 @@ public struct DisassemblyRequest<AddressType: BinaryInteger> {
     let representation: DatatypeRepresentation
   }
 
-  private mutating func createDatatype(named name: String, type: Datatype) {
+  private func createDatatype(named name: String, type: Datatype) {
     precondition(!name.isEmpty, "Data type has invalid name.")
     precondition(dataTypes[name] == nil, "Data type \(name) already exists.")
     dataTypes[name] = type
