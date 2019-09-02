@@ -948,7 +948,11 @@ extension LR35902 {
       let dataType: String?
       init(name: String, dataType: String? = nil) {
         self.name = name
-        self.dataType = dataType
+        if let dataType = dataType, !dataType.isEmpty {
+          self.dataType = dataType
+        } else {
+          self.dataType = nil
+        }
       }
     }
     var globals: [Address: Global] = [:]
@@ -971,15 +975,18 @@ extension LR35902 {
       }
     }
     public func createDatatype(named name: String, enumeration: [UInt8: String], representation: Datatype.Representation = .hexadecimal) {
+      precondition(!name.isEmpty, "Data type has invalid name.")
       precondition(dataTypes[name] == nil, "Data type \(name) already exists.")
       assert(Set(enumeration.values).count == enumeration.count, "There exist duplicate enumeration names.")
       dataTypes[name] = Datatype(namedValues: enumeration, interpretation: .enumerated, representation: representation)
     }
     public func createDatatype(named name: String, bitmask: [UInt8: String], representation: Datatype.Representation = .binary) {
+      precondition(!name.isEmpty, "Data type has invalid name.")
       precondition(dataTypes[name] == nil, "Data type \(name) already exists.")
       dataTypes[name] = Datatype(namedValues: bitmask, interpretation: .bitmask, representation: representation)
     }
     public func createDatatype(named name: String, representation: Datatype.Representation) {
+      precondition(!name.isEmpty, "Data type has invalid name.")
       precondition(dataTypes[name] == nil, "Data type \(name) already exists.")
       dataTypes[name] = Datatype(namedValues: [:], interpretation: .any, representation: representation)
     }
@@ -989,6 +996,7 @@ extension LR35902 {
     var dataTypes: [String: Datatype] = [:]
 
     public func setType(at address: LR35902.Address, in bank: LR35902.Bank, to type: String) {
+      precondition(!type.isEmpty, "Invalid type provided.")
       precondition(dataTypes[type] != nil, "\(type) is not a known type.")
       typeAtLocation[LR35902.cartAddress(for: address, in: bank)!] = type
     }
