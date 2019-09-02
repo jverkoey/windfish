@@ -55,7 +55,8 @@ let package = Package(
     ),
 
     .target(
-      name: "DisassemblyHints"
+      name: "DisassemblyHints",
+      dependencies: ["SwiftProtobuf"]
     ),
   ]
 )
