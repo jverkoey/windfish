@@ -1,5 +1,6 @@
 import Foundation
 import LR35902
+import DisassemblyHints
 
 let data = try Data(contentsOf: URL(fileURLWithPath: "/Users/featherless/workbench/awakenlink/rom/LinksAwakening.gb"))
 
@@ -696,70 +697,51 @@ rstAddresses.forEach {
 
 disassembly.setData(at: 0x0006..<0x0008, in: 0x00)
 
-struct DisassemblyHints {
-  struct Global: ExpressibleByStringLiteral {
-    let name: String
-    let dataType: String?
+var hints = DisassemblyHints<LR35902.Address>()
 
-    init(stringLiteral: String) {
-      self.name = stringLiteral
-      self.dataType = nil
-    }
-
-    init(named name: String, dataType: String? = nil) {
-      self.name = name
-      self.dataType = dataType
-    }
-  }
-
-  var globals: [LR35902.Address: Global] = [:]
-}
-
-var hints = DisassemblyHints()
-
-hints.globals = [
-  0x0003: .init(named: "DEBUG_TOOL1", dataType: "bool"),
-  0x0004: .init(named: "DEBUG_TOOL2", dataType: "bool"),
-  0x0005: .init(named: "DEBUG_TOOL3", dataType: "bool"),
+hints.addGlobals([
+  0x0003: "bool DEBUG_TOOL1",
+  0x0004: "bool DEBUG_TOOL2",
+  0x0005: "bool DEBUG_TOOL3",
   0xa100: "SAVEFILES",
-  0xc100: .init(named: "wScrollXOffsetForSection", dataType: "decimal"),
-  0xc105: .init(named: "wLCDSectionIndex", dataType: "decimal"),
-  0xc106: .init(named: "wIntroBGYOffset", dataType: "decimal"),
-  0xc108: .init(named: "wNameIndex", dataType: "decimal"),
-  0xc10b: .init(named: "wMusicTrackTiming", dataType: "MUSIC_TIMING"),
-  0xc10e: .init(named: "wNeedsNPCTilesUpdate", dataType: "bool"),
+  0xc100: "decimal wScrollXOffsetForSection",
+  0xc105: "decimal wLCDSectionIndex",
+  0xc106: "decimal wIntroBGYOffset",
+  0xc108: "decimal wNameIndex",
+  0xc10b: "MUSIC_TIMING wMusicTrackTiming",
+  0xc10e: "bool wNeedsNPCTilesUpdate",
   0xc114: "wNoiseSfxSeaWavesCounter",
-  0xc11c: .init(named: "wLinkMotionState", dataType: "LINK_MOTION"),
-  0xc11f: .init(named: "wLinkGroundStatus", dataType: "LINK_GROUND_STATUS"),
-  0xc121: .init(named: "wUsingSpinAttack", dataType: "bool"),
-  0xc122: .init(named: "wSwordCharge", dataType: "decimal"),
-  0xc123: .init(named: "wLinkWalkingFrameCount", dataType: "decimal"),
-  0xc124: .init(named: "wRoomTransitionState", dataType: "ROOM_TRANSITION"),
-  0xc125: .init(named: "wRoomTransitionDirection", dataType: "ROOM_TRANSITION_DIRECTION"),
+  0xc11c: "LINK_MOTION wLinkMotionState",
+  0xc11f: "LINK_GROUND_STATUS wLinkGroundStatus",
+  0xc121: "bool wUsingSpinAttack",
+  0xc122: "decimal wSwordCharge",
+  0xc123: "decimal wLinkWalkingFrameCount",
+  0xc124: "ROOM_TRANSITION wRoomTransitionState",
+  0xc125: "ROOM_TRANSITION_DIRECTION wRoomTransitionDirection",
   0xc126: "wBGUpdateRegionOriginHigh",
   0xc127: "wBGUpdateRegionOriginLow",
   0xc128: "wBGUpdateRegionTilesCount",
-  0xc129: .init(named: "wRoomTransitionFramesBeforeMidScreen", dataType: "decimal"),
-  0xc12c: .init(named: "wRoomTransitionTargetScrollX", dataType: "decimal"),
-  0xc12d: .init(named: "wRoomTransitionTargetScrollY", dataType: "decimal"),
+  0xc129: "decimal wRoomTransitionFramesBeforeMidScreen",
+  0xc12c: "decimal wRoomTransitionTargetScrollX",
+  0xc12d: "decimal wRoomTransitionTargetScrollY",
   0xc12e: "wBGOriginHigh",
   0xc12f: "wBGOriginLow",
   0xc133: "wCollisionType",
-  0xc136: .init(named: "wSwordDirection", dataType: "SWORD_DIRECTION"),
-  0xc137: .init(named: "wSwordAnimationState", dataType: "SWORD_ANIMATION_STATE"),
+  0xc136: "SWORD_DIRECTION wSwordDirection",
+  0xc137: "SWORD_ANIMATION_STATE wSwordAnimationState",
   0xc13d: "wRandomSeed",
-  0xc143: .init(named: "wIsLinkInTheAir", dataType: "bool"),
-  0xc14a: .init(named: "wIsRunningWithPegasusBoots", dataType: "bool"),
-  0xc14b: .init(named: "wPegasusBootsChargeMeter", dataType: "decimal"),
-  0xc14c: .init(named: "wIsShootingArrow", dataType: "bool"),
-  0xc14d: .init(named: "wProjectileCount", dataType: "decimal"),
-  0xc14e: .init(named: "wHasPlacedBomb", dataType: "bool"),
-  0xc14f: .init(named: "wInventoryAppearing", dataType: "bool"),
-  0xc155: .init(named: "wScreenShakeHorizontal", dataType: "decimal"),
-  0xc156: .init(named: "wScreenShakeVertical", dataType: "decimal"),
-  0xc159: .init(named: "wInventoryCursorFrameCounter", dataType: "decimal"),
-  0xc15a: .init(named: "wHasMirrorShield", dataType: "bool"),
-  0xc15b: .init(named: "wIsUsingShield", dataType: "bool"),
+  0xc143: "bool wIsLinkInTheAir",
+  0xc14a: "bool wIsRunningWithPegasusBoots",
+  0xc14b: "decimal wPegasusBootsChargeMeter",
+  0xc14c: "bool wIsShootingArrow",
+  0xc14d: "decimal wProjectileCount",
+  0xc14e: "bool wHasPlacedBomb",
+  0xc14f: "bool wInventoryAppearing",
+  0xc155: "decimal wScreenShakeHorizontal",
+  0xc156: "decimal wScreenShakeVertical",
+  0xc159: "decimal wInventoryCursorFrameCounter",
+  0xc15a: "bool wHasMirrorShield",
+  0xc15b: "bool wIsUsingShield",
   0xC166: "wLinkPlayingOcarinaCountdown",
   0xC169: "wNextJingle",
   0xC16B: "wTransitionSequenceCounter",
@@ -1012,48 +994,48 @@ hints.globals = [
   0xDDD4: "wPaletteUnknownD",
   0xDDD5: "wPaletteUnknownE",
   0xDDE0: "wColorDungeonRoomStatus",
-  0xc1bf: .init(named: "wScrollXOffset", dataType: "decimal"),
-  0xc280: .init(named: "wEntitiesStateTable", dataType: "ENTITY_STATE"),
-  0xc500: .init(named: "wAlternateBackgroundEnabled", dataType: "bool"),
+  0xc1bf: "decimal wScrollXOffset",
+  0xc280: "ENTITY_STATE wEntitiesStateTable",
+  0xc500: "bool wAlternateBackgroundEnabled",
   0xd369: "wAudioData",
   0xd379: "wAudioSelection",
-  0xd46c: .init(named: "wBossDefeated", dataType: "bool"),
-  0xd6fc: .init(named: "wEnginePaused", dataType: "bool"),
-  0xd6fd: .init(named: "wLCDControl", dataType: "LCDCF"),
+  0xd46c: "bool wBossDefeated",
+  0xd6fc: "bool wEnginePaused",
+  0xd6fd: "LCDCF wLCDControl",
   0xd6fe: "wTileMapToLoad",
   0xd6ff: "wBGMapToLoad",
-  0xdb95: .init(named: "wGameMode", dataType: "GAMEMODE"),
+  0xdb95: "GAMEMODE wGameMode",
   0xdb96: "wGameSubMode",
   0xdbaf: "wCurrentBank",
   0xff80: "hRomBank",
   0xff81: "hTemp",
   0xff82: "hCodeTemp",
-  0xff90: .init(named: "hNeedsBGTilesUpdate", dataType: "bool"),
-  0xff91: .init(named: "hNeedsEnemyTilesUpdate", dataType: "bool"),
-  0xff96: .init(named: "hBaseScrollX", dataType: "decimal"),
-  0xff97: .init(named: "hBaseScrollY", dataType: "decimal"),
-  0xff98: .init(named: "hLinkX", dataType: "decimal"),
-  0xff99: .init(named: "hLinkY", dataType: "decimal"),
-  0xff9a: .init(named: "hLinkXDelta", dataType: "decimal"),
-  0xff9b: .init(named: "hLinkYDelta", dataType: "decimal"),
+  0xff90: "bool hNeedsBGTilesUpdate",
+  0xff91: "bool hNeedsEnemyTilesUpdate",
+  0xff96: "decimal hBaseScrollX",
+  0xff97: "decimal hBaseScrollY",
+  0xff98: "decimal hLinkX",
+  0xff99: "decimal hLinkY",
+  0xff9a: "decimal hLinkXDelta",
+  0xff9b: "decimal hLinkYDelta",
   0xff9d: "hLinkAnimationState",
-  0xff9e: .init(named: "hLinkDirection", dataType: "DIRECTION"),
-  0xff9f: .init(named: "hLinkXFinal", dataType: "decimal"),
-  0xffa0: .init(named: "hLinkYFinal", dataType: "decimal"),
-  0xffa4: .init(named: "hAnimatedTilesGroup", dataType: "ANIMATED_TILES"),
-  0xffa6: .init(named: "hAnimatedTilesFrameCount", dataType: "decimal"),
+  0xff9e: "DIRECTION hLinkDirection",
+  0xff9f: "decimal hLinkXFinal",
+  0xffa0: "decimal hLinkYFinal",
+  0xffa4: "ANIMATED_TILES hAnimatedTilesGroup",
+  0xffa6: "decimal hAnimatedTilesFrameCount",
   0xffa7: "hAnimatedTilesDataOffset",
   0xffa9: "hWindowY",
   0xffaa: "hWindowX",
-  0xffb0: .init(named: "hMusicTrack", dataType: "TRACK"),
-  0xffb1: .init(named: "hNextMusicTrack", dataType: "TRACK"),
-  0xffb5: .init(named: "hButtonsInactiveDelay", dataType: "decimal"),
-  0xffbf: .init(named: "hNextWorldMusicTrack", dataType: "TRACK"),
+  0xffb0: "TRACK hMusicTrack",
+  0xffb1: "TRACK hNextMusicTrack",
+  0xffb5: "decimal hButtonsInactiveDelay",
+  0xffbf: "TRACK hNextWorldMusicTrack",
   0xffc0: "hDMARoutine",
-  0xffcb: .init(named: "hPreviousJoypadState", dataType: "BUTTON"),
-  0xffcc: .init(named: "hJoypadState", dataType: "BUTTON"),
-  0xffcd: .init(named: "hSwordIntersectedAreaY", dataType: "decimal"),
-  0xffce: .init(named: "hSwordIntersectedAreaX", dataType: "decimal"),
+  0xffcb: "BUTTON hPreviousJoypadState",
+  0xffcc: "BUTTON hJoypadState",
+  0xffcd: "decimal hSwordIntersectedAreaY",
+  0xffce: "decimal hSwordIntersectedAreaX",
   0xffd1: "hNeedsRenderingFrame",
   0xffd7: "hScratchA",
   0xffd8: "hScratchB",
@@ -1071,28 +1053,36 @@ hints.globals = [
   0xffe8: "hScratchK",
   0xffe9: "hScratchL",
   0xffea: "hActiveEntityState",
-  0xffeb: .init(named: "hActiveEntityType", dataType: "ENTITY"),
-  0xffec: .init(named: "wActiveEntityPosY", dataType: "decimal"),
-  0xffee: .init(named: "wActiveEntityPosX", dataType: "decimal"),
-  0xfff0: .init(named: "hActiveEntityWalking", dataType: "bool"),
-  0xfff2: .init(named: "hJingle", dataType: "JINGLE"),
-  0xfff3: .init(named: "hWaveSfx", dataType: "WAVE"),
-  0xfff4: .init(named: "hNoiseSfx", dataType: "NOISE"),
+  0xffeb: "ENTITY hActiveEntityType",
+  0xffec: "decimal wActiveEntityPosY",
+  0xffee: "decimal wActiveEntityPosX",
+  0xfff0: "bool hActiveEntityWalking",
+  0xfff2: "JINGLE hJingle",
+  0xfff3: "WAVE hWaveSfx",
+  0xfff4: "NOISE hNoiseSfx",
   0xfff6: "hMapRoom",
   0xfff7: "hMapID",
-  0xfff8: .init(named: "hRoomStatus", dataType: "ROOM_STATUS"),
-  0xfff9: .init(named: "hIsSideScrolling", dataType: "SCROLL_VIEW"),
-  0xfffa: .init(named: "hLinkRoomPosition", dataType: "decimal"),
-  0xfffb: .init(named: "hLinkFinalRoomPosition", dataType: "decimal"),
-  0xfffd: .init(named: "hDidRenderFrame", dataType: "bool"),
-]
+  0xfff8: "ROOM_STATUS hRoomStatus",
+  0xfff9: "SCROLL_VIEW hIsSideScrolling",
+  0xfffa: "decimal hLinkRoomPosition",
+  0xfffb: "decimal hLinkFinalRoomPosition",
+  0xfffd: "bool hDidRenderFrame",
+])
 
-(0xc281...0xC28F).forEach {
-  hints.globals[$0] = .init(named: "wEntity\(UInt8($0 - 0xc280).hexString)State", dataType: "ENTITY_STATE")
+(LR35902.Address(0xc281)...LR35902.Address(0xC28F)).forEach {
+  hints.addGlobal(at: $0, named: "ENTITY_STATE wEntity\(UInt8($0 - 0xc280).hexString)State")
 }
 
-for (address, global) in hints.globals {
-  disassembly.createGlobal(at: address, named: global.name, dataType: global.dataType)
+let hintData = try hints.toWireformat()
+
+// MARK: - WIRE TRANSFER
+
+let hints_ = try Hints(serializedData: hintData)
+
+// MARK: - Receiving end of the data.
+
+for global in hints_.globals {
+  disassembly.createGlobal(at: LR35902.Address(global.address), named: global.name, dataType: global.datatype)
 }
 
 disassembly.setSoftTerminator(at: 0x05F1, in: 0x00) // This function can't logically proceed past this point.

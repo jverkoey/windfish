@@ -22,7 +22,7 @@ let package = Package(
       name: "gbdis",
       dependencies: [
         "LR35902",
-        "SwiftProtobuf",
+        "DisassemblyHints",
       ]),
     .testTarget(
       name: "LR35902Tests",
@@ -42,14 +42,21 @@ let package = Package(
 
     .target(
       name: "CPU",
-      dependencies: []),
+      dependencies: []
+    ),
     .testTarget(
       name: "CPUTests",
-      dependencies: ["CPU"]),
+      dependencies: ["CPU"]
+    ),
 
     .target(
       name: "Disassembler",
-      dependencies: ["CPU"]),
+      dependencies: ["CPU"]
+    ),
+
+    .target(
+      name: "DisassemblyHints"
+    ),
   ]
 )
 
