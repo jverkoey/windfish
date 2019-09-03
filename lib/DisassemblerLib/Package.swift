@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-  name: "gbdis",
+  name: "DisassemblerLib",
   products: [
     .executable(
       name: "gbdis",
