@@ -54,11 +54,9 @@ public final class DisassemblyRequest<AddressType: BinaryInteger> {
       request.binary = data
       request.hints = Disassembly_Hints.with { hints in
 
-        hints.datatypes = dataTypes.map { name, datatype in
-          Disassembly_Datatype.with { proto in
-            proto.name = name
-
-            switch datatype.kind {
+        hints.datatypes = dataTypes.reduce(into: [:]) { accumulator, element in
+          accumulator[element.key] = Disassembly_Datatype.with { proto in
+            switch element.value.kind {
             case .enumeration:
               proto.kind = .enumeration
             case .bitmask:
@@ -67,7 +65,7 @@ public final class DisassemblyRequest<AddressType: BinaryInteger> {
               proto.kind = .any
             }
 
-            switch datatype.representation {
+            switch element.value.representation {
             case .binary:
               proto.representation = .binary
             case .decimal:
@@ -76,17 +74,16 @@ public final class DisassemblyRequest<AddressType: BinaryInteger> {
               proto.representation = .hexadecimal
             }
 
-            proto.valueNames = datatype.valueNames.reduce(into: [:]) { (accumulator, element) in
+            proto.valueNames = element.value.valueNames.reduce(into: [:]) { (accumulator, element) in
               accumulator[UInt64(element.key)] = element.value
             }
           }
         }
 
-        hints.globals = globals.map { address, global in
-          Disassembly_Global.with { proto in
-            proto.address = UInt64(address)
-            proto.name = global.name
-            if let dataType = global.dataType {
+        hints.globals = globals.reduce(into: [:]) { accumulator, element in
+          accumulator[UInt64(element.key)] = Disassembly_Global.with { proto in
+            proto.name = element.value.name
+            if let dataType = element.value.dataType {
               proto.datatype = dataType
             }
           }

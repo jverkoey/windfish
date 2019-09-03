@@ -24,8 +24,6 @@ struct Disassembly_Datatype {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var name: String = String()
-
   var kind: Disassembly_Datatype.Kind = .enumeration
 
   var representation: Disassembly_Datatype.Representation = .hexadecimal
@@ -128,9 +126,35 @@ struct Disassembly_Global {
 
   var name: String = String()
 
-  var address: UInt64 = 0
-
   var datatype: String = String()
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct Disassembly_MacroInstruction {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var specification: String = String()
+
+  var operands: Data = SwiftProtobuf.Internal.emptyData
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct Disassembly_Macro {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var pattern: [Disassembly_MacroInstruction] = []
+
+  var templatedSpecifications: [String] = []
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -142,9 +166,11 @@ struct Disassembly_Hints {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var globals: [Disassembly_Global] = []
+  var globals: Dictionary<UInt64,Disassembly_Global> = [:]
 
-  var datatypes: [Disassembly_Datatype] = []
+  var datatypes: Dictionary<String,Disassembly_Datatype> = [:]
+
+  var macros: Dictionary<String,Disassembly_Macro> = [:]
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -184,42 +210,36 @@ fileprivate let _protobuf_package = "Disassembly"
 extension Disassembly_Datatype: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Datatype"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "name"),
-    2: .same(proto: "kind"),
-    3: .same(proto: "representation"),
-    4: .standard(proto: "value_names"),
+    1: .same(proto: "kind"),
+    2: .same(proto: "representation"),
+    3: .standard(proto: "value_names"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       switch fieldNumber {
-      case 1: try decoder.decodeSingularStringField(value: &self.name)
-      case 2: try decoder.decodeSingularEnumField(value: &self.kind)
-      case 3: try decoder.decodeSingularEnumField(value: &self.representation)
-      case 4: try decoder.decodeMapField(fieldType: SwiftProtobuf._ProtobufMap<SwiftProtobuf.ProtobufUInt64,SwiftProtobuf.ProtobufString>.self, value: &self.valueNames)
+      case 1: try decoder.decodeSingularEnumField(value: &self.kind)
+      case 2: try decoder.decodeSingularEnumField(value: &self.representation)
+      case 3: try decoder.decodeMapField(fieldType: SwiftProtobuf._ProtobufMap<SwiftProtobuf.ProtobufUInt64,SwiftProtobuf.ProtobufString>.self, value: &self.valueNames)
       default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.name.isEmpty {
-      try visitor.visitSingularStringField(value: self.name, fieldNumber: 1)
-    }
     if self.kind != .enumeration {
-      try visitor.visitSingularEnumField(value: self.kind, fieldNumber: 2)
+      try visitor.visitSingularEnumField(value: self.kind, fieldNumber: 1)
     }
     if self.representation != .hexadecimal {
-      try visitor.visitSingularEnumField(value: self.representation, fieldNumber: 3)
+      try visitor.visitSingularEnumField(value: self.representation, fieldNumber: 2)
     }
     if !self.valueNames.isEmpty {
-      try visitor.visitMapField(fieldType: SwiftProtobuf._ProtobufMap<SwiftProtobuf.ProtobufUInt64,SwiftProtobuf.ProtobufString>.self, value: self.valueNames, fieldNumber: 4)
+      try visitor.visitMapField(fieldType: SwiftProtobuf._ProtobufMap<SwiftProtobuf.ProtobufUInt64,SwiftProtobuf.ProtobufString>.self, value: self.valueNames, fieldNumber: 3)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: Disassembly_Datatype, rhs: Disassembly_Datatype) -> Bool {
-    if lhs.name != rhs.name {return false}
     if lhs.kind != rhs.kind {return false}
     if lhs.representation != rhs.representation {return false}
     if lhs.valueNames != rhs.valueNames {return false}
@@ -248,16 +268,14 @@ extension Disassembly_Global: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
   static let protoMessageName: String = _protobuf_package + ".Global"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "name"),
-    2: .same(proto: "address"),
-    3: .same(proto: "datatype"),
+    2: .same(proto: "datatype"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       switch fieldNumber {
       case 1: try decoder.decodeSingularStringField(value: &self.name)
-      case 2: try decoder.decodeSingularUInt64Field(value: &self.address)
-      case 3: try decoder.decodeSingularStringField(value: &self.datatype)
+      case 2: try decoder.decodeSingularStringField(value: &self.datatype)
       default: break
       }
     }
@@ -267,19 +285,85 @@ extension Disassembly_Global: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
     if !self.name.isEmpty {
       try visitor.visitSingularStringField(value: self.name, fieldNumber: 1)
     }
-    if self.address != 0 {
-      try visitor.visitSingularUInt64Field(value: self.address, fieldNumber: 2)
-    }
     if !self.datatype.isEmpty {
-      try visitor.visitSingularStringField(value: self.datatype, fieldNumber: 3)
+      try visitor.visitSingularStringField(value: self.datatype, fieldNumber: 2)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: Disassembly_Global, rhs: Disassembly_Global) -> Bool {
     if lhs.name != rhs.name {return false}
-    if lhs.address != rhs.address {return false}
     if lhs.datatype != rhs.datatype {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Disassembly_MacroInstruction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".MacroInstruction"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "specification"),
+    2: .same(proto: "operands"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      switch fieldNumber {
+      case 1: try decoder.decodeSingularStringField(value: &self.specification)
+      case 2: try decoder.decodeSingularBytesField(value: &self.operands)
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.specification.isEmpty {
+      try visitor.visitSingularStringField(value: self.specification, fieldNumber: 1)
+    }
+    if !self.operands.isEmpty {
+      try visitor.visitSingularBytesField(value: self.operands, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Disassembly_MacroInstruction, rhs: Disassembly_MacroInstruction) -> Bool {
+    if lhs.specification != rhs.specification {return false}
+    if lhs.operands != rhs.operands {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Disassembly_Macro: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".Macro"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "pattern"),
+    2: .standard(proto: "templated_specifications"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      switch fieldNumber {
+      case 1: try decoder.decodeRepeatedMessageField(value: &self.pattern)
+      case 2: try decoder.decodeRepeatedStringField(value: &self.templatedSpecifications)
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.pattern.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.pattern, fieldNumber: 1)
+    }
+    if !self.templatedSpecifications.isEmpty {
+      try visitor.visitRepeatedStringField(value: self.templatedSpecifications, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Disassembly_Macro, rhs: Disassembly_Macro) -> Bool {
+    if lhs.pattern != rhs.pattern {return false}
+    if lhs.templatedSpecifications != rhs.templatedSpecifications {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -290,13 +374,15 @@ extension Disassembly_Hints: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "globals"),
     2: .same(proto: "datatypes"),
+    3: .same(proto: "macros"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       switch fieldNumber {
-      case 1: try decoder.decodeRepeatedMessageField(value: &self.globals)
-      case 2: try decoder.decodeRepeatedMessageField(value: &self.datatypes)
+      case 1: try decoder.decodeMapField(fieldType: SwiftProtobuf._ProtobufMessageMap<SwiftProtobuf.ProtobufUInt64,Disassembly_Global>.self, value: &self.globals)
+      case 2: try decoder.decodeMapField(fieldType: SwiftProtobuf._ProtobufMessageMap<SwiftProtobuf.ProtobufString,Disassembly_Datatype>.self, value: &self.datatypes)
+      case 3: try decoder.decodeMapField(fieldType: SwiftProtobuf._ProtobufMessageMap<SwiftProtobuf.ProtobufString,Disassembly_Macro>.self, value: &self.macros)
       default: break
       }
     }
@@ -304,10 +390,13 @@ extension Disassembly_Hints: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.globals.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.globals, fieldNumber: 1)
+      try visitor.visitMapField(fieldType: SwiftProtobuf._ProtobufMessageMap<SwiftProtobuf.ProtobufUInt64,Disassembly_Global>.self, value: self.globals, fieldNumber: 1)
     }
     if !self.datatypes.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.datatypes, fieldNumber: 2)
+      try visitor.visitMapField(fieldType: SwiftProtobuf._ProtobufMessageMap<SwiftProtobuf.ProtobufString,Disassembly_Datatype>.self, value: self.datatypes, fieldNumber: 2)
+    }
+    if !self.macros.isEmpty {
+      try visitor.visitMapField(fieldType: SwiftProtobuf._ProtobufMessageMap<SwiftProtobuf.ProtobufString,Disassembly_Macro>.self, value: self.macros, fieldNumber: 3)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -315,6 +404,7 @@ extension Disassembly_Hints: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
   static func ==(lhs: Disassembly_Hints, rhs: Disassembly_Hints) -> Bool {
     if lhs.globals != rhs.globals {return false}
     if lhs.datatypes != rhs.datatypes {return false}
+    if lhs.macros != rhs.macros {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

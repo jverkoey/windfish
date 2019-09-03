@@ -125,7 +125,7 @@ func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902
   }
 }
 
-for datatype in _request.hints.datatypes {
+for (name, datatype) in _request.hints.datatypes {
   let representation: LR35902.Disassembly.Datatype.Representation
   switch datatype.representation {
   case .hexadecimal:
@@ -142,18 +142,18 @@ for datatype in _request.hints.datatypes {
   }
   switch datatype.kind {
   case .any:
-    disassembly.createDatatype(named: datatype.name, representation: representation)
+    disassembly.createDatatype(named: name, representation: representation)
   case .bitmask:
-    disassembly.createDatatype(named: datatype.name, bitmask: valueNames, representation: representation)
+    disassembly.createDatatype(named: name, bitmask: valueNames, representation: representation)
   case .enumeration:
-    disassembly.createDatatype(named: datatype.name, enumeration: valueNames, representation: representation)
+    disassembly.createDatatype(named: name, enumeration: valueNames, representation: representation)
   case .UNRECOGNIZED(_):
     continue
   }
 }
 
-for global in _request.hints.globals {
-  disassembly.createGlobal(at: LR35902.Address(global.address), named: global.name, dataType: global.datatype)
+for (address, global) in _request.hints.globals {
+  disassembly.createGlobal(at: LR35902.Address(address), named: global.name, dataType: global.datatype)
 }
 
 disassembly.mapCharacter(0x5e, to: "'")
