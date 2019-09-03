@@ -1,0 +1,3 @@
+steps:
+- name: 'gcr.io/syntropy1/swift-latest'
+  args: ['swift', 'test']
