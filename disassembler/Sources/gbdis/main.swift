@@ -1,6 +1,9 @@
 import Foundation
 import LR35902
 import DisassemblyRequest
+#if os(Linux)
+import FoundationNetworking
+#endif
 
 let data = try Data(contentsOf: URL(fileURLWithPath: "/Users/featherless/workbench/awakenlink/rom/LinksAwakening.gb"))
 
