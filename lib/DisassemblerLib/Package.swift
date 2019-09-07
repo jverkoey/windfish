@@ -56,7 +56,7 @@ let package = Package(
 
     .target(
       name: "DisassemblyRequest",
-      dependencies: ["SwiftProtobuf"]
+      dependencies: ["SwiftProtobuf", "CPU"]
     ),
   ]
 )

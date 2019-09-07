@@ -2,7 +2,7 @@ import Foundation
 import LR35902
 import DisassemblyRequest
 
-func populateRequestWithGameDatatypes(_ request: DisassemblyRequest<LR35902.Address>) {
+func populateRequestWithGameDatatypes(_ request: DisassemblyRequest<LR35902.Address, LR35902.Instruction>) {
   request.createDatatype(named: "GAMEMODE", enumeration: [
     0x00: "GAMEMODE_INTRO",
     0x01: "GAMEMODE_CREDITS",

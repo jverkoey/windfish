@@ -7,45 +7,45 @@ import FoundationNetworking
 
 let data = try Data(contentsOf: URL(fileURLWithPath: "/Users/featherless/workbench/awakenlink/rom/LinksAwakening.gb"))
 
-var disassemblyRequest = DisassemblyRequest<LR35902.Address>(data: data)
+var disassemblyRequest = DisassemblyRequest<LR35902.Address, LR35902.Instruction>(data: data)
 
 populateRequestWithHardwareDefaults(disassemblyRequest)
 populateRequestWithGameData(disassemblyRequest)
 
 let requestData = try disassemblyRequest.toWireformat()
 
-var request = URLRequest(url: URL(string: "http://syntropy.run/disassemble")!)
-request.httpMethod = "POST"
-request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
-
-let semaphore = DispatchSemaphore(value: 0)
-let task = URLSession.shared.uploadTask(with: request, from: requestData) { data, response, error in
-  if let error = error {
-    print("error: \(error)")
-    return
-  }
-  guard let response = response as? HTTPURLResponse else {
-    print("Missing response")
-    return
-  }
-  guard (200...299).contains(response.statusCode) else {
-    print("Request did not succeed:")
-    print(response)
-    return
-  }
-  if let mimeType = response.mimeType,
-    mimeType == "application/json",
-    let data = data,
-    let dataString = String(data: data, encoding: .utf8) {
-    print("got data: \(dataString)")
-  }
-  print(response)
-  print(String(data: data!, encoding: .utf8)!)
-  semaphore.signal()
-}
-task.resume()
-semaphore.wait()
-exit(0)
+//var request = URLRequest(url: URL(string: "http://syntropy.run/disassemble")!)
+//request.httpMethod = "POST"
+//request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
+//
+//let semaphore = DispatchSemaphore(value: 0)
+//let task = URLSession.shared.uploadTask(with: request, from: requestData) { data, response, error in
+//  if let error = error {
+//    print("error: \(error)")
+//    return
+//  }
+//  guard let response = response as? HTTPURLResponse else {
+//    print("Missing response")
+//    return
+//  }
+//  guard (200...299).contains(response.statusCode) else {
+//    print("Request did not succeed:")
+//    print(response)
+//    return
+//  }
+//  if let mimeType = response.mimeType,
+//    mimeType == "application/json",
+//    let data = data,
+//    let dataString = String(data: data, encoding: .utf8) {
+//    print("got data: \(dataString)")
+//  }
+//  print(response)
+//  print(String(data: data!, encoding: .utf8)!)
+//  semaphore.signal()
+//}
+//task.resume()
+//semaphore.wait()
+//exit(0)
 
 // MARK: - TODO: WIRE TRANSFER
 
@@ -154,6 +154,20 @@ for (name, datatype) in _request.hints.datatypes {
 
 for (address, global) in _request.hints.globals {
   disassembly.createGlobal(at: LR35902.Address(address), named: global.name, dataType: global.datatype)
+}
+
+for (name, macro) in _request.hints.macros {
+  let macroLines: [LR35902.Disassembly.MacroLine] = macro.patterns.map {
+    let instructionData: Data = $0.opcode + $0.operands
+    let cpu = LR35902(cartridge: instructionData)
+    let spec = cpu.spec(at: 0, in: 0)!
+    if let instruction = cpu.instruction(at: 0, in: 0, spec: spec) {
+      return .instruction(instruction)
+    } else {
+      return .any(spec)
+    }
+  }
+  disassembly.defineMacro(named: name, instructions: macroLines)
 }
 
 disassembly.mapCharacter(0x5e, to: "'")

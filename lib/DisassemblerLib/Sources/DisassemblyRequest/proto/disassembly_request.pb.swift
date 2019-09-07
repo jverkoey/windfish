@@ -133,14 +133,16 @@ struct Disassembly_Global {
   init() {}
 }
 
-struct Disassembly_MacroInstruction {
+struct Disassembly_MacroPattern {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var specification: String = String()
+  var opcode: Data = SwiftProtobuf.Internal.emptyData
 
   var operands: Data = SwiftProtobuf.Internal.emptyData
+
+  var argument: UInt64 = 0
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -152,9 +154,7 @@ struct Disassembly_Macro {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var pattern: [Disassembly_MacroInstruction] = []
-
-  var templatedSpecifications: [String] = []
+  var patterns: [Disassembly_MacroPattern] = []
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -299,36 +299,42 @@ extension Disassembly_Global: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
   }
 }
 
-extension Disassembly_MacroInstruction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".MacroInstruction"
+extension Disassembly_MacroPattern: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".MacroPattern"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "specification"),
+    1: .same(proto: "opcode"),
     2: .same(proto: "operands"),
+    3: .same(proto: "argument"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       switch fieldNumber {
-      case 1: try decoder.decodeSingularStringField(value: &self.specification)
+      case 1: try decoder.decodeSingularBytesField(value: &self.opcode)
       case 2: try decoder.decodeSingularBytesField(value: &self.operands)
+      case 3: try decoder.decodeSingularUInt64Field(value: &self.argument)
       default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.specification.isEmpty {
-      try visitor.visitSingularStringField(value: self.specification, fieldNumber: 1)
+    if !self.opcode.isEmpty {
+      try visitor.visitSingularBytesField(value: self.opcode, fieldNumber: 1)
     }
     if !self.operands.isEmpty {
       try visitor.visitSingularBytesField(value: self.operands, fieldNumber: 2)
     }
+    if self.argument != 0 {
+      try visitor.visitSingularUInt64Field(value: self.argument, fieldNumber: 3)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Disassembly_MacroInstruction, rhs: Disassembly_MacroInstruction) -> Bool {
-    if lhs.specification != rhs.specification {return false}
+  static func ==(lhs: Disassembly_MacroPattern, rhs: Disassembly_MacroPattern) -> Bool {
+    if lhs.opcode != rhs.opcode {return false}
     if lhs.operands != rhs.operands {return false}
+    if lhs.argument != rhs.argument {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -337,33 +343,27 @@ extension Disassembly_MacroInstruction: SwiftProtobuf.Message, SwiftProtobuf._Me
 extension Disassembly_Macro: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Macro"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "pattern"),
-    2: .standard(proto: "templated_specifications"),
+    1: .same(proto: "patterns"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       switch fieldNumber {
-      case 1: try decoder.decodeRepeatedMessageField(value: &self.pattern)
-      case 2: try decoder.decodeRepeatedStringField(value: &self.templatedSpecifications)
+      case 1: try decoder.decodeRepeatedMessageField(value: &self.patterns)
       default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.pattern.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.pattern, fieldNumber: 1)
-    }
-    if !self.templatedSpecifications.isEmpty {
-      try visitor.visitRepeatedStringField(value: self.templatedSpecifications, fieldNumber: 2)
+    if !self.patterns.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.patterns, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: Disassembly_Macro, rhs: Disassembly_Macro) -> Bool {
-    if lhs.pattern != rhs.pattern {return false}
-    if lhs.templatedSpecifications != rhs.templatedSpecifications {return false}
+    if lhs.patterns != rhs.patterns {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

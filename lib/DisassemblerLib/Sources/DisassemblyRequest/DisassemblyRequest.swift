@@ -1,6 +1,7 @@
 import Foundation
+import CPU
 
-public final class DisassemblyRequest<AddressType: BinaryInteger> {
+public final class DisassemblyRequest<AddressType: BinaryInteger, InstructionType: Instruction> {
   public init(data: Data) {
     self.data = data
   }
@@ -47,6 +48,16 @@ public final class DisassemblyRequest<AddressType: BinaryInteger> {
     addGlobals([address: name])
   }
 
+  // MARK: Macros
+
+  public enum MacroPattern: Hashable {
+    case any(InstructionType.SpecType, argument: UInt64?)
+    case instruction(InstructionType)
+  }
+  public func createMacro(named name: String, pattern: [MacroPattern]) {
+    macros[name] = Macro(patterns: pattern)
+  }
+
   // MARK: - Converting to wire format
 
   public func toWireformat() throws -> Data {
@@ -54,9 +65,36 @@ public final class DisassemblyRequest<AddressType: BinaryInteger> {
       request.binary = data
       request.hints = Disassembly_Hints.with { hints in
 
-        hints.datatypes = dataTypes.reduce(into: [:]) { accumulator, element in
-          accumulator[element.key] = Disassembly_Datatype.with { proto in
-            switch element.value.kind {
+        hints.macros = macros.mapValues { macro in
+          Disassembly_Macro.with { proto in
+            proto.patterns = macro.patterns.map { patternLine in
+              switch patternLine {
+              case .any(let spec, let argument):
+                return Disassembly_MacroPattern.with { patternProto in
+                  if let opcode = spec.asData() {
+                    patternProto.opcode = opcode
+                  }
+                  if let argument = argument {
+                    patternProto.argument = argument
+                  }
+                }
+              case .instruction(let instruction):
+                return Disassembly_MacroPattern.with { patternProto in
+                  if let opcode = instruction.spec.asData() {
+                    patternProto.opcode = opcode
+                  }
+                  if let operands = instruction.operandData() {
+                    patternProto.operands = operands
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        hints.datatypes = dataTypes.mapValues { datatype in
+          Disassembly_Datatype.with { proto in
+            switch datatype.kind {
             case .enumeration:
               proto.kind = .enumeration
             case .bitmask:
@@ -65,7 +103,7 @@ public final class DisassemblyRequest<AddressType: BinaryInteger> {
               proto.kind = .any
             }
 
-            switch element.value.representation {
+            switch datatype.representation {
             case .binary:
               proto.representation = .binary
             case .decimal:
@@ -74,7 +112,7 @@ public final class DisassemblyRequest<AddressType: BinaryInteger> {
               proto.representation = .hexadecimal
             }
 
-            proto.valueNames = element.value.valueNames.reduce(into: [:]) { (accumulator, element) in
+            proto.valueNames = datatype.valueNames.reduce(into: [:]) { (accumulator, element) in
               accumulator[UInt64(element.key)] = element.value
             }
           }
@@ -96,6 +134,7 @@ public final class DisassemblyRequest<AddressType: BinaryInteger> {
   private let data: Data
   private var globals: [AddressType: Global] = [:]
   private var dataTypes: [String: Datatype] = [:]
+  private var macros: [String: Macro] = [:]
 
   private enum DatatypeKind {
     case enumeration
@@ -107,6 +146,10 @@ public final class DisassemblyRequest<AddressType: BinaryInteger> {
     let valueNames: [UInt8: String]
     let kind: DatatypeKind
     let representation: DatatypeRepresentation
+  }
+
+  private struct Macro {
+    let patterns: [MacroPattern]
   }
 
   private func createDatatype(named name: String, type: Datatype) {

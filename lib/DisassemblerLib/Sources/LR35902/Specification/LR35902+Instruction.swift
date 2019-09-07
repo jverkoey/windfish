@@ -27,5 +27,15 @@ extension LR35902 {
       self.imm8 = nil
       self.imm16 = imm16
     }
+
+    public func operandData() -> Data? {
+      if let imm8 = imm8 {
+        return Data([imm8])
+      }
+      if let imm16 = imm16 {
+        return Data([UInt8(imm16 & 0xff), UInt8((imm16 >> 8) & 0xff)])
+      }
+      return nil
+    }
   }
 }

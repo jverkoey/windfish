@@ -4,6 +4,10 @@ import XCTest
 struct TestInstruction: Instruction {
   var spec: TestInstruction.Spec
 
+  func operandData() -> Data? {
+    return nil
+  }
+
   indirect enum Spec: InstructionSpec, Hashable {
     case nop
     case ld(Operand)

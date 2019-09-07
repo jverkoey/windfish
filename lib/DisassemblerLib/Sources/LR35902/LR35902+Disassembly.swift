@@ -527,7 +527,7 @@ extension LR35902 {
 
     // MARK: - Instructions
 
-    func instruction(at pc: Address, in bank: Bank) -> Instruction? {
+    public func instruction(at pc: Address, in bank: Bank) -> Instruction? {
       let location = cartAddress(for: pc, in: bank)!
       guard code.contains(Int(location)) else {
         return nil
@@ -989,47 +989,11 @@ extension LR35902 {
             advance(1)
             continue
           }
-          let byte = Int(cpu[cpu.pc, cpu.bank])
 
-          var spec = Instruction.table[byte]
-
-          switch spec {
-          case .invalid:
+          guard let spec = cpu.spec(at: cpu.pc, in: cpu.bank),
+                let instruction = cpu.instruction(at: cpu.pc, in: cpu.bank, spec: spec) else {
             advance(1)
             continue
-
-          case .cb:
-            let byteCB = Int(cpu[cpu.pc + 1, cpu.bank])
-            let cbInstruction = Instruction.tableCB[byteCB]
-            if case .invalid = spec {
-              advance(2)
-              continue
-            }
-            spec = cbInstruction
-
-          default:
-            break
-          }
-
-          let instructionWidth = Instruction.widths[spec]!
-
-          if let bankChange = bankChange(at: cpu.pc, in: cpu.bank) {
-            cpu.bank = bankChange
-          }
-
-          let instructionAddress = cpu.pc
-          let instructionBank = cpu.bank
-          let instruction: Instruction
-          switch instructionWidth.operand {
-          case 1:
-            instruction = Instruction(spec: spec, imm8: cpu[instructionAddress + instructionWidth.opcode, instructionBank])
-          case 2:
-            let low = Address(cpu[instructionAddress + instructionWidth.opcode, instructionBank])
-            let high = Address(cpu[instructionAddress + instructionWidth.opcode + 1, instructionBank]) << 8
-            let immediate16 = high | low
-            instruction = Instruction(spec: spec, imm16: immediate16)
-          default:
-            instruction = Instruction(spec: spec)
           }
 
           // STOP must be followed by 0
@@ -1038,7 +1002,16 @@ extension LR35902 {
             continue
           }
 
-          register(instruction: instruction, at: instructionAddress, in: instructionBank)
+          register(instruction: instruction, at: cpu.pc, in: cpu.bank)
+
+          let instructionAddress = cpu.pc
+          let instructionBank = cpu.bank
+
+          if let bankChange = bankChange(at: instructionAddress, in: instructionBank) {
+            cpu.bank = bankChange
+          }
+
+          let instructionWidth = Instruction.widths[spec]!
           advance(instructionWidth.total)
 
           switch spec {

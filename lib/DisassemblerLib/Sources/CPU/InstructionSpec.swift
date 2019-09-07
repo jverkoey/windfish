@@ -26,6 +26,8 @@ public protocol InstructionSpec: Hashable {
    */
   var category: InstructionCategory? { get }
 
+  func asData() -> Data?
+
   /**
    An abstract representation of this instruction in assembly.
 
@@ -34,11 +36,6 @@ public protocol InstructionSpec: Hashable {
    - #: Any numeric value.
    */
   var representation: String { get }
-}
-
-public enum InstructionCategory {
-  case call
-  case ret
 }
 
 /**

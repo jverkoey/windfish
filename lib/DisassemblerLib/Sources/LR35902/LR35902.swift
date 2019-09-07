@@ -55,6 +55,50 @@ public final class LR35902 {
     return (address: address, bank: bank)
   }
 
+  /// Returns a specification at the given address, if a valid one exists.
+  public func spec(at pc: Address, in bank: Bank) -> Instruction.Spec? {
+    let byte = Int(self[pc, bank])
+    let spec = Instruction.table[byte]
+    switch spec {
+    case .invalid:
+      return nil
+    case .cb:
+      let byteCB = Int(self[pc + 1, bank])
+      let cbInstruction = Instruction.tableCB[byteCB]
+      if case .invalid = spec {
+        return nil
+      }
+      return cbInstruction
+    default:
+      return spec
+    }
+  }
+
+  /// Returns an instruction at the given address.
+  public func instruction(at pc: Address, in bank: Bank, spec: Instruction.Spec) -> Instruction? {
+    let instructionWidth = Instruction.widths[spec]!
+    guard let location = LR35902.cartAddress(for: pc + instructionWidth.opcode, in: bank) else {
+      return nil
+    }
+    switch instructionWidth.operand {
+    case 1:
+      if location >= cartridge.count {
+        return nil
+      }
+      return Instruction(spec: spec, imm8: self[pc + instructionWidth.opcode, bank])
+    case 2:
+      if location + 1 >= cartridge.count {
+        return nil
+      }
+      let low = Address(self[pc + instructionWidth.opcode, bank])
+      let high = Address(self[pc + instructionWidth.opcode + 1, bank]) << 8
+      let immediate16 = high | low
+      return Instruction(spec: spec, imm16: immediate16)
+    default:
+      return Instruction(spec: spec)
+    }
+  }
+
   func pcIsValid() -> Bool {
     return
       ((bank == 0 && pc < 0x4000)

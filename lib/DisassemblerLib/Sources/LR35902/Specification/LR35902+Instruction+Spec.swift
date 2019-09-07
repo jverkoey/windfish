@@ -59,6 +59,10 @@ extension LR35902.Instruction {
 
     // Invalid opcode
     case invalid
+
+    public func asData() -> Data? {
+      return Data(RGBDSAssembler.instructionOpcodeBinary[self]!)
+    }
   }
 
   /// Numeric operands in LR35902's instruction set.
