@@ -141,6 +141,17 @@ public final class RGBDSAssembly {
     return typedValue(for: imm8, with: dataType.representation)
   }
 
+  /// Returns one of a label, a global, or a hexadecimal representation of a given imm16 value.
+  private static func prettify(imm16: UInt16, with disassembly: LR35902.Disassembly) -> String {
+    if let label = disassembly.label(at: imm16, in: disassembly.cpu.bank) {
+      return label
+    } else if let global = disassembly.globals[imm16] {
+      return global.name
+    } else {
+      return "$\(imm16.hexString)"
+    }
+  }
+
   private static func operands(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil, argumentString: String?) -> [String]? {
     if let disassembly = disassembly {
       switch instruction.spec {
@@ -196,12 +207,8 @@ public final class RGBDSAssembly {
         var addressLabel: String
         if let argumentString = argumentString {
           addressLabel = argumentString
-        } else if let label = disassembly.label(at: instruction.imm16!, in: disassembly.cpu.bank) {
-          addressLabel = "[\(label)]"
-        } else if let global = disassembly.globals[instruction.imm16!] {
-          addressLabel = "[\(global.name)]"
         } else {
-          addressLabel = "[$\(instruction.imm16!.hexString)]"
+          addressLabel = "[\(prettify(imm16: instruction.imm16!, with: disassembly))]"
         }
         return [addressLabel, operand(for: instruction, operand: operand2, with: disassembly, argumentString: argumentString)]
 
@@ -209,12 +216,8 @@ public final class RGBDSAssembly {
         var addressLabel: String
         if let argumentString = argumentString {
           addressLabel = argumentString
-        } else if let label = disassembly.label(at: instruction.imm16!, in: disassembly.cpu.bank) {
-          addressLabel = "[\(label)]"
-        } else if let global = disassembly.globals[instruction.imm16!] {
-          addressLabel = "[\(global.name)]"
         } else {
-          addressLabel = "[$\(instruction.imm16!.hexString)]"
+          addressLabel = "[\(prettify(imm16: instruction.imm16!, with: disassembly))]"
         }
         return [operand(for: instruction, operand: operand1, with: disassembly, argumentString: argumentString), addressLabel]
 
@@ -222,10 +225,8 @@ public final class RGBDSAssembly {
         var addressLabel: String
         if let argumentString = argumentString {
           addressLabel = argumentString
-        } else if let global = disassembly.globals[0xFF00 | UInt16(instruction.imm8!)] {
-          addressLabel = "[\(global.name)]"
         } else {
-          addressLabel = "[$FF\(instruction.imm8!.hexString)]"
+          addressLabel = "[\(prettify(imm16: 0xFF00 | UInt16(instruction.imm8!), with: disassembly))]"
         }
         return [addressLabel, operand(for: instruction, operand: operand2, with: disassembly, argumentString: argumentString)]
 
@@ -233,10 +234,8 @@ public final class RGBDSAssembly {
         var addressLabel: String
         if let argumentString = argumentString {
           addressLabel = argumentString
-        } else if let global = disassembly.globals[0xFF00 | UInt16(instruction.imm8!)] {
-          addressLabel = "[\(global.name)]"
         } else {
-          addressLabel = "[$FF\(instruction.imm8!.hexString)]"
+          addressLabel = "[\(prettify(imm16: 0xFF00 | UInt16(instruction.imm8!), with: disassembly))]"
         }
         return [operand(for: instruction, operand: operand1, with: disassembly, argumentString: argumentString), addressLabel]
 
