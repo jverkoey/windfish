@@ -19,6 +19,10 @@ struct TestInstruction: Instruction {
     var category: InstructionCategory? {
       return nil
     }
+
+    func asData() -> Data? {
+      return nil
+    }
   }
 
   enum Operand: Hashable, InstructionOperandAssemblyRepresentable {
