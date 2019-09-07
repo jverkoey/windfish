@@ -156,19 +156,21 @@ for (address, global) in _request.hints.globals {
   disassembly.createGlobal(at: LR35902.Address(address), named: global.name, dataType: global.datatype)
 }
 
-//for (name, macro) in _request.hints.macros {
-//  let macroLines: [LR35902.Disassembly.MacroLine] = macro.patterns.map {
-//    let instructionData: Data = $0.opcode + $0.operands
-//    let cpu = LR35902(cartridge: instructionData)
-//    let spec = cpu.spec(at: 0, in: 0)!
-//    if let instruction = cpu.instruction(at: 0, in: 0, spec: spec) {
-//      return .instruction(instruction)
-//    } else {
-//      return .any(spec)
-//    }
-//  }
-//  disassembly.defineMacro(named: name, instructions: macroLines)
-//}
+for (name, macro) in _request.hints.macros {
+  let macroLines: [LR35902.Disassembly.MacroLine] = macro.patterns.map {
+    let instructionData: Data = $0.opcode + $0.operands
+    let cpu = LR35902(cartridge: instructionData)
+    let spec = cpu.spec(at: 0, in: 0)!
+    if let instruction = cpu.instruction(at: 0, in: 0, spec: spec) {
+      return .instruction(instruction)
+    } else if $0.argument > 0 {
+      return .any(spec, argument: $0.argument)
+    } else {
+      return .any(spec)
+    }
+  }
+  disassembly.defineMacro(named: name, instructions: macroLines)
+}
 
 disassembly.mapCharacter(0x5e, to: "'")
 disassembly.mapCharacter(0xd9, to: "<flower>")

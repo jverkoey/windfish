@@ -55,6 +55,7 @@ public final class DisassemblyRequest<AddressType: BinaryInteger, InstructionTyp
     case instruction(InstructionType)
   }
   public func createMacro(named name: String, pattern: [MacroPattern]) {
+    // TODO: Validate the pattern.
     macros[name] = Macro(patterns: pattern)
   }
 
