@@ -65,357 +65,216 @@ extension LR35902 {
       setData(at: 0x014E..<0x0150, in: 0x00)
 
       defineMacro(named: "ifHGte", instructions: [
-        .any(.ld(.a, .ffimm8addr)),
-        .any(.cp(.imm8)),
-        .any(.jr(.nc, .simm8)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .cp(.arg(2)),
-        .jr(.nc, .arg(3)),
+        .any(.ld(.a, .ffimm8addr), argument: 1),
+        .any(.cp(.imm8), argument: 2),
+        .any(.jr(.nc, .simm8), argument: 3),
       ])
 
       defineMacro(named: "ifHLt", instructions: [
-        .any(.ld(.a, .ffimm8addr)),
-        .any(.cp(.imm8)),
-        .any(.jr(.c, .simm8)),
-        ], code: [
-          .ld(.a, .arg(1)),
-          .cp(.arg(2)),
-          .jr(.c, .arg(3)),
+        .any(.ld(.a, .ffimm8addr), argument: 1),
+        .any(.cp(.imm8), argument: 2),
+        .any(.jr(.c, .simm8), argument: 3),
       ])
 
       defineMacro(named: "_ifLt", instructions: [
-        .any(.cp(.imm8)),
-        .any(.jr(.c, .simm8)),
-        ], code: [
-          .cp(.arg(1)),
-          .jr(.c, .arg(2)),
+        .any(.cp(.imm8), argument: 1),
+        .any(.jr(.c, .simm8), argument: 2),
       ])
 
       defineMacro(named: "ifEq", instructions: [
-        .any(.ld(.a, .imm16addr)),
-        .any(.cp(.imm8)),
-        .any(.jr(.z, .simm8)),
-        ], code: [
-          .ld(.a, .arg(1)),
-          .cp(.arg(2)),
-          .jr(.z, .arg(3)),
+        .any(.ld(.a, .imm16addr), argument: 1),
+        .any(.cp(.imm8), argument: 2),
+        .any(.jr(.z, .simm8), argument: 3),
       ])
 
       defineMacro(named: "ifHEq", instructions: [
-        .any(.ld(.a, .ffimm8addr)),
-        .any(.cp(.imm8)),
-        .any(.jr(.z, .simm8)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .cp(.arg(2)),
-        .jr(.z, .arg(3)),
+        .any(.ld(.a, .ffimm8addr), argument: 1),
+        .any(.cp(.imm8), argument: 2),
+        .any(.jr(.z, .simm8), argument: 3),
       ])
 
       defineMacro(named: "ifHEq_", instructions: [
-        .any(.ld(.a, .ffimm8addr)),
-        .any(.cp(.imm8)),
-        .any(.jp(.z, .imm16)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .cp(.arg(2)),
-        .jp(.z, .arg(3)),
+        .any(.ld(.a, .ffimm8addr), argument: 1),
+        .any(.cp(.imm8), argument: 2),
+        .any(.jp(.z, .imm16), argument: 3),
       ])
 
       defineMacro(named: "ifHNe", instructions: [
-        .any(.ld(.a, .ffimm8addr)),
-        .any(.cp(.imm8)),
-        .any(.jr(.nz, .simm8)),
-        ], code: [
-          .ld(.a, .arg(1)),
-          .cp(.arg(2)),
-          .jr(.nz, .arg(3)),
+        .any(.ld(.a, .ffimm8addr), argument: 1),
+        .any(.cp(.imm8), argument: 2),
+        .any(.jr(.nz, .simm8), argument: 3),
       ])
 
       defineMacro(named: "ifNe", instructions: [
-        .any(.ld(.a, .imm16addr)),
-        .any(.cp(.imm8)),
-        .any(.jr(.nz, .simm8)),
-        ], code: [
-          .ld(.a, .arg(1)),
-          .cp(.arg(2)),
-          .jr(.nz, .arg(3)),
+        .any(.ld(.a, .imm16addr), argument: 1),
+        .any(.cp(.imm8), argument: 2),
+        .any(.jr(.nz, .simm8), argument: 3),
       ])
 
       defineMacro(named: "ifHNe_", instructions: [
-        .any(.ld(.a, .ffimm8addr)),
-        .any(.cp(.imm8)),
-        .any(.jp(.nz, .imm16)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .cp(.arg(2)),
-        .jp(.nz, .arg(3)),
+        .any(.ld(.a, .ffimm8addr), argument: 1),
+        .any(.cp(.imm8), argument: 2),
+        .any(.jp(.nz, .imm16), argument: 3),
       ])
 
       defineMacro(named: "_ifNe", instructions: [
-        .any(.cp(.imm8)),
-        .any(.jr(.nz, .simm8)),
-        ], code: [
-          .cp(.arg(1)),
-          .jr(.nz, .arg(2)),
+        .any(.cp(.imm8), argument: 1),
+        .any(.jr(.nz, .simm8), argument: 2),
       ])
 
       defineMacro(named: "ifGte", instructions: [
-        .any(.ld(.a, .imm16addr)),
-        .any(.cp(.imm8)),
-        .any(.jr(.nc, .simm8)),
-        ], code: [
-          .ld(.a, .arg(1)),
-          .cp(.arg(2)),
-          .jr(.nc, .arg(3)),
+        .any(.ld(.a, .imm16addr), argument: 1),
+        .any(.cp(.imm8), argument: 2),
+        .any(.jr(.nc, .simm8), argument: 3),
       ])
 
       defineMacro(named: "returnIfLt", instructions: [
-        .any(.ld(.a, .imm16addr)),
-        .any(.cp(.imm8)),
-        .any(.ret(.c)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .cp(.arg(2)),
-        .ret(.c),
+        .any(.ld(.a, .imm16addr), argument: 1),
+        .any(.cp(.imm8), argument: 2),
+        .instruction(.init(spec: .ret(.c))),
       ])
 
       defineMacro(named: "returnIfGte", instructions: [
-        .any(.ld(.a, .imm16addr)),
-        .any(.cp(.imm8)),
-        .any(.ret(.nc)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .cp(.arg(2)),
-        .ret(.nc),
+        .any(.ld(.a, .imm16addr), argument: 1),
+        .any(.cp(.imm8), argument: 2),
+        .instruction(.init(spec: .ret(.nc))),
       ])
 
       defineMacro(named: "returnIfHLt", instructions: [
-        .any(.ld(.a, .ffimm8addr)),
-        .any(.cp(.imm8)),
-        .any(.ret(.c)),
-        ], code: [
-          .ld(.a, .arg(1)),
-          .cp(.arg(2)),
-          .ret(.c),
+        .any(.ld(.a, .ffimm8addr), argument: 1),
+        .any(.cp(.imm8), argument: 2),
+        .instruction(.init(spec: .ret(.c))),
       ])
 
       defineMacro(named: "returnIfHGte", instructions: [
-        .any(.ld(.a, .ffimm8addr)),
-        .any(.cp(.imm8)),
-        .any(.ret(.nc)),
-        ], code: [
-          .ld(.a, .arg(1)),
-          .cp(.arg(2)),
-          .ret(.nc),
+        .any(.ld(.a, .ffimm8addr), argument: 1),
+        .any(.cp(.imm8), argument: 2),
+        .instruction(.init(spec: .ret(.nc))),
       ])
 
       defineMacro(named: "ifLt", instructions: [
-        .any(.ld(.a, .imm16addr)),
-        .any(.cp(.imm8)),
-        .any(.jr(.c, .simm8)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .cp(.arg(2)),
-        .jr(.c, .arg(3)),
+        .any(.ld(.a, .imm16addr), argument: 1),
+        .any(.cp(.imm8), argument: 2),
+        .any(.jr(.c, .simm8), argument: 3),
       ])
 
       defineMacro(named: "ifNot", instructions: [
-        .any(.ld(.a, .imm16addr)),
-        .any(.and(.a)),
-        .any(.jr(.z, .simm8)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .and(.a),
-        .jr(.z, .arg(2)),
+        .any(.ld(.a, .imm16addr), argument: 1),
+        .instruction(.init(spec: .and(.a))),
+        .any(.jr(.z, .simm8), argument: 2),
       ])
 
       defineMacro(named: "ifNot_", instructions: [
-        .any(.ld(.a, .imm16addr)),
-        .any(.and(.a)),
-        .any(.jp(.z, .imm16)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .and(.a),
-        .jp(.z, .arg(2)),
+        .any(.ld(.a, .imm16addr), argument: 1),
+        .instruction(.init(spec: .and(.a))),
+        .any(.jp(.z, .imm16), argument: 2),
       ])
 
       defineMacro(named: "ifNotH", instructions: [
-        .any(.ld(.a, .ffimm8addr)),
-        .any(.and(.a)),
-        .any(.jr(.z, .simm8)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .and(.a),
-        .jr(.z, .arg(2)),
+        .any(.ld(.a, .ffimm8addr), argument: 1),
+        .instruction(.init(spec: .and(.a))),
+        .any(.jr(.z, .simm8), argument: 2),
       ])
 
       defineMacro(named: "ifNotH_", instructions: [
-        .any(.ld(.a, .ffimm8addr)),
-        .any(.and(.a)),
-        .any(.jp(.z, .imm16)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .and(.a),
-        .jp(.z, .arg(2)),
+        .any(.ld(.a, .ffimm8addr), argument: 1),
+        .instruction(.init(spec: .and(.a))),
+        .any(.jp(.z, .imm16), argument: 2),
       ])
 
       defineMacro(named: "ifBitsNotSet_", instructions: [
-        .any(.ld(.a, .imm16addr)),
-        .any(.and(.imm8)),
-        .any(.jr(.z, .simm8)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .and(.arg(2)),
-        .jr(.z, .arg(3)),
+        .any(.ld(.a, .imm16addr), argument: 1),
+        .any(.and(.imm8), argument: 2),
+        .any(.jr(.z, .simm8), argument: 3),
       ])
 
       defineMacro(named: "ifBitsNotSetH", instructions: [
-        .any(.ld(.a, .ffimm8addr)),
-        .any(.and(.imm8)),
-        .any(.jr(.z, .simm8)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .and(.arg(2)),
-        .jr(.z, .arg(3)),
+        .any(.ld(.a, .ffimm8addr), argument: 1),
+        .any(.and(.imm8), argument: 2),
+        .any(.jr(.z, .simm8), argument: 3),
       ])
 
       defineMacro(named: "_if", instructions: [
-        .any(.ld(.a, .imm16addr)),
-        .any(.and(.a)),
-        .any(.jr(.nz, .simm8)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .and(.a),
-        .jr(.nz, .arg(2)),
+        .any(.ld(.a, .imm16addr), argument: 1),
+        .instruction(.init(spec: .and(.a))),
+        .any(.jr(.nz, .simm8), argument: 2),
       ])
 
       defineMacro(named: "if_", instructions: [
-        .any(.ld(.a, .imm16addr)),
-        .any(.and(.a)),
-        .any(.jp(.nz, .imm16)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .and(.a),
-        .jp(.nz, .arg(2)),
+        .any(.ld(.a, .imm16addr), argument: 1),
+        .instruction(.init(spec: .and(.a))),
+        .any(.jp(.nz, .imm16), argument: 2),
       ])
 
       defineMacro(named: "ifH", instructions: [
-        .any(.ld(.a, .ffimm8addr)),
-        .any(.and(.a)),
-        .any(.jr(.nz, .imm16)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .and(.a),
-        .jr(.nz, .arg(2)),
+        .any(.ld(.a, .ffimm8addr), argument: 1),
+        .instruction(.init(spec: .and(.a))),
+        .any(.jr(.nz, .imm16), argument: 2),
       ])
 
       defineMacro(named: "ifH_", instructions: [
-        .any(.ld(.a, .ffimm8addr)),
-        .any(.and(.a)),
-        .any(.jp(.nz, .imm16)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .and(.a),
-        .jp(.nz, .arg(2)),
+        .any(.ld(.a, .ffimm8addr), argument: 1),
+        .instruction(.init(spec: .and(.a))),
+        .any(.jp(.nz, .imm16), argument: 2),
       ])
 
       defineMacro(named: "ifHLAddr", instructions: [
-        .any(.ld(.a, .hladdr)),
-        .any(.and(.a)),
-        .any(.jr(.nz, .simm8)),
-      ], code: [
-        .ld(.a, .hladdr),
-        .and(.a),
-        .jr(.nz, .arg(1)),
+        .instruction(.init(spec: .ld(.a, .hladdr))),
+        .instruction(.init(spec: .and(.a))),
+        .any(.jr(.nz, .simm8), argument: 1),
       ])
 
       defineMacro(named: "ifHLAddr_", instructions: [
-        .any(.ld(.a, .hladdr)),
-        .any(.and(.a)),
-        .any(.jp(.nz, .simm8)),
-      ], code: [
-        .ld(.a, .hladdr),
-        .and(.a),
-        .jp(.nz, .arg(1)),
+        .instruction(.init(spec: .ld(.a, .hladdr))),
+        .instruction(.init(spec: .and(.a))),
+        .any(.jp(.nz, .simm8), argument: 1),
       ])
 
       defineMacro(named: "assignH", instructions: [
-        .any(.ld(.a, .imm8)),
-        .any(.ld(.ffimm8addr, .a)),
-      ], code: [
-        .ld(.a, .arg(2)),
-        .ld(.arg(1), .a),
+        .any(.ld(.a, .imm8), argument: 2),
+        .any(.ld(.ffimm8addr, .a), argument: 1),
       ])
 
       defineMacro(named: "or__", instructions: [
-        .any(.ld(.a, .imm16addr)),
-        .any(.ld(.hl, .imm16)),
-        .any(.or(.hladdr)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .ld(.hl, .arg(2)),
-        .or(.hladdr),
+        .any(.ld(.a, .imm16addr), argument: 1),
+        .any(.ld(.hl, .imm16), argument: 2),
+        .instruction(.init(spec: .or(.hladdr))),
       ])
 
       defineMacro(named: "orH_", instructions: [
-        .any(.ld(.a, .ffimm8addr)),
-        .any(.ld(.hl, .imm16)),
-        .any(.or(.hladdr)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .ld(.hl, .arg(2)),
-        .or(.hladdr),
+        .any(.ld(.a, .ffimm8addr), argument: 1),
+        .any(.ld(.hl, .imm16), argument: 2),
+        .instruction(.init(spec: .or(.hladdr))),
       ])
 
       defineMacro(named: "ifAnyH__", instructions: [
-        .any(.ld(.a, .ffimm8addr)),
-        .any(.ld(.hl, .imm16)),
-        .any(.or(.hladdr)),
-        .any(.ld(.hl, .imm16)),
-        .any(.or(.hladdr)),
-        .any(.jr(.nz, .simm8)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .ld(.hl, .arg(2)),
-        .or(.hladdr),
-        .ld(.hl, .arg(3)),
-        .or(.hladdr),
-        .jr(.nz, .arg(4)),
+        .any(.ld(.a, .ffimm8addr), argument: 1),
+        .any(.ld(.hl, .imm16), argument: 2),
+        .instruction(.init(spec: .or(.hladdr))),
+        .any(.ld(.hl, .imm16), argument: 3),
+        .instruction(.init(spec: .or(.hladdr))),
+        .any(.jr(.nz, .simm8), argument: 4),
       ])
 
       defineMacro(named: "assign", instructions: [
-        .any(.ld(.a, .imm8)),
-        .any(.ld(.imm16addr, .a)),
-      ], code: [
-        .ld(.a, .arg(2)),
-        .ld(.arg(1), .a),
+        .any(.ld(.a, .imm8), argument: 2),
+        .any(.ld(.imm16addr, .a), argument: 1),
       ])
 
       defineMacro(named: "clear", instructions: [
-        .any(.xor(.a)),
-        .any(.ld(.imm16addr, .a)),
-      ], code: [
-        .xor(.a),
-        .ld(.arg(1), .a),
+        .instruction(.init(spec: .xor(.a))),
+        .any(.ld(.imm16addr, .a), argument: 1),
       ])
 
       defineMacro(named: "plusPlusHL", instructions: [
-        .any(.ld(.hl, .imm16)),
-        .any(.inc(.hladdr)),
-      ], code: [
-        .ld(.hl, .arg(1)),
-        .inc(.hladdr),
+        .any(.ld(.hl, .imm16), argument: 1),
+        .instruction(.init(spec: .inc(.hladdr))),
       ])
 
       defineMacro(named: "plusEqualH", instructions: [
-        .any(.ld(.a, .ffimm8addr)),
-        .any(.add(.imm8)),
-        .any(.ld(.ffimm8addr, .a)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .add(.arg(2)),
-        .ld(.arg(1), .a),
+        .any(.ld(.a, .ffimm8addr), argument: 1),
+        .any(.add(.imm8), argument: 2),
+        .any(.ld(.ffimm8addr, .a), argument: 1),
       ])
 
       // TODO: These can't be enabled until we support multiple simultaneous macro checks.
@@ -451,49 +310,31 @@ extension LR35902 {
 //      ])
 
       defineMacro(named: "loadHL", instructions: [
-        .any(.ld(.a, .imm16addr)),
-        .any(.ld(.h, .a)),
-        .any(.ld(.a, .imm16addr)),
-        .any(.ld(.l, .a)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .ld(.h, .a),
-        .ld(.a, .arg(2)),
-        .ld(.l, .a),
+        .any(.ld(.a, .imm16addr), argument: 1),
+        .instruction(.init(spec: .ld(.h, .a))),
+        .any(.ld(.a, .imm16addr), argument: 2),
+        .instruction(.init(spec: .ld(.l, .a))),
       ])
 
       defineMacro(named: "copyMemory", instructions: [
-        .any(.ld(.a, .imm16addr)),
-        .any(.ld(.imm16addr, .a)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .ld(.arg(2), .a),
+        .any(.ld(.a, .imm16addr), argument: 1),
+        .any(.ld(.imm16addr, .a), argument: 2),
       ])
 
       defineMacro(named: "copyMemoryHH", instructions: [
-        .any(.ld(.a, .ffimm8addr)),
-        .any(.ld(.ffimm8addr, .a)),
-      ], code: [
-        .ld(.a, .arg(1)),
-        .ld(.arg(2), .a),
+        .any(.ld(.a, .ffimm8addr), argument: 1),
+        .any(.ld(.ffimm8addr, .a), argument: 2),
       ])
 
       defineMacro(named: "copyMemory_H", instructions: [
-        .any(.ld(.a, .imm16addr)),
-        .any(.ld(.ffimm8addr, .a)),
-        ], code: [
-          .ld(.a, .arg(1)),
-          .ld(.arg(2), .a),
+        .any(.ld(.a, .imm16addr), argument: 1),
+        .any(.ld(.ffimm8addr, .a), argument: 2),
       ])
 
       defineMacro(named: "copyMemoryH_", instructions: [
-        .any(.ld(.a, .ffimm8addr)),
-        .any(.ld(.imm16addr, .a)),
-        ], code: [
-          .ld(.a, .arg(1)),
-          .ld(.arg(2), .a),
+        .any(.ld(.a, .ffimm8addr), argument: 1),
+        .any(.ld(.imm16addr, .a), argument: 2),
       ])
-
     }
 
     // MARK: - Transfers of control
@@ -879,23 +720,40 @@ extension LR35902 {
     // MARK: - Macros
 
     public enum MacroLine: Hashable {
+      case any(Instruction.Spec, argument: UInt64? = nil, argumentText: String? = nil)
+      case instruction(Instruction)
+
+      func asEdge() -> MacroTreeEdge {
+        switch self {
+        case .any(let spec, _, _):          return .any(spec)
+        case .instruction(let instruction): return .instruction(instruction)
+        }
+      }
+      func spec() -> Instruction.Spec {
+        switch self {
+        case .any(let spec, _, _):          return spec
+        case .instruction(let instruction): return instruction.spec
+        }
+      }
+    }
+    enum MacroTreeEdge: Hashable {
       case any(Instruction.Spec)
       case instruction(Instruction)
     }
     // TODO: Verify that each instruction actually exists in the instruction table.
     public func defineMacro(named name: String,
                             instructions: [MacroLine],
-                            code: [Instruction.Spec]? = nil,
                             validArgumentValues: [Int: IndexSet]? = nil,
                             action: (([Int: String], LR35902.Address, LR35902.Bank) -> Void)? = nil) {
       precondition(!macroNames.contains(name))
       macroNames.insert(name)
-      let leaf = instructions.reduce(macroTree, { node, spec in
-        let child = node.children[spec, default: MacroNode()]
-        node.children[spec] = child
+      let leaf = instructions.reduce(macroTree, { node, line in
+        let edge = line.asEdge()
+        let child = node.children[edge, default: MacroNode()]
+        node.children[edge] = child
         return child
       })
-      leaf.macros.append(.init(name: name, macroLines: instructions, code: code, validArgumentValues: validArgumentValues, action: action))
+      leaf.macros.append(.init(name: name, macroLines: instructions, validArgumentValues: validArgumentValues, action: action))
     }
     public func defineMacro(named name: String, template: String) {
       let assembler = RGBDSAssembler()
@@ -910,24 +768,22 @@ extension LR35902 {
     public final class Macro {
       let name: String
       let macroLines: [MacroLine]
-      let code: [Instruction.Spec]?
       let validArgumentValues: [Int: IndexSet]?
       let action: (([Int: String], LR35902.Address, LR35902.Bank) -> Void)?
       var hasWritten = false
 
-      init(name: String, macroLines: [MacroLine], code: [Instruction.Spec]?, validArgumentValues: [Int: IndexSet]?, action: (([Int: String], LR35902.Address, LR35902.Bank) -> Void)?) {
+      init(name: String, macroLines: [MacroLine], validArgumentValues: [Int: IndexSet]?, action: (([Int: String], LR35902.Address, LR35902.Bank) -> Void)?) {
         self.name = name
         self.macroLines = macroLines
-        self.code = code
         self.validArgumentValues = validArgumentValues
         self.action = action
       }
     }
-    public final class MacroNode {
-      var children: [MacroLine: MacroNode] = [:]
+    final class MacroNode {
+      var children: [MacroTreeEdge: MacroNode] = [:]
       var macros: [Macro] = []
     }
-    public let macroTree = MacroNode()
+    let macroTree = MacroNode()
 
     private struct DisassemblyIntent: Hashable {
       let bank: Bank

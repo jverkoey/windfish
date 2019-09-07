@@ -81,10 +81,6 @@ extension LR35902.Instruction {
 
     case zeroimm8
 
-     // For macro use only
-    case macro(String)
-    case arg(Int)
-
     static let registers8: Set<LR35902.Instruction.Numeric> = Set([
       .a,
       .b, .c,

@@ -24,8 +24,8 @@ public final class RGBDSAssembly {
     }
   }
 
-  static func assembly(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil) -> Statement {
-    if let operands = operands(for: instruction, with: disassembly) {
+  static func assembly(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil, argumentString: String? = nil) -> Statement {
+    if let operands = operands(for: instruction, with: disassembly, argumentString: argumentString) {
       return Statement(opcode: instruction.spec.opcode, operands: operands.filter { $0.count > 0 })
     } else {
       return Statement(opcode: instruction.spec.opcode)
@@ -141,14 +141,16 @@ public final class RGBDSAssembly {
     return typedValue(for: imm8, with: dataType.representation)
   }
 
-  private static func operands(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil) -> [String]? {
+  private static func operands(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil, argumentString: String?) -> [String]? {
     if let disassembly = disassembly {
       switch instruction.spec {
       case let LR35902.Instruction.Spec.jp(condition, operand) where operand == .imm16,
            let LR35902.Instruction.Spec.call(condition, operand) where operand == .imm16:
         if disassembly.transfersOfControl(at: instruction.imm16!, in: disassembly.cpu.bank) != nil {
           var addressLabel: String
-          if let label = disassembly.label(at: instruction.imm16!, in: disassembly.cpu.bank) {
+          if let argumentString = argumentString {
+            addressLabel = argumentString
+          } else if let label = disassembly.label(at: instruction.imm16!, in: disassembly.cpu.bank) {
             if let scope = disassembly.labeledContiguousScopes(at: disassembly.cpu.pc, in: disassembly.cpu.bank).first(where: { labeledScope in
               label.starts(with: "\(labeledScope.label).")
             })?.label {
@@ -170,7 +172,9 @@ public final class RGBDSAssembly {
         let jumpAddress = (disassembly.cpu.pc + LR35902.Instruction.widths[instruction.spec]!.total).advanced(by: Int(Int8(bitPattern: instruction.imm8!)))
         if disassembly.transfersOfControl(at: jumpAddress, in: disassembly.cpu.bank) != nil {
           var addressLabel: String
-          if let label = disassembly.label(at: jumpAddress, in: disassembly.cpu.bank) {
+          if let argumentString = argumentString {
+            addressLabel = argumentString
+          } else if let label = disassembly.label(at: jumpAddress, in: disassembly.cpu.bank) {
             if let scope = disassembly.labeledContiguousScopes(at: disassembly.cpu.pc, in: disassembly.cpu.bank).first(where: { labeledScope in
               label.starts(with: "\(labeledScope.label).")
             })?.label {
@@ -190,84 +194,94 @@ public final class RGBDSAssembly {
 
       case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand1 == .imm16addr:
         var addressLabel: String
-        if let label = disassembly.label(at: instruction.imm16!, in: disassembly.cpu.bank) {
-          addressLabel = label
+        if let argumentString = argumentString {
+          addressLabel = argumentString
+        } else if let label = disassembly.label(at: instruction.imm16!, in: disassembly.cpu.bank) {
+          addressLabel = "[\(label)]"
         } else if let global = disassembly.globals[instruction.imm16!] {
-          addressLabel = global.name
+          addressLabel = "[\(global.name)]"
         } else {
-          addressLabel = "$\(instruction.imm16!.hexString)"
+          addressLabel = "[$\(instruction.imm16!.hexString)]"
         }
-        return ["[\(addressLabel)]", operand(for: instruction, operand: operand2, with: disassembly)]
+        return [addressLabel, operand(for: instruction, operand: operand2, with: disassembly, argumentString: argumentString)]
 
       case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .imm16addr:
         var addressLabel: String
-        if let label = disassembly.label(at: instruction.imm16!, in: disassembly.cpu.bank) {
-          addressLabel = label
+        if let argumentString = argumentString {
+          addressLabel = argumentString
+        } else if let label = disassembly.label(at: instruction.imm16!, in: disassembly.cpu.bank) {
+          addressLabel = "[\(label)]"
         } else if let global = disassembly.globals[instruction.imm16!] {
-          addressLabel = global.name
+          addressLabel = "[\(global.name)]"
         } else {
-          addressLabel = "$\(instruction.imm16!.hexString)"
+          addressLabel = "[$\(instruction.imm16!.hexString)]"
         }
-        return [operand(for: instruction, operand: operand1, with: disassembly), "[\(addressLabel)]"]
+        return [operand(for: instruction, operand: operand1, with: disassembly, argumentString: argumentString), addressLabel]
 
       case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand1 == .ffimm8addr:
         var addressLabel: String
-        if let global = disassembly.globals[0xFF00 | UInt16(instruction.imm8!)] {
-          addressLabel = global.name
+        if let argumentString = argumentString {
+          addressLabel = argumentString
+        } else if let global = disassembly.globals[0xFF00 | UInt16(instruction.imm8!)] {
+          addressLabel = "[\(global.name)]"
         } else {
-          addressLabel = "$FF\(instruction.imm8!.hexString)"
+          addressLabel = "[$FF\(instruction.imm8!.hexString)]"
         }
-        return ["[\(addressLabel)]", operand(for: instruction, operand: operand2, with: disassembly)]
+        return [addressLabel, operand(for: instruction, operand: operand2, with: disassembly, argumentString: argumentString)]
 
       case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .ffimm8addr:
         var addressLabel: String
-        if let global = disassembly.globals[0xFF00 | UInt16(instruction.imm8!)] {
-          addressLabel = global.name
+        if let argumentString = argumentString {
+          addressLabel = argumentString
+        } else if let global = disassembly.globals[0xFF00 | UInt16(instruction.imm8!)] {
+          addressLabel = "[\(global.name)]"
         } else {
-          addressLabel = "$FF\(instruction.imm8!.hexString)"
+          addressLabel = "[$FF\(instruction.imm8!.hexString)]"
         }
-        return [operand(for: instruction, operand: operand1, with: disassembly), "[\(addressLabel)]"]
+        return [operand(for: instruction, operand: operand1, with: disassembly, argumentString: argumentString), addressLabel]
 
       case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .imm16:
         var addressLabel: String
         // TODO: These are only globals if they're referenced as an address in a subsequent instruction.
-        if operand1 == .hl, let name = disassembly.globals[instruction.imm16!]?.name {
+        if let argumentString = argumentString {
+          addressLabel = argumentString
+        } else if operand1 == .hl, let name = disassembly.globals[instruction.imm16!]?.name {
           addressLabel = name
         } else {
           addressLabel = "$\(instruction.imm16!.hexString)"
         }
-        return [operand(for: instruction, operand: operand1, with: disassembly), addressLabel]
+        return [operand(for: instruction, operand: operand1, with: disassembly, argumentString: argumentString), addressLabel]
 
       default:
         break
       }
     }
-    return operands(for: instruction, spec: instruction.spec, with: disassembly)
+    return operands(for: instruction, spec: instruction.spec, with: disassembly, argumentString: argumentString)
   }
 
-  private static func operands(for instruction: LR35902.Instruction, spec: LR35902.Instruction.Spec, with disassembly: LR35902.Disassembly?) -> [String]? {
+  private static func operands(for instruction: LR35902.Instruction, spec: LR35902.Instruction.Spec, with disassembly: LR35902.Disassembly?, argumentString: String?) -> [String]? {
     let mirror = Mirror(reflecting: spec)
     guard let operandReflection = mirror.children.first else {
       return nil
     }
     switch operandReflection.value {
     case let childInstruction as LR35902.Instruction.Spec:
-      return operands(for: instruction, spec: childInstruction, with: disassembly)
+      return operands(for: instruction, spec: childInstruction, with: disassembly, argumentString: argumentString)
     case let tuple as (LR35902.Instruction.Condition?, LR35902.Instruction.Numeric):
       if let condition = tuple.0 {
-        return ["\(condition)", operand(for: instruction, operand: tuple.1, with: disassembly)]
+        return ["\(condition)", operand(for: instruction, operand: tuple.1, with: disassembly, argumentString: argumentString)]
       } else {
-        return [operand(for: instruction, operand: tuple.1, with: disassembly)]
+        return [operand(for: instruction, operand: tuple.1, with: disassembly, argumentString: argumentString)]
       }
     case let condition as LR35902.Instruction.Condition:
       return ["\(condition)"]
     case let tuple as (LR35902.Instruction.Numeric, LR35902.Instruction.Numeric):
-      return [operand(for: instruction, operand: tuple.0, with: disassembly),
-              operand(for: instruction, operand: tuple.1, with: disassembly)]
+      return [operand(for: instruction, operand: tuple.0, with: disassembly, argumentString: argumentString),
+              operand(for: instruction, operand: tuple.1, with: disassembly, argumentString: argumentString)]
     case let tuple as (LR35902.Instruction.Bit, LR35902.Instruction.Numeric):
-      return ["\(tuple.0.rawValue)", operand(for: instruction, operand: tuple.1, with: disassembly)]
+      return ["\(tuple.0.rawValue)", operand(for: instruction, operand: tuple.1, with: disassembly, argumentString: argumentString)]
     case let operandValue as LR35902.Instruction.Numeric:
-      return [operand(for: instruction, operand: operandValue, with: disassembly)]
+      return [operand(for: instruction, operand: operandValue, with: disassembly, argumentString: argumentString)]
     case let address as LR35902.Instruction.RestartAddress:
       return ["\(address)".replacingOccurrences(of: "x", with: "$")]
     default:
@@ -275,7 +289,20 @@ public final class RGBDSAssembly {
     }
   }
 
-  private static func operand(for instruction: LR35902.Instruction, operand: LR35902.Instruction.Numeric, with disassembly: LR35902.Disassembly?) -> String {
+  private static func operand(for instruction: LR35902.Instruction, operand: LR35902.Instruction.Numeric, with disassembly: LR35902.Disassembly?, argumentString: String?) -> String {
+    if let argumentString = argumentString {
+      switch operand {
+      case LR35902.Instruction.Numeric.imm16,
+           LR35902.Instruction.Numeric.imm8,
+           LR35902.Instruction.Numeric.imm16addr,
+           LR35902.Instruction.Numeric.simm8,
+           LR35902.Instruction.Numeric.sp_plus_simm8,
+           LR35902.Instruction.Numeric.ffimm8addr:
+        return argumentString
+      default:
+        break
+      }
+    }
     switch operand {
     case .imm8:
       if let typedValue = typedOperand(for: instruction.imm8!, with: disassembly) {
@@ -305,11 +332,6 @@ public final class RGBDSAssembly {
         return "sp+$\(instruction.imm8!.hexString)"
       }
     case .a, .af, .b, .c, .bc, .d, .e, .de, .h, .l, .hl, .sp: return "\(operand)"
-
-    case let .macro(text):
-      return text
-    case let .arg(number):
-      return "\\\(number)"
 
     case .zeroimm8:
       return ""

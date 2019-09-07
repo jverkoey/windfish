@@ -26,33 +26,49 @@ private func line(_ transfersOfControl: Set<LR35902.Disassembly.TransferOfContro
   return line("\(label):", comment: "Sources: \(sources)")
 }
 
-private func extractArgs(from statement: RGBDSAssembly.Statement, using spec: LR35902.Instruction.Spec) -> [Int: String] {
+private func extractArgs(from statement: RGBDSAssembly.Statement, using spec: LR35902.Instruction.Spec, argument: Int) -> [Int: String] {
   var args: [Int: String] = [:]
   spec.visit { (operand, index) in
     guard let operand = operand, let index = index else {
       return
     }
 
-    if case let LR35902.Instruction.Numeric.arg(argumentNumber) = operand {
-      args[argumentNumber] = Mirror(reflecting: statement).descendant(1, 0, index) as? String
+    switch operand {
+    case LR35902.Instruction.Numeric.imm16,
+         LR35902.Instruction.Numeric.imm8,
+         LR35902.Instruction.Numeric.imm16addr,
+         LR35902.Instruction.Numeric.simm8,
+         LR35902.Instruction.Numeric.sp_plus_simm8,
+         LR35902.Instruction.Numeric.ffimm8addr:
+      args[argument] = Mirror(reflecting: statement).descendant(1, 0, index) as? String
+    default:
+      break
     }
   }
   return args
 }
 
-private func extractArgTypes(from instruction: LR35902.Instruction.Spec, using spec: LR35902.Instruction.Spec) -> [Int: String] {
+private func extractArgTypes(from instruction: LR35902.Instruction.Spec, using spec: LR35902.Instruction.Spec, argument: Int) -> [Int: String] {
   var args: [Int: String] = [:]
   spec.visit { (operand, index) in
     guard let operand = operand, let index = index else {
       return
     }
 
-    if case LR35902.Instruction.Numeric.arg(let argNumber) = operand {
+    switch operand {
+    case LR35902.Instruction.Numeric.imm16,
+         LR35902.Instruction.Numeric.imm8,
+         LR35902.Instruction.Numeric.imm16addr,
+         LR35902.Instruction.Numeric.simm8,
+         LR35902.Instruction.Numeric.sp_plus_simm8,
+         LR35902.Instruction.Numeric.ffimm8addr:
       if let operand = Mirror(reflecting: instruction).descendant(0, index) {
-        args[argNumber] = "\(operand)"
+        args[argument] = "\(operand)"
       } else if let operand = Mirror(reflecting: instruction).descendant(index) {
-        args[argNumber] = "\(operand)"
+        args[argument] = "\(operand)"
       }
+    default:
+      break
     }
   }
   return args
@@ -219,8 +235,8 @@ clean:
       }
 
       let initialCheckMacro: (LR35902.Instruction) -> MacroNode? = { instruction in
-        let asInstruction = MacroLine.instruction(instruction)
-        let asAny = MacroLine.any(instruction.spec)
+        let asInstruction = MacroTreeEdge.instruction(instruction)
+        let asAny = MacroTreeEdge.any(instruction.spec)
         guard macroNode == nil, let child = self.macroTree.children[asInstruction] ?? self.macroTree.children[asAny] else {
           return nil
         }
@@ -232,8 +248,8 @@ clean:
         guard let macroNodeIterator = macroNode else {
           return nil
         }
-        let asInstruction = MacroLine.instruction(instruction)
-        let asAny = MacroLine.any(instruction.spec)
+        let asInstruction = MacroTreeEdge.instruction(instruction)
+        let asAny = MacroTreeEdge.any(instruction.spec)
         // Only descend the tree if we're not a label.
         guard !isLabeled, let child = macroNodeIterator.children[asInstruction] ?? macroNodeIterator.children[asAny] else {
           return nil
@@ -256,23 +272,15 @@ clean:
             }
           }
 
-          let macros: [(macro: LR35902.Disassembly.Macro, code: [LR35902.Instruction.Spec], arguments: [Int: String], rawArguments: [Int: String])] = macroNodeIterator.macros.compactMap { macro in
-
-            var code: [LR35902.Instruction.Spec]
-            if let macroCode = macro.code {
-              code = macroCode
-            } else {
-              code = macro.macroLines.map {
-                if case .instruction(let instruction) = $0 {
-                  return instruction.spec
-                }
-                preconditionFailure("Unhandled")
-              }
-            }
+          let macros: [(macro: LR35902.Disassembly.Macro, arguments: [Int: String], rawArguments: [Int: String])] = macroNodeIterator.macros.compactMap { macro in
             // Extract the arguments.
             var anyArgumentMismatches = false
-            let arguments: [Int: String] = zip(code, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
-              let args = extractArgs(from: zipped.1.1, using: zipped.0)
+            let arguments: [Int: String] = zip(macro.macroLines, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
+              guard case let .any(spec, argumentOrNil, _) = zipped.0,
+                  let argument = argumentOrNil else {
+                return iter
+              }
+              let args = extractArgs(from: zipped.1.1, using: spec, argument: Int(argument))
               return iter.merging(args, uniquingKeysWith: { first, second in
                 if first != second {
                   anyArgumentMismatches = true
@@ -284,8 +292,13 @@ clean:
               return nil
             }
 
-            let rawArguments: [Int: String] = zip(code, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
-              let args = extractArgs(from: RGBDSAssembly.assembly(for: zipped.1.0), using: zipped.0)
+            // Arguments without any label replacements.
+            let rawArguments: [Int: String] = zip(macro.macroLines, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
+              guard case let .any(spec, argumentOrNil, _) = zipped.0,
+                let argument = argumentOrNil else {
+                  return iter
+              }
+              let args = extractArgs(from: RGBDSAssembly.assembly(for: zipped.1.0), using: spec, argument: Int(argument))
               return iter.merging(args, uniquingKeysWith: { first, second in
                 if first != second {
                   anyArgumentMismatches = true
@@ -297,7 +310,7 @@ clean:
               return nil
             }
 
-            return (macro: macro, code: code, arguments: arguments, rawArguments: rawArguments)
+            return (macro: macro, arguments: arguments, rawArguments: rawArguments)
           }
 
           var validMacros = macros.filter { macro in
@@ -341,17 +354,14 @@ clean:
               if !macro.arguments.isEmpty {
                 lines.append(.macroComment("Arguments:"))
 
-                let macroSpecs: [LR35902.Instruction.Spec] = macro.macro.macroLines.map {
-                  switch $0 {
-                  case .instruction(let instruction):
-                    return instruction.spec
-                  case .any(let spec):
-                    return spec
-                  }
-                }
+                let macroSpecs: [LR35902.Instruction.Spec] = macro.macro.macroLines.map { $0.spec() }
 
-                let argumentTypes: [Int: String] = zip(macro.code, macroSpecs).reduce([:], { (iter, zipped) -> [Int: String] in
-                  let args = extractArgTypes(from: zipped.1, using: zipped.0)
+                let argumentTypes: [Int: String] = zip(macro.macro.macroLines, macroSpecs).reduce([:], { (iter, zipped) -> [Int: String] in
+                  guard case let .any(spec, argumentOrNil, _) = zipped.0,
+                    let argument = argumentOrNil else {
+                      return iter
+                  }
+                  let args = extractArgTypes(from: zipped.1, using: spec, argument: Int(argument))
                   return iter.merging(args, uniquingKeysWith: { first, second in
                     assert(first == second, "Mismatch in arguments")
                     return first
@@ -376,10 +386,22 @@ clean:
                 }
               }
               lines.append(.macroDefinition(macro.macro.name))
-              lines.append(contentsOf: zip(macro.code, instructions).map { spec, instruction in
+              lines.append(contentsOf: zip(macro.macro.macroLines, instructions).map { line, instruction in
                 var macroInstruction = instruction.0
-                macroInstruction.spec = spec
-                let macroAssembly = RGBDSAssembly.assembly(for: macroInstruction, with: self)
+                macroInstruction.spec = line.spec()
+                let argumentString: String?
+                if case let .any(_, argumentOrNil, argumentText) = line {
+                  if let argumentText = argumentText {
+                    argumentString = argumentText
+                  } else if let argument = argumentOrNil {
+                    argumentString = "\\\(argument)"
+                  } else {
+                    argumentString = nil
+                  }
+                } else {
+                  argumentString = nil
+                }
+                let macroAssembly = RGBDSAssembly.assembly(for: macroInstruction, with: self, argumentString: argumentString)
                 return .macroInstruction(macroInstruction, macroAssembly)
               })
               lines.append(.macroTerminator)
