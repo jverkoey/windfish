@@ -231,6 +231,8 @@ struct Disassembly_Hints {
 
   var macros: Dictionary<String,Disassembly_Macro> = [:]
 
+  var labels: Dictionary<UInt64,String> = [:]
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -518,6 +520,7 @@ extension Disassembly_Hints: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
     1: .same(proto: "globals"),
     2: .same(proto: "datatypes"),
     3: .same(proto: "macros"),
+    4: .same(proto: "labels"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -526,6 +529,7 @@ extension Disassembly_Hints: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
       case 1: try decoder.decodeMapField(fieldType: SwiftProtobuf._ProtobufMessageMap<SwiftProtobuf.ProtobufUInt64,Disassembly_Global>.self, value: &self.globals)
       case 2: try decoder.decodeMapField(fieldType: SwiftProtobuf._ProtobufMessageMap<SwiftProtobuf.ProtobufString,Disassembly_Datatype>.self, value: &self.datatypes)
       case 3: try decoder.decodeMapField(fieldType: SwiftProtobuf._ProtobufMessageMap<SwiftProtobuf.ProtobufString,Disassembly_Macro>.self, value: &self.macros)
+      case 4: try decoder.decodeMapField(fieldType: SwiftProtobuf._ProtobufMap<SwiftProtobuf.ProtobufUInt64,SwiftProtobuf.ProtobufString>.self, value: &self.labels)
       default: break
       }
     }
@@ -541,6 +545,9 @@ extension Disassembly_Hints: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
     if !self.macros.isEmpty {
       try visitor.visitMapField(fieldType: SwiftProtobuf._ProtobufMessageMap<SwiftProtobuf.ProtobufString,Disassembly_Macro>.self, value: self.macros, fieldNumber: 3)
     }
+    if !self.labels.isEmpty {
+      try visitor.visitMapField(fieldType: SwiftProtobuf._ProtobufMap<SwiftProtobuf.ProtobufUInt64,SwiftProtobuf.ProtobufString>.self, value: self.labels, fieldNumber: 4)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -548,6 +555,7 @@ extension Disassembly_Hints: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
     if lhs.globals != rhs.globals {return false}
     if lhs.datatypes != rhs.datatypes {return false}
     if lhs.macros != rhs.macros {return false}
+    if lhs.labels != rhs.labels {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

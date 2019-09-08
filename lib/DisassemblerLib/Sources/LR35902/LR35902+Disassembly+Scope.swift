@@ -73,8 +73,9 @@ extension LR35902.Disassembly {
         }
       }
       guard let runStartAddress = runGroup.startAddress,
-        let runGroupLabel = labels[runStartAddress],
-        let runGroupName = runGroupLabel.components(separatedBy: ".").first else {
+            let runGroupLabel = label(at: LR35902.addressAndBank(from: runStartAddress).address,
+                                      in: LR35902.addressAndBank(from: runStartAddress).bank),
+            let runGroupName = runGroupLabel.components(separatedBy: ".").first else {
         continue
       }
 
@@ -105,8 +106,7 @@ extension LR35902.Disassembly {
   private func rewriteReturnLabels(at locations: [LR35902.CartridgeLocation]) {
     let returnLabelAddresses = locations.filter { instructionMap[$0]?.spec.category == .ret }
     for cartLocation in returnLabelAddresses {
-      let addressAndBank = LR35902.addressAndBank(from: cartLocation)
-      labels[cartLocation] = "return_\(addressAndBank.address.hexString)_\(addressAndBank.bank.hexString)"
+      labelTypes[cartLocation] = .returnType
     }
   }
 
@@ -121,7 +121,7 @@ extension LR35902.Disassembly {
     }
     let backwardTocs: [(source: LR35902.CartridgeLocation, destination: LR35902.CartridgeLocation)] = tocs.reduce(into: [], { (accumulator, element) in
       let tocsInThisScope = element.tocs.filter {
-        scope.contains($0.sourceLocation) && element.destination < $0.sourceLocation && labels[element.destination] != nil
+        scope.contains($0.sourceLocation) && element.destination < $0.sourceLocation && (labels[element.destination] != nil || labelTypes[element.destination] != nil)
       }
       for toc in tocsInThisScope {
         if case .jr(let condition, _) = instructionMap[toc.sourceLocation]?.spec,
@@ -153,8 +153,7 @@ extension LR35902.Disassembly {
     }
     let destinations = Set(loops.map { $0.destination })
     for cartLocation in destinations {
-      let addressAndBank = LR35902.addressAndBank(from: cartLocation)
-      labels[cartLocation] = "loop_\(addressAndBank.address.hexString)_\(addressAndBank.bank.hexString)"
+      labelTypes[cartLocation] = .loopType
     }
   }
 
@@ -169,7 +168,9 @@ extension LR35902.Disassembly {
     }
     let forwardTocs: [(source: LR35902.CartridgeLocation, destination: LR35902.CartridgeLocation)] = tocs.reduce(into: [], { (accumulator, element) in
       let tocsInThisScope = element.tocs.filter {
-        scope.contains($0.sourceLocation) && element.destination > $0.sourceLocation && labels[element.destination] != nil
+        scope.contains($0.sourceLocation)
+          && element.destination > $0.sourceLocation
+          && (labels[element.destination] != nil || labelTypes[element.destination] != nil)
       }
       for toc in tocsInThisScope {
         if case .jr(let condition, _) = instructionMap[toc.sourceLocation]?.spec,
@@ -183,8 +184,7 @@ extension LR35902.Disassembly {
     }
     let destinations = Set(forwardTocs.map { $0.destination })
     for cartLocation in destinations {
-      let addressAndBank = LR35902.addressAndBank(from: cartLocation)
-      labels[cartLocation] = "else_\(addressAndBank.address.hexString)_\(addressAndBank.bank.hexString)"
+      labelTypes[cartLocation] = .elseType
     }
   }
 

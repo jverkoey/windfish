@@ -2,7 +2,7 @@ import Foundation
 import LR35902
 import DisassemblyRequest
 
-func populateRequestWithGameGlobals(_ request: DisassemblyRequest<LR35902.Address, LR35902.Instruction>) {
+func populateRequestWithGameGlobals(_ request: DisassemblyRequest<LR35902.Address, LR35902.CartridgeLocation, LR35902.Instruction>) {
   request.addGlobals([
     0x0003: "bool DEBUG_TOOL1",
     0x0004: "bool DEBUG_TOOL2",

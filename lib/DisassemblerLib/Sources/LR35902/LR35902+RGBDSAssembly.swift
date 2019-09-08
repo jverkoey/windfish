@@ -75,16 +75,6 @@ public final class RGBDSAssembly {
     return "\(opcode) \(operand)"
   }
 
-  public static func defaultLabel(at pc: LR35902.Address, in bank: LR35902.Bank) -> String? {
-    if pc < 0x4000 {
-      return "toc_00_\(pc.hexString)"
-    } else if pc < 0x8000 {
-      return "toc_\(bank.hexString)_\(pc.hexString)"
-    } else {
-      return nil
-    }
-  }
-
   private static func typedValue(for imm8: UInt8, with representation: LR35902.Disassembly.Datatype.Representation) -> String {
     switch representation {
     case .binary:

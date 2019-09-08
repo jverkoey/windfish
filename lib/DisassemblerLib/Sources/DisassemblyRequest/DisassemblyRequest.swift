@@ -1,12 +1,18 @@
 import Foundation
 import CPU
 
-public final class DisassemblyRequest<AddressType: BinaryInteger, InstructionType: Instruction> {
+public final class DisassemblyRequest<AddressType: BinaryInteger, LocationType: BinaryInteger, InstructionType: Instruction> {
   public init(data: Data) {
     self.data = data
   }
 
   // MARK: - Adding hints
+
+  // MARK: Labels
+
+  public func setLabel(at location: LocationType, to name: String) {
+    labels[location] = name
+  }
 
   // MARK: Datatypes
 
@@ -66,6 +72,10 @@ public final class DisassemblyRequest<AddressType: BinaryInteger, InstructionTyp
     return try Disassembly_Request.with { request in
       request.binary = data
       request.hints = Disassembly_Hints.with { hints in
+
+        hints.labels = labels.reduce(into: [:]) { accumulator, element in
+          accumulator[UInt64(element.key)] = element.value
+        }
 
         hints.macros = macros.mapValues { macro in
           Disassembly_Macro.with { proto in
@@ -153,6 +163,7 @@ public final class DisassemblyRequest<AddressType: BinaryInteger, InstructionTyp
   private var globals: [AddressType: Global] = [:]
   private var dataTypes: [String: Datatype] = [:]
   private var macros: [String: Macro] = [:]
+  private var labels: [LocationType: String] = [:]
 
   private enum DatatypeKind {
     case enumeration

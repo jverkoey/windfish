@@ -7,7 +7,7 @@ import FoundationNetworking
 
 let data = try Data(contentsOf: URL(fileURLWithPath: "/Users/featherless/workbench/awakenlink/rom/LinksAwakening.gb"))
 
-var disassemblyRequest = DisassemblyRequest<LR35902.Address, LR35902.Instruction>(data: data)
+var disassemblyRequest = DisassemblyRequest<LR35902.Address, LR35902.CartridgeLocation, LR35902.Instruction>(data: data)
 
 populateRequestWithHardwareDefaults(disassemblyRequest)
 populateRequestWithGameData(disassemblyRequest)
@@ -154,6 +154,11 @@ for (name, datatype) in _request.hints.datatypes {
 
 for (address, global) in _request.hints.globals {
   disassembly.createGlobal(at: LR35902.Address(address), named: global.name, dataType: global.datatype)
+}
+
+for (location, label) in _request.hints.labels {
+  let addressAndBank = LR35902.addressAndBank(from: LR35902.CartridgeLocation(location))
+  disassembly.setLabel(at: addressAndBank.address, in: addressAndBank.bank, named: label)
 }
 
 for (name, macro) in _request.hints.macros {
@@ -519,13 +524,7 @@ disassembly.disassembleAsGameboyCartridge()
 disassembly.defineFunction(startingAt: 0x0150, in: 0x00, named: "Main")
 disassembly.setPreComment(at: 0x0156, in: 0x00, text: "Reset the palette registers to zero.")
 disassembly.setPreComment(at: 0x015D, in: 0x00, text: "Clears 6144 bytes of video ram. Graphics vram location for OBJ and BG tiles start at $8000 and end at $97FF; for a total of 0x1800 bytes.")
-disassembly.setLabel(at: 0x01a6, in: 0x00, named: "frameDidRender")
 disassembly.setPreComment(at: 0x01b7, in: 0x00, text: "Load a with a value that is non-zero every other frame.")
-disassembly.setLabel(at: 0x01aa, in: 0x00, named: "renderLoop_setScrollY")
-disassembly.setLabel(at: 0x01be, in: 0x00, named: "defaultShakeBehavior")
-disassembly.setLabel(at: 0x01c4, in: 0x00, named: "setScrollY")
-disassembly.setLabel(at: 0x01f5, in: 0x00, named: "playAudio")
-disassembly.setLabel(at: 0x01fb, in: 0x00, named: "skipAudio")
 disassembly.setPreComment(at: 0x2872, in: 0x00, text: """
 hl = address after rst $00 invocation
 hl += [0, a << 1]
@@ -533,12 +532,7 @@ hl = [ram[hl + 1], ram[hl]]
 jp hl
 """)
 disassembly.defineFunction(startingAt: 0x2872, in: 0x00, named: "JumpTable")
-disassembly.setLabel(at: 0x03bd, in: 0x00, named: "waitForNextFrame")
-disassembly.setLabel(at: 0x038a, in: 0x00, named: "engineIsPaused")
-disassembly.setLabel(at: 0x03a4, in: 0x00, named: "checkEnginePaused")
 disassembly.defineFunction(startingAt: 0x04a1, in: 0x00, named: "LoadMapData")
-disassembly.setLabel(at: 0x04f5, in: 0x00, named: "loadMapZero")
-disassembly.setLabel(at: 0x0516, in: 0x00, named: "cleanupAndReturn")
 disassembly.defineFunction(startingAt: 0x07B9, in: 0x00, named: "SetBank")
 disassembly.defineFunction(startingAt: 0x0844, in: 0x00, named: "PlayAudioStep")
 disassembly.defineFunction(startingAt: 0x27fe, in: 0x00, named: "ReadJoypadState")
@@ -579,7 +573,6 @@ extractText(from: LR35902.cartAddress(for: 0x5c00, in: 0x14)!..<LR35902.cartAddr
 extractText(from: LR35902.cartAddress(for: 0x5700, in: 0x16)!..<LR35902.cartAddress(for: 0x7ff0, in: 0x16)!)
 
 // MARK: - Bank 23 (17)
-disassembly.setLabel(at: 0x4099, in: 0x17, named: "CreditsText")
 disassembly.setText(at: 0x4099..<0x42fd, in: 0x17)
 
 // MARK: - Bank 27 (1b)
@@ -606,19 +599,12 @@ extractText(from: LR35902.cartAddress(for: 0x4000, in: 0x1d)!..<LR35902.cartAddr
 // MARK: - Bank 31 (1f)
 disassembly.defineFunction(startingAt: 0x4000, in: 0x1f, named: "EnableSound")
 disassembly.defineFunction(startingAt: 0x4006, in: 0x1f, named: "PlayAudioStep_Launcher")
-disassembly.setLabel(at: 0x401e, in: 0x1f, named: "PlayAudioStep_Start")
 
 disassembly.defineFunction(startingAt: 0x4204, in: 0x1f, named: "InitSquareSound")
-disassembly.setLabel(at: 0x53e6, in: 0x1f, named: "ClearActiveSquareSound")
 
 disassembly.defineFunction(startingAt: 0x53ed, in: 0x1f, named: "InitWaveSound")
-disassembly.setLabel(at: 0x6385, in: 0x1f, named: "ClearActiveWaveSound")
 
 disassembly.defineFunction(startingAt: 0x64e8, in: 0x1f, named: "InitNoiseSound")
-disassembly.setLabel(at: 0x650e, in: 0x1f, named: "_InitNoiseSoundNoNoiseSound")
-disassembly.setLabel(at: 0x7a28, in: 0x1f, named: "ClearActiveNoiseSound")
-
-disassembly.setLabel(at: 0x7a60, in: 0x1f, named: "_ShiftHL")
 
 disassembly.defineFunction(startingAt: 0x7f80, in: 0x1f, named: "SoundUnknown1")
 

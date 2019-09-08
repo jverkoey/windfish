@@ -85,11 +85,10 @@ extension LR35902 {
       transfers[index, default: Set()].insert(transfer)
 
       // Create a label if one doesn't exist.
-      if labels[index] == nil
-        // Don't create a label in the middle of an instruction.
-        && (!code.contains(Int(index)) || instruction(at: pc, in: bank) != nil),
-        let label = RGBDSAssembly.defaultLabel(at: pc, in: bank) {
-        setLabel(at: pc, in: bank, named: label)
+      if labelTypes[index] == nil
+          // Don't create a label in the middle of an instruction.
+          && (!code.contains(Int(index)) || instruction(at: pc, in: bank) != nil) {
+        labelTypes[index] = .transferOfControlType
       }
     }
     private var transfers: [CartridgeLocation: Set<TransferOfControl>] = [:]
@@ -159,6 +158,7 @@ extension LR35902 {
           }
         }
         labels[location] = nil
+        labelTypes[location] = nil
       }
     }
     var dataRanges = Set<Range<CartridgeLocation>>()
@@ -319,7 +319,18 @@ extension LR35902 {
         return nil
       }
 
-      guard let name = labels[index] else {
+      let name: String
+      if let explicitName = labels[index] {
+        name = explicitName
+      } else if let labelType = labelTypes[index] {
+        let bank: Bank = (pc < 0x4000) ? 0 : bank
+        switch labelType {
+        case .transferOfControlType: name = "toc_\(bank.hexString)_\(pc.hexString)"
+        case .elseType:              name = "else_\(bank.hexString)_\(pc.hexString)"
+        case .loopType:              name = "loop_\(bank.hexString)_\(pc.hexString)"
+        case .returnType:            name = "return_\(bank.hexString)_\(pc.hexString)"
+        }
+      } else {
         return nil
       }
 
@@ -340,7 +351,7 @@ extension LR35902 {
 
     func labelLocations(in range: Range<CartridgeLocation>) -> [CartridgeLocation] {
       return range.filter {
-        labels[$0] != nil
+        labels[$0] != nil || labelTypes[$0] != nil
       }
     }
 
@@ -352,6 +363,13 @@ extension LR35902 {
       labels[cartAddress] = name
     }
     var labels: [CartridgeLocation: String] = [:]
+    enum LabelType {
+      case transferOfControlType
+      case elseType
+      case returnType
+      case loopType
+    }
+    var labelTypes: [CartridgeLocation: LabelType] = [:]
 
     // MARK: - Globals
 
