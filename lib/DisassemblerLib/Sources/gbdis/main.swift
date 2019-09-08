@@ -611,41 +611,6 @@ disassembly.setLabel(at: 0x7a60, in: 0x1f, named: "_ShiftHL")
 
 disassembly.defineFunction(startingAt: 0x7f80, in: 0x1f, named: "SoundUnknown1")
 
-disassembly.defineMacro(named: "jumpTable", instructions: [
-  .instruction(.init(spec: .rst(.x00))),
-]) /*{ args, address, bank in
-  print("disassembleJumpTable(within: 0x\((address + 1).hexString)..<0x\((address + 3).hexString), in: 0x\(bank.hexString), selectedBank: 0x\(bank.hexString))")
-}*/
-
-
-disassembly.defineMacro(named: "changebank", instructions: [
-  .any(.ld(.a, .imm8), argument: 1),
-  .instruction(.init(spec: .ld(.imm16addr, .a), imm16: 0x2100)),
-])
-
-disassembly.defineMacro(named: "_changebank", instructions: [
-  .any(.ld(.a, .imm8), argument: 1),
-  .instruction(.init(spec: .call(nil, .imm16), imm16: 0x07b9))
-])
-
-disassembly.defineMacro(named: "__changebank", instructions: [
-  .instruction(.init(spec: .ld(.hl, .imm16), imm16: 0x2100)),
-  .any(.ld(.hladdr, .imm8), argument: 1),
-])
-
-// TODO: Add validation for a label existing for a given argument.
-//disassembly.defineMacro(named: "_callcb", instructions: [
-//  .any(.ld(.a, .imm8)),
-//  .instruction(.init(spec: .call(nil, .imm16), imm16: 0x07b9)),
-//  .any(.call(nil, .imm16))
-//], code: [
-//  .ld(.a, .macro("bank(\\1)")),
-//  .call(nil, .imm16),
-//  .call(nil, .arg(1))
-//], validArgumentValues: [
-//  1: IndexSet(integersIn: 0x4000..<0x8000)
-//])
-
 disassembly.defineMacro(named: "callcb", instructions: [
   .any(.ld(.a, .imm8), argumentText: "bank(\\1)"),
   .instruction(.init(spec: .ld(.imm16addr, .a), imm16: 0x2100)),
@@ -654,50 +619,11 @@ disassembly.defineMacro(named: "callcb", instructions: [
   1: IndexSet(integersIn: 0x4000..<0x8000)
 ])
 
-disassembly.defineMacro(named: "copyRegion", instructions: [
-  .any(.ld(.hl, .imm16), argument: 1),
-  .any(.ld(.de, .imm16), argument: 3),
-  .any(.ld(.bc, .imm16), argument: 2),
-  .instruction(.init(spec: .call(nil, .imm16), imm16: 0x28C5)),
-]) /*{ args, address, bank in
-  print("disassembly.setData(at: \(args[1]!)..<(\(args[1]!) + \(args[2]!)), in: 0x\(bank.hexString))")
-}*/
-
-disassembly.defineMacro(named: "copyRegion_", instructions: [
-  .any(.ld(.hl, .imm16), argument: 1),
-  .any(.ld(.de, .imm16), argument: 3),
-  .any(.ld(.bc, .imm16), argument: 2),
-  .instruction(.init(spec: .jp(nil, .imm16), imm16: 0x28C5)),
-]) /*{ args, address, bank in
-  print("disassembly.setData(at: \(args[1]!)..<(\(args[1]!) + \(args[2]!)), in: 0x\(bank.hexString))")
-}*/
-
-disassembly.defineMacro(named: "copyRegion__", instructions: [
-  .any(.ld(.de, .imm16), argument: 3),
-  .any(.ld(.hl, .imm16), argument: 1),
-  .any(.ld(.bc, .imm16), argument: 2),
-  .instruction(.init(spec: .jp(nil, .imm16), imm16: 0x28C5)),
-]) /*{ args, address, bank in
-  print("disassembly.setData(at: \(args[1]!)..<(\(args[1]!) + \(args[2]!)), in: 0x\(bank.hexString))")
-}*/
-
 disassembly.defineMacro(named: "modifySave", instructions: [
   .any(.ld(.a, .imm8), argument: 2),
   .any(.ld(.imm16addr, .a), argument: 1)
 ], validArgumentValues: [
   1: IndexSet(integersIn: 0xA100..<0xAB8F)
-])
-
-disassembly.defineMacro(named: "ifAnyPressed", instructions: [
-  .instruction(.init(spec: .ld(.a, .ffimm8addr), imm8: 0xcb)),
-  .any(.and(.imm8), argument: 1),
-  .any(.jr(.nz, .simm8), argument: 2),
-])
-
-disassembly.defineMacro(named: "ifNotPressed", instructions: [
-  .instruction(.init(spec: .ld(.a, .ffimm8addr), imm8: 0xcb)),
-  .any(.and(.imm8), argument: 1),
-  .any(.jr(.z, .simm8), argument: 2),
 ])
 
 disassembly.defineMacro(named: "resetAudio", template: """
