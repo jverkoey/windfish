@@ -24,13 +24,23 @@ let package = Package(
         "LR35902",
         "DisassemblyRequest",
       ]),
-    .testTarget(
-      name: "LR35902Tests",
-      dependencies: ["LR35902"]),
 
     .target(
       name: "LR35902",
-      dependencies: ["FixedWidthInteger", "AssemblyGenerator", "CPU", "Disassembler"]),
+      dependencies: [
+        "FixedWidthInteger",
+        "AssemblyGenerator",
+        "CPU",
+        "Disassembler",
+        "SwiftProtobuf",
+      ]
+    ),
+    .testTarget(
+      name: "LR35902Tests",
+      dependencies: [
+        "LR35902",
+      ]
+    ),
 
     .target(
       name: "AssemblyGenerator",
