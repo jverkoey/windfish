@@ -9,6 +9,20 @@ func populateRequestWithGameMacros(_ request: DisassemblyRequest<LR35902.Address
    print("disassembleJumpTable(within: 0x\((address + 1).hexString)..<0x\((address + 3).hexString), in: 0x\(bank.hexString), selectedBank: 0x\(bank.hexString))")
    }*/
 
+  request.createMacro(named: "callcb", pattern: [
+    .any(.ld(.a, .imm8), argumentText: "bank(\\1)"),
+    .instruction(.init(spec: .ld(.imm16addr, .a), imm16: 0x2100)),
+    .any(.call(nil, .imm16), argument: 1)
+  ], validArgumentValues: [
+    1: IndexSet(integersIn: 0x4000..<0x8000)
+  ])
+
+  request.createMacro(named: "modifySave", pattern: [
+    .any(.ld(.a, .imm8), argument: 2),
+    .any(.ld(.imm16addr, .a), argument: 1)
+  ], validArgumentValues: [
+    1: IndexSet(integersIn: 0xA100..<0xAB8F)
+  ])
 
   request.createMacro(named: "changebank", pattern: [
     .any(.ld(.a, .imm8), argument: 1),

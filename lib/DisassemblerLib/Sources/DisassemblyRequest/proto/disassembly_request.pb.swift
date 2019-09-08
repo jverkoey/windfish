@@ -142,7 +142,64 @@ struct Disassembly_MacroPattern {
 
   var operands: Data = SwiftProtobuf.Internal.emptyData
 
-  var argument: UInt64 = 0
+  var argumentType: Disassembly_MacroPattern.OneOf_ArgumentType? = nil
+
+  var argument: UInt64 {
+    get {
+      if case .argument(let v)? = argumentType {return v}
+      return 0
+    }
+    set {argumentType = .argument(newValue)}
+  }
+
+  var argumentText: String {
+    get {
+      if case .argumentText(let v)? = argumentType {return v}
+      return String()
+    }
+    set {argumentType = .argumentText(newValue)}
+  }
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  enum OneOf_ArgumentType: Equatable {
+    case argument(UInt64)
+    case argumentText(String)
+
+  #if !swift(>=4.1)
+    static func ==(lhs: Disassembly_MacroPattern.OneOf_ArgumentType, rhs: Disassembly_MacroPattern.OneOf_ArgumentType) -> Bool {
+      switch (lhs, rhs) {
+      case (.argument(let l), .argument(let r)): return l == r
+      case (.argumentText(let l), .argumentText(let r)): return l == r
+      default: return false
+      }
+    }
+  #endif
+  }
+
+  init() {}
+}
+
+struct Disassembly_Range {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var inclusiveLower: UInt64 = 0
+
+  var exclusiveUpper: UInt64 = 0
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct Disassembly_ValidArgumentValues {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var ranges: [Disassembly_Range] = []
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -155,6 +212,8 @@ struct Disassembly_Macro {
   // methods supported on all messages.
 
   var patterns: [Disassembly_MacroPattern] = []
+
+  var validArgumentValues: Dictionary<UInt64,Disassembly_ValidArgumentValues> = [:]
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -305,6 +364,7 @@ extension Disassembly_MacroPattern: SwiftProtobuf.Message, SwiftProtobuf._Messag
     1: .same(proto: "opcode"),
     2: .same(proto: "operands"),
     3: .same(proto: "argument"),
+    4: .standard(proto: "argument_text"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -312,7 +372,16 @@ extension Disassembly_MacroPattern: SwiftProtobuf.Message, SwiftProtobuf._Messag
       switch fieldNumber {
       case 1: try decoder.decodeSingularBytesField(value: &self.opcode)
       case 2: try decoder.decodeSingularBytesField(value: &self.operands)
-      case 3: try decoder.decodeSingularUInt64Field(value: &self.argument)
+      case 3:
+        if self.argumentType != nil {try decoder.handleConflictingOneOf()}
+        var v: UInt64?
+        try decoder.decodeSingularUInt64Field(value: &v)
+        if let v = v {self.argumentType = .argument(v)}
+      case 4:
+        if self.argumentType != nil {try decoder.handleConflictingOneOf()}
+        var v: String?
+        try decoder.decodeSingularStringField(value: &v)
+        if let v = v {self.argumentType = .argumentText(v)}
       default: break
       }
     }
@@ -325,8 +394,12 @@ extension Disassembly_MacroPattern: SwiftProtobuf.Message, SwiftProtobuf._Messag
     if !self.operands.isEmpty {
       try visitor.visitSingularBytesField(value: self.operands, fieldNumber: 2)
     }
-    if self.argument != 0 {
-      try visitor.visitSingularUInt64Field(value: self.argument, fieldNumber: 3)
+    switch self.argumentType {
+    case .argument(let v)?:
+      try visitor.visitSingularUInt64Field(value: v, fieldNumber: 3)
+    case .argumentText(let v)?:
+      try visitor.visitSingularStringField(value: v, fieldNumber: 4)
+    case nil: break
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -334,7 +407,71 @@ extension Disassembly_MacroPattern: SwiftProtobuf.Message, SwiftProtobuf._Messag
   static func ==(lhs: Disassembly_MacroPattern, rhs: Disassembly_MacroPattern) -> Bool {
     if lhs.opcode != rhs.opcode {return false}
     if lhs.operands != rhs.operands {return false}
-    if lhs.argument != rhs.argument {return false}
+    if lhs.argumentType != rhs.argumentType {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Disassembly_Range: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".Range"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "inclusive_lower"),
+    2: .standard(proto: "exclusive_upper"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      switch fieldNumber {
+      case 1: try decoder.decodeSingularUInt64Field(value: &self.inclusiveLower)
+      case 2: try decoder.decodeSingularUInt64Field(value: &self.exclusiveUpper)
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.inclusiveLower != 0 {
+      try visitor.visitSingularUInt64Field(value: self.inclusiveLower, fieldNumber: 1)
+    }
+    if self.exclusiveUpper != 0 {
+      try visitor.visitSingularUInt64Field(value: self.exclusiveUpper, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Disassembly_Range, rhs: Disassembly_Range) -> Bool {
+    if lhs.inclusiveLower != rhs.inclusiveLower {return false}
+    if lhs.exclusiveUpper != rhs.exclusiveUpper {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Disassembly_ValidArgumentValues: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".ValidArgumentValues"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "ranges"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      switch fieldNumber {
+      case 1: try decoder.decodeRepeatedMessageField(value: &self.ranges)
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.ranges.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.ranges, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Disassembly_ValidArgumentValues, rhs: Disassembly_ValidArgumentValues) -> Bool {
+    if lhs.ranges != rhs.ranges {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -344,12 +481,14 @@ extension Disassembly_Macro: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
   static let protoMessageName: String = _protobuf_package + ".Macro"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "patterns"),
+    2: .standard(proto: "valid_argument_values"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       switch fieldNumber {
       case 1: try decoder.decodeRepeatedMessageField(value: &self.patterns)
+      case 2: try decoder.decodeMapField(fieldType: SwiftProtobuf._ProtobufMessageMap<SwiftProtobuf.ProtobufUInt64,Disassembly_ValidArgumentValues>.self, value: &self.validArgumentValues)
       default: break
       }
     }
@@ -359,11 +498,15 @@ extension Disassembly_Macro: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
     if !self.patterns.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.patterns, fieldNumber: 1)
     }
+    if !self.validArgumentValues.isEmpty {
+      try visitor.visitMapField(fieldType: SwiftProtobuf._ProtobufMessageMap<SwiftProtobuf.ProtobufUInt64,Disassembly_ValidArgumentValues>.self, value: self.validArgumentValues, fieldNumber: 2)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: Disassembly_Macro, rhs: Disassembly_Macro) -> Bool {
     if lhs.patterns != rhs.patterns {return false}
+    if lhs.validArgumentValues != rhs.validArgumentValues {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

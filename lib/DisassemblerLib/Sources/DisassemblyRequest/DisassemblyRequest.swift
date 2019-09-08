@@ -51,12 +51,13 @@ public final class DisassemblyRequest<AddressType: BinaryInteger, InstructionTyp
   // MARK: Macros
 
   public enum MacroPattern: Hashable {
-    case any(InstructionType.SpecType, argument: UInt64?)
+    case any(InstructionType.SpecType, argument: UInt64? = nil, argumentText: String? = nil)
     case instruction(InstructionType)
   }
-  public func createMacro(named name: String, pattern: [MacroPattern]) {
+  public func createMacro(named name: String, pattern: [MacroPattern],
+                          validArgumentValues: [Int: IndexSet]? = nil) {
     // TODO: Validate the pattern.
-    macros[name] = Macro(patterns: pattern)
+    macros[name] = Macro(patterns: pattern, validArgumentValues: validArgumentValues)
   }
 
   // MARK: - Converting to wire format
@@ -68,14 +69,30 @@ public final class DisassemblyRequest<AddressType: BinaryInteger, InstructionTyp
 
         hints.macros = macros.mapValues { macro in
           Disassembly_Macro.with { proto in
+
+            if let validArgumentValues = macro.validArgumentValues {
+              proto.validArgumentValues = validArgumentValues.reduce(into: [:]) { accumulator, element in
+                accumulator[UInt64(element.key)] = Disassembly_ValidArgumentValues.with { validArgumentValuesProto in
+                  validArgumentValuesProto.ranges = element.value.rangeView.map { range in
+                    Disassembly_Range.with { rangeProto in
+                      rangeProto.inclusiveLower = UInt64(range.lowerBound)
+                      rangeProto.exclusiveUpper = UInt64(range.upperBound)
+                    }
+                  }
+                }
+              }
+            }
+
             proto.patterns = macro.patterns.map { patternLine in
               switch patternLine {
-              case .any(let spec, let argument):
+              case .any(let spec, let argument, let argumentText):
                 return Disassembly_MacroPattern.with { patternProto in
                   if let opcode = spec.asData() {
                     patternProto.opcode = opcode
                   }
-                  if let argument = argument {
+                  if let argumentText = argumentText {
+                    patternProto.argumentText = argumentText
+                  } else if let argument = argument {
                     patternProto.argument = argument
                   }
                 }
@@ -151,6 +168,7 @@ public final class DisassemblyRequest<AddressType: BinaryInteger, InstructionTyp
 
   private struct Macro {
     let patterns: [MacroPattern]
+    let validArgumentValues: [Int: IndexSet]?
   }
 
   private func createDatatype(named name: String, type: Datatype) {

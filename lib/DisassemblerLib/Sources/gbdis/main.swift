@@ -163,13 +163,24 @@ for (name, macro) in _request.hints.macros {
     let spec = cpu.spec(at: 0, in: 0)!
     if let instruction = cpu.instruction(at: 0, in: 0, spec: spec) {
       return .instruction(instruction)
+    } else if !$0.argumentText.isEmpty {
+      return .any(spec, argumentText: $0.argumentText)
     } else if $0.argument > 0 {
       return .any(spec, argument: $0.argument)
     } else {
       return .any(spec)
     }
   }
-  disassembly.defineMacro(named: name, instructions: macroLines)
+  let validArgumentValues = macro.validArgumentValues.reduce(into: [:]) { accumulator, element in
+    accumulator[Int(element.key)] = element.value.ranges.reduce(into: IndexSet()) { indexSet, range in
+      indexSet.insert(integersIn: Int(range.inclusiveLower)..<Int(range.exclusiveUpper))
+    }
+  }
+  if validArgumentValues.isEmpty {
+    disassembly.defineMacro(named: name, instructions: macroLines)
+  } else {
+    disassembly.defineMacro(named: name, instructions: macroLines, validArgumentValues: validArgumentValues)
+  }
 }
 
 disassembly.mapCharacter(0x5e, to: "'")
@@ -610,21 +621,6 @@ disassembly.setLabel(at: 0x7a28, in: 0x1f, named: "ClearActiveNoiseSound")
 disassembly.setLabel(at: 0x7a60, in: 0x1f, named: "_ShiftHL")
 
 disassembly.defineFunction(startingAt: 0x7f80, in: 0x1f, named: "SoundUnknown1")
-
-disassembly.defineMacro(named: "callcb", instructions: [
-  .any(.ld(.a, .imm8), argumentText: "bank(\\1)"),
-  .instruction(.init(spec: .ld(.imm16addr, .a), imm16: 0x2100)),
-  .any(.call(nil, .imm16), argument: 1)
-], validArgumentValues: [
-  1: IndexSet(integersIn: 0x4000..<0x8000)
-])
-
-disassembly.defineMacro(named: "modifySave", instructions: [
-  .any(.ld(.a, .imm8), argument: 2),
-  .any(.ld(.imm16addr, .a), argument: 1)
-], validArgumentValues: [
-  1: IndexSet(integersIn: 0xA100..<0xAB8F)
-])
 
 disassembly.defineMacro(named: "resetAudio", template: """
 xor  a
