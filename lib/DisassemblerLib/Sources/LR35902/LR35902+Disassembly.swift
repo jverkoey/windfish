@@ -26,7 +26,7 @@ extension LR35902 {
       disassemble(range: 0x0050..<0x0058, inBank: 0)
       disassemble(range: 0x0058..<0x0060, inBank: 0)
       disassemble(range: 0x0060..<0x0068, inBank: 0)
-      disassemble(range: 0x0100..<0x104, inBank: 0)
+      disassemble(range: 0x0100..<0x0104, inBank: 0)
 
       setData(at: 0x0104..<0x0134, in: 0x00)
       setText(at: 0x0134..<0x0143, in: 0x00)
