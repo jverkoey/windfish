@@ -6,4 +6,5 @@ func populateRequestWithHardwareDefaults(_ request: DisassemblyRequest<LR35902.A
   populateRequestWithHardwareDatatypes(request)
   populateRequestWithHardwareGlobals(request)
   populateRequestWithHardwareMacros(request)
+  populateRequestWithHardwareLabels(request)
 }

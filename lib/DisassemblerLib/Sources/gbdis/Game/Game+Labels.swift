@@ -14,6 +14,7 @@ func populateRequestWithGameLabels(_ request: DisassemblyRequest<LR35902.Address
   request.setLabel(at: LR35902.cartridgeLocation(for: 0x03a4, in: 0x00)!, to: "checkEnginePaused")
   request.setLabel(at: LR35902.cartridgeLocation(for: 0x04f5, in: 0x00)!, to: "loadMapZero")
   request.setLabel(at: LR35902.cartridgeLocation(for: 0x0516, in: 0x00)!, to: "cleanupAndReturn")
+  request.setLabel(at: LR35902.cartridgeLocation(for: 0x415d, in: 0x1b)!, to: "AudioData")
   request.setLabel(at: LR35902.cartridgeLocation(for: 0x4099, in: 0x17)!, to: "CreditsText")
   request.setLabel(at: LR35902.cartridgeLocation(for: 0x401e, in: 0x1f)!, to: "PlayAudioStep_Start")
   request.setLabel(at: LR35902.cartridgeLocation(for: 0x53e6, in: 0x1f)!, to: "ClearActiveSquareSound")
