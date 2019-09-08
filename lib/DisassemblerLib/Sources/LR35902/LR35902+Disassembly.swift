@@ -45,10 +45,10 @@ extension LR35902 {
       let sourceInstructionSpec: Instruction.Spec
     }
     func transfersOfControl(at pc: Address, in bank: Bank) -> Set<TransferOfControl>? {
-      guard let cartAddress = cartridgeLocation(for: pc, in: bank) else {
+      guard let cartridgeLocation = cartridgeLocation(for: pc, in: bank) else {
         return nil
       }
-      return transfers[cartAddress]
+      return transfers[cartridgeLocation]
     }
 
     public func registerTransferOfControl(to pc: Address, in bank: Bank, from fromPc: Address, in fromBank: Bank, spec: Instruction.Spec) {
@@ -190,13 +190,13 @@ extension LR35902 {
       case ram
     }
     public func type(of address: Address, in bank: Bank) -> ByteType {
-      guard let cartAddress = cartridgeLocation(for: address, in: bank) else {
+      guard let cartridgeLocation = cartridgeLocation(for: address, in: bank) else {
         return .ram
       }
-      let index = Int(cartAddress)
+      let index = Int(cartridgeLocation)
       if code.contains(index) {
         return .code
-      } else if jumpTables.contains(where: { $0.contains(cartAddress) }) {
+      } else if jumpTables.contains(where: { $0.contains(cartridgeLocation) }) {
         return .jumpTable
       } else if data.contains(index) {
         return .data
@@ -218,17 +218,17 @@ extension LR35902 {
     // MARK: - Functions
 
     public func function(startingAt pc: Address, in bank: Bank) -> String? {
-      guard let cartAddress = cartridgeLocation(for: pc, in: bank) else {
+      guard let cartridgeLocation = cartridgeLocation(for: pc, in: bank) else {
         return nil
       }
-      return functions[cartAddress]
+      return functions[cartridgeLocation]
     }
     public func scope(at pc: Address, in bank: Bank) -> Set<String> {
-      guard let cartAddress = cartridgeLocation(for: pc, in: bank) else {
+      guard let cartridgeLocation = cartridgeLocation(for: pc, in: bank) else {
         return Set()
       }
       let intersectingScopes = scopes.filter { iterator in
-        iterator.value.contains(Int(cartAddress))
+        iterator.value.contains(Int(cartridgeLocation))
       }
       return Set(intersectingScopes.keys)
     }
@@ -238,11 +238,11 @@ extension LR35902 {
     var softTerminators: [LR35902.CartridgeLocation: Bool] = [:]
 
     public func contiguousScopes(at pc: Address, in bank: Bank) -> Set<Range<CartridgeLocation>> {
-      guard let cartAddress = cartridgeLocation(for: pc, in: bank) else {
+      guard let cartridgeLocation = cartridgeLocation(for: pc, in: bank) else {
         return Set()
       }
       // TODO(perf): This is accounting for 11.5% of runtime costs.
-      return contiguousScopes.filter { scope in scope.contains(cartAddress) }
+      return contiguousScopes.filter { scope in scope.contains(cartridgeLocation) }
     }
     public func labeledContiguousScopes(at pc: Address, in bank: Bank) -> [(label: String, scope: Range<CartridgeLocation>)] {
       return contiguousScopes(at: pc, in: bank).compactMap {
@@ -259,12 +259,12 @@ extension LR35902 {
     var contiguousScopes = Set<Range<CartridgeLocation>>()
 
     public func defineFunction(startingAt pc: Address, in bank: Bank, named name: String) {
-      guard let cartAddress = safeCartridgeLocation(for: pc, in: bank) else {
+      guard let cartridgeLocation = safeCartridgeLocation(for: pc, in: bank) else {
         preconditionFailure("Attempting to set label in non-cart addressable location.")
       }
 
       setLabel(at: pc, in: bank, named: name)
-      functions[cartAddress] = name
+      functions[cartridgeLocation] = name
 
       let upperBound: Address = (pc < 0x4000) ? 0x4000 : 0x8000
       disassemble(range: pc..<upperBound, inBank: bank)
@@ -330,10 +330,10 @@ extension LR35902 {
 
     public func setLabel(at pc: Address, in bank: Bank, named name: String) {
       precondition(!name.contains("."), "Labels cannot contain dots.")
-      guard let cartAddress = safeCartridgeLocation(for: pc, in: bank) else {
+      guard let cartridgeLocation = safeCartridgeLocation(for: pc, in: bank) else {
         preconditionFailure("Attempting to set label in non-cart addressable location.")
       }
-      labels[cartAddress] = name
+      labels[cartridgeLocation] = name
     }
     var labels: [CartridgeLocation: String] = [:]
     enum LabelType {
@@ -423,16 +423,16 @@ extension LR35902 {
     // MARK: - Comments
 
     public func preComment(at address: Address, in bank: Bank) -> String? {
-      guard let cartAddress = cartridgeLocation(for: address, in: bank) else {
+      guard let cartridgeLocation = cartridgeLocation(for: address, in: bank) else {
         return nil
       }
-      return preComments[cartAddress]
+      return preComments[cartridgeLocation]
     }
     public func setPreComment(at address: Address, in bank: Bank, text: String) {
-      guard let cartAddress = cartridgeLocation(for: address, in: bank) else {
+      guard let cartridgeLocation = cartridgeLocation(for: address, in: bank) else {
         preconditionFailure("Attempting to set pre-comment in non-cart addressable location.")
       }
-      preComments[cartAddress] = text
+      preComments[cartridgeLocation] = text
     }
     private var preComments: [CartridgeLocation: String] = [:]
 
