@@ -410,8 +410,8 @@ clean:
               macro.macro.hasWritten = true
             }
 
-            let lowerBound = LR35902.cartAddress(for: lineBufferAddress, in: bank)!
-            let upperBound = LR35902.cartAddress(for: lastAddress, in: bank)!
+            let lowerBound = LR35902.cartridgeLocation(for: lineBufferAddress, in: bank)!
+            let upperBound = LR35902.cartridgeLocation(for: lastAddress, in: bank)!
             let bytes = self.cpu[lowerBound..<upperBound]
 
             let macroArgs = macro.arguments.keys.sorted().map { macro.arguments[$0]! }.joined(separator: ", ")
@@ -467,7 +467,7 @@ clean:
           }
 
           // Write the instruction as assembly.
-          let index = LR35902.cartAddress(for: cpu.pc, in: bank)!
+          let index = LR35902.cartridgeLocation(for: cpu.pc, in: bank)!
           let instructionWidth = LR35902.Instruction.widths[instruction.spec]!.total
           let bytes = cpu[index..<(index + LR35902.CartridgeLocation(instructionWidth))]
           let instructionScope = labeledContiguousScopes(at: cpu.pc, in: bank).map { $0.label }
@@ -574,7 +574,7 @@ clean:
               } else {
                 jumpLocation = "$\(address.hexString)"
               }
-              let bytes = cpu[LR35902.cartAddress(for: chunkPc, in: bank)!..<(LR35902.cartAddress(for: chunkPc, in: bank)! + 2)]
+              let bytes = cpu[LR35902.cartridgeLocation(for: chunkPc, in: bank)!..<(LR35902.cartridgeLocation(for: chunkPc, in: bank)! + 2)]
               asm.append(write(line("dw \(jumpLocation)", address: chunkPc, addressType: "jumpTable [\(index)]", comment: "\(bytes.map { "$\($0.hexString)" }.joined(separator: " "))")))
               chunkPc += LR35902.Address(pair.count)
             }

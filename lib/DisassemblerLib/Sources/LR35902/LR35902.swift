@@ -19,17 +19,17 @@ public final class LR35902 {
   // MARK: - Accessing ROM data
 
   public subscript(pc: Address, bank: Bank) -> UInt8 {
-    return cartridge[Int(LR35902.cartAddress(for: pc, in: bank)!)]
+    return cartridge[Int(LR35902.cartridgeLocation(for: pc, in: bank)!)]
   }
 
   public subscript(range: Range<CartridgeLocation>) -> Data {
     return cartridge[range]
   }
 
-  /// Returns a cartridge address for the given program counter and bank.
+  /// Returns a cartridge location for the given program counter and bank.
   /// - Parameter pc: The program counter's location.
   /// - Parameter bank: The current bank.
-  public static func cartAddress(for pc: Address, in bank: Bank) -> CartridgeLocation? {
+  public static func cartridgeLocation(for pc: Address, in bank: Bank) -> CartridgeLocation? {
     // Bank 0 is permanently addressable from 0x0000...0x3FFF.
     // All other banks map from 0x4000...0x7FFF
     guard (bank == 0 && pc < 0x4000) || (bank > 0 && pc < 0x8000) else {
@@ -42,8 +42,8 @@ public final class LR35902 {
     }
   }
 
-  public static func safeCartAddress(for pc: Address, in bank: Bank) -> CartridgeLocation? {
-    return cartAddress(for: pc, in: (bank == 0) ? 1 : bank)
+  public static func safeCartridgeLocation(for pc: Address, in bank: Bank) -> CartridgeLocation? {
+    return cartridgeLocation(for: pc, in: (bank == 0) ? 1 : bank)
   }
 
   /// Returns a cartridge address for the given program counter and bank.
@@ -77,7 +77,7 @@ public final class LR35902 {
   /// Returns an instruction at the given address.
   public func instruction(at pc: Address, in bank: Bank, spec: Instruction.Spec) -> Instruction? {
     let instructionWidth = Instruction.widths[spec]!
-    guard let location = LR35902.cartAddress(for: pc + instructionWidth.opcode, in: bank) else {
+    guard let location = LR35902.cartridgeLocation(for: pc + instructionWidth.opcode, in: bank) else {
       return nil
     }
     switch instructionWidth.operand {
@@ -103,7 +103,7 @@ public final class LR35902 {
     return
       ((bank == 0 && pc < 0x4000)
         || (bank != 0 && pc < 0x8000))
-        && LR35902.cartAddress(for: pc, in: bank)! < cartridgeSize
+        && LR35902.cartridgeLocation(for: pc, in: bank)! < cartridgeSize
   }
 
   public var numberOfBanks: Bank {
