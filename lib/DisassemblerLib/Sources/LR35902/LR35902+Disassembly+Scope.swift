@@ -79,22 +79,22 @@ extension LR35902.Disassembly {
       }
       addContiguousScope(range: contiguousScope)
 
-      let labelLocations = self.labelLocations(in: contiguousScope.dropFirst())
-
-      rewriteLoopLabels(in: contiguousScope.dropFirst())
-      rewriteElseLabels(in: contiguousScope.dropFirst())
-      rewriteReturnLabels(at: labelLocations)
+      let contiguousScopeWithoutFirstInstruction = contiguousScope.dropFirst()
+      inferLoops(in: contiguousScopeWithoutFirstInstruction)
+      inferElses(in: contiguousScopeWithoutFirstInstruction)
+      inferReturns(in: contiguousScopeWithoutFirstInstruction)
     }
   }
 
-  private func rewriteReturnLabels(at locations: [LR35902.CartridgeLocation]) {
-    let returnLabelAddresses = locations.filter { instructionMap[$0]?.spec.category == .ret }
+  private func inferReturns(in scope: Range<LR35902.CartridgeLocation>) {
+    let labelLocations = self.labelLocations(in: scope)
+    let returnLabelAddresses = labelLocations.filter { instructionMap[$0]?.spec.category == .ret }
     for cartLocation in returnLabelAddresses {
       labelTypes[cartLocation] = .returnType
     }
   }
 
-  private func rewriteLoopLabels(in scope: Range<LR35902.CartridgeLocation>) {
+  private func inferLoops(in scope: Range<LR35902.CartridgeLocation>) {
     let tocs: [(destination: LR35902.CartridgeLocation, tocs: Set<TransferOfControl>)] = scope.compactMap {
       let (address, bank) = LR35902.addressAndBank(from: $0)
       if let toc = transfersOfControl(at: address, in: bank) {
@@ -141,7 +141,7 @@ extension LR35902.Disassembly {
     }
   }
 
-  private func rewriteElseLabels(in scope: Range<LR35902.CartridgeLocation>) {
+  private func inferElses(in scope: Range<LR35902.CartridgeLocation>) {
     let tocs: [(destination: LR35902.CartridgeLocation, tocs: Set<TransferOfControl>)] = scope.compactMap {
       let (address, bank) = LR35902.addressAndBank(from: $0)
       if let toc = transfersOfControl(at: address, in: bank) {
