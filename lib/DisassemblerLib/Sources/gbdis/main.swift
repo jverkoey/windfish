@@ -608,7 +608,7 @@ ld   [$FF10], a
 ld   [$ff1a], a
 """)
 
-let files = try disassembly.generateFiles()
+let responseData = try disassembly.generateResponse()
 
 let directory = "/Users/featherless/workbench/gbdis/disassembly"
 let fm = FileManager.default
@@ -625,7 +625,9 @@ extension FileManager {
   }
 }
 
-for (file, data) in files {
+let response = try Disassembly_Response(serializedData: responseData)
+
+for (file, data) in response.files {
   let handle = try fm.restartFile(atPath: directoryUrl.appendingPathComponent(file).path)
   handle.write(data)
 }

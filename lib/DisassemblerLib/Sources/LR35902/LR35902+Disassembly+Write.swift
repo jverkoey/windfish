@@ -112,7 +112,7 @@ extension LR35902.Disassembly {
       }
     }
   }
-  public func generateFiles() throws -> [String: Data] {
+  public func generateResponse() throws -> Data {
     var files: [String: Data] = [:]
     files["Makefile"] =
 """
@@ -624,6 +624,11 @@ clean:
         (Int(bank) * Int(LR35902.bankSize))..<(Int(bank + 1) * Int(LR35902.bankSize))))
       print("Bank \(bank.hexString): \(Double(disassembledBankLocations.count * 100) / Double(LR35902.bankSize))%")
     }
-    return files
+
+    let response = Disassembly_Response.with { proto in
+      proto.files = files
+    }
+
+    return try response.serializedData()
   }
 }
