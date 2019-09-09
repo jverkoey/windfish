@@ -88,7 +88,8 @@ extension LR35902 {
       let instructionRange = Int(address)..<(Int(address) + Int(Instruction.widths[instruction.spec]!.total))
 
       // Remove any overlapping instructions.
-      for index in instructionRange.dropFirst() {
+      let subRange = instructionRange.dropFirst()
+      for index in subRange {
         let location = LR35902.CartridgeLocation(index)
         instructionMap[location] = nil
       }
@@ -140,11 +141,11 @@ extension LR35902 {
     public func setJumpTable(at range: Range<Address>, in bank: Bank) {
       let lowerBound = cartridgeLocation(for: range.lowerBound, in: bank)!
       let upperBound = cartridgeLocation(for: range.upperBound, in: bank)!
-      jumpTables.insert(lowerBound..<upperBound)
+      jumpTables.insert(integersIn: Int(lowerBound)..<Int(upperBound))
 
       setData(at: range, in: bank)
     }
-    var jumpTables = Set<Range<CartridgeLocation>>()
+    var jumpTables = IndexSet()
 
     // MARK: - Text segments
 
@@ -197,7 +198,7 @@ extension LR35902 {
       let index = Int(cartridgeLocation)
       if code.contains(index) {
         return .code
-      } else if jumpTables.contains(where: { $0.contains(cartridgeLocation) }) {
+      } else if jumpTables.contains(index) {
         return .jumpTable
       } else if data.contains(index) {
         return .data
