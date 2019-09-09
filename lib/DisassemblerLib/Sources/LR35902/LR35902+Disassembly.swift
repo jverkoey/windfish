@@ -106,7 +106,7 @@ extension LR35902 {
       let lowerBound = cartridgeLocation(for: range.lowerBound, in: bank)!
       let upperBound = cartridgeLocation(for: range.upperBound, in: bank)!
       let cartRange = lowerBound..<upperBound
-      dataRanges.insert(cartRange)
+      dataBlocks.insert(integersIn: Int(lowerBound + 1)..<Int(upperBound))
 
       let scopeBank = effectiveBank(at: range.lowerBound, in: bank)
       // Shorten any contiguous scopes that contain this data.
@@ -135,7 +135,7 @@ extension LR35902 {
         labelTypes[location] = nil
       }
     }
-    var dataRanges = Set<Range<CartridgeLocation>>()
+    private var dataBlocks = IndexSet()
 
     public func setJumpTable(at range: Range<Address>, in bank: Bank) {
       let lowerBound = cartridgeLocation(for: range.lowerBound, in: bank)!
@@ -297,8 +297,7 @@ extension LR35902 {
         return nil
       }
       // Don't return labels that point to the middle of data.
-      // TODO(perf): This is 6.6% of costs.
-      if data.contains(Int(index)) && dataRanges.contains(where: { $0.dropFirst().contains(index) }) {
+      if dataBlocks.contains(Int(index)) {
         return nil
       }
 
