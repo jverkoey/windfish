@@ -108,12 +108,13 @@ extension LR35902 {
       let cartRange = lowerBound..<upperBound
       dataRanges.insert(cartRange)
 
+      let scopeBank = effectiveBank(at: range.lowerBound, in: bank)
       // Shorten any contiguous scopes that contain this data.
-      let overlappingScopes = contiguousScopes.filter { $0.overlaps(cartRange) }
+      let overlappingScopes = contiguousScopes[scopeBank, default: Set()].filter { $0.overlaps(cartRange) }
       for scope in overlappingScopes {
         if cartRange.lowerBound < scope.upperBound {
-          contiguousScopes.remove(scope)
-          contiguousScopes.insert(scope.lowerBound..<cartRange.lowerBound)
+          contiguousScopes[scopeBank, default: Set()].remove(scope)
+          contiguousScopes[scopeBank, default: Set()].insert(scope.lowerBound..<cartRange.lowerBound)
         }
       }
 
@@ -237,12 +238,18 @@ extension LR35902 {
     }
     var softTerminators: [LR35902.CartridgeLocation: Bool] = [:]
 
+    private func effectiveBank(at pc: Address, in bank: Bank) -> Bank {
+      if pc < 0x4000 {
+        return 0
+      }
+      return bank
+    }
+
     public func contiguousScopes(at pc: Address, in bank: Bank) -> Set<Range<CartridgeLocation>> {
       guard let cartridgeLocation = cartridgeLocation(for: pc, in: bank) else {
         return Set()
       }
-      // TODO(perf): This is accounting for 11.5% of runtime costs.
-      return contiguousScopes.filter { scope in scope.contains(cartridgeLocation) }
+      return contiguousScopes[effectiveBank(at: pc, in: bank), default: Set()].filter { scope in scope.contains(cartridgeLocation) }
     }
     public func labeledContiguousScopes(at pc: Address, in bank: Bank) -> [(label: String, scope: Range<CartridgeLocation>)] {
       return contiguousScopes(at: pc, in: bank).compactMap {
@@ -254,9 +261,12 @@ extension LR35902 {
       }
     }
     func addContiguousScope(range: Range<CartridgeLocation>) {
-      contiguousScopes.insert(range)
+      let bankAndAddress = LR35902.addressAndBank(from: range.lowerBound)
+      let bankAndAddress2 = LR35902.addressAndBank(from: range.upperBound - 1)
+      precondition(bankAndAddress.bank == bankAndAddress2.bank, "Scopes can't cross banks")
+      contiguousScopes[effectiveBank(at: bankAndAddress.address, in: bankAndAddress.bank), default: Set()].insert(range)
     }
-    var contiguousScopes = Set<Range<CartridgeLocation>>()
+    var contiguousScopes: [Bank: Set<Range<CartridgeLocation>>] = [:]
 
     public func defineFunction(startingAt pc: Address, in bank: Bank, named name: String) {
       guard let cartridgeLocation = safeCartridgeLocation(for: pc, in: bank) else {
