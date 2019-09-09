@@ -225,15 +225,6 @@ extension LR35902 {
       }
       return functions[cartridgeLocation]
     }
-    public func scope(at pc: Address, in bank: Bank) -> Set<String> {
-      guard let cartridgeLocation = cartridgeLocation(for: pc, in: bank) else {
-        return Set()
-      }
-      let intersectingScopes = scopes.filter { iterator in
-        iterator.value.contains(Int(cartridgeLocation))
-      }
-      return Set(intersectingScopes.keys)
-    }
     public func setSoftTerminator(at pc: Address, in bank: Bank) {
       softTerminators[cartridgeLocation(for: pc, in: bank)!] = true
     }
@@ -281,11 +272,6 @@ extension LR35902 {
       disassemble(range: pc..<upperBound, inBank: bank)
     }
     private var functions: [CartridgeLocation: String] = [:]
-
-    func expandScope(forLabel label: String, scope: IndexSet) {
-      scopes[label, default: IndexSet()].formUnion(scope)
-    }
-    private var scopes: [String: IndexSet] = [:]
 
     // MARK: - Labels
 

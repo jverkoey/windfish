@@ -72,22 +72,6 @@ extension LR35902.Disassembly {
           }
         }
       }
-      guard let runStartAddress = runGroup.startAddress,
-            let runGroupLabel = label(at: LR35902.addressAndBank(from: runStartAddress).address,
-                                      in: LR35902.addressAndBank(from: runStartAddress).bank),
-            let runGroupName = runGroupLabel.components(separatedBy: ".").first else {
-        continue
-      }
-
-      // Expand scopes for the label.
-      // TODO: This doesn't work well if the labels change after the scope has been defined.
-      // TODO: Labels should be annotable with a name and a scope independently.
-      let scope = runGroup.scope
-      if scope.isEmpty {
-        continue
-      }
-      expandScope(forLabel: runGroupName, scope: scope)
-
       // Define the initial contiguous scope for the rungroup's label.
       // This allows functions to rewrite local labels as relative labels.
       guard let contiguousScope = runGroup.firstContiguousScopeRange else {
