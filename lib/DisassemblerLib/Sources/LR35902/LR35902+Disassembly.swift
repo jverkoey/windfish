@@ -40,17 +40,12 @@ extension LR35902 {
 
     // MARK: - Transfers of control
 
-    struct TransferOfControl: Hashable {
-      let sourceLocation: CartridgeLocation
-      let sourceInstructionSpec: Instruction.Spec
-    }
     func transfersOfControl(at pc: Address, in bank: Bank) -> Set<TransferOfControl>? {
       guard let cartridgeLocation = cartridgeLocation(for: pc, in: bank) else {
         return nil
       }
       return transfers[cartridgeLocation]
     }
-
     public func registerTransferOfControl(to pc: Address, in bank: Bank, from fromPc: Address, in fromBank: Bank, spec: Instruction.Spec) {
       let index = cartridgeLocation(for: pc, in: bank)!
       let fromLocation = cartridgeLocation(for: fromPc, in: fromBank)!
@@ -63,6 +58,10 @@ extension LR35902 {
           && (!code.contains(Int(index)) || instruction(at: pc, in: bank) != nil) {
         labelTypes[index] = .transferOfControlType
       }
+    }
+    struct TransferOfControl: Hashable {
+      let sourceLocation: CartridgeLocation
+      let sourceInstructionSpec: Instruction.Spec
     }
     private var transfers: [CartridgeLocation: Set<TransferOfControl>] = [:]
 

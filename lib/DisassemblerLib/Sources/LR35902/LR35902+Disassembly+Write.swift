@@ -626,7 +626,7 @@ clean:
     }
 
     let response = Disassembly_Response.with { proto in
-      proto.files = files
+      proto.files = files.mapValues { String(data: $0, encoding: .utf8)! }
     }
 
     return try response.serializedData()
