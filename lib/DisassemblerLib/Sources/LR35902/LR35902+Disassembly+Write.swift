@@ -20,7 +20,7 @@ private func line(_ transfersOfControl: Set<LR35902.Disassembly.TransferOfContro
     .sorted(by: { $0.sourceLocation < $1.sourceLocation })
     .map {
       let (address, _) = LR35902.addressAndBank(from: $0.sourceLocation)
-      return "\($0.sourceInstructionSpec.opcode) @ $\(address.hexString)"
+      return "\(LR35902.Instruction.opcodes[$0.sourceInstructionSpec]!) @ $\(address.hexString)"
     }
     .joined(separator: ", ")
   return line("\(label):", comment: "Sources: \(sources)")

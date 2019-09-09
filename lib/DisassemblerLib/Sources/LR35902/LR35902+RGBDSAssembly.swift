@@ -26,9 +26,9 @@ public final class RGBDSAssembly {
 
   static func assembly(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil, argumentString: String? = nil) -> Statement {
     if let operands = operands(for: instruction, with: disassembly, argumentString: argumentString) {
-      return Statement(opcode: instruction.spec.opcode, operands: operands.filter { $0.count > 0 })
+      return Statement(opcode: LR35902.Instruction.opcodes[instruction.spec]!, operands: operands.filter { $0.count > 0 })
     } else {
-      return Statement(opcode: instruction.spec.opcode)
+      return Statement(opcode: LR35902.Instruction.opcodes[instruction.spec]!)
     }
   }
 
