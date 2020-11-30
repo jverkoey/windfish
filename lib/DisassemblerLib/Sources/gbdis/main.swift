@@ -14,47 +14,6 @@ populateRequestWithGameData(disassemblyRequest)
 
 let requestData = try disassemblyRequest.toWireformat()
 
-var request = URLRequest(url: URL(string: "http://syntropy.run/disassemble")!)
-request.httpMethod = "POST"
-request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
-
-let semaphore = DispatchSemaphore(value: 0)
-let task = URLSession.shared.uploadTask(with: request, from: requestData) { data, response, error in
-  if let error = error {
-    print("error: \(error)")
-    return
-  }
-  guard let response = response as? HTTPURLResponse else {
-    print("Missing response")
-    return
-  }
-  guard (200...299).contains(response.statusCode) else {
-    print("Request did not succeed:")
-    print(response)
-    return
-  }
-  if let mimeType = response.mimeType,
-    mimeType == "application/json",
-    let data = data,
-    let dataString = String(data: data, encoding: .utf8) {
-    print("got data: \(dataString)")
-  }
-  print(response)
-  let disassemblyResponse = try! Disassembly_Response.init(serializedData: data!)
-
-  for (file, contents) in disassemblyResponse.files {
-    print(file)
-    print(contents)
-  }
-
-  semaphore.signal()
-}
-task.resume()
-semaphore.wait()
-exit(0)
-
-// MARK: - TODO: WIRE TRANSFER
-
 // MARK: - Receipt of data
 
 let disassembly = try LR35902.Disassembly.fromRequest(requestData)
