@@ -5,6 +5,10 @@ import PackageDescription
 
 let package = Package(
   name: "DisassemblerLib",
+  platforms: [
+    .iOS("13.0"),
+    .macOS("10.15")
+  ],
   products: [
     .executable(
       name: "gbdis",

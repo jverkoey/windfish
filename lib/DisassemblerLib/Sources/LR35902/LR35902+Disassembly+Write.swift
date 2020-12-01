@@ -112,24 +112,25 @@ extension LR35902.Disassembly {
       }
     }
   }
-  public func generateResponse() throws -> Data {
+
+  public func disassembleToFiles() throws -> [String: Data] {
     var files: [String: Data] = [:]
     files["Makefile"] =
-"""
+      """
 all: game.gb
 
 game.o: game.asm bank_*.asm
-	rgbasm -h -o game.o game.asm
+  rgbasm -h -o game.o game.asm
 
 game.gb: game.o
-	rgblink -d -n game.sym -m game.map -o $@ $<
-	rgbfix -v -p 255 $@
+  rgblink -d -n game.sym -m game.map -o $@ $<
+  rgbfix -v -p 255 $@
 
-	md5 $@
+  md5 $@
 
 clean:
-	rm -f game.o game.gb game.sym game.map *.o
-	find . \\( -iname '*.1bpp' -o -iname '*.2bpp' \\) -exec rm {} +
+  rm -f game.o game.gb game.sym game.map *.o
+  find . \\( -iname '*.1bpp' -o -iname '*.2bpp' \\) -exec rm {} +
 
 """.data(using: .utf8)!
 
@@ -277,7 +278,7 @@ clean:
             var anyArgumentMismatches = false
             let arguments: [Int: String] = zip(macro.macroLines, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
               guard case let .any(spec, argumentOrNil, _) = zipped.0,
-                  let argument = argumentOrNil else {
+                    let argument = argumentOrNil else {
                 return iter
               }
               let args = extractArgs(from: zipped.1.1, using: spec, argument: Int(argument))
@@ -295,8 +296,8 @@ clean:
             // Arguments without any label replacements.
             let rawArguments: [Int: String] = zip(macro.macroLines, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
               guard case let .any(spec, argumentOrNil, _) = zipped.0,
-                let argument = argumentOrNil else {
-                  return iter
+                    let argument = argumentOrNil else {
+                return iter
               }
               let args = extractArgs(from: RGBDSAssembly.assembly(for: zipped.1.0), using: spec, argument: Int(argument))
               return iter.merging(args, uniquingKeysWith: { first, second in
@@ -358,8 +359,8 @@ clean:
 
                 let argumentTypes: [Int: String] = zip(macro.macro.macroLines, macroSpecs).reduce([:], { (iter, zipped) -> [Int: String] in
                   guard case let .any(spec, argumentOrNil, _) = zipped.0,
-                    let argument = argumentOrNil else {
-                      return iter
+                        let argument = argumentOrNil else {
+                    return iter
                   }
                   let args = extractArgTypes(from: zipped.1, using: spec, argument: Int(argument))
                   return iter.merging(args, uniquingKeysWith: { first, second in
@@ -542,9 +543,9 @@ clean:
 
           let globalValue: String?
           if let global = global,
-            let dataType = global.dataType,
-            let type = dataTypes[dataType],
-            let value = type.namedValues[accumulator.last!] {
+             let dataType = global.dataType,
+             let type = dataTypes[dataType],
+             let value = type.namedValues[accumulator.last!] {
             globalValue = value
             accumulator.removeLast()
           } else {
@@ -592,8 +593,8 @@ clean:
           }
 
           if let global = global,
-            let dataType = global.dataType,
-            let globalValue = globalValue {
+             let dataType = global.dataType,
+             let globalValue = globalValue {
             asm.append(write(line(RGBDSAssembly.assembly(for: globalValue), address: chunkPc, addressType: dataType)))
           }
 
@@ -621,9 +622,15 @@ clean:
     print("Disassembled: \(Double(disassembledLocations.count * 100) / Double(cpu.cartridgeSize))%")
     for bank in 0..<cpu.numberOfBanks {
       let disassembledBankLocations = disassembledLocations.intersection(IndexSet(integersIn:
-        (Int(bank) * Int(LR35902.bankSize))..<(Int(bank + 1) * Int(LR35902.bankSize))))
+                                                                                    (Int(bank) * Int(LR35902.bankSize))..<(Int(bank + 1) * Int(LR35902.bankSize))))
       print("Bank \(bank.hexString): \(Double(disassembledBankLocations.count * 100) / Double(LR35902.bankSize))%")
     }
+
+    return files
+  }
+
+  public func generateResponse() throws -> Data {
+    let files = try disassembleToFiles()
 
     let response = Disassembly_Response.with { proto in
       proto.files = files.mapValues { String(data: $0, encoding: .utf8)! }
