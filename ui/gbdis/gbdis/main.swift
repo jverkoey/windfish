@@ -10,6 +10,8 @@ import Cocoa
 
 extension NSApplication {
   var customMenu: NSMenu {
+    // Related docs:
+    // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MenuList/Articles/EnablingMenuItems.html
     let appMenu = NSMenuItem()
     appMenu.submenu = NSMenu()
     let appName = ProcessInfo.processInfo.processName
@@ -33,6 +35,7 @@ extension NSApplication {
     fileMenu.submenu?.addItem(NSMenuItem(title: "New", action: #selector(NSDocumentController.newDocument(_:)), keyEquivalent: "n"))
     fileMenu.submenu?.addItem(NSMenuItem(title: "Open", action: #selector(NSDocumentController.openDocument(_:)), keyEquivalent: "o"))
     fileMenu.submenu?.addItem(NSMenuItem.separator())
+    fileMenu.submenu?.addItem(NSMenuItem(title: "Load ROM…", action: #selector(ProjectDocument.loadRom(_:)), keyEquivalent: "l"))
     fileMenu.submenu?.addItem(NSMenuItem(title: "Close", action: #selector(NSWindow.performClose(_:)), keyEquivalent: "w"))
     fileMenu.submenu?.addItem(NSMenuItem(title: "Save…", action: #selector(NSDocument.save(_:)), keyEquivalent: "s"))
     fileMenu.submenu?.addItem(NSMenuItem(title: "Revert to Saved", action: #selector(NSDocument.revertToSaved(_:)), keyEquivalent: ""))
