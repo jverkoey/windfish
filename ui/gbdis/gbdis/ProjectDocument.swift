@@ -21,7 +21,7 @@ private struct Filenames {
 
 @objc(ProjectDocument)
 class ProjectDocument: NSDocument {
-  let contentViewController = ViewController()
+  let contentViewController = ProjectViewController()
 
   var disassemblyFiles: [String: Data]?
 
@@ -40,6 +40,8 @@ class ProjectDocument: NSDocument {
   }
 }
 
+// MARK: - Document modifications
+
 extension ProjectDocument {
   @objc func loadRom(_ sender: Any?) {
     let openPanel = NSOpenPanel()
@@ -50,6 +52,7 @@ extension ProjectDocument {
       openPanel.beginSheetModal(for: window) { response in
         if response == .OK, let url = openPanel.url {
           self.metadata.romUrl = openPanel.url
+          self.contentViewController.startProgressIndicator()
 
           DispatchQueue.global(qos: .userInitiated).async {
             let data = try! Data(contentsOf: url)
@@ -59,6 +62,7 @@ extension ProjectDocument {
 
             DispatchQueue.main.async {
               self.disassemblyFiles = files
+              self.contentViewController.stopProgressIndicator()
             }
           }
         }
@@ -103,6 +107,7 @@ extension ProjectDocument {
     metadataFileWrapper.preferredFilename = Filenames.metadata
     documentFileWrapper.addFileWrapper(metadataFileWrapper)
 
+    // TODO: Wait until the assembly has finished?
     if let disassemblyFiles = disassemblyFiles {
       let wrappers = disassemblyFiles.mapValues { content in
         FileWrapper(regularFileWithContents: content)
