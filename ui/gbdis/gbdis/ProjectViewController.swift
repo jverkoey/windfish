@@ -5,6 +5,7 @@
 //  Created by Jeff Verkoeyen on 11/30/20.
 //
 
+import Combine
 import Cocoa
 
 func constraints(for contentView: NSView, filling containerView: NSView) -> [NSLayoutConstraint] {
@@ -76,10 +77,35 @@ extension URL {
 }
 
 final class OutlineViewController: NSViewController {
+  let document: ProjectDocument
+
   let containerView = NSScrollView()
   let outlineView = NSOutlineView()
   let treeController = NSTreeController()
   @objc var contents: [OutlineNode] = []
+
+  private var disassembledSubscriber: AnyCancellable?
+
+  init(document: ProjectDocument) {
+    self.document = document
+
+    super.init(nibName: nil, bundle: nil)
+
+    disassembledSubscriber = NotificationCenter.default.publisher(for: .disassembled, object: document)
+      .receive(on: RunLoop.main)
+      .sink(receiveValue: { notification in
+        for filename in document.disassemblyFiles!.keys.sorted() {
+          let node = OutlineNode()
+          node.title = filename
+          node.type = .document
+          self.treeController.insert(node, atArrangedObjectIndexPath: IndexPath(indexes: [0, self.treeController.arrangedObjects.children![0].children!.count]))
+        }
+      })
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
 
   override func loadView() {
     view = NSView()
@@ -140,12 +166,7 @@ final class OutlineViewController: NSViewController {
 
     NSLayoutConstraint.activate(constraints(for: containerView, filling: view))
 
-    addGroupNode("Top level", identifier: "top-level")
-    let node = OutlineNode()
-    node.title = "Some content"
-    node.type = .document
-    treeController.insert(node, atArrangedObjectIndexPath: IndexPath(indexes: [0, 0]))
-    addGroupNode("Second level", identifier: "second-level")
+    addGroupNode("Disassembly", identifier: "disassembly")
 
     outlineView.expandItem(treeController.arrangedObjects.children![0])
 
@@ -161,7 +182,6 @@ final class OutlineViewController: NSViewController {
     let insertionIndexPath = IndexPath(index: contents.count)
     treeController.insert(node, atArrangedObjectIndexPath: insertionIndexPath)
   }
-
 }
 
 final class TextTableCellView: NSTableCellView {
@@ -244,11 +264,11 @@ final class SplitViewController: NSSplitViewController {
   let sidebarViewController: NSViewController
   let contentViewController: NSViewController
 
-  override init(nibName nibNameOrNil: NSNib.Name?, bundle nibBundleOrNil: Bundle?) {
-    self.sidebarViewController = OutlineViewController()
+  init(document: ProjectDocument) {
+    self.sidebarViewController = OutlineViewController(document: document)
     self.contentViewController = ContentViewController()
 
-    super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    super.init(nibName: nil, bundle: nil)
 
     addSplitViewItem(NSSplitViewItem(sidebarWithViewController: sidebarViewController))
     addSplitViewItem(NSSplitViewItem(viewController: contentViewController))
@@ -272,13 +292,15 @@ final class SplitViewController: NSSplitViewController {
 
 final class ProjectViewController: NSViewController {
 
+  let document: ProjectDocument
   let containerView = NSView()
   let horizontalLine = HorizontalLine()
   let progressIndicator = NSProgressIndicator()
   let contentViewController: NSViewController
 
-  init() {
-    self.contentViewController = SplitViewController()
+  init(document: ProjectDocument) {
+    self.document = document
+    self.contentViewController = SplitViewController(document: document)
 
     super.init(nibName: nil, bundle: nil)
 

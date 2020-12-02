@@ -21,7 +21,7 @@ private struct Filenames {
 
 @objc(ProjectDocument)
 class ProjectDocument: NSDocument {
-  let contentViewController = ProjectViewController()
+  weak var contentViewController: ProjectViewController?
 
   var disassemblyFiles: [String: Data]?
 
@@ -30,6 +30,8 @@ class ProjectDocument: NSDocument {
   private var documentFileWrapper: FileWrapper?
 
   override func makeWindowControllers() {
+    let contentViewController = ProjectViewController(document: self)
+    self.contentViewController = contentViewController
     let window = NSWindow(contentViewController: contentViewController)
     window.setContentSize(NSSize(width: 800, height: 600))
     let wc = NSWindowController(window: window)
@@ -42,17 +44,21 @@ class ProjectDocument: NSDocument {
 
 // MARK: - Document modifications
 
+extension Notification.Name {
+  static let disassembled = Notification.Name("disassembled")
+}
+
 extension ProjectDocument {
   @objc func loadRom(_ sender: Any?) {
     let openPanel = NSOpenPanel()
     openPanel.allowedFileTypes = ["gb"]
     openPanel.canChooseFiles = true
     openPanel.canChooseDirectories = false
-    if let window = contentViewController.view.window {
+    if let window = contentViewController?.view.window {
       openPanel.beginSheetModal(for: window) { response in
         if response == .OK, let url = openPanel.url {
           self.metadata.romUrl = openPanel.url
-          self.contentViewController.startProgressIndicator()
+          self.contentViewController?.startProgressIndicator()
 
           DispatchQueue.global(qos: .userInitiated).async {
             let data = try! Data(contentsOf: url)
@@ -62,7 +68,10 @@ extension ProjectDocument {
 
             DispatchQueue.main.async {
               self.disassemblyFiles = files
-              self.contentViewController.stopProgressIndicator()
+
+              NotificationCenter.default.post(name: .disassembled, object: self)
+
+              self.contentViewController?.stopProgressIndicator()
             }
           }
         }
