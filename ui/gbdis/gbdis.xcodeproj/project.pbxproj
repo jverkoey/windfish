@@ -36,7 +36,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		665D4F552575F75400C3A03B /* gbdis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = gbdis.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		665D4F552575F75400C3A03B /* gbdisui.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = gbdisui.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		665D4F582575F75400C3A03B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		665D4F5A2575F75400C3A03B /* ProjectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectViewController.swift; sourceTree = "<group>"; };
 		665D4F5C2575F75400C3A03B /* ProjectDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectDocument.swift; sourceTree = "<group>"; };
@@ -95,7 +95,7 @@
 		665D4F562575F75400C3A03B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				665D4F552575F75400C3A03B /* gbdis.app */,
+				665D4F552575F75400C3A03B /* gbdisui.app */,
 				665D4F692575F75700C3A03B /* gbdisTests.xctest */,
 				665D4F742575F75700C3A03B /* gbdisUITests.xctest */,
 			);
@@ -153,9 +153,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		665D4F542575F75400C3A03B /* gbdis */ = {
+		665D4F542575F75400C3A03B /* gbdisui */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 665D4F7D2575F75700C3A03B /* Build configuration list for PBXNativeTarget "gbdis" */;
+			buildConfigurationList = 665D4F7D2575F75700C3A03B /* Build configuration list for PBXNativeTarget "gbdisui" */;
 			buildPhases = (
 				665D4F512575F75400C3A03B /* Sources */,
 				665D4F522575F75400C3A03B /* Frameworks */,
@@ -166,12 +166,12 @@
 			dependencies = (
 				665D4FA02576C98C00C3A03B /* PBXTargetDependency */,
 			);
-			name = gbdis;
+			name = gbdisui;
 			packageProductDependencies = (
 				665D4FA22576C99000C3A03B /* LR35902 */,
 			);
 			productName = gbdis;
-			productReference = 665D4F552575F75400C3A03B /* gbdis.app */;
+			productReference = 665D4F552575F75400C3A03B /* gbdisui.app */;
 			productType = "com.apple.product-type.application";
 		};
 		665D4F682575F75700C3A03B /* gbdisTests */ = {
@@ -245,7 +245,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				665D4F542575F75400C3A03B /* gbdis */,
+				665D4F542575F75400C3A03B /* gbdisui */,
 				665D4F682575F75700C3A03B /* gbdisTests */,
 				665D4F732575F75700C3A03B /* gbdisUITests */,
 			);
@@ -311,12 +311,12 @@
 /* Begin PBXTargetDependency section */
 		665D4F6B2575F75700C3A03B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 665D4F542575F75400C3A03B /* gbdis */;
+			target = 665D4F542575F75400C3A03B /* gbdisui */;
 			targetProxy = 665D4F6A2575F75700C3A03B /* PBXContainerItemProxy */;
 		};
 		665D4F762575F75700C3A03B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 665D4F542575F75400C3A03B /* gbdis */;
+			target = 665D4F542575F75400C3A03B /* gbdisui */;
 			targetProxy = 665D4F752575F75700C3A03B /* PBXContainerItemProxy */;
 		};
 		665D4FA02576C98C00C3A03B /* PBXTargetDependency */ = {
@@ -579,7 +579,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		665D4F7D2575F75700C3A03B /* Build configuration list for PBXNativeTarget "gbdis" */ = {
+		665D4F7D2575F75700C3A03B /* Build configuration list for PBXNativeTarget "gbdisui" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				665D4F7E2575F75700C3A03B /* Debug */,
