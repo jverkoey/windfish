@@ -6,6 +6,7 @@
 //
 
 import Cocoa
+import Combine
 
 final class ProjectViewController: NSViewController {
 
@@ -15,8 +16,10 @@ final class ProjectViewController: NSViewController {
   let progressIndicator = NSProgressIndicator()
   let splitViewController: NSSplitViewController
 
-  let sidebarViewController: NSViewController
-  let contentViewController: NSViewController
+  let sidebarViewController: OutlineViewController
+  let contentViewController: ContentViewController
+
+  private var selectedFileDidChangeSubscriber: AnyCancellable?
 
   init(document: ProjectDocument) {
     self.document = document
@@ -83,6 +86,18 @@ final class ProjectViewController: NSViewController {
       progressIndicator.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
       progressIndicator.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -7)
     ] + constraints(for: splitViewController.view, filling: containerView))
+
+    selectedFileDidChangeSubscriber = NotificationCenter.default.publisher(for: .selectedFileDidChange, object: document)
+      .receive(on: RunLoop.main)
+      .sink(receiveValue: { notification in
+        guard let nodes = notification.userInfo?["selectedNodes"] as? [ProjectOutlineNode] else {
+          preconditionFailure()
+        }
+        guard let node = nodes.first else {
+          preconditionFailure()
+        }
+        self.contentViewController.textField.stringValue = node.title
+      })
   }
 
   private let splitViewResorationIdentifier = "com.featherless.restorationId:SplitViewController"

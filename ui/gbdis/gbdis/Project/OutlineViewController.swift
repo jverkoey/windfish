@@ -18,6 +18,7 @@ final class OutlineViewController: NSViewController {
   @objc var contents: [ProjectOutlineNode] = []
 
   private var disassembledSubscriber: AnyCancellable?
+  private var treeControllerObserver: NSKeyValueObservation?
 
   init(document: ProjectDocument) {
     self.document = document
@@ -60,14 +61,18 @@ final class OutlineViewController: NSViewController {
     treeController.countKeyPath = "count"
     treeController.leafKeyPath = "isLeaf"
 
-    treeController.bind(NSBindingName(rawValue: "contentArray"),
+    treeController.bind(.contentArray,
                         to: self,
                         withKeyPath: "contents",
                         options: nil)
 
-    outlineView.bind(NSBindingName(rawValue: "content"),
+    outlineView.bind(.content,
                      to: treeController,
                      withKeyPath: "arrangedObjects",
+                     options: nil)
+    outlineView.bind(.selectionIndexPaths,
+                     to: treeController,
+                     withKeyPath: "selectionIndexPaths",
                      options: nil)
 
     let column = NSTableColumn(identifier: .init(rawValue: "col1"))
@@ -104,6 +109,14 @@ final class OutlineViewController: NSViewController {
     outlineView.expandItem(treeController.arrangedObjects.children![0])
 
     containerView.documentView = outlineView
+
+    treeControllerObserver = treeController.observe(\.selectedObjects, options: [.new]) { (treeController, change) in
+      let nodes = treeController.selectedNodes.map { OutlineViewController.node(from: $0) }
+      NotificationCenter.default.post(name: .selectedFileDidChange, object: self.document, userInfo: ["selectedNodes": nodes])
+    }
+
+    // Clear any default selection.
+    outlineView.deselectAll(self)
   }
 
   private func addGroupNode(_ folderName: String, identifier: String) {

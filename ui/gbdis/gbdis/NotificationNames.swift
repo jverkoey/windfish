@@ -9,4 +9,5 @@ import Foundation
 
 extension Notification.Name {
   static let disassembled = Notification.Name("disassembled")
+  static let selectedFileDidChange = Notification.Name("selectedFileDidChange")
 }
