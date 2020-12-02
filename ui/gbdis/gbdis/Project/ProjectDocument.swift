@@ -6,11 +6,10 @@
 //
 
 import Cocoa
-import UniformTypeIdentifiers
 
 import LR35902
 
-struct ProjectMetadata: Codable {
+private struct ProjectMetadata: Codable {
   var romUrl: URL?
 }
 
@@ -25,7 +24,7 @@ class ProjectDocument: NSDocument {
 
   var disassemblyFiles: [String: Data]?
 
-  var metadata = ProjectMetadata()
+  private var metadata = ProjectMetadata()
 
   private var documentFileWrapper: FileWrapper?
 
@@ -43,10 +42,6 @@ class ProjectDocument: NSDocument {
 }
 
 // MARK: - Document modifications
-
-extension Notification.Name {
-  static let disassembled = Notification.Name("disassembled")
-}
 
 extension ProjectDocument {
   @objc func loadRom(_ sender: Any?) {

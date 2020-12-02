@@ -10,12 +10,19 @@
 		665D4F592575F75400C3A03B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F582575F75400C3A03B /* AppDelegate.swift */; };
 		665D4F5B2575F75400C3A03B /* ProjectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F5A2575F75400C3A03B /* ProjectViewController.swift */; };
 		665D4F5D2575F75400C3A03B /* ProjectDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F5C2575F75400C3A03B /* ProjectDocument.swift */; };
-		665D4F5F2575F75600C3A03B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 665D4F5E2575F75600C3A03B /* Assets.xcassets */; };
 		665D4F6E2575F75700C3A03B /* gbdisTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F6D2575F75700C3A03B /* gbdisTests.swift */; };
 		665D4F792575F75700C3A03B /* gbdisUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F782575F75700C3A03B /* gbdisUITests.swift */; };
 		665D4F8D2575F92500C3A03B /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F8C2575F92500C3A03B /* main.swift */; };
 		665D4FA32576C99000C3A03B /* LR35902 in Frameworks */ = {isa = PBXBuildFile; productRef = 665D4FA22576C99000C3A03B /* LR35902 */; };
 		665D4FAE257727CA00C3A03B /* HorizontalLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4FAD257727CA00C3A03B /* HorizontalLine.swift */; };
+		667B1B632578541F00CE670F /* NotificationNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1B622578541F00CE670F /* NotificationNames.swift */; };
+		667B1B75257854BB00CE670F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 667B1B72257854BB00CE670F /* Assets.xcassets */; };
+		667B1B8B2578554600CE670F /* ProjectOutlineNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1B8A2578554600CE670F /* ProjectOutlineNode.swift */; };
+		667B1B912578557D00CE670F /* URL+localizedName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1B902578557D00CE670F /* URL+localizedName.swift */; };
+		667B1B9A257855AE00CE670F /* CommonConstraints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1B99257855AE00CE670F /* CommonConstraints.swift */; };
+		667B1B9F2578560A00CE670F /* TextTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1B9E2578560A00CE670F /* TextTableCellView.swift */; };
+		667B1BA92578563E00CE670F /* ContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1BA82578563E00CE670F /* ContentViewController.swift */; };
+		667B1BAE2578565A00CE670F /* OutlineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1BAD2578565A00CE670F /* OutlineViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,9 +47,6 @@
 		665D4F582575F75400C3A03B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		665D4F5A2575F75400C3A03B /* ProjectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectViewController.swift; sourceTree = "<group>"; };
 		665D4F5C2575F75400C3A03B /* ProjectDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectDocument.swift; sourceTree = "<group>"; };
-		665D4F5E2575F75600C3A03B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		665D4F632575F75600C3A03B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		665D4F642575F75600C3A03B /* gbdis.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = gbdis.entitlements; sourceTree = "<group>"; };
 		665D4F692575F75700C3A03B /* gbdisTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = gbdisTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		665D4F6D2575F75700C3A03B /* gbdisTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gbdisTests.swift; sourceTree = "<group>"; };
 		665D4F6F2575F75700C3A03B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -52,6 +56,16 @@
 		665D4F8C2575F92500C3A03B /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		665D4F9B2576C8EC00C3A03B /* DisassemblerLib */ = {isa = PBXFileReference; lastKnownFileType = folder; name = DisassemblerLib; path = ../../lib/DisassemblerLib; sourceTree = "<group>"; };
 		665D4FAD257727CA00C3A03B /* HorizontalLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalLine.swift; sourceTree = "<group>"; };
+		667B1B622578541F00CE670F /* NotificationNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationNames.swift; sourceTree = "<group>"; };
+		667B1B72257854BB00CE670F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		667B1B73257854BB00CE670F /* gbdis.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = gbdis.entitlements; sourceTree = "<group>"; };
+		667B1B74257854BB00CE670F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		667B1B8A2578554600CE670F /* ProjectOutlineNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectOutlineNode.swift; sourceTree = "<group>"; };
+		667B1B902578557D00CE670F /* URL+localizedName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+localizedName.swift"; sourceTree = "<group>"; };
+		667B1B99257855AE00CE670F /* CommonConstraints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonConstraints.swift; sourceTree = "<group>"; };
+		667B1B9E2578560A00CE670F /* TextTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextTableCellView.swift; sourceTree = "<group>"; };
+		667B1BA82578563E00CE670F /* ContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewController.swift; sourceTree = "<group>"; };
+		667B1BAD2578565A00CE670F /* OutlineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,14 +119,14 @@
 		665D4F572575F75400C3A03B /* gbdis */ = {
 			isa = PBXGroup;
 			children = (
+				667B1B982578559600CE670F /* AutoLayout */,
+				667B1B8F2578557100CE670F /* FoundationExtensions */,
+				667B1B612578540500CE670F /* Project */,
 				665D4FAC257727C000C3A03B /* Views */,
 				665D4F582575F75400C3A03B /* AppDelegate.swift */,
-				665D4F5A2575F75400C3A03B /* ProjectViewController.swift */,
-				665D4F5C2575F75400C3A03B /* ProjectDocument.swift */,
-				665D4F5E2575F75600C3A03B /* Assets.xcassets */,
-				665D4F632575F75600C3A03B /* Info.plist */,
-				665D4F642575F75600C3A03B /* gbdis.entitlements */,
+				667B1B622578541F00CE670F /* NotificationNames.swift */,
 				665D4F8C2575F92500C3A03B /* main.swift */,
+				667B1B7A257854BF00CE670F /* Resources */,
 			);
 			path = gbdis;
 			sourceTree = "<group>";
@@ -148,6 +162,45 @@
 				665D4FAD257727CA00C3A03B /* HorizontalLine.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		667B1B612578540500CE670F /* Project */ = {
+			isa = PBXGroup;
+			children = (
+				665D4F5C2575F75400C3A03B /* ProjectDocument.swift */,
+				667B1B8A2578554600CE670F /* ProjectOutlineNode.swift */,
+				665D4F5A2575F75400C3A03B /* ProjectViewController.swift */,
+				667B1B9E2578560A00CE670F /* TextTableCellView.swift */,
+				667B1BA82578563E00CE670F /* ContentViewController.swift */,
+				667B1BAD2578565A00CE670F /* OutlineViewController.swift */,
+			);
+			path = Project;
+			sourceTree = "<group>";
+		};
+		667B1B7A257854BF00CE670F /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				667B1B72257854BB00CE670F /* Assets.xcassets */,
+				667B1B73257854BB00CE670F /* gbdis.entitlements */,
+				667B1B74257854BB00CE670F /* Info.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		667B1B8F2578557100CE670F /* FoundationExtensions */ = {
+			isa = PBXGroup;
+			children = (
+				667B1B902578557D00CE670F /* URL+localizedName.swift */,
+			);
+			path = FoundationExtensions;
+			sourceTree = "<group>";
+		};
+		667B1B982578559600CE670F /* AutoLayout */ = {
+			isa = PBXGroup;
+			children = (
+				667B1B99257855AE00CE670F /* CommonConstraints.swift */,
+			);
+			path = AutoLayout;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -257,7 +310,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				665D4F5F2575F75600C3A03B /* Assets.xcassets in Resources */,
+				667B1B75257854BB00CE670F /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,9 +335,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				667B1B9A257855AE00CE670F /* CommonConstraints.swift in Sources */,
+				667B1B912578557D00CE670F /* URL+localizedName.swift in Sources */,
+				667B1B9F2578560A00CE670F /* TextTableCellView.swift in Sources */,
+				667B1BA92578563E00CE670F /* ContentViewController.swift in Sources */,
 				665D4F5B2575F75400C3A03B /* ProjectViewController.swift in Sources */,
+				667B1B632578541F00CE670F /* NotificationNames.swift in Sources */,
+				667B1B8B2578554600CE670F /* ProjectOutlineNode.swift in Sources */,
 				665D4F592575F75400C3A03B /* AppDelegate.swift in Sources */,
 				665D4F8D2575F92500C3A03B /* main.swift in Sources */,
+				667B1BAE2578565A00CE670F /* OutlineViewController.swift in Sources */,
 				665D4F5D2575F75400C3A03B /* ProjectDocument.swift in Sources */,
 				665D4FAE257727CA00C3A03B /* HorizontalLine.swift in Sources */,
 			);
@@ -446,12 +506,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = gbdis/gbdis.entitlements;
+				CODE_SIGN_ENTITLEMENTS = gbdis/Resources/gbdis.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 69Y7ARDN28;
 				ENABLE_HARDENED_RUNTIME = YES;
-				INFOPLIST_FILE = gbdis/Info.plist;
+				INFOPLIST_FILE = gbdis/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -467,12 +527,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = gbdis/gbdis.entitlements;
+				CODE_SIGN_ENTITLEMENTS = gbdis/Resources/gbdis.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 69Y7ARDN28;
 				ENABLE_HARDENED_RUNTIME = YES;
-				INFOPLIST_FILE = gbdis/Info.plist;
+				INFOPLIST_FILE = gbdis/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
