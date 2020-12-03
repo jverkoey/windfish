@@ -33,7 +33,7 @@ final class ProjectViewController: NSViewController {
     splitViewController.addSplitViewItem(NSSplitViewItem(sidebarWithViewController: sidebarViewController))
     splitViewController.addSplitViewItem(NSSplitViewItem(viewController: contentViewController))
     let hexItem = NSSplitViewItem(viewController: hexViewController)
-    hexItem.minimumThickness = 100
+    hexItem.minimumThickness = 80
     hexItem.maximumThickness = 400
     splitViewController.addSplitViewItem(hexItem)
 
@@ -105,6 +105,12 @@ final class ProjectViewController: NSViewController {
         }
         let string = String(data: self.document.disassemblyFiles![node.title]!, encoding: .utf8)!
         self.contentViewController.textStorage = NSTextStorage(string: string)
+
+        if let metadata = self.document.metadata, let bank = metadata.bankMap[node.title] {
+          self.hexViewController.showBank(bank: bank)
+        } else {
+          self.hexViewController.showBank(bank: nil)
+        }
       })
   }
 

@@ -26,6 +26,7 @@ class ProjectDocument: NSDocument {
   weak var contentViewController: ProjectViewController?
 
   var romData: Data?
+  var slice: HFSharedMemoryByteSlice?
   var disassemblyFiles: [String: Data]?
 
   var metadata: ProjectMetadata?
@@ -91,6 +92,7 @@ extension ProjectDocument {
 
             DispatchQueue.main.async {
               self.romData = data
+              self.slice = HFSharedMemoryByteSlice(unsharedData: data)
               self.disassemblyFiles = disassemblyFiles
               self.metadata = metadata
 
@@ -123,6 +125,7 @@ extension ProjectDocument {
     if let fileWrapper = fileWrappers[Filenames.rom],
        let data = fileWrapper.regularFileContents {
       self.romData = data
+      self.slice = HFSharedMemoryByteSlice(unsharedData: data)
     }
 
     if let fileWrapper = fileWrappers[Filenames.disassembly] {

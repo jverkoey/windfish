@@ -7,6 +7,7 @@
 
 import Foundation
 import Cocoa
+import LR35902
 import Combine
 
 final class HexViewController: NSViewController {
@@ -24,12 +25,6 @@ final class HexViewController: NSViewController {
 
     textRepresenter.rowBackgroundColors = []
     hexController.addRepresenter(textRepresenter)
-
-    disassembledSubscriber = NotificationCenter.default.publisher(for: .disassembled, object: document)
-      .receive(on: RunLoop.main)
-      .sink(receiveValue: { notification in
-        self.updateMemory()
-      })
   }
 
   required init?(coder: NSCoder) {
@@ -40,20 +35,19 @@ final class HexViewController: NSViewController {
     view = textRepresenter.view()
   }
 
-  override func viewDidLoad() {
-    super.viewDidLoad()
-
-    updateMemory()
-  }
-
-  func updateMemory() {
-    guard let data = document.romData else {
+  func showBank(bank: LR35902.Bank?) {
+    guard let slice = document.slice else {
       return
     }
 
-    let slice = HFSharedMemoryByteSlice(unsharedData: data)
-    let byteArray = HFBTreeByteArray()
-    byteArray.insertByteSlice(slice, in: HFRange(location: 0, length: 0))
-    hexController.byteArray = byteArray
+    if let bank = bank {
+      let range = LR35902.rangeOf(bank: bank)
+      let byteArray = HFBTreeByteArray()
+      byteArray.insertByteSlice(slice.subslice(with: HFRange(location: UInt64(range.location), length: UInt64(range.length))),
+                                in: HFRange(location: 0, length: 0))
+      hexController.byteArray = byteArray
+    } else {
+      hexController.byteArray = HFBTreeByteArray()
+    }
   }
 }

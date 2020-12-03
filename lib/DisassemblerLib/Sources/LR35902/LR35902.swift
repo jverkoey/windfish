@@ -55,6 +55,10 @@ public final class LR35902 {
     return (address: address, bank: bank)
   }
 
+  public static func rangeOf(bank: Bank) -> (location: CartridgeLocation, length: CartridgeLocation) {
+    return (CartridgeLocation(bank) * CartridgeLocation(LR35902.bankSize), LR35902.bankSize)
+  }
+
   /// Returns a specification at the given address, if a valid one exists.
   public func spec(at pc: Address, in bank: Bank) -> Instruction.Spec? {
     let byte = Int(self[pc, bank])
