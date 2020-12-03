@@ -122,10 +122,10 @@ final class OutlineViewController: NSViewController {
       NotificationCenter.default.post(name: .selectedFileDidChange, object: self.document, userInfo: ["selectedNodes": nodes])
     }
 
+    populateFromDocument()
+
     // Clear any default selection.
     outlineView.deselectAll(self)
-
-    populateFromDocument()
   }
 
   private func addGroupNode(_ folderName: String, identifier: String) {
