@@ -9,10 +9,10 @@ import Cocoa
 
 import LR35902
 
-@objcMembers
-class ProjectMetadata: NSObject, Codable {
-  var romUrl: URL?
-  var numberOfBanks: Int?
+struct ProjectMetadata: Codable {
+  var romUrl: URL
+  var numberOfBanks: LR35902.Bank
+  var bankMap: [String: LR35902.Bank]
 }
 
 private struct Filenames {
@@ -28,7 +28,7 @@ class ProjectDocument: NSDocument {
   var romData: Data?
   var disassemblyFiles: [String: Data]?
 
-  var metadata = ProjectMetadata()
+  var metadata: ProjectMetadata?
 
   private var documentFileWrapper: FileWrapper?
 
@@ -56,7 +56,6 @@ extension ProjectDocument {
     if let window = contentViewController?.view.window {
       openPanel.beginSheetModal(for: window) { response in
         if response == .OK, let url = openPanel.url {
-          self.metadata.romUrl = openPanel.url
           self.contentViewController?.startProgressIndicator()
 
           DispatchQueue.global(qos: .userInitiated).async {
@@ -64,12 +63,36 @@ extension ProjectDocument {
 
             let disassembly = LR35902.Disassembly(rom: data)
             disassembly.disassembleAsGameboyCartridge()
-            self.metadata.numberOfBanks = Int(disassembly.cpu.numberOfBanks)
-            let files = try! disassembly.disassembleToFiles()
+            let disassembledSource = try! disassembly.generateSource()
+
+            let bankMap: [String: LR35902.Bank] = disassembledSource.sources.reduce(into: [:], { accumulator, element in
+              if case .bank(let number, _) = element.value {
+                accumulator[element.key] = number
+              }
+            })
+            let disassemblyFiles: [String: Data] = disassembledSource.sources.mapValues {
+              switch $0 {
+              case .bank(_, let content): fallthrough
+              case .charmap(content: let content): fallthrough
+              case .datatypes(content: let content): fallthrough
+              case .game(content: let content): fallthrough
+              case .macros(content: let content): fallthrough
+              case .makefile(content: let content): fallthrough
+              case .variables(content: let content):
+                return content.data(using: .utf8)!
+              }
+            }
+
+            let metadata = ProjectMetadata(
+              romUrl: url,
+              numberOfBanks: disassembly.cpu.numberOfBanks,
+              bankMap: bankMap
+            )
 
             DispatchQueue.main.async {
               self.romData = data
-              self.disassemblyFiles = files
+              self.disassemblyFiles = disassemblyFiles
+              self.metadata = metadata
 
               NotificationCenter.default.post(name: .disassembled, object: self)
 

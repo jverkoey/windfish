@@ -11,8 +11,8 @@ extension Array {
   }
 }
 
-private func write(_ string: String) -> Data {
-  return "\(string)\n".data(using: .utf8)!
+private func write(_ string: String) -> String {
+  return string + "\n"
 }
 
 private func line(_ transfersOfControl: Set<LR35902.Disassembly.TransferOfControl>, label: String) -> String {
@@ -113,9 +113,23 @@ extension LR35902.Disassembly {
     }
   }
 
-  public func disassembleToFiles() throws -> [String: Data] {
-    var files: [String: Data] = [:]
-    files["Makefile"] =
+  public struct Source {
+    public enum FileDescription {
+      case charmap(content: String)
+      case datatypes(content: String)
+      case game(content: String)
+      case macros(content: String)
+      case makefile(content: String)
+      case variables(content: String)
+      case bank(number: LR35902.Bank, content: String)
+    }
+    public let sources: [String: FileDescription]
+  }
+
+  public func generateSource() throws -> Source {
+    var sources: [String: Source.FileDescription] = [:]
+
+    sources["Makefile"] = .makefile(content:
       """
 all: game.gb
 
@@ -132,18 +146,18 @@ clean:
   rm -f game.o game.gb game.sym game.map *.o
   find . \\( -iname '*.1bpp' -o -iname '*.2bpp' \\) -exec rm {} +
 
-""".data(using: .utf8)!
+""")
 
-    var gameAsm = Data()
+    var gameAsm = ""
 
     if !dataTypes.isEmpty {
-      var asm = Data(capacity: 1024 * 1024) // 1MB capacity
+      var asm = String()
 
       for dataType in dataTypes.sorted(by: { $0.0 < $1.0 }) {
         guard !dataType.value.namedValues.isEmpty else {
           continue
         }
-        asm.append("; Type: \(dataType.key)\n".data(using: .utf8)!)
+        asm += "; Type: \(dataType.key)\n"
         let namedValues = dataType.value.namedValues.sorted(by: { $0.key < $1.key })
         let longestVariable = namedValues.reduce(0) { (currentMax, next) in
           max(currentMax, next.value.count)
@@ -160,51 +174,50 @@ clean:
             value = "$\($0.key.hexString)"
           }
           return "\(name) EQU \(value)"
-        }.joined(separator: "\n").data(using: .utf8)!)
-        asm.append("\n\n".data(using: .utf8)!)
+        }.joined(separator: "\n"))
+        asm.append("\n\n")
       }
-      files["datatypes.asm"] = asm
-
-      gameAsm.append("INCLUDE \"datatypes.asm\"\n".data(using: .utf8)!)
+      sources["datatypes.asm"] = .datatypes(content: asm)
+      gameAsm += "INCLUDE \"datatypes.asm\"\n"
     }
 
     if !globals.isEmpty {
-      var asm = Data()
+      var asm = ""
 
       asm.append(globals.filter { $0.key >= 0x8000 }.sorted { $0.0 < $1.0 }.map { address, global in
         "\(global.name) EQU $\(address.hexString)"
-      }.joined(separator: "\n\n").data(using: .utf8)!)
+      }.joined(separator: "\n\n"))
 
-      files["variables.asm"] = asm
-      gameAsm.append("INCLUDE \"variables.asm\"\n".data(using: .utf8)!)
+      sources["variables.asm"] = .variables(content: asm)
+      gameAsm += "INCLUDE \"variables.asm\"\n"
     }
 
     if !characterMap.isEmpty {
-      var asm = Data()
+      var asm = ""
 
       asm.append(characterMap.sorted { $0.key < $1.key }.map { value, string in
         "charmap \"\(string)\", $\(value.hexString)"
-      }.joined(separator: "\n").data(using: .utf8)!)
+      }.joined(separator: "\n"))
 
-      files["charmap.asm"] = asm
-      gameAsm.append("INCLUDE \"charmap.asm\"\n".data(using: .utf8)!)
+      sources["charmap.asm"] = .charmap(content: asm)
+      gameAsm += "INCLUDE \"charmap.asm\"\n"
     }
 
     var instructionsToDecode = Int.max
     var instructionsDecoded = 0
 
-    var macrosAsm: Data? = nil
+    var macrosAsm: String? = nil
 
     for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
-      var asm = Data()
+      var asm = ""
       defer {
-        files["bank_\(bank.hexString).asm"] = asm
+        sources["bank_\(bank.hexString).asm"] = .bank(number: bank, content: asm)
       }
 
       if bank == 0 {
-        asm.append(write("SECTION \"ROM Bank \(bank.hexString)\", ROM0[$\(bank.hexString)]"))
+        asm += write("SECTION \"ROM Bank \(bank.hexString)\", ROM0[$\(bank.hexString)]")
       } else {
-        asm.append(write("SECTION \"ROM Bank \(bank.hexString)\", ROMX[$4000], BANK[$\(bank.hexString)]"))
+        asm += write("SECTION \"ROM Bank \(bank.hexString)\", ROMX[$4000], BANK[$\(bank.hexString)]")
       }
 
       cpu.pc = (bank == 0) ? 0x0000 : 0x4000
@@ -216,14 +229,14 @@ clean:
       lineBuffer.append(.empty)
       var macroNode: MacroNode? = nil
 
-      let writeLines: ([Line]) -> Data = { lines in
-        var data = Data()
+      let writeLines: ([Line]) -> String = { lines in
+        var data = ""
         var lastLine: Line?
         lines.forEach { thisLine in
           if let lastLine = lastLine, lastLine == .empty && thisLine == .empty {
             return
           }
-          data.append(write(thisLine.description))
+          data += write(thisLine.description)
           lastLine = thisLine
         }
         return data
@@ -346,8 +359,8 @@ clean:
           if let macro = validMacros.first {
             if !macro.macro.hasWritten {
               if macrosAsm == nil {
-                macrosAsm = Data()
-                gameAsm.append("INCLUDE \"macros.asm\"\n".data(using: .utf8)!)
+                macrosAsm = ""
+                gameAsm += "INCLUDE \"macros.asm\"\n"
               }
 
               var lines: [Line] = []
@@ -607,14 +620,14 @@ clean:
       flush()
     }
 
-    files["macros.asm"] = macrosAsm
-    gameAsm.append(
-      ((UInt8(0)..<UInt8(cpu.numberOfBanks))
-        .map { "INCLUDE \"bank_\($0.hexString).asm\"" }
-        .joined(separator: "\n") + "\n")
-        .data(using: .utf8)!)
+    if let macrosAsm = macrosAsm {
+      sources["macros.asm"] = .macros(content: macrosAsm)
+    }
+    gameAsm += ((UInt8(0)..<UInt8(cpu.numberOfBanks))
+                  .map { "INCLUDE \"bank_\($0.hexString).asm\"" }
+                  .joined(separator: "\n") + "\n")
 
-    files["game.asm"] = gameAsm
+    sources["game.asm"] = .game(content: gameAsm)
 
     print("Instructions decoded: \(instructionsDecoded)")
 
@@ -626,16 +639,6 @@ clean:
       print("Bank \(bank.hexString): \(Double(disassembledBankLocations.count * 100) / Double(LR35902.bankSize))%")
     }
 
-    return files
-  }
-
-  public func generateResponse() throws -> Data {
-    let files = try disassembleToFiles()
-
-    let response = Disassembly_Response.with { proto in
-      proto.files = files.mapValues { String(data: $0, encoding: .utf8)! }
-    }
-
-    return try response.serializedData()
+    return Source(sources: sources)
   }
 }

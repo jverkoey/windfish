@@ -33,7 +33,8 @@ final class ProjectViewController: NSViewController {
     splitViewController.addSplitViewItem(NSSplitViewItem(sidebarWithViewController: sidebarViewController))
     splitViewController.addSplitViewItem(NSSplitViewItem(viewController: contentViewController))
     let hexItem = NSSplitViewItem(viewController: hexViewController)
-    hexItem.minimumThickness = 200
+    hexItem.minimumThickness = 100
+    hexItem.maximumThickness = 400
     splitViewController.addSplitViewItem(hexItem)
 
     super.init(nibName: nil, bundle: nil)
