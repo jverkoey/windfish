@@ -61,19 +61,21 @@ final class ContentViewController: NSViewController {
     textView.isSelectable = true
     textView.drawsBackground = false
 
+    let safeAreaLayoutGuide = view.safeAreaLayoutGuide
+
     bankConstraints = [containerView.trailingAnchor.constraint(equalTo: self.hexViewController.view.leadingAnchor)]
-    fileConstraints = [containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor)]
+    fileConstraints = [containerView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor)]
 
     NSLayoutConstraint.activate([
       // Text content
-      containerView.topAnchor.constraint(equalTo: view.topAnchor),
-      containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-      containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+      containerView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+      containerView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
+      containerView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
 
       // Hex viewer
-      self.hexViewController.view.topAnchor.constraint(equalTo: view.topAnchor),
-      self.hexViewController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-      self.hexViewController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+      self.hexViewController.view.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+      self.hexViewController.view.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
+      self.hexViewController.view.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
       self.hexViewController.view.widthAnchor.constraint(equalToConstant: self.hexViewController.minimumWidth),
     ])
 

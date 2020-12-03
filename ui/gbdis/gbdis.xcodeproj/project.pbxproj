@@ -25,6 +25,7 @@
 		667B1BAE2578565A00CE670F /* OutlineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1BAD2578565A00CE670F /* OutlineViewController.swift */; };
 		667B1BE02578760E00CE670F /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 667B1BC7257875FC00CE670F /* HexFiend.framework */; };
 		667B1BFD2578809C00CE670F /* HexViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1BFC2578809C00CE670F /* HexViewController.swift */; };
+		667B1C0225789BAE00CE670F /* EditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1C0125789BAE00CE670F /* EditorViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -127,6 +128,7 @@
 		667B1BB8257875FC00CE670F /* HexFiend_2.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = HexFiend_2.xcodeproj; path = ../../third_party/HexFiend/HexFiend_2.xcodeproj; sourceTree = "<group>"; };
 		667B1BE425787ACE00CE670F /* gbdisui-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "gbdisui-Bridging-Header.h"; sourceTree = "<group>"; };
 		667B1BFC2578809C00CE670F /* HexViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HexViewController.swift; sourceTree = "<group>"; };
+		667B1C0125789BAE00CE670F /* EditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -238,6 +240,7 @@
 				667B1B9E2578560A00CE670F /* TextTableCellView.swift */,
 				667B1BAD2578565A00CE670F /* OutlineViewController.swift */,
 				667B1BA82578563E00CE670F /* ContentViewController.swift */,
+				667B1C0125789BAE00CE670F /* EditorViewController.swift */,
 				667B1BFC2578809C00CE670F /* HexViewController.swift */,
 			);
 			path = Project;
@@ -488,6 +491,7 @@
 				667B1BAE2578565A00CE670F /* OutlineViewController.swift in Sources */,
 				665D4F5D2575F75400C3A03B /* ProjectDocument.swift in Sources */,
 				665D4FAE257727CA00C3A03B /* HorizontalLine.swift in Sources */,
+				667B1C0225789BAE00CE670F /* EditorViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -18,6 +18,7 @@ final class ProjectViewController: NSViewController {
 
   let sidebarViewController: OutlineViewController
   let contentViewController: ContentViewController
+  let editorViewController: EditorViewController
 
   private var selectedFileDidChangeSubscriber: AnyCancellable?
 
@@ -27,9 +28,11 @@ final class ProjectViewController: NSViewController {
     self.splitViewController = NSSplitViewController()
     self.sidebarViewController = OutlineViewController(document: document)
     self.contentViewController = ContentViewController(document: document)
+    self.editorViewController = EditorViewController()
 
     splitViewController.addSplitViewItem(NSSplitViewItem(sidebarWithViewController: sidebarViewController))
     splitViewController.addSplitViewItem(NSSplitViewItem(viewController: contentViewController))
+    splitViewController.addSplitViewItem(NSSplitViewItem(sidebarWithViewController: editorViewController))
 
     super.init(nibName: nil, bundle: nil)
 
@@ -61,7 +64,7 @@ final class ProjectViewController: NSViewController {
     splitViewController.view.translatesAutoresizingMaskIntoConstraints = false
     containerView.addSubview(splitViewController.view)
 
-    splitViewController.splitView.dividerStyle = .paneSplitter
+    splitViewController.splitView.dividerStyle = .thin
     splitViewController.splitView.isVertical = true
     splitViewController.splitView.autosaveName = NSSplitView.AutosaveName(splitViewResorationIdentifier)
     splitViewController.splitView.identifier = NSUserInterfaceItemIdentifier(splitViewResorationIdentifier)

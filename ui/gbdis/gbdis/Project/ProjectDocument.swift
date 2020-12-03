@@ -39,10 +39,58 @@ class ProjectDocument: NSDocument {
     let window = NSWindow(contentViewController: contentViewController)
     window.setContentSize(NSSize(width: 800, height: 600))
     let wc = NSWindowController(window: window)
+    wc.window?.styleMask.insert(.fullSizeContentView)
     wc.contentViewController = contentViewController
     addWindowController(wc)
     window.setFrameAutosaveName("windowFrame")
+
+    let toolbar = NSToolbar()
+    toolbar.delegate = self
+    wc.window?.toolbar = toolbar
+
     window.makeKeyAndOrderFront(nil)
+  }
+}
+
+// MARK: - Toolbar
+
+private extension NSToolbarItem.Identifier {
+  static let leadingSidebarTrackingSeperator = NSToolbarItem.Identifier(rawValue: "leadingSidebarTrackingSeperator")
+  static let trailingSidebarTrackingSeperator = NSToolbarItem.Identifier(rawValue: "trailingSidebarTrackingSeperator")
+}
+
+extension ProjectDocument: NSToolbarDelegate {
+  func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+    return [
+      .leadingSidebarTrackingSeperator,
+      .trailingSidebarTrackingSeperator,
+    ]
+  }
+
+  func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+    return [
+      .leadingSidebarTrackingSeperator,
+      .trailingSidebarTrackingSeperator,
+    ]
+  }
+
+  func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier, willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
+    switch itemIdentifier {
+    case .leadingSidebarTrackingSeperator:
+      return NSTrackingSeparatorToolbarItem(
+        identifier: itemIdentifier,
+        splitView: contentViewController!.splitViewController.splitView,
+        dividerIndex: 0
+      )
+    case .trailingSidebarTrackingSeperator:
+      return NSTrackingSeparatorToolbarItem(
+        identifier: itemIdentifier,
+        splitView: contentViewController!.splitViewController.splitView,
+        dividerIndex: 1
+      )
+    default:
+      return NSToolbarItem(itemIdentifier: itemIdentifier)
+    }
   }
 }
 
