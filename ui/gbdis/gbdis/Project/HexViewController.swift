@@ -9,6 +9,7 @@ import Foundation
 import Cocoa
 import Combine
 
+// TODO: Add support for line offsets.
 final class LineCountingRepresenter: HFLineCountingRepresenter {
   override func cycleLineNumberFormat() {
     // Do nothing.

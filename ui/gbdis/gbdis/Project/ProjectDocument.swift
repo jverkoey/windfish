@@ -55,39 +55,48 @@ class ProjectDocument: NSDocument {
 // MARK: - Toolbar
 
 private extension NSToolbarItem.Identifier {
-  static let leadingSidebarTrackingSeperator = NSToolbarItem.Identifier(rawValue: "leadingSidebarTrackingSeperator")
-  static let trailingSidebarTrackingSeperator = NSToolbarItem.Identifier(rawValue: "trailingSidebarTrackingSeperator")
+  static let leadingSidebarTrackingSeparator = NSToolbarItem.Identifier(rawValue: "leadingSidebarTrackingSeperator")
+  static let trailingSidebarTrackingSeparator = NSToolbarItem.Identifier(rawValue: "trailingSidebarTrackingSeperator")
+  static let disassemble = NSToolbarItem.Identifier(rawValue: "disassemble")
 }
 
 extension ProjectDocument: NSToolbarDelegate {
   func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
     return [
-      .leadingSidebarTrackingSeperator,
-      .trailingSidebarTrackingSeperator,
+      .leadingSidebarTrackingSeparator,
+      .disassemble,
+      .trailingSidebarTrackingSeparator,
     ]
   }
 
   func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
     return [
-      .leadingSidebarTrackingSeperator,
-      .trailingSidebarTrackingSeperator,
+      .disassemble,
+      .leadingSidebarTrackingSeparator,
+      .trailingSidebarTrackingSeparator,
     ]
   }
 
   func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier, willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
     switch itemIdentifier {
-    case .leadingSidebarTrackingSeperator:
+    case .leadingSidebarTrackingSeparator:
       return NSTrackingSeparatorToolbarItem(
         identifier: itemIdentifier,
         splitView: contentViewController!.splitViewController.splitView,
         dividerIndex: 0
       )
-    case .trailingSidebarTrackingSeperator:
+    case .trailingSidebarTrackingSeparator:
       return NSTrackingSeparatorToolbarItem(
         identifier: itemIdentifier,
         splitView: contentViewController!.splitViewController.splitView,
         dividerIndex: 1
       )
+    case .disassemble:
+      let item = NSToolbarItem(itemIdentifier: itemIdentifier)
+      item.target = self
+      item.action = #selector(disassemble(_:))
+      item.image = NSImage(systemSymbolName: "chevron.left.slash.chevron.right", accessibilityDescription: "Disassemble the rom")
+      return item
     default:
       return NSToolbarItem(itemIdentifier: itemIdentifier)
     }
@@ -97,6 +106,47 @@ extension ProjectDocument: NSToolbarDelegate {
 // MARK: - Document modifications
 
 extension ProjectDocument {
+  @objc func disassemble(_ sender: Any?) {
+    guard let romData = romData else {
+      return
+    }
+    self.contentViewController?.startProgressIndicator()
+
+    DispatchQueue.global(qos: .userInitiated).async {
+      let disassembly = LR35902.Disassembly(rom: romData)
+      //            disassembly.disassembleAsGameboyCartridge()
+      let disassembledSource = try! disassembly.generateSource()
+
+      let bankMap: [String: LR35902.Bank] = disassembledSource.sources.reduce(into: [:], { accumulator, element in
+        if case .bank(let number, _) = element.value {
+          accumulator[element.key] = number
+        }
+      })
+      let disassemblyFiles: [String: Data] = disassembledSource.sources.mapValues {
+        switch $0 {
+        case .bank(_, let content): fallthrough
+        case .charmap(content: let content): fallthrough
+        case .datatypes(content: let content): fallthrough
+        case .game(content: let content): fallthrough
+        case .macros(content: let content): fallthrough
+        case .makefile(content: let content): fallthrough
+        case .variables(content: let content):
+          return content.data(using: .utf8)!
+        }
+      }
+
+      DispatchQueue.main.async {
+        self.disassemblyFiles = disassemblyFiles
+        self.metadata?.numberOfBanks = disassembly.cpu.numberOfBanks
+        self.metadata?.bankMap = bankMap
+
+        NotificationCenter.default.post(name: .disassembled, object: self)
+
+        self.contentViewController?.stopProgressIndicator()
+      }
+    }
+  }
+
   @objc func loadRom(_ sender: Any?) {
     let openPanel = NSOpenPanel()
     openPanel.allowedFileTypes = ["gb"]
@@ -105,50 +155,16 @@ extension ProjectDocument {
     if let window = contentViewController?.view.window {
       openPanel.beginSheetModal(for: window) { response in
         if response == .OK, let url = openPanel.url {
-          self.contentViewController?.startProgressIndicator()
+          let data = try! Data(contentsOf: url)
+          self.romData = data
+          self.slice = HFSharedMemoryByteSlice(unsharedData: data)
 
-          DispatchQueue.global(qos: .userInitiated).async {
-            let data = try! Data(contentsOf: url)
-
-            let disassembly = LR35902.Disassembly(rom: data)
-            disassembly.disassembleAsGameboyCartridge()
-            let disassembledSource = try! disassembly.generateSource()
-
-            let bankMap: [String: LR35902.Bank] = disassembledSource.sources.reduce(into: [:], { accumulator, element in
-              if case .bank(let number, _) = element.value {
-                accumulator[element.key] = number
-              }
-            })
-            let disassemblyFiles: [String: Data] = disassembledSource.sources.mapValues {
-              switch $0 {
-              case .bank(_, let content): fallthrough
-              case .charmap(content: let content): fallthrough
-              case .datatypes(content: let content): fallthrough
-              case .game(content: let content): fallthrough
-              case .macros(content: let content): fallthrough
-              case .makefile(content: let content): fallthrough
-              case .variables(content: let content):
-                return content.data(using: .utf8)!
-              }
-            }
-
-            let metadata = ProjectMetadata(
-              romUrl: url,
-              numberOfBanks: disassembly.cpu.numberOfBanks,
-              bankMap: bankMap
-            )
-
-            DispatchQueue.main.async {
-              self.romData = data
-              self.slice = HFSharedMemoryByteSlice(unsharedData: data)
-              self.disassemblyFiles = disassemblyFiles
-              self.metadata = metadata
-
-              NotificationCenter.default.post(name: .disassembled, object: self)
-
-              self.contentViewController?.stopProgressIndicator()
-            }
-          }
+          self.metadata = ProjectMetadata(
+            romUrl: url,
+            numberOfBanks: 0,
+            bankMap: [:]
+          )
+          self.disassemble(nil)
         }
       }
     }
