@@ -89,6 +89,14 @@ extension ProjectDocument {
       let metadata = try decoder.decode(ProjectMetadata.self, from: encodedMetadata)
       Swift.print(metadata)
     }
+
+    if let fileWrapper = fileWrappers[Filenames.disassembly] {
+      self.disassemblyFiles = fileWrapper.fileWrappers?.mapValues {
+        $0.regularFileContents!
+      }
+    }
+
+    NotificationCenter.default.post(name: .disassembled, object: self)
   }
 
   override func fileWrapper(ofType typeName: String) throws -> FileWrapper {

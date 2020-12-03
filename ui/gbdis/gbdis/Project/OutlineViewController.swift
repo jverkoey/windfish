@@ -28,13 +28,20 @@ final class OutlineViewController: NSViewController {
     disassembledSubscriber = NotificationCenter.default.publisher(for: .disassembled, object: document)
       .receive(on: RunLoop.main)
       .sink(receiveValue: { notification in
-        for filename in document.disassemblyFiles!.keys.sorted() {
-          let node = ProjectOutlineNode()
-          node.title = filename
-          node.type = .document
-          self.treeController.insert(node, atArrangedObjectIndexPath: IndexPath(indexes: [0, self.treeController.arrangedObjects.children![0].children!.count]))
-        }
+        self.populateFromDocument()
       })
+  }
+
+  private func populateFromDocument() {
+    guard let disassemblyFiles = document.disassemblyFiles else {
+      return
+    }
+    for filename in disassemblyFiles.keys.sorted() {
+      let node = ProjectOutlineNode()
+      node.title = filename
+      node.type = .document
+      self.treeController.insert(node, atArrangedObjectIndexPath: IndexPath(indexes: [0, self.treeController.arrangedObjects.children![0].children!.count]))
+    }
   }
 
   required init?(coder: NSCoder) {
@@ -117,6 +124,8 @@ final class OutlineViewController: NSViewController {
 
     // Clear any default selection.
     outlineView.deselectAll(self)
+
+    populateFromDocument()
   }
 
   private func addGroupNode(_ folderName: String, identifier: String) {
