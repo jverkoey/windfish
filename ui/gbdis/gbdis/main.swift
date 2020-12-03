@@ -32,12 +32,13 @@ extension NSApplication {
 
     let fileMenu = NSMenuItem()
     fileMenu.submenu = NSMenu(title: "File")
-    fileMenu.submenu?.addItem(NSMenuItem(title: "New", action: #selector(NSDocumentController.newDocument(_:)), keyEquivalent: "n"))
-    fileMenu.submenu?.addItem(NSMenuItem(title: "Open", action: #selector(NSDocumentController.openDocument(_:)), keyEquivalent: "o"))
+    fileMenu.submenu?.addItem(NSMenuItem(title: "New project", action: #selector(NSDocumentController.newDocument(_:)), keyEquivalent: "n"))
+    fileMenu.submenu?.addItem(NSMenuItem(title: "Open project…", action: #selector(NSDocumentController.openDocument(_:)), keyEquivalent: "o"))
     fileMenu.submenu?.addItem(NSMenuItem.separator())
     fileMenu.submenu?.addItem(NSMenuItem(title: "Load ROM…", action: #selector(ProjectDocument.loadRom(_:)), keyEquivalent: "l"))
+    fileMenu.submenu?.addItem(NSMenuItem.separator())
     fileMenu.submenu?.addItem(NSMenuItem(title: "Close", action: #selector(NSWindow.performClose(_:)), keyEquivalent: "w"))
-    fileMenu.submenu?.addItem(NSMenuItem(title: "Save…", action: #selector(NSDocument.save(_:)), keyEquivalent: "s"))
+    fileMenu.submenu?.addItem(NSMenuItem(title: "Save project", action: #selector(NSDocument.save(_:)), keyEquivalent: "s"))
     fileMenu.submenu?.addItem(NSMenuItem(title: "Revert to Saved", action: #selector(NSDocument.revertToSaved(_:)), keyEquivalent: ""))
 
     let editMenu = NSMenuItem()
