@@ -10,21 +10,47 @@ import Cocoa
 import LR35902
 import Combine
 
+final class LineCountingRepresenter: HFLineCountingRepresenter {
+  override func cycleLineNumberFormat() {
+    // Do nothing.
+  }
+}
+
 final class HexViewController: NSViewController {
   let document: ProjectDocument
 
   let hexController = HFController()
-  let textRepresenter = HFHexTextRepresenter()
+  let layoutRepresenter = HFLayoutRepresenter()
+  let minimumWidth: CGFloat
 
   private var disassembledSubscriber: AnyCancellable?
 
   init(document: ProjectDocument) {
     self.document = document
 
-    super.init(nibName: nil, bundle: nil)
+    hexController.editable = false
 
+    let lineRepresenter = LineCountingRepresenter()
+    lineRepresenter.lineNumberFormat = .hexadecimal
+    lineRepresenter.minimumDigitCount = 4
+    let textRepresenter = HFHexTextRepresenter()
     textRepresenter.rowBackgroundColors = []
-    hexController.addRepresenter(textRepresenter)
+    let asciiRepresenter = HFStringEncodingTextRepresenter()
+    asciiRepresenter.rowBackgroundColors = []
+    let verticalScrollerRepresenter = HFVerticalScrollerRepresenter()
+
+    hexController.addRepresenter(layoutRepresenter)
+
+    for representer in [lineRepresenter, textRepresenter, asciiRepresenter, verticalScrollerRepresenter] {
+      hexController.addRepresenter(representer)
+      layoutRepresenter.addRepresenter(representer)
+    }
+
+    self.minimumWidth = layoutRepresenter.representers.map { $0 as! HFRepresenter }.reduce(0) {
+      $0 + $1.minimumViewWidth(forBytesPerLine: 8)
+    }
+
+    super.init(nibName: nil, bundle: nil)
   }
 
   required init?(coder: NSCoder) {
@@ -32,7 +58,7 @@ final class HexViewController: NSViewController {
   }
 
   override func loadView() {
-    view = textRepresenter.view()
+    view = layoutRepresenter.view()
   }
 
   func showBank(bank: LR35902.Bank?) {

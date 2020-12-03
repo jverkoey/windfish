@@ -18,7 +18,6 @@ final class ProjectViewController: NSViewController {
 
   let sidebarViewController: OutlineViewController
   let contentViewController: ContentViewController
-  let hexViewController: HexViewController
 
   private var selectedFileDidChangeSubscriber: AnyCancellable?
 
@@ -27,15 +26,10 @@ final class ProjectViewController: NSViewController {
 
     self.splitViewController = NSSplitViewController()
     self.sidebarViewController = OutlineViewController(document: document)
-    self.contentViewController = ContentViewController()
-    self.hexViewController = HexViewController(document: document)
+    self.contentViewController = ContentViewController(document: document)
 
     splitViewController.addSplitViewItem(NSSplitViewItem(sidebarWithViewController: sidebarViewController))
     splitViewController.addSplitViewItem(NSSplitViewItem(viewController: contentViewController))
-    let hexItem = NSSplitViewItem(viewController: hexViewController)
-    hexItem.minimumThickness = 80
-    hexItem.maximumThickness = 400
-    splitViewController.addSplitViewItem(hexItem)
 
     super.init(nibName: nil, bundle: nil)
 
@@ -107,9 +101,9 @@ final class ProjectViewController: NSViewController {
         self.contentViewController.textStorage = NSTextStorage(string: string)
 
         if let metadata = self.document.metadata, let bank = metadata.bankMap[node.title] {
-          self.hexViewController.showBank(bank: bank)
+          self.contentViewController.hexViewController.showBank(bank: bank)
         } else {
-          self.hexViewController.showBank(bank: nil)
+          self.contentViewController.hexViewController.showBank(bank: nil)
         }
       })
   }
