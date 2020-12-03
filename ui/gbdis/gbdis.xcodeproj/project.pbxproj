@@ -23,6 +23,8 @@
 		667B1B9F2578560A00CE670F /* TextTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1B9E2578560A00CE670F /* TextTableCellView.swift */; };
 		667B1BA92578563E00CE670F /* ContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1BA82578563E00CE670F /* ContentViewController.swift */; };
 		667B1BAE2578565A00CE670F /* OutlineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1BAD2578565A00CE670F /* OutlineViewController.swift */; };
+		667B1BE02578760E00CE670F /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 667B1BC7257875FC00CE670F /* HexFiend.framework */; };
+		667B1BFD2578809C00CE670F /* HexViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1BFC2578809C00CE670F /* HexViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,6 +41,62 @@
 			proxyType = 1;
 			remoteGlobalIDString = 665D4F542575F75400C3A03B;
 			remoteInfo = gbdis;
+		};
+		667B1BC4257875FC00CE670F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 667B1BB8257875FC00CE670F /* HexFiend_2.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8D1107320486CEB800E47090;
+			remoteInfo = HexFiend_2;
+		};
+		667B1BC6257875FC00CE670F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 667B1BB8257875FC00CE670F /* HexFiend_2.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D01E7BB80CDC530C00943F9E;
+			remoteInfo = HexFiend_Framework;
+		};
+		667B1BC8257875FC00CE670F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 667B1BB8257875FC00CE670F /* HexFiend_2.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A5EF294A20F187B700CA7B39;
+			remoteInfo = HexFiend_Framework_iOS;
+		};
+		667B1BCA257875FC00CE670F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 667B1BB8257875FC00CE670F /* HexFiend_2.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D047E3151022CEFE00EF307B;
+			remoteInfo = "FortunateSon (PrivilegedHelper)";
+		};
+		667B1BCC257875FC00CE670F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 667B1BB8257875FC00CE670F /* HexFiend_2.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D00C15E50FF091FF006D021F;
+			remoteInfo = HexFiendling;
+		};
+		667B1BCE257875FC00CE670F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 667B1BB8257875FC00CE670F /* HexFiend_2.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 9408FBFA19DD72DE004F800E;
+			remoteInfo = "HexFiend_Framework Tests";
+		};
+		667B1BD0257875FC00CE670F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 667B1BB8257875FC00CE670F /* HexFiend_2.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A550A7161F7877F8001C79C7;
+			remoteInfo = hexf;
+		};
+		667B1BDB2578760600CE670F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 667B1BB8257875FC00CE670F /* HexFiend_2.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D01E7BB70CDC530C00943F9E;
+			remoteInfo = HexFiend_Framework;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -66,6 +124,9 @@
 		667B1B9E2578560A00CE670F /* TextTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextTableCellView.swift; sourceTree = "<group>"; };
 		667B1BA82578563E00CE670F /* ContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewController.swift; sourceTree = "<group>"; };
 		667B1BAD2578565A00CE670F /* OutlineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineViewController.swift; sourceTree = "<group>"; };
+		667B1BB8257875FC00CE670F /* HexFiend_2.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = HexFiend_2.xcodeproj; path = ../../third_party/HexFiend/HexFiend_2.xcodeproj; sourceTree = "<group>"; };
+		667B1BE425787ACE00CE670F /* gbdisui-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "gbdisui-Bridging-Header.h"; sourceTree = "<group>"; };
+		667B1BFC2578809C00CE670F /* HexViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HexViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +134,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				667B1BE02578760E00CE670F /* HexFiend.framework in Frameworks */,
 				665D4FA32576C99000C3A03B /* LR35902 in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -97,11 +159,11 @@
 		665D4F4C2575F75400C3A03B = {
 			isa = PBXGroup;
 			children = (
+				667B1BB8257875FC00CE670F /* HexFiend_2.xcodeproj */,
 				665D4F9B2576C8EC00C3A03B /* DisassemblerLib */,
 				665D4F572575F75400C3A03B /* gbdis */,
 				665D4F6C2575F75700C3A03B /* gbdisTests */,
 				665D4F772575F75700C3A03B /* gbdisUITests */,
-				665D4F562575F75400C3A03B /* Products */,
 				665D4FA12576C99000C3A03B /* Frameworks */,
 			);
 			sourceTree = "<group>";
@@ -114,11 +176,13 @@
 				665D4F742575F75700C3A03B /* gbdisUITests.xctest */,
 			);
 			name = Products;
+			path = ..;
 			sourceTree = "<group>";
 		};
 		665D4F572575F75400C3A03B /* gbdis */ = {
 			isa = PBXGroup;
 			children = (
+				667B1BE425787ACE00CE670F /* gbdisui-Bridging-Header.h */,
 				667B1B982578559600CE670F /* AutoLayout */,
 				667B1B8F2578557100CE670F /* FoundationExtensions */,
 				667B1B612578540500CE670F /* Project */,
@@ -127,6 +191,7 @@
 				667B1B622578541F00CE670F /* NotificationNames.swift */,
 				665D4F8C2575F92500C3A03B /* main.swift */,
 				667B1B7A257854BF00CE670F /* Resources */,
+				665D4F562575F75400C3A03B /* Products */,
 			);
 			path = gbdis;
 			sourceTree = "<group>";
@@ -173,6 +238,7 @@
 				667B1B9E2578560A00CE670F /* TextTableCellView.swift */,
 				667B1BAD2578565A00CE670F /* OutlineViewController.swift */,
 				667B1BA82578563E00CE670F /* ContentViewController.swift */,
+				667B1BFC2578809C00CE670F /* HexViewController.swift */,
 			);
 			path = Project;
 			sourceTree = "<group>";
@@ -203,6 +269,20 @@
 			path = AutoLayout;
 			sourceTree = "<group>";
 		};
+		667B1BB9257875FC00CE670F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				667B1BC5257875FC00CE670F /* Hex Fiend.app */,
+				667B1BC7257875FC00CE670F /* HexFiend.framework */,
+				667B1BC9257875FC00CE670F /* HexFiend_Framework_iOS.framework */,
+				667B1BCB257875FC00CE670F /* com.ridiculousfish.HexFiend.PrivilegedHelper */,
+				667B1BCD257875FC00CE670F /* HexFiendling.app */,
+				667B1BCF257875FC00CE670F /* HexFiend_Framework Tests.xctest */,
+				667B1BD1257875FC00CE670F /* hexf */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -217,6 +297,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				667B1BDC2578760600CE670F /* PBXTargetDependency */,
 				665D4FA02576C98C00C3A03B /* PBXTargetDependency */,
 			);
 			name = gbdisui;
@@ -274,6 +355,7 @@
 				TargetAttributes = {
 					665D4F542575F75400C3A03B = {
 						CreatedOnToolsVersion = 12.2;
+						LastSwiftMigration = 1220;
 					};
 					665D4F682575F75700C3A03B = {
 						CreatedOnToolsVersion = 12.2;
@@ -296,6 +378,12 @@
 			mainGroup = 665D4F4C2575F75400C3A03B;
 			productRefGroup = 665D4F562575F75400C3A03B /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 667B1BB9257875FC00CE670F /* Products */;
+					ProjectRef = 667B1BB8257875FC00CE670F /* HexFiend_2.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				665D4F542575F75400C3A03B /* gbdisui */,
@@ -304,6 +392,58 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		667B1BC5257875FC00CE670F /* Hex Fiend.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = "Hex Fiend.app";
+			remoteRef = 667B1BC4257875FC00CE670F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		667B1BC7257875FC00CE670F /* HexFiend.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = HexFiend.framework;
+			remoteRef = 667B1BC6257875FC00CE670F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		667B1BC9257875FC00CE670F /* HexFiend_Framework_iOS.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = HexFiend_Framework_iOS.framework;
+			remoteRef = 667B1BC8257875FC00CE670F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		667B1BCB257875FC00CE670F /* com.ridiculousfish.HexFiend.PrivilegedHelper */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = com.ridiculousfish.HexFiend.PrivilegedHelper;
+			remoteRef = 667B1BCA257875FC00CE670F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		667B1BCD257875FC00CE670F /* HexFiendling.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = HexFiendling.app;
+			remoteRef = 667B1BCC257875FC00CE670F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		667B1BCF257875FC00CE670F /* HexFiend_Framework Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "HexFiend_Framework Tests.xctest";
+			remoteRef = 667B1BCE257875FC00CE670F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		667B1BD1257875FC00CE670F /* hexf */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = hexf;
+			remoteRef = 667B1BD0257875FC00CE670F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		665D4F532575F75400C3A03B /* Resources */ = {
@@ -339,6 +479,7 @@
 				667B1B912578557D00CE670F /* URL+localizedName.swift in Sources */,
 				667B1B9F2578560A00CE670F /* TextTableCellView.swift in Sources */,
 				667B1BA92578563E00CE670F /* ContentViewController.swift in Sources */,
+				667B1BFD2578809C00CE670F /* HexViewController.swift in Sources */,
 				665D4F5B2575F75400C3A03B /* ProjectViewController.swift in Sources */,
 				667B1B632578541F00CE670F /* NotificationNames.swift in Sources */,
 				667B1B8B2578554600CE670F /* ProjectOutlineNode.swift in Sources */,
@@ -382,6 +523,11 @@
 		665D4FA02576C98C00C3A03B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = 665D4F9F2576C98C00C3A03B /* LR35902 */;
+		};
+		667B1BDC2578760600CE670F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = HexFiend_Framework;
+			targetProxy = 667B1BDB2578760600CE670F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -506,6 +652,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = gbdis/Resources/gbdis.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -518,6 +665,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = featherless.gbdis;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "gbdis/gbdisui-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -527,6 +676,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = gbdis/Resources/gbdis.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -539,6 +689,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = featherless.gbdis;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "gbdis/gbdisui-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;

@@ -6,7 +6,7 @@ extension LR35902 {
   /// A class that owns and manages disassembly information for a given ROM.
   public class Disassembly {
 
-    let cpu: LR35902
+    public let cpu: LR35902
     public init(rom: Data) {
       cpu = LR35902(cartridge: rom)
     }

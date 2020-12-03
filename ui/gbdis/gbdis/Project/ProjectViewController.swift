@@ -18,6 +18,7 @@ final class ProjectViewController: NSViewController {
 
   let sidebarViewController: OutlineViewController
   let contentViewController: ContentViewController
+  let hexViewController: HexViewController
 
   private var selectedFileDidChangeSubscriber: AnyCancellable?
 
@@ -27,9 +28,13 @@ final class ProjectViewController: NSViewController {
     self.splitViewController = NSSplitViewController()
     self.sidebarViewController = OutlineViewController(document: document)
     self.contentViewController = ContentViewController()
+    self.hexViewController = HexViewController(document: document)
 
     splitViewController.addSplitViewItem(NSSplitViewItem(sidebarWithViewController: sidebarViewController))
     splitViewController.addSplitViewItem(NSSplitViewItem(viewController: contentViewController))
+    let hexItem = NSSplitViewItem(viewController: hexViewController)
+    hexItem.minimumThickness = 200
+    splitViewController.addSplitViewItem(hexItem)
 
     super.init(nibName: nil, bundle: nil)
 
@@ -94,7 +99,8 @@ final class ProjectViewController: NSViewController {
           preconditionFailure()
         }
         guard let node = nodes.first else {
-          preconditionFailure()
+          self.contentViewController.textStorage = NSTextStorage(string: "")
+          return
         }
         let string = String(data: self.document.disassemblyFiles![node.title]!, encoding: .utf8)!
         self.contentViewController.textStorage = NSTextStorage(string: string)

@@ -9,12 +9,15 @@ import Cocoa
 
 import LR35902
 
-private struct ProjectMetadata: Codable {
+@objcMembers
+class ProjectMetadata: NSObject, Codable {
   var romUrl: URL?
+  var numberOfBanks: Int?
 }
 
 private struct Filenames {
   static let metadata = "metadata.plist"
+  static let rom = "rom.gb"
   static let disassembly = "disassembly"
 }
 
@@ -22,9 +25,10 @@ private struct Filenames {
 class ProjectDocument: NSDocument {
   weak var contentViewController: ProjectViewController?
 
+  var romData: Data?
   var disassemblyFiles: [String: Data]?
 
-  private var metadata = ProjectMetadata()
+  var metadata = ProjectMetadata()
 
   private var documentFileWrapper: FileWrapper?
 
@@ -59,9 +63,12 @@ extension ProjectDocument {
             let data = try! Data(contentsOf: url)
 
             let disassembly = LR35902.Disassembly(rom: data)
+            disassembly.disassembleAsGameboyCartridge()
+            self.metadata.numberOfBanks = Int(disassembly.cpu.numberOfBanks)
             let files = try! disassembly.disassembleToFiles()
 
             DispatchQueue.main.async {
+              self.romData = data
               self.disassemblyFiles = files
 
               NotificationCenter.default.post(name: .disassembled, object: self)
@@ -87,7 +94,12 @@ extension ProjectDocument {
        let encodedMetadata = metadataFileWrapper.regularFileContents {
       let decoder = PropertyListDecoder()
       let metadata = try decoder.decode(ProjectMetadata.self, from: encodedMetadata)
-      Swift.print(metadata)
+      self.metadata = metadata
+    }
+
+    if let fileWrapper = fileWrappers[Filenames.rom],
+       let data = fileWrapper.regularFileContents {
+      self.romData = data
     }
 
     if let fileWrapper = fileWrappers[Filenames.disassembly] {
@@ -118,6 +130,15 @@ extension ProjectDocument {
     let metadataFileWrapper = FileWrapper(regularFileWithContents: encodedMetadata)
     metadataFileWrapper.preferredFilename = Filenames.metadata
     documentFileWrapper.addFileWrapper(metadataFileWrapper)
+
+    if let romData = romData {
+      if let fileWrapper = fileWrappers[Filenames.rom] {
+        documentFileWrapper.removeFileWrapper(fileWrapper)
+      }
+      let fileWrapper = FileWrapper(regularFileWithContents: romData)
+      fileWrapper.preferredFilename = Filenames.rom
+      documentFileWrapper.addFileWrapper(fileWrapper)
+    }
 
     // TODO: Wait until the assembly has finished?
     if let disassemblyFiles = disassemblyFiles {
