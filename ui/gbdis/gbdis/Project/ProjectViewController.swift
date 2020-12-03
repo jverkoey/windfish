@@ -96,7 +96,8 @@ final class ProjectViewController: NSViewController {
         guard let node = nodes.first else {
           preconditionFailure()
         }
-        self.contentViewController.textField.stringValue = node.title
+        let string = String(data: self.document.disassemblyFiles![node.title]!, encoding: .utf8)!
+        self.contentViewController.textStorage = NSTextStorage(string: string)
       })
   }
 

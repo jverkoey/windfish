@@ -171,8 +171,8 @@
 				667B1B8A2578554600CE670F /* ProjectOutlineNode.swift */,
 				665D4F5A2575F75400C3A03B /* ProjectViewController.swift */,
 				667B1B9E2578560A00CE670F /* TextTableCellView.swift */,
-				667B1BA82578563E00CE670F /* ContentViewController.swift */,
 				667B1BAD2578565A00CE670F /* OutlineViewController.swift */,
+				667B1BA82578563E00CE670F /* ContentViewController.swift */,
 			);
 			path = Project;
 			sourceTree = "<group>";
