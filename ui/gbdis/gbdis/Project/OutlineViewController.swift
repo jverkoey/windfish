@@ -93,8 +93,8 @@ final class OutlineViewController: NSViewController {
 
     outlineView.delegate = self
     outlineView.backgroundColor = .clear
-    outlineView.style = .automatic
-    outlineView.selectionHighlightStyle = .sourceList
+    outlineView.style = .plain
+//    outlineView.selectionHighlightStyle = .sourceList
     outlineView.columnAutoresizingStyle = .lastColumnOnlyAutoresizingStyle
     outlineView.allowsMultipleSelection = false
     outlineView.allowsEmptySelection = true
@@ -111,7 +111,7 @@ final class OutlineViewController: NSViewController {
 
     NSLayoutConstraint.activate(constraints(for: containerView, filling: view))
 
-    addGroupNode("Disassembly", identifier: "disassembly")
+    addGroupNode("Source", identifier: "disassembly")
 
     outlineView.expandItem(treeController.arrangedObjects.children![0])
 

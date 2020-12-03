@@ -7,6 +7,7 @@
 
 import Foundation
 import Cocoa
+import LR35902
 
 final class ContentViewController: NSViewController {
   var containerView: NSScrollView?
@@ -19,10 +20,14 @@ final class ContentViewController: NSViewController {
     }
   }
 
+  let document: ProjectDocument
   let hexViewController: HexViewController
+  var bankConstraints: [NSLayoutConstraint] = []
+  var fileConstraints: [NSLayoutConstraint] = []
 
   init(document: ProjectDocument) {
-    self.hexViewController = HexViewController(document: document)
+    self.document = document
+    self.hexViewController = HexViewController()
 
     super.init(nibName: nil, bundle: nil)
 
@@ -56,12 +61,14 @@ final class ContentViewController: NSViewController {
     textView.isSelectable = true
     textView.drawsBackground = false
 
+    bankConstraints = [containerView.trailingAnchor.constraint(equalTo: self.hexViewController.view.leadingAnchor)]
+    fileConstraints = [containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor)]
+
     NSLayoutConstraint.activate([
       // Text content
       containerView.topAnchor.constraint(equalTo: view.topAnchor),
       containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
       containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-      containerView.trailingAnchor.constraint(equalTo: self.hexViewController.view.leadingAnchor),
 
       // Hex viewer
       self.hexViewController.view.topAnchor.constraint(equalTo: view.topAnchor),
@@ -69,5 +76,29 @@ final class ContentViewController: NSViewController {
       self.hexViewController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
       self.hexViewController.view.widthAnchor.constraint(equalToConstant: self.hexViewController.minimumWidth),
     ])
+
+    showBank(bank: nil)
+  }
+
+  func showBank(bank: LR35902.Bank?) {
+    guard let slice = document.slice else {
+      return
+    }
+
+    if let bank = bank {
+      let range = LR35902.rangeOf(bank: bank)
+      let byteArray = HFBTreeByteArray()
+      byteArray.insertByteSlice(slice.subslice(with: HFRange(location: UInt64(range.location), length: UInt64(range.length))),
+                                in: HFRange(location: 0, length: 0))
+      hexViewController.hexController.byteArray = byteArray
+      hexViewController.view.isHidden = false
+      NSLayoutConstraint.deactivate(fileConstraints)
+      NSLayoutConstraint.activate(bankConstraints)
+    } else {
+      hexViewController.hexController.byteArray = HFBTreeByteArray()
+      hexViewController.view.isHidden = true
+      NSLayoutConstraint.deactivate(bankConstraints)
+      NSLayoutConstraint.activate(fileConstraints)
+    }
   }
 }

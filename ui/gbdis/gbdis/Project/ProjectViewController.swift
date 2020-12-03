@@ -101,9 +101,9 @@ final class ProjectViewController: NSViewController {
         self.contentViewController.textStorage = NSTextStorage(string: string)
 
         if let metadata = self.document.metadata, let bank = metadata.bankMap[node.title] {
-          self.contentViewController.hexViewController.showBank(bank: bank)
+          self.contentViewController.showBank(bank: bank)
         } else {
-          self.contentViewController.hexViewController.showBank(bank: nil)
+          self.contentViewController.showBank(bank: nil)
         }
       })
   }
