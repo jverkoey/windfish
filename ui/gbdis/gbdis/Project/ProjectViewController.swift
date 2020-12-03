@@ -30,9 +30,15 @@ final class ProjectViewController: NSViewController {
     self.contentViewController = ContentViewController(document: document)
     self.editorViewController = EditorViewController()
 
-    splitViewController.addSplitViewItem(NSSplitViewItem(sidebarWithViewController: sidebarViewController))
+    let leadingSidebarItem = NSSplitViewItem(sidebarWithViewController: sidebarViewController)
+    leadingSidebarItem.canCollapse = false
+    splitViewController.addSplitViewItem(leadingSidebarItem)
+
     splitViewController.addSplitViewItem(NSSplitViewItem(viewController: contentViewController))
-    splitViewController.addSplitViewItem(NSSplitViewItem(sidebarWithViewController: editorViewController))
+
+    let trailingSidebarItem = NSSplitViewItem(sidebarWithViewController: editorViewController)
+    trailingSidebarItem.canCollapse = false
+    splitViewController.addSplitViewItem(trailingSidebarItem)
 
     super.init(nibName: nil, bundle: nil)
 
