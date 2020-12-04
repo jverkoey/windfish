@@ -38,6 +38,8 @@ class ProjectDocument: NSDocument {
     self.contentViewController = contentViewController
     let window = NSWindow(contentViewController: contentViewController)
     window.setContentSize(NSSize(width: 800, height: 600))
+    window.toolbarStyle = .unifiedCompact
+    window.tabbingMode = .disallowed
     let wc = NSWindowController(window: window)
     wc.window?.styleMask.insert(.fullSizeContentView)
     wc.contentViewController = contentViewController
@@ -71,9 +73,9 @@ extension ProjectDocument: NSToolbarDelegate {
 
   func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
     return [
-      .disassemble,
       .leadingSidebarTrackingSeparator,
       .trailingSidebarTrackingSeparator,
+      .disassemble,
     ]
   }
 

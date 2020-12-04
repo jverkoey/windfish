@@ -12,17 +12,6 @@ protocol TabSelectable {
   var selectedTabImage: NSImage { get }
 }
 
-final class ProjectInspectorViewController: NSViewController, TabSelectable {
-  let deselectedTabImage = NSImage(systemSymbolName: "doc", accessibilityDescription: nil)!
-  let selectedTabImage = NSImage(systemSymbolName: "doc.fill", accessibilityDescription: nil)!
-
-  override func loadView() {
-    view = NSView()
-    view.wantsLayer = true
-    view.layer?.backgroundColor = NSColor.red.cgColor
-  }
-}
-
 final class BankInspectorViewController: NSViewController, TabSelectable {
   let deselectedTabImage = NSImage(systemSymbolName: "questionmark.circle", accessibilityDescription: nil)!
   let selectedTabImage = NSImage(systemSymbolName: "questionmark.circle.fill", accessibilityDescription: nil)!
@@ -45,7 +34,7 @@ final class InspectorViewController: NSViewController {
     tabViewController.view.translatesAutoresizingMaskIntoConstraints = false
     tabViewController.tabStyle = .unspecified
 
-    tabViewController.addTabViewItem(NSTabViewItem(viewController: ProjectInspectorViewController()))
+    tabViewController.addTabViewItem(NSTabViewItem(viewController: RegionInspectorViewController()))
     tabViewController.addTabViewItem(NSTabViewItem(viewController: BankInspectorViewController()))
 
     addChild(tabViewController)
@@ -54,16 +43,19 @@ final class InspectorViewController: NSViewController {
     tabPickerView.translatesAutoresizingMaskIntoConstraints = false
     tabPickerView.orientation = .horizontal
     tabPickerView.distribution = .gravityAreas
+    // TODO: Enable and make buttons wider.
+//    tabPickerView.spacing = 0
 
     let tabButtons: [NSButton] = tabViewController.tabViewItems.map {
       guard let tabSelectable = $0.viewController as? TabSelectable else {
         preconditionFailure()
       }
       let button = NSButton()
-      button.bezelStyle = .regularSquare
+      button.bezelStyle = .rounded
       button.isBordered = false
       button.setButtonType(.toggle)
       button.image = tabSelectable.deselectedTabImage
+      button.font = .systemFont(ofSize: 16)
       button.target = self
       button.action = #selector(didSelectTab(_:))
       return button

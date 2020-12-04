@@ -15,6 +15,7 @@
 		665D4F8D2575F92500C3A03B /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F8C2575F92500C3A03B /* main.swift */; };
 		665D4FA32576C99000C3A03B /* LR35902 in Frameworks */ = {isa = PBXBuildFile; productRef = 665D4FA22576C99000C3A03B /* LR35902 */; };
 		665D4FAE257727CA00C3A03B /* HorizontalLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4FAD257727CA00C3A03B /* HorizontalLine.swift */; };
+		66763D732579F26000824278 /* RegionInspectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66763D722579F26000824278 /* RegionInspectorViewController.swift */; };
 		667B1B632578541F00CE670F /* NotificationNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1B622578541F00CE670F /* NotificationNames.swift */; };
 		667B1B75257854BB00CE670F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 667B1B72257854BB00CE670F /* Assets.xcassets */; };
 		667B1B8B2578554600CE670F /* ProjectOutlineNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1B8A2578554600CE670F /* ProjectOutlineNode.swift */; };
@@ -115,6 +116,7 @@
 		665D4F8C2575F92500C3A03B /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		665D4F9B2576C8EC00C3A03B /* DisassemblerLib */ = {isa = PBXFileReference; lastKnownFileType = folder; name = DisassemblerLib; path = ../../lib/DisassemblerLib; sourceTree = "<group>"; };
 		665D4FAD257727CA00C3A03B /* HorizontalLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalLine.swift; sourceTree = "<group>"; };
+		66763D722579F26000824278 /* RegionInspectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionInspectorViewController.swift; sourceTree = "<group>"; };
 		667B1B622578541F00CE670F /* NotificationNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationNames.swift; sourceTree = "<group>"; };
 		667B1B72257854BB00CE670F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		667B1B73257854BB00CE670F /* gbdis.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = gbdis.entitlements; sourceTree = "<group>"; };
@@ -241,6 +243,7 @@
 				667B1BAD2578565A00CE670F /* OutlineViewController.swift */,
 				667B1BA82578563E00CE670F /* ContentViewController.swift */,
 				667B1C0125789BAE00CE670F /* InspectorViewController.swift */,
+				66763D722579F26000824278 /* RegionInspectorViewController.swift */,
 				667B1BFC2578809C00CE670F /* HexViewController.swift */,
 			);
 			path = Project;
@@ -483,6 +486,7 @@
 				667B1B9F2578560A00CE670F /* TextTableCellView.swift in Sources */,
 				667B1BA92578563E00CE670F /* ContentViewController.swift in Sources */,
 				667B1BFD2578809C00CE670F /* HexViewController.swift in Sources */,
+				66763D732579F26000824278 /* RegionInspectorViewController.swift in Sources */,
 				665D4F5B2575F75400C3A03B /* ProjectViewController.swift in Sources */,
 				667B1B632578541F00CE670F /* NotificationNames.swift in Sources */,
 				667B1B8B2578554600CE670F /* ProjectOutlineNode.swift in Sources */,
