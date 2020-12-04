@@ -9,11 +9,22 @@ import Foundation
 import Cocoa
 import LR35902
 
+extension NSUserInterfaceItemIdentifier {
+  fileprivate static let name = NSUserInterfaceItemIdentifier("name")
+  fileprivate static let bank = NSUserInterfaceItemIdentifier("bank")
+  fileprivate static let address = NSUserInterfaceItemIdentifier("address")
+  fileprivate static let length = NSUserInterfaceItemIdentifier("length")
+
+  fileprivate static let textCell = NSUserInterfaceItemIdentifier("textCell")
+  fileprivate static let numberCell = NSUserInterfaceItemIdentifier("numberCell")
+  fileprivate static let addressCell = NSUserInterfaceItemIdentifier("addressCell")
+}
+
 class Region: NSObject, NSCopying {
-  @objc dynamic let name: String
-  @objc dynamic let bank: LR35902.Bank
-  @objc dynamic let address: LR35902.Address
-  @objc dynamic let length: LR35902.Address
+  @objc dynamic var name: String
+  @objc dynamic var bank: LR35902.Bank
+  @objc dynamic var address: LR35902.Address
+  @objc dynamic var length: LR35902.Address
 
   init(name: String, bank: LR35902.Bank, address: LR35902.Address, length: LR35902.Address) {
     self.name = name
@@ -25,26 +36,6 @@ class Region: NSObject, NSCopying {
   func copy(with zone: NSZone? = nil) -> Any {
     return Region(name: name, bank: bank, address: address, length: length)
   }
-}
-
-final class LR35902AddressFormatter: Formatter {
-  override func string(for obj: Any?) -> String? {
-    guard let address = obj as? LR35902.Address else {
-      return nil
-    }
-    return "0x\(address.hexString)"
-  }
-//
-//  override func getObjectValue(_ obj: AutoreleasingUnsafeMutablePointer<AnyObject?>?,
-//                               for string: String,
-//                               errorDescription error: AutoreleasingUnsafeMutablePointer<NSString?>?) -> Bool {
-//    if string.hasPrefix("0x") {
-//      let numericalValue = string.dropFirst(3)
-//      obj?.pointee = LR35902.Address(numericalValue, radix: 16)
-//      return true
-//    }
-//    return false
-//  }
 }
 
 final class RegionInspectorViewController: NSViewController, TabSelectable {
@@ -75,8 +66,8 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
       containerView.heightAnchor.constraint(equalToConstant: 200)
     ])
 
-    for columnName in [("Name", "name"), ("Bank", "bank"), ("Address", "address"), ("Length", "length")] {
-      let column = NSTableColumn(identifier: .init(rawValue: columnName.1))
+    for columnName in [("Name", NSUserInterfaceItemIdentifier.name), ("Bank", .bank), ("Address", .address), ("Length", .length)] {
+      let column = NSTableColumn(identifier: columnName.1)
       column.isEditable = false
       column.headerCell.stringValue = columnName.0
       column.width = 50
@@ -111,18 +102,26 @@ extension RegionInspectorViewController: NSTableViewDelegate {
     let view: TextTableCellView
 
     switch tableColumn.identifier {
-    case .init("name"): fallthrough
-    case .init("bank"): fallthrough
-    case .init("length"):
-      let identifier = NSUserInterfaceItemIdentifier("textCell")
+    case .name:
+      let identifier = NSUserInterfaceItemIdentifier.textCell
       if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TextTableCellView {
         view = recycledView
       } else {
         view = TextTableCellView()
         view.identifier = identifier
       }
-    case .init("address"):
-      let identifier = NSUserInterfaceItemIdentifier("numberCell")
+    case .bank: fallthrough
+    case .length:
+      let identifier = NSUserInterfaceItemIdentifier.numberCell
+      if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TextTableCellView {
+        view = recycledView
+      } else {
+        view = TextTableCellView()
+        view.identifier = identifier
+        view.textField?.formatter = NumberFormatter()
+      }
+    case .address:
+      let identifier = NSUserInterfaceItemIdentifier.addressCell
       if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TextTableCellView {
         view = recycledView
       } else {
