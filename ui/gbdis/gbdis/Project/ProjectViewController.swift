@@ -18,7 +18,7 @@ final class ProjectViewController: NSViewController {
 
   let sidebarViewController: OutlineViewController
   let contentViewController: ContentViewController
-  let editorViewController: EditorViewController
+  let inspectorViewController: InspectorViewController
 
   private var selectedFileDidChangeSubscriber: AnyCancellable?
 
@@ -28,7 +28,7 @@ final class ProjectViewController: NSViewController {
     self.splitViewController = NSSplitViewController()
     self.sidebarViewController = OutlineViewController(document: document)
     self.contentViewController = ContentViewController(document: document)
-    self.editorViewController = EditorViewController()
+    self.inspectorViewController = InspectorViewController()
 
     let leadingSidebarItem = NSSplitViewItem(sidebarWithViewController: sidebarViewController)
     leadingSidebarItem.canCollapse = false
@@ -36,7 +36,7 @@ final class ProjectViewController: NSViewController {
 
     splitViewController.addSplitViewItem(NSSplitViewItem(viewController: contentViewController))
 
-    let trailingSidebarItem = NSSplitViewItem(sidebarWithViewController: editorViewController)
+    let trailingSidebarItem = NSSplitViewItem(sidebarWithViewController: inspectorViewController)
     trailingSidebarItem.canCollapse = false
     splitViewController.addSplitViewItem(trailingSidebarItem)
 
