@@ -115,6 +115,10 @@ final class ProjectViewController: NSViewController {
           self.contentViewController.showBank(bank: nil)
         }
       })
+
+    if document.isDisassembling {
+      startProgressIndicator()
+    }
   }
 
   private let splitViewResorationIdentifier = "com.featherless.restorationId:SplitViewController"

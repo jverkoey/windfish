@@ -48,9 +48,11 @@ private struct Filenames {
 class ProjectDocument: NSDocument {
   weak var contentViewController: ProjectViewController?
 
+  var isDisassembling = false
   var romData: Data?
   var slice: HFSharedMemoryByteSlice?
   var disassemblyFiles: [String: Data]?
+  var bankLines: [LR35902.Bank: [LR35902.Disassembly.Line]]?
 
   var metadata: ProjectMetadata?
   var configuration = ProjectConfiguration()
@@ -148,6 +150,7 @@ extension ProjectDocument {
     guard let romData = romData else {
       return
     }
+    isDisassembling = true
     self.contentViewController?.startProgressIndicator()
 
     DispatchQueue.global(qos: .userInitiated).async {
@@ -166,6 +169,16 @@ extension ProjectDocument {
           accumulator[element.key] = number
         }
       })
+      let bankLines: [LR35902.Bank: [LR35902.Disassembly.Line]] = disassembledSource.sources.compactMapValues {
+        switch $0 {
+        case .bank(_, _, let lines):
+          return lines
+        default:
+          return nil
+        }
+      }.reduce(into: [:]) { accumulator, entry in
+        accumulator[bankMap[entry.0]!] = entry.1
+      }
       let disassemblyFiles: [String: Data] = disassembledSource.sources.mapValues {
         switch $0 {
         case .bank(_, let content, _): fallthrough
@@ -183,7 +196,9 @@ extension ProjectDocument {
         self.disassemblyFiles = disassemblyFiles
         self.metadata?.numberOfBanks = disassembly.cpu.numberOfBanks
         self.metadata?.bankMap = bankMap
+        self.bankLines = bankLines
 
+        self.isDisassembling = false
         NotificationCenter.default.post(name: .disassembled, object: self)
 
         self.contentViewController?.stopProgressIndicator()
@@ -248,7 +263,7 @@ extension ProjectDocument {
       }
     }
 
-    NotificationCenter.default.post(name: .disassembled, object: self)
+    self.disassemble(nil)
   }
 
   override func fileWrapper(ofType typeName: String) throws -> FileWrapper {
