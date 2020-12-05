@@ -51,6 +51,19 @@ extension NSApplication {
     editMenu.submenu?.addItem(NSMenuItem(title: "Paste", action: #selector(NSText.paste(_:)), keyEquivalent: "v"))
     editMenu.submenu?.addItem(NSMenuItem(title: "Select All", action: #selector(NSText.selectAll(_:)), keyEquivalent: "a"))
 
+    let findMenu = NSMenuItem()
+    findMenu.submenu = NSMenu(title: "Find")
+    let findItem = NSMenuItem(title: "Find…", action: #selector(NSTextView.performFindPanelAction(_:)), keyEquivalent: "f")
+    findItem.tag = Int(NSFindPanelAction.showFindPanel.rawValue)
+    findMenu.submenu?.addItem(findItem)
+    let findNextItem = NSMenuItem(title: "Find Next", action: #selector(NSTextView.performFindPanelAction(_:)), keyEquivalent: "g")
+    findNextItem.tag = Int(NSFindPanelAction.next.rawValue)
+    findMenu.submenu?.addItem(findNextItem)
+    let findPrevItem = NSMenuItem(title: "Find Previous", action: #selector(NSTextView.performFindPanelAction(_:)), keyEquivalent: "g")
+    findPrevItem.tag = Int(NSFindPanelAction.previous.rawValue)
+    findPrevItem.keyEquivalentModifierMask = [.command, .shift]
+    findMenu.submenu?.addItem(findPrevItem)
+
     let windowMenu = NSMenuItem()
     windowMenu.submenu = NSMenu(title: "Window")
     windowMenu.submenu?.addItem(NSMenuItem(title: "Minmize", action: #selector(NSWindow.miniaturize(_:)), keyEquivalent: "m"))
@@ -62,6 +75,7 @@ extension NSApplication {
     mainMenu.addItem(appMenu)
     mainMenu.addItem(fileMenu)
     mainMenu.addItem(editMenu)
+    mainMenu.addItem(findMenu)
     mainMenu.addItem(windowMenu)
     return mainMenu
   }

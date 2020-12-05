@@ -60,6 +60,8 @@ final class ContentViewController: NSViewController {
     textView.isEditable = false
     textView.isSelectable = true
     textView.drawsBackground = false
+    textView.usesFindBar = true
+    textView.isIncrementalSearchingEnabled = true
 
     let safeAreaLayoutGuide = view.safeAreaLayoutGuide
 
