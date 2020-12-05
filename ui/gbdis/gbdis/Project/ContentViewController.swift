@@ -48,21 +48,28 @@ final class ContentViewController: NSViewController {
     view.wantsLayer = true
     view.layer?.backgroundColor = NSColor.textBackgroundColor.cgColor
 
-    let containerView = NSTextView.scrollableTextView()
+    let containerView = NSScrollView()
     self.containerView = containerView
     containerView.frame = view.bounds
     containerView.translatesAutoresizingMaskIntoConstraints = false
     containerView.hasVerticalScroller = true
+    containerView.borderType = .noBorder
     view.addSubview(containerView)
 
-    let textView = containerView.documentView as! NSTextView
+    let textView = NSTextView()
     self.textView = textView
+    textView.isVerticallyResizable = true
+    textView.autoresizingMask = [.width]
+    textView.textContainer?.containerSize = NSSize(width: containerView.contentSize.width,
+                                                   height: CGFloat.greatestFiniteMagnitude)
+    textView.textContainer?.widthTracksTextView = true
     textView.focusRingType = .none
     textView.isEditable = false
     textView.isSelectable = true
     textView.drawsBackground = false
     textView.usesFindBar = true
     textView.isIncrementalSearchingEnabled = true
+    containerView.documentView = textView
 
     let safeAreaLayoutGuide = view.safeAreaLayoutGuide
 
