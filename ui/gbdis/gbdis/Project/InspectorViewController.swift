@@ -24,9 +24,20 @@ final class BankInspectorViewController: NSViewController, TabSelectable {
 }
 
 final class InspectorViewController: NSViewController {
+  let document: ProjectDocument
 
   let tabViewController = NSTabViewController()
   var tabButtons: [NSButton]?
+
+  init(document: ProjectDocument) {
+    self.document = document
+
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
 
   override func loadView() {
     view = NSView()
@@ -34,7 +45,7 @@ final class InspectorViewController: NSViewController {
     tabViewController.view.translatesAutoresizingMaskIntoConstraints = false
     tabViewController.tabStyle = .unspecified
 
-    tabViewController.addTabViewItem(NSTabViewItem(viewController: RegionInspectorViewController()))
+    tabViewController.addTabViewItem(NSTabViewItem(viewController: RegionInspectorViewController(document: document)))
     tabViewController.addTabViewItem(NSTabViewItem(viewController: BankInspectorViewController()))
 
     addChild(tabViewController)

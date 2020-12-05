@@ -20,29 +20,23 @@ extension NSUserInterfaceItemIdentifier {
   fileprivate static let addressCell = NSUserInterfaceItemIdentifier("addressCell")
 }
 
-class Region: NSObject, NSCopying {
-  @objc dynamic var name: String
-  @objc dynamic var bank: LR35902.Bank
-  @objc dynamic var address: LR35902.Address
-  @objc dynamic var length: LR35902.Address
-
-  init(name: String, bank: LR35902.Bank, address: LR35902.Address, length: LR35902.Address) {
-    self.name = name
-    self.bank = bank
-    self.address = address
-    self.length = length
-  }
-
-  func copy(with zone: NSZone? = nil) -> Any {
-    return Region(name: name, bank: bank, address: address, length: length)
-  }
-}
-
 final class RegionInspectorViewController: NSViewController, TabSelectable {
   let deselectedTabImage = NSImage(systemSymbolName: "book", accessibilityDescription: nil)!
   let selectedTabImage = NSImage(systemSymbolName: "book.fill", accessibilityDescription: nil)!
 
+  let document: ProjectDocument
   let regionController = NSArrayController()
+  private var selectionObserver: NSKeyValueObservation?
+
+  init(document: ProjectDocument) {
+    self.document = document
+
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
 
   override func loadView() {
     view = NSView()
@@ -59,11 +53,30 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
     containerView.documentView = regionTableView
     view.addSubview(containerView)
 
+    let tableControls = NSSegmentedControl()
+    tableControls.translatesAutoresizingMaskIntoConstraints = false
+    tableControls.trackingMode = .momentary
+    tableControls.segmentStyle = .smallSquare
+    tableControls.segmentCount = 2
+    tableControls.setImage(NSImage(imageLiteralResourceName: NSImage.addTemplateName), forSegment: 0)
+    tableControls.setImage(NSImage(imageLiteralResourceName: NSImage.removeTemplateName), forSegment: 1)
+    tableControls.setWidth(40, forSegment: 0)
+    tableControls.setWidth(40, forSegment: 1)
+    tableControls.setEnabled(true, forSegment: 0)
+    tableControls.setEnabled(false, forSegment: 1)
+    tableControls.target = self
+    tableControls.action = #selector(performTableControlAction(_:))
+    view.addSubview(tableControls)
+
     NSLayoutConstraint.activate([
       containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
       containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
       containerView.topAnchor.constraint(equalTo: view.topAnchor),
-      containerView.heightAnchor.constraint(equalToConstant: 200)
+      containerView.heightAnchor.constraint(equalToConstant: 200),
+
+      tableControls.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+      tableControls.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+      tableControls.topAnchor.constraint(equalTo: containerView.bottomAnchor),
     ])
 
     for columnName in [("Name", NSUserInterfaceItemIdentifier.name), ("Bank", .bank), ("Address", .address), ("Length", .length)] {
@@ -76,16 +89,28 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
       regionTableView.addTableColumn(column)
     }
 
-    regionController.addObject(Region(
-      name: "RST_00",
-      bank: 0,
-      address: 0x0000,
-      length: 8
-    ))
-
+    regionController.bind(.contentArray, to: document.configuration, withKeyPath: "regions", options: nil)
     regionTableView.bind(.content, to: regionController, withKeyPath: "arrangedObjects", options: nil)
     regionTableView.bind(.selectionIndexes, to: regionController, withKeyPath:"selectionIndexes", options: nil)
     regionTableView.bind(.sortDescriptors, to: regionController, withKeyPath: "sortDescriptors", options: nil)
+
+    selectionObserver = regionController.observe(\.selectedObjects, options: [.new]) { (controller, change) in
+      tableControls.setEnabled(controller.selectedObjects.count > 0, forSegment: 1)
+    }
+  }
+
+  @objc func performTableControlAction(_ sender: NSSegmentedControl) {
+    if sender.selectedSegment == 0 {
+      // Add
+      document.configuration.regions.append(
+        Region(name: "New region", bank: 0, address: 0, length: 0)
+      )
+    } else if sender.selectedSegment == 1 {
+      // Remove
+      document.configuration.regions.removeAll { region in
+        regionController.selectedObjects.contains { $0 as! Region === region }
+      }
+    }
   }
 }
 

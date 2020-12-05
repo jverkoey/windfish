@@ -9,6 +9,28 @@ import Cocoa
 
 import LR35902
 
+final class Region: NSObject, NSCopying, Codable {
+  @objc dynamic var name: String
+  @objc dynamic var bank: LR35902.Bank
+  @objc dynamic var address: LR35902.Address
+  @objc dynamic var length: LR35902.Address
+
+  init(name: String, bank: LR35902.Bank, address: LR35902.Address, length: LR35902.Address) {
+    self.name = name
+    self.bank = bank
+    self.address = address
+    self.length = length
+  }
+
+  func copy(with zone: NSZone? = nil) -> Any {
+    return Region(name: name, bank: bank, address: address, length: length)
+  }
+}
+
+class ProjectConfiguration: NSObject, Codable {
+  @objc dynamic var regions: [Region] = []
+}
+
 struct ProjectMetadata: Codable {
   var romUrl: URL
   var numberOfBanks: LR35902.Bank
@@ -19,6 +41,7 @@ private struct Filenames {
   static let metadata = "metadata.plist"
   static let rom = "rom.gb"
   static let disassembly = "disassembly"
+  static let configuration = "configuration.plist"
 }
 
 @objc(ProjectDocument)
@@ -30,6 +53,7 @@ class ProjectDocument: NSDocument {
   var disassemblyFiles: [String: Data]?
 
   var metadata: ProjectMetadata?
+  var configuration = ProjectConfiguration()
 
   private var documentFileWrapper: FileWrapper?
 
@@ -188,6 +212,12 @@ extension ProjectDocument {
       self.metadata = metadata
     }
 
+    if let fileWrapper = fileWrappers[Filenames.configuration],
+       let regularFileContents = fileWrapper.regularFileContents {
+      let decoder = PropertyListDecoder()
+      self.configuration = try decoder.decode(ProjectConfiguration.self, from: regularFileContents)
+    }
+
     if let fileWrapper = fileWrappers[Filenames.rom],
        let data = fileWrapper.regularFileContents {
       self.romData = data
@@ -222,6 +252,14 @@ extension ProjectDocument {
     let metadataFileWrapper = FileWrapper(regularFileWithContents: encodedMetadata)
     metadataFileWrapper.preferredFilename = Filenames.metadata
     documentFileWrapper.addFileWrapper(metadataFileWrapper)
+
+    if let fileWrapper = fileWrappers[Filenames.configuration] {
+      documentFileWrapper.removeFileWrapper(fileWrapper)
+    }
+    let encodedConfiguration = try encoder.encode(configuration)
+    let configurationFileWrapper = FileWrapper(regularFileWithContents: encodedConfiguration)
+    configurationFileWrapper.preferredFilename = Filenames.configuration
+    documentFileWrapper.addFileWrapper(configurationFileWrapper)
 
     if let romData = romData {
       if let fileWrapper = fileWrappers[Filenames.rom] {

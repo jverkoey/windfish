@@ -28,7 +28,7 @@ final class ProjectViewController: NSViewController {
     self.splitViewController = NSSplitViewController()
     self.sidebarViewController = OutlineViewController(document: document)
     self.contentViewController = ContentViewController(document: document)
-    self.inspectorViewController = InspectorViewController()
+    self.inspectorViewController = InspectorViewController(document: document)
 
     let leadingSidebarItem = NSSplitViewItem(sidebarWithViewController: sidebarViewController)
     leadingSidebarItem.canCollapse = false
