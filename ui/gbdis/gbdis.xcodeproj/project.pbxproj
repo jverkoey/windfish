@@ -188,6 +188,7 @@
 		665D4F572575F75400C3A03B /* gbdis */ = {
 			isa = PBXGroup;
 			children = (
+				66763D87257B2DD800824278 /* CellViews */,
 				66763D7E257AF37900824278 /* Formatters */,
 				667B1BE425787ACE00CE670F /* gbdisui-Bridging-Header.h */,
 				667B1B982578559600CE670F /* AutoLayout */,
@@ -244,13 +245,20 @@
 			path = Formatters;
 			sourceTree = "<group>";
 		};
+		66763D87257B2DD800824278 /* CellViews */ = {
+			isa = PBXGroup;
+			children = (
+				667B1B9E2578560A00CE670F /* TextTableCellView.swift */,
+			);
+			path = CellViews;
+			sourceTree = "<group>";
+		};
 		667B1B612578540500CE670F /* Project */ = {
 			isa = PBXGroup;
 			children = (
 				665D4F5C2575F75400C3A03B /* ProjectDocument.swift */,
 				667B1B8A2578554600CE670F /* ProjectOutlineNode.swift */,
 				665D4F5A2575F75400C3A03B /* ProjectViewController.swift */,
-				667B1B9E2578560A00CE670F /* TextTableCellView.swift */,
 				667B1BAD2578565A00CE670F /* OutlineViewController.swift */,
 				667B1BA82578563E00CE670F /* ContentViewController.swift */,
 				667B1C0125789BAE00CE670F /* InspectorViewController.swift */,

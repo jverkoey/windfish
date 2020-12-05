@@ -26,6 +26,7 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
 
   let document: ProjectDocument
   let regionController = NSArrayController()
+  private var stashedTextFieldValue: String?
   private var selectionObserver: NSKeyValueObservation?
 
   init(document: ProjectDocument) {
@@ -89,28 +90,58 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
       regionTableView.addTableColumn(column)
     }
 
+    selectionObserver = regionController.observe(\.selectedObjects, options: [.new]) { (controller, change) in
+      tableControls.setEnabled(controller.selectedObjects.count > 0, forSegment: 1)
+    }
+
     regionController.bind(.contentArray, to: document.configuration, withKeyPath: "regions", options: nil)
     regionTableView.bind(.content, to: regionController, withKeyPath: "arrangedObjects", options: nil)
     regionTableView.bind(.selectionIndexes, to: regionController, withKeyPath:"selectionIndexes", options: nil)
     regionTableView.bind(.sortDescriptors, to: regionController, withKeyPath: "sortDescriptors", options: nil)
-
-    selectionObserver = regionController.observe(\.selectedObjects, options: [.new]) { (controller, change) in
-      tableControls.setEnabled(controller.selectedObjects.count > 0, forSegment: 1)
-    }
   }
 
   @objc func performTableControlAction(_ sender: NSSegmentedControl) {
-    if sender.selectedSegment == 0 {
-      // Add
-      document.configuration.regions.append(
-        Region(name: "New region", bank: 0, address: 0, length: 0)
-      )
-    } else if sender.selectedSegment == 1 {
-      // Remove
-      document.configuration.regions.removeAll { region in
-        regionController.selectedObjects.contains { $0 as! Region === region }
+    applyChangeToRegions {
+      if sender.selectedSegment == 0 {
+        // Add
+        document.configuration.regions.append(
+          Region(name: "New region", bank: 0, address: 0, length: 0)
+        )
+        return "Create Region"
+      } else if sender.selectedSegment == 1 {
+        // Remove
+        document.configuration.regions.removeAll { region in
+          regionController.selectedObjects.contains { $0 as! Region === region }
+        }
+        return "Delete Region"
+      } else {
+        preconditionFailure()
       }
     }
+  }
+
+  func applyChangeToRegions(_ action: () -> String) {
+    let originalRegions = document.configuration.regions
+    let undoName = action()
+    document.undoManager?.registerUndo(withTarget: self, handler: { controller in
+      controller.undoChangeToRegions {
+        controller.document.configuration.regions = originalRegions
+        return undoName
+      }
+    })
+    document.undoManager?.setActionName(undoName)
+  }
+
+  func undoChangeToRegions(_ action: () -> String) {
+    let originalRegions = document.configuration.regions
+    let undoName = action()
+    document.undoManager?.registerUndo(withTarget: self, handler: { controller in
+      controller.applyChangeToRegions {
+        controller.document.configuration.regions = originalRegions
+        return undoName
+      }
+    })
+    document.undoManager?.setActionName(undoName)
   }
 }
 
@@ -158,8 +189,47 @@ extension RegionInspectorViewController: NSTableViewDelegate {
       preconditionFailure()
     }
 
+    view.textField?.delegate = self
     view.textField?.bind(.value, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
 
     return view
+  }
+}
+
+extension RegionInspectorViewController: NSTextFieldDelegate {
+  func controlTextDidBeginEditing(_ obj: Notification) {
+    guard let textField = obj.object as? NSTextField else {
+      preconditionFailure()
+    }
+    stashedTextFieldValue = textField.stringValue
+  }
+
+  func controlTextDidEndEditing(_ obj: Notification) {
+    guard let textField = obj.object as? NSTextField else {
+      preconditionFailure()
+    }
+
+    if let stashedTextFieldValue = stashedTextFieldValue,
+       stashedTextFieldValue != textField.stringValue {
+      registerUndoForRegion(textField: textField, originalValue: stashedTextFieldValue)
+    }
+  }
+
+  func registerUndoForRegion(textField: NSTextField, originalValue: String) {
+    document.undoManager?.registerUndo(withTarget: self, handler: { controller in
+      let redoValue = textField.stringValue
+      textField.stringValue = originalValue
+      controller.registerRedoForRegion(textField: textField, newValue: redoValue)
+    })
+    document.undoManager?.setActionName("Region Edit")
+  }
+
+  func registerRedoForRegion(textField: NSTextField, newValue: String) {
+    document.undoManager?.registerUndo(withTarget: self, handler: { controller in
+      let redoValue = textField.stringValue
+      textField.stringValue = newValue
+      controller.registerUndoForRegion(textField: textField, originalValue: redoValue)
+    })
+    document.undoManager?.setActionName("Region Edit")
   }
 }
