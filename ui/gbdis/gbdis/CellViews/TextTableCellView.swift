@@ -16,6 +16,7 @@ final class TextTableCellView: NSTableCellView {
     textField.translatesAutoresizingMaskIntoConstraints = false
     textField.isBordered = false
     textField.drawsBackground = false // Required for text color to be set correctly.
+    textField.lineBreakMode = .byTruncatingTail
     addSubview(textField)
 
     self.textField = textField

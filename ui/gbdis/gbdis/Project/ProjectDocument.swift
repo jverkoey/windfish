@@ -55,6 +55,18 @@ class ProjectDocument: NSDocument {
   var metadata: ProjectMetadata?
   var configuration = ProjectConfiguration()
 
+  override init() {
+    super.init()
+
+    let numberOfRestartAddresses: LR35902.Address = 8
+    let restartSize: LR35902.Address = 8
+    let rstAddresses = (0..<numberOfRestartAddresses).map { ($0 * restartSize)..<($0 * restartSize + restartSize) }
+    rstAddresses.forEach {
+      let region = Region(name: "RST_\($0.lowerBound.hexString)", bank: 0, address: $0.lowerBound, length: LR35902.Address($0.count))
+      configuration.regions.append(region)
+    }
+  }
+
   private var documentFileWrapper: FileWrapper?
 
   override func makeWindowControllers() {
