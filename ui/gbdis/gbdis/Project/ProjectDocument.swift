@@ -162,13 +162,13 @@ extension ProjectDocument {
       let disassembledSource = try! disassembly.generateSource()
 
       let bankMap: [String: LR35902.Bank] = disassembledSource.sources.reduce(into: [:], { accumulator, element in
-        if case .bank(let number, _) = element.value {
+        if case .bank(let number, _, _) = element.value {
           accumulator[element.key] = number
         }
       })
       let disassemblyFiles: [String: Data] = disassembledSource.sources.mapValues {
         switch $0 {
-        case .bank(_, let content): fallthrough
+        case .bank(_, let content, _): fallthrough
         case .charmap(content: let content): fallthrough
         case .datatypes(content: let content): fallthrough
         case .game(content: let content): fallthrough

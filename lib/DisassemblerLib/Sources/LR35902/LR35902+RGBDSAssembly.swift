@@ -6,15 +6,15 @@ public final class RGBDSAssembly {
 
   static let maxOpcodeNameLength = 4
 
-  struct Statement: Equatable, CustomStringConvertible {
-    let opcode: String
-    let operands: [String]?
+  public struct Statement: Equatable, CustomStringConvertible {
+    public let opcode: String
+    public let operands: [String]?
     init(opcode: String, operands: [String]? = nil) {
       self.opcode = opcode
       self.operands = operands
     }
 
-    var description: String {
+    public var description: String {
       let opcodeName = opcode.padding(toLength: maxOpcodeNameLength, withPad: " ", startingAt: 0)
       if let operands = operands {
         return "\(opcodeName) \(operands.joined(separator: ", "))"
@@ -32,15 +32,12 @@ public final class RGBDSAssembly {
     }
   }
 
-  public static func assembly(for bytes: [UInt8]) -> String {
-    let opcode = "db".padding(toLength: maxOpcodeNameLength, withPad: " ", startingAt: 0)
-    let operand = bytes.map { "$\($0.hexString)" }.joined(separator: ", ")
-    return "\(opcode) \(operand)"
+  public static func statement(for bytes: [UInt8]) -> Statement {
+    return Statement(opcode: "db", operands: bytes.map { "$\($0.hexString)" })
   }
 
-  public static func assembly(for value: String) -> String {
-    let opcode = "db".padding(toLength: maxOpcodeNameLength, withPad: " ", startingAt: 0)
-    return "\(opcode) \(value)"
+  public static func statement(for value: String) -> Statement {
+    return Statement(opcode: "db", operands: [value])
   }
 
   private static func flatten(asciiCodes: [UInt8], characterMap: [UInt8: String]) -> String {
@@ -53,7 +50,7 @@ public final class RGBDSAssembly {
     }.joined()
   }
 
-  public static func text(for bytes: [UInt8], characterMap: [UInt8: String]) -> String {
+  public static func line(for bytes: [UInt8], characterMap: [UInt8: String], address: LR35902.Address) -> LR35902.Disassembly.Line {
     var accumulator: [String] = []
     var asciiCharacterAccumulator: [UInt8] = []
     for byte in bytes {
@@ -70,9 +67,7 @@ public final class RGBDSAssembly {
     if asciiCharacterAccumulator.count > 0 {
       accumulator.append("\"\(flatten(asciiCodes: asciiCharacterAccumulator, characterMap: characterMap))\"")
     }
-    let opcode = "db".padding(toLength: maxOpcodeNameLength, withPad: " ", startingAt: 0)
-    let operand = accumulator.joined(separator: ", ")
-    return "\(opcode) \(operand)"
+    return .data(Statement(opcode: "db", operands: accumulator), address)
   }
 
   private static func typedValue(for imm8: UInt8, with representation: LR35902.Disassembly.Datatype.Representation) -> String {

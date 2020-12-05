@@ -11,7 +11,7 @@ extension Array {
   }
 }
 
-private func write(_ string: String) -> String {
+private func stringWithNewline(_ string: String) -> String {
   return string + "\n"
 }
 
@@ -83,33 +83,72 @@ func prettify(_ label: String) -> String {
 }
 
 extension LR35902.Disassembly {
-  enum Line: Equatable, CustomStringConvertible {
+  public enum Line: Equatable, CustomStringConvertible {
     case newline
     case empty
     case macroComment(String)
     case preComment(String)
     case label(String)
+    case section(LR35902.Bank)
     case transferOfControl(Set<TransferOfControl>, String)
     case instruction(LR35902.Instruction, RGBDSAssembly.Statement, LR35902.Address, LR35902.Bank, String, Data)
     case macroInstruction(LR35902.Instruction, RGBDSAssembly.Statement)
     case macro(String, LR35902.Address, LR35902.Bank, String, Data)
     case macroDefinition(String)
     case macroTerminator
+    case data(RGBDSAssembly.Statement, LR35902.Address)
+    case jumpTable(String, LR35902.Address, Int, Data)
+    case unknown(RGBDSAssembly.Statement, LR35902.Address, String?, String)
+    case global(RGBDSAssembly.Statement, LR35902.Address, String)
 
-    var description: String {
+    public var description: String {
       switch self {
       case .newline:                           return ""
+
       case .empty:                             return ""
+
       case let .label(label):                  return "\(prettify(label)):"
+
+      case let .section(bank):
+        if bank == 0 {
+          return "SECTION \"ROM Bank \(bank.hexString)\", ROM0[$\(bank.hexString)]"
+        } else {
+          return "SECTION \"ROM Bank \(bank.hexString)\", ROMX[$4000], BANK[$\(bank.hexString)]"
+        }
       case let .macroComment(comment):         return "; \(comment)"
+
       case let .preComment(comment):           return line(comment: comment)
+
       case let .transferOfControl(toc, label): return line(toc, label: prettify(label))
-      case let .instruction(_, assembly, address, bank, scope, bytes): return line(assembly.description, address: address, bank: bank, scope: scope, bytes: bytes)
+
+      case let .instruction(_, assembly, address, bank, scope, bytes):
+        return line(assembly.description, address: address, bank: bank, scope: scope, bytes: bytes)
+
       case let .macroInstruction(_, assembly): return line(assembly.description)
-      case let .macro(assembly, address, bank, scope, bytes): return line(assembly, address: address, bank: bank, scope: scope, bytes: bytes)
+
+      case let .macro(assembly, address, bank, scope, bytes):
+        return line(assembly, address: address, bank: bank, scope: scope, bytes: bytes)
+
       case let .macroDefinition(name):         return "\(name): MACRO"
+
       case .macroTerminator:                   return line("ENDM")
+
+      case let .data(statement, address):
+        return line(statement.description, address: address, addressType: "text")
+
+      case let .jumpTable(jumpLocation, address, index, bytes):
+        return line("dw \(jumpLocation)", address: address, addressType: "jumpTable [\(index)]", comment: "\(bytes.map { "$\($0.hexString)" }.joined(separator: " "))")
+
+      case let .unknown(statement, address, addressType, bytesAsCharacters):
+        return line(statement.description, address: address, addressType: addressType, comment: "|\(bytesAsCharacters)|")
+
+      case let .global(statement, address, addressType):
+        return line(statement.description, address: address, addressType: addressType)
       }
+    }
+
+    var asString: String {
+      return description + "\n"
     }
   }
 
@@ -121,7 +160,7 @@ extension LR35902.Disassembly {
       case macros(content: String)
       case makefile(content: String)
       case variables(content: String)
-      case bank(number: LR35902.Bank, content: String)
+      case bank(number: LR35902.Bank, content: String, lines: [Line])
     }
     public let sources: [String: FileDescription]
   }
@@ -134,17 +173,17 @@ extension LR35902.Disassembly {
 all: game.gb
 
 game.o: game.asm bank_*.asm
-  rgbasm -h -o game.o game.asm
+\trgbasm -h -o game.o game.asm
 
 game.gb: game.o
-  rgblink -d -n game.sym -m game.map -o $@ $<
-  rgbfix -v -p 255 $@
+\trgblink -d -n game.sym -m game.map -o $@ $<
+\trgbfix -v -p 255 $@
 
-  md5 $@
+\tmd5 $@
 
 clean:
-  rm -f game.o game.gb game.sym game.map *.o
-  find . \\( -iname '*.1bpp' -o -iname '*.2bpp' \\) -exec rm {} +
+\trm -f game.o game.gb game.sym game.map *.o
+\tfind . \\( -iname '*.1bpp' -o -iname '*.2bpp' \\) -exec rm {} +
 
 """)
 
@@ -162,7 +201,7 @@ clean:
         let longestVariable = namedValues.reduce(0) { (currentMax, next) in
           max(currentMax, next.value.count)
         }
-        asm.append(namedValues.map {
+        asm += namedValues.map {
           let name = $0.value.padding(toLength: longestVariable, withPad: " ", startingAt: 0)
           let value: String
           switch dataType.value.representation {
@@ -174,30 +213,26 @@ clean:
             value = "$\($0.key.hexString)"
           }
           return "\(name) EQU \(value)"
-        }.joined(separator: "\n"))
-        asm.append("\n\n")
+        }.joined(separator: "\n")
+        asm += "\n\n"
       }
       sources["datatypes.asm"] = .datatypes(content: asm)
       gameAsm += "INCLUDE \"datatypes.asm\"\n"
     }
 
     if !globals.isEmpty {
-      var asm = ""
-
-      asm.append(globals.filter { $0.key >= 0x8000 }.sorted { $0.0 < $1.0 }.map { address, global in
+      let asm = globals.filter { $0.key >= 0x8000 }.sorted { $0.0 < $1.0 }.map { address, global in
         "\(global.name) EQU $\(address.hexString)"
-      }.joined(separator: "\n\n"))
+      }.joined(separator: "\n\n")
 
       sources["variables.asm"] = .variables(content: asm)
       gameAsm += "INCLUDE \"variables.asm\"\n"
     }
 
     if !characterMap.isEmpty {
-      var asm = ""
-
-      asm.append(characterMap.sorted { $0.key < $1.key }.map { value, string in
+      let asm = characterMap.sorted { $0.key < $1.key }.map { value, string in
         "charmap \"\(string)\", $\(value.hexString)"
-      }.joined(separator: "\n"))
+      }.joined(separator: "\n")
 
       sources["charmap.asm"] = .charmap(content: asm)
       gameAsm += "INCLUDE \"charmap.asm\"\n"
@@ -209,16 +244,25 @@ clean:
     var macrosAsm: String? = nil
 
     for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
-      var asm = ""
+      var bankLines: [Line] = []
       defer {
-        sources["bank_\(bank.hexString).asm"] = .bank(number: bank, content: asm)
+        sources["bank_\(bank.hexString).asm"] = .bank(number: bank, content: linesAsString(bankLines), lines: bankLines)
       }
 
-      if bank == 0 {
-        asm += write("SECTION \"ROM Bank \(bank.hexString)\", ROM0[$\(bank.hexString)]")
-      } else {
-        asm += write("SECTION \"ROM Bank \(bank.hexString)\", ROMX[$4000], BANK[$\(bank.hexString)]")
+      let linesAsString: ([Line]) -> String = { lines in
+        var data = ""
+        var lastLine: Line?
+        lines.forEach { thisLine in
+          if let lastLine = lastLine, lastLine == .empty && thisLine == .empty {
+            return
+          }
+          data += thisLine.asString
+          lastLine = thisLine
+        }
+        return data
       }
+
+      bankLines.append(.section(bank))
 
       cpu.pc = (bank == 0) ? 0x0000 : 0x4000
       cpu.bank = bank
@@ -229,21 +273,8 @@ clean:
       lineBuffer.append(.empty)
       var macroNode: MacroNode? = nil
 
-      let writeLines: ([Line]) -> String = { lines in
-        var data = ""
-        var lastLine: Line?
-        lines.forEach { thisLine in
-          if let lastLine = lastLine, lastLine == .empty && thisLine == .empty {
-            return
-          }
-          data += write(thisLine.description)
-          lastLine = thisLine
-        }
-        return data
-      }
-
       let flush = {
-        asm.append(writeLines(lineBuffer))
+        bankLines += lineBuffer
         lineBuffer.removeAll()
         macroNode = nil
       }
@@ -419,7 +450,7 @@ clean:
                 return .macroInstruction(macroInstruction, macroAssembly)
               })
               lines.append(.macroTerminator)
-              macrosAsm?.append(writeLines(lines))
+              macrosAsm?.append(linesAsString(lines))
 
               macro.macro.hasWritten = true
             }
@@ -570,7 +601,7 @@ clean:
           case .text:
             let lineLength = lineLengthOfText(at: initialPc, in: bank) ?? 254
             for chunk in accumulator.chunked(into: lineLength) {
-              asm.append(write(line(RGBDSAssembly.text(for: chunk, characterMap: characterMap), address: chunkPc, addressType: "text")))
+              bankLines.append(RGBDSAssembly.line(for: chunk, characterMap: characterMap, address: chunkPc))
               chunkPc += LR35902.Address(chunk.count)
             }
           case .jumpTable:
@@ -589,7 +620,7 @@ clean:
                 jumpLocation = "$\(address.hexString)"
               }
               let bytes = cpu[LR35902.cartridgeLocation(for: chunkPc, in: bank)!..<(LR35902.cartridgeLocation(for: chunkPc, in: bank)! + 2)]
-              asm.append(write(line("dw \(jumpLocation)", address: chunkPc, addressType: "jumpTable [\(index)]", comment: "\(bytes.map { "$\($0.hexString)" }.joined(separator: " "))")))
+              bankLines.append(.jumpTable(jumpLocation, chunkPc, index, bytes))
               chunkPc += LR35902.Address(pair.count)
             }
             break
@@ -597,10 +628,9 @@ clean:
             // Dump the bytes in blocks of 8.
             let addressType = initialType == .data ? "data" : nil
             for chunk in accumulator.chunked(into: 8) {
-              let instruction = RGBDSAssembly.assembly(for: chunk)
               let displayableBytes = chunk.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
               let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
-              asm.append(write(line(instruction, address: chunkPc, addressType: addressType, comment: "|\(bytesAsCharacters)|")))
+              bankLines.append(.unknown(RGBDSAssembly.statement(for: chunk), chunkPc, addressType, bytesAsCharacters))
               chunkPc += LR35902.Address(chunk.count)
             }
           }
@@ -608,7 +638,7 @@ clean:
           if let global = global,
              let dataType = global.dataType,
              let globalValue = globalValue {
-            asm.append(write(line(RGBDSAssembly.assembly(for: globalValue), address: chunkPc, addressType: dataType)))
+            bankLines.append(.global(RGBDSAssembly.statement(for: globalValue), chunkPc, dataType))
           }
 
           lineBuffer.append(.empty)

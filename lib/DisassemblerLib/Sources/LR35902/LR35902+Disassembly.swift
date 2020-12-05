@@ -59,9 +59,9 @@ extension LR35902 {
         labelTypes[index] = .transferOfControlType
       }
     }
-    struct TransferOfControl: Hashable {
-      let sourceLocation: CartridgeLocation
-      let sourceInstructionSpec: Instruction.Spec
+    public struct TransferOfControl: Hashable {
+      public let sourceLocation: CartridgeLocation
+      public let sourceInstructionSpec: Instruction.Spec
     }
     private var transfers: [CartridgeLocation: Set<TransferOfControl>] = [:]
 
