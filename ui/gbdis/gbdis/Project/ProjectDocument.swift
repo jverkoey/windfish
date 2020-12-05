@@ -140,6 +140,12 @@ extension ProjectDocument {
 
     DispatchQueue.global(qos: .userInitiated).async {
       let disassembly = LR35902.Disassembly(rom: romData)
+
+      for region in self.configuration.regions {
+        disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
+        disassembly.disassemble(range: region.address..<(region.address + region.length), inBank: region.bank)
+      }
+
       //            disassembly.disassembleAsGameboyCartridge()
       let disassembledSource = try! disassembly.generateSource()
 
