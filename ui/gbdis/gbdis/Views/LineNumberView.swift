@@ -92,7 +92,8 @@ final class LineNumberView: NSRulerView {
     lineInformationValid = true
 
     let digitSize = NSString("0000").size(withAttributes: textAttributes())
-    ruleThickness = max(ceil(digitSize.width + 4) + scopeColumnWidth, 10)
+    let bankDigitSize = NSString("00").size(withAttributes: textAttributes())
+    ruleThickness = max(ceil(bankDigitSize.width + 4) + scopeColumnWidth + ceil(digitSize.width + 4), 10)
   }
 
   override func viewWillDraw() {
@@ -131,7 +132,8 @@ final class LineNumberView: NSRulerView {
   }
 
   func processLines(in rect: NSRect,
-                    scopeHandler: ((LR35902.Disassembly.Line?, LR35902.Disassembly.Line, LR35902.Disassembly.Line?, NSRect) -> Void)?,
+                    scopeHandler: ((LR35902.Disassembly.Line?, LR35902.Disassembly.Line, LR35902.Disassembly.Line?, NSRect) -> Void)? = nil,
+                    bankHandler: ((LR35902.Bank, NSRect) -> Void)? = nil,
                     handler: (Int, NSString, NSRect) -> Bool) {
     guard let textView = clientView as? NSTextView else {
       return
@@ -152,6 +154,8 @@ final class LineNumberView: NSRulerView {
     let visibleGlyphGrange = layoutManager.glyphRange(forBoundingRect: visibleRect, in: textContainer)
     let visibleCharacterRange = layoutManager.characterRange(forGlyphRange: visibleGlyphGrange, actualGlyphRange: nil)
     let textAttributes = self.textAttributes()
+
+    let bankDigitSize = NSString("00").size(withAttributes: textAttributes)
 
     var lastLinePositionY: CGFloat = -1.0
     var layoutRectCount: Int = 0
@@ -177,13 +181,25 @@ final class LineNumberView: NSRulerView {
         let currentLine = bankLines[lineNumber]
         let nextLine = lineNumber < bankLines.count - 1 ? bankLines[lineNumber + 1] : nil
 
-        let scopeRect = NSRect(
-          x: 0,
-          y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY,
-          width: scopeColumnWidth,
-          height: layoutRects.pointee.height
-        )
-        scopeHandler?(previousLine, currentLine, nextLine, scopeRect)
+        if let bank = bankLines[lineNumber].bank, let bankHandler = bankHandler {
+          let bankRect = NSRect(
+            x: 4,
+            y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY,
+            width: bankDigitSize.width,
+            height: layoutRects.pointee.height
+          )
+          bankHandler(bank, bankRect)
+        }
+
+        if let scopeHandler = scopeHandler {
+          let scopeRect = NSRect(
+            x: bankDigitSize.width + 4,
+            y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY,
+            width: scopeColumnWidth,
+            height: layoutRects.pointee.height
+          )
+          scopeHandler(previousLine, currentLine, nextLine, scopeRect)
+        }
 
         // TODO: Also show the current bank and current execution context
         // TODO: Cmd+clicking labels should jump to the label
@@ -292,6 +308,11 @@ final class LineNumberView: NSRulerView {
           ).fill()
         }
       }
+    }, bankHandler: { (bank, bankRect) in
+      let bankString = NSString(string: bank.hexString)
+      if self.needsToDraw(bankRect.insetBy(dx: -4, dy: -4)) {
+        bankString.draw(with: bankRect, options: .usesLineFragmentOrigin, attributes: textAttributes)
+      }
     }, handler: { _, lineString, lineStringRect in
       if needsToDraw(lineStringRect.insetBy(dx: -4, dy: -4)) {
         lineString.draw(with: lineStringRect, options: .usesLineFragmentOrigin, attributes: textAttributes)
@@ -306,7 +327,7 @@ final class LineNumberView: NSRulerView {
 extension LineNumberView {
   private func lineNumber(at location: NSPoint) -> Int? {
     var tappedLineNumber: Int? = nil
-    processLines(in: bounds, scopeHandler: nil, handler: { lineNumber, lineString, lineStringRect in
+    processLines(in: bounds, handler: { lineNumber, lineString, lineStringRect in
       if lineStringRect.contains(location) {
         tappedLineNumber = lineNumber
         return false

@@ -79,7 +79,7 @@ extension LR35902.Disassembly {
       case macroComment(String)
       case preComment(String)
       case label(String)
-      case section
+      case section(LR35902.Bank)
       case transferOfControl(Set<TransferOfControl>, String)
       case instruction(LR35902.Instruction, RGBDSAssembly.Statement, Data)
       case macroInstruction(LR35902.Instruction, RGBDSAssembly.Statement)
@@ -112,11 +112,11 @@ extension LR35902.Disassembly {
 
       case let .label(label):                  return "\(prettify(label)):"
 
-      case .section:
+      case let .section(bank):
         if bank == 0 {
-          return "SECTION \"ROM Bank \(bank!.hexString)\", ROM0[$\(bank!.hexString)]"
+          return "SECTION \"ROM Bank \(bank.hexString)\", ROM0[$\(bank.hexString)]"
         } else {
-          return "SECTION \"ROM Bank \(bank!.hexString)\", ROMX[$4000], BANK[$\(bank!.hexString)]"
+          return "SECTION \"ROM Bank \(bank.hexString)\", ROMX[$4000], BANK[$\(bank.hexString)]"
         }
       case let .macroComment(comment):         return "; \(comment)"
 
@@ -136,7 +136,7 @@ extension LR35902.Disassembly {
         if detailedComments {
           return line(assembly.description, address: address!, bank: bank!, scope: scope!, bytes: bytes)
         } else {
-          return line(assembly.description, bank: bank!, bytes: bytes)
+          return line(assembly.description, bytes: bytes)
         }
 
       case let .macroInstruction(_, assembly): return line(assembly.description)
@@ -145,7 +145,7 @@ extension LR35902.Disassembly {
         if detailedComments {
           return line(assembly, address: address!, bank: bank!, scope: scope!, bytes: bytes)
         } else {
-          return line(assembly, bank: bank!, bytes: bytes)
+          return line(assembly, bytes: bytes)
         }
 
       case let .macroDefinition(name):         return "\(name): MACRO"
@@ -304,7 +304,7 @@ clean:
         return lines.map { $0.asString(detailedComments: false) }.joined(separator: "\n")
       }
 
-      bankLines.append(Line(semantic: .section, bank: bank))
+      bankLines.append(Line(semantic: .section(bank)))
 
       cpu.pc = (bank == 0) ? 0x0000 : 0x4000
       cpu.bank = bank

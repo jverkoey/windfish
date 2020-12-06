@@ -73,7 +73,7 @@ public func line<T: FixedWidthInteger>(_ code: String, address: T, bank: UInt8, 
   return line("    \(code)", comment: comment)
 }
 
-public func line(_ code: String, bank: UInt8, bytes: Data) -> String {
-  let comment = "(\(bank.hexString)): \(bytes.map { "$\($0.hexString)" }.joined(separator: " "))"
+public func line(_ code: String, bytes: Data) -> String {
+  let comment = bytes.map { "$\($0.hexString)" }.joined(separator: " ")
   return line("    \(code)", comment: comment)
 }
