@@ -130,7 +130,9 @@ final class LineNumberView: NSRulerView {
     return NSNotFound
   }
 
-  func processLines(in rect: NSRect, handler: (Int, NSString, NSRect) -> Bool) {
+  func processLines(in rect: NSRect,
+                    scopeHandler: ((LR35902.Disassembly.Line?, LR35902.Disassembly.Line, LR35902.Disassembly.Line?, NSRect) -> Void)?,
+                    handler: (Int, NSString, NSRect) -> Bool) {
     guard let textView = clientView as? NSTextView else {
       return
     }
@@ -175,64 +177,7 @@ final class LineNumberView: NSRulerView {
         let currentLine = bankLines[lineNumber]
         let nextLine = lineNumber < bankLines.count - 1 ? bankLines[lineNumber + 1] : nil
 
-        let previousScope = previousLine?.scope
-        let currentScope = currentLine.scope
-        let nextScope = nextLine?.scope
-
-        if let currentScope = currentScope {
-          if previousScope == currentScope && currentScope == nextScope {
-            // Continuation of scope.
-            let scopeRect = NSRect(
-              x: scopeColumnWidth / 2,
-              y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY,
-              width: 1,
-              height: layoutRects.pointee.height
-            )
-            scopeRect.fill()
-          } else if previousScope != currentScope && currentScope == nextScope {
-            // Starting a new scope.
-
-            if previousScope != nil {
-              // Close the previous scope.
-              NSRect(
-                x: 1,
-                y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY,
-                width: scopeColumnWidth - 2,
-                height: 1
-              ).fill()
-            }
-
-            // Start the next scope.
-            NSRect(
-              x: scopeColumnWidth / 2 - 1,
-              y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY + layoutRects.pointee.height / 2 - 1,
-              width: 3,
-              height: 3
-            ).fill()
-            NSRect(
-              x: scopeColumnWidth / 2,
-              y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY + layoutRects.pointee.height / 2,
-              width: 1,
-              height: layoutRects.pointee.height / 2
-            ).fill()
-          } else if previousScope == currentScope && currentScope != nextScope {
-            // Ending the current scope.
-
-            NSRect(
-              x: scopeColumnWidth / 2,
-              y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY,
-              width: 1,
-              height: layoutRects.pointee.height
-            ).fill()
-            // Finish the current scope.
-            NSRect(
-              x: 1,
-              y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY + layoutRects.pointee.height - 1,
-              width: scopeColumnWidth - 2,
-              height: 1
-            ).fill()
-          }
-        }
+        scopeHandler?(previousLine, currentLine, nextLine, layoutRects.pointee)
 
         // TODO: Also show the current bank and current execution context
         // TODO: Cmd+clicking labels should jump to the label
@@ -280,14 +225,79 @@ final class LineNumberView: NSRulerView {
       borderLineRect.fill()
     }
 
+    guard let textView = clientView as? NSTextView,
+          let visibleRect = scrollView?.contentView.bounds else {
+      return
+    }
     let textAttributes = self.textAttributes()
+    let textContainerInset = textView.textContainerInset
 
-    processLines(in: rect) { _, lineString, lineStringRect in
+    processLines(in: rect, scopeHandler: { (previousLine, currentLine, nextLine, layoutRect) in
+      let previousScope = previousLine?.scope
+      let currentScope = currentLine.scope
+      let nextScope = nextLine?.scope
+
+      self.backgroundColor.shadow(withLevel: 0.6)?.set()
+      if let currentScope = currentScope {
+        if previousScope == currentScope && currentScope == nextScope {
+          // Continuation of scope.
+          let scopeRect = NSRect(
+            x: scopeColumnWidth / 2,
+            y: layoutRect.minY + textContainerInset.height - visibleRect.minY,
+            width: 1,
+            height: layoutRect.height
+          )
+          scopeRect.fill()
+        } else if previousScope != currentScope && currentScope == nextScope {
+          // Starting a new scope.
+
+          if previousScope != nil {
+            // Close the previous scope.
+            NSRect(
+              x: 1,
+              y: layoutRect.minY + textContainerInset.height - visibleRect.minY,
+              width: scopeColumnWidth - 2,
+              height: 1
+            ).fill()
+          }
+
+          // Start the next scope.
+          NSRect(
+            x: scopeColumnWidth / 2 - 1,
+            y: layoutRect.minY + textContainerInset.height - visibleRect.minY + layoutRect.height / 2 - 1,
+            width: 3,
+            height: 3
+          ).fill()
+          NSRect(
+            x: scopeColumnWidth / 2,
+            y: layoutRect.minY + textContainerInset.height - visibleRect.minY + layoutRect.height / 2,
+            width: 1,
+            height: layoutRect.height / 2
+          ).fill()
+        } else if previousScope == currentScope && currentScope != nextScope {
+          // Ending the current scope.
+
+          NSRect(
+            x: scopeColumnWidth / 2,
+            y: layoutRect.minY + textContainerInset.height - visibleRect.minY,
+            width: 1,
+            height: layoutRect.height
+          ).fill()
+          // Finish the current scope.
+          NSRect(
+            x: 1,
+            y: layoutRect.minY + textContainerInset.height - visibleRect.minY + layoutRect.height - 1,
+            width: scopeColumnWidth - 2,
+            height: 1
+          ).fill()
+        }
+      }
+    }, handler: { _, lineString, lineStringRect in
       if needsToDraw(lineStringRect.insetBy(dx: -4, dy: -4)) {
         lineString.draw(with: lineStringRect, options: .usesLineFragmentOrigin, attributes: textAttributes)
       }
       return true
-    }
+    })
   }
 }
 
@@ -296,13 +306,13 @@ final class LineNumberView: NSRulerView {
 extension LineNumberView {
   private func lineNumber(at location: NSPoint) -> Int? {
     var tappedLineNumber: Int? = nil
-    processLines(in: bounds) { lineNumber, lineString, lineStringRect in
+    processLines(in: bounds, scopeHandler: nil, handler: { lineNumber, lineString, lineStringRect in
       if lineStringRect.contains(location) {
         tappedLineNumber = lineNumber
         return false
       }
       return true
-    }
+    })
     return tappedLineNumber
   }
 
