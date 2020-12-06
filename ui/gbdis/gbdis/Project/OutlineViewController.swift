@@ -38,13 +38,13 @@ final class OutlineViewController: NSViewController {
     guard let disassemblyFiles = document.disassemblyFiles else {
       return
     }
-    let children = self.treeController.arrangedObjects.children![0]
+    let children = treeController.arrangedObjects.children![0]
     children.mutableChildren.removeAllObjects()
-    for filename in disassemblyFiles.keys.sorted() {
+    disassemblyFiles.keys.sorted().reversed().forEach {
       let node = ProjectOutlineNode()
-      node.title = filename
+      node.title = $0
       node.type = .document
-      self.treeController.insert(node, atArrangedObjectIndexPath: IndexPath(indexes: [0, self.treeController.arrangedObjects.children![0].children!.count]))
+      treeController.insert(node, atArrangedObjectIndexPath: IndexPath(indexes: [0, 0]))
     }
   }
 
@@ -71,6 +71,8 @@ final class OutlineViewController: NSViewController {
     treeController.childrenKeyPath = "children"
     treeController.countKeyPath = "count"
     treeController.leafKeyPath = "isLeaf"
+    treeController.preservesSelection = true
+    treeController.selectsInsertedObjects = false
 
     treeController.bind(.contentArray,
                         to: self,
@@ -121,15 +123,27 @@ final class OutlineViewController: NSViewController {
 
     containerView.documentView = outlineView
 
-    treeControllerObserver = treeController.observe(\.selectedObjects, options: [.new]) { (treeController, change) in
-      let nodes = treeController.selectedNodes.map { OutlineViewController.node(from: $0) }
-      NotificationCenter.default.post(name: .selectedFileDidChange, object: self.document, userInfo: ["selectedNodes": nodes])
-    }
-
     populateFromDocument()
 
     // Clear any default selection.
     outlineView.deselectAll(self)
+
+    var lastSelectedObjects: [ProjectOutlineNode] = []
+    treeControllerObserver = treeController.observe(\.selectedObjects, options: [.new, .old]) { (treeController, change) in
+      precondition(treeController.selectedObjects.count <= 1, "Multiple selection not supported")
+      guard let selectedNodes = treeController.selectedObjects as? [ProjectOutlineNode] else {
+        return
+      }
+      guard lastSelectedObjects != selectedNodes else {
+        return
+      }
+      lastSelectedObjects = selectedNodes
+      NotificationCenter.default.post(
+        name: .selectedFileDidChange,
+        object: self.document,
+        userInfo: ["selectedNodes": treeController.selectedObjects]
+      )
+    }
   }
 
   private func addGroupNode(_ folderName: String, identifier: String) {

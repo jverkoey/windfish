@@ -20,8 +20,12 @@ final class ContentViewController: NSViewController {
     didSet {
       textStorage.delegate = self
       textView?.layoutManager?.replaceTextStorage(textStorage)
-      textView?.textColor = .textColor
-      textView?.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
+      textStorage.delegate?.textStorage?(
+        textStorage,
+        didProcessEditing: .editedCharacters,
+        range: NSRange(location: 0, length: textStorage.string.count),
+        changeInLength: 0
+      )
     }
   }
 
@@ -131,8 +135,13 @@ final class ContentViewController: NSViewController {
 
 extension ContentViewController: NSTextStorageDelegate {
   func textStorage(_ textStorage: NSTextStorage, didProcessEditing editedMask: NSTextStorageEditActions, range editedRange: NSRange, changeInLength delta: Int) {
-    textStorage.removeAttribute(.foregroundColor, range: editedRange)
-    textStorage.addAttributes([.foregroundColor: NSColor.textColor], range: editedRange)
+    guard editedMask == [.editedCharacters] else {
+      return
+    }
+    textStorage.addAttributes([
+      .foregroundColor: NSColor.textColor,
+      .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
+    ], range: editedRange)
 
     guard let regex = try? NSRegularExpression(pattern: ";.+$", options: [.anchorsMatchLines]) else {
       return

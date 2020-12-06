@@ -96,6 +96,7 @@ final class ProjectViewController: NSViewController {
       progressIndicator.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -7)
     ] + constraints(for: splitViewController.view, filling: containerView))
 
+    var lastSelectedFile: String? = nil
     selectedFileDidChangeSubscriber = NotificationCenter.default.publisher(for: .selectedFileDidChange, object: document)
       .receive(on: RunLoop.main)
       .sink(receiveValue: { notification in
@@ -106,6 +107,10 @@ final class ProjectViewController: NSViewController {
           self.contentViewController.textStorage = NSTextStorage(string: "")
           return
         }
+        guard lastSelectedFile != node.title else {
+          return
+        }
+        lastSelectedFile = node.title
         let string = String(data: self.document.disassemblyFiles![node.title]!, encoding: .utf8)!
         self.contentViewController.textStorage = NSTextStorage(string: string)
 
