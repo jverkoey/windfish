@@ -101,6 +101,30 @@ extension LR35902.Disassembly {
     case unknown(RGBDSAssembly.Statement, LR35902.Address, String?, String)
     case global(RGBDSAssembly.Statement, LR35902.Address, String)
 
+    public var address: LR35902.Address? {
+      switch self {
+      case .newline: fallthrough
+      case .empty: fallthrough
+      case .label: fallthrough
+      case .section: fallthrough
+      case .macroComment: fallthrough
+      case .preComment: fallthrough
+      case .transferOfControl: fallthrough
+      case .macroInstruction: fallthrough
+      case .macroDefinition: fallthrough
+      case .macroTerminator:
+        return nil
+
+      case let .instruction(_, _, address, _, _, _): fallthrough
+      case let .macro(_, address, _, _, _): fallthrough
+      case let .data(_, address): fallthrough
+      case let .jumpTable(_, address, _, _): fallthrough
+      case let .unknown(_, address, _, _): fallthrough
+      case let .global(_, address, _):
+        return address
+      }
+    }
+
     public var description: String {
       switch self {
       case .newline:                           return ""
@@ -246,20 +270,19 @@ clean:
     for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
       var bankLines: [Line] = []
       defer {
-        sources["bank_\(bank.hexString).asm"] = .bank(number: bank, content: linesAsString(bankLines), lines: bankLines)
+        var lastLine: Line?
+        let filteredBankLines = bankLines.filter { thisLine in
+          if let lastLine = lastLine, lastLine == .empty && thisLine == .empty {
+            return false
+          }
+          lastLine = thisLine
+          return true
+        }
+        sources["bank_\(bank.hexString).asm"] = .bank(number: bank, content: linesAsString(filteredBankLines), lines: filteredBankLines)
       }
 
       let linesAsString: ([Line]) -> String = { lines in
-        var data = ""
-        var lastLine: Line?
-        lines.forEach { thisLine in
-          if let lastLine = lastLine, lastLine == .empty && thisLine == .empty {
-            return
-          }
-          data += thisLine.asString
-          lastLine = thisLine
-        }
-        return data
+        return lines.map { $0.description }.joined(separator: "\n")
       }
 
       bankLines.append(.section(bank))

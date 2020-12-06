@@ -17,6 +17,7 @@
 		665D4FAE257727CA00C3A03B /* HorizontalLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4FAD257727CA00C3A03B /* HorizontalLine.swift */; };
 		66763D732579F26000824278 /* RegionInspectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66763D722579F26000824278 /* RegionInspectorViewController.swift */; };
 		66763D80257AF38200824278 /* LR35902AddressFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66763D7F257AF38200824278 /* LR35902AddressFormatter.swift */; };
+		66763D97257C0D4900824278 /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66763D96257C0D4900824278 /* TextView.swift */; };
 		667B1B632578541F00CE670F /* NotificationNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1B622578541F00CE670F /* NotificationNames.swift */; };
 		667B1B75257854BB00CE670F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 667B1B72257854BB00CE670F /* Assets.xcassets */; };
 		667B1B8B2578554600CE670F /* ProjectOutlineNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1B8A2578554600CE670F /* ProjectOutlineNode.swift */; };
@@ -119,6 +120,7 @@
 		665D4FAD257727CA00C3A03B /* HorizontalLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalLine.swift; sourceTree = "<group>"; };
 		66763D722579F26000824278 /* RegionInspectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionInspectorViewController.swift; sourceTree = "<group>"; };
 		66763D7F257AF38200824278 /* LR35902AddressFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LR35902AddressFormatter.swift; sourceTree = "<group>"; };
+		66763D96257C0D4900824278 /* TextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
 		667B1B622578541F00CE670F /* NotificationNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationNames.swift; sourceTree = "<group>"; };
 		667B1B72257854BB00CE670F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		667B1B73257854BB00CE670F /* gbdis.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = gbdis.entitlements; sourceTree = "<group>"; };
@@ -188,7 +190,6 @@
 		665D4F572575F75400C3A03B /* gbdis */ = {
 			isa = PBXGroup;
 			children = (
-				66763D87257B2DD800824278 /* CellViews */,
 				66763D7E257AF37900824278 /* Formatters */,
 				667B1BE425787ACE00CE670F /* gbdisui-Bridging-Header.h */,
 				667B1B982578559600CE670F /* AutoLayout */,
@@ -232,7 +233,9 @@
 		665D4FAC257727C000C3A03B /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				66763D87257B2DD800824278 /* CellViews */,
 				665D4FAD257727CA00C3A03B /* HorizontalLine.swift */,
+				66763D96257C0D4900824278 /* TextView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -511,6 +514,7 @@
 				667B1B632578541F00CE670F /* NotificationNames.swift in Sources */,
 				667B1B8B2578554600CE670F /* ProjectOutlineNode.swift in Sources */,
 				665D4F592575F75400C3A03B /* AppDelegate.swift in Sources */,
+				66763D97257C0D4900824278 /* TextView.swift in Sources */,
 				665D4F8D2575F92500C3A03B /* main.swift in Sources */,
 				667B1BAE2578565A00CE670F /* OutlineViewController.swift in Sources */,
 				665D4F5D2575F75400C3A03B /* ProjectDocument.swift in Sources */,
@@ -682,6 +686,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = gbdis/Resources/gbdis.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 69Y7ARDN28;
@@ -706,6 +711,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = gbdis/Resources/gbdis.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 69Y7ARDN28;
