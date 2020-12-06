@@ -138,6 +138,7 @@ extension ContentViewController: NSTextStorageDelegate {
     guard editedMask == [.editedCharacters] else {
       return
     }
+    textStorage.beginEditing()
     textStorage.addAttributes([
       .foregroundColor: NSColor.textColor,
       .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
@@ -153,7 +154,7 @@ extension ContentViewController: NSTextStorageDelegate {
       textStorage.addAttributes([.foregroundColor: NSColor.systemGray], range: result.range)
     }
 
-    try? NSRegularExpression(pattern: "^[^;]+:", options: [.anchorsMatchLines])
+    try? NSRegularExpression(pattern: "^[^;\\n]+:", options: [.anchorsMatchLines])
       .enumerateMatches(in: textStorage.string, options: [], range: editedRange) { result, flags, out in
         guard let result = result else {
           return
@@ -168,6 +169,7 @@ extension ContentViewController: NSTextStorageDelegate {
         }
         textStorage.addAttributes([.foregroundColor: NSColor.systemGreen], range: result.range)
       }
+    textStorage.endEditing()
   }
 }
 
