@@ -72,85 +72,51 @@ func prettify(_ label: String) -> String {
 }
 
 extension LR35902.Disassembly {
-  public enum Line: Equatable, CustomStringConvertible {
-    case newline
-    case empty
-    case macroComment(String)
-    case preComment(String)
-    case label(String, String)
-    case section(LR35902.Bank)
-    case transferOfControl(Set<TransferOfControl>, String)
-    case instruction(LR35902.Instruction, RGBDSAssembly.Statement, LR35902.Address, LR35902.Bank, String, Data)
-    case macroInstruction(LR35902.Instruction, RGBDSAssembly.Statement)
-    case macro(String, LR35902.Address, LR35902.Bank, String, Data)
-    case macroDefinition(String)
-    case macroTerminator
-    case data(RGBDSAssembly.Statement, LR35902.Address)
-    case jumpTable(String, LR35902.Address, Int, Data)
-    case unknown(RGBDSAssembly.Statement, LR35902.Address, String?, String)
-    case global(RGBDSAssembly.Statement, LR35902.Address, String)
-
-    public var address: LR35902.Address? {
-      switch self {
-      case .newline: fallthrough
-      case .empty: fallthrough
-      case .label: fallthrough
-      case .section: fallthrough
-      case .macroComment: fallthrough
-      case .preComment: fallthrough
-      case .transferOfControl: fallthrough
-      case .macroInstruction: fallthrough
-      case .macroDefinition: fallthrough
-      case .macroTerminator:
-        return nil
-
-      case let .instruction(_, _, address, _, _, _): fallthrough
-      case let .macro(_, address, _, _, _): fallthrough
-      case let .data(_, address): fallthrough
-      case let .jumpTable(_, address, _, _): fallthrough
-      case let .unknown(_, address, _, _): fallthrough
-      case let .global(_, address, _):
-        return address
-      }
+  public struct Line: Equatable {
+    public enum Semantic: Equatable {
+      case newline
+      case empty
+      case macroComment(String)
+      case preComment(String)
+      case label(String)
+      case section
+      case transferOfControl(Set<TransferOfControl>, String)
+      case instruction(LR35902.Instruction, RGBDSAssembly.Statement, Data)
+      case macroInstruction(LR35902.Instruction, RGBDSAssembly.Statement)
+      case macro(String, Data)
+      case macroDefinition(String)
+      case macroTerminator
+      case data(RGBDSAssembly.Statement)
+      case jumpTable(String, Int, Data)
+      case unknown(RGBDSAssembly.Statement, String?, String)
+      case global(RGBDSAssembly.Statement, String)
     }
 
-    public var scope: String? {
-      switch self {
-      case .newline: fallthrough
-      case .empty: fallthrough
-      case .section: fallthrough
-      case .macroComment: fallthrough
-      case .preComment: fallthrough
-      case .transferOfControl: fallthrough
-      case .macroInstruction: fallthrough
-      case .macroDefinition: fallthrough
-      case .macroTerminator: fallthrough
-      case .data: fallthrough
-      case .jumpTable: fallthrough
-      case .unknown: fallthrough
-      case .global:
-        return nil
-
-      case let .label(_, scope): fallthrough
-      case let .instruction(_, _, _, _, scope, _): fallthrough
-      case let .macro(_, _, _, scope, _):
-        return scope.count > 0 ? scope : nil
-      }
+    init(semantic: Semantic, address: LR35902.Address? = nil, bank: LR35902.Bank? = nil, scope: String? = nil) {
+      self.semantic = semantic
+      self.address = address
+      self.bank = bank
+      self.scope = scope
     }
+
+    public let semantic: Semantic
+    public let address: LR35902.Address?
+    public let bank: LR35902.Bank?
+    public let scope: String?
 
     func asString(detailedComments: Bool) -> String {
-      switch self {
+      switch semantic {
       case .newline:                           return ""
 
       case .empty:                             return ""
 
-      case let .label(label, _):               return "\(prettify(label)):"
+      case let .label(label):                  return "\(prettify(label)):"
 
-      case let .section(bank):
+      case .section:
         if bank == 0 {
-          return "SECTION \"ROM Bank \(bank.hexString)\", ROM0[$\(bank.hexString)]"
+          return "SECTION \"ROM Bank \(bank!.hexString)\", ROM0[$\(bank!.hexString)]"
         } else {
-          return "SECTION \"ROM Bank \(bank.hexString)\", ROMX[$4000], BANK[$\(bank.hexString)]"
+          return "SECTION \"ROM Bank \(bank!.hexString)\", ROMX[$4000], BANK[$\(bank!.hexString)]"
         }
       case let .macroComment(comment):         return "; \(comment)"
 
@@ -166,50 +132,50 @@ extension LR35902.Disassembly {
           .joined(separator: ", ")
         return line("\(label):", comment: "Sources: \(sources)")
 
-      case let .instruction(_, assembly, address, bank, scope, bytes):
+      case let .instruction(_, assembly, bytes):
         if detailedComments {
-          return line(assembly.description, address: address, bank: bank, scope: scope, bytes: bytes)
+          return line(assembly.description, address: address!, bank: bank!, scope: scope!, bytes: bytes)
         } else {
-          return line(assembly.description, bank: bank, bytes: bytes)
+          return line(assembly.description, bank: bank!, bytes: bytes)
         }
 
       case let .macroInstruction(_, assembly): return line(assembly.description)
 
-      case let .macro(assembly, address, bank, scope, bytes):
+      case let .macro(assembly, bytes):
         if detailedComments {
-          return line(assembly, address: address, bank: bank, scope: scope, bytes: bytes)
+          return line(assembly, address: address!, bank: bank!, scope: scope!, bytes: bytes)
         } else {
-          return line(assembly, bank: bank, bytes: bytes)
+          return line(assembly, bank: bank!, bytes: bytes)
         }
 
       case let .macroDefinition(name):         return "\(name): MACRO"
 
       case .macroTerminator:                   return line("ENDM")
 
-      case let .data(statement, address):
+      case let .data(statement):
         if detailedComments {
-          return line(statement.description, address: address, addressType: "text")
+          return line(statement.description, address: address!, addressType: "text")
         } else {
           return line(statement.description, addressType: "text")
         }
 
-      case let .jumpTable(jumpLocation, address, index, bytes):
+      case let .jumpTable(jumpLocation, index, bytes):
         if detailedComments {
-          return line("dw \(jumpLocation)", address: address, addressType: "jumpTable [\(index)]", comment: "\(bytes.map { "$\($0.hexString)" }.joined(separator: " "))")
+          return line("dw \(jumpLocation)", address: address!, addressType: "jumpTable [\(index)]", comment: "\(bytes.map { "$\($0.hexString)" }.joined(separator: " "))")
         } else {
           return line("dw \(jumpLocation)", addressType: "jumpTable [\(index)]", comment: "\(bytes.map { "$\($0.hexString)" }.joined(separator: " "))")
         }
 
-      case let .unknown(statement, address, addressType, bytesAsCharacters):
+      case let .unknown(statement, addressType, bytesAsCharacters):
         if detailedComments {
-          return line(statement.description, address: address, addressType: addressType, comment: "|\(bytesAsCharacters)|")
+          return line(statement.description, address: address!, addressType: addressType, comment: "|\(bytesAsCharacters)|")
         } else {
           return line(statement.description, addressType: addressType, comment: "|\(bytesAsCharacters)|")
         }
 
-      case let .global(statement, address, addressType):
+      case let .global(statement, addressType):
         if detailedComments {
-          return line(statement.description, address: address, addressType: addressType)
+          return line(statement.description, address: address!, addressType: addressType)
         } else {
           return line(statement.description, addressType: addressType)
         }
@@ -325,7 +291,7 @@ clean:
       defer {
         var lastLine: Line?
         let filteredBankLines = bankLines.filter { thisLine in
-          if let lastLine = lastLine, lastLine == .empty && thisLine == .empty {
+          if let lastLine = lastLine, lastLine.semantic == .empty && thisLine.semantic == .empty {
             return false
           }
           lastLine = thisLine
@@ -338,7 +304,7 @@ clean:
         return lines.map { $0.asString(detailedComments: false) }.joined(separator: "\n")
       }
 
-      bankLines.append(.section(bank))
+      bankLines.append(Line(semantic: .section, bank: bank))
 
       cpu.pc = (bank == 0) ? 0x0000 : 0x4000
       cpu.bank = bank
@@ -346,7 +312,7 @@ clean:
 
       var lineBufferAddress: LR35902.Address = cpu.pc
       var lineBuffer: [Line] = []
-      lineBuffer.append(.empty)
+      lineBuffer.append(Line(semantic: .empty))
       var macroNode: MacroNode? = nil
 
       let flush = {
@@ -386,7 +352,7 @@ clean:
         // No further nodes to be traversed; is this the end of a macro?
         if !macroNodeIterator.macros.isEmpty {
           let instructions = lineBuffer.compactMap { thisLine -> (LR35902.Instruction, RGBDSAssembly.Statement)? in
-            if case let .instruction(instruction, assembly, _, _, _, _) = thisLine {
+            if case let .instruction(instruction, assembly, _) = thisLine.semantic {
               return (instruction, assembly)
             } else {
               return nil
@@ -471,9 +437,9 @@ clean:
               }
 
               var lines: [Line] = []
-              lines.append(.empty)
+              lines.append(Line(semantic: .empty))
               if !macro.arguments.isEmpty {
-                lines.append(.macroComment("Arguments:"))
+                lines.append(Line(semantic: .macroComment("Arguments:")))
 
                 let macroSpecs: [LR35902.Instruction.Spec] = macro.macro.macroLines.map { $0.spec() }
 
@@ -500,13 +466,13 @@ clean:
                     let ranges = validation.rangeView.map {
                       "$\(LR35902.Address($0.lowerBound).hexString)..<$\(LR35902.Address($0.upperBound).hexString)"
                     }.joined(separator: ", ")
-                    lines.append(.macroComment("- \(argNumber)\(argType): valid values in \(ranges)"))
+                    lines.append(Line(semantic: .macroComment("- \(argNumber)\(argType): valid values in \(ranges)")))
                   } else {
-                    lines.append(.macroComment("- \(argNumber)\(argType)"))
+                    lines.append(Line(semantic: .macroComment("- \(argNumber)\(argType)")))
                   }
                 }
               }
-              lines.append(.macroDefinition(macro.macro.name))
+              lines.append(Line(semantic: .macroDefinition(macro.macro.name)))
               lines.append(contentsOf: zip(macro.macro.macroLines, instructions).map { line, instruction in
                 var macroInstruction = instruction.0
                 macroInstruction.spec = line.spec()
@@ -523,9 +489,9 @@ clean:
                   argumentString = nil
                 }
                 let macroAssembly = RGBDSAssembly.assembly(for: macroInstruction, with: self, argumentString: argumentString)
-                return .macroInstruction(macroInstruction, macroAssembly)
+                return Line(semantic: .macroInstruction(macroInstruction, macroAssembly))
               })
-              lines.append(.macroTerminator)
+              lines.append(Line(semantic: .macroTerminator))
               macrosAsm?.append(linesAsString(lines))
 
               macro.macro.hasWritten = true
@@ -537,17 +503,20 @@ clean:
 
             let macroArgs = macro.arguments.keys.sorted().map { macro.arguments[$0]! }.joined(separator: ", ")
 
-            let firstInstruction = lineBuffer.firstIndex { line in if case .instruction = line { return true } else { return false} }!
-            let lastInstruction = lineBuffer.lastIndex { line in if case .instruction = line { return true } else { return false} }!
+            let firstInstruction = lineBuffer.firstIndex { line in if case .instruction = line.semantic { return true } else { return false} }!
+            let lastInstruction = lineBuffer.lastIndex { line in if case .instruction = line.semantic { return true } else { return false} }!
             let bank: LR35902.Bank
-            if case let .instruction(_, _, _, instructionBank, _, _) = lineBuffer[lastInstruction] {
-              bank = instructionBank
+            if case .instruction = lineBuffer[lastInstruction].semantic {
+              bank = lineBuffer[lastInstruction].bank!
             } else {
               bank = self.cpu.bank
             }
             let macroScopes = self.labeledContiguousScopes(at: lineBufferAddress, in: bank).map { $0.label }
             lineBuffer.replaceSubrange(firstInstruction...lastInstruction,
-                                       with: [.macro("\(macro.macro.name) \(macroArgs)", lineBufferAddress, bank, macroScopes.sorted().joined(separator: ", "), bytes)])
+                                       with: [Line(semantic: .macro("\(macro.macro.name) \(macroArgs)", bytes),
+                                                   address: lineBufferAddress,
+                                                   bank: bank,
+                                                   scope: macroScopes.sorted().joined(separator: ", "))])
 
             if let action = macro.macro.action {
               action(macro.arguments, lineBufferAddress, bank)
@@ -566,16 +535,16 @@ clean:
         var isLabeled = false
         var lineGroup: [Line] = []
         if let preComment = preComment(at: cpu.pc, in: bank) {
-          lineGroup.append(.empty)
-          lineGroup.append(.preComment(preComment))
+          lineGroup.append(Line(semantic: .empty))
+          lineGroup.append(Line(semantic: .preComment(preComment)))
         }
         if let label = label(at: cpu.pc, in: bank) {
           if let transfersOfControl = transfersOfControl(at: cpu.pc, in: bank) {
-            lineGroup.append(.transferOfControl(transfersOfControl, label))
+            lineGroup.append(Line(semantic: .transferOfControl(transfersOfControl, label)))
           } else {
             let instructionScope = labeledContiguousScopes(at: cpu.pc, in: bank).map { $0.label }
-            lineGroup.append(.empty)
-            lineGroup.append(.label(label, instructionScope.sorted().joined(separator: ", ")))
+            lineGroup.append(Line(semantic: .empty))
+            lineGroup.append(Line(semantic: .label(label), scope: instructionScope.sorted().joined(separator: ", ")))
           }
           isLabeled = true
         }
@@ -593,7 +562,10 @@ clean:
           let instructionWidth = LR35902.Instruction.widths[instruction.spec]!.total
           let bytes = cpu[index..<(index + LR35902.CartridgeLocation(instructionWidth))]
           let instructionScope = labeledContiguousScopes(at: cpu.pc, in: bank).map { $0.label }
-          lineGroup.append(.instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: self), cpu.pc, cpu.bank, instructionScope.sorted().joined(separator: ", "), bytes))
+          lineGroup.append(Line(semantic: .instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: self), bytes),
+                                address: cpu.pc,
+                                bank: cpu.bank,
+                                scope: instructionScope.sorted().joined(separator: ", ")))
 
           cpu.pc += instructionWidth
 
@@ -613,19 +585,19 @@ clean:
           // Handle context changes.
           switch instruction.spec {
           case .jp(let condition, _), .jr(let condition, _):
-            lineGroup.append(.empty)
+            lineGroup.append(Line(semantic: .empty))
             if condition == nil {
               cpu.bank = bank
             }
           case .ret(let condition):
-            lineGroup.append(.newline)
+            lineGroup.append(Line(semantic: .newline))
             if condition == nil {
-              lineGroup.append(.empty)
+              lineGroup.append(Line(semantic: .empty))
               cpu.bank = bank
             }
           case .reti:
-            lineGroup.append(.newline)
-            lineGroup.append(.empty)
+            lineGroup.append(Line(semantic: .newline))
+            lineGroup.append(Line(semantic: .empty))
             cpu.bank = bank
           default:
             break
@@ -697,7 +669,7 @@ clean:
                 jumpLocation = "$\(address.hexString)"
               }
               let bytes = cpu[LR35902.cartridgeLocation(for: chunkPc, in: bank)!..<(LR35902.cartridgeLocation(for: chunkPc, in: bank)! + 2)]
-              bankLines.append(.jumpTable(jumpLocation, chunkPc, index, bytes))
+              bankLines.append(Line(semantic: .jumpTable(jumpLocation, index, bytes), address: chunkPc))
               chunkPc += LR35902.Address(pair.count)
             }
             break
@@ -707,7 +679,7 @@ clean:
             for chunk in accumulator.chunked(into: 8) {
               let displayableBytes = chunk.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
               let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
-              bankLines.append(.unknown(RGBDSAssembly.statement(for: chunk), chunkPc, addressType, bytesAsCharacters))
+              bankLines.append(Line(semantic: .unknown(RGBDSAssembly.statement(for: chunk), addressType, bytesAsCharacters), address: chunkPc))
               chunkPc += LR35902.Address(chunk.count)
             }
           }
@@ -715,10 +687,10 @@ clean:
           if let global = global,
              let dataType = global.dataType,
              let globalValue = globalValue {
-            bankLines.append(.global(RGBDSAssembly.statement(for: globalValue), chunkPc, dataType))
+            bankLines.append(Line(semantic: .global(RGBDSAssembly.statement(for: globalValue), dataType), address: chunkPc))
           }
 
-          lineBuffer.append(.empty)
+          lineBuffer.append(Line(semantic: .empty))
           lineBufferAddress = cpu.pc
           cpu.bank = bank
         }

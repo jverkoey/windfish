@@ -69,7 +69,7 @@ public final class RGBDSAssembly {
     if asciiCharacterAccumulator.count > 0 {
       accumulator.append("\"\(flatten(asciiCodes: asciiCharacterAccumulator, characterMap: characterMap))\"")
     }
-    return .data(Statement(opcode: "db", operands: accumulator), address)
+    return LR35902.Disassembly.Line(semantic: .data(Statement(opcode: "db", operands: accumulator)), address: address)
   }
 
   private static func typedValue(for imm8: UInt8, with representation: LR35902.Disassembly.Datatype.Representation) -> String {
