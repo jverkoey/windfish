@@ -114,6 +114,30 @@ extension LR35902.Disassembly {
       }
     }
 
+    public var scope: String? {
+      switch self {
+      case .newline: fallthrough
+      case .empty: fallthrough
+      case .label: fallthrough
+      case .section: fallthrough
+      case .macroComment: fallthrough
+      case .preComment: fallthrough
+      case .transferOfControl: fallthrough
+      case .macroInstruction: fallthrough
+      case .macroDefinition: fallthrough
+      case .macroTerminator: fallthrough
+      case .data: fallthrough
+      case .jumpTable: fallthrough
+      case .unknown: fallthrough
+      case .global:
+        return nil
+
+      case let .instruction(_, _, _, _, scope, _): fallthrough
+      case let .macro(_, _, _, scope, _):
+        return scope.count > 0 ? scope : nil
+      }
+    }
+
     func asString(addressInComments: Bool) -> String {
       switch self {
       case .newline:                           return ""

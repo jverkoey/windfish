@@ -14,6 +14,8 @@ protocol LineNumberViewDelegate: NSObject {
   func lineNumberView(_ lineNumberView: LineNumberView, didActivate lineNumber: Int)
 }
 
+private let scopeColumnWidth: CGFloat = 8
+
 final class LineNumberView: NSRulerView {
   var bankLines: [LR35902.Disassembly.Line]?
   weak var delegate: LineNumberViewDelegate?
@@ -90,7 +92,7 @@ final class LineNumberView: NSRulerView {
     lineInformationValid = true
 
     let digitSize = NSString("0000").size(withAttributes: textAttributes())
-    ruleThickness = max(ceil(digitSize.width + 8), 10)
+    ruleThickness = max(ceil(digitSize.width + 4) + scopeColumnWidth, 10)
   }
 
   override func viewWillDraw() {
@@ -153,6 +155,7 @@ final class LineNumberView: NSRulerView {
     var layoutRectCount: Int = 0
     withUnsafeMutablePointer(to: &layoutRectCount) { layoutRectCount in
       var characterIndex = visibleCharacterRange.location
+
       while characterIndex < (visibleCharacterRange.location + visibleCharacterRange.length) {
         let lineNumber = lineIndex(for: characterIndex)
         if lineNumber == NSNotFound {
@@ -166,6 +169,80 @@ final class LineNumberView: NSRulerView {
           rectCount: layoutRectCount
         ), layoutRectCount.pointee > 0 else {
           break
+        }
+
+        let previousLine = lineNumber > 0 ? bankLines[lineNumber - 1] : nil
+        let currentLine = bankLines[lineNumber]
+        let nextLine = lineNumber < bankLines.count - 1 ? bankLines[lineNumber + 1] : nil
+
+        let previousScope = previousLine?.scope
+        let currentScope = currentLine.scope
+        let nextScope = nextLine?.scope
+
+        if let currentScope = currentScope {
+          if previousScope == currentScope && currentScope == nextScope {
+            // Continuation of scope.
+            let scopeRect = NSRect(
+              x: scopeColumnWidth / 2,
+              y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY,
+              width: 1,
+              height: layoutRects.pointee.height
+            )
+            scopeRect.fill()
+          } else if previousScope != currentScope && currentScope == nextScope {
+            // Starting a new scope.
+
+            if previousScope != nil {
+              // Close the previous scope.
+              NSRect(
+                x: 1,
+                y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY,
+                width: scopeColumnWidth - 2,
+                height: 1
+              ).fill()
+            }
+
+            // Start the next scope.
+            NSRect(
+              x: scopeColumnWidth / 2 - 1,
+              y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY + layoutRects.pointee.height / 2 - 1,
+              width: 3,
+              height: 3
+            ).fill()
+            NSRect(
+              x: scopeColumnWidth / 2,
+              y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY + layoutRects.pointee.height / 2,
+              width: 1,
+              height: layoutRects.pointee.height / 2
+            ).fill()
+          } else if previousScope == currentScope && currentScope != nextScope {
+            // Ending the current scope.
+
+            NSRect(
+              x: scopeColumnWidth / 2,
+              y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY,
+              width: 1,
+              height: layoutRects.pointee.height / 2
+            ).fill()
+            // Finish the current scope.
+            NSRect(
+              x: 1,
+              y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY + layoutRects.pointee.height / 2,
+              width: scopeColumnWidth - 2,
+              height: 1
+            ).fill()
+
+            if nextScope != nil {
+              // Start the next scope.
+              NSRect(
+                x: 1,
+                y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY + layoutRects.pointee.height - 1,
+                width: scopeColumnWidth - 2,
+                height: 1
+              ).fill()
+            }
+
+          }
         }
 
         // TODO: Also show the current bank and current execution context
@@ -239,6 +316,18 @@ extension LineNumberView {
     }
     return tappedLineNumber
   }
+
+// https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/EventOverview/MouseTrackingEvents/MouseTrackingEvents.html
+//  override func mouseMoved(with event: NSEvent) {
+//    super.mouseDown(with: event)
+//
+//    let location = self.convert(event.locationInWindow, from: nil)
+//    if lineNumber(at: location) != nil {
+//      NSCursor.pointingHand.set()
+//    } else {
+//      NSCursor.arrow.set()
+//    }
+//  }
 
   override func mouseDown(with event: NSEvent) {
     super.mouseDown(with: event)
