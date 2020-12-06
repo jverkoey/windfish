@@ -78,6 +78,7 @@ final class ContentViewController: NSViewController {
 
     let lineNumbersRuler = LineNumberView(scrollView: containerView, orientation: .verticalRuler)
     lineNumbersRuler.clientView = textView
+    lineNumbersRuler.delegate = self
     containerView.verticalRulerView = lineNumbersRuler
     containerView.rulersVisible = true
     self.lineNumbersRuler = lineNumbersRuler
@@ -142,5 +143,27 @@ extension ContentViewController: NSTextStorageDelegate {
       }
       textStorage.addAttributes([.foregroundColor: NSColor.systemGray], range: result.range)
     }
+  }
+}
+
+extension ContentViewController: LineNumberViewDelegate {
+  func lineNumberView(_ lineNumberView: LineNumberView, didActivate lineNumber: Int) {
+    guard let bankLines = lineNumbersRuler?.bankLines else {
+      return
+    }
+    guard let address = bankLines[lineNumber].address else {
+      return
+    }
+    let iterator = bankLines.makeIterator().dropFirst(lineNumber + 1)
+
+    let range: HFRange
+    if let nextLineAddress = iterator.first(where: { $0.address != nil })?.address {
+      range = HFRange(location: UInt64(address), length: UInt64(nextLineAddress - address))
+    } else {
+      range = HFRange(location: UInt64(address), length: 1)
+    }
+    hexViewController.hexController.centerContentsRange(range)
+    hexViewController.hexController.selectedContentsRanges = [HFRangeWrapper.withRange(range)]
+    hexViewController.hexController.pulseSelection()
   }
 }

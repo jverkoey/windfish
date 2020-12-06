@@ -10,8 +10,13 @@ import Cocoa
 import LR35902
 import Combine
 
+protocol LineNumberViewDelegate: NSObject {
+  func lineNumberView(_ lineNumberView: LineNumberView, didActivate lineNumber: Int)
+}
+
 final class LineNumberView: NSRulerView {
   var bankLines: [LR35902.Disassembly.Line]?
+  weak var delegate: LineNumberViewDelegate?
 
   private let font = NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
   private let textColor = NSColor.systemGray
@@ -20,6 +25,7 @@ final class LineNumberView: NSRulerView {
   private var numberOfLines: Int?
   private var lineStartCharacterIndices: UnsafeMutablePointer<Int>?
   private var didProcessEditingSubscriber: AnyCancellable?
+  private var tappedLineNumber: Int?
 
   deinit {
     lineStartCharacterIndices?.deallocate()
@@ -122,20 +128,7 @@ final class LineNumberView: NSRulerView {
     return NSNotFound
   }
 
-  override func drawHashMarksAndLabels(in rect: NSRect) {
-    guard self.orientation == .verticalRuler else {
-      preconditionFailure()
-    }
-
-    backgroundColor.set()
-    rect.fill()
-
-    let borderLineRect = NSRect(x: bounds.maxX - 1, y: 0, width: 1, height: bounds.height)
-    if needsToDraw(borderLineRect) {
-      backgroundColor.shadow(withLevel: 0.4)?.set()
-      borderLineRect.fill()
-    }
-
+  func processLines(in rect: NSRect, handler: (Int, NSString, NSRect) -> Bool) {
     guard let textView = clientView as? NSTextView else {
       return
     }
@@ -150,7 +143,7 @@ final class LineNumberView: NSRulerView {
     }
     let textString = NSString(string: storageString)
     let textContainerInset = textView.textContainerInset
-    let rightMostDrawableLocation = borderLineRect.minX
+    let rightMostDrawableLocation = borderLineRect().minX
 
     let visibleGlyphGrange = layoutManager.glyphRange(forBoundingRect: visibleRect, in: textContainer)
     let visibleCharacterRange = layoutManager.characterRange(forGlyphRange: visibleGlyphGrange, actualGlyphRange: nil)
@@ -185,8 +178,10 @@ final class LineNumberView: NSRulerView {
             height: lineStringSize.height
           )
 
-          if needsToDraw(lineStringRect.insetBy(dx: -4, dy: -4)) && lineStringRect.minY != lastLinePositionY {
-            lineString.draw(with: lineStringRect, options: .usesLineFragmentOrigin, attributes: textAttributes)
+          if lineStringRect.minY != lastLinePositionY {
+            if !handler(lineNumber, lineString, lineStringRect) {
+              break
+            }
           }
 
           lastLinePositionY = lineStringRect.minY
@@ -196,6 +191,69 @@ final class LineNumberView: NSRulerView {
           textString.getLineStart(nil, end: pointer, contentsEnd: nil, for: characterRange)
         }
       }
+    }
+  }
+
+  private func borderLineRect() -> NSRect {
+    return NSRect(x: bounds.maxX - 1, y: 0, width: 1, height: bounds.height)
+  }
+
+  override func drawHashMarksAndLabels(in rect: NSRect) {
+    guard self.orientation == .verticalRuler else {
+      preconditionFailure()
+    }
+
+    backgroundColor.set()
+    rect.fill()
+
+    let borderLineRect = self.borderLineRect()
+    if needsToDraw(borderLineRect) {
+      backgroundColor.shadow(withLevel: 0.4)?.set()
+      borderLineRect.fill()
+    }
+
+    let textAttributes = self.textAttributes()
+
+    processLines(in: rect) { _, lineString, lineStringRect in
+      if needsToDraw(lineStringRect.insetBy(dx: -4, dy: -4)) {
+        lineString.draw(with: lineStringRect, options: .usesLineFragmentOrigin, attributes: textAttributes)
+      }
+      return true
+    }
+  }
+}
+
+// MARK: - User interaction
+
+extension LineNumberView {
+  private func lineNumber(at location: NSPoint) -> Int? {
+    var tappedLineNumber: Int? = nil
+    processLines(in: bounds) { lineNumber, lineString, lineStringRect in
+      if lineStringRect.contains(location) {
+        tappedLineNumber = lineNumber
+        return false
+      }
+      return true
+    }
+    return tappedLineNumber
+  }
+
+  override func mouseDown(with event: NSEvent) {
+    super.mouseDown(with: event)
+
+    let location = self.convert(event.locationInWindow, from: nil)
+    self.tappedLineNumber = lineNumber(at: location)
+  }
+
+  override func mouseUp(with event: NSEvent) {
+    super.mouseUp(with: event)
+
+    guard let tappedLineNumber = tappedLineNumber else {
+      return
+    }
+    let location = self.convert(event.locationInWindow, from: nil)
+    if lineNumber(at: location) == tappedLineNumber {
+      delegate?.lineNumberView(self, didActivate: tappedLineNumber)
     }
   }
 }

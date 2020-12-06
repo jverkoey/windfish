@@ -26,6 +26,8 @@ final class HexViewController: NSViewController {
   init() {
     hexController.editable = false
 
+    hexController.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
+
     let lineRepresenter = LineCountingRepresenter()
     lineRepresenter.lineNumberFormat = .hexadecimal
     lineRepresenter.minimumDigitCount = 4
