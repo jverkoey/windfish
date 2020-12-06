@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		66521DA9257C996B0088C97B /* LineNumberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66521DA8257C996B0088C97B /* LineNumberView.swift */; };
 		665D4F592575F75400C3A03B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F582575F75400C3A03B /* AppDelegate.swift */; };
 		665D4F5B2575F75400C3A03B /* ProjectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F5A2575F75400C3A03B /* ProjectViewController.swift */; };
 		665D4F5D2575F75400C3A03B /* ProjectDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F5C2575F75400C3A03B /* ProjectDocument.swift */; };
@@ -105,6 +106,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		66521DA8257C996B0088C97B /* LineNumberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineNumberView.swift; sourceTree = "<group>"; };
 		665D4F552575F75400C3A03B /* gbdisui.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = gbdisui.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		665D4F582575F75400C3A03B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		665D4F5A2575F75400C3A03B /* ProjectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectViewController.swift; sourceTree = "<group>"; };
@@ -236,6 +238,7 @@
 				66763D87257B2DD800824278 /* CellViews */,
 				665D4FAD257727CA00C3A03B /* HorizontalLine.swift */,
 				66763D96257C0D4900824278 /* TextView.swift */,
+				66521DA8257C996B0088C97B /* LineNumberView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -504,6 +507,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				667B1B9A257855AE00CE670F /* CommonConstraints.swift in Sources */,
+				66521DA9257C996B0088C97B /* LineNumberView.swift in Sources */,
 				667B1B912578557D00CE670F /* URL+localizedName.swift in Sources */,
 				667B1B9F2578560A00CE670F /* TextTableCellView.swift in Sources */,
 				66763D80257AF38200824278 /* LR35902AddressFormatter.swift in Sources */,
