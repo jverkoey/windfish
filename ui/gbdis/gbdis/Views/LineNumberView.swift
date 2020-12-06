@@ -222,26 +222,15 @@ final class LineNumberView: NSRulerView {
               x: scopeColumnWidth / 2,
               y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY,
               width: 1,
-              height: layoutRects.pointee.height / 2
+              height: layoutRects.pointee.height
             ).fill()
             // Finish the current scope.
             NSRect(
               x: 1,
-              y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY + layoutRects.pointee.height / 2,
+              y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY + layoutRects.pointee.height - 1,
               width: scopeColumnWidth - 2,
               height: 1
             ).fill()
-
-            if nextScope != nil {
-              // Start the next scope.
-              NSRect(
-                x: 1,
-                y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY + layoutRects.pointee.height - 1,
-                width: scopeColumnWidth - 2,
-                height: 1
-              ).fill()
-            }
-
           }
         }
 

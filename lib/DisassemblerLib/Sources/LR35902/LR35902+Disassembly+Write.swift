@@ -77,7 +77,7 @@ extension LR35902.Disassembly {
     case empty
     case macroComment(String)
     case preComment(String)
-    case label(String)
+    case label(String, String)
     case section(LR35902.Bank)
     case transferOfControl(Set<TransferOfControl>, String)
     case instruction(LR35902.Instruction, RGBDSAssembly.Statement, LR35902.Address, LR35902.Bank, String, Data)
@@ -118,7 +118,6 @@ extension LR35902.Disassembly {
       switch self {
       case .newline: fallthrough
       case .empty: fallthrough
-      case .label: fallthrough
       case .section: fallthrough
       case .macroComment: fallthrough
       case .preComment: fallthrough
@@ -132,6 +131,7 @@ extension LR35902.Disassembly {
       case .global:
         return nil
 
+      case let .label(_, scope): fallthrough
       case let .instruction(_, _, _, _, scope, _): fallthrough
       case let .macro(_, _, _, scope, _):
         return scope.count > 0 ? scope : nil
@@ -144,7 +144,7 @@ extension LR35902.Disassembly {
 
       case .empty:                             return ""
 
-      case let .label(label):                  return "\(prettify(label)):"
+      case let .label(label, _):               return "\(prettify(label)):"
 
       case let .section(bank):
         if bank == 0 {
@@ -573,8 +573,9 @@ clean:
           if let transfersOfControl = transfersOfControl(at: cpu.pc, in: bank) {
             lineGroup.append(.transferOfControl(transfersOfControl, label))
           } else {
+            let instructionScope = labeledContiguousScopes(at: cpu.pc, in: bank).map { $0.label }
             lineGroup.append(.empty)
-            lineGroup.append(.label(label))
+            lineGroup.append(.label(label, instructionScope.sorted().joined(separator: ", ")))
           }
           isLabeled = true
         }
