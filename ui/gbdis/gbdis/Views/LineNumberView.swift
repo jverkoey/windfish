@@ -177,7 +177,13 @@ final class LineNumberView: NSRulerView {
         let currentLine = bankLines[lineNumber]
         let nextLine = lineNumber < bankLines.count - 1 ? bankLines[lineNumber + 1] : nil
 
-        scopeHandler?(previousLine, currentLine, nextLine, layoutRects.pointee)
+        let scopeRect = NSRect(
+          x: 0,
+          y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY,
+          width: scopeColumnWidth,
+          height: layoutRects.pointee.height
+        )
+        scopeHandler?(previousLine, currentLine, nextLine, scopeRect)
 
         // TODO: Also show the current bank and current execution context
         // TODO: Cmd+clicking labels should jump to the label
@@ -232,7 +238,7 @@ final class LineNumberView: NSRulerView {
     let textAttributes = self.textAttributes()
     let textContainerInset = textView.textContainerInset
 
-    processLines(in: rect, scopeHandler: { (previousLine, currentLine, nextLine, layoutRect) in
+    processLines(in: rect, scopeHandler: { (previousLine, currentLine, nextLine, scopeRect) in
       let previousScope = previousLine?.scope
       let currentScope = currentLine.scope
       let nextScope = nextLine?.scope
@@ -241,53 +247,52 @@ final class LineNumberView: NSRulerView {
       if let currentScope = currentScope {
         if previousScope == currentScope && currentScope == nextScope {
           // Continuation of scope.
-          let scopeRect = NSRect(
-            x: scopeColumnWidth / 2,
-            y: layoutRect.minY + textContainerInset.height - visibleRect.minY,
+          NSRect(
+            x: scopeRect.midX,
+            y: scopeRect.minY,
             width: 1,
-            height: layoutRect.height
-          )
-          scopeRect.fill()
+            height: scopeRect.height
+          ).fill()
         } else if previousScope != currentScope && currentScope == nextScope {
           // Starting a new scope.
 
           if previousScope != nil {
             // Close the previous scope.
             NSRect(
-              x: 1,
-              y: layoutRect.minY + textContainerInset.height - visibleRect.minY,
-              width: scopeColumnWidth - 2,
+              x: scopeRect.minX + 1,
+              y: scopeRect.minY,
+              width: scopeRect.width - 2,
               height: 1
             ).fill()
           }
 
           // Start the next scope.
           NSRect(
-            x: scopeColumnWidth / 2 - 1,
-            y: layoutRect.minY + textContainerInset.height - visibleRect.minY + layoutRect.height / 2 - 1,
+            x: scopeRect.midX - 1,
+            y: scopeRect.midY - 1,
             width: 3,
             height: 3
           ).fill()
           NSRect(
-            x: scopeColumnWidth / 2,
-            y: layoutRect.minY + textContainerInset.height - visibleRect.minY + layoutRect.height / 2,
+            x: scopeRect.midX,
+            y: scopeRect.midY,
             width: 1,
-            height: layoutRect.height / 2
+            height: scopeRect.height / 2
           ).fill()
         } else if previousScope == currentScope && currentScope != nextScope {
           // Ending the current scope.
 
           NSRect(
-            x: scopeColumnWidth / 2,
-            y: layoutRect.minY + textContainerInset.height - visibleRect.minY,
+            x: scopeRect.midX,
+            y: scopeRect.minY,
             width: 1,
-            height: layoutRect.height
+            height: scopeRect.height
           ).fill()
           // Finish the current scope.
           NSRect(
-            x: 1,
-            y: layoutRect.minY + textContainerInset.height - visibleRect.minY + layoutRect.height - 1,
-            width: scopeColumnWidth - 2,
+            x: scopeRect.minX + 1,
+            y: scopeRect.maxY - 1,
+            width: scopeRect.width - 2,
             height: 1
           ).fill()
         }
