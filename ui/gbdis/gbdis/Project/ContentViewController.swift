@@ -310,8 +310,6 @@ class LineNumberView: NSRulerView {
           break
         }
 
-        print(lineNumber)
-        print(bankLines[lineNumber])
         if let address = bankLines[lineNumber].address {
           let lineString = NSString(string: address.hexString)
           let lineStringSize = lineString.size(withAttributes: textAttributes)

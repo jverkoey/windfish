@@ -9,9 +9,11 @@ public final class RGBDSAssembly {
   public struct Statement: Equatable, CustomStringConvertible {
     public let opcode: String
     public let operands: [String]?
-    init(opcode: String, operands: [String]? = nil) {
+    public let comments: String?
+    init(opcode: String, operands: [String]? = nil, comments: String? = nil) {
       self.opcode = opcode
       self.operands = operands
+      self.comments = comments
     }
 
     public var description: String {

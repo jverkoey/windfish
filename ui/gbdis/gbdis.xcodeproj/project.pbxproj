@@ -723,6 +723,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = featherless.gbdis;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_DISABLE_SAFETY_CHECKS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "gbdis/gbdisui-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
