@@ -143,6 +143,22 @@ extension ContentViewController: NSTextStorageDelegate {
       }
       textStorage.addAttributes([.foregroundColor: NSColor.systemGray], range: result.range)
     }
+
+    try? NSRegularExpression(pattern: "^[^;]+:", options: [.anchorsMatchLines])
+      .enumerateMatches(in: textStorage.string, options: [], range: editedRange) { result, flags, out in
+        guard let result = result else {
+          return
+        }
+        textStorage.addAttributes([.foregroundColor: NSColor.systemOrange], range: result.range)
+      }
+
+    try? NSRegularExpression(pattern: "^    \\w+ ", options: [.anchorsMatchLines])
+      .enumerateMatches(in: textStorage.string, options: [], range: editedRange) { result, flags, out in
+        guard let result = result else {
+          return
+        }
+        textStorage.addAttributes([.foregroundColor: NSColor.systemGreen], range: result.range)
+      }
   }
 }
 

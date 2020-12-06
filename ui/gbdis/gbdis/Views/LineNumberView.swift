@@ -168,6 +168,8 @@ final class LineNumberView: NSRulerView {
           break
         }
 
+        // TODO: Also show the current bank and current execution context
+        // TODO: Cmd+clicking labels should jump to the label
         if let address = bankLines[lineNumber].address {
           let lineString = NSString(string: address.hexString)
           let lineStringSize = lineString.size(withAttributes: textAttributes)
