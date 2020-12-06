@@ -174,7 +174,7 @@ final class LineNumberView: NSRulerView {
           let lineString = NSString(string: address.hexString)
           let lineStringSize = lineString.size(withAttributes: textAttributes)
           let lineStringRect = NSRect(
-            x: rightMostDrawableLocation - lineStringSize.width,
+            x: rightMostDrawableLocation - lineStringSize.width - 4,
             y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY + (layoutRects.pointee.height - lineStringSize.height) / 2.0,
             width: lineStringSize.width,
             height: lineStringSize.height
@@ -210,7 +210,7 @@ final class LineNumberView: NSRulerView {
 
     let borderLineRect = self.borderLineRect()
     if needsToDraw(borderLineRect) {
-      backgroundColor.shadow(withLevel: 0.4)?.set()
+      backgroundColor.shadow(withLevel: 0.1)?.set()
       borderLineRect.fill()
     }
 
