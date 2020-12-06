@@ -231,12 +231,7 @@ final class LineNumberView: NSRulerView {
       borderLineRect.fill()
     }
 
-    guard let textView = clientView as? NSTextView,
-          let visibleRect = scrollView?.contentView.bounds else {
-      return
-    }
     let textAttributes = self.textAttributes()
-    let textContainerInset = textView.textContainerInset
 
     processLines(in: rect, scopeHandler: { (previousLine, currentLine, nextLine, scopeRect) in
       let previousScope = previousLine?.scope

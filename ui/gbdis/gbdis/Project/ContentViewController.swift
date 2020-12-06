@@ -16,6 +16,51 @@ final class ContentViewController: NSViewController {
   var textView: NSTextView?
   var lineNumbersRuler: LineNumberView?
 
+  var filename: String? {
+    didSet {
+      refreshFileContents()
+    }
+  }
+
+  var bank: LR35902.Bank? {
+    didSet {
+      refreshBank()
+    }
+  }
+  private func refreshBank() {
+    guard let slice = document.slice else {
+      return
+    }
+
+    if let bank = bank {
+      let range = LR35902.rangeOf(bank: bank)
+      let byteArray = HFBTreeByteArray()
+      byteArray.insertByteSlice(slice.subslice(with: HFRange(location: UInt64(range.location), length: UInt64(range.length))),
+                                in: HFRange(location: 0, length: 0))
+      hexViewController.hexController.byteArray = byteArray
+      hexViewController.view.isHidden = false
+      NSLayoutConstraint.deactivate(fileConstraints)
+      NSLayoutConstraint.activate(bankConstraints)
+      lineNumbersRuler?.bankLines = document.bankLines?[bank]
+    } else {
+      hexViewController.hexController.byteArray = HFBTreeByteArray()
+      hexViewController.view.isHidden = true
+      NSLayoutConstraint.deactivate(bankConstraints)
+      NSLayoutConstraint.activate(fileConstraints)
+      lineNumbersRuler?.bankLines = nil
+    }
+    lineNumbersRuler?.needsDisplay = true
+  }
+
+  private func refreshFileContents() {
+    if let filename = filename {
+      let string = String(data: document.disassemblyFiles![filename]!, encoding: .utf8)!
+      textStorage = NSTextStorage(string: string)
+    } else {
+      textStorage = NSTextStorage()
+    }
+  }
+
   var textStorage = NSTextStorage() {
     didSet {
       textStorage.delegate = self
@@ -33,6 +78,7 @@ final class ContentViewController: NSViewController {
   let hexViewController: HexViewController
   var bankConstraints: [NSLayoutConstraint] = []
   var fileConstraints: [NSLayoutConstraint] = []
+  private var disassembledSubscriber: AnyCancellable?
 
   init(document: ProjectDocument) {
     self.document = document
@@ -105,31 +151,14 @@ final class ContentViewController: NSViewController {
       self.hexViewController.view.widthAnchor.constraint(equalToConstant: self.hexViewController.minimumWidth),
     ])
 
-    showBank(bank: nil)
-  }
+    self.bank = nil
 
-  func showBank(bank: LR35902.Bank?) {
-    guard let slice = document.slice else {
-      return
-    }
-
-    if let bank = bank {
-      let range = LR35902.rangeOf(bank: bank)
-      let byteArray = HFBTreeByteArray()
-      byteArray.insertByteSlice(slice.subslice(with: HFRange(location: UInt64(range.location), length: UInt64(range.length))),
-                                in: HFRange(location: 0, length: 0))
-      hexViewController.hexController.byteArray = byteArray
-      hexViewController.view.isHidden = false
-      NSLayoutConstraint.deactivate(fileConstraints)
-      NSLayoutConstraint.activate(bankConstraints)
-      lineNumbersRuler?.bankLines = document.bankLines?[bank]
-    } else {
-      hexViewController.hexController.byteArray = HFBTreeByteArray()
-      hexViewController.view.isHidden = true
-      NSLayoutConstraint.deactivate(bankConstraints)
-      NSLayoutConstraint.activate(fileConstraints)
-      lineNumbersRuler?.bankLines = nil
-    }
+    disassembledSubscriber = NotificationCenter.default.publisher(for: .disassembled, object: document)
+      .receive(on: RunLoop.main)
+      .sink(receiveValue: { notification in
+        self.refreshBank()
+        self.refreshFileContents()
+      })
   }
 }
 

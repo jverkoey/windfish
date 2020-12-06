@@ -111,13 +111,12 @@ final class ProjectViewController: NSViewController {
           return
         }
         lastSelectedFile = node.title
-        let string = String(data: self.document.disassemblyFiles![node.title]!, encoding: .utf8)!
-        self.contentViewController.textStorage = NSTextStorage(string: string)
+        self.contentViewController.filename = node.title
 
         if let metadata = self.document.metadata, let bank = metadata.bankMap[node.title] {
-          self.contentViewController.showBank(bank: bank)
+          self.contentViewController.bank = bank
         } else {
-          self.contentViewController.showBank(bank: nil)
+          self.contentViewController.bank = nil
         }
       })
 
