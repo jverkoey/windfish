@@ -138,7 +138,7 @@ extension LR35902.Disassembly {
       }
     }
 
-    func asString(addressInComments: Bool) -> String {
+    func asString(detailedComments: Bool) -> String {
       switch self {
       case .newline:                           return ""
 
@@ -167,19 +167,19 @@ extension LR35902.Disassembly {
         return line("\(label):", comment: "Sources: \(sources)")
 
       case let .instruction(_, assembly, address, bank, scope, bytes):
-        if addressInComments {
+        if detailedComments {
           return line(assembly.description, address: address, bank: bank, scope: scope, bytes: bytes)
         } else {
-          return line(assembly.description, bank: bank, scope: scope, bytes: bytes)
+          return line(assembly.description, bank: bank, bytes: bytes)
         }
 
       case let .macroInstruction(_, assembly): return line(assembly.description)
 
       case let .macro(assembly, address, bank, scope, bytes):
-        if addressInComments {
+        if detailedComments {
           return line(assembly, address: address, bank: bank, scope: scope, bytes: bytes)
         } else {
-          return line(assembly, address: address, bank: bank, scope: scope, bytes: bytes)
+          return line(assembly, bank: bank, bytes: bytes)
         }
 
       case let .macroDefinition(name):         return "\(name): MACRO"
@@ -187,28 +187,28 @@ extension LR35902.Disassembly {
       case .macroTerminator:                   return line("ENDM")
 
       case let .data(statement, address):
-        if addressInComments {
+        if detailedComments {
           return line(statement.description, address: address, addressType: "text")
         } else {
           return line(statement.description, addressType: "text")
         }
 
       case let .jumpTable(jumpLocation, address, index, bytes):
-        if addressInComments {
+        if detailedComments {
           return line("dw \(jumpLocation)", address: address, addressType: "jumpTable [\(index)]", comment: "\(bytes.map { "$\($0.hexString)" }.joined(separator: " "))")
         } else {
           return line("dw \(jumpLocation)", addressType: "jumpTable [\(index)]", comment: "\(bytes.map { "$\($0.hexString)" }.joined(separator: " "))")
         }
 
       case let .unknown(statement, address, addressType, bytesAsCharacters):
-        if addressInComments {
+        if detailedComments {
           return line(statement.description, address: address, addressType: addressType, comment: "|\(bytesAsCharacters)|")
         } else {
           return line(statement.description, addressType: addressType, comment: "|\(bytesAsCharacters)|")
         }
 
       case let .global(statement, address, addressType):
-        if addressInComments {
+        if detailedComments {
           return line(statement.description, address: address, addressType: addressType)
         } else {
           return line(statement.description, addressType: addressType)
@@ -217,15 +217,15 @@ extension LR35902.Disassembly {
     }
 
     public var description: String {
-      return asString(addressInComments: true)
+      return asString(detailedComments: true)
     }
 
     var asString: String {
-      return asString(addressInComments: true) + "\n"
+      return asString(detailedComments: true) + "\n"
     }
 
     var asEditorString: String {
-      return asString(addressInComments: false) + "\n"
+      return asString(detailedComments: false) + "\n"
     }
   }
 
@@ -335,7 +335,7 @@ clean:
       }
 
       let linesAsString: ([Line]) -> String = { lines in
-        return lines.map { $0.asString(addressInComments: false) }.joined(separator: "\n")
+        return lines.map { $0.asString(detailedComments: false) }.joined(separator: "\n")
       }
 
       bankLines.append(.section(bank))
