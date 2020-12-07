@@ -105,13 +105,12 @@ final class ContentViewController: NSViewController {
                                                    height: CGFloat.greatestFiniteMagnitude)
     textView.textContainer?.widthTracksTextView = true
     textView.focusRingType = .none
-    textView.isEditable = true
-    textView.allowsUndo = true
+    textView.isEditable = false
+    textView.allowsUndo = false
     textView.isSelectable = true
     textView.drawsBackground = false
     textView.usesFindBar = true
     textView.isIncrementalSearchingEnabled = true
-    textView.delegate = self
     containerView.documentView = textView
 
     let lineNumbersRuler = LineNumberView(scrollView: containerView, orientation: .verticalRuler)
@@ -271,46 +270,3 @@ extension ContentViewController: LineNumberViewDelegate {
     print(range)
   }
 }
-
-extension ContentViewController: NSTextViewDelegate {
-  func textView(_ textView: NSTextView, shouldChangeTextIn affectedCharRange: NSRange, replacementString: String?) -> Bool {
-    guard let lineAnalysis = lineAnalysis,
-          let bank = bank,
-          let bankLines = document.bankLines?[bank] else {
-      return false
-    }
-    let textString = NSString(string: textView.textStorage!.string)
-
-    var linesBeingModified: [(Int, NSRange)] = []
-    let processSubstring: (NSRange) -> Void = { substringRange in
-      var lineStart: Int = NSNotFound
-      withUnsafeMutablePointer(to: &lineStart) { pointer in
-        textString.getLineStart(nil, end: pointer, contentsEnd: nil, for: substringRange)
-      }
-      let lineIndex = lineAnalysis.lineIndex(for: lineStart)
-      linesBeingModified.append((lineIndex, substringRange))
-    }
-    textString.enumerateSubstrings(in: affectedCharRange, options: [.byLines, .substringNotRequired]) { (_, substringRange, _, _) in
-      processSubstring(substringRange)
-    }
-    if linesBeingModified.isEmpty {
-      processSubstring(affectedCharRange)
-    }
-    if linesBeingModified.count > 1 {
-      return false  // Don't allow multiple lines to be edited at once.
-    }
-    guard let lineBeingModified = linesBeingModified.first else {
-      return false
-    }
-    let line = bankLines[lineBeingModified.0 - 1]
-    switch line.semantic {
-    case .label:
-      return false
-    default:
-      return false
-    }
-  }
-}
-
-// To get the width of the scroller region.
-// -NSScroller.scrollerWidth(for: .regular, scrollerStyle: .overlay)
