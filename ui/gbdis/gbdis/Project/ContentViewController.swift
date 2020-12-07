@@ -15,6 +15,7 @@ final class ContentViewController: NSViewController {
   var containerView: NSScrollView?
   var textView: NSTextView?
   var lineNumbersRuler: LineNumberView?
+  var dataRuler: LineNumberView?
 
   var filename: String? {
     didSet {
@@ -28,28 +29,22 @@ final class ContentViewController: NSViewController {
     }
   }
   private func refreshBank() {
-    guard let slice = document.slice else {
-      return
-    }
-
     if let bank = bank {
-      let range = LR35902.rangeOf(bank: bank)
-      let byteArray = HFBTreeByteArray()
-      byteArray.insertByteSlice(slice.subslice(with: HFRange(location: UInt64(range.location), length: UInt64(range.length))),
-                                in: HFRange(location: 0, length: 0))
-      hexViewController.hexController.byteArray = byteArray
-      hexViewController.view.isHidden = false
-      NSLayoutConstraint.deactivate(fileConstraints)
-      NSLayoutConstraint.activate(bankConstraints)
-      lineNumbersRuler?.bankLines = document.bankLines?[bank]
+      dataRuler?.isHidden = false
+
+      let bankLines = document.bankLines?[bank]
+      lineNumbersRuler?.bankLines = bankLines
+      dataRuler?.bankLines = bankLines
     } else {
-      hexViewController.hexController.byteArray = HFBTreeByteArray()
-      hexViewController.view.isHidden = true
-      NSLayoutConstraint.deactivate(bankConstraints)
-      NSLayoutConstraint.activate(fileConstraints)
+      dataRuler?.isHidden = true
       lineNumbersRuler?.bankLines = nil
+      dataRuler?.bankLines = nil
     }
     lineNumbersRuler?.needsDisplay = true
+    dataRuler?.needsDisplay = true
+
+    containerView?.contentView.contentInsets.left = lineNumbersRuler!.ruleThickness
+    containerView?.contentView.contentInsets.right = self.hexViewController.minimumWidth
   }
 
   private func refreshFileContents() {
@@ -76,8 +71,6 @@ final class ContentViewController: NSViewController {
 
   let document: ProjectDocument
   let hexViewController: HexViewController
-  var bankConstraints: [NSLayoutConstraint] = []
-  var fileConstraints: [NSLayoutConstraint] = []
   private var disassembledSubscriber: AnyCancellable?
 
   init(document: ProjectDocument) {
@@ -108,7 +101,6 @@ final class ContentViewController: NSViewController {
     containerView.translatesAutoresizingMaskIntoConstraints = false
     containerView.hasVerticalScroller = true
     containerView.borderType = .noBorder
-    containerView.hasVerticalRuler = true
     view.addSubview(containerView)
 
     let textView = NSTextView()
@@ -129,26 +121,35 @@ final class ContentViewController: NSViewController {
     let lineNumbersRuler = LineNumberView(scrollView: containerView, orientation: .verticalRuler)
     lineNumbersRuler.clientView = textView
     lineNumbersRuler.delegate = self
+    containerView.hasVerticalRuler = true
     containerView.verticalRulerView = lineNumbersRuler
     containerView.rulersVisible = true
     self.lineNumbersRuler = lineNumbersRuler
 
+    let dataRuler = LineNumberView(scrollView: containerView, orientation: .verticalRuler)
+    dataRuler.translatesAutoresizingMaskIntoConstraints = false
+    dataRuler.clientView = textView
+    dataRuler.scrollView = containerView
+    dataRuler.delegate = self
+    self.dataRuler = dataRuler
+    containerView.contentView.addSubview(dataRuler)
+
     let safeAreaLayoutGuide = view.safeAreaLayoutGuide
 
-    bankConstraints = [containerView.trailingAnchor.constraint(equalTo: self.hexViewController.view.leadingAnchor)]
-    fileConstraints = [containerView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor)]
+    containerView.contentView.automaticallyAdjustsContentInsets = false
 
     NSLayoutConstraint.activate([
       // Text content
       containerView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
       containerView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
       containerView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+      containerView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
 
       // Hex viewer
-      self.hexViewController.view.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
-      self.hexViewController.view.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
-      self.hexViewController.view.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
-      self.hexViewController.view.widthAnchor.constraint(equalToConstant: self.hexViewController.minimumWidth),
+      dataRuler.topAnchor.constraint(equalTo: textView.topAnchor),
+      dataRuler.bottomAnchor.constraint(equalTo: textView.bottomAnchor),
+      dataRuler.leadingAnchor.constraint(equalTo: textView.trailingAnchor),
+      dataRuler.widthAnchor.constraint(equalToConstant: self.hexViewController.minimumWidth),
     ])
 
     self.bank = nil
@@ -203,6 +204,14 @@ extension ContentViewController: NSTextStorageDelegate {
 }
 
 extension ContentViewController: LineNumberViewDelegate {
+  func lineNumberViewDidChangeRuleThickness(_ lineNumberView: LineNumberView) {
+    if lineNumberView == self.lineNumbersRuler {
+      containerView?.contentView.contentInsets.left = lineNumberView.ruleThickness
+    } else if lineNumberView == self.dataRuler {
+      containerView?.contentView.contentInsets.right = lineNumberView.ruleThickness
+    }
+  }
+
   func lineNumberView(_ lineNumberView: LineNumberView, didActivate lineNumber: Int) {
     guard let bankLines = lineNumbersRuler?.bankLines else {
       return
@@ -223,3 +232,6 @@ extension ContentViewController: LineNumberViewDelegate {
     hexViewController.hexController.pulseSelection()
   }
 }
+
+// To get the width of the scroller region.
+// -NSScroller.scrollerWidth(for: .regular, scrollerStyle: .overlay)
