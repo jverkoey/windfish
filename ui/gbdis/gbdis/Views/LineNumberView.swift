@@ -23,6 +23,7 @@ final class LineNumberView: NSRulerView {
   private let font = NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
   private let textColor = NSColor.systemGray
   private let backgroundColor = NSColor.textBackgroundColor
+  private let scopeLineColor = NSColor.highlightColor
   private var lineInformationValid = false
   private var numberOfLines: Int?
   private var lineStartCharacterIndices: UnsafeMutablePointer<Int>?
@@ -254,7 +255,7 @@ final class LineNumberView: NSRulerView {
       let currentScope = currentLine.scope
       let nextScope = nextLine?.scope
 
-      self.backgroundColor.shadow(withLevel: 0.6)?.set()
+      self.scopeLineColor.set()
       if let currentScope = currentScope {
         if previousScope == currentScope && currentScope == nextScope {
           // Continuation of scope.
