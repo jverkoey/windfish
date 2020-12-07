@@ -98,7 +98,8 @@ final class ContentViewController: NSViewController {
                                                    height: CGFloat.greatestFiniteMagnitude)
     textView.textContainer?.widthTracksTextView = true
     textView.focusRingType = .none
-    textView.isEditable = false
+    textView.isEditable = true
+    textView.allowsUndo = true
     textView.isSelectable = true
     textView.drawsBackground = false
     textView.usesFindBar = true
