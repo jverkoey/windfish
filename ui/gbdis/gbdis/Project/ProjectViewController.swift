@@ -156,6 +156,7 @@ final class ProjectViewController: NSViewController {
 
         guard let analysis = self.contentViewController.lineAnalysis,
               let textView = self.contentViewController.textView,
+              let containerView = self.contentViewController.containerView,
               let layoutManager = textView.layoutManager,
               let textContainer = textView.textContainer else {
           return
@@ -164,7 +165,7 @@ final class ProjectViewController: NSViewController {
         let lineRange = analysis.lineRanges[lineIndex]
         let glyphGraph = layoutManager.glyphRange(forCharacterRange: lineRange, actualCharacterRange: nil)
         let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphGraph, in: textContainer)
-        self.contentViewController.textView?.scrollToVisible(boundingRect)
+        self.contentViewController.textView?.scroll(boundingRect.offsetBy(dx: 0, dy: -containerView.bounds.height / 2).origin)
       })
 
     if document.isDisassembling {
