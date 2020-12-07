@@ -47,7 +47,7 @@ public func line(_ code: String, addressType: String?) -> String {
 }
 
 public func line(_ code: String) -> String {
-  return "\(codeColumn("    \(code)"))"
+  return "    \(code)"
 }
 
 public func line<T: FixedWidthInteger>(_ code: String, address: T, addressType: String?, comment: String) -> String {

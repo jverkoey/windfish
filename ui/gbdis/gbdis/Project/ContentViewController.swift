@@ -198,12 +198,35 @@ final class LineAnalysis {
     self.numberOfLines = numberOfLines
   }
 
-  var lineStartCharacterIndices: UnsafeMutablePointer<Int>?
-  var numberOfLines: Int?
+  var lineStartCharacterIndices: UnsafeMutablePointer<Int>
+  var numberOfLines: Int
 
   deinit {
-    lineStartCharacterIndices?.deallocate()
+    lineStartCharacterIndices.deallocate()
   }
+
+  func lineIndex(for characterIndex: Int) -> Int {
+    let foundIndex = withUnsafePointer(to: characterIndex) { pointer in
+      bsearch_b(pointer, lineStartCharacterIndices, numberOfLines, MemoryLayout<Int>.size) { pointer1, pointer2 in
+        guard let pointer1 = pointer1, let pointer2 = pointer2 else {
+          return 0
+        }
+        let value1 = pointer1.bindMemory(to: Int.self, capacity: 1).pointee
+        let value2 = pointer2.bindMemory(to: Int.self, capacity: 1).pointee
+        if value1 < value2 {
+          return -1
+        } else if value1 > value2 {
+          return 1;
+        }
+        return 0
+      }
+    }
+    if let foundIndex = foundIndex {
+      return -foundIndex.distance(to: lineStartCharacterIndices) / MemoryLayout<Int>.size
+    }
+    return NSNotFound
+  }
+
 }
 
 extension ContentViewController: LineNumberViewDelegate {
@@ -251,7 +274,41 @@ extension ContentViewController: LineNumberViewDelegate {
 
 extension ContentViewController: NSTextViewDelegate {
   func textView(_ textView: NSTextView, shouldChangeTextIn affectedCharRange: NSRange, replacementString: String?) -> Bool {
-    return false
+    guard let lineAnalysis = lineAnalysis,
+          let bank = bank,
+          let bankLines = document.bankLines?[bank] else {
+      return false
+    }
+    let textString = NSString(string: textView.textStorage!.string)
+
+    var linesBeingModified: [(Int, NSRange)] = []
+    let processSubstring: (NSRange) -> Void = { substringRange in
+      var lineStart: Int = NSNotFound
+      withUnsafeMutablePointer(to: &lineStart) { pointer in
+        textString.getLineStart(nil, end: pointer, contentsEnd: nil, for: substringRange)
+      }
+      let lineIndex = lineAnalysis.lineIndex(for: lineStart)
+      linesBeingModified.append((lineIndex, substringRange))
+    }
+    textString.enumerateSubstrings(in: affectedCharRange, options: [.byLines, .substringNotRequired]) { (_, substringRange, _, _) in
+      processSubstring(substringRange)
+    }
+    if linesBeingModified.isEmpty {
+      processSubstring(affectedCharRange)
+    }
+    if linesBeingModified.count > 1 {
+      return false  // Don't allow multiple lines to be edited at once.
+    }
+    guard let lineBeingModified = linesBeingModified.first else {
+      return false
+    }
+    let line = bankLines[lineBeingModified.0 - 1]
+    switch line.semantic {
+    case .label:
+      return false
+    default:
+      return false
+    }
   }
 }
 

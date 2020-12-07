@@ -76,33 +76,6 @@ final class LineNumberView: NSRulerView {
     return ceil(NSString("|........|").size(withAttributes: textAttributes()).width + columnPadding)
   }
 
-  func lineIndex(for characterIndex: Int) -> Int {
-    guard let lineStartCharacterIndices = lineAnalysis?.lineStartCharacterIndices,
-          let numberOfLines = lineAnalysis?.numberOfLines else {
-      return NSNotFound
-    }
-
-    let foundIndex = withUnsafePointer(to: characterIndex) { pointer in
-      bsearch_b(pointer, lineStartCharacterIndices, numberOfLines, MemoryLayout<Int>.size) { pointer1, pointer2 in
-        guard let pointer1 = pointer1, let pointer2 = pointer2 else {
-          return 0
-        }
-        let value1 = pointer1.bindMemory(to: Int.self, capacity: 1).pointee
-        let value2 = pointer2.bindMemory(to: Int.self, capacity: 1).pointee
-        if value1 < value2 {
-          return -1
-        } else if value1 > value2 {
-          return 1;
-        }
-        return 0
-      }
-    }
-    if let foundIndex = foundIndex {
-      return -foundIndex.distance(to: lineStartCharacterIndices) / MemoryLayout<Int>.size
-    }
-    return NSNotFound
-  }
-
   func processLines(in rect: NSRect,
                     dataHandler: ((LR35902.Disassembly.Line.Semantic, Data, NSRect) -> Void)? = nil,
                     scopeHandler: ((LR35902.Disassembly.Line?, LR35902.Disassembly.Line, LR35902.Disassembly.Line?, NSRect) -> Void)? = nil,
@@ -113,7 +86,8 @@ final class LineNumberView: NSRulerView {
     }
 
     let textStorage = textView.textStorage
-    guard let storageString = textStorage?.string,
+    guard let lineAnalysis = lineAnalysis,
+          let storageString = textStorage?.string,
           let layoutManager = textView.layoutManager,
           let visibleRect = scrollView?.contentView.bounds,
           let textContainer = textView.textContainer,
@@ -138,7 +112,7 @@ final class LineNumberView: NSRulerView {
       var characterIndex = visibleCharacterRange.location
 
       while characterIndex < (visibleCharacterRange.location + visibleCharacterRange.length) {
-        let lineNumber = lineIndex(for: characterIndex)
+        let lineNumber = lineAnalysis.lineIndex(for: characterIndex)
         if lineNumber == NSNotFound {
           break
         }
