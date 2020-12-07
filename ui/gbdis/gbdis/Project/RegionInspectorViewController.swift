@@ -235,3 +235,9 @@ extension RegionInspectorViewController: NSTextFieldDelegate {
     document.undoManager?.setActionName("Region Edit")
   }
 }
+
+// TODO: Surface detected labels in the region inspector; add a new column indicating whether a region is automatic or manual.
+// TODO: Editing an automatic label turns it into a manaul label.
+// TODO: Allow sorting of the regions.
+// TODO: Selecting a region should jump to it in the source
+// TODO: Add a "type" for the regions, which will enable or disable the length column accordingly. Support labels, executable regions, and functions.
