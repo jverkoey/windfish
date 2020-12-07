@@ -81,28 +81,30 @@ extension LR35902.Disassembly {
       case label(String)
       case section(LR35902.Bank)
       case transferOfControl(Set<TransferOfControl>, String)
-      case instruction(LR35902.Instruction, RGBDSAssembly.Statement, Data)
+      case instruction(LR35902.Instruction, RGBDSAssembly.Statement)
       case macroInstruction(LR35902.Instruction, RGBDSAssembly.Statement)
-      case macro(String, Data)
+      case macro(String)
       case macroDefinition(String)
       case macroTerminator
       case data(RGBDSAssembly.Statement)
-      case jumpTable(String, Int, Data)
-      case unknown(RGBDSAssembly.Statement, String?, String)
+      case jumpTable(String, Int)
+      case unknown(RGBDSAssembly.Statement, String?)
       case global(RGBDSAssembly.Statement, String)
     }
 
-    init(semantic: Semantic, address: LR35902.Address? = nil, bank: LR35902.Bank? = nil, scope: String? = nil) {
+    init(semantic: Semantic, address: LR35902.Address? = nil, bank: LR35902.Bank? = nil, scope: String? = nil, data: Data? = nil) {
       self.semantic = semantic
       self.address = address
       self.bank = bank
       self.scope = scope
+      self.data = data
     }
 
     public let semantic: Semantic
     public let address: LR35902.Address?
     public let bank: LR35902.Bank?
     public let scope: String?
+    public let data: Data?
 
     func asString(detailedComments: Bool) -> String {
       switch semantic {
@@ -132,20 +134,20 @@ extension LR35902.Disassembly {
           .joined(separator: ", ")
         return line("\(label):", comment: "Sources: \(sources)")
 
-      case let .instruction(_, assembly, bytes):
+      case let .instruction(_, assembly):
         if detailedComments {
-          return line(assembly.description, address: address!, bank: bank!, scope: scope!, bytes: bytes)
+          return line(assembly.description, address: address!, bank: bank!, scope: scope!, bytes: data!)
         } else {
-          return line(assembly.description, bytes: bytes)
+          return line(assembly.description)
         }
 
       case let .macroInstruction(_, assembly): return line(assembly.description)
 
-      case let .macro(assembly, bytes):
+      case let .macro(assembly):
         if detailedComments {
-          return line(assembly, address: address!, bank: bank!, scope: scope!, bytes: bytes)
+          return line(assembly, address: address!, bank: bank!, scope: scope!, bytes: data!)
         } else {
-          return line(assembly, bytes: bytes)
+          return line(assembly)
         }
 
       case let .macroDefinition(name):         return "\(name): MACRO"
@@ -159,18 +161,20 @@ extension LR35902.Disassembly {
           return line(statement.description, addressType: "text")
         }
 
-      case let .jumpTable(jumpLocation, index, bytes):
+      case let .jumpTable(jumpLocation, index):
         if detailedComments {
-          return line("dw \(jumpLocation)", address: address!, addressType: "jumpTable [\(index)]", comment: "\(bytes.map { "$\($0.hexString)" }.joined(separator: " "))")
+          return line("dw \(jumpLocation)", address: address!, addressType: "jumpTable [\(index)]", comment: "\(data!.map { "$\($0.hexString)" }.joined(separator: " "))")
         } else {
-          return line("dw \(jumpLocation)", addressType: "jumpTable [\(index)]", comment: "\(bytes.map { "$\($0.hexString)" }.joined(separator: " "))")
+          return line("dw \(jumpLocation)", addressType: "jumpTable [\(index)]")
         }
 
-      case let .unknown(statement, addressType, bytesAsCharacters):
+      case let .unknown(statement, addressType):
         if detailedComments {
+          let displayableBytes = data!.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
+          let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
           return line(statement.description, address: address!, addressType: addressType, comment: "|\(bytesAsCharacters)|")
         } else {
-          return line(statement.description, addressType: addressType, comment: "|\(bytesAsCharacters)|")
+          return line(statement.description, addressType: addressType)
         }
 
       case let .global(statement, addressType):
@@ -352,7 +356,7 @@ clean:
         // No further nodes to be traversed; is this the end of a macro?
         if !macroNodeIterator.macros.isEmpty {
           let instructions = lineBuffer.compactMap { thisLine -> (LR35902.Instruction, RGBDSAssembly.Statement)? in
-            if case let .instruction(instruction, assembly, _) = thisLine.semantic {
+            if case let .instruction(instruction, assembly) = thisLine.semantic {
               return (instruction, assembly)
             } else {
               return nil
@@ -513,10 +517,11 @@ clean:
             }
             let macroScopes = self.labeledContiguousScopes(at: lineBufferAddress, in: bank).map { $0.label }
             lineBuffer.replaceSubrange(firstInstruction...lastInstruction,
-                                       with: [Line(semantic: .macro("\(macro.macro.name) \(macroArgs)", bytes),
+                                       with: [Line(semantic: .macro("\(macro.macro.name) \(macroArgs)"),
                                                    address: lineBufferAddress,
                                                    bank: bank,
-                                                   scope: macroScopes.sorted().joined(separator: ", "))])
+                                                   scope: macroScopes.sorted().joined(separator: ", "),
+                                                   data: bytes)])
 
             if let action = macro.macro.action {
               action(macro.arguments, lineBufferAddress, bank)
@@ -562,10 +567,11 @@ clean:
           let instructionWidth = LR35902.Instruction.widths[instruction.spec]!.total
           let bytes = cpu[index..<(index + LR35902.CartridgeLocation(instructionWidth))]
           let instructionScope = labeledContiguousScopes(at: cpu.pc, in: bank).map { $0.label }
-          lineGroup.append(Line(semantic: .instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: self), bytes),
+          lineGroup.append(Line(semantic: .instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: self)),
                                 address: cpu.pc,
                                 bank: cpu.bank,
-                                scope: instructionScope.sorted().joined(separator: ", ")))
+                                scope: instructionScope.sorted().joined(separator: ", "),
+                                data: bytes))
 
           cpu.pc += instructionWidth
 
@@ -669,7 +675,7 @@ clean:
                 jumpLocation = "$\(address.hexString)"
               }
               let bytes = cpu[LR35902.cartridgeLocation(for: chunkPc, in: bank)!..<(LR35902.cartridgeLocation(for: chunkPc, in: bank)! + 2)]
-              bankLines.append(Line(semantic: .jumpTable(jumpLocation, index, bytes), address: chunkPc))
+              bankLines.append(Line(semantic: .jumpTable(jumpLocation, index), address: chunkPc, data: bytes))
               chunkPc += LR35902.Address(pair.count)
             }
             break
@@ -677,9 +683,7 @@ clean:
             // Dump the bytes in blocks of 8.
             let addressType = initialType == .data ? "data" : nil
             for chunk in accumulator.chunked(into: 8) {
-              let displayableBytes = chunk.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
-              let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
-              bankLines.append(Line(semantic: .unknown(RGBDSAssembly.statement(for: chunk), addressType, bytesAsCharacters), address: chunkPc))
+              bankLines.append(Line(semantic: .unknown(RGBDSAssembly.statement(for: chunk), addressType), address: chunkPc, data: Data(chunk)))
               chunkPc += LR35902.Address(chunk.count)
             }
           }

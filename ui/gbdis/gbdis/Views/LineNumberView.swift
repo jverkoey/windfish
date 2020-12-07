@@ -15,6 +15,7 @@ protocol LineNumberViewDelegate: NSObject {
 }
 
 private let scopeColumnWidth: CGFloat = 8
+private let columnPadding: CGFloat = 4
 
 final class LineNumberView: NSRulerView {
   var bankLines: [LR35902.Disassembly.Line]?
@@ -92,9 +93,10 @@ final class LineNumberView: NSRulerView {
 
     lineInformationValid = true
 
-    let digitSize = NSString("0000").size(withAttributes: textAttributes())
-    let bankDigitSize = NSString("00").size(withAttributes: textAttributes())
-    ruleThickness = max(ceil(bankDigitSize.width + 4) + scopeColumnWidth + ceil(digitSize.width + 4), 10)
+    let digitSize = digitColumnWidth()
+    let bankDigitSize = bankColumnWidth()
+    let dataSize = dataColumnWidth()
+    ruleThickness = max(dataSize + bankDigitSize + scopeColumnWidth + digitSize, 10)
   }
 
   override func viewWillDraw() {
@@ -103,6 +105,18 @@ final class LineNumberView: NSRulerView {
     if !lineInformationValid {
       updateLineInformation()
     }
+  }
+
+  func digitColumnWidth() -> CGFloat {
+    return ceil(NSString("0000").size(withAttributes: textAttributes()).width + columnPadding)
+  }
+
+  func bankColumnWidth() -> CGFloat {
+    return ceil(NSString("00").size(withAttributes: textAttributes()).width + columnPadding)
+  }
+
+  func dataColumnWidth() -> CGFloat {
+    return ceil(NSString("|........|").size(withAttributes: textAttributes()).width + columnPadding)
   }
 
   func lineIndex(for characterIndex: Int) -> Int {
@@ -156,7 +170,9 @@ final class LineNumberView: NSRulerView {
     let visibleCharacterRange = layoutManager.characterRange(forGlyphRange: visibleGlyphGrange, actualGlyphRange: nil)
     let textAttributes = self.textAttributes()
 
-    let bankDigitSize = NSString("00").size(withAttributes: textAttributes)
+    let digitSize = digitColumnWidth()
+    let bankDigitSize = bankColumnWidth()
+    let dataSize = dataColumnWidth()
 
     var lastLinePositionY: CGFloat = -1.0
     var layoutRectCount: Int = 0
@@ -184,9 +200,9 @@ final class LineNumberView: NSRulerView {
 
         if let bank = bankLines[lineNumber].bank, let bankHandler = bankHandler {
           let bankRect = NSRect(
-            x: 4,
+            x: rightMostDrawableLocation - digitSize - scopeColumnWidth - bankDigitSize + columnPadding,
             y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY,
-            width: bankDigitSize.width,
+            width: bankDigitSize,
             height: layoutRects.pointee.height
           )
           bankHandler(bank, bankRect)
@@ -194,7 +210,7 @@ final class LineNumberView: NSRulerView {
 
         if let scopeHandler = scopeHandler {
           let scopeRect = NSRect(
-            x: bankDigitSize.width + 4,
+            x: rightMostDrawableLocation - digitSize - scopeColumnWidth,
             y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY,
             width: scopeColumnWidth,
             height: layoutRects.pointee.height
@@ -208,7 +224,7 @@ final class LineNumberView: NSRulerView {
           let lineString = NSString(string: address.hexString)
           let lineStringSize = lineString.size(withAttributes: textAttributes)
           let lineStringRect = NSRect(
-            x: rightMostDrawableLocation - lineStringSize.width - 4,
+            x: rightMostDrawableLocation - digitSize,
             y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY + (layoutRects.pointee.height - lineStringSize.height) / 2.0,
             width: lineStringSize.width,
             height: lineStringSize.height
