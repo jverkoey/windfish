@@ -12,6 +12,7 @@ import Combine
 
 protocol LineNumberViewDelegate: NSObject {
   func lineNumberView(_ lineNumberView: LineNumberView, didActivate lineNumber: Int)
+  func lineNumberViewWillDraw(_ lineNumberView: LineNumberView)
 }
 
 private let scopeColumnWidth: CGFloat = 8
@@ -25,40 +26,25 @@ final class LineNumberView: NSRulerView {
   private let textColor = NSColor.systemGray
   private let backgroundColor = NSColor.textBackgroundColor
   private let scopeLineColor = NSColor.highlightColor
-  private var lineInformationValid = false
-  private var numberOfLines: Int?
-  private var lineStartCharacterIndices: UnsafeMutablePointer<Int>?
   private var didProcessEditingSubscriber: AnyCancellable?
   private var tappedLineNumber: Int?
+  var lineAnalysis: LineAnalysis?
 
-  deinit {
-    lineStartCharacterIndices?.deallocate()
+  override init(scrollView: NSScrollView?, orientation: NSRulerView.Orientation) {
+    super.init(scrollView: scrollView, orientation: orientation)
+
+    let digitSize = digitColumnWidth()
+    let bankDigitSize = bankColumnWidth()
+    let dataSize = dataColumnWidth()
+    ruleThickness = max(dataSize + bankDigitSize + scopeColumnWidth + digitSize, 10)
+  }
+
+  required init(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
   }
 
   override var isFlipped: Bool {
     return true
-  }
-
-  override var clientView: NSView? {
-    didSet {
-      guard let textView = clientView as? NSTextView else {
-        return
-      }
-      didProcessEditingSubscriber = NotificationCenter.default.publisher(
-        for: NSTextStorage.didProcessEditingNotification
-      )
-      .receive(on: RunLoop.main)
-      .sink(receiveValue: { [weak self] notification in
-        guard let self = self else {
-          return
-        }
-        guard notification.object as? NSTextStorage === textView.textStorage else {
-          return
-        }
-        self.lineInformationValid = false
-        self.needsDisplay = true
-      })
-    }
   }
 
   private func currentTextStorage() -> NSTextStorage? {
@@ -72,39 +58,10 @@ final class LineNumberView: NSRulerView {
     ]
   }
 
-  private func updateLineInformation() {
-    let lineStartCharacterIndices = NSMutableIndexSet()
-    guard let clientString = currentTextStorage()?.string else {
-      return
-    }
-    let nsString = NSString(string: clientString)
-    let range = NSRange(location: 0, length: nsString.length)
-    nsString.enumerateSubstrings(in: range, options: [String.EnumerationOptions.byLines, .substringNotRequired]) { (_, substringRange, _, _) in
-      lineStartCharacterIndices.add(substringRange.location)
-    }
-
-    self.lineStartCharacterIndices?.deallocate()
-
-    let numberOfLines = lineStartCharacterIndices.count
-    let buffer = UnsafeMutablePointer<Int>.allocate(capacity: numberOfLines)
-    lineStartCharacterIndices.getIndexes(buffer, maxCount: numberOfLines, inIndexRange: nil)
-    self.numberOfLines = numberOfLines
-    self.lineStartCharacterIndices = buffer
-
-    lineInformationValid = true
-
-    let digitSize = digitColumnWidth()
-    let bankDigitSize = bankColumnWidth()
-    let dataSize = dataColumnWidth()
-    ruleThickness = max(dataSize + bankDigitSize + scopeColumnWidth + digitSize, 10)
-  }
-
   override func viewWillDraw() {
     super.viewWillDraw()
 
-    if !lineInformationValid {
-      updateLineInformation()
-    }
+    delegate?.lineNumberViewWillDraw(self)
   }
 
   func digitColumnWidth() -> CGFloat {
@@ -120,8 +77,8 @@ final class LineNumberView: NSRulerView {
   }
 
   func lineIndex(for characterIndex: Int) -> Int {
-    guard let lineStartCharacterIndices = lineStartCharacterIndices,
-          let numberOfLines = numberOfLines else {
+    guard let lineStartCharacterIndices = lineAnalysis?.lineStartCharacterIndices,
+          let numberOfLines = lineAnalysis?.numberOfLines else {
       return NSNotFound
     }
 

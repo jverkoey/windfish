@@ -66,6 +66,13 @@ final class ContentViewController: NSViewController {
   let document: ProjectDocument
   private var disassembledSubscriber: AnyCancellable?
 
+  private var didProcessEditingSubscriber: AnyCancellable?
+  private var lineAnalysis: LineAnalysis? {
+    didSet {
+      lineNumbersRuler?.lineAnalysis = lineAnalysis
+    }
+  }
+
   init(document: ProjectDocument) {
     self.document = document
 
@@ -104,6 +111,7 @@ final class ContentViewController: NSViewController {
     textView.drawsBackground = false
     textView.usesFindBar = true
     textView.isIncrementalSearchingEnabled = true
+    textView.delegate = self
     containerView.documentView = textView
 
     let lineNumbersRuler = LineNumberView(scrollView: containerView, orientation: .verticalRuler)
@@ -130,6 +138,16 @@ final class ContentViewController: NSViewController {
       .sink(receiveValue: { notification in
         self.refreshBank()
         self.refreshFileContents()
+      })
+
+    didProcessEditingSubscriber = NotificationCenter.default.publisher(for: NSTextStorage.didProcessEditingNotification)
+      .receive(on: RunLoop.main)
+      .sink(receiveValue: { notification in
+        guard notification.object as? NSTextStorage === textView.textStorage else {
+          return
+        }
+        self.lineAnalysis = nil
+        lineNumbersRuler.needsDisplay = true
       })
   }
 }
@@ -174,7 +192,44 @@ extension ContentViewController: NSTextStorageDelegate {
   }
 }
 
+final class LineAnalysis {
+  internal init(lineStartCharacterIndices: UnsafeMutablePointer<Int>, numberOfLines: Int) {
+    self.lineStartCharacterIndices = lineStartCharacterIndices
+    self.numberOfLines = numberOfLines
+  }
+
+  var lineStartCharacterIndices: UnsafeMutablePointer<Int>?
+  var numberOfLines: Int?
+
+  deinit {
+    lineStartCharacterIndices?.deallocate()
+  }
+}
+
 extension ContentViewController: LineNumberViewDelegate {
+  private func updateLineInformation() {
+    let lineStartCharacterIndices = NSMutableIndexSet()
+    guard let clientString = textView?.textStorage?.string else {
+      return
+    }
+    let nsString = NSString(string: clientString)
+    let range = NSRange(location: 0, length: nsString.length)
+    nsString.enumerateSubstrings(in: range, options: [String.EnumerationOptions.byLines, .substringNotRequired]) { (_, substringRange, _, _) in
+      lineStartCharacterIndices.add(substringRange.location)
+    }
+
+    let numberOfLines = lineStartCharacterIndices.count
+    let buffer = UnsafeMutablePointer<Int>.allocate(capacity: numberOfLines)
+    lineStartCharacterIndices.getIndexes(buffer, maxCount: numberOfLines, inIndexRange: nil)
+    self.lineAnalysis = LineAnalysis(lineStartCharacterIndices: buffer, numberOfLines: numberOfLines)
+  }
+
+  func lineNumberViewWillDraw(_ lineNumberView: LineNumberView) {
+    if lineAnalysis == nil {
+      updateLineInformation()
+    }
+  }
+
   func lineNumberView(_ lineNumberView: LineNumberView, didActivate lineNumber: Int) {
     guard let bankLines = lineNumbersRuler?.bankLines else {
       return
@@ -191,6 +246,12 @@ extension ContentViewController: LineNumberViewDelegate {
       range = HFRange(location: UInt64(address), length: 1)
     }
     print(range)
+  }
+}
+
+extension ContentViewController: NSTextViewDelegate {
+  func textView(_ textView: NSTextView, shouldChangeTextIn affectedCharRange: NSRange, replacementString: String?) -> Bool {
+    return false
   }
 }
 
