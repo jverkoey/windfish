@@ -63,9 +63,15 @@ class ProjectDocument: NSDocument {
     let restartSize: LR35902.Address = 8
     let rstAddresses = (0..<numberOfRestartAddresses).map { ($0 * restartSize)..<($0 * restartSize + restartSize) }
     rstAddresses.forEach {
-      let region = Region(name: "RST_\($0.lowerBound.hexString)", bank: 0, address: $0.lowerBound, length: LR35902.Address($0.count))
-      configuration.regions.append(region)
+      configuration.regions.append(Region(name: "RST_\($0.lowerBound.hexString)", bank: 0, address: $0.lowerBound, length: LR35902.Address($0.count)))
     }
+
+    configuration.regions.append(Region(name: "VBlankInterrupt", bank: 0, address: 0x0040, length: 8))
+    configuration.regions.append(Region(name: "LCDCInterrupt", bank: 0, address: 0x0048, length: 8))
+    configuration.regions.append(Region(name: "TimerOverflowInterrupt", bank: 0, address: 0x0050, length: 8))
+    configuration.regions.append(Region(name: "SerialTransferCompleteInterrupt", bank: 0, address: 0x0058, length: 8))
+    configuration.regions.append(Region(name: "JoypadTransitionInterrupt", bank: 0, address: 0x0060, length: 8))
+    configuration.regions.append(Region(name: "Boot", bank: 0, address: 0x0100, length: 4))
   }
 
   private var documentFileWrapper: FileWrapper?
@@ -157,7 +163,9 @@ extension ProjectDocument {
 
       for region in self.configuration.regions {
         disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
-        disassembly.disassemble(range: region.address..<(region.address + region.length), inBank: region.bank)
+        if region.length > 0 {
+          disassembly.disassemble(range: region.address..<(region.address + region.length), inBank: region.bank)
+        }
       }
 
       //            disassembly.disassembleAsGameboyCartridge()

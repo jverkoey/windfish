@@ -69,15 +69,17 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
     tableControls.action = #selector(performTableControlAction(_:))
     view.addSubview(tableControls)
 
-    NSLayoutConstraint.activate([
-      containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-      containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-      containerView.topAnchor.constraint(equalTo: view.topAnchor),
-      containerView.heightAnchor.constraint(equalToConstant: 200),
+    let safeAreas = view.safeAreaLayoutGuide
 
-      tableControls.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-      tableControls.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-      tableControls.topAnchor.constraint(equalTo: containerView.bottomAnchor),
+    NSLayoutConstraint.activate([
+      containerView.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
+      containerView.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
+      containerView.topAnchor.constraint(equalTo: safeAreas.topAnchor),
+      containerView.bottomAnchor.constraint(equalTo: tableControls.topAnchor),
+
+      tableControls.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
+      tableControls.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
+      tableControls.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
     ])
 
     for columnName in [("Name", NSUserInterfaceItemIdentifier.name), ("Bank", .bank), ("Address", .address), ("Length", .length)] {

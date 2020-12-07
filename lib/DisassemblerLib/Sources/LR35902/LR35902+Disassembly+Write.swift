@@ -135,7 +135,7 @@ extension LR35902.Disassembly {
             .joined(separator: ", ")
           return line("\(label):", comment: "Sources: \(sources)")
         } else {
-          return line("\(label):")
+          return line("\(label):", comment: nil)
         }
 
       case let .instruction(_, assembly):
