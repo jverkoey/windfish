@@ -67,7 +67,7 @@ final class ContentViewController: NSViewController {
   private var disassembledSubscriber: AnyCancellable?
 
   private var didProcessEditingSubscriber: AnyCancellable?
-  private var lineAnalysis: LineAnalysis? {
+  var lineAnalysis: LineAnalysis? {
     didSet {
       lineNumbersRuler?.lineAnalysis = lineAnalysis
     }
@@ -192,12 +192,14 @@ extension ContentViewController: NSTextStorageDelegate {
 }
 
 final class LineAnalysis {
-  internal init(lineStartCharacterIndices: UnsafeMutablePointer<Int>, numberOfLines: Int) {
+  internal init(lineStartCharacterIndices: UnsafeMutablePointer<Int>, lineRanges: [NSRange], numberOfLines: Int) {
     self.lineStartCharacterIndices = lineStartCharacterIndices
+    self.lineRanges = lineRanges
     self.numberOfLines = numberOfLines
   }
 
   var lineStartCharacterIndices: UnsafeMutablePointer<Int>
+  var lineRanges: [NSRange]
   var numberOfLines: Int
 
   deinit {
@@ -236,14 +238,16 @@ extension ContentViewController: LineNumberViewDelegate {
     }
     let nsString = NSString(string: clientString)
     let range = NSRange(location: 0, length: nsString.length)
+    var lineRanges: [NSRange] = []
     nsString.enumerateSubstrings(in: range, options: [String.EnumerationOptions.byLines, .substringNotRequired]) { (_, substringRange, _, _) in
       lineStartCharacterIndices.add(substringRange.location)
+      lineRanges.append(substringRange)
     }
 
     let numberOfLines = lineStartCharacterIndices.count
     let buffer = UnsafeMutablePointer<Int>.allocate(capacity: numberOfLines)
     lineStartCharacterIndices.getIndexes(buffer, maxCount: numberOfLines, inIndexRange: nil)
-    self.lineAnalysis = LineAnalysis(lineStartCharacterIndices: buffer, numberOfLines: numberOfLines)
+    self.lineAnalysis = LineAnalysis(lineStartCharacterIndices: buffer, lineRanges: lineRanges, numberOfLines: numberOfLines)
   }
 
   func lineNumberViewWillDraw(_ lineNumberView: LineNumberView) {

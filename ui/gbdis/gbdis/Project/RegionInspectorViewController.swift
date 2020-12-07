@@ -113,8 +113,12 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
       regionTableView.addTableColumn(column)
     }
 
-    selectionObserver = regionController.observe(\.selectedObjects, options: [.new]) { (controller, change) in
+    selectionObserver = regionController.observe(\.selectedObjects, options: []) { (controller, change) in
       tableControls.setEnabled(controller.selectedObjects.count > 0, forSegment: 1)
+
+      if let region = controller.selectedObjects.first as? Region {
+        NotificationCenter.default.post(name: .selectedRegionDidChange, object: self.document, userInfo: ["selectedRegion": region])
+      }
     }
 
     regionController.bind(.contentArray, to: document.configuration, withKeyPath: "regions", options: nil)

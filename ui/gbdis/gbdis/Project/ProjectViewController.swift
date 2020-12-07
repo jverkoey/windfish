@@ -21,6 +21,7 @@ final class ProjectViewController: NSViewController {
   let inspectorViewController: InspectorViewController
 
   private var selectedFileDidChangeSubscriber: AnyCancellable?
+  private var selectedRegionDidChangeSubscriber: AnyCancellable?
 
   init(document: ProjectDocument) {
     self.document = document
@@ -118,6 +119,52 @@ final class ProjectViewController: NSViewController {
         } else {
           self.contentViewController.bank = nil
         }
+      })
+
+    selectedRegionDidChangeSubscriber = NotificationCenter.default.publisher(for: .selectedRegionDidChange, object: document)
+      .receive(on: RunLoop.main)
+      .sink(receiveValue: { notification in
+        guard let region = notification.userInfo?["selectedRegion"] as? Region else {
+          preconditionFailure()
+        }
+
+        guard let metadata = self.document.metadata else {
+          return
+        }
+        let fileName = metadata.bankMap.first { key, value in
+          value == region.bank
+        }?.key
+        guard let index = self.sidebarViewController.treeController.arrangedObjects.descendant(at: IndexPath(indexes: [0]))?.children?.firstIndex(where: { node in
+          (node.representedObject as? ProjectOutlineNode)?.title == fileName
+        }) else {
+          return
+        }
+        self.sidebarViewController.treeController.setSelectionIndexPath(IndexPath(indexes: [0, index]))
+
+        guard let bankLines = self.document.bankLines?[region.bank] else {
+          return
+        }
+        guard let lineIndex = bankLines.firstIndex(where: { line in
+          if let address = line.address {
+            return address >= region.address
+          } else {
+            return false
+          }
+        }) else {
+          return
+        }
+
+        guard let analysis = self.contentViewController.lineAnalysis,
+              let textView = self.contentViewController.textView,
+              let layoutManager = textView.layoutManager,
+              let textContainer = textView.textContainer else {
+          return
+        }
+
+        let lineRange = analysis.lineRanges[lineIndex]
+        let glyphGraph = layoutManager.glyphRange(forCharacterRange: lineRange, actualCharacterRange: nil)
+        let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphGraph, in: textContainer)
+        self.contentViewController.textView?.scrollToVisible(boundingRect)
       })
 
     if document.isDisassembling {

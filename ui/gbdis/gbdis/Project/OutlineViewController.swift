@@ -129,7 +129,7 @@ final class OutlineViewController: NSViewController {
     outlineView.deselectAll(self)
 
     var lastSelectedObjects: [ProjectOutlineNode] = []
-    treeControllerObserver = treeController.observe(\.selectedObjects, options: [.new, .old]) { (treeController, change) in
+    treeControllerObserver = treeController.observe(\.selectedObjects, options: [.new]) { (treeController, change) in
       precondition(treeController.selectedObjects.count <= 1, "Multiple selection not supported")
       guard let selectedNodes = treeController.selectedObjects as? [ProjectOutlineNode] else {
         return
