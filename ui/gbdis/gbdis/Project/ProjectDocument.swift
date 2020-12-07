@@ -50,7 +50,6 @@ class ProjectDocument: NSDocument {
 
   var isDisassembling = false
   var romData: Data?
-  var slice: HFSharedMemoryByteSlice?
   var disassemblyFiles: [String: Data]?
   var bankLines: [LR35902.Bank: [LR35902.Disassembly.Line]]?
 
@@ -216,7 +215,6 @@ extension ProjectDocument {
         if response == .OK, let url = openPanel.url {
           let data = try! Data(contentsOf: url)
           self.romData = data
-          self.slice = HFSharedMemoryByteSlice(unsharedData: data)
 
           self.metadata = ProjectMetadata(
             romUrl: url,
@@ -254,7 +252,6 @@ extension ProjectDocument {
     if let fileWrapper = fileWrappers[Filenames.rom],
        let data = fileWrapper.regularFileContents {
       self.romData = data
-      self.slice = HFSharedMemoryByteSlice(unsharedData: data)
     }
 
     if let fileWrapper = fileWrappers[Filenames.disassembly] {

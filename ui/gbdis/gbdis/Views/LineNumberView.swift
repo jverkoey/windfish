@@ -12,7 +12,6 @@ import Combine
 
 protocol LineNumberViewDelegate: NSObject {
   func lineNumberView(_ lineNumberView: LineNumberView, didActivate lineNumber: Int)
-  func lineNumberViewDidChangeRuleThickness(_ lineNumberView: LineNumberView)
 }
 
 private let scopeColumnWidth: CGFloat = 8
@@ -96,12 +95,6 @@ final class LineNumberView: NSRulerView {
     let digitSize = NSString("0000").size(withAttributes: textAttributes())
     let bankDigitSize = NSString("00").size(withAttributes: textAttributes())
     ruleThickness = max(ceil(bankDigitSize.width + 4) + scopeColumnWidth + ceil(digitSize.width + 4), 10)
-  }
-
-  override var ruleThickness: CGFloat {
-    didSet {
-      delegate?.lineNumberViewDidChangeRuleThickness(self)
-    }
   }
 
   override func viewWillDraw() {

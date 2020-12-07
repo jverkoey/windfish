@@ -15,7 +15,6 @@ final class ContentViewController: NSViewController {
   var containerView: NSScrollView?
   var textView: NSTextView?
   var lineNumbersRuler: LineNumberView?
-  var dataRuler: LineNumberView?
 
   var filename: String? {
     didSet {
@@ -30,23 +29,16 @@ final class ContentViewController: NSViewController {
   }
   private func refreshBank() {
     if let bank = bank {
-      dataRuler?.isHidden = false
-
       let bankLines = document.bankLines?[bank]
       lineNumbersRuler?.bankLines = bankLines
-      dataRuler?.bankLines = bankLines
     } else {
-      dataRuler?.isHidden = true
       lineNumbersRuler?.bankLines = nil
-      dataRuler?.bankLines = nil
     }
     lineNumbersRuler?.needsDisplay = true
-    dataRuler?.needsDisplay = true
 
     if let lineNumbersRuler = lineNumbersRuler {
       containerView?.contentView.contentInsets.left = lineNumbersRuler.ruleThickness
     }
-    containerView?.contentView.contentInsets.right = self.hexViewController.minimumWidth
   }
 
   private func refreshFileContents() {
@@ -72,16 +64,12 @@ final class ContentViewController: NSViewController {
   }
 
   let document: ProjectDocument
-  let hexViewController: HexViewController
   private var disassembledSubscriber: AnyCancellable?
 
   init(document: ProjectDocument) {
     self.document = document
-    self.hexViewController = HexViewController()
 
     super.init(nibName: nil, bundle: nil)
-
-    self.addChild(self.hexViewController)
   }
 
   required init?(coder: NSCoder) {
@@ -90,9 +78,6 @@ final class ContentViewController: NSViewController {
 
   override func loadView() {
     view = NSView()
-
-    self.hexViewController.view.translatesAutoresizingMaskIntoConstraints = false
-    view.addSubview(self.hexViewController.view)
 
     view.wantsLayer = true
     view.layer?.backgroundColor = NSColor.textBackgroundColor.cgColor
@@ -128,30 +113,13 @@ final class ContentViewController: NSViewController {
     containerView.rulersVisible = true
     self.lineNumbersRuler = lineNumbersRuler
 
-    let dataRuler = LineNumberView(scrollView: containerView, orientation: .verticalRuler)
-    dataRuler.translatesAutoresizingMaskIntoConstraints = false
-    dataRuler.clientView = textView
-    dataRuler.scrollView = containerView
-    dataRuler.delegate = self
-    self.dataRuler = dataRuler
-    containerView.contentView.addSubview(dataRuler)
-
     let safeAreaLayoutGuide = view.safeAreaLayoutGuide
-
-    containerView.contentView.automaticallyAdjustsContentInsets = false
-
     NSLayoutConstraint.activate([
       // Text content
       containerView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
       containerView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
       containerView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
       containerView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
-
-      // Hex viewer
-      dataRuler.topAnchor.constraint(equalTo: textView.topAnchor),
-      dataRuler.bottomAnchor.constraint(equalTo: textView.bottomAnchor),
-      dataRuler.leadingAnchor.constraint(equalTo: textView.trailingAnchor),
-      dataRuler.widthAnchor.constraint(equalToConstant: self.hexViewController.minimumWidth),
     ])
 
     self.bank = nil
@@ -206,14 +174,6 @@ extension ContentViewController: NSTextStorageDelegate {
 }
 
 extension ContentViewController: LineNumberViewDelegate {
-  func lineNumberViewDidChangeRuleThickness(_ lineNumberView: LineNumberView) {
-    if lineNumberView == self.lineNumbersRuler {
-      containerView?.contentView.contentInsets.left = lineNumberView.ruleThickness
-    } else if lineNumberView == self.dataRuler {
-      containerView?.contentView.contentInsets.right = lineNumberView.ruleThickness
-    }
-  }
-
   func lineNumberView(_ lineNumberView: LineNumberView, didActivate lineNumber: Int) {
     guard let bankLines = lineNumbersRuler?.bankLines else {
       return
@@ -229,9 +189,7 @@ extension ContentViewController: LineNumberViewDelegate {
     } else {
       range = HFRange(location: UInt64(address), length: 1)
     }
-    hexViewController.hexController.centerContentsRange(range)
-    hexViewController.hexController.selectedContentsRanges = [HFRangeWrapper.withRange(range)]
-    hexViewController.hexController.pulseSelection()
+    print(range)
   }
 }
 
