@@ -10,11 +10,13 @@ import Cocoa
 import LR35902
 
 extension NSUserInterfaceItemIdentifier {
+  fileprivate static let type = NSUserInterfaceItemIdentifier("regionType")
   fileprivate static let name = NSUserInterfaceItemIdentifier("name")
   fileprivate static let bank = NSUserInterfaceItemIdentifier("bank")
   fileprivate static let address = NSUserInterfaceItemIdentifier("address")
   fileprivate static let length = NSUserInterfaceItemIdentifier("length")
 
+  fileprivate static let typeCell = NSUserInterfaceItemIdentifier("typeCell")
   fileprivate static let textCell = NSUserInterfaceItemIdentifier("textCell")
   fileprivate static let numberCell = NSUserInterfaceItemIdentifier("numberCell")
   fileprivate static let addressCell = NSUserInterfaceItemIdentifier("addressCell")
@@ -28,11 +30,22 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
   let regionController = NSArrayController()
   private var stashedTextFieldValue: String?
   private var selectionObserver: NSKeyValueObservation?
+  let regionTypeController = NSArrayController()
+
+  private struct Column {
+    let name: String
+    let identifier: NSUserInterfaceItemIdentifier
+    let width: CGFloat
+  }
 
   init(document: ProjectDocument) {
     self.document = document
 
     super.init(nibName: nil, bundle: nil)
+
+    regionTypeController.addObject(Region.Kind.region)
+    regionTypeController.addObject(Region.Kind.label)
+    regionTypeController.addObject(Region.Kind.function)
   }
 
   required init?(coder: NSCoder) {
@@ -82,11 +95,19 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
       tableControls.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
     ])
 
-    for columnName in [("Name", NSUserInterfaceItemIdentifier.name), ("Bank", .bank), ("Address", .address), ("Length", .length)] {
-      let column = NSTableColumn(identifier: columnName.1)
+    let columns = [
+      Column(name: "Type", identifier: .type, width: 100),
+      Column(name: "Name", identifier: .name, width: 120),
+      Column(name: "Bank", identifier: .bank, width: 35),
+      Column(name: "Address", identifier: .address, width: 50),
+      Column(name: "Region length", identifier: .length, width: 35),
+    ]
+
+    for columnInfo in columns {
+      let column = NSTableColumn(identifier: columnInfo.identifier)
       column.isEditable = false
-      column.headerCell.stringValue = columnName.0
-      column.width = 50
+      column.headerCell.stringValue = columnInfo.name
+      column.width = columnInfo.width
       // Note: this only works for cell-based tables.
 //      column.bind(.value, to: regionController, withKeyPath: "arrangedObjects.name", options: nil)
       regionTableView.addTableColumn(column)
@@ -107,7 +128,7 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
       if sender.selectedSegment == 0 {
         // Add
         document.configuration.regions.append(
-          Region(name: "New region", bank: 0, address: 0, length: 0)
+          Region(regionType: Region.Kind.label, name: "New region", bank: 0, address: 0, length: 0)
         )
         return "Create Region"
       } else if sender.selectedSegment == 1 {
@@ -157,9 +178,20 @@ extension RegionInspectorViewController: NSTableViewDelegate {
     guard let tableColumn = tableColumn else {
       preconditionFailure()
     }
-    let view: TextTableCellView
+    let view: NSTableCellView
 
     switch tableColumn.identifier {
+    case .type:
+      let identifier = NSUserInterfaceItemIdentifier.typeCell
+      if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TypeTableCellView {
+        view = recycledView
+      } else {
+        let typeView = TypeTableCellView()
+        typeView.identifier = identifier
+        typeView.popupButton.bind(.content, to: regionTypeController, withKeyPath: "arrangedObjects", options: nil)
+        typeView.popupButton.bind(.selectedObject, to: typeView, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
+        view = typeView
+      }
     case .name:
       let identifier = NSUserInterfaceItemIdentifier.textCell
       if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TextTableCellView {

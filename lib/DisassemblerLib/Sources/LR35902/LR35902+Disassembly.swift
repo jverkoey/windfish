@@ -216,14 +216,6 @@ extension LR35902 {
       return code.union(data).union(text)
     }
 
-    // MARK: - Functions
-
-    public func function(startingAt pc: Address, in bank: Bank) -> String? {
-      guard let cartridgeLocation = cartridgeLocation(for: pc, in: bank) else {
-        return nil
-      }
-      return functions[cartridgeLocation]
-    }
     public func setSoftTerminator(at pc: Address, in bank: Bank) {
       softTerminators[cartridgeLocation(for: pc, in: bank)!] = true
     }
@@ -260,17 +252,10 @@ extension LR35902 {
     var contiguousScopes: [Bank: Set<Range<CartridgeLocation>>] = [:]
 
     public func defineFunction(startingAt pc: Address, in bank: Bank, named name: String) {
-      guard let cartridgeLocation = safeCartridgeLocation(for: pc, in: bank) else {
-        preconditionFailure("Attempting to set label in non-cart addressable location.")
-      }
-
       setLabel(at: pc, in: bank, named: name)
-      functions[cartridgeLocation] = name
-
       let upperBound: Address = (pc < 0x4000) ? 0x4000 : 0x8000
       disassemble(range: pc..<upperBound, inBank: bank)
     }
-    private var functions: [CartridgeLocation: String] = [:]
 
     // MARK: - Labels
 

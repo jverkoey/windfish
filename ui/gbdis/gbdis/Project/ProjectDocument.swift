@@ -10,12 +10,25 @@ import Cocoa
 import LR35902
 
 final class Region: NSObject, NSCopying, Codable {
+  struct Kind {
+    static let region = "Region"
+    static let label = "Label"
+    static let function = "Function"
+  }
+  @objc dynamic var regionType: String {
+    didSet {
+      if regionType == Kind.label || regionType == Kind.function {
+        length = 0
+      }
+    }
+  }
   @objc dynamic var name: String
   @objc dynamic var bank: LR35902.Bank
   @objc dynamic var address: LR35902.Address
   @objc dynamic var length: LR35902.Address
 
-  init(name: String, bank: LR35902.Bank, address: LR35902.Address, length: LR35902.Address) {
+  init(regionType: String, name: String, bank: LR35902.Bank, address: LR35902.Address, length: LR35902.Address) {
+    self.regionType = regionType
     self.name = name
     self.bank = bank
     self.address = address
@@ -23,7 +36,7 @@ final class Region: NSObject, NSCopying, Codable {
   }
 
   func copy(with zone: NSZone? = nil) -> Any {
-    return Region(name: name, bank: bank, address: address, length: length)
+    return Region(regionType: regionType, name: name, bank: bank, address: address, length: length)
   }
 }
 
@@ -63,15 +76,15 @@ class ProjectDocument: NSDocument {
     let restartSize: LR35902.Address = 8
     let rstAddresses = (0..<numberOfRestartAddresses).map { ($0 * restartSize)..<($0 * restartSize + restartSize) }
     rstAddresses.forEach {
-      configuration.regions.append(Region(name: "RST_\($0.lowerBound.hexString)", bank: 0, address: $0.lowerBound, length: LR35902.Address($0.count)))
+      configuration.regions.append(Region(regionType: Region.Kind.region, name: "RST_\($0.lowerBound.hexString)", bank: 0, address: $0.lowerBound, length: LR35902.Address($0.count)))
     }
 
-    configuration.regions.append(Region(name: "VBlankInterrupt", bank: 0, address: 0x0040, length: 8))
-    configuration.regions.append(Region(name: "LCDCInterrupt", bank: 0, address: 0x0048, length: 8))
-    configuration.regions.append(Region(name: "TimerOverflowInterrupt", bank: 0, address: 0x0050, length: 8))
-    configuration.regions.append(Region(name: "SerialTransferCompleteInterrupt", bank: 0, address: 0x0058, length: 8))
-    configuration.regions.append(Region(name: "JoypadTransitionInterrupt", bank: 0, address: 0x0060, length: 8))
-    configuration.regions.append(Region(name: "Boot", bank: 0, address: 0x0100, length: 4))
+    configuration.regions.append(Region(regionType: Region.Kind.region, name: "VBlankInterrupt", bank: 0, address: 0x0040, length: 8))
+    configuration.regions.append(Region(regionType: Region.Kind.region, name: "LCDCInterrupt", bank: 0, address: 0x0048, length: 8))
+    configuration.regions.append(Region(regionType: Region.Kind.region, name: "TimerOverflowInterrupt", bank: 0, address: 0x0050, length: 8))
+    configuration.regions.append(Region(regionType: Region.Kind.region, name: "SerialTransferCompleteInterrupt", bank: 0, address: 0x0058, length: 8))
+    configuration.regions.append(Region(regionType: Region.Kind.region, name: "JoypadTransitionInterrupt", bank: 0, address: 0x0060, length: 8))
+    configuration.regions.append(Region(regionType: Region.Kind.region, name: "Boot", bank: 0, address: 0x0100, length: 4))
   }
 
   private var documentFileWrapper: FileWrapper?
@@ -162,9 +175,18 @@ extension ProjectDocument {
       let disassembly = LR35902.Disassembly(rom: romData)
 
       for region in self.configuration.regions {
-        disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
-        if region.length > 0 {
-          disassembly.disassemble(range: region.address..<(region.address + region.length), inBank: region.bank)
+        switch region.regionType {
+        case Region.Kind.region:
+          disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
+          if region.length > 0 {
+            disassembly.disassemble(range: region.address..<(region.address + region.length), inBank: region.bank)
+          }
+        case Region.Kind.label:
+          disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
+        case Region.Kind.function:
+          disassembly.defineFunction(startingAt: region.address, in: region.bank, named: region.name)
+        default:
+          preconditionFailure()
         }
       }
 

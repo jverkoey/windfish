@@ -32,3 +32,23 @@ final class TextTableCellView: NSTableCellView {
     fatalError("init(coder:) has not been implemented")
   }
 }
+
+final class TypeTableCellView: NSTableCellView {
+  let popupButton = NSPopUpButton()
+  override init(frame frameRect: NSRect) {
+    super.init(frame: frameRect)
+
+    popupButton.translatesAutoresizingMaskIntoConstraints = false
+    addSubview(popupButton)
+
+    NSLayoutConstraint.activate([
+      popupButton.leadingAnchor.constraint(equalTo: leadingAnchor),
+      popupButton.trailingAnchor.constraint(equalTo: trailingAnchor),
+      popupButton.centerYAnchor.constraint(equalTo: centerYAnchor)
+    ])
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+}
