@@ -147,6 +147,7 @@ final class LineNumberView: NSRulerView {
   }
 
   func processLines(in rect: NSRect,
+                    dataHandler: ((LR35902.Disassembly.Line.Semantic, Data, NSRect) -> Void)? = nil,
                     scopeHandler: ((LR35902.Disassembly.Line?, LR35902.Disassembly.Line, LR35902.Disassembly.Line?, NSRect) -> Void)? = nil,
                     bankHandler: ((LR35902.Bank, NSRect) -> Void)? = nil,
                     handler: (Int, NSString, NSRect) -> Bool) {
@@ -197,6 +198,16 @@ final class LineNumberView: NSRulerView {
         let previousLine = lineNumber > 0 ? bankLines[lineNumber - 1] : nil
         let currentLine = bankLines[lineNumber]
         let nextLine = lineNumber < bankLines.count - 1 ? bankLines[lineNumber + 1] : nil
+
+        if let data = bankLines[lineNumber].data, let dataHandler = dataHandler {
+          let dataRect = NSRect(
+            x: rightMostDrawableLocation - digitSize - scopeColumnWidth - bankDigitSize - dataSize,
+            y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY,
+            width: dataSize,
+            height: layoutRects.pointee.height
+          )
+          dataHandler(bankLines[lineNumber].semantic, data, dataRect)
+        }
 
         if let bank = bankLines[lineNumber].bank, let bankHandler = bankHandler {
           let bankRect = NSRect(
@@ -266,7 +277,24 @@ final class LineNumberView: NSRulerView {
 
     let textAttributes = self.textAttributes()
 
-    processLines(in: rect, scopeHandler: { (previousLine, currentLine, nextLine, scopeRect) in
+    processLines(in: rect, dataHandler: { semantic, data, dataRect in
+      if self.needsToDraw(dataRect.insetBy(dx: -4, dy: -4)) {
+        let textRect = dataRect.offsetBy(dx: 2, dy: 0)
+        switch semantic {
+        case .unknown: fallthrough
+        case .data:
+          let displayableBytes = data.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
+          let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
+          let dataString = "|\(bytesAsCharacters)|"
+          dataString.draw(with: textRect, options: .usesLineFragmentOrigin, attributes: textAttributes)
+        case .instruction:
+          let dataString = data.map { "$\($0.hexString)" }.joined(separator: " ")
+          dataString.draw(with: textRect, options: .usesLineFragmentOrigin, attributes: textAttributes)
+        default:
+          break
+        }
+      }
+    }, scopeHandler: { (previousLine, currentLine, nextLine, scopeRect) in
       let previousScope = previousLine?.scope
       let currentScope = currentLine.scope
       let nextScope = nextLine?.scope

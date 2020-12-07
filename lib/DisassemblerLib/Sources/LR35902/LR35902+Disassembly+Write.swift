@@ -125,14 +125,18 @@ extension LR35902.Disassembly {
       case let .preComment(comment):           return line(comment: comment)
 
       case let .transferOfControl(toc, label):
-        let sources = toc
-          .sorted(by: { $0.sourceLocation < $1.sourceLocation })
-          .map {
-            let (address, _) = LR35902.addressAndBank(from: $0.sourceLocation)
-            return "\(LR35902.Instruction.opcodes[$0.sourceInstructionSpec]!) @ $\(address.hexString)"
-          }
-          .joined(separator: ", ")
-        return line("\(label):", comment: "Sources: \(sources)")
+        if detailedComments {
+          let sources = toc
+            .sorted(by: { $0.sourceLocation < $1.sourceLocation })
+            .map {
+              let (address, _) = LR35902.addressAndBank(from: $0.sourceLocation)
+              return "\(LR35902.Instruction.opcodes[$0.sourceInstructionSpec]!) @ $\(address.hexString)"
+            }
+            .joined(separator: ", ")
+          return line("\(label):", comment: "Sources: \(sources)")
+        } else {
+          return line("\(label):")
+        }
 
       case let .instruction(_, assembly):
         if detailedComments {
