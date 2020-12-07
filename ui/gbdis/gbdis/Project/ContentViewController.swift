@@ -43,7 +43,9 @@ final class ContentViewController: NSViewController {
     lineNumbersRuler?.needsDisplay = true
     dataRuler?.needsDisplay = true
 
-    containerView?.contentView.contentInsets.left = lineNumbersRuler!.ruleThickness
+    if let lineNumbersRuler = lineNumbersRuler {
+      containerView?.contentView.contentInsets.left = lineNumbersRuler.ruleThickness
+    }
     containerView?.contentView.contentInsets.right = self.hexViewController.minimumWidth
   }
 
