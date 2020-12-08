@@ -16,6 +16,8 @@ final class Region: NSObject, Codable {
     static let function = "Function"
     static let string = "String"
     static let data = "Data"
+    static let image1bpp = "Image (1bpp)"
+    static let image2bpp = "Image (2bpp)"
   }
   @objc dynamic var regionType: String {
     didSet {
@@ -147,7 +149,7 @@ class ProjectDocument: NSDocument {
       Region(regionType: Region.Kind.region, name: "SerialTransferCompleteInterrupt", bank: 0, address: 0x0058, length: 8),
       Region(regionType: Region.Kind.region, name: "JoypadTransitionInterrupt", bank: 0, address: 0x0060, length: 8),
       Region(regionType: Region.Kind.region, name: "Boot", bank: 0, address: 0x0100, length: 4),
-      Region(regionType: Region.Kind.label, name: "HeaderLogo", bank: 0, address: 0x0104, length: 0),
+      Region(regionType: Region.Kind.image1bpp, name: "HeaderLogo", bank: 0, address: 0x0104, length: 0x0134 - 0x0104),
       Region(regionType: Region.Kind.string, name: "HeaderTitle", bank: 0, address: 0x0134, length: 0x0143 - 0x0134),
       Region(regionType: Region.Kind.label, name: "HeaderNewLicenseeCode", bank: 0, address: 0x0144, length: 0),
       Region(regionType: Region.Kind.label, name: "HeaderCartridgeType", bank: 0, address: 0x0147, length: 0),
@@ -506,6 +508,8 @@ extension ProjectDocument {
         case Region.Kind.string:
           disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
           disassembly.setText(at: region.address..<(region.address + region.length), in: region.bank, lineLength: nil)
+        case Region.Kind.image1bpp: fallthrough
+        case Region.Kind.image2bpp: fallthrough
         case Region.Kind.data:
           disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
           disassembly.setData(at: region.address..<(region.address + region.length), in: region.bank)

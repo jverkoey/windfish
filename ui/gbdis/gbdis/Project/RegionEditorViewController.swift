@@ -50,6 +50,8 @@ final class RegionEditorViewController: NSViewController, TabSelectable {
     regionTypeController.addObject(Region.Kind.function)
     regionTypeController.addObject(Region.Kind.string)
     regionTypeController.addObject(Region.Kind.data)
+    regionTypeController.addObject(Region.Kind.image1bpp)
+    regionTypeController.addObject(Region.Kind.image2bpp)
   }
 
   required init?(coder: NSCoder) {
