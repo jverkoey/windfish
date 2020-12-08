@@ -73,6 +73,10 @@ func prettify(_ label: String) -> String {
 
 extension LR35902.Disassembly {
   public struct Line: Equatable {
+    public enum ImageFormat {
+      case oneBitPerPixel
+      case twoBitsPerPixel
+    }
     public enum Semantic: Equatable {
       case newline
       case empty
@@ -86,11 +90,14 @@ extension LR35902.Disassembly {
       case macro(String)
       case macroDefinition(String)
       case macroTerminator
+      case imagePlaceholder(format: ImageFormat)
+      case image1bpp(RGBDSAssembly.Statement)
+      case image2bpp(RGBDSAssembly.Statement)
       case data(RGBDSAssembly.Statement)
       case text(RGBDSAssembly.Statement)
       case jumpTable(String, Int)
-      case unknown(RGBDSAssembly.Statement, String?)
-      case global(RGBDSAssembly.Statement, String)
+      case unknown(RGBDSAssembly.Statement)
+      case global(RGBDSAssembly.Statement, dataTypeName: String, dataType: Datatype)
     }
 
     init(semantic: Semantic, address: LR35902.Address? = nil, bank: LR35902.Bank? = nil, scope: String? = nil, data: Data? = nil) {
@@ -112,6 +119,8 @@ extension LR35902.Disassembly {
       case .newline:                           return ""
 
       case .empty:                             return ""
+
+      case .imagePlaceholder:                  return ""
 
       case let .label(label):                  return "\(label):"
 
@@ -159,8 +168,7 @@ extension LR35902.Disassembly {
 
       case .macroTerminator:                   return line("ENDM")
 
-      case let .text(statement): fallthrough
-      case let .data(statement):
+      case let .text(statement):
         if detailedComments {
           return line(statement.description, address: address!, addressType: "text")
         } else {
@@ -174,16 +182,43 @@ extension LR35902.Disassembly {
           return line("dw \(jumpLocation)", addressType: "jumpTable [\(index)]")
         }
 
-      case let .unknown(statement, addressType):
+      case let .image1bpp(statement):
         if detailedComments {
           let displayableBytes = data!.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
           let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
-          return line(statement.description, address: address!, addressType: addressType, comment: "|\(bytesAsCharacters)|")
+          return line(statement.description, address: address!, addressType: "image1bpp", comment: "|\(bytesAsCharacters)|")
         } else {
           return line(statement.description)
         }
 
-      case let .global(statement, addressType):
+      case let .image2bpp(statement):
+        if detailedComments {
+          let displayableBytes = data!.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
+          let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
+          return line(statement.description, address: address!, addressType: "image2bpp", comment: "|\(bytesAsCharacters)|")
+        } else {
+          return line(statement.description)
+        }
+
+      case let .data(statement):
+        if detailedComments {
+          let displayableBytes = data!.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
+          let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
+          return line(statement.description, address: address!, addressType: "data", comment: "|\(bytesAsCharacters)|")
+        } else {
+          return line(statement.description)
+        }
+
+      case let .unknown(statement):
+        if detailedComments {
+          let displayableBytes = data!.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
+          let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
+          return line(statement.description, address: address!, addressType: nil, comment: "|\(bytesAsCharacters)|")
+        } else {
+          return line(statement.description)
+        }
+
+      case let .global(statement, addressType, _):
         if detailedComments {
           return line(statement.description, address: address!, addressType: addressType)
         } else {
@@ -650,14 +685,16 @@ clean:
             && global == nil
 
           let globalValue: String?
+          let globalData: Data?
           if let global = global,
              let dataType = global.dataType,
              let type = dataTypes[dataType],
              let value = type.namedValues[accumulator.last!] {
             globalValue = value
-            accumulator.removeLast()
+            globalData = Data([accumulator.removeLast()])
           } else {
             globalValue = nil
+            globalData = nil
           }
 
           var chunkPc = initialPc
@@ -688,19 +725,39 @@ clean:
               chunkPc += LR35902.Address(pair.count)
             }
             break
-          default:
-            // Dump the bytes in blocks of 8.
-            let addressType = initialType == .data ? "data" : nil
+          case .unknown:
             for chunk in accumulator.chunked(into: 8) {
-              bankLines.append(Line(semantic: .unknown(RGBDSAssembly.statement(for: chunk), addressType), address: chunkPc, data: Data(chunk)))
+              bankLines.append(Line(semantic: .unknown(RGBDSAssembly.statement(for: chunk)), address: chunkPc, data: Data(chunk)))
               chunkPc += LR35902.Address(chunk.count)
             }
+          case .data:
+            for chunk in accumulator.chunked(into: 8) {
+              bankLines.append(Line(semantic: .data(RGBDSAssembly.statement(for: chunk)), address: chunkPc, data: Data(chunk)))
+              chunkPc += LR35902.Address(chunk.count)
+            }
+          case .image2bpp:
+            bankLines.append(Line(semantic: .imagePlaceholder(format: .twoBitsPerPixel), address: chunkPc, data: Data(accumulator)))
+            for chunk in accumulator.chunked(into: 8) {
+              bankLines.append(Line(semantic: .image2bpp(RGBDSAssembly.statement(for: chunk)), address: chunkPc, data: Data(chunk)))
+              chunkPc += LR35902.Address(chunk.count)
+            }
+          case .image1bpp:
+            bankLines.append(Line(semantic: .imagePlaceholder(format: .oneBitPerPixel), address: chunkPc, data: Data(accumulator)))
+            for chunk in accumulator.chunked(into: 8) {
+              bankLines.append(Line(semantic: .image1bpp(RGBDSAssembly.statement(for: chunk)), address: chunkPc, data: Data(chunk)))
+              chunkPc += LR35902.Address(chunk.count)
+            }
+          case .code:
+            preconditionFailure()
+          case .ram:
+            preconditionFailure()
           }
 
           if let global = global,
-             let dataType = global.dataType,
+             let dataTypeName = global.dataType,
+             let dataType = dataTypes[dataTypeName],
              let globalValue = globalValue {
-            bankLines.append(Line(semantic: .global(RGBDSAssembly.statement(for: globalValue), dataType), address: chunkPc))
+            bankLines.append(Line(semantic: .global(RGBDSAssembly.statement(for: globalValue), dataTypeName: dataTypeName, dataType: dataType), address: chunkPc, data: globalData))
           }
 
           lineBuffer.append(Line(semantic: .empty))

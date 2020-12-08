@@ -508,8 +508,12 @@ extension ProjectDocument {
         case Region.Kind.string:
           disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
           disassembly.setText(at: region.address..<(region.address + region.length), in: region.bank, lineLength: nil)
-        case Region.Kind.image1bpp: fallthrough
-        case Region.Kind.image2bpp: fallthrough
+        case Region.Kind.image1bpp:
+          disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
+          disassembly.setData(at: region.address..<(region.address + region.length), in: region.bank, format: .image1bpp)
+        case Region.Kind.image2bpp:
+          disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
+          disassembly.setData(at: region.address..<(region.address + region.length), in: region.bank, format: .image2bpp)
         case Region.Kind.data:
           disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
           disassembly.setData(at: region.address..<(region.address + region.length), in: region.bank)
@@ -579,14 +583,77 @@ extension ProjectDocument {
                                                     attributes: baseAttributes))
             case let .text(assembly): fallthrough
             case let .data(assembly): fallthrough
-            case let .unknown(assembly, _): fallthrough
-            case let .global(assembly, _): fallthrough
+            case let .unknown(assembly): fallthrough
+            case let .global(assembly, _, _): fallthrough
+            case let .image1bpp(assembly): fallthrough
+            case let .image2bpp(assembly): fallthrough
             case let .instruction(_, assembly):
               accumulator.append(NSAttributedString(string: "    ",
                                                     attributes: baseAttributes))
               accumulator.append(assembly.attributedString(attributes: baseAttributes,
                                                            opcodeAttributes: opcodeAttributes,
                                                            operandAttributes: operandAttributes))
+            case let .imagePlaceholder(format):
+              switch format {
+              case .oneBitPerPixel:
+                let data = line.data!
+                let scale: CGFloat = 4
+                let imageSize = NSSize(width: 48 * scale + 4 * scale, height: 8 * scale + 4 * scale)
+                let image = NSImage(size: imageSize)
+                image.lockFocusFlipped(true)
+                NSColor.textColor.set()
+
+                var column: CGFloat = 0
+                var row: CGFloat = 0
+                let pixel = NSRect(x: 2 * scale, y: 2 * scale, width: scale, height: scale)
+                var alternator = false
+                for byte in data {
+                  if (byte & 0x80) != 0 {
+                    pixel.offsetBy(dx: column, dy: row).fill()
+                  }
+                  if (byte & 0x40) != 0 {
+                    pixel.offsetBy(dx: column + 1 * scale, dy: row).fill()
+                  }
+                  if (byte & 0x20) != 0 {
+                    pixel.offsetBy(dx: column + 2 * scale, dy: row).fill()
+                  }
+                  if (byte & 0x10) != 0 {
+                    pixel.offsetBy(dx: column + 3 * scale, dy: row).fill()
+                  }
+                  if (byte & 0x08) != 0 {
+                    pixel.offsetBy(dx: column, dy: row + 1 * scale).fill()
+                  }
+                  if (byte & 0x04) != 0 {
+                    pixel.offsetBy(dx: column + 1 * scale, dy: row + 1 * scale).fill()
+                  }
+                  if (byte & 0x02) != 0 {
+                    pixel.offsetBy(dx: column + 2 * scale, dy: row + 1 * scale).fill()
+                  }
+                  if (byte & 0x01) != 0 {
+                    pixel.offsetBy(dx: column + 3 * scale, dy: row + 1 * scale).fill()
+                  }
+                  if alternator {
+                    column += 4 * scale
+                    row -= 2 * scale
+                  } else {
+                    row += 2 * scale
+                  }
+                  alternator = !alternator
+                  if column >= (imageSize.width - 4 * scale) {
+                    column = 0
+                    row += 4 * scale
+                  }
+                }
+
+                image.unlockFocus()
+
+                let textAttachment = NSTextAttachment()
+                textAttachment.image = image
+                accumulator.append(NSAttributedString(attachment: textAttachment))
+              case .twoBitsPerPixel:
+                break
+              }
+              break
             }
             accumulator.append(NSAttributedString(string: "\n"))
           }

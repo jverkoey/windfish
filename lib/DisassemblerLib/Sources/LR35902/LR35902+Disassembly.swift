@@ -99,14 +99,21 @@ extension LR35902 {
 
     // MARK: - Data segments
 
+    public enum DataFormat {
+      case bytes
+      case image1bpp
+      case image2bpp
+    }
+
     public func setData(at address: Address, in bank: Bank) {
       setData(at: address..<(address+1), in: bank)
     }
-    public func setData(at range: Range<Address>, in bank: Bank) {
+    public func setData(at range: Range<Address>, in bank: Bank, format: DataFormat = .bytes) {
       let lowerBound = cartridgeLocation(for: range.lowerBound, in: bank)!
       let upperBound = cartridgeLocation(for: range.upperBound, in: bank)!
       let cartRange = lowerBound..<upperBound
       dataBlocks.insert(integersIn: Int(lowerBound + 1)..<Int(upperBound))
+      dataFormats[cartRange] = format
 
       let scopeBank = effectiveBank(at: range.lowerBound, in: bank)
       // Shorten any contiguous scopes that contain this data.
@@ -135,7 +142,14 @@ extension LR35902 {
         labelTypes[location] = nil
       }
     }
+    func formatOfData(at address: Address, in bank: Bank) -> DataFormat? {
+      let location = cartridgeLocation(for: address, in: bank)!
+      return dataFormats.first { pair in
+        pair.0.contains(location)
+      }?.value
+    }
     private var dataBlocks = IndexSet()
+    private var dataFormats: [Range<CartridgeLocation>: DataFormat] = [:]
 
     public func setJumpTable(at range: Range<Address>, in bank: Bank) {
       let lowerBound = cartridgeLocation(for: range.lowerBound, in: bank)!
@@ -188,6 +202,8 @@ extension LR35902 {
       case data
       case jumpTable
       case text
+      case image1bpp
+      case image2bpp
       case ram
     }
     public func type(of address: Address, in bank: Bank) -> ByteType {
@@ -200,7 +216,15 @@ extension LR35902 {
       } else if jumpTables.contains(index) {
         return .jumpTable
       } else if data.contains(index) {
-        return .data
+        switch formatOfData(at: address, in: bank) {
+        case .image1bpp:
+          return .image1bpp
+        case .image2bpp:
+          return .image2bpp
+        case .bytes: fallthrough
+        default:
+          return .data
+        }
       } else if text.contains(index) {
         return .text
       } else {
@@ -355,10 +379,10 @@ extension LR35902 {
     }
     var globals: [Address: Global] = [:]
 
-    public struct Datatype {
-      let namedValues: [UInt8: String]
-      let interpretation: Interpretation
-      let representation: Representation
+    public struct Datatype: Equatable {
+      public let namedValues: [UInt8: String]
+      public let interpretation: Interpretation
+      public let representation: Representation
 
       public enum Interpretation {
         case any

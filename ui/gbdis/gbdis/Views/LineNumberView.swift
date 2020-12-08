@@ -134,6 +134,7 @@ final class LineNumberView: NSRulerView {
         switch bankLines[lineNumber].semantic {
         case .label: fallthrough
         case .empty: fallthrough
+        case .imagePlaceholder: fallthrough
         case .transferOfControl:
           isLabel = true
         default:
@@ -228,9 +229,26 @@ final class LineNumberView: NSRulerView {
           let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
           let dataString = "|\(bytesAsCharacters)|"
           dataString.draw(with: textRect, options: .usesLineFragmentOrigin, attributes: textAttributes)
+        case .image1bpp: fallthrough
+        case .image2bpp:
+          "image".draw(with: textRect, options: .usesLineFragmentOrigin, attributes: textAttributes)
+        case .text:
+          "text".draw(with: textRect, options: .usesLineFragmentOrigin, attributes: textAttributes)
         case .instruction:
           let dataString = data.map { "$\($0.hexString)" }.joined(separator: " ")
           dataString.draw(with: textRect, options: .usesLineFragmentOrigin, attributes: textAttributes)
+        case let .global(_, _, dataType):
+          switch dataType.representation {
+          case .binary:
+            let dataString = data.map { "b\($0.binaryString)" }.joined(separator: " ")
+            dataString.draw(with: textRect, options: .usesLineFragmentOrigin, attributes: textAttributes)
+          case .decimal:
+            let dataString = data.map { "\($0)" }.joined(separator: " ")
+            dataString.draw(with: textRect, options: .usesLineFragmentOrigin, attributes: textAttributes)
+          case .hexadecimal:
+            let dataString = data.map { "$\($0.hexString)" }.joined(separator: " ")
+            dataString.draw(with: textRect, options: .usesLineFragmentOrigin, attributes: textAttributes)
+          }
         default:
           break
         }
