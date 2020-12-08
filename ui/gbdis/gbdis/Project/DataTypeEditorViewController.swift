@@ -57,6 +57,7 @@ final class DataTypeEditorViewController: TableViewEditorViewController, TabSele
     }
 
     tableView.delegate = self
+    tableView.tableView?.delegate = self
 
     let columns = [
       Column(name: "Name", identifier: .name, width: 120),
@@ -71,7 +72,7 @@ final class DataTypeEditorViewController: TableViewEditorViewController, TabSele
       column.width = columnInfo.width
       // Note: this only works for cell-based tables.
 //      column.bind(.value, to: regionController, withKeyPath: "arrangedObjects.name", options: nil)
-      tableView.addTableColumn(column)
+      tableView.tableView?.addTableColumn(column)
     }
 
     selectionObserver = elementsController.observe(\.selectedObjects, options: []) { (controller, change) in
@@ -81,30 +82,32 @@ final class DataTypeEditorViewController: TableViewEditorViewController, TabSele
     }
 
     elementsController.bind(.contentArray, to: document.configuration, withKeyPath: "dataTypes", options: nil)
-    tableView.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
-    tableView.bind(.selectionIndexes, to: elementsController, withKeyPath:"selectionIndexes", options: nil)
-    tableView.bind(.sortDescriptors, to: elementsController, withKeyPath: "sortDescriptors", options: nil)
+    tableView.tableView?.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
+    tableView.tableView?.bind(.selectionIndexes, to: elementsController, withKeyPath:"selectionIndexes", options: nil)
+    tableView.tableView?.bind(.sortDescriptors, to: elementsController, withKeyPath: "sortDescriptors", options: nil)
   }
+}
 
-  override func createElement() -> String {
+extension DataTypeEditorViewController: EditorTableViewDelegate {
+  func createElement() -> String {
     document.configuration.dataTypes.append(
       DataType(name: "New data type", representation: DataType.Representation.decimal, interpretation: DataType.Interpretation.any, namedValues: [:])
     )
     return "Create Data Type"
   }
 
-  override func deleteSelectedElements() -> String {
+  func deleteSelectedElements() -> String {
     document.configuration.dataTypes.removeAll { region in
       elementsController.selectedObjects.contains { $0 as! Region === region }
     }
     return "Delete Data Type"
   }
 
-  override func stashElements() -> Any {
+  func stashElements() -> Any {
     return document.configuration.dataTypes
   }
 
-  override func restoreElements(_ elements: Any) {
+  func restoreElements(_ elements: Any) {
     document.configuration.dataTypes = elements as! [DataType]
   }
 }

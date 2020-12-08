@@ -32,6 +32,7 @@
 		66C617CC257F1AE200E372BA /* TabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617CB257F1AE200E372BA /* TabViewController.swift */; };
 		66C617D7257F1B5300E372BA /* TableViewEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617D6257F1B5300E372BA /* TableViewEditorViewController.swift */; };
 		66C617DC257F202B00E372BA /* DataTypeEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617DB257F202B00E372BA /* DataTypeEditorViewController.swift */; };
+		66C617E4257F24E000E372BA /* EditorTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617E3257F24E000E372BA /* EditorTableView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,6 +86,7 @@
 		66C617CB257F1AE200E372BA /* TabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewController.swift; sourceTree = "<group>"; };
 		66C617D6257F1B5300E372BA /* TableViewEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewEditorViewController.swift; sourceTree = "<group>"; };
 		66C617DB257F202B00E372BA /* DataTypeEditorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataTypeEditorViewController.swift; sourceTree = "<group>"; };
+		66C617E3257F24E000E372BA /* EditorTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorTableView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -186,6 +188,7 @@
 				665D4FAD257727CA00C3A03B /* HorizontalLine.swift */,
 				66763D96257C0D4900824278 /* TextView.swift */,
 				66521DA8257C996B0088C97B /* LineNumberView.swift */,
+				66C617E3257F24E000E372BA /* EditorTableView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -398,6 +401,7 @@
 				667B1B9F2578560A00CE670F /* TextTableCellView.swift in Sources */,
 				66763D80257AF38200824278 /* LR35902AddressFormatter.swift in Sources */,
 				667B1BA92578563E00CE670F /* ContentViewController.swift in Sources */,
+				66C617E4257F24E000E372BA /* EditorTableView.swift in Sources */,
 				66763D732579F26000824278 /* RegionEditorViewController.swift in Sources */,
 				665D4F5B2575F75400C3A03B /* ProjectViewController.swift in Sources */,
 				667B1B632578541F00CE670F /* NotificationNames.swift in Sources */,

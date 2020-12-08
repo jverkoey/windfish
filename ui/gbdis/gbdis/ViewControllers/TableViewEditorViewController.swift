@@ -17,9 +17,8 @@ extension NSUserInterfaceItemIdentifier {
 class TableViewEditorViewController: NSViewController {
   let elementsController = NSArrayController()
   private var stashedTextFieldValue: String?
-  private var selectionObserver: NSKeyValueObservation?
   var textEditActionName = "Edit"
-  var tableView: NSTableView?
+  var tableView: EditorTableView?
 
   private struct Column {
     let name: String
@@ -30,105 +29,22 @@ class TableViewEditorViewController: NSViewController {
   override func loadView() {
     view = NSView()
 
-    let containerView = NSScrollView()
-    containerView.translatesAutoresizingMaskIntoConstraints = false
-    containerView.hasVerticalScroller = true
-
-    let tableView = NSTableView()
+    let tableView = EditorTableView(elementsController: elementsController)
     tableView.translatesAutoresizingMaskIntoConstraints = false
-    tableView.style = .fullWidth
-    tableView.selectionHighlightStyle = .regular
-    containerView.documentView = tableView
-    view.addSubview(containerView)
+    view.addSubview(tableView)
     self.tableView = tableView
 
-    let tableControls = NSSegmentedControl()
-    tableControls.translatesAutoresizingMaskIntoConstraints = false
-    tableControls.trackingMode = .momentary
-    tableControls.segmentStyle = .smallSquare
-    tableControls.segmentCount = 2
-    tableControls.setImage(NSImage(imageLiteralResourceName: NSImage.addTemplateName), forSegment: 0)
-    tableControls.setImage(NSImage(imageLiteralResourceName: NSImage.removeTemplateName), forSegment: 1)
-    tableControls.setWidth(40, forSegment: 0)
-    tableControls.setWidth(40, forSegment: 1)
-    tableControls.setEnabled(true, forSegment: 0)
-    tableControls.setEnabled(false, forSegment: 1)
-    tableControls.target = self
-    tableControls.action = #selector(performTableControlAction(_:))
-    view.addSubview(tableControls)
-
     let safeAreas = view.safeAreaLayoutGuide
-
     NSLayoutConstraint.activate([
-      containerView.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
-      containerView.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
-      containerView.topAnchor.constraint(equalTo: safeAreas.topAnchor),
-      containerView.bottomAnchor.constraint(equalTo: tableControls.topAnchor),
-
-      tableControls.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
-      tableControls.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
-      tableControls.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
+      tableView.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
+      tableView.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
+      tableView.topAnchor.constraint(equalTo: safeAreas.topAnchor),
+      tableView.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
     ])
 
-    selectionObserver = elementsController.observe(\.selectedObjects, options: []) { (controller, change) in
-      tableControls.setEnabled(controller.selectedObjects.count > 0, forSegment: 1)
-    }
-
-    tableView.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
-    tableView.bind(.selectionIndexes, to: elementsController, withKeyPath:"selectionIndexes", options: nil)
-    tableView.bind(.sortDescriptors, to: elementsController, withKeyPath: "sortDescriptors", options: nil)
-  }
-
-  @objc func performTableControlAction(_ sender: NSSegmentedControl) {
-    applyChangeToRegions {
-      if sender.selectedSegment == 0 {
-        return self.createElement()
-      } else if sender.selectedSegment == 1 {
-        return self.deleteSelectedElements()
-      } else {
-        preconditionFailure()
-      }
-    }
-  }
-
-  func createElement() -> String {
-    preconditionFailure()
-  }
-
-  func deleteSelectedElements() -> String {
-    preconditionFailure()
-  }
-
-  func stashElements() -> Any {
-    preconditionFailure()
-  }
-
-  func restoreElements(_ elements: Any) {
-    preconditionFailure()
-  }
-
-  func applyChangeToRegions(_ action: () -> String) {
-    let original = stashElements()
-    let undoName = action()
-    undoManager?.registerUndo(withTarget: self, handler: { controller in
-      controller.undoChangeToRegions {
-        controller.restoreElements(original)
-        return undoName
-      }
-    })
-    undoManager?.setActionName(undoName)
-  }
-
-  func undoChangeToRegions(_ action: () -> String) {
-    let original = stashElements()
-    let undoName = action()
-    undoManager?.registerUndo(withTarget: self, handler: { controller in
-      controller.applyChangeToRegions {
-        controller.restoreElements(original)
-        return undoName
-      }
-    })
-    undoManager?.setActionName(undoName)
+    tableView.tableView?.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
+    tableView.tableView?.bind(.selectionIndexes, to: elementsController, withKeyPath:"selectionIndexes", options: nil)
+    tableView.tableView?.bind(.sortDescriptors, to: elementsController, withKeyPath: "sortDescriptors", options: nil)
   }
 }
 

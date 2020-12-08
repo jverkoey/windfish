@@ -55,6 +55,7 @@ final class RegionEditorViewController: TableViewEditorViewController, TabSelect
     }
 
     tableView.delegate = self
+    tableView.tableView?.delegate = self
 
     let columns = [
       Column(name: "Type", identifier: .type, width: 100),
@@ -71,7 +72,7 @@ final class RegionEditorViewController: TableViewEditorViewController, TabSelect
       column.width = columnInfo.width
       // Note: this only works for cell-based tables.
 //      column.bind(.value, to: regionController, withKeyPath: "arrangedObjects.name", options: nil)
-      tableView.addTableColumn(column)
+      tableView.tableView?.addTableColumn(column)
     }
 
     selectionObserver = elementsController.observe(\.selectedObjects, options: []) { (controller, change) in
@@ -81,30 +82,32 @@ final class RegionEditorViewController: TableViewEditorViewController, TabSelect
     }
 
     elementsController.bind(.contentArray, to: document.configuration, withKeyPath: "regions", options: nil)
-    tableView.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
-    tableView.bind(.selectionIndexes, to: elementsController, withKeyPath:"selectionIndexes", options: nil)
-    tableView.bind(.sortDescriptors, to: elementsController, withKeyPath: "sortDescriptors", options: nil)
+    tableView.tableView?.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
+    tableView.tableView?.bind(.selectionIndexes, to: elementsController, withKeyPath:"selectionIndexes", options: nil)
+    tableView.tableView?.bind(.sortDescriptors, to: elementsController, withKeyPath: "sortDescriptors", options: nil)
   }
+}
 
-  override func createElement() -> String {
+extension RegionEditorViewController: EditorTableViewDelegate {
+  func createElement() -> String {
     document.configuration.regions.append(
       Region(regionType: Region.Kind.label, name: "New region", bank: 0, address: 0, length: 0)
     )
     return "Create Region"
   }
 
-  override func deleteSelectedElements() -> String {
+  func deleteSelectedElements() -> String {
     document.configuration.regions.removeAll { region in
       elementsController.selectedObjects.contains { $0 as! Region === region }
     }
     return "Delete Region"
   }
 
-  override func stashElements() -> Any {
+  func stashElements() -> Any {
     return document.configuration.regions
   }
 
-  override func restoreElements(_ elements: Any) {
+  func restoreElements(_ elements: Any) {
     document.configuration.regions = elements as! [Region]
   }
 }
