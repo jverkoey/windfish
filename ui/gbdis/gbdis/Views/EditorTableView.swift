@@ -10,10 +10,10 @@ import Cocoa
 import Combine
 
 protocol EditorTableViewDelegate: NSObject {
-  func createElement() -> String
-  func deleteSelectedElements() -> String
-  func stashElements() -> Any
-  func restoreElements(_ elements: Any)
+  func editorTableViewCreateElement(_ tableView: EditorTableView) -> String
+  func editorTableViewDeleteSelectedElements(_ tableView: EditorTableView) -> String
+  func editorTableViewStashElements(_ tableView: EditorTableView) -> Any
+  func editorTableView(_ tableView: EditorTableView, restoreElements elements: Any)
 }
 
 final class EditorTableView: NSView {
@@ -85,9 +85,9 @@ final class EditorTableView: NSView {
     }
     applyChangeToRegions {
       if sender.selectedSegment == 0 {
-        return delegate.createElement()
+        return delegate.editorTableViewCreateElement(self)
       } else if sender.selectedSegment == 1 {
-        return delegate.deleteSelectedElements()
+        return delegate.editorTableViewDeleteSelectedElements(self)
       } else {
         preconditionFailure()
       }
@@ -98,11 +98,14 @@ final class EditorTableView: NSView {
     guard let delegate = delegate else {
       return
     }
-    let original = delegate.stashElements()
+    let original = delegate.editorTableViewStashElements(self)
     let undoName = action()
-    undoManager?.registerUndo(withTarget: self, handler: { controller in
+    undoManager?.registerUndo(withTarget: self, handler: { [weak self] controller in
+      guard let self = self else {
+        return
+      }
       controller.undoChangeToRegions {
-        controller.delegate?.restoreElements(original)
+        controller.delegate?.editorTableView(self, restoreElements: original)
         return undoName
       }
     })
@@ -113,11 +116,14 @@ final class EditorTableView: NSView {
     guard let delegate = delegate else {
       return
     }
-    let original = delegate.stashElements()
+    let original = delegate.editorTableViewStashElements(self)
     let undoName = action()
-    undoManager?.registerUndo(withTarget: self, handler: { controller in
+    undoManager?.registerUndo(withTarget: self, handler: {  [weak self] controller in
+      guard let self = self else {
+        return
+      }
       controller.applyChangeToRegions {
-        controller.delegate?.restoreElements(original)
+        controller.delegate?.editorTableView(self, restoreElements: original)
         return undoName
       }
     })

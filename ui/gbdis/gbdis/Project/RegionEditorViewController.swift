@@ -104,25 +104,25 @@ final class RegionEditorViewController: NSViewController, TabSelectable {
 }
 
 extension RegionEditorViewController: EditorTableViewDelegate {
-  func createElement() -> String {
+  func editorTableViewCreateElement(_ tableView: EditorTableView) -> String {
     document.configuration.regions.append(
       Region(regionType: Region.Kind.label, name: "New region", bank: 0, address: 0, length: 0)
     )
     return "Create Region"
   }
 
-  func deleteSelectedElements() -> String {
+  func editorTableViewDeleteSelectedElements(_ tableView: EditorTableView) -> String {
     document.configuration.regions.removeAll { region in
       elementsController.selectedObjects.contains { $0 as! Region === region }
     }
     return "Delete Region"
   }
 
-  func stashElements() -> Any {
+  func editorTableViewStashElements(_ tableView: EditorTableView) -> Any {
     return document.configuration.regions
   }
 
-  func restoreElements(_ elements: Any) {
+  func editorTableView(_ tableView: EditorTableView, restoreElements elements: Any) {
     document.configuration.regions = elements as! [Region]
   }
 }
@@ -147,9 +147,9 @@ extension RegionEditorViewController: NSTableViewDelegate {
       } else {
         view = TypeTableCellView()
         view.identifier = identifier
-        view.popupButton.bind(.content, to: regionTypeController, withKeyPath: "arrangedObjects", options: nil)
-        view.popupButton.bind(.selectedObject, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
       }
+      view.popupButton.bind(.content, to: regionTypeController, withKeyPath: "arrangedObjects", options: nil)
+      view.popupButton.bind(.selectedObject, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
       return view
     case .name:
       let identifier = NSUserInterfaceItemIdentifier.textCell
@@ -173,6 +173,7 @@ extension RegionEditorViewController: NSTableViewDelegate {
         view.identifier = identifier
         view.textField?.formatter = NumberFormatter()
       }
+      view.textField?.bind(.value, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
       return view
     case .address:
       let identifier = NSUserInterfaceItemIdentifier.addressCell
@@ -184,6 +185,7 @@ extension RegionEditorViewController: NSTableViewDelegate {
         view.identifier = identifier
         view.textField?.formatter = LR35902AddressFormatter()
       }
+      view.textField?.bind(.value, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
       return view
     default:
       preconditionFailure()

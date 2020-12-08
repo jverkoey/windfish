@@ -12,6 +12,7 @@ import LR35902
 extension NSUserInterfaceItemIdentifier {
   static let representation = NSUserInterfaceItemIdentifier("representation")
   static let interpretation = NSUserInterfaceItemIdentifier("interpretation")
+  static let value = NSUserInterfaceItemIdentifier("value")
 }
 
 final class DataTypeEditorViewController: NSViewController, TabSelectable {
@@ -23,6 +24,10 @@ final class DataTypeEditorViewController: NSViewController, TabSelectable {
   var tableView: EditorTableView?
   let representationController = NSArrayController()
   let interpretationController = NSArrayController()
+  private var selectionObserver: NSKeyValueObservation?
+
+  let mappingElementsController = NSArrayController()
+  var mappingTableView: EditorTableView?
 
   private struct Column {
     let name: String
@@ -69,9 +74,26 @@ final class DataTypeEditorViewController: NSViewController, TabSelectable {
       column.isEditable = false
       column.headerCell.stringValue = columnInfo.name
       column.width = columnInfo.width
-      // Note: this only works for cell-based tables.
-//      column.bind(.value, to: regionController, withKeyPath: "arrangedObjects.name", options: nil)
       tableView.tableView?.addTableColumn(column)
+    }
+
+    let mappingTableView = EditorTableView(elementsController: mappingElementsController)
+    mappingTableView.translatesAutoresizingMaskIntoConstraints = false
+    mappingTableView.delegate = self
+    mappingTableView.tableView?.delegate = self
+    view.addSubview(mappingTableView)
+    self.mappingTableView = mappingTableView
+
+    let mappingColumns = [
+      Column(name: "Name", identifier: .name, width: 120),
+      Column(name: "Value", identifier: .value, width: 100),
+    ]
+    for columnInfo in mappingColumns {
+      let column = NSTableColumn(identifier: columnInfo.identifier)
+      column.isEditable = false
+      column.headerCell.stringValue = columnInfo.name
+      column.width = columnInfo.width
+      mappingTableView.tableView?.addTableColumn(column)
     }
 
     let safeAreas = view.safeAreaLayoutGuide
@@ -79,46 +101,92 @@ final class DataTypeEditorViewController: NSViewController, TabSelectable {
       tableView.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
       tableView.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
       tableView.topAnchor.constraint(equalTo: safeAreas.topAnchor),
-      tableView.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
+
+      tableView.bottomAnchor.constraint(equalTo: mappingTableView.topAnchor),
+
+      mappingTableView.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
+      mappingTableView.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
+      mappingTableView.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
+      mappingTableView.heightAnchor.constraint(equalToConstant: 200)
     ])
 
     elementsController.bind(.contentArray, to: document.configuration, withKeyPath: "dataTypes", options: nil)
     tableView.tableView?.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
     tableView.tableView?.bind(.selectionIndexes, to: elementsController, withKeyPath:"selectionIndexes", options: nil)
     tableView.tableView?.bind(.sortDescriptors, to: elementsController, withKeyPath: "sortDescriptors", options: nil)
+
+    selectionObserver = elementsController.observe(\.selectedObjects, options: []) { (controller, change) in
+      if let selectedObject = controller.selectedObjects.first {
+        self.mappingElementsController.bind(.contentArray, to: selectedObject, withKeyPath: "mappings", options: nil)
+      } else {
+        self.mappingElementsController.unbind(.contentArray)
+      }
+    }
+    mappingTableView.tableView?.bind(.content, to: mappingElementsController, withKeyPath: "arrangedObjects", options: nil)
+    mappingTableView.tableView?.bind(.selectionIndexes, to: mappingElementsController, withKeyPath:"selectionIndexes", options: nil)
+    mappingTableView.tableView?.bind(.sortDescriptors, to: mappingElementsController, withKeyPath: "sortDescriptors", options: nil)
+
+    elementsController.setSelectionIndexes(IndexSet())
   }
 }
 
 extension DataTypeEditorViewController: EditorTableViewDelegate {
-  func createElement() -> String {
-    document.configuration.dataTypes.append(
-      DataType(name: "New data type", representation: DataType.Representation.decimal, interpretation: DataType.Interpretation.any, namedValues: [:])
-    )
-    return "Create Data Type"
-  }
-
-  func deleteSelectedElements() -> String {
-    document.configuration.dataTypes.removeAll { region in
-      elementsController.selectedObjects.contains { $0 as! Region === region }
+  func editorTableViewCreateElement(_ tableView: EditorTableView) -> String {
+    if tableView == self.tableView {
+      document.configuration.dataTypes.append(
+        DataType(name: "New data type", representation: DataType.Representation.decimal, interpretation: DataType.Interpretation.any, mappings: [])
+      )
+      return "Create Data Type"
+    } else if tableView == self.mappingTableView {
+      guard let selectedObject = elementsController.selectedObjects.first as? DataType else {
+        preconditionFailure()
+      }
+      selectedObject.mappings.append(DataType.Mapping(name: "Variable", value: 1))
+      return "Create Data Type Mapping"
     }
-    return "Delete Data Type"
+    preconditionFailure()
   }
 
-  func stashElements() -> Any {
-    return document.configuration.dataTypes
+  func editorTableViewDeleteSelectedElements(_ tableView: EditorTableView) -> String {
+    if tableView == self.tableView {
+      document.configuration.dataTypes.removeAll { dataType in
+        elementsController.selectedObjects.contains { $0 as! DataType === dataType }
+      }
+      return "Delete Data Type"
+    } else if tableView == self.mappingTableView {
+      guard let selectedObject = elementsController.selectedObjects.first as? DataType else {
+        preconditionFailure()
+      }
+      selectedObject.mappings.removeAll { mapping in
+        mappingElementsController.selectedObjects.contains { $0 as! DataType.Mapping === mapping }
+      }
+      return "Delete Data Type Mapping"
+    }
+    preconditionFailure()
   }
 
-  func restoreElements(_ elements: Any) {
-    document.configuration.dataTypes = elements as! [DataType]
+  func editorTableViewStashElements(_ tableView: EditorTableView) -> Any {
+    if tableView == self.tableView {
+      return document.configuration.dataTypes
+    } else if tableView == self.mappingTableView {
+      return self.mappingElementsController.content!
+    }
+    preconditionFailure()
+  }
+
+  func editorTableView(_ tableView: EditorTableView, restoreElements elements: Any) {
+    if tableView == self.tableView {
+      document.configuration.dataTypes = elements as! [DataType]
+      return
+    } else if tableView == self.mappingTableView {
+      self.mappingElementsController.content = elements
+      return
+    }
+    preconditionFailure()
   }
 }
 
 extension DataTypeEditorViewController: NSTableViewDelegate {
-  func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
-    let rowView = NSTableRowView()
-    return rowView
-  }
-
   func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
     guard let tableColumn = tableColumn else {
       preconditionFailure()
@@ -159,6 +227,18 @@ extension DataTypeEditorViewController: NSTableViewDelegate {
       }
       view.popupButton.bind(.content, to: interpretationController, withKeyPath: "arrangedObjects", options: nil)
       view.popupButton.bind(.selectedObject, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
+      return view
+    case .value:
+      let identifier = NSUserInterfaceItemIdentifier.numberCell
+      let view: TextTableCellView
+      if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TextTableCellView {
+        view = recycledView
+      } else {
+        view = TextTableCellView()
+        view.identifier = identifier
+        view.textField?.formatter = NumberFormatter()
+      }
+      view.textField?.bind(.value, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
       return view
     default:
       preconditionFailure()

@@ -37,11 +37,11 @@ final class Region: NSObject, Codable {
 }
 
 final class DataType: NSObject, Codable {
-  init(name: String, representation: String, interpretation: String, namedValues: [UInt8: String]) {
+  init(name: String, representation: String, interpretation: String, mappings: [Mapping]) {
     self.name = name
     self.representation = representation
     self.interpretation = interpretation
-    self.namedValues = namedValues
+    self.mappings = mappings
   }
 
   struct Interpretation {
@@ -55,10 +55,20 @@ final class DataType: NSObject, Codable {
     static let binary = "Binary"
   }
 
+  final class Mapping: NSObject, Codable {
+    internal init(name: String, value: UInt8) {
+      self.name = name
+      self.value = value
+    }
+    
+    @objc dynamic var name: String
+    @objc dynamic var value: UInt8
+  }
+
   @objc dynamic var name: String
   @objc dynamic var representation: String
   @objc dynamic var interpretation: String
-  @objc dynamic var namedValues: [UInt8: String]
+  @objc dynamic var mappings: [Mapping]
 }
 
 class ProjectConfiguration: NSObject, Codable {
@@ -119,6 +129,9 @@ class ProjectDocument: NSDocument {
     configuration.regions.append(Region(regionType: Region.Kind.region, name: "SerialTransferCompleteInterrupt", bank: 0, address: 0x0058, length: 8))
     configuration.regions.append(Region(regionType: Region.Kind.region, name: "JoypadTransitionInterrupt", bank: 0, address: 0x0060, length: 8))
     configuration.regions.append(Region(regionType: Region.Kind.region, name: "Boot", bank: 0, address: 0x0100, length: 4))
+
+    configuration.dataTypes.append(DataType(name: "decimal", representation: DataType.Representation.decimal, interpretation: DataType.Interpretation.any, mappings: []))
+    configuration.dataTypes.append(DataType(name: "binary", representation: DataType.Representation.binary, interpretation: DataType.Interpretation.any, mappings: []))
   }
 
   private var documentFileWrapper: FileWrapper?
