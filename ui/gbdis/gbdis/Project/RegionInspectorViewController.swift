@@ -17,6 +17,7 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
   let regionController = NSArrayController()
   private var selectionObserver: NSKeyValueObservation?
   let regionTypeController = NSArrayController()
+  var tableView = NSTableView()
 
   private struct Column {
     let name: String
@@ -45,13 +46,16 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
     containerView.translatesAutoresizingMaskIntoConstraints = false
     containerView.hasVerticalScroller = true
 
-    let regionTableView = NSTableView()
-    regionTableView.translatesAutoresizingMaskIntoConstraints = false
-    regionTableView.style = .fullWidth
-    regionTableView.selectionHighlightStyle = .regular
-    regionTableView.delegate = self
-    containerView.documentView = regionTableView
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.style = .fullWidth
+    tableView.selectionHighlightStyle = .regular
+    tableView.delegate = self
+    containerView.documentView = tableView
     view.addSubview(containerView)
+
+    let contextMenu = NSMenu()
+    contextMenu.addItem(withTitle: "Define label...", action: #selector(createRegion(_:)), keyEquivalent: "")
+    tableView.menu = contextMenu
 
     let safeAreas = view.safeAreaLayoutGuide
 
@@ -75,7 +79,7 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
       column.width = columnInfo.width
       // Note: this only works for cell-based tables.
 //      column.bind(.value, to: regionController, withKeyPath: "arrangedObjects.name", options: nil)
-      regionTableView.addTableColumn(column)
+      tableView.addTableColumn(column)
     }
 
     selectionObserver = regionController.observe(\.selectedObjects, options: []) { (controller, change) in
@@ -90,9 +94,32 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
     ]
 
     regionController.bind(.contentArray, to: document, withKeyPath: "disassemblyResults.regions", options: nil)
-    regionTableView.bind(.content, to: regionController, withKeyPath: "arrangedObjects", options: nil)
-    regionTableView.bind(.selectionIndexes, to: regionController, withKeyPath:"selectionIndexes", options: nil)
-    regionTableView.bind(.sortDescriptors, to: regionController, withKeyPath: "sortDescriptors", options: nil)
+    tableView.bind(.content, to: regionController, withKeyPath: "arrangedObjects", options: nil)
+    tableView.bind(.selectionIndexes, to: regionController, withKeyPath:"selectionIndexes", options: nil)
+    tableView.bind(.sortDescriptors, to: regionController, withKeyPath: "sortDescriptors", options: nil)
+  }
+}
+
+extension RegionInspectorViewController: NSUserInterfaceValidations {
+  @objc func createRegion(_ sender: AnyObject) {
+    guard let region = (regionController.arrangedObjects as? [Region])?[tableView.clickedRow] else {
+      return
+    }
+    document.configuration.regions.append(region)
+
+    NotificationCenter.default.post(name: .didCreateRegion, object: document, userInfo: ["region": region])
+  }
+
+  func validateUserInterfaceItem(_ item: NSValidatedUserInterfaceItem) -> Bool {
+    guard let region = (regionController.arrangedObjects as? [Region])?[tableView.clickedRow] else {
+      return false
+    }
+    guard document.configuration.regions.first(where: { existingRegion in
+      existingRegion.bank == region.bank && existingRegion.address == region.address
+    }) == nil else {
+      return false
+    }
+    return true
   }
 }
 

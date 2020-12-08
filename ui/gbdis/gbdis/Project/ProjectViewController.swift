@@ -22,6 +22,7 @@ final class ProjectViewController: NSViewController {
 
   private var selectedFileDidChangeSubscriber: AnyCancellable?
   private var selectedRegionDidChangeSubscriber: AnyCancellable?
+  private var didCreateRegionSubscriber: AnyCancellable?
 
   init(document: ProjectDocument) {
     self.document = document
@@ -167,6 +168,19 @@ final class ProjectViewController: NSViewController {
         let glyphGraph = layoutManager.glyphRange(forCharacterRange: lineRange, actualCharacterRange: nil)
         let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphGraph, in: textContainer)
         self.contentViewController.textView?.scroll(boundingRect.offsetBy(dx: 0, dy: -containerView.bounds.height / 2).origin)
+      })
+
+    didCreateRegionSubscriber = NotificationCenter.default.publisher(for: .didCreateRegion, object: document)
+      .receive(on: RunLoop.main)
+      .sink(receiveValue: { notification in
+        guard let region = notification.userInfo?["region"] as? Region else {
+          preconditionFailure()
+        }
+        self.inspectorViewController.tabViewController.selectedTabViewItemIndex = 0
+        guard let regionEditorViewController = self.inspectorViewController.tabViewController.tabViewItems[0].viewController as? RegionEditorViewController else {
+          return
+        }
+        regionEditorViewController.regionController.setSelectedObjects([region])
       })
 
     if document.isDisassembling {

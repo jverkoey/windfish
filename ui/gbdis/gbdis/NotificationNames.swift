@@ -11,4 +11,5 @@ extension Notification.Name {
   static let disassembled = Notification.Name("disassembled")
   static let selectedFileDidChange = Notification.Name("selectedFileDidChange")
   static let selectedRegionDidChange = Notification.Name("selectedRegionDidChange")
+  static let didCreateRegion = Notification.Name("didCreateRegion")
 }
