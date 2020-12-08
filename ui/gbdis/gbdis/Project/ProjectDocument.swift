@@ -130,8 +130,16 @@ class ProjectDocument: NSDocument {
     configuration.regions.append(Region(regionType: Region.Kind.region, name: "JoypadTransitionInterrupt", bank: 0, address: 0x0060, length: 8))
     configuration.regions.append(Region(regionType: Region.Kind.region, name: "Boot", bank: 0, address: 0x0100, length: 4))
 
-    configuration.dataTypes.append(DataType(name: "decimal", representation: DataType.Representation.decimal, interpretation: DataType.Interpretation.any, mappings: []))
-    configuration.dataTypes.append(DataType(name: "binary", representation: DataType.Representation.binary, interpretation: DataType.Interpretation.any, mappings: []))
+    configuration.dataTypes.append(DataType(name: "decimal",
+                                            representation: DataType.Representation.decimal,
+                                            interpretation: DataType.Interpretation.any, mappings: []))
+    configuration.dataTypes.append(DataType(name: "binary",
+                                            representation: DataType.Representation.binary,
+                                            interpretation: DataType.Interpretation.any, mappings: []))
+    configuration.dataTypes.append(DataType(name: "bool",
+                                            representation: DataType.Representation.decimal,
+                                            interpretation: DataType.Interpretation.enumerated,
+                                            mappings: [DataType.Mapping(name: "false", value: 0), DataType.Mapping(name: "true", value: 1)]))
   }
 
   private var documentFileWrapper: FileWrapper?
@@ -232,6 +240,33 @@ extension ProjectDocument {
           disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
         case Region.Kind.function:
           disassembly.defineFunction(startingAt: region.address, in: region.bank, named: region.name)
+        default:
+          preconditionFailure()
+        }
+      }
+
+      for dataType in self.configuration.dataTypes {
+        let mappingDict = dataType.mappings.reduce(into: [:]) { accumulator, mapping in
+          accumulator[mapping.value] = mapping.name
+        }
+        let representation: LR35902.Disassembly.Datatype.Representation
+        switch dataType.representation {
+        case DataType.Representation.binary:
+          representation = .binary
+        case DataType.Representation.decimal:
+          representation = .decimal
+        case DataType.Representation.hexadecimal:
+          representation = .hexadecimal
+        default:
+          preconditionFailure()
+        }
+        switch dataType.interpretation {
+        case DataType.Interpretation.any:
+          disassembly.createDatatype(named: dataType.name, representation: representation)
+        case DataType.Interpretation.bitmask:
+          disassembly.createDatatype(named: dataType.name, bitmask: mappingDict, representation: representation)
+        case DataType.Interpretation.enumerated:
+          disassembly.createDatatype(named: dataType.name, enumeration: mappingDict, representation: representation)
         default:
           preconditionFailure()
         }
