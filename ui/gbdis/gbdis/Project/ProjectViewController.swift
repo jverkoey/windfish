@@ -177,7 +177,7 @@ final class ProjectViewController: NSViewController {
           preconditionFailure()
         }
         self.inspectorViewController.tabViewController.tabViewController.selectedTabViewItemIndex = 0
-        self.inspectorViewController.regionEditorViewController.regionController.setSelectedObjects([region])
+        self.inspectorViewController.regionEditorViewController.elementsController.setSelectedObjects([region])
       })
 
     if document.isDisassembling {

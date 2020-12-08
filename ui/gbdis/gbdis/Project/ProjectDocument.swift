@@ -37,27 +37,27 @@ final class Region: NSObject, Codable {
 }
 
 final class DataType: NSObject, Codable {
-  init(name: String, representation: Representation, interpretation: Interpretation, namedValues: [UInt8: String]) {
+  init(name: String, representation: String, interpretation: String, namedValues: [UInt8: String]) {
     self.name = name
     self.representation = representation
     self.interpretation = interpretation
     self.namedValues = namedValues
   }
 
-  @objc public enum Interpretation: Int, Codable {
-    case any
-    case enumerated
-    case bitmask
+  struct Interpretation {
+    static let any = "Any"
+    static let enumerated = "Enumerated"
+    static let bitmask = "Bitmask"
   }
-  @objc enum Representation: Int, Codable {
-    case decimal
-    case hexadecimal
-    case binary
+  struct Representation {
+    static let decimal = "Decimal"
+    static let hexadecimal = "Hex"
+    static let binary = "Binary"
   }
 
   @objc dynamic var name: String
-  @objc dynamic var representation: Representation
-  @objc dynamic var interpretation: Interpretation
+  @objc dynamic var representation: String
+  @objc dynamic var interpretation: String
   @objc dynamic var namedValues: [UInt8: String]
 }
 

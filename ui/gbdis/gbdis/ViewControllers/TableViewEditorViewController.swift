@@ -8,12 +8,6 @@
 import Foundation
 
 extension NSUserInterfaceItemIdentifier {
-  static let type = NSUserInterfaceItemIdentifier("regionType")
-  static let name = NSUserInterfaceItemIdentifier("name")
-  static let bank = NSUserInterfaceItemIdentifier("bank")
-  static let address = NSUserInterfaceItemIdentifier("address")
-  static let length = NSUserInterfaceItemIdentifier("length")
-
   static let typeCell = NSUserInterfaceItemIdentifier("typeCell")
   static let textCell = NSUserInterfaceItemIdentifier("textCell")
   static let numberCell = NSUserInterfaceItemIdentifier("numberCell")
@@ -21,7 +15,7 @@ extension NSUserInterfaceItemIdentifier {
 }
 
 class TableViewEditorViewController: NSViewController {
-  let regionController = NSArrayController()
+  let elementsController = NSArrayController()
   private var stashedTextFieldValue: String?
   private var selectionObserver: NSKeyValueObservation?
   var textEditActionName = "Edit"
@@ -76,13 +70,13 @@ class TableViewEditorViewController: NSViewController {
       tableControls.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
     ])
 
-    selectionObserver = regionController.observe(\.selectedObjects, options: []) { (controller, change) in
+    selectionObserver = elementsController.observe(\.selectedObjects, options: []) { (controller, change) in
       tableControls.setEnabled(controller.selectedObjects.count > 0, forSegment: 1)
     }
 
-    tableView.bind(.content, to: regionController, withKeyPath: "arrangedObjects", options: nil)
-    tableView.bind(.selectionIndexes, to: regionController, withKeyPath:"selectionIndexes", options: nil)
-    tableView.bind(.sortDescriptors, to: regionController, withKeyPath: "sortDescriptors", options: nil)
+    tableView.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
+    tableView.bind(.selectionIndexes, to: elementsController, withKeyPath:"selectionIndexes", options: nil)
+    tableView.bind(.sortDescriptors, to: elementsController, withKeyPath: "sortDescriptors", options: nil)
   }
 
   @objc func performTableControlAction(_ sender: NSSegmentedControl) {

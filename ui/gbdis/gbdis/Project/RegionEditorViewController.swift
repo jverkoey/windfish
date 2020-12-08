@@ -9,6 +9,14 @@ import Foundation
 import Cocoa
 import LR35902
 
+extension NSUserInterfaceItemIdentifier {
+  static let type = NSUserInterfaceItemIdentifier("regionType")
+  static let name = NSUserInterfaceItemIdentifier("name")
+  static let bank = NSUserInterfaceItemIdentifier("bank")
+  static let address = NSUserInterfaceItemIdentifier("address")
+  static let length = NSUserInterfaceItemIdentifier("length")
+}
+
 final class RegionEditorViewController: TableViewEditorViewController, TabSelectable {
   let deselectedTabImage = NSImage(systemSymbolName: "book", accessibilityDescription: nil)!
   let selectedTabImage = NSImage(systemSymbolName: "book.fill", accessibilityDescription: nil)!
@@ -66,16 +74,16 @@ final class RegionEditorViewController: TableViewEditorViewController, TabSelect
       tableView.addTableColumn(column)
     }
 
-    selectionObserver = regionController.observe(\.selectedObjects, options: []) { (controller, change) in
+    selectionObserver = elementsController.observe(\.selectedObjects, options: []) { (controller, change) in
       if let region = controller.selectedObjects.first as? Region {
         NotificationCenter.default.post(name: .selectedRegionDidChange, object: self.document, userInfo: ["selectedRegion": region])
       }
     }
 
-    regionController.bind(.contentArray, to: document.configuration, withKeyPath: "regions", options: nil)
-    tableView.bind(.content, to: regionController, withKeyPath: "arrangedObjects", options: nil)
-    tableView.bind(.selectionIndexes, to: regionController, withKeyPath:"selectionIndexes", options: nil)
-    tableView.bind(.sortDescriptors, to: regionController, withKeyPath: "sortDescriptors", options: nil)
+    elementsController.bind(.contentArray, to: document.configuration, withKeyPath: "regions", options: nil)
+    tableView.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
+    tableView.bind(.selectionIndexes, to: elementsController, withKeyPath:"selectionIndexes", options: nil)
+    tableView.bind(.sortDescriptors, to: elementsController, withKeyPath: "sortDescriptors", options: nil)
   }
 
   override func createElement() -> String {
@@ -87,7 +95,7 @@ final class RegionEditorViewController: TableViewEditorViewController, TabSelect
 
   override func deleteSelectedElements() -> String {
     document.configuration.regions.removeAll { region in
-      regionController.selectedObjects.contains { $0 as! Region === region }
+      elementsController.selectedObjects.contains { $0 as! Region === region }
     }
     return "Delete Region"
   }

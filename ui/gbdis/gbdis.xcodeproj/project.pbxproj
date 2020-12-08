@@ -31,6 +31,7 @@
 		66C617C6257F04D600E372BA /* RegionInspectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */; };
 		66C617CC257F1AE200E372BA /* TabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617CB257F1AE200E372BA /* TabViewController.swift */; };
 		66C617D7257F1B5300E372BA /* TableViewEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617D6257F1B5300E372BA /* TableViewEditorViewController.swift */; };
+		66C617DC257F202B00E372BA /* DataTypeEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617DB257F202B00E372BA /* DataTypeEditorViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -83,6 +84,7 @@
 		66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegionInspectorViewController.swift; sourceTree = "<group>"; };
 		66C617CB257F1AE200E372BA /* TabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewController.swift; sourceTree = "<group>"; };
 		66C617D6257F1B5300E372BA /* TableViewEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewEditorViewController.swift; sourceTree = "<group>"; };
+		66C617DB257F202B00E372BA /* DataTypeEditorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataTypeEditorViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -214,6 +216,7 @@
 				667B1BA82578563E00CE670F /* ContentViewController.swift */,
 				667B1C0125789BAE00CE670F /* InspectorViewController.swift */,
 				66763D722579F26000824278 /* RegionEditorViewController.swift */,
+				66C617DB257F202B00E372BA /* DataTypeEditorViewController.swift */,
 				66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */,
 			);
 			path = Project;
@@ -387,6 +390,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66C617DC257F202B00E372BA /* DataTypeEditorViewController.swift in Sources */,
 				667B1B9A257855AE00CE670F /* CommonConstraints.swift in Sources */,
 				66521DA9257C996B0088C97B /* LineNumberView.swift in Sources */,
 				66C617C6257F04D600E372BA /* RegionInspectorViewController.swift in Sources */,
