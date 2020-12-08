@@ -80,7 +80,7 @@ final class LineNumberView: NSRulerView {
                     dataHandler: ((LR35902.Disassembly.Line.Semantic, Data, NSRect) -> Void)? = nil,
                     scopeHandler: ((LR35902.Disassembly.Line?, LR35902.Disassembly.Line, LR35902.Disassembly.Line?, NSRect) -> Void)? = nil,
                     bankHandler: ((LR35902.Bank, NSRect) -> Void)? = nil,
-                    handler: (Int, NSString, NSRect) -> Bool) {
+                    handler: (Int, NSString, NSRect, LR35902.Disassembly.Line.Semantic) -> Bool) {
     guard let textView = clientView as? NSTextView else {
       return
     }
@@ -184,7 +184,7 @@ final class LineNumberView: NSRulerView {
           )
 
           if lineStringRect.minY != lastLinePositionY {
-            if !handler(lineNumber, lineString, lineStringRect) {
+            if !handler(lineNumber, lineString, lineStringRect, bankLines[lineNumber].semantic) {
               break
             }
           }
@@ -317,9 +317,36 @@ final class LineNumberView: NSRulerView {
       if self.needsToDraw(bankRect.insetBy(dx: -4, dy: -4)) {
         bankString.draw(with: bankRect, options: .usesLineFragmentOrigin, attributes: textAttributes)
       }
-    }, handler: { _, lineString, lineStringRect in
+    }, handler: { _, lineString, lineStringRect, semantic in
       if needsToDraw(lineStringRect.insetBy(dx: -4, dy: -4)) {
         lineString.draw(with: lineStringRect, options: .usesLineFragmentOrigin, attributes: textAttributes)
+
+        let shortLineRect = NSRect(x: lineStringRect.maxX + 4, y: lineStringRect.minY, width: 1, height: lineStringRect.height)
+        let lineRect = NSRect(x: lineStringRect.maxX + 3, y: lineStringRect.minY, width: 2, height: lineStringRect.height)
+        switch semantic {
+        case .instruction: fallthrough
+        case .global: fallthrough
+        case .macroInstruction:
+          NSColor.systemGreen.set()
+          shortLineRect.fill()
+
+        case .image1bpp: fallthrough
+        case .image2bpp: fallthrough
+        case .data:
+          NSColor.systemGray.set()
+          shortLineRect.fill()
+
+        case .text:
+          NSColor.systemOrange.set()
+          shortLineRect.fill()
+
+        case .unknown:
+          NSColor.systemRed.set()
+          lineRect.fill()
+
+        default:
+          break
+        }
       }
       return true
     })
@@ -331,7 +358,7 @@ final class LineNumberView: NSRulerView {
 extension LineNumberView {
   private func lineNumber(at location: NSPoint) -> Int? {
     var tappedLineNumber: Int? = nil
-    processLines(in: bounds, handler: { lineNumber, lineString, lineStringRect in
+    processLines(in: bounds, handler: { lineNumber, lineString, lineStringRect, _ in
       if lineStringRect.contains(location) {
         tappedLineNumber = lineNumber
         return false
