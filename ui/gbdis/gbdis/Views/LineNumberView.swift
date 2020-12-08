@@ -25,7 +25,7 @@ final class LineNumberView: NSRulerView {
   private let font = NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
   private let textColor = NSColor.systemGray
   private let backgroundColor = NSColor.textBackgroundColor
-  private let scopeLineColor = NSColor.highlightColor
+  private let scopeLineColor = NSColor.textColor
   private var didProcessEditingSubscriber: AnyCancellable?
   private var tappedLineNumber: Int?
   var lineAnalysis: LineAnalysis?

@@ -104,7 +104,15 @@ extension LR35902.Disassembly {
       self.semantic = semantic
       self.address = address
       self.bank = bank
-      self.scope = scope
+      if let scope = scope {
+        if scope.isEmpty {
+          self.scope = nil
+        } else {
+          self.scope = scope
+        }
+      } else {
+        self.scope = nil
+      }
       self.data = data
     }
 
