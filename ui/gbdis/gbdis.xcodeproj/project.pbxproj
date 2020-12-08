@@ -30,6 +30,7 @@
 		667B1C0225789BAE00CE670F /* InspectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1C0125789BAE00CE670F /* InspectorViewController.swift */; };
 		66C617C6257F04D600E372BA /* RegionInspectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */; };
 		66C617CC257F1AE200E372BA /* TabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617CB257F1AE200E372BA /* TabViewController.swift */; };
+		66C617D7257F1B5300E372BA /* TableViewEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617D6257F1B5300E372BA /* TableViewEditorViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,6 +82,7 @@
 		667B1C0125789BAE00CE670F /* InspectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InspectorViewController.swift; sourceTree = "<group>"; };
 		66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegionInspectorViewController.swift; sourceTree = "<group>"; };
 		66C617CB257F1AE200E372BA /* TabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewController.swift; sourceTree = "<group>"; };
+		66C617D6257F1B5300E372BA /* TableViewEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewEditorViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -247,6 +249,7 @@
 			isa = PBXGroup;
 			children = (
 				66C617CB257F1AE200E372BA /* TabViewController.swift */,
+				66C617D6257F1B5300E372BA /* TableViewEditorViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -399,6 +402,7 @@
 				66763D97257C0D4900824278 /* TextView.swift in Sources */,
 				665D4F8D2575F92500C3A03B /* main.swift in Sources */,
 				667B1BAE2578565A00CE670F /* OutlineViewController.swift in Sources */,
+				66C617D7257F1B5300E372BA /* TableViewEditorViewController.swift in Sources */,
 				665D4F5D2575F75400C3A03B /* ProjectDocument.swift in Sources */,
 				665D4FAE257727CA00C3A03B /* HorizontalLine.swift in Sources */,
 				667B1C0225789BAE00CE670F /* InspectorViewController.swift in Sources */,
