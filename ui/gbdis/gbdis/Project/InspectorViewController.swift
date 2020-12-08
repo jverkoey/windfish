@@ -39,6 +39,7 @@ final class InspectorViewController: NSViewController {
     let editorTabViewController = InspectorEditorViewController()
     editorTabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: RegionEditorViewController(document: document)))
     editorTabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: DataTypeEditorViewController(document: document)))
+    editorTabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: GlobalEditorViewController(document: document)))
     tabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: editorTabViewController))
     tabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: RegionInspectorViewController(document: document)))
 

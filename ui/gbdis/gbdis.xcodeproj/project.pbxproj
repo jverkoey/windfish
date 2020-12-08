@@ -32,6 +32,7 @@
 		66C617CC257F1AE200E372BA /* TabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617CB257F1AE200E372BA /* TabViewController.swift */; };
 		66C617DC257F202B00E372BA /* DataTypeEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617DB257F202B00E372BA /* DataTypeEditorViewController.swift */; };
 		66C617E4257F24E000E372BA /* EditorTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617E3257F24E000E372BA /* EditorTableView.swift */; };
+		66C617EC257F30C200E372BA /* GlobalEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617EB257F30C200E372BA /* GlobalEditorViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,6 +86,7 @@
 		66C617CB257F1AE200E372BA /* TabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewController.swift; sourceTree = "<group>"; };
 		66C617DB257F202B00E372BA /* DataTypeEditorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataTypeEditorViewController.swift; sourceTree = "<group>"; };
 		66C617E3257F24E000E372BA /* EditorTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorTableView.swift; sourceTree = "<group>"; };
+		66C617EB257F30C200E372BA /* GlobalEditorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalEditorViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -218,6 +220,7 @@
 				667B1C0125789BAE00CE670F /* InspectorViewController.swift */,
 				66763D722579F26000824278 /* RegionEditorViewController.swift */,
 				66C617DB257F202B00E372BA /* DataTypeEditorViewController.swift */,
+				66C617EB257F30C200E372BA /* GlobalEditorViewController.swift */,
 				66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */,
 			);
 			path = Project;
@@ -394,6 +397,7 @@
 				667B1B9A257855AE00CE670F /* CommonConstraints.swift in Sources */,
 				66521DA9257C996B0088C97B /* LineNumberView.swift in Sources */,
 				66C617C6257F04D600E372BA /* RegionInspectorViewController.swift in Sources */,
+				66C617EC257F30C200E372BA /* GlobalEditorViewController.swift in Sources */,
 				667B1B912578557D00CE670F /* URL+localizedName.swift in Sources */,
 				667B1B9F2578560A00CE670F /* TextTableCellView.swift in Sources */,
 				66763D80257AF38200824278 /* LR35902AddressFormatter.swift in Sources */,
