@@ -44,9 +44,18 @@ class ProjectConfiguration: NSObject, Codable {
   @objc dynamic var regions: [Region] = []
 }
 
-struct DisassemblyResults {
+final class DisassemblyResults: NSObject {
+  internal init(files: [String : Data], bankLines: [LR35902.Bank : [LR35902.Disassembly.Line]]? = nil, regions: [Region]? = nil, statistics: LR35902.Disassembly.Statistics? = nil) {
+    self.files = files
+    self.bankLines = bankLines
+    self.regions = regions
+    self.statistics = statistics
+  }
+
   var files: [String: Data]
   var bankLines: [LR35902.Bank: [LR35902.Disassembly.Line]]?
+  @objc dynamic var regions: [Region]?
+  var statistics: LR35902.Disassembly.Statistics?
 }
 
 struct ProjectMetadata: Codable {
@@ -68,8 +77,7 @@ class ProjectDocument: NSDocument {
 
   var isDisassembling = false
   var romData: Data?
-  var disassemblyResults: DisassemblyResults?
-
+  @objc dynamic var disassemblyResults: DisassemblyResults?
   var metadata: ProjectMetadata?
   var configuration = ProjectConfiguration()
 
@@ -195,7 +203,7 @@ extension ProjectDocument {
       }
 
       //            disassembly.disassembleAsGameboyCartridge()
-      let disassembledSource = try! disassembly.generateSource()
+      let (disassembledSource, statistics) = try! disassembly.generateSource()
 
       let bankMap: [String: LR35902.Bank] = disassembledSource.sources.reduce(into: [:], { accumulator, element in
         if case .bank(let number, _, _) = element.value {
@@ -225,10 +233,37 @@ extension ProjectDocument {
         }
       }
 
+      let regions: [Region] = bankLines.reduce(into: []) { accumulator, element in
+        let bank = element.key
+        accumulator.append(contentsOf: element.value.reduce(into: []) { accumulator, line in
+          switch line.semantic {
+          case let .label(name): fallthrough
+          case let .transferOfControl(_, name):
+            accumulator.append(
+              Region(
+                regionType: Region.Kind.label,
+                name: name,
+                bank: bank,
+                address: line.address!,
+                length: 0
+              )
+            )
+            break
+          default:
+            break
+          }
+        })
+      }
+
       DispatchQueue.main.async {
         self.metadata?.numberOfBanks = disassembly.cpu.numberOfBanks
         self.metadata?.bankMap = bankMap
-        self.disassemblyResults = DisassemblyResults(files: disassemblyFiles, bankLines: bankLines)
+        self.disassemblyResults = DisassemblyResults(
+          files: disassemblyFiles,
+          bankLines: bankLines,
+          regions: regions,
+          statistics: statistics
+        )
 
         self.isDisassembling = false
         NotificationCenter.default.post(name: .disassembled, object: self)

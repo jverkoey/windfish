@@ -9,26 +9,12 @@ import Foundation
 import Cocoa
 import LR35902
 
-extension NSUserInterfaceItemIdentifier {
-  fileprivate static let type = NSUserInterfaceItemIdentifier("regionType")
-  fileprivate static let name = NSUserInterfaceItemIdentifier("name")
-  fileprivate static let bank = NSUserInterfaceItemIdentifier("bank")
-  fileprivate static let address = NSUserInterfaceItemIdentifier("address")
-  fileprivate static let length = NSUserInterfaceItemIdentifier("length")
-
-  fileprivate static let typeCell = NSUserInterfaceItemIdentifier("typeCell")
-  fileprivate static let textCell = NSUserInterfaceItemIdentifier("textCell")
-  fileprivate static let numberCell = NSUserInterfaceItemIdentifier("numberCell")
-  fileprivate static let addressCell = NSUserInterfaceItemIdentifier("addressCell")
-}
-
 final class RegionInspectorViewController: NSViewController, TabSelectable {
   let deselectedTabImage = NSImage(systemSymbolName: "book", accessibilityDescription: nil)!
   let selectedTabImage = NSImage(systemSymbolName: "book.fill", accessibilityDescription: nil)!
 
   let document: ProjectDocument
   let regionController = NSArrayController()
-  private var stashedTextFieldValue: String?
   private var selectionObserver: NSKeyValueObservation?
   let regionTypeController = NSArrayController()
 
@@ -61,26 +47,11 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
 
     let regionTableView = NSTableView()
     regionTableView.translatesAutoresizingMaskIntoConstraints = false
-    regionTableView.delegate = self
     regionTableView.style = .fullWidth
     regionTableView.selectionHighlightStyle = .regular
+    regionTableView.delegate = self
     containerView.documentView = regionTableView
     view.addSubview(containerView)
-
-    let tableControls = NSSegmentedControl()
-    tableControls.translatesAutoresizingMaskIntoConstraints = false
-    tableControls.trackingMode = .momentary
-    tableControls.segmentStyle = .smallSquare
-    tableControls.segmentCount = 2
-    tableControls.setImage(NSImage(imageLiteralResourceName: NSImage.addTemplateName), forSegment: 0)
-    tableControls.setImage(NSImage(imageLiteralResourceName: NSImage.removeTemplateName), forSegment: 1)
-    tableControls.setWidth(40, forSegment: 0)
-    tableControls.setWidth(40, forSegment: 1)
-    tableControls.setEnabled(true, forSegment: 0)
-    tableControls.setEnabled(false, forSegment: 1)
-    tableControls.target = self
-    tableControls.action = #selector(performTableControlAction(_:))
-    view.addSubview(tableControls)
 
     let safeAreas = view.safeAreaLayoutGuide
 
@@ -88,19 +59,13 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
       containerView.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
       containerView.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
       containerView.topAnchor.constraint(equalTo: safeAreas.topAnchor),
-      containerView.bottomAnchor.constraint(equalTo: tableControls.topAnchor),
-
-      tableControls.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
-      tableControls.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
-      tableControls.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
+      containerView.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
     ])
 
     let columns = [
-      Column(name: "Type", identifier: .type, width: 100),
       Column(name: "Name", identifier: .name, width: 120),
       Column(name: "Bank", identifier: .bank, width: 35),
       Column(name: "Address", identifier: .address, width: 50),
-      Column(name: "Region length", identifier: .length, width: 35),
     ]
 
     for columnInfo in columns {
@@ -114,61 +79,20 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
     }
 
     selectionObserver = regionController.observe(\.selectedObjects, options: []) { (controller, change) in
-      tableControls.setEnabled(controller.selectedObjects.count > 0, forSegment: 1)
-
       if let region = controller.selectedObjects.first as? Region {
         NotificationCenter.default.post(name: .selectedRegionDidChange, object: self.document, userInfo: ["selectedRegion": region])
       }
     }
 
-    regionController.bind(.contentArray, to: document.configuration, withKeyPath: "regions", options: nil)
+    regionController.sortDescriptors = [
+      NSSortDescriptor(key: NSUserInterfaceItemIdentifier.bank.rawValue, ascending: true),
+      NSSortDescriptor(key: NSUserInterfaceItemIdentifier.address.rawValue, ascending: true),
+    ]
+
+    regionController.bind(.contentArray, to: document, withKeyPath: "disassemblyResults.regions", options: nil)
     regionTableView.bind(.content, to: regionController, withKeyPath: "arrangedObjects", options: nil)
     regionTableView.bind(.selectionIndexes, to: regionController, withKeyPath:"selectionIndexes", options: nil)
     regionTableView.bind(.sortDescriptors, to: regionController, withKeyPath: "sortDescriptors", options: nil)
-  }
-
-  @objc func performTableControlAction(_ sender: NSSegmentedControl) {
-    applyChangeToRegions {
-      if sender.selectedSegment == 0 {
-        // Add
-        document.configuration.regions.append(
-          Region(regionType: Region.Kind.label, name: "New region", bank: 0, address: 0, length: 0)
-        )
-        return "Create Region"
-      } else if sender.selectedSegment == 1 {
-        // Remove
-        document.configuration.regions.removeAll { region in
-          regionController.selectedObjects.contains { $0 as! Region === region }
-        }
-        return "Delete Region"
-      } else {
-        preconditionFailure()
-      }
-    }
-  }
-
-  func applyChangeToRegions(_ action: () -> String) {
-    let originalRegions = document.configuration.regions
-    let undoName = action()
-    document.undoManager?.registerUndo(withTarget: self, handler: { controller in
-      controller.undoChangeToRegions {
-        controller.document.configuration.regions = originalRegions
-        return undoName
-      }
-    })
-    document.undoManager?.setActionName(undoName)
-  }
-
-  func undoChangeToRegions(_ action: () -> String) {
-    let originalRegions = document.configuration.regions
-    let undoName = action()
-    document.undoManager?.registerUndo(withTarget: self, handler: { controller in
-      controller.applyChangeToRegions {
-        controller.document.configuration.regions = originalRegions
-        return undoName
-      }
-    })
-    document.undoManager?.setActionName(undoName)
   }
 }
 
@@ -185,17 +109,6 @@ extension RegionInspectorViewController: NSTableViewDelegate {
     let view: NSTableCellView
 
     switch tableColumn.identifier {
-    case .type:
-      let identifier = NSUserInterfaceItemIdentifier.typeCell
-      if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TypeTableCellView {
-        view = recycledView
-      } else {
-        let typeView = TypeTableCellView()
-        typeView.identifier = identifier
-        typeView.popupButton.bind(.content, to: regionTypeController, withKeyPath: "arrangedObjects", options: nil)
-        typeView.popupButton.bind(.selectedObject, to: typeView, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
-        view = typeView
-      }
     case .name:
       let identifier = NSUserInterfaceItemIdentifier.textCell
       if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TextTableCellView {
@@ -204,15 +117,14 @@ extension RegionInspectorViewController: NSTableViewDelegate {
         view = TextTableCellView()
         view.identifier = identifier
       }
-    case .bank: fallthrough
-    case .length:
+    case .bank:
       let identifier = NSUserInterfaceItemIdentifier.numberCell
       if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TextTableCellView {
         view = recycledView
       } else {
         view = TextTableCellView()
         view.identifier = identifier
-        view.textField?.formatter = NumberFormatter()
+        view.textField?.formatter = LR35902BankFormatter()
       }
     case .address:
       let identifier = NSUserInterfaceItemIdentifier.addressCell
@@ -227,53 +139,9 @@ extension RegionInspectorViewController: NSTableViewDelegate {
       preconditionFailure()
     }
 
-    view.textField?.delegate = self
+    view.textField?.isEditable = false
     view.textField?.bind(.value, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
 
     return view
   }
 }
-
-extension RegionInspectorViewController: NSTextFieldDelegate {
-  func controlTextDidBeginEditing(_ obj: Notification) {
-    guard let textField = obj.object as? NSTextField else {
-      preconditionFailure()
-    }
-    stashedTextFieldValue = textField.stringValue
-  }
-
-  func controlTextDidEndEditing(_ obj: Notification) {
-    guard let textField = obj.object as? NSTextField else {
-      preconditionFailure()
-    }
-
-    if let stashedTextFieldValue = stashedTextFieldValue,
-       stashedTextFieldValue != textField.stringValue {
-      registerUndoForRegion(textField: textField, originalValue: stashedTextFieldValue)
-    }
-  }
-
-  func registerUndoForRegion(textField: NSTextField, originalValue: String) {
-    document.undoManager?.registerUndo(withTarget: self, handler: { controller in
-      let redoValue = textField.stringValue
-      textField.stringValue = originalValue
-      controller.registerRedoForRegion(textField: textField, newValue: redoValue)
-    })
-    document.undoManager?.setActionName("Region Edit")
-  }
-
-  func registerRedoForRegion(textField: NSTextField, newValue: String) {
-    document.undoManager?.registerUndo(withTarget: self, handler: { controller in
-      let redoValue = textField.stringValue
-      textField.stringValue = newValue
-      controller.registerUndoForRegion(textField: textField, originalValue: redoValue)
-    })
-    document.undoManager?.setActionName("Region Edit")
-  }
-}
-
-// TODO: Surface detected labels in the region inspector; add a new column indicating whether a region is automatic or manual.
-// TODO: Editing an automatic label turns it into a manaul label.
-// TODO: Allow sorting of the regions.
-// TODO: Selecting a region should jump to it in the source
-// TODO: Add a "type" for the regions, which will enable or disable the length column accordingly. Support labels, executable regions, and functions.

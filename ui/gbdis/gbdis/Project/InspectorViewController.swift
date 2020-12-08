@@ -45,6 +45,7 @@ final class InspectorViewController: NSViewController {
     tabViewController.view.translatesAutoresizingMaskIntoConstraints = false
     tabViewController.tabStyle = .unspecified
 
+    tabViewController.addTabViewItem(NSTabViewItem(viewController: RegionEditorViewController(document: document)))
     tabViewController.addTabViewItem(NSTabViewItem(viewController: RegionInspectorViewController(document: document)))
     tabViewController.addTabViewItem(NSTabViewItem(viewController: BankInspectorViewController()))
 

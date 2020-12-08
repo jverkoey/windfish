@@ -158,7 +158,8 @@ final class ProjectViewController: NSViewController {
               let textView = self.contentViewController.textView,
               let containerView = self.contentViewController.containerView,
               let layoutManager = textView.layoutManager,
-              let textContainer = textView.textContainer else {
+              let textContainer = textView.textContainer,
+              analysis.lineRanges.count > 0 else {
           return
         }
 

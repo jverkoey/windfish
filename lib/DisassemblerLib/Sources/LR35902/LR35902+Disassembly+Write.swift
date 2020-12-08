@@ -216,7 +216,7 @@ extension LR35902.Disassembly {
     public let sources: [String: FileDescription]
   }
 
-  public func generateSource() throws -> Source {
+  public func generateSource() throws -> (Source, Statistics) {
     var sources: [String: Source.FileDescription] = [:]
 
     sources["Makefile"] = .makefile(content:
@@ -549,11 +549,11 @@ clean:
         }
         if let label = label(at: cpu.pc, in: bank) {
           if let transfersOfControl = transfersOfControl(at: cpu.pc, in: bank) {
-            lineGroup.append(Line(semantic: .transferOfControl(transfersOfControl, label)))
+            lineGroup.append(Line(semantic: .transferOfControl(transfersOfControl, label), address: cpu.pc, bank: cpu.bank))
           } else {
             let instructionScope = labeledContiguousScopes(at: cpu.pc, in: bank).map { $0.label }
             lineGroup.append(Line(semantic: .empty))
-            lineGroup.append(Line(semantic: .label(label), scope: instructionScope.sorted().joined(separator: ", ")))
+            lineGroup.append(Line(semantic: .label(label), address: cpu.pc, bank: cpu.bank, scope: instructionScope.sorted().joined(separator: ", ")))
           }
           isLabeled = true
         }
@@ -716,16 +716,25 @@ clean:
 
     sources["game.asm"] = .game(content: gameAsm)
 
-    print("Instructions decoded: \(instructionsDecoded)")
-
     let disassembledLocations = knownLocations()
-    print("Disassembled: \(Double(disassembledLocations.count * 100) / Double(cpu.cartridgeSize))%")
-    for bank in 0..<cpu.numberOfBanks {
-      let disassembledBankLocations = disassembledLocations.intersection(IndexSet(integersIn:
-                                                                                    (Int(bank) * Int(LR35902.bankSize))..<(Int(bank + 1) * Int(LR35902.bankSize))))
-      print("Bank \(bank.hexString): \(Double(disassembledBankLocations.count * 100) / Double(LR35902.bankSize))%")
+    let bankPercents: [LR35902.Bank: Double] = (0..<cpu.numberOfBanks).reduce(into: [:]) { accumulator, bank in
+      let disassembledBankLocations = disassembledLocations.intersection(
+        IndexSet(integersIn: (Int(bank) * Int(LR35902.bankSize))..<(Int(bank + 1) * Int(LR35902.bankSize)))
+      )
+      accumulator[bank] = Double(disassembledBankLocations.count * 100) / Double(LR35902.bankSize)
     }
+    let statistics = Statistics(
+      instructionsDecoded: instructionsDecoded,
+      percent: Double(disassembledLocations.count * 100) / Double(cpu.cartridgeSize),
+      bankPercents: bankPercents
+    )
 
-    return Source(sources: sources)
+    return (Source(sources: sources), statistics)
+  }
+
+  public struct Statistics {
+    public let instructionsDecoded: Int
+    public let percent: Double
+    public let bankPercents: [LR35902.Bank: Double]
   }
 }
