@@ -31,7 +31,6 @@ final class RegionEditorViewController: NSViewController, TabSelectable {
   let document: ProjectDocument
   let elementsController = NSArrayController()
   var tableView: EditorTableView?
-  private var selectionObserver: NSKeyValueObservation?
   let regionTypeController = NSArrayController()
 
   private struct Column {
@@ -84,12 +83,6 @@ final class RegionEditorViewController: NSViewController, TabSelectable {
       // Note: this only works for cell-based tables.
 //      column.bind(.value, to: regionController, withKeyPath: "arrangedObjects.name", options: nil)
       tableView.tableView?.addTableColumn(column)
-    }
-
-    selectionObserver = elementsController.observe(\.selectedObjects, options: []) { (controller, change) in
-      if let region = controller.selectedObjects.first as? Region {
-        NotificationCenter.default.post(name: .selectedRegionDidChange, object: self.document, userInfo: ["selectedRegion": region])
-      }
     }
 
     let safeAreas = view.safeAreaLayoutGuide
