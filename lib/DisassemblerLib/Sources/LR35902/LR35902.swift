@@ -111,7 +111,7 @@ public final class LR35902 {
   }
 
   public var numberOfBanks: Bank {
-    return Bank(CartridgeLocation(cartridge.count) / LR35902.bankSize)
+    return Bank((CartridgeLocation(cartridge.count) + LR35902.bankSize - 1) / LR35902.bankSize)
   }
 
   static let bankSize: CartridgeLocation = 0x4000

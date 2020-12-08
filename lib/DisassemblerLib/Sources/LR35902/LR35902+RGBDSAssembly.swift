@@ -10,7 +10,7 @@ public final class RGBDSAssembly {
     public let opcode: String
     public let operands: [String]?
     public let comments: String?
-    init(opcode: String, operands: [String]? = nil, comments: String? = nil) {
+    public init(opcode: String, operands: [String]? = nil, comments: String? = nil) {
       self.opcode = opcode
       self.operands = operands
       self.comments = comments

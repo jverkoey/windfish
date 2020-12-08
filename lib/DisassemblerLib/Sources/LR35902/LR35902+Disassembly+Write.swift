@@ -316,7 +316,7 @@ clean:
 
       cpu.pc = (bank == 0) ? 0x0000 : 0x4000
       cpu.bank = bank
-      let end: LR35902.Address = (bank == 0) ? 0x4000 : 0x8000
+      let end: LR35902.Address = (bank == 0) ? (cpu.cartridgeSize < 0x4000 ? LR35902.Address(cpu.cartridgeSize) : 0x4000) : 0x8000
 
       var lineBufferAddress: LR35902.Address = cpu.pc
       var lineBuffer: [Line] = []

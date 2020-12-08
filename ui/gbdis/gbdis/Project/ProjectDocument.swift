@@ -438,22 +438,6 @@ extension ProjectDocument {
     DispatchQueue.global(qos: .userInitiated).async {
       let disassembly = LR35902.Disassembly(rom: romData)
 
-      for region in self.configuration.regions {
-        switch region.regionType {
-        case Region.Kind.region:
-          disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
-          if region.length > 0 {
-            disassembly.disassemble(range: region.address..<(region.address + region.length), inBank: region.bank)
-          }
-        case Region.Kind.label:
-          disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
-        case Region.Kind.function:
-          disassembly.defineFunction(startingAt: region.address, in: region.bank, named: region.name)
-        default:
-          preconditionFailure()
-        }
-      }
-
       for dataType in self.configuration.dataTypes {
         let mappingDict = dataType.mappings.reduce(into: [:]) { accumulator, mapping in
           accumulator[mapping.value] = mapping.name
@@ -483,6 +467,22 @@ extension ProjectDocument {
 
       for global in self.configuration.globals {
         disassembly.createGlobal(at: global.address, named: global.name, dataType: global.dataType)
+      }
+
+      for region in self.configuration.regions {
+        switch region.regionType {
+        case Region.Kind.region:
+          disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
+          if region.length > 0 {
+            disassembly.disassemble(range: region.address..<(region.address + region.length), inBank: region.bank)
+          }
+        case Region.Kind.label:
+          disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
+        case Region.Kind.function:
+          disassembly.defineFunction(startingAt: region.address, in: region.bank, named: region.name)
+        default:
+          preconditionFailure()
+        }
       }
 
       //            disassembly.disassembleAsGameboyCartridge()
