@@ -24,6 +24,19 @@ public final class RGBDSAssembly {
         return opcodeName
       }
     }
+
+    public func attributedString(attributes: [NSAttributedString.Key : Any],
+                                 opcodeAttributes: [NSAttributedString.Key : Any],
+                                 operandAttributes: [NSAttributedString.Key : Any]) -> NSAttributedString {
+      let string = NSMutableAttributedString()
+      let opcodeName = opcode.padding(toLength: maxOpcodeNameLength, withPad: " ", startingAt: 0)
+      string.append(NSAttributedString(string: opcodeName, attributes: opcodeAttributes))
+      if let operands = operands {
+        string.append(NSAttributedString(string: " ", attributes: attributes))
+        string.append(NSAttributedString(string: operands.joined(separator: ", "), attributes: operandAttributes))
+      }
+      return string
+    }
   }
 
   static func assembly(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil, argumentString: String? = nil) -> Statement {

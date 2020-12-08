@@ -92,15 +92,17 @@ class ProjectConfiguration: NSObject, Codable {
 }
 
 final class DisassemblyResults: NSObject {
-  internal init(files: [String : Data], bankLines: [LR35902.Bank : [LR35902.Disassembly.Line]]? = nil, regions: [Region]? = nil, statistics: LR35902.Disassembly.Statistics? = nil) {
+  internal init(files: [String : Data], bankLines: [LR35902.Bank : [LR35902.Disassembly.Line]]? = nil, bankTextStorage: [LR35902.Bank: NSAttributedString]? = nil, regions: [Region]? = nil, statistics: LR35902.Disassembly.Statistics? = nil) {
     self.files = files
     self.bankLines = bankLines
+    self.bankTextStorage = bankTextStorage
     self.regions = regions
     self.statistics = statistics
   }
 
   var files: [String: Data]
   var bankLines: [LR35902.Bank: [LR35902.Disassembly.Line]]?
+  var bankTextStorage: [LR35902.Bank: NSAttributedString]?
   @objc dynamic var regions: [Region]?
   var statistics: LR35902.Disassembly.Statistics?
 }
@@ -531,54 +533,64 @@ extension ProjectDocument {
         accumulator[bankMap[entry.0]!] = entry.1
       }
 
-//      let commentColor = NSColor.systemGreen
-//
-//      let bankTextStorage: [LR35902.Bank: NSAttributedString] = disassembledSource.sources.compactMapValues {
-//        switch $0 {
-//        case .bank(_, _, let lines):
-//          return lines.reduce(into: NSMutableAttributedString()) { accumulator, line in
-//            let string: NSAttributedString
-//            switch line.semantic {
-//            case .newline:
-//              string = NSAttributedString(string: "\n")
-//            case .empty:
-//              string = NSAttributedString(string: "\n")
-//            case let .macroComment(comment): fallthrough
-//            case let .preComment(comment):
-//              string = NSAttributedString(string: "    ; \(comment)", attributes: [.foregroundColor: commentColor])
-//            case .label(labelName):
-//              <#code#>
-//            case .section(_):
-//              <#code#>
-//            case .transferOfControl(_, _):
-//              <#code#>
-//            case .instruction(_, _):
-//              <#code#>
-//            case .macroInstruction(_, _):
-//              <#code#>
-//            case .macro(_):
-//              <#code#>
-//            case .macroDefinition(_):
-//              <#code#>
-//            case .macroTerminator:
-//              <#code#>
-//            case .data(_):
-//              <#code#>
-//            case .jumpTable(_, _):
-//              <#code#>
-//            case .unknown(_, _):
-//              <#code#>
-//            case .global(_, _):
-//              <#code#>
-//            }
-//            accumulator.append(string)
-//          }
-//        default:
-//          return nil
-//        }
-//      }.reduce(into: [:]) { accumulator, entry in
-//        accumulator[bankMap[entry.0]!] = entry.1
-//      }
+      let commentColor = NSColor.systemGreen
+      let labelColor = NSColor.systemOrange
+      let baseAttributes: [NSAttributedString.Key : Any] = [
+        .foregroundColor: NSColor.textColor,
+        .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
+      ]
+      let opcodeAttributes: [NSAttributedString.Key : Any] = [
+        .foregroundColor: NSColor.systemGreen,
+        .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
+      ]
+      let operandAttributes: [NSAttributedString.Key : Any] = baseAttributes
+
+      let bankTextStorage: [LR35902.Bank: NSAttributedString] = disassembledSource.sources.compactMapValues {
+        switch $0 {
+        case .bank(_, _, let lines):
+          return lines.reduce(into: NSMutableAttributedString()) { accumulator, line in
+            switch line.semantic {
+            case .newline: fallthrough
+            case .empty:
+              break // Do nothing.
+            case .macroComment: fallthrough
+            case .preComment:
+              accumulator.append(NSAttributedString(string: line.asString(detailedComments: false), attributes: [
+                .foregroundColor: commentColor,
+                .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
+              ]))
+            case .label: fallthrough
+            case .transferOfControl:
+              accumulator.append(NSAttributedString(string: line.asString(detailedComments: false), attributes: [
+                .foregroundColor: labelColor,
+                .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
+              ]))
+            case .section: fallthrough
+            case .macro: fallthrough
+            case .macroInstruction: fallthrough
+            case .macroDefinition: fallthrough
+            case .macroTerminator: fallthrough
+            case .jumpTable: fallthrough
+            case .global:
+              accumulator.append(NSAttributedString(string: line.asString(detailedComments: false),
+                                                    attributes: baseAttributes))
+            case let .data(assembly): fallthrough
+            case let .unknown(assembly, _): fallthrough
+            case let .instruction(_, assembly):
+              accumulator.append(NSAttributedString(string: "    ",
+                                                    attributes: baseAttributes))
+              accumulator.append(assembly.attributedString(attributes: baseAttributes,
+                                                           opcodeAttributes: opcodeAttributes,
+                                                           operandAttributes: operandAttributes))
+            }
+            accumulator.append(NSAttributedString(string: "\n"))
+          }
+        default:
+          return nil
+        }
+      }.reduce(into: [:]) { accumulator, entry in
+        accumulator[bankMap[entry.0]!] = entry.1
+      }
       let disassemblyFiles: [String: Data] = disassembledSource.sources.mapValues {
         switch $0 {
         case .bank(_, let content, _): fallthrough
@@ -620,6 +632,7 @@ extension ProjectDocument {
         self.disassemblyResults = DisassemblyResults(
           files: disassemblyFiles,
           bankLines: bankLines,
+          bankTextStorage: bankTextStorage,
           regions: regions,
           statistics: statistics
         )

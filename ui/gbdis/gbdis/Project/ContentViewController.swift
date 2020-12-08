@@ -16,14 +16,11 @@ final class ContentViewController: NSViewController {
   var textView: NSTextView?
   var lineNumbersRuler: LineNumberView?
 
-  var filename: String? {
-    didSet {
-      refreshFileContents()
-    }
-  }
+  var filename: String?
 
   var bank: LR35902.Bank? {
     didSet {
+      refreshFileContents()
       refreshBank()
     }
   }
@@ -42,10 +39,16 @@ final class ContentViewController: NSViewController {
   }
 
   private func refreshFileContents() {
-    if let filename = filename {
+    if let bank = bank, let bankTextStorage = document.disassemblyResults?.bankTextStorage,
+       let bankString = bankTextStorage[bank] {
+      textStorage = NSTextStorage(attributedString: bankString)
+    } else if let filename = filename {
       let string = String(data: document.disassemblyResults!.files[filename]!, encoding: .utf8)!
-      let storage = NSTextStorage(string: string)
 
+      let storage = NSTextStorage(string: string, attributes: [
+        .foregroundColor: NSColor.textColor,
+        .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
+      ])
       textStorage = storage
     } else {
       textStorage = NSTextStorage()
@@ -54,14 +57,7 @@ final class ContentViewController: NSViewController {
 
   var textStorage = NSTextStorage() {
     didSet {
-      textStorage.delegate = self
       textView?.layoutManager?.replaceTextStorage(textStorage)
-      textStorage.delegate?.textStorage?(
-        textStorage,
-        didProcessEditing: .editedCharacters,
-        range: NSRange(location: 0, length: textStorage.string.count),
-        changeInLength: 0
-      )
     }
   }
 
@@ -163,46 +159,6 @@ final class ContentViewController: NSViewController {
         self.lineAnalysis = nil
         lineNumbersRuler.needsDisplay = true
       })
-  }
-}
-
-extension ContentViewController: NSTextStorageDelegate {
-  func textStorage(_ textStorage: NSTextStorage, didProcessEditing editedMask: NSTextStorageEditActions, range editedRange: NSRange, changeInLength delta: Int) {
-    guard editedMask == [.editedCharacters] else {
-      return
-    }
-    textStorage.beginEditing()
-    textStorage.addAttributes([
-      .foregroundColor: NSColor.textColor,
-      .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
-    ], range: editedRange)
-
-    guard let regex = try? NSRegularExpression(pattern: ";.+$", options: [.anchorsMatchLines]) else {
-      return
-    }
-    regex.enumerateMatches(in: textStorage.string, options: [], range: editedRange) { result, flags, out in
-      guard let result = result else {
-        return
-      }
-      textStorage.addAttributes([.foregroundColor: NSColor.systemGray], range: result.range)
-    }
-
-    try? NSRegularExpression(pattern: "^[^;\\n]+:", options: [.anchorsMatchLines])
-      .enumerateMatches(in: textStorage.string, options: [], range: editedRange) { result, flags, out in
-        guard let result = result else {
-          return
-        }
-        textStorage.addAttributes([.foregroundColor: NSColor.systemOrange], range: result.range)
-      }
-
-    try? NSRegularExpression(pattern: "^    \\w+ ", options: [.anchorsMatchLines])
-      .enumerateMatches(in: textStorage.string, options: [], range: editedRange) { result, flags, out in
-        guard let result = result else {
-          return
-        }
-        textStorage.addAttributes([.foregroundColor: NSColor.systemGreen], range: result.range)
-      }
-    textStorage.endEditing()
   }
 }
 

@@ -106,7 +106,7 @@ extension LR35902.Disassembly {
     public let scope: String?
     public let data: Data?
 
-    func asString(detailedComments: Bool) -> String {
+    public func asString(detailedComments: Bool) -> String {
       switch semantic {
       case .newline:                           return ""
 
@@ -198,7 +198,7 @@ extension LR35902.Disassembly {
       return asString(detailedComments: true) + "\n"
     }
 
-    var asEditorString: String {
+    public var asEditorString: String {
       return asString(detailedComments: false) + "\n"
     }
   }
