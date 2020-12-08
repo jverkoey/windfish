@@ -136,12 +136,22 @@ class ProjectDocument: NSDocument {
       configuration.regions.append(Region(regionType: Region.Kind.region, name: "RST_\($0.lowerBound.hexString)", bank: 0, address: $0.lowerBound, length: LR35902.Address($0.count)))
     }
 
-    configuration.regions.append(Region(regionType: Region.Kind.region, name: "VBlankInterrupt", bank: 0, address: 0x0040, length: 8))
-    configuration.regions.append(Region(regionType: Region.Kind.region, name: "LCDCInterrupt", bank: 0, address: 0x0048, length: 8))
-    configuration.regions.append(Region(regionType: Region.Kind.region, name: "TimerOverflowInterrupt", bank: 0, address: 0x0050, length: 8))
-    configuration.regions.append(Region(regionType: Region.Kind.region, name: "SerialTransferCompleteInterrupt", bank: 0, address: 0x0058, length: 8))
-    configuration.regions.append(Region(regionType: Region.Kind.region, name: "JoypadTransitionInterrupt", bank: 0, address: 0x0060, length: 8))
-    configuration.regions.append(Region(regionType: Region.Kind.region, name: "Boot", bank: 0, address: 0x0100, length: 4))
+    configuration.regions.append(contentsOf: [
+      Region(regionType: Region.Kind.region, name: "VBlankInterrupt", bank: 0, address: 0x0040, length: 8),
+      Region(regionType: Region.Kind.region, name: "LCDCInterrupt", bank: 0, address: 0x0048, length: 8),
+      Region(regionType: Region.Kind.region, name: "TimerOverflowInterrupt", bank: 0, address: 0x0050, length: 8),
+      Region(regionType: Region.Kind.region, name: "SerialTransferCompleteInterrupt", bank: 0, address: 0x0058, length: 8),
+      Region(regionType: Region.Kind.region, name: "JoypadTransitionInterrupt", bank: 0, address: 0x0060, length: 8),
+      Region(regionType: Region.Kind.region, name: "Boot", bank: 0, address: 0x0100, length: 4),
+      Region(regionType: Region.Kind.label, name: "HeaderLogo", bank: 0, address: 0x0104, length: 0),
+      Region(regionType: Region.Kind.label, name: "HeaderTitle", bank: 0, address: 0x0134, length: 0),
+      Region(regionType: Region.Kind.label, name: "HeaderNewLicenseeCode", bank: 0, address: 0x0144, length: 0),
+      Region(regionType: Region.Kind.label, name: "HeaderCartridgeType", bank: 0, address: 0x0147, length: 0),
+      Region(regionType: Region.Kind.label, name: "HeaderOldLicenseeCode", bank: 0, address: 0x014B, length: 0),
+      Region(regionType: Region.Kind.label, name: "HeaderMaskROMVersion", bank: 0, address: 0x014C, length: 0),
+      Region(regionType: Region.Kind.label, name: "HeaderComplementCheck", bank: 0, address: 0x014D, length: 0),
+      Region(regionType: Region.Kind.label, name: "HeaderGlobalChecksum", bank: 0, address: 0x014E, length: 0),
+    ])
 
     configuration.dataTypes.append(DataType(name: "hex",
                                             representation: DataType.Representation.hexadecimal,
