@@ -29,6 +29,7 @@
 		667B1BAE2578565A00CE670F /* OutlineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1BAD2578565A00CE670F /* OutlineViewController.swift */; };
 		667B1C0225789BAE00CE670F /* InspectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1C0125789BAE00CE670F /* InspectorViewController.swift */; };
 		66C617C6257F04D600E372BA /* RegionInspectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */; };
+		66C617CC257F1AE200E372BA /* TabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617CB257F1AE200E372BA /* TabViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +80,7 @@
 		667B1BE425787ACE00CE670F /* gbdisui-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "gbdisui-Bridging-Header.h"; sourceTree = "<group>"; };
 		667B1C0125789BAE00CE670F /* InspectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InspectorViewController.swift; sourceTree = "<group>"; };
 		66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegionInspectorViewController.swift; sourceTree = "<group>"; };
+		66C617CB257F1AE200E372BA /* TabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,6 +139,7 @@
 				667B1B982578559600CE670F /* AutoLayout */,
 				667B1B8F2578557100CE670F /* FoundationExtensions */,
 				667B1B612578540500CE670F /* Project */,
+				66C617CA257F1AD500E372BA /* ViewControllers */,
 				665D4FAC257727C000C3A03B /* Views */,
 				665D4F582575F75400C3A03B /* AppDelegate.swift */,
 				667B1B622578541F00CE670F /* NotificationNames.swift */,
@@ -238,6 +241,14 @@
 				667B1B99257855AE00CE670F /* CommonConstraints.swift */,
 			);
 			path = AutoLayout;
+			sourceTree = "<group>";
+		};
+		66C617CA257F1AD500E372BA /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				66C617CB257F1AE200E372BA /* TabViewController.swift */,
+			);
+			path = ViewControllers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -391,6 +402,7 @@
 				665D4F5D2575F75400C3A03B /* ProjectDocument.swift in Sources */,
 				665D4FAE257727CA00C3A03B /* HorizontalLine.swift in Sources */,
 				667B1C0225789BAE00CE670F /* InspectorViewController.swift in Sources */,
+				66C617CC257F1AE200E372BA /* TabViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
