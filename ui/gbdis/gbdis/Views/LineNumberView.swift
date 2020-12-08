@@ -130,6 +130,15 @@ final class LineNumberView: NSRulerView {
         let currentLine = bankLines[lineNumber]
         let nextLine = lineNumber < bankLines.count - 1 ? bankLines[lineNumber + 1] : nil
 
+        let isLabel: Bool
+        switch bankLines[lineNumber].semantic {
+        case .label: fallthrough
+        case .transferOfControl:
+          isLabel = true
+        default:
+          isLabel = false
+        }
+
         if let data = bankLines[lineNumber].data, let dataHandler = dataHandler {
           let dataRect = NSRect(
             x: rightMostDrawableLocation - digitSize - scopeColumnWidth - bankDigitSize - dataSize,
@@ -140,7 +149,7 @@ final class LineNumberView: NSRulerView {
           dataHandler(bankLines[lineNumber].semantic, data, dataRect)
         }
 
-        if let bank = bankLines[lineNumber].bank, let bankHandler = bankHandler {
+        if !isLabel, let bank = bankLines[lineNumber].bank, let bankHandler = bankHandler {
           let bankRect = NSRect(
             x: rightMostDrawableLocation - digitSize - scopeColumnWidth - bankDigitSize + columnPadding,
             y: layoutRects.pointee.minY + textContainerInset.height - visibleRect.minY,
@@ -162,7 +171,7 @@ final class LineNumberView: NSRulerView {
 
         // TODO: Also show the current bank and current execution context
         // TODO: Cmd+clicking labels should jump to the label
-        if let address = bankLines[lineNumber].address {
+        if !isLabel, let address = bankLines[lineNumber].address {
           let lineString = NSString(string: address.hexString)
           let lineStringSize = lineString.size(withAttributes: textAttributes)
           let lineStringRect = NSRect(

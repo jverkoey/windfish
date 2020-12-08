@@ -162,7 +162,7 @@ extension LR35902.Disassembly {
         if detailedComments {
           return line(statement.description, address: address!, addressType: "text")
         } else {
-          return line(statement.description, addressType: "text")
+          return line(statement.description)
         }
 
       case let .jumpTable(jumpLocation, index):
@@ -178,14 +178,14 @@ extension LR35902.Disassembly {
           let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
           return line(statement.description, address: address!, addressType: addressType, comment: "|\(bytesAsCharacters)|")
         } else {
-          return line(statement.description, addressType: addressType)
+          return line(statement.description)
         }
 
       case let .global(statement, addressType):
         if detailedComments {
           return line(statement.description, address: address!, addressType: addressType)
         } else {
-          return line(statement.description, addressType: addressType)
+          return line(statement.description)
         }
       }
     }

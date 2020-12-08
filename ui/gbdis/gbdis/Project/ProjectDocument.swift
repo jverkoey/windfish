@@ -143,6 +143,9 @@ class ProjectDocument: NSDocument {
     configuration.regions.append(Region(regionType: Region.Kind.region, name: "JoypadTransitionInterrupt", bank: 0, address: 0x0060, length: 8))
     configuration.regions.append(Region(regionType: Region.Kind.region, name: "Boot", bank: 0, address: 0x0100, length: 4))
 
+    configuration.dataTypes.append(DataType(name: "hex",
+                                            representation: DataType.Representation.hexadecimal,
+                                            interpretation: DataType.Interpretation.any, mappings: []))
     configuration.dataTypes.append(DataType(name: "decimal",
                                             representation: DataType.Representation.decimal,
                                             interpretation: DataType.Interpretation.any, mappings: []))
@@ -283,6 +286,10 @@ extension ProjectDocument {
         default:
           preconditionFailure()
         }
+      }
+
+      for global in self.configuration.globals {
+        disassembly.createGlobal(at: global.address, named: global.name, dataType: global.dataType)
       }
 
       //            disassembly.disassembleAsGameboyCartridge()
