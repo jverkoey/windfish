@@ -10,6 +10,13 @@ import Cocoa
 import LR35902
 
 extension NSUserInterfaceItemIdentifier {
+  static let typeCell = NSUserInterfaceItemIdentifier("typeCell")
+  static let textCell = NSUserInterfaceItemIdentifier("textCell")
+  static let numberCell = NSUserInterfaceItemIdentifier("numberCell")
+  static let addressCell = NSUserInterfaceItemIdentifier("addressCell")
+}
+
+extension NSUserInterfaceItemIdentifier {
   static let type = NSUserInterfaceItemIdentifier("regionType")
   static let name = NSUserInterfaceItemIdentifier("name")
   static let bank = NSUserInterfaceItemIdentifier("bank")
@@ -17,11 +24,13 @@ extension NSUserInterfaceItemIdentifier {
   static let length = NSUserInterfaceItemIdentifier("length")
 }
 
-final class RegionEditorViewController: TableViewEditorViewController, TabSelectable {
+final class RegionEditorViewController: NSViewController, TabSelectable {
   let deselectedTabImage = NSImage(systemSymbolName: "book", accessibilityDescription: nil)!
   let selectedTabImage = NSImage(systemSymbolName: "book.fill", accessibilityDescription: nil)!
 
   let document: ProjectDocument
+  let elementsController = NSArrayController()
+  var tableView: EditorTableView?
   private var selectionObserver: NSKeyValueObservation?
   let regionTypeController = NSArrayController()
 
@@ -36,8 +45,6 @@ final class RegionEditorViewController: TableViewEditorViewController, TabSelect
 
     super.init(nibName: nil, bundle: nil)
 
-    self.textEditActionName = "Region Edit"
-
     regionTypeController.addObject(Region.Kind.region)
     regionTypeController.addObject(Region.Kind.label)
     regionTypeController.addObject(Region.Kind.function)
@@ -47,15 +54,15 @@ final class RegionEditorViewController: TableViewEditorViewController, TabSelect
     fatalError("init(coder:) has not been implemented")
   }
 
-  override func viewDidLoad() {
-    super.viewDidLoad()
+  override func loadView() {
+    view = NSView()
 
-    guard let tableView = tableView else {
-      preconditionFailure()
-    }
-
+    let tableView = EditorTableView(elementsController: elementsController)
+    tableView.translatesAutoresizingMaskIntoConstraints = false
     tableView.delegate = self
     tableView.tableView?.delegate = self
+    view.addSubview(tableView)
+    self.tableView = tableView
 
     let columns = [
       Column(name: "Type", identifier: .type, width: 100),
@@ -80,6 +87,14 @@ final class RegionEditorViewController: TableViewEditorViewController, TabSelect
         NotificationCenter.default.post(name: .selectedRegionDidChange, object: self.document, userInfo: ["selectedRegion": region])
       }
     }
+
+    let safeAreas = view.safeAreaLayoutGuide
+    NSLayoutConstraint.activate([
+      tableView.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
+      tableView.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
+      tableView.topAnchor.constraint(equalTo: safeAreas.topAnchor),
+      tableView.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
+    ])
 
     elementsController.bind(.contentArray, to: document.configuration, withKeyPath: "regions", options: nil)
     tableView.tableView?.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
@@ -122,31 +137,35 @@ extension RegionEditorViewController: NSTableViewDelegate {
     guard let tableColumn = tableColumn else {
       preconditionFailure()
     }
-    let view: NSTableCellView
 
     switch tableColumn.identifier {
     case .type:
       let identifier = NSUserInterfaceItemIdentifier.typeCell
+      let view: TypeTableCellView
       if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TypeTableCellView {
         view = recycledView
       } else {
-        let typeView = TypeTableCellView()
-        typeView.identifier = identifier
-        typeView.popupButton.bind(.content, to: regionTypeController, withKeyPath: "arrangedObjects", options: nil)
-        typeView.popupButton.bind(.selectedObject, to: typeView, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
-        view = typeView
+        view = TypeTableCellView()
+        view.identifier = identifier
+        view.popupButton.bind(.content, to: regionTypeController, withKeyPath: "arrangedObjects", options: nil)
+        view.popupButton.bind(.selectedObject, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
       }
+      return view
     case .name:
       let identifier = NSUserInterfaceItemIdentifier.textCell
+      let view: TextTableCellView
       if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TextTableCellView {
         view = recycledView
       } else {
         view = TextTableCellView()
         view.identifier = identifier
       }
+      view.textField?.bind(.value, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
+      return view
     case .bank: fallthrough
     case .length:
       let identifier = NSUserInterfaceItemIdentifier.numberCell
+      let view: TextTableCellView
       if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TextTableCellView {
         view = recycledView
       } else {
@@ -154,8 +173,10 @@ extension RegionEditorViewController: NSTableViewDelegate {
         view.identifier = identifier
         view.textField?.formatter = NumberFormatter()
       }
+      return view
     case .address:
       let identifier = NSUserInterfaceItemIdentifier.addressCell
+      let view: TextTableCellView
       if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TextTableCellView {
         view = recycledView
       } else {
@@ -163,14 +184,10 @@ extension RegionEditorViewController: NSTableViewDelegate {
         view.identifier = identifier
         view.textField?.formatter = LR35902AddressFormatter()
       }
+      return view
     default:
       preconditionFailure()
     }
-
-    view.textField?.delegate = self
-    view.textField?.bind(.value, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
-
-    return view
   }
 }
 

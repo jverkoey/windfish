@@ -14,12 +14,13 @@ extension NSUserInterfaceItemIdentifier {
   static let interpretation = NSUserInterfaceItemIdentifier("interpretation")
 }
 
-final class DataTypeEditorViewController: TableViewEditorViewController, TabSelectable {
+final class DataTypeEditorViewController: NSViewController, TabSelectable {
   let deselectedTabImage = NSImage(systemSymbolName: "number.circle", accessibilityDescription: nil)!
   let selectedTabImage = NSImage(systemSymbolName: "number.circle.fill", accessibilityDescription: nil)!
 
   let document: ProjectDocument
-  private var selectionObserver: NSKeyValueObservation?
+  let elementsController = NSArrayController()
+  var tableView: EditorTableView?
   let representationController = NSArrayController()
   let interpretationController = NSArrayController()
 
@@ -34,8 +35,6 @@ final class DataTypeEditorViewController: TableViewEditorViewController, TabSele
 
     super.init(nibName: nil, bundle: nil)
 
-    self.textEditActionName = "Data Type Edit"
-
     representationController.addObject(DataType.Representation.decimal)
     representationController.addObject(DataType.Representation.hexadecimal)
     representationController.addObject(DataType.Representation.binary)
@@ -49,15 +48,15 @@ final class DataTypeEditorViewController: TableViewEditorViewController, TabSele
     fatalError("init(coder:) has not been implemented")
   }
 
-  override func viewDidLoad() {
-    super.viewDidLoad()
+  override func loadView() {
+    view = NSView()
 
-    guard let tableView = tableView else {
-      preconditionFailure()
-    }
-
+    let tableView = EditorTableView(elementsController: elementsController)
+    tableView.translatesAutoresizingMaskIntoConstraints = false
     tableView.delegate = self
     tableView.tableView?.delegate = self
+    view.addSubview(tableView)
+    self.tableView = tableView
 
     let columns = [
       Column(name: "Name", identifier: .name, width: 120),
@@ -75,11 +74,13 @@ final class DataTypeEditorViewController: TableViewEditorViewController, TabSele
       tableView.tableView?.addTableColumn(column)
     }
 
-    selectionObserver = elementsController.observe(\.selectedObjects, options: []) { (controller, change) in
-      if let region = controller.selectedObjects.first as? Region {
-        NotificationCenter.default.post(name: .selectedRegionDidChange, object: self.document, userInfo: ["selectedRegion": region])
-      }
-    }
+    let safeAreas = view.safeAreaLayoutGuide
+    NSLayoutConstraint.activate([
+      tableView.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
+      tableView.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
+      tableView.topAnchor.constraint(equalTo: safeAreas.topAnchor),
+      tableView.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
+    ])
 
     elementsController.bind(.contentArray, to: document.configuration, withKeyPath: "dataTypes", options: nil)
     tableView.tableView?.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
@@ -133,7 +134,6 @@ extension DataTypeEditorViewController: NSTableViewDelegate {
         view = TextTableCellView()
         view.identifier = identifier
       }
-      view.textField?.delegate = self
       view.textField?.bind(.value, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
       return view
     case .representation:
