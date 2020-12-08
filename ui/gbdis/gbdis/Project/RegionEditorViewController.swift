@@ -14,6 +14,7 @@ extension NSUserInterfaceItemIdentifier {
   static let textCell = NSUserInterfaceItemIdentifier("textCell")
   static let numberCell = NSUserInterfaceItemIdentifier("numberCell")
   static let addressCell = NSUserInterfaceItemIdentifier("addressCell")
+  static let bankCell = NSUserInterfaceItemIdentifier("bankCell")
 }
 
 extension NSUserInterfaceItemIdentifier {
@@ -159,7 +160,18 @@ extension RegionEditorViewController: NSTableViewDelegate {
       }
       view.textField?.bind(.value, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
       return view
-    case .bank: fallthrough
+    case .bank:
+      let identifier = NSUserInterfaceItemIdentifier.bankCell
+      let view: TextTableCellView
+      if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TextTableCellView {
+        view = recycledView
+      } else {
+        view = TextTableCellView()
+        view.identifier = identifier
+        view.textField?.formatter = UInt8HexFormatter()
+      }
+      view.textField?.bind(.value, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
+      return view
     case .length:
       let identifier = NSUserInterfaceItemIdentifier.numberCell
       let view: TextTableCellView
