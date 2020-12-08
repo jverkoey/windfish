@@ -14,6 +14,8 @@ final class Region: NSObject, Codable {
     static let region = "Region"
     static let label = "Label"
     static let function = "Function"
+    static let string = "String"
+    static let data = "Data"
   }
   @objc dynamic var regionType: String {
     didSet {
@@ -144,7 +146,7 @@ class ProjectDocument: NSDocument {
       Region(regionType: Region.Kind.region, name: "JoypadTransitionInterrupt", bank: 0, address: 0x0060, length: 8),
       Region(regionType: Region.Kind.region, name: "Boot", bank: 0, address: 0x0100, length: 4),
       Region(regionType: Region.Kind.label, name: "HeaderLogo", bank: 0, address: 0x0104, length: 0),
-      Region(regionType: Region.Kind.label, name: "HeaderTitle", bank: 0, address: 0x0134, length: 0),
+      Region(regionType: Region.Kind.string, name: "HeaderTitle", bank: 0, address: 0x0134, length: 0x0143 - 0x0134),
       Region(regionType: Region.Kind.label, name: "HeaderNewLicenseeCode", bank: 0, address: 0x0144, length: 0),
       Region(regionType: Region.Kind.label, name: "HeaderCartridgeType", bank: 0, address: 0x0147, length: 0),
       Region(regionType: Region.Kind.label, name: "HeaderOldLicenseeCode", bank: 0, address: 0x014B, length: 0),
@@ -349,6 +351,16 @@ class ProjectDocument: NSDocument {
       Global(name: "gbPCM34", address: 0xff77, dataType: "hex"),
       Global(name: "gbIE", address: 0xffff, dataType: "HW_IE"),
     ])
+
+    // TODO: Handle data and text definitions.
+//    setData(at: 0x0104..<0x0134, in: 0x00)
+//    setText(at: 0x0134..<0x0143, in: 0x00)
+//    setData(at: 0x0144..<0x0146, in: 0x00)
+//    setData(at: 0x0147, in: 0x00)
+//    setData(at: 0x014B, in: 0x00)
+//    setData(at: 0x014C, in: 0x00)
+//    setData(at: 0x014D, in: 0x00)
+//    setData(at: 0x014E..<0x0150, in: 0x00)
   }
 
   private var documentFileWrapper: FileWrapper?
@@ -469,6 +481,7 @@ extension ProjectDocument {
         disassembly.createGlobal(at: global.address, named: global.name, dataType: global.dataType)
       }
 
+      // Disassemble everything first
       for region in self.configuration.regions {
         switch region.regionType {
         case Region.Kind.region:
@@ -476,12 +489,26 @@ extension ProjectDocument {
           if region.length > 0 {
             disassembly.disassemble(range: region.address..<(region.address + region.length), inBank: region.bank)
           }
-        case Region.Kind.label:
-          disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
         case Region.Kind.function:
           disassembly.defineFunction(startingAt: region.address, in: region.bank, named: region.name)
         default:
-          preconditionFailure()
+          break
+        }
+      }
+
+      // And then set any explicit regions
+      for region in self.configuration.regions {
+        switch region.regionType {
+        case Region.Kind.label:
+          disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
+        case Region.Kind.string:
+          disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
+          disassembly.setText(at: region.address..<(region.address + region.length), in: region.bank, lineLength: nil)
+        case Region.Kind.data:
+          disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
+          disassembly.setData(at: region.address..<(region.address + region.length), in: region.bank)
+        default:
+          break
         }
       }
 
