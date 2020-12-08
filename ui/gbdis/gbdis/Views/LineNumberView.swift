@@ -133,6 +133,7 @@ final class LineNumberView: NSRulerView {
         let isLabel: Bool
         switch bankLines[lineNumber].semantic {
         case .label: fallthrough
+        case .empty: fallthrough
         case .transferOfControl:
           isLabel = true
         default:

@@ -552,8 +552,9 @@ clean:
             lineGroup.append(Line(semantic: .transferOfControl(transfersOfControl, label), address: cpu.pc, bank: cpu.bank))
           } else {
             let instructionScope = labeledContiguousScopes(at: cpu.pc, in: bank).map { $0.label }
-            lineGroup.append(Line(semantic: .empty))
-            lineGroup.append(Line(semantic: .label(label), address: cpu.pc, bank: cpu.bank, scope: instructionScope.sorted().joined(separator: ", ")))
+            let scope = instructionScope.sorted().joined(separator: ", ")
+            lineGroup.append(Line(semantic: .empty, address: cpu.pc, bank: cpu.bank, scope: scope))
+            lineGroup.append(Line(semantic: .label(label), address: cpu.pc, bank: cpu.bank, scope: scope))
           }
           isLabeled = true
         }
@@ -595,7 +596,9 @@ clean:
           // Handle context changes.
           switch instruction.spec {
           case .jp(let condition, _), .jr(let condition, _):
-            lineGroup.append(Line(semantic: .empty))
+            let instructionScope = labeledContiguousScopes(at: cpu.pc, in: bank).map { $0.label }
+            let scope = instructionScope.sorted().joined(separator: ", ")
+            lineGroup.append(Line(semantic: .empty, scope: scope))
             if condition == nil {
               cpu.bank = bank
             }
