@@ -65,7 +65,7 @@ public final class RGBDSAssembly {
     }.joined()
   }
 
-  public static func line(for bytes: [UInt8], characterMap: [UInt8: String], address: LR35902.Address) -> LR35902.Disassembly.Line {
+  public static func textLine(for bytes: [UInt8], characterMap: [UInt8: String], address: LR35902.Address) -> LR35902.Disassembly.Line {
     var accumulator: [String] = []
     var asciiCharacterAccumulator: [UInt8] = []
     for byte in bytes {
@@ -82,7 +82,7 @@ public final class RGBDSAssembly {
     if asciiCharacterAccumulator.count > 0 {
       accumulator.append("\"\(flatten(asciiCodes: asciiCharacterAccumulator, characterMap: characterMap))\"")
     }
-    return LR35902.Disassembly.Line(semantic: .data(Statement(opcode: "db", operands: accumulator)), address: address)
+    return LR35902.Disassembly.Line(semantic: .text(Statement(opcode: "db", operands: accumulator)), address: address)
   }
 
   private static func typedValue(for imm8: UInt8, with representation: LR35902.Disassembly.Datatype.Representation) -> String {

@@ -87,6 +87,7 @@ extension LR35902.Disassembly {
       case macroDefinition(String)
       case macroTerminator
       case data(RGBDSAssembly.Statement)
+      case text(RGBDSAssembly.Statement)
       case jumpTable(String, Int)
       case unknown(RGBDSAssembly.Statement, String?)
       case global(RGBDSAssembly.Statement, String)
@@ -158,6 +159,7 @@ extension LR35902.Disassembly {
 
       case .macroTerminator:                   return line("ENDM")
 
+      case let .text(statement): fallthrough
       case let .data(statement):
         if detailedComments {
           return line(statement.description, address: address!, addressType: "text")
@@ -663,7 +665,7 @@ clean:
           case .text:
             let lineLength = lineLengthOfText(at: initialPc, in: bank) ?? 254
             for chunk in accumulator.chunked(into: lineLength) {
-              bankLines.append(RGBDSAssembly.line(for: chunk, characterMap: characterMap, address: chunkPc))
+              bankLines.append(RGBDSAssembly.textLine(for: chunk, characterMap: characterMap, address: chunkPc))
               chunkPc += LR35902.Address(chunk.count)
             }
           case .jumpTable:

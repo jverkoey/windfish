@@ -570,12 +570,13 @@ extension ProjectDocument {
             case .macroInstruction: fallthrough
             case .macroDefinition: fallthrough
             case .macroTerminator: fallthrough
-            case .jumpTable: fallthrough
-            case .global:
+            case .jumpTable:
               accumulator.append(NSAttributedString(string: line.asString(detailedComments: false),
                                                     attributes: baseAttributes))
+            case let .text(assembly): fallthrough
             case let .data(assembly): fallthrough
             case let .unknown(assembly, _): fallthrough
+            case let .global(assembly, _): fallthrough
             case let .instruction(_, assembly):
               accumulator.append(NSAttributedString(string: "    ",
                                                     attributes: baseAttributes))
