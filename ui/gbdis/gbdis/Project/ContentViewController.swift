@@ -29,7 +29,7 @@ final class ContentViewController: NSViewController {
   }
   private func refreshBank() {
     if let bank = bank {
-      let bankLines = document.bankLines?[bank]
+      let bankLines = document.disassemblyResults?.bankLines?[bank]
       lineNumbersRuler?.bankLines = bankLines
     } else {
       lineNumbersRuler?.bankLines = nil
@@ -43,7 +43,7 @@ final class ContentViewController: NSViewController {
 
   private func refreshFileContents() {
     if let filename = filename {
-      let string = String(data: document.disassemblyFiles![filename]!, encoding: .utf8)!
+      let string = String(data: document.disassemblyResults!.files[filename]!, encoding: .utf8)!
       textStorage = NSTextStorage(string: string)
     } else {
       textStorage = NSTextStorage()

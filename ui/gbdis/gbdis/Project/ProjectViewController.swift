@@ -141,7 +141,7 @@ final class ProjectViewController: NSViewController {
         }
         self.sidebarViewController.treeController.setSelectionIndexPath(IndexPath(indexes: [0, index]))
 
-        guard let bankLines = self.document.bankLines?[region.bank] else {
+        guard let bankLines = self.document.disassemblyResults?.bankLines?[region.bank] else {
           return
         }
         guard let lineIndex = bankLines.firstIndex(where: { line in

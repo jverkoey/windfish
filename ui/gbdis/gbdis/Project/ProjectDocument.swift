@@ -44,6 +44,11 @@ class ProjectConfiguration: NSObject, Codable {
   @objc dynamic var regions: [Region] = []
 }
 
+struct DisassemblyResults {
+  var files: [String: Data]
+  var bankLines: [LR35902.Bank: [LR35902.Disassembly.Line]]?
+}
+
 struct ProjectMetadata: Codable {
   var romUrl: URL
   var numberOfBanks: LR35902.Bank
@@ -63,8 +68,7 @@ class ProjectDocument: NSDocument {
 
   var isDisassembling = false
   var romData: Data?
-  var disassemblyFiles: [String: Data]?
-  var bankLines: [LR35902.Bank: [LR35902.Disassembly.Line]]?
+  var disassemblyResults: DisassemblyResults?
 
   var metadata: ProjectMetadata?
   var configuration = ProjectConfiguration()
@@ -222,10 +226,9 @@ extension ProjectDocument {
       }
 
       DispatchQueue.main.async {
-        self.disassemblyFiles = disassemblyFiles
         self.metadata?.numberOfBanks = disassembly.cpu.numberOfBanks
         self.metadata?.bankMap = bankMap
-        self.bankLines = bankLines
+        self.disassemblyResults = DisassemblyResults(files: disassemblyFiles, bankLines: bankLines)
 
         self.isDisassembling = false
         NotificationCenter.default.post(name: .disassembled, object: self)
@@ -285,8 +288,8 @@ extension ProjectDocument {
     }
 
     if let fileWrapper = fileWrappers[Filenames.disassembly] {
-      self.disassemblyFiles = fileWrapper.fileWrappers?.mapValues {
-        $0.regularFileContents!
+      if let files = fileWrapper.fileWrappers?.mapValues({ $0.regularFileContents! }) {
+        self.disassemblyResults = DisassemblyResults(files: files, bankLines: nil)
       }
     }
 
@@ -331,8 +334,8 @@ extension ProjectDocument {
     }
 
     // TODO: Wait until the assembly has finished?
-    if let disassemblyFiles = disassemblyFiles {
-      let wrappers = disassemblyFiles.mapValues { content in
+    if let disassemblyResults = disassemblyResults {
+      let wrappers = disassemblyResults.files.mapValues { content in
         FileWrapper(regularFileWithContents: content)
       }
       if let fileWrapper = fileWrappers[Filenames.disassembly] {

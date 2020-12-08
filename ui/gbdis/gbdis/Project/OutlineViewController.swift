@@ -35,7 +35,7 @@ final class OutlineViewController: NSViewController {
   }
 
   private func populateFromDocument() {
-    guard let disassemblyFiles = document.disassemblyFiles else {
+    guard let disassemblyFiles = document.disassemblyResults?.files else {
       return
     }
     let children = treeController.arrangedObjects.children![0]
