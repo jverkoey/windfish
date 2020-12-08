@@ -9,7 +9,7 @@ import Cocoa
 
 import LR35902
 
-final class Region: NSObject, NSCopying, Codable {
+final class Region: NSObject, Codable {
   struct Kind {
     static let region = "Region"
     static let label = "Label"
@@ -34,14 +34,36 @@ final class Region: NSObject, NSCopying, Codable {
     self.address = address
     self.length = length
   }
+}
 
-  func copy(with zone: NSZone? = nil) -> Any {
-    return Region(regionType: regionType, name: name, bank: bank, address: address, length: length)
+final class DataType: NSObject, Codable {
+  init(name: String, representation: Representation, interpretation: Interpretation, namedValues: [UInt8: String]) {
+    self.name = name
+    self.representation = representation
+    self.interpretation = interpretation
+    self.namedValues = namedValues
   }
+
+  @objc public enum Interpretation: Int, Codable {
+    case any
+    case enumerated
+    case bitmask
+  }
+  @objc enum Representation: Int, Codable {
+    case decimal
+    case hexadecimal
+    case binary
+  }
+
+  @objc dynamic var name: String
+  @objc dynamic var representation: Representation
+  @objc dynamic var interpretation: Interpretation
+  @objc dynamic var namedValues: [UInt8: String]
 }
 
 class ProjectConfiguration: NSObject, Codable {
   @objc dynamic var regions: [Region] = []
+  @objc dynamic var dataTypes: [DataType] = []
 }
 
 final class DisassemblyResults: NSObject {

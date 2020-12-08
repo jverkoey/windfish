@@ -366,7 +366,7 @@ extension LR35902 {
         case bitmask
       }
 
-      public enum Representation {
+      public enum Representation: Int, Codable {
         case decimal
         case hexadecimal
         case binary
