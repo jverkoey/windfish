@@ -44,7 +44,9 @@ final class ContentViewController: NSViewController {
   private func refreshFileContents() {
     if let filename = filename {
       let string = String(data: document.disassemblyResults!.files[filename]!, encoding: .utf8)!
-      textStorage = NSTextStorage(string: string)
+      let storage = NSTextStorage(string: string)
+
+      textStorage = storage
     } else {
       textStorage = NSTextStorage()
     }
@@ -70,6 +72,19 @@ final class ContentViewController: NSViewController {
   var lineAnalysis: LineAnalysis? {
     didSet {
       lineNumbersRuler?.lineAnalysis = lineAnalysis
+
+      // TODO: This needs to happen between analysis and setting of the storage.
+      // 1. Set new storage.
+      // 2. Analyze and mutate the storage if needed.
+      // 3. Set the storage.
+//      if let lineAnalysis = lineAnalysis, lineAnalysis.lineRanges.count > 0 {
+//        refreshFileContents()
+//
+//        let range = lineAnalysis.lineRanges[20]
+//        let imageAttachment = NSTextAttachment()
+//        imageAttachment.image = NSImage(systemSymbolName: "pencil.circle", accessibilityDescription: nil)
+//        textStorage.insert(NSAttributedString(attachment: imageAttachment), at: range.lowerBound)
+//      }
     }
   }
 

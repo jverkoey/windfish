@@ -530,6 +530,55 @@ extension ProjectDocument {
       }.reduce(into: [:]) { accumulator, entry in
         accumulator[bankMap[entry.0]!] = entry.1
       }
+
+//      let commentColor = NSColor.systemGreen
+//
+//      let bankTextStorage: [LR35902.Bank: NSAttributedString] = disassembledSource.sources.compactMapValues {
+//        switch $0 {
+//        case .bank(_, _, let lines):
+//          return lines.reduce(into: NSMutableAttributedString()) { accumulator, line in
+//            let string: NSAttributedString
+//            switch line.semantic {
+//            case .newline:
+//              string = NSAttributedString(string: "\n")
+//            case .empty:
+//              string = NSAttributedString(string: "\n")
+//            case let .macroComment(comment): fallthrough
+//            case let .preComment(comment):
+//              string = NSAttributedString(string: "    ; \(comment)", attributes: [.foregroundColor: commentColor])
+//            case .label(labelName):
+//              <#code#>
+//            case .section(_):
+//              <#code#>
+//            case .transferOfControl(_, _):
+//              <#code#>
+//            case .instruction(_, _):
+//              <#code#>
+//            case .macroInstruction(_, _):
+//              <#code#>
+//            case .macro(_):
+//              <#code#>
+//            case .macroDefinition(_):
+//              <#code#>
+//            case .macroTerminator:
+//              <#code#>
+//            case .data(_):
+//              <#code#>
+//            case .jumpTable(_, _):
+//              <#code#>
+//            case .unknown(_, _):
+//              <#code#>
+//            case .global(_, _):
+//              <#code#>
+//            }
+//            accumulator.append(string)
+//          }
+//        default:
+//          return nil
+//        }
+//      }.reduce(into: [:]) { accumulator, entry in
+//        accumulator[bankMap[entry.0]!] = entry.1
+//      }
       let disassemblyFiles: [String: Data] = disassembledSource.sources.mapValues {
         switch $0 {
         case .bank(_, let content, _): fallthrough

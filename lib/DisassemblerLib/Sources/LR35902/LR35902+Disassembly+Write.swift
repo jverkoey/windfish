@@ -76,9 +76,9 @@ extension LR35902.Disassembly {
     public enum Semantic: Equatable {
       case newline
       case empty
-      case macroComment(String)
-      case preComment(String)
-      case label(String)
+      case macroComment(comment: String)
+      case preComment(comment: String)
+      case label(labelName: String)
       case section(LR35902.Bank)
       case transferOfControl(Set<TransferOfControl>, String)
       case instruction(LR35902.Instruction, RGBDSAssembly.Statement)
@@ -112,7 +112,7 @@ extension LR35902.Disassembly {
 
       case .empty:                             return ""
 
-      case let .label(label):                  return "\(prettify(label)):"
+      case let .label(label):                  return "\(label):"
 
       case let .section(bank):
         if bank == 0 {
@@ -447,7 +447,7 @@ clean:
               var lines: [Line] = []
               lines.append(Line(semantic: .empty))
               if !macro.arguments.isEmpty {
-                lines.append(Line(semantic: .macroComment("Arguments:")))
+                lines.append(Line(semantic: .macroComment(comment: "Arguments:")))
 
                 let macroSpecs: [LR35902.Instruction.Spec] = macro.macro.macroLines.map { $0.spec() }
 
@@ -474,9 +474,9 @@ clean:
                     let ranges = validation.rangeView.map {
                       "$\(LR35902.Address($0.lowerBound).hexString)..<$\(LR35902.Address($0.upperBound).hexString)"
                     }.joined(separator: ", ")
-                    lines.append(Line(semantic: .macroComment("- \(argNumber)\(argType): valid values in \(ranges)")))
+                    lines.append(Line(semantic: .macroComment(comment: "- \(argNumber)\(argType): valid values in \(ranges)")))
                   } else {
-                    lines.append(Line(semantic: .macroComment("- \(argNumber)\(argType)")))
+                    lines.append(Line(semantic: .macroComment(comment: "- \(argNumber)\(argType)")))
                   }
                 }
               }
@@ -545,7 +545,7 @@ clean:
         var lineGroup: [Line] = []
         if let preComment = preComment(at: cpu.pc, in: bank) {
           lineGroup.append(Line(semantic: .empty))
-          lineGroup.append(Line(semantic: .preComment(preComment)))
+          lineGroup.append(Line(semantic: .preComment(comment: preComment)))
         }
         if let label = label(at: cpu.pc, in: bank) {
           if let transfersOfControl = transfersOfControl(at: cpu.pc, in: bank) {
@@ -554,7 +554,7 @@ clean:
             let instructionScope = labeledContiguousScopes(at: cpu.pc, in: bank).map { $0.label }
             let scope = instructionScope.sorted().joined(separator: ", ")
             lineGroup.append(Line(semantic: .empty, address: cpu.pc, bank: cpu.bank, scope: scope))
-            lineGroup.append(Line(semantic: .label(label), address: cpu.pc, bank: cpu.bank, scope: scope))
+            lineGroup.append(Line(semantic: .label(labelName: prettify(label)), address: cpu.pc, bank: cpu.bank, scope: scope))
           }
           isLabeled = true
         }
