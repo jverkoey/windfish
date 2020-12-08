@@ -274,7 +274,7 @@ class ProjectDocument: NSDocument {
     let contentViewController = ProjectViewController(document: self)
     self.contentViewController = contentViewController
     let window = NSWindow(contentViewController: contentViewController)
-    window.setContentSize(NSSize(width: 800, height: 600))
+    window.setContentSize(NSSize(width: 1280, height: 768))
     window.toolbarStyle = .unifiedCompact
     window.tabbingMode = .disallowed
     let wc = NSWindowController(window: window)

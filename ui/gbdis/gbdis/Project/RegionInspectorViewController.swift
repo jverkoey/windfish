@@ -151,7 +151,7 @@ extension RegionInspectorViewController: NSTableViewDelegate {
       } else {
         view = TextTableCellView()
         view.identifier = identifier
-        view.textField?.formatter = LR35902BankFormatter()
+        view.textField?.formatter = UInt8HexFormatter()
       }
     case .address:
       let identifier = NSUserInterfaceItemIdentifier.addressCell

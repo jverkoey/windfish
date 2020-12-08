@@ -64,7 +64,7 @@ final class DataTypeEditorViewController: NSViewController, TabSelectable {
     self.tableView = tableView
 
     let columns = [
-      Column(name: "Name", identifier: .name, width: 120),
+      Column(name: "Name", identifier: .name, width: 180),
       Column(name: "Representation", identifier: .representation, width: 100),
       Column(name: "Interpretation", identifier: .interpretation, width: 120),
     ]
@@ -85,7 +85,7 @@ final class DataTypeEditorViewController: NSViewController, TabSelectable {
     self.mappingTableView = mappingTableView
 
     let mappingColumns = [
-      Column(name: "Name", identifier: .name, width: 120),
+      Column(name: "Name", identifier: .name, width: 180),
       Column(name: "Value", identifier: .value, width: 100),
     ]
     for columnInfo in mappingColumns {
@@ -236,8 +236,18 @@ extension DataTypeEditorViewController: NSTableViewDelegate {
       } else {
         view = TextTableCellView()
         view.identifier = identifier
-        view.textField?.formatter = NumberFormatter()
       }
+
+      if let selectedObject = elementsController.selectedObjects.first as? DataType {
+        if selectedObject.representation == DataType.Representation.hexadecimal {
+          view.textField?.formatter = UInt8HexFormatter()
+        } else if selectedObject.representation == DataType.Representation.binary {
+          view.textField?.formatter = UInt8BinaryFormatter()
+        } else {
+          view.textField?.formatter = NumberFormatter()
+        }
+      }
+
       view.textField?.bind(.value, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
       return view
     default:
