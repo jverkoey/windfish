@@ -57,7 +57,12 @@ final class ContentViewController: NSViewController {
 
   var textStorage = NSTextStorage() {
     didSet {
+      let originalOffset = containerView?.documentVisibleRect.origin
       textView?.layoutManager?.replaceTextStorage(textStorage)
+      if let originalOffset = originalOffset {
+        textView?.layoutManager?.ensureLayout(for: textView!.textContainer!)
+        containerView?.documentView?.scroll(CGPoint(x: originalOffset.x, y: originalOffset.y))
+      }
     }
   }
 
