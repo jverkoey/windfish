@@ -176,11 +176,8 @@ final class ProjectViewController: NSViewController {
         guard let region = notification.userInfo?["region"] as? Region else {
           preconditionFailure()
         }
-        self.inspectorViewController.tabViewController.selectedTabViewItemIndex = 0
-        guard let regionEditorViewController = self.inspectorViewController.tabViewController.tabViewItems[0].viewController as? RegionEditorViewController else {
-          return
-        }
-        regionEditorViewController.regionController.setSelectedObjects([region])
+        self.inspectorViewController.tabViewController.tabViewController.selectedTabViewItemIndex = 0
+        self.inspectorViewController.regionEditorViewController.regionController.setSelectedObjects([region])
       })
 
     if document.isDisassembling {

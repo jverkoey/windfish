@@ -23,8 +23,8 @@ extension NSUserInterfaceItemIdentifier {
 }
 
 final class RegionEditorViewController: NSViewController, TabSelectable {
-  let deselectedTabImage = NSImage(systemSymbolName: "pencil.circle", accessibilityDescription: nil)!
-  let selectedTabImage = NSImage(systemSymbolName: "pencil.circle.fill", accessibilityDescription: nil)!
+  let deselectedTabImage = NSImage(systemSymbolName: "book", accessibilityDescription: nil)!
+  let selectedTabImage = NSImage(systemSymbolName: "book.fill", accessibilityDescription: nil)!
 
   let document: ProjectDocument
   let regionController = NSArrayController()
