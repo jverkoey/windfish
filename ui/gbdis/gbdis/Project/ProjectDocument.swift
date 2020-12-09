@@ -575,11 +575,6 @@ extension ProjectDocument {
         }
       }
 
-      disassembly.defineMacro(named: "assign", template: """
-ld a, #2
-ld [#1], a
-""")
-
       //            disassembly.disassembleAsGameboyCartridge()
       let (disassembledSource, statistics) = try! disassembly.generateSource()
 

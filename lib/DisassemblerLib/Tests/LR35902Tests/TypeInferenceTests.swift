@@ -1,6 +1,19 @@
 import XCTest
 @testable import LR35902
 
+extension LR35902.Disassembly.Macro: Equatable {
+  public static func == (lhs: LR35902.Disassembly.Macro, rhs: LR35902.Disassembly.Macro) -> Bool {
+    return lhs.name == rhs.name && lhs.validArgumentValues == rhs.validArgumentValues && lhs.macroLines == rhs.macroLines
+  }
+}
+
+extension LR35902.Disassembly.MacroNode: Equatable {
+  public static func == (lhs: LR35902.Disassembly.MacroNode, rhs: LR35902.Disassembly.MacroNode) -> Bool {
+    return lhs.macros == rhs.macros && lhs.children == rhs.children
+  }
+
+}
+
 class TypeInferenceTests: XCTestCase {
   func test_something() throws {
     let assembler = RGBDSAssembler()
@@ -55,5 +68,30 @@ SECTION "ROM Bank 00", ROM0[$00]
 ld a, #2
 ld [#1], a
 """)
+
+    XCTAssertEqual(disassembly.macroTree, LR35902.Disassembly.MacroNode(
+      children: [
+        .any(.ld(.a, .imm8)): LR35902.Disassembly.MacroNode(
+          children: [
+            .any(.ld(.imm16addr, .a)): LR35902.Disassembly.MacroNode(
+              children: [:],
+              macros: [
+                .init(
+                  name: "assign",
+                  macroLines: [
+                    .any(.ld(.a, .imm8), argument: 2),
+                    .any(.ld(.imm16addr, .a), argument: 1)
+                  ],
+                  validArgumentValues: nil,
+                  action: nil
+                )
+              ]
+            )
+          ],
+          macros: []
+        )
+      ],
+      macros: []
+    ))
   }
 }

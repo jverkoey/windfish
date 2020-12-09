@@ -2,11 +2,6 @@ import Foundation
 
 import FixedWidthInteger
 
-private func codeAndComments(from line: String) -> (code: String?, comment: String?) {
-  let parts = line.split(separator: ";", maxSplits: 1, omittingEmptySubsequences: false)
-  return (code: parts.first?.trimmed(), comment: parts.last?.trimmed())
-}
-
 private func createStatement(from code: String) -> RGBDSAssembly.Statement {
   let opcodeAndOperands = code.split(separator: " ", maxSplits: 1)
 
@@ -28,6 +23,8 @@ private func createRepresentation(from statement: RGBDSAssembly.Statement) -> St
   if let operands: [String] = statement.operands?.map({ operand in
     if isNumber(operand) {
       return "#"
+    } else if operand.hasPrefix("[") && operand.hasSuffix("]") && String(operand.dropFirst().dropLast()).lowercased().hasPrefix("$ff") {
+      return "[ff#]"
     } else if operand.hasPrefix("[") && operand.hasSuffix("]") && isNumber(String(operand.dropFirst().dropLast())) {
       return "[#]"
     } else if operand.hasPrefix("sp+") {
@@ -94,11 +91,7 @@ public final class RGBDSAssembler {
     let error: String
   }
 
-  public static func specs(for line: String) -> (RGBDSAssembly.Statement, [LR35902.Instruction.Spec])? {
-    guard let code = codeAndComments(from: line).code, code.count > 0 else {
-      return nil
-    }
-
+  public static func specs(for code: String) -> (RGBDSAssembly.Statement, [LR35902.Instruction.Spec])? {
     let statement = createStatement(from: code)
     let representation = createRepresentation(from: statement)
     guard let specs = RGBDSAssembler.representations[representation] else {
@@ -106,6 +99,11 @@ public final class RGBDSAssembler {
     }
 
     return (statement, specs)
+  }
+
+  public static func codeAndComments(from line: String) -> (code: String?, comment: String?) {
+    let parts = line.split(separator: ";", maxSplits: 1, omittingEmptySubsequences: false)
+    return (code: parts.first?.trimmed(), comment: parts.last?.trimmed())
   }
 
   public static func instruction(from statement: RGBDSAssembly.Statement, using spec: LR35902.Instruction.Spec) throws -> LR35902.Instruction? {
@@ -204,7 +202,11 @@ public final class RGBDSAssembler {
         lineNumber += 1
       }
 
-      guard let (statement, specs) = RGBDSAssembler.specs(for: line) else {
+      guard let code = RGBDSAssembler.codeAndComments(from: line).code, code.count > 0 else {
+        return
+      }
+
+      guard let (statement, specs) = RGBDSAssembler.specs(for: code) else {
         errors.append(Error(lineNumber: lineNumber, error: "Invalid instruction: \(line)"))
         return
       }

@@ -481,7 +481,10 @@ extension LR35902 {
     public func defineMacro(named name: String, template: String) {
       var patterns: [MacroLine] = []
       template.enumerateLines { line, _ in
-        guard let (statement, specs) = RGBDSAssembler.specs(for: line) else {
+        guard let code = RGBDSAssembler.codeAndComments(from: line).code, code.count > 0 else {
+          return
+        }
+        guard let (statement, specs) = RGBDSAssembler.specs(for: code) else {
           preconditionFailure()
         }
         guard specs.count == 1 else {
@@ -523,6 +526,11 @@ extension LR35902 {
       }
     }
     final class MacroNode {
+      init(children: [MacroTreeEdge : MacroNode] = [:], macros: [Macro] = []) {
+        self.children = children
+        self.macros = macros
+      }
+
       var children: [MacroTreeEdge: MacroNode] = [:]
       var macros: [Macro] = []
     }

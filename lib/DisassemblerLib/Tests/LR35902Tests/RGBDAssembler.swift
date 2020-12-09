@@ -5,7 +5,7 @@ class RGBDAssembler: XCTestCase {
   func test_nop_failsWithExtraOperand() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    nop nop
+nop nop
 """)
 
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
@@ -19,7 +19,7 @@ class RGBDAssembler: XCTestCase {
     let errors = assembler.assemble(assembly: """
 
 ; This is a comment-only line
-    nop nop
+nop nop
 """)
 
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
@@ -31,9 +31,9 @@ class RGBDAssembler: XCTestCase {
   func test_newline_doesNotCauseParseFailures() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    nop
+nop
 
-    nop
+nop
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -48,7 +48,7 @@ class RGBDAssembler: XCTestCase {
   func test_nop_1() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    nop
+nop
 """)
 
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
@@ -61,8 +61,8 @@ class RGBDAssembler: XCTestCase {
   func test_nop_2() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    nop
-    nop
+nop
+nop
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -77,7 +77,7 @@ class RGBDAssembler: XCTestCase {
   func test_ld_bc_imm16_dollarHexIsRepresentable() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    ld bc, $1234
+ld bc, $1234
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -91,7 +91,7 @@ class RGBDAssembler: XCTestCase {
   func test_ld_bc_imm16_0xHexIsRepresentable() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    ld bc, 0x1234
+ld bc, 0x1234
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -105,7 +105,7 @@ class RGBDAssembler: XCTestCase {
   func test_ld_bc_imm16_numberIsRepresentable() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    ld bc, 1234
+ld bc, 1234
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -120,7 +120,7 @@ class RGBDAssembler: XCTestCase {
   func test_ld_bc_imm16_negativeNumberIsRepresentable() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    ld bc, -1234
+ld bc, -1234
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -135,7 +135,7 @@ class RGBDAssembler: XCTestCase {
   func test_ld_bc_imm16_nop() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    ld bc, $1234
+ld bc, $1234
     nop
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
@@ -151,7 +151,7 @@ class RGBDAssembler: XCTestCase {
   func test_ld_bc_imm16_unrepresentableNumberFails() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    ld bc, $12342342342
+ld bc, $12342342342
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -163,7 +163,7 @@ class RGBDAssembler: XCTestCase {
   func test_ld_bc_imm16_emptyNumberFails() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    ld bc, $
+ld bc, $
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -175,7 +175,7 @@ class RGBDAssembler: XCTestCase {
   func test_ld_bcAddress_a() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    ld [bc], a
+ld [bc], a
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -189,7 +189,7 @@ class RGBDAssembler: XCTestCase {
   func test_inc_bc() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    inc bc
+inc bc
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -203,7 +203,7 @@ class RGBDAssembler: XCTestCase {
   func test_ld_b_imm8() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    ld b, 255
+ld b, 255
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -217,7 +217,7 @@ class RGBDAssembler: XCTestCase {
   func test_ld_b_imm8_0xHex() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    ld b, 0xFF
+ld b, 0xFF
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -231,7 +231,7 @@ class RGBDAssembler: XCTestCase {
   func test_ld_imm16addr_sp() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    ld [$1234], sp
+ld [$1234], sp
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -245,7 +245,7 @@ class RGBDAssembler: XCTestCase {
   func test_ld_a_bcaddr() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    ld a, [bc]
+ld a, [bc]
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -259,7 +259,7 @@ class RGBDAssembler: XCTestCase {
   func test_rrca() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    rrca
+rrca
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -273,7 +273,7 @@ class RGBDAssembler: XCTestCase {
   func test_jr() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    jr 5
+jr 5
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -287,7 +287,7 @@ class RGBDAssembler: XCTestCase {
   func test_ld_ffimm8_a() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    ld [$FFA0], a
+ld [$FFA0], a
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -301,7 +301,7 @@ class RGBDAssembler: XCTestCase {
   func test_ld_imm16_a() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    ld [$FAA0], a
+ld [$FAA0], a
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -315,7 +315,7 @@ class RGBDAssembler: XCTestCase {
   func test_ret_z() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    ret z
+ret z
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -329,7 +329,7 @@ class RGBDAssembler: XCTestCase {
   func test_sub_imm8() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    sub 5
+sub 5
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -343,7 +343,7 @@ class RGBDAssembler: XCTestCase {
   func test_rst() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    rst $38
+rst $38
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -357,7 +357,7 @@ class RGBDAssembler: XCTestCase {
   func test_rlc_b() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    rlc b
+rlc b
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -371,7 +371,7 @@ class RGBDAssembler: XCTestCase {
   func test_bit_2_b() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    bit 2, b
+bit 2, b
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -385,7 +385,7 @@ class RGBDAssembler: XCTestCase {
   func test_set_6_hladdr() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    set 6, [hl]
+set 6, [hl]
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -399,7 +399,7 @@ class RGBDAssembler: XCTestCase {
   func test_jr_cond() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    jr nz, 5
+jr nz, 5
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -413,7 +413,7 @@ class RGBDAssembler: XCTestCase {
   func test_ld_hl_spimm8() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
-    ld hl, sp+$05
+ld hl, sp+$05
 """)
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
@@ -437,7 +437,7 @@ class RGBDAssembler: XCTestCase {
       let assembly: String
       switch spec {
       case .ld(.ffimm8addr, _), .ld(_, .ffimm8addr):
-        assembly = representation.replacingOccurrences(of: "#", with: "$FF00")
+        assembly = representation.replacingOccurrences(of: "ff#", with: "$FF00")
       case let .rst(address):
         assembly = representation.replacingOccurrences(of: "#", with: "\(address.rawValue)")
       default:
@@ -484,13 +484,13 @@ class RGBDAssembler: XCTestCase {
   func testBoo() {
     let assembler = RGBDSAssembler()
     let _ = assembler.assemble(assembly: """
-   ld   c, a                                    ; $282A (00): ReadJoypadState $4F
-   ld   a, [$ffcb]               ; $282B (00): ReadJoypadState $F0 $CB
-   xor  c                                       ; $282D (00): ReadJoypadState $A9
-   and  c                                       ; $282E (00): ReadJoypadState $A1
-   ld   [$ffcc], a                       ; $282F (00): ReadJoypadState $E0 $CC
-   ld   a, c                                    ; $2831 (00): ReadJoypadState $79
-   ld   [$ffcb], a               ; $2832 (00): ReadJoypadState $E0 $CB
+ld   c, a                                    ; $282A (00): ReadJoypadState $4F
+ld   a, [$ffcb]               ; $282B (00): ReadJoypadState $F0 $CB
+xor  c                                       ; $282D (00): ReadJoypadState $A9
+and  c                                       ; $282E (00): ReadJoypadState $A1
+ld   [$ffcc], a                       ; $282F (00): ReadJoypadState $E0 $CC
+ld   a, c                                    ; $2831 (00): ReadJoypadState $79
+ld   [$ffcb], a               ; $2832 (00): ReadJoypadState $E0 $CB
 """)
 
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
