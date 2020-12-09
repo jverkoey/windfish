@@ -332,12 +332,9 @@ final class LineNumberView: NSRulerView {
 
         case .image1bpp: fallthrough
         case .image2bpp: fallthrough
+        case .text: fallthrough
         case .data:
           NSColor.systemGray.set()
-          shortLineRect.fill()
-
-        case .text:
-          NSColor.systemOrange.set()
           shortLineRect.fill()
 
         case .unknown:

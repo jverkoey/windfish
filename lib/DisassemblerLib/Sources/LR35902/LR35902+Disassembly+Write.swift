@@ -708,7 +708,7 @@ clean:
           var chunkPc = initialPc
           switch initialType {
           case .text:
-            let lineLength = lineLengthOfText(at: initialPc, in: bank) ?? 254
+            let lineLength = lineLengthOfText(at: initialPc, in: bank) ?? 36
             for chunk in accumulator.chunked(into: lineLength) {
               bankLines.append(RGBDSAssembly.textLine(for: chunk, characterMap: characterMap, address: chunkPc))
               chunkPc += LR35902.Address(chunk.count)
