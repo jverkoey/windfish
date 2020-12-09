@@ -66,7 +66,7 @@ extension LR35902.Instruction {
   }
 
   /// Numeric operands in LR35902's instruction set.
-  public enum Numeric: Hashable, CPU.InstructionOperandWithBinaryFootprint, CPU.InstructionOperandAssemblyRepresentable {
+  public enum Numeric: Hashable, InstructionOperandWithBinaryFootprint, InstructionOperandAssemblyRepresentable {
     case a, af
     case b, c, bc, bcaddr
     case d, e, de, deaddr
@@ -87,6 +87,14 @@ extension LR35902.Instruction {
       .d, .e,
       .h, .l,
     ])
+
+    public var width: Int {
+      switch self {
+      case .sp_plus_simm8, .imm8, .simm8, .ffimm8addr, .zeroimm8: return 1
+      case .imm16, .imm16addr: return 2
+      default: return 0
+      }
+    }
   }
 
   /// Possible conditions in LR35902's instruction set.
@@ -98,7 +106,7 @@ extension LR35902.Instruction {
   }
 
   /// Possible rst addresses in LR35902's instruction set.
-  public enum RestartAddress: UInt8, CPU.InstructionOperandAssemblyRepresentable {
+  public enum RestartAddress: UInt8, InstructionOperandAssemblyRepresentable {
     case x00 = 0x00
     case x08 = 0x08
     case x10 = 0x10
@@ -110,7 +118,7 @@ extension LR35902.Instruction {
   }
 
   /// Possible bits in LR35902's instruction set.
-  public enum Bit: UInt8, CPU.InstructionOperandAssemblyRepresentable {
+  public enum Bit: UInt8, InstructionOperandAssemblyRepresentable {
     case b0 = 0
     case b1 = 1
     case b2 = 2

@@ -1,6 +1,121 @@
 import Foundation
 
+import CPU
 import FixedWidthInteger
+
+public protocol InstructionSpecRepresentable {
+  /**
+   The assembly opcode for this instruction.
+   */
+  var opcode: String { get }
+
+  /**
+   An abstract representation of this instruction in assembly.
+
+   The following wildcards are permitted:
+
+   - #: Any numeric value.
+   */
+  var representation: String { get }
+}
+
+/**
+ An abstract representation of an instruction's operand.
+ */
+public protocol InstructionOperandAssemblyRepresentable {
+  /**
+   The operand's abstract representation.
+   */
+  var representation: InstructionOperandAssemblyRepresentation { get }
+}
+
+/**
+ Possible types of abstract representations for instruction operands.
+ */
+public enum InstructionOperandAssemblyRepresentation {
+  /**
+   A numeric representation.
+   */
+  case numeric
+
+  /**
+   An address representation.
+   */
+  case address
+
+  /**
+   An FF## address representation.
+   */
+  case ffaddress
+
+  /**
+   A stack pointer offset representation.
+   */
+  case stackPointerOffset
+
+  /**
+   A specific representation.
+   */
+  case specific(String)
+}
+
+extension InstructionSpec {
+  /**
+   Extracts the opcode from the name of the first part of the spec.
+   */
+  public var opcode: String {
+    if let child = Mirror(reflecting: self).children.first {
+      if let childInstruction = child.value as? Self {
+        return childInstruction.opcode
+      }
+      return child.label!
+    } else {
+      return "\("\(self)".split(separator: ".").last!)"
+    }
+  }
+}
+
+extension InstructionSpec {
+  /**
+   Returns a generic representation of the instruction by visiting each of the operands and returning their representable versions.
+   */
+  public var representation: String {
+    var operands: [String] = []
+    visit { (value, _) in
+      // Optional operands are provided by the visitor as boxed optional types represented as an Any.
+      // We can't cast an Any to an Any? using the as? operator, so perform an explicit Optional-type unboxing instead:
+      guard let valueUnboxed = value,
+            case Optional<Any>.some(let value) = valueUnboxed else {
+        return
+      }
+
+      if let representable = value as? InstructionOperandAssemblyRepresentable {
+        switch representable.representation {
+        case .numeric:
+          operands.append("#")
+        case .address:
+          operands.append("[#]")
+        case .ffaddress:
+          operands.append("[ff#]")
+        case .stackPointerOffset:
+          operands.append("sp+#")
+        case let .specific(string):
+          operands.append(string)
+        }
+      } else {
+        operands.append("\(value)")
+      }
+    }
+    var representationParts = [opcode]
+    if !operands.isEmpty {
+      representationParts.append(operands.joined(separator: ", "))
+    }
+    return representationParts.joined(separator: " ")
+  }
+}
+
+extension LR35902.Instruction.Spec: InstructionSpecRepresentable {
+}
 
 private func createStatement(from code: String) -> RGBDSAssembly.Statement {
   let opcodeAndOperands = code.split(separator: " ", maxSplits: 1)

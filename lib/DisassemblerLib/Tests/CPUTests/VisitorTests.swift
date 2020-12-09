@@ -71,12 +71,4 @@ class VisitorTests: XCTestCase {
     XCTAssertEqual(visitedIndices, [0, 1])
     XCTAssertEqual(visitCount, 2)
   }
-
-  func testRepresentation() throws {
-    XCTAssertEqual(SimpleCPU.Instruction.Spec.nop.representation, "nop")
-    XCTAssertEqual(SimpleCPU.Instruction.Spec.ld(.a, .imm8).representation, "ld a, #")
-    XCTAssertEqual(SimpleCPU.Instruction.Spec.sub(.ld(.imm8, .a)).representation, "ld #, a")
-    XCTAssertEqual(SimpleCPU.Instruction.Spec.sub(.ld(.a)).representation, "ld a")
-    XCTAssertEqual(SimpleCPU.Instruction.Spec.ld(.arg(1)).representation, "ld arg(1)")
-  }
 }

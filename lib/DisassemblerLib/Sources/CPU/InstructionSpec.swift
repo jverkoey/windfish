@@ -1,9 +1,20 @@
 import Foundation
 
 /**
- An instruction specification defines the shape of the instruction.
+ An abstract representation of the instructions in a CPU's instruction set.
+
+ This protocol is expected to be implemented using an enum type where each case defines the shape of a single
+ instruction.
+
+ Implementing this protocol makes it possible to calculate the binary size of a given instruction.
  */
 public protocol InstructionSpec: Hashable {
+  /**
+   The type to be used for all width expressions.
+
+   The chosen type should support the largest addressable value for the CPU. For example, a 32 bit CPU would use a width
+   type of UInt32, while a 16 bit CPU would use UInt16.
+   */
   associatedtype WidthType: BinaryInteger
 
   /**
@@ -15,68 +26,4 @@ public protocol InstructionSpec: Hashable {
    The width of the instruction's operands, if any.
    */
   var operandWidth: WidthType { get }
-
-  /**
-   The assembly opcode for this instruction.
-   */
-  var opcode: String { get }
-
-  /**
-   An abstract representation of this instruction in assembly.
-
-   The following wildcards are permitted:
-
-   - #: Any numeric value.
-   */
-  var representation: String { get }
-}
-
-/**
- An instruction operand that has a width.
- */
-public protocol InstructionOperandWithBinaryFootprint {
-  /**
-   The width of the immediate.
-   */
-  var width: Int { get }
-}
-
-/**
- An abstract representation of an instruction's operand.
- */
-public protocol InstructionOperandAssemblyRepresentable {
-  /**
-   The operand's abstract representation.
-   */
-  var representation: InstructionOperandAssemblyRepresentation { get }
-}
-
-/**
- Possible types of abstract representations for instruction operands.
- */
-public enum InstructionOperandAssemblyRepresentation {
-  /**
-   A numeric representation.
-   */
-  case numeric
-
-  /**
-   An address representation.
-   */
-  case address
-
-  /**
-   An FF## address representation.
-   */
-  case ffaddress
-
-  /**
-   A stack pointer offset representation.
-   */
-  case stackPointerOffset
-
-  /**
-   A specific representation.
-   */
-  case specific(String)
 }

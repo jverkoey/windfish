@@ -1,5 +1,7 @@
 import Foundation
 
+// TODO: Make this automatic implementation something that can be opted in to because it's less performant.
+
 /**
  A representation of an instruction's width.
  */
@@ -10,6 +12,16 @@ public struct InstructionWidth<T: BinaryInteger> {
   public var total: T {
     return opcode + operand
   }
+}
+
+/**
+ An instruction operand that has a width.
+ */
+public protocol InstructionOperandWithBinaryFootprint {
+  /**
+   The width of the immediate.
+   */
+  var width: Int { get }
 }
 
 /**

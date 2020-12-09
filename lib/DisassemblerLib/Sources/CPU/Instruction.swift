@@ -1,7 +1,7 @@
 import Foundation
 
 /**
- A concrete representation of an instruction in a CPU's instruction set.
+ A concrete representation of a single instruction in a CPU's instruction set.
 
  A instruction provides a complete representation of a specific action that the CPU is able to take.
 

@@ -21,20 +21,11 @@ struct SimpleCPU {
       typealias WidthType = UInt16
     }
 
-    enum Operand: Hashable, InstructionOperandAssemblyRepresentable {
+    enum Operand: Hashable {
       case imm8
       case imm16
       case a
       case arg(Int)
-
-      var representation: InstructionOperandAssemblyRepresentation {
-        switch self {
-        case .imm8, .imm16:
-          return .numeric
-        default:
-          return .specific("\(self)")
-        }
-      }
     }
   }
 }
