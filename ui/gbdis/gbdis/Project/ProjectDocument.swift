@@ -154,7 +154,6 @@ class ProjectDocument: NSDocument {
       Region(regionType: Region.Kind.image1bpp, name: "HeaderLogo", bank: 0, address: 0x0104, length: 0x0134 - 0x0104),
       Region(regionType: Region.Kind.string, name: "HeaderTitle", bank: 0, address: 0x0134, length: 0x0143 - 0x0134),
       Region(regionType: Region.Kind.label, name: "HeaderNewLicenseeCode", bank: 0, address: 0x0144, length: 0),
-      Region(regionType: Region.Kind.label, name: "HeaderCartridgeType", bank: 0, address: 0x0147, length: 0),
       Region(regionType: Region.Kind.label, name: "HeaderOldLicenseeCode", bank: 0, address: 0x014B, length: 0),
       Region(regionType: Region.Kind.label, name: "HeaderMaskROMVersion", bank: 0, address: 0x014C, length: 0),
       Region(regionType: Region.Kind.label, name: "HeaderComplementCheck", bank: 0, address: 0x014D, length: 0),
@@ -209,6 +208,19 @@ class ProjectDocument: NSDocument {
                                               DataType.Mapping(name: "romsize_72banks", value: 0x52),
                                               DataType.Mapping(name: "romsize_80banks", value: 0x53),
                                               DataType.Mapping(name: "romsize_96banks", value: 0x54),
+                                            ]))
+    configuration.dataTypes.append(DataType(name: "HW_CARTRIDGETYPE",
+                                            representation: DataType.Representation.hexadecimal,
+                                            interpretation: DataType.Interpretation.enumerated,
+                                            mappings: [
+                                              DataType.Mapping(name: "cartridge_romonly", value: 0),
+                                              DataType.Mapping(name: "cartridge_mbc1", value: 1),
+                                              DataType.Mapping(name: "cartridge_mbc1_ram", value: 2),
+                                              DataType.Mapping(name: "cartridge_mbc1_ram_battery", value: 3),
+                                              DataType.Mapping(name: "cartridge_mbc2", value: 5),
+                                              DataType.Mapping(name: "cartridge_mbc2_battery", value: 6),
+                                              DataType.Mapping(name: "cartridge_rom_ram", value: 8),
+                                              DataType.Mapping(name: "cartridge_rom_ram_battery", value: 9),
                                             ]))
     configuration.dataTypes.append(DataType(name: "HW_RAMSIZE",
                                             representation: DataType.Representation.hexadecimal,
@@ -288,6 +300,7 @@ class ProjectDocument: NSDocument {
     configuration.globals.append(contentsOf: [
       Global(name: "HeaderIsColorGB", address: 0x0143, dataType: "HW_COLORGAMEBOY"),
       Global(name: "HeaderSGBFlag", address: 0x0146, dataType: "HW_SUPERGAMEBOY"),
+      Global(name: "HeaderCartridgeType", address: 0x0147, dataType: "HW_CARTRIDGETYPE"),
       Global(name: "HeaderROMSize", address: 0x0148, dataType: "HW_ROMSIZE"),
       Global(name: "HeaderRAMSize", address: 0x0149, dataType: "HW_RAMSIZE"),
       Global(name: "HeaderDestinationCode", address: 0x014A, dataType: "HW_DESTINATIONCODE"),
