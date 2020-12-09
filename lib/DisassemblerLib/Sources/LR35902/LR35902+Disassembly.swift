@@ -479,12 +479,32 @@ extension LR35902 {
       leaf.macros.append(.init(name: name, macroLines: instructions, validArgumentValues: validArgumentValues, action: action))
     }
     public func defineMacro(named name: String, template: String) {
-      let assembler = RGBDSAssembler()
-      let errors = assembler.assemble(assembly: template)
-      guard errors.isEmpty else {
-        preconditionFailure("\(errors)")
+      var patterns: [MacroLine] = []
+      template.enumerateLines { line, _ in
+        guard let (statement, specs) = RGBDSAssembler.specs(for: line) else {
+          preconditionFailure()
+        }
+        guard specs.count == 1 else {
+          preconditionFailure()
+        }
+        guard let spec = specs.first else {
+          preconditionFailure()
+        }
+
+        if let instruction = try? RGBDSAssembler.instruction(from: statement, using: spec) {
+          patterns.append(.instruction(instruction))
+        } else {
+          guard let argumentNumber = statement.operands?.first(where: { $0.contains("#") }) else {
+            preconditionFailure()
+          }
+          let scanner = Scanner(string: argumentNumber)
+          _ = scanner.scanUpToString("#")
+          _ = scanner.scanCharacter()
+          let argument = scanner.scanUInt64()
+          patterns.append(.any(spec, argument: argument, argumentText: nil))
+        }
       }
-      defineMacro(named: name, instructions: assembler.instructions.map { .instruction($0) })
+      defineMacro(named: name, instructions: patterns)
     }
     private var macroNames = Set<String>()
 

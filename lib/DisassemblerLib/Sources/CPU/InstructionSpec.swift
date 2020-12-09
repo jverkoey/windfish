@@ -73,6 +73,11 @@ public enum InstructionOperandAssemblyRepresentation {
   case address
 
   /**
+   An FF## address representation.
+   */
+  case ffaddress
+
+  /**
    A stack pointer offset representation.
    */
   case stackPointerOffset

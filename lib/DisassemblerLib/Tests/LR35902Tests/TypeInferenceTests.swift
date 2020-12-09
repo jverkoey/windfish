@@ -47,4 +47,13 @@ SECTION "ROM Bank 00", ROM0[$00]
       ])
     }
   }
+
+  func test_somethingelse() throws {
+    let disassembly = LR35902.Disassembly(rom: Data())
+
+    disassembly.defineMacro(named: "assign", template: """
+ld a, #2
+ld [#1], a
+""")
+  }
 }

@@ -10,8 +10,10 @@ extension LR35902.Instruction.Numeric {
       return .specific("[de]")
     case .hladdr:
       return .specific("[hl]")
-    case .imm16addr, .ffimm8addr:
+    case .imm16addr:
       return .address
+    case .ffimm8addr:
+      return .ffaddress
     case .sp_plus_simm8:
       return .stackPointerOffset
     case .imm8, .simm8, .imm16:

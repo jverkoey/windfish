@@ -20,6 +20,8 @@ extension InstructionSpec {
           operands.append("#")
         case .address:
           operands.append("[#]")
+        case .ffaddress:
+          operands.append("[ff#]")
         case .stackPointerOffset:
           operands.append("sp+#")
         case let .specific(string):
