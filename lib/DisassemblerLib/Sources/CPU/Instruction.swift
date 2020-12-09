@@ -10,13 +10,16 @@ import Foundation
  */
 public protocol Instruction: Hashable {
   /**
-   The specification that is associated with this instruction.
+   The type of the specification that is associated with this instruction.
 
-   This is typically an enum consisting of one case per abstract instruction.
+   This type is typically an enum consisting of one case per abstract instruction.
    */
   associatedtype SpecType: InstructionSpec
+
   /**
    The instruction's specification.
+
+   The returned specification is assumed to be a representation of the concrete instruction.
    */
   var spec: SpecType { get }
 }
