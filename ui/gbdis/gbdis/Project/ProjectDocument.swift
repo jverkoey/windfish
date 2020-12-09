@@ -651,6 +651,52 @@ extension ProjectDocument {
                 textAttachment.image = image
                 accumulator.append(NSAttributedString(attachment: textAttachment))
               case .twoBitsPerPixel:
+                let data = line.data!
+                let scale: CGFloat = 8
+                let tiles = data.count / 16
+                let imageSize = NSSize(width: 8 * scale + 4 * scale, height: CGFloat(tiles) * 8 * scale + 4 * scale)
+                let image = NSImage(size: imageSize)
+                image.lockFocusFlipped(true)
+                NSColor.textColor.set()
+
+                let colorForBytePair: (UInt8, UInt8, UInt8) -> UInt8 = { highByte, lowByte, bit in
+                  let mask = UInt8(0x01) << bit
+                  return (((highByte & mask) >> bit) << 1) | ((lowByte & mask) >> bit)
+                }
+
+                let colors: [NSColor] = [
+                  .black,
+                  .darkGray,
+                  .lightGray,
+                  .white,
+                ]
+
+                var column: CGFloat = 0
+                var row: CGFloat = 0
+                var rows = 0
+                let pixel = NSRect(x: 2 * scale, y: 2 * scale, width: scale, height: scale)
+                for bytePairs in [UInt8](data).chunked(into: 2) {
+                  let lowByte = bytePairs.first!
+                  let highByte = bytePairs.last!
+
+                  for i: UInt8 in 0..<8 {
+                    colors[Int(colorForBytePair(highByte, lowByte, 7 - i))].set()
+                    pixel.offsetBy(dx: column + CGFloat(i) * scale, dy: row).fill()
+                  }
+                  row += scale
+                  rows += 1
+                  if rows >= 16 {
+                    column += 8 * scale
+                    row = 0
+                    rows = 0
+                  }
+                }
+
+                image.unlockFocus()
+
+                let textAttachment = NSTextAttachment()
+                textAttachment.image = image
+                accumulator.append(NSAttributedString(attachment: textAttachment))
                 break
               }
               break
