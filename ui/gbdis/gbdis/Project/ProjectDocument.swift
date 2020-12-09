@@ -447,7 +447,8 @@ extension RGBDSAssembly.Statement {
   func attributedString(attributes: [NSAttributedString.Key : Any],
                         opcodeAttributes: [NSAttributedString.Key : Any],
                         operandAttributes: [NSAttributedString.Key : Any],
-                        regionLookup: [String: Region]) -> NSAttributedString {
+                        regionLookup: [String: Region],
+                        scope: String?) -> NSAttributedString {
     let string = NSMutableAttributedString()
     let opcodeName = opcode.padding(toLength: RGBDSAssembly.maxOpcodeNameLength, withPad: " ", startingAt: 0)
     string.append(NSAttributedString(string: opcodeName, attributes: opcodeAttributes))
@@ -455,9 +456,15 @@ extension RGBDSAssembly.Statement {
       string.append(NSAttributedString(string: " ", attributes: attributes))
 
       let operandStrings: [NSAttributedString] = operands.map { operand in
-        if regionLookup[operand] != nil {
+        let label: String
+        if let scope = scope, operand.starts(with: ".") {
+          label = scope + operand
+        } else {
+          label = operand
+        }
+        if regionLookup[label] != nil {
           var linkAttributes = operandAttributes
-          linkAttributes[.link] = "gbdis://jumpto/\(operand)"
+          linkAttributes[.link] = "gbdis://jumpto/\(label)"
           return NSAttributedString(string: operand, attributes: linkAttributes)
         } else {
           return NSAttributedString(string: operand, attributes: operandAttributes)
@@ -649,7 +656,8 @@ extension ProjectDocument {
               accumulator.append(assembly.attributedString(attributes: baseAttributes,
                                                            opcodeAttributes: opcodeAttributes,
                                                            operandAttributes: operandAttributes,
-                                                           regionLookup: regionLookup))
+                                                           regionLookup: regionLookup,
+                                                           scope: line.scope))
             case let .imagePlaceholder(format):
               switch format {
               case .oneBitPerPixel:

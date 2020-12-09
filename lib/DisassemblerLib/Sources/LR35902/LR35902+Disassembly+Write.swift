@@ -130,7 +130,7 @@ extension LR35902.Disassembly {
 
       case .imagePlaceholder:                  return ""
 
-      case let .label(label):                  return "\(label):"
+      case let .label(label):                  return "\(prettify(label)):"
 
       case let .section(bank):
         if bank == 0 {
@@ -599,7 +599,7 @@ clean:
             let instructionScope = labeledContiguousScopes(at: cpu.pc, in: bank).map { $0.label }
             let scope = instructionScope.sorted().joined(separator: ", ")
             lineGroup.append(Line(semantic: .empty, address: cpu.pc, bank: cpu.bank, scope: scope))
-            lineGroup.append(Line(semantic: .label(labelName: prettify(label)), address: cpu.pc, bank: cpu.bank, scope: scope))
+            lineGroup.append(Line(semantic: .label(labelName: label), address: cpu.pc, bank: cpu.bank, scope: scope))
           }
           isLabeled = true
         }
