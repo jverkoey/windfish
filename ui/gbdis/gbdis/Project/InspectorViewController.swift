@@ -27,6 +27,10 @@ final class InspectorViewController: NSViewController {
     fatalError("init(coder:) has not been implemented")
   }
 
+  var regionInspectorViewController: RegionInspectorViewController {
+    return tabViewController.tabViewController.tabViewItems[1].viewController as! RegionInspectorViewController
+  }
+
   var regionEditorViewController: RegionEditorViewController {
     return (tabViewController.tabViewController.tabViewItems[0].viewController as! TabViewController).tabViewController.tabViewItems[0].viewController as! RegionEditorViewController
   }

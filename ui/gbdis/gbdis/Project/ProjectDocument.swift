@@ -455,9 +455,9 @@ extension RGBDSAssembly.Statement {
       string.append(NSAttributedString(string: " ", attributes: attributes))
 
       let operandStrings: [NSAttributedString] = operands.map { operand in
-        if let region = regionLookup[operand] {
+        if regionLookup[operand] != nil {
           var linkAttributes = operandAttributes
-          linkAttributes[.link] = "gbdis://jumpto/\(region.bank.hexString)/\(region.address.hexString)"
+          linkAttributes[.link] = "gbdis://jumpto/\(operand)"
           return NSAttributedString(string: operand, attributes: linkAttributes)
         } else {
           return NSAttributedString(string: operand, attributes: operandAttributes)

@@ -59,14 +59,15 @@ final class ContentViewController: NSViewController {
     didSet {
       let originalOffset = containerView?.documentVisibleRect.origin
       textView?.layoutManager?.replaceTextStorage(textStorage)
+      textView?.linkTextAttributes = [
+        .foregroundColor: NSColor.linkColor,
+        .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .medium),
+        .underlineColor: NSColor.linkColor,
+        .underlineStyle: NSUnderlineStyle.single.rawValue,
+        .cursor: NSCursor.pointingHand,
+      ]
       if let originalOffset = originalOffset {
         textView?.layoutManager?.ensureLayout(for: textView!.textContainer!)
-        textView?.linkTextAttributes = [
-          .foregroundColor: NSColor.textColor,
-          .underlineColor: NSColor.textColor.withAlphaComponent(0.5),
-          .underlineStyle: NSUnderlineStyle.single.rawValue,
-          .cursor: NSCursor.pointingHand,
-        ]
         containerView?.documentView?.scroll(CGPoint(x: originalOffset.x, y: originalOffset.y))
       }
     }

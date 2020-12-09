@@ -129,46 +129,7 @@ final class ProjectViewController: NSViewController {
         guard let region = notification.userInfo?["selectedRegion"] as? Region else {
           preconditionFailure()
         }
-
-        guard let metadata = self.document.metadata else {
-          return
-        }
-        let fileName = metadata.bankMap.first { key, value in
-          value == region.bank
-        }?.key
-        guard let index = self.sidebarViewController.treeController.arrangedObjects.descendant(at: IndexPath(indexes: [0]))?.children?.firstIndex(where: { node in
-          (node.representedObject as? ProjectOutlineNode)?.title == fileName
-        }) else {
-          return
-        }
-        self.sidebarViewController.treeController.setSelectionIndexPath(IndexPath(indexes: [0, index]))
-
-        guard let bankLines = self.document.disassemblyResults?.bankLines?[region.bank] else {
-          return
-        }
-        guard let lineIndex = bankLines.firstIndex(where: { line in
-          if let address = line.address {
-            return address >= region.address
-          } else {
-            return false
-          }
-        }) else {
-          return
-        }
-
-        guard let analysis = self.contentViewController.lineAnalysis,
-              let textView = self.contentViewController.textView,
-              let containerView = self.contentViewController.containerView,
-              let layoutManager = textView.layoutManager,
-              let textContainer = textView.textContainer,
-              analysis.lineRanges.count > 0 else {
-          return
-        }
-
-        let lineRange = analysis.lineRanges[lineIndex]
-        let glyphGraph = layoutManager.glyphRange(forCharacterRange: lineRange, actualCharacterRange: nil)
-        let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphGraph, in: textContainer)
-        self.contentViewController.textView?.scroll(boundingRect.offsetBy(dx: 0, dy: -containerView.bounds.height / 2).origin)
+        self.showRegion(region)
       })
 
     didCreateRegionSubscriber = NotificationCenter.default.publisher(for: .didCreateRegion, object: document)
@@ -186,5 +147,56 @@ final class ProjectViewController: NSViewController {
     }
   }
 
+  func showRegion(_ region: Region) {
+    guard let metadata = self.document.metadata else {
+      return
+    }
+    let fileName = metadata.bankMap.first { key, value in
+      value == region.bank
+    }?.key
+    guard let index = self.sidebarViewController.treeController.arrangedObjects.descendant(at: IndexPath(indexes: [0]))?.children?.firstIndex(where: { node in
+      (node.representedObject as? ProjectOutlineNode)?.title == fileName
+    }) else {
+      return
+    }
+    self.sidebarViewController.treeController.setSelectionIndexPath(IndexPath(indexes: [0, index]))
+
+    guard let bankLines = self.document.disassemblyResults?.bankLines?[region.bank] else {
+      return
+    }
+    guard let lineIndex = bankLines.firstIndex(where: { line in
+      if let address = line.address {
+        return address >= region.address
+      } else {
+        return false
+      }
+    }) else {
+      return
+    }
+
+    guard let analysis = self.contentViewController.lineAnalysis,
+          let textView = self.contentViewController.textView,
+          let containerView = self.contentViewController.containerView,
+          let layoutManager = textView.layoutManager,
+          let textContainer = textView.textContainer,
+          analysis.lineRanges.count > 0 else {
+      return
+    }
+
+    let lineRange = analysis.lineRanges[lineIndex]
+    let glyphGraph = layoutManager.glyphRange(forCharacterRange: lineRange, actualCharacterRange: nil)
+    let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphGraph, in: textContainer)
+    self.contentViewController.textView?.scroll(boundingRect.offsetBy(dx: 0, dy: -containerView.bounds.height / 2).origin)
+  }
+
   private let splitViewResorationIdentifier = "com.featherless.restorationId:SplitViewController"
+}
+
+extension ProjectViewController: LabelJumper {
+  func jumpToLabel(_ labelName: String) {
+    guard let region = document.disassemblyResults?.regionLookup?[labelName] else {
+      return
+    }
+    showRegion(region)
+  }
 }
