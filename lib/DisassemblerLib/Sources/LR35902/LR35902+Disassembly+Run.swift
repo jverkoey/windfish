@@ -3,6 +3,8 @@ import Disassembler
 
 extension LR35902.Disassembly {
   final class Run: Disassembler.Run {
+    typealias SpecT = LR35902.Instruction.SpecType
+
     let startAddress: LR35902.CartridgeLocation
     let endAddress: LR35902.CartridgeLocation?
     let initialBank: LR35902.Bank

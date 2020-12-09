@@ -1,9 +1,22 @@
 import Foundation
 import CPU
 
+public enum InstructionCategory {
+  case call
+  case ret
+}
+
+public protocol InstructionSpecDisassemblyInfo {
+  /**
+   The category this instruction's opcode falls under, if any.
+   */
+  var category: InstructionCategory? { get }
+}
+
 public protocol Run {
   associatedtype AddressT: BinaryInteger
   associatedtype InstructionT: Instruction
+  associatedtype SpecT: InstructionSpecDisassemblyInfo where SpecT == InstructionT.SpecType
 
   var startAddress: AddressT { get }
   var visitedRange: Range<AddressT>? { get }

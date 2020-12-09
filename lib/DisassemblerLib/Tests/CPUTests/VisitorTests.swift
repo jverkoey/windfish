@@ -4,7 +4,7 @@ import XCTest
 class VisitorTests: XCTestCase {
 
   func testInstructionWithNoOperandsIsVisitedWithNil() throws {
-    let instruction = SimpleCPU.TestInstruction(spec: .nop)
+    let instruction = SimpleCPU.Instruction(spec: .nop)
 
     var visitCount = 0
     instruction.spec.visit { (operand, index) in
@@ -16,13 +16,13 @@ class VisitorTests: XCTestCase {
   }
 
   func testInstructionWithOneOperandIsVisitedOnce() throws {
-    let instruction = SimpleCPU.TestInstruction(spec: .ld(.imm8))
+    let instruction = SimpleCPU.Instruction(spec: .ld(.imm8))
 
     var visitCount = 0
-    var visitedOperands: [SimpleCPU.TestInstruction.Operand] = []
+    var visitedOperands: [SimpleCPU.Instruction.Operand] = []
     var visitedIndices: [Int] = []
     instruction.spec.visit { (operand, index) in
-      if let operand = operand as? SimpleCPU.TestInstruction.Operand,
+      if let operand = operand as? SimpleCPU.Instruction.Operand,
         let index = index {
         visitedOperands.append(operand)
         visitedIndices.append(index)
@@ -35,13 +35,13 @@ class VisitorTests: XCTestCase {
   }
 
   func testInstructionWithTwoOperandsIsVisitedTwice() throws {
-    let instruction = SimpleCPU.TestInstruction(spec: .ld(.a, .imm8))
+    let instruction = SimpleCPU.Instruction(spec: .ld(.a, .imm8))
 
     var visitCount = 0
-    var visitedOperands: [SimpleCPU.TestInstruction.Operand] = []
+    var visitedOperands: [SimpleCPU.Instruction.Operand] = []
     var visitedIndices: [Int] = []
     instruction.spec.visit { (operand, index) in
-      if let operand = operand as? SimpleCPU.TestInstruction.Operand,
+      if let operand = operand as? SimpleCPU.Instruction.Operand,
         let index = index {
         visitedOperands.append(operand)
         visitedIndices.append(index)
@@ -54,13 +54,13 @@ class VisitorTests: XCTestCase {
   }
 
   func testNestedInstructionWithTwoOperandsIsVisitedTwice() throws {
-    let instruction = SimpleCPU.TestInstruction(spec: .sub(.ld(.a, .imm8)))
+    let instruction = SimpleCPU.Instruction(spec: .sub(.ld(.a, .imm8)))
 
     var visitCount = 0
-    var visitedOperands: [SimpleCPU.TestInstruction.Operand] = []
+    var visitedOperands: [SimpleCPU.Instruction.Operand] = []
     var visitedIndices: [Int] = []
     instruction.spec.visit { (operand, index) in
-      if let operand = operand as? SimpleCPU.TestInstruction.Operand,
+      if let operand = operand as? SimpleCPU.Instruction.Operand,
         let index = index {
         visitedOperands.append(operand)
         visitedIndices.append(index)
@@ -73,10 +73,10 @@ class VisitorTests: XCTestCase {
   }
 
   func testRepresentation() throws {
-    XCTAssertEqual(SimpleCPU.TestInstruction.Spec.nop.representation, "nop")
-    XCTAssertEqual(SimpleCPU.TestInstruction.Spec.ld(.a, .imm8).representation, "ld a, #")
-    XCTAssertEqual(SimpleCPU.TestInstruction.Spec.sub(.ld(.imm8, .a)).representation, "ld #, a")
-    XCTAssertEqual(SimpleCPU.TestInstruction.Spec.sub(.ld(.a)).representation, "ld a")
-    XCTAssertEqual(SimpleCPU.TestInstruction.Spec.ld(.arg(1)).representation, "ld arg(1)")
+    XCTAssertEqual(SimpleCPU.Instruction.Spec.nop.representation, "nop")
+    XCTAssertEqual(SimpleCPU.Instruction.Spec.ld(.a, .imm8).representation, "ld a, #")
+    XCTAssertEqual(SimpleCPU.Instruction.Spec.sub(.ld(.imm8, .a)).representation, "ld #, a")
+    XCTAssertEqual(SimpleCPU.Instruction.Spec.sub(.ld(.a)).representation, "ld a")
+    XCTAssertEqual(SimpleCPU.Instruction.Spec.ld(.arg(1)).representation, "ld arg(1)")
   }
 }

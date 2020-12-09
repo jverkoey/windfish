@@ -9,8 +9,8 @@ import Foundation
 import CPU
 
 struct SimpleCPU {
-  struct TestInstruction: Instruction {
-    var spec: TestInstruction.Spec
+  struct Instruction: CPU.Instruction {
+    var spec: Instruction.Spec
 
     indirect enum Spec: InstructionSpec, Hashable {
       case nop
@@ -19,10 +19,6 @@ struct SimpleCPU {
       case sub(Spec)
 
       typealias WidthType = UInt16
-
-      var category: InstructionCategory? {
-        return nil
-      }
     }
 
     enum Operand: Hashable, InstructionOperandAssemblyRepresentable {

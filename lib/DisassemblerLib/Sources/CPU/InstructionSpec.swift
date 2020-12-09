@@ -1,10 +1,5 @@
 import Foundation
 
-public enum InstructionCategory {
-  case call
-  case ret
-}
-
 /**
  An instruction specification defines the shape of the instruction.
  */
@@ -25,11 +20,6 @@ public protocol InstructionSpec: Hashable {
    The assembly opcode for this instruction.
    */
   var opcode: String { get }
-
-  /**
-   The category this instruction's opcode falls under, if any.
-   */
-  var category: InstructionCategory? { get }
 
   /**
    An abstract representation of this instruction in assembly.
