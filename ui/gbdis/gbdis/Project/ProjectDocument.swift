@@ -654,7 +654,10 @@ extension ProjectDocument {
                 let data = line.data!
                 let scale: CGFloat = 8
                 let tiles = data.count / 16
-                let imageSize = NSSize(width: 8 * scale + 4 * scale, height: CGFloat(tiles) * 8 * scale + 4 * scale)
+                let totalColumns = min(8, (tiles + 1) / 2)
+                let totalRows = (tiles - 1) / 16 * 2 + ((tiles - 1) % 16 >= 1 ? 2 : 1)
+                let imageSize = NSSize(width: CGFloat(totalColumns) * 8 * scale + 4 * scale,
+                                       height: CGFloat(totalRows) * 8 * scale + 4 * scale)
                 let image = NSImage(size: imageSize)
                 image.lockFocusFlipped(true)
                 NSColor.textColor.set()
@@ -671,9 +674,9 @@ extension ProjectDocument {
                   .white,
                 ]
 
-                var column: CGFloat = 0
-                var row: CGFloat = 0
-                var rows = 0
+                var tileColumn = 0
+                var tileRow = 0
+                var pixelRow = 0
                 let pixel = NSRect(x: 2 * scale, y: 2 * scale, width: scale, height: scale)
                 for bytePairs in [UInt8](data).chunked(into: 2) {
                   let lowByte = bytePairs.first!
@@ -681,14 +684,18 @@ extension ProjectDocument {
 
                   for i: UInt8 in 0..<8 {
                     colors[Int(colorForBytePair(highByte, lowByte, 7 - i))].set()
-                    pixel.offsetBy(dx: column + CGFloat(i) * scale, dy: row).fill()
+                    pixel.offsetBy(dx: CGFloat(tileColumn) * 8 * scale + CGFloat(i) * scale,
+                                   dy: CGFloat(tileRow) * 8 * scale + CGFloat(pixelRow) * scale).fill()
                   }
-                  row += scale
-                  rows += 1
-                  if rows >= 16 {
-                    column += 8 * scale
-                    row = 0
-                    rows = 0
+                  pixelRow += 1
+                  if pixelRow >= 16 {
+                    tileColumn += 1
+                    pixelRow = 0
+
+                    if tileColumn >= 8 {
+                      tileColumn = 0
+                      tileRow += 2
+                    }
                   }
                 }
 

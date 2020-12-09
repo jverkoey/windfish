@@ -73,7 +73,7 @@ final class RegionEditorViewController: NSViewController, TabSelectable {
       Column(name: "Name", identifier: .name, width: 120),
       Column(name: "Bank", identifier: .bank, width: 35),
       Column(name: "Address", identifier: .address, width: 50),
-      Column(name: "Region length", identifier: .length, width: 35),
+      Column(name: "Size", identifier: .length, width: 35),
     ]
 
     for columnInfo in columns {
