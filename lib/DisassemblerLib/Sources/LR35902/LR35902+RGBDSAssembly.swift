@@ -4,7 +4,7 @@ import FixedWidthInteger
 
 public final class RGBDSAssembly {
 
-  static let maxOpcodeNameLength = 4
+  public static let maxOpcodeNameLength = 4
 
   public struct Statement: Equatable, CustomStringConvertible {
     public let opcode: String
@@ -23,19 +23,6 @@ public final class RGBDSAssembly {
       } else {
         return opcodeName
       }
-    }
-
-    public func attributedString(attributes: [NSAttributedString.Key : Any],
-                                 opcodeAttributes: [NSAttributedString.Key : Any],
-                                 operandAttributes: [NSAttributedString.Key : Any]) -> NSAttributedString {
-      let string = NSMutableAttributedString()
-      let opcodeName = opcode.padding(toLength: maxOpcodeNameLength, withPad: " ", startingAt: 0)
-      string.append(NSAttributedString(string: opcodeName, attributes: opcodeAttributes))
-      if let operands = operands {
-        string.append(NSAttributedString(string: " ", attributes: attributes))
-        string.append(NSAttributedString(string: operands.joined(separator: ", "), attributes: operandAttributes))
-      }
-      return string
     }
   }
 

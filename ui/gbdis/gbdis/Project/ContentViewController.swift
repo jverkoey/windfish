@@ -61,6 +61,12 @@ final class ContentViewController: NSViewController {
       textView?.layoutManager?.replaceTextStorage(textStorage)
       if let originalOffset = originalOffset {
         textView?.layoutManager?.ensureLayout(for: textView!.textContainer!)
+        textView?.linkTextAttributes = [
+          .foregroundColor: NSColor.textColor,
+          .underlineColor: NSColor.textColor.withAlphaComponent(0.5),
+          .underlineStyle: NSUnderlineStyle.single.rawValue,
+          .cursor: NSCursor.pointingHand,
+        ]
         containerView?.documentView?.scroll(CGPoint(x: originalOffset.x, y: originalOffset.y))
       }
     }

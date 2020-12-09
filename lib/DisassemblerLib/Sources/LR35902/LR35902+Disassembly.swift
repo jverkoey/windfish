@@ -339,7 +339,7 @@ extension LR35902 {
       }
       labels[cartridgeLocation] = name
     }
-    var labels: [CartridgeLocation: String] = [:]
+    public var labels: [CartridgeLocation: String] = [:]
     enum LabelType {
       case transferOfControlType
       case elseType

@@ -94,11 +94,12 @@ class ProjectConfiguration: NSObject, Codable {
 }
 
 final class DisassemblyResults: NSObject {
-  internal init(files: [String : Data], bankLines: [LR35902.Bank : [LR35902.Disassembly.Line]]? = nil, bankTextStorage: [LR35902.Bank: NSAttributedString]? = nil, regions: [Region]? = nil, statistics: LR35902.Disassembly.Statistics? = nil) {
+  internal init(files: [String : Data], bankLines: [LR35902.Bank : [LR35902.Disassembly.Line]]? = nil, bankTextStorage: [LR35902.Bank: NSAttributedString]? = nil, regions: [Region]? = nil, regionLookup: [String: Region]? = nil, statistics: LR35902.Disassembly.Statistics? = nil) {
     self.files = files
     self.bankLines = bankLines
     self.bankTextStorage = bankTextStorage
     self.regions = regions
+    self.regionLookup = regionLookup
     self.statistics = statistics
   }
 
@@ -106,6 +107,7 @@ final class DisassemblyResults: NSObject {
   var bankLines: [LR35902.Bank: [LR35902.Disassembly.Line]]?
   var bankTextStorage: [LR35902.Bank: NSAttributedString]?
   @objc dynamic var regions: [Region]?
+  var regionLookup: [String: Region]?
   var statistics: LR35902.Disassembly.Statistics?
 }
 
@@ -441,6 +443,37 @@ extension ProjectDocument: NSToolbarDelegate {
   }
 }
 
+extension RGBDSAssembly.Statement {
+  func attributedString(attributes: [NSAttributedString.Key : Any],
+                        opcodeAttributes: [NSAttributedString.Key : Any],
+                        operandAttributes: [NSAttributedString.Key : Any],
+                        regionLookup: [String: Region]) -> NSAttributedString {
+    let string = NSMutableAttributedString()
+    let opcodeName = opcode.padding(toLength: RGBDSAssembly.maxOpcodeNameLength, withPad: " ", startingAt: 0)
+    string.append(NSAttributedString(string: opcodeName, attributes: opcodeAttributes))
+    if let operands = operands {
+      string.append(NSAttributedString(string: " ", attributes: attributes))
+
+      let operandStrings: [NSAttributedString] = operands.map { operand in
+        if let region = regionLookup[operand] {
+          var linkAttributes = operandAttributes
+          linkAttributes[.link] = "gbdis://jumpto/\(region.bank.hexString)/\(region.address.hexString)"
+          return NSAttributedString(string: operand, attributes: linkAttributes)
+        } else {
+          return NSAttributedString(string: operand, attributes: operandAttributes)
+        }
+      }
+      for (index, operandString) in operandStrings.enumerated() {
+        string.append(operandString)
+        if index < operandStrings.count - 1 {
+          string.append(NSAttributedString(string: ", ", attributes: operandAttributes))
+        }
+      }
+    }
+    return string
+  }
+}
+
 // MARK: - Document modifications
 
 extension ProjectDocument {
@@ -541,6 +574,29 @@ extension ProjectDocument {
         accumulator[bankMap[entry.0]!] = entry.1
       }
 
+      var regionLookup: [String: Region] = [:]
+      let regions: [Region] = bankLines.reduce(into: []) { accumulator, element in
+        let bank = element.key
+        accumulator.append(contentsOf: element.value.reduce(into: []) { accumulator, line in
+          switch line.semantic {
+          case let .label(name): fallthrough
+          case let .transferOfControl(_, name):
+            let region = Region(
+              regionType: Region.Kind.label,
+              name: name,
+              bank: bank,
+              address: line.address!,
+              length: 0
+            )
+            accumulator.append(region)
+            regionLookup[name] = region
+            break
+          default:
+            break
+          }
+        })
+      }
+
       let commentColor = NSColor.systemGreen
       let labelColor = NSColor.systemOrange
       let baseAttributes: [NSAttributedString.Key : Any] = [
@@ -592,7 +648,8 @@ extension ProjectDocument {
                                                     attributes: baseAttributes))
               accumulator.append(assembly.attributedString(attributes: baseAttributes,
                                                            opcodeAttributes: opcodeAttributes,
-                                                           operandAttributes: operandAttributes))
+                                                           operandAttributes: operandAttributes,
+                                                           regionLookup: regionLookup))
             case let .imagePlaceholder(format):
               switch format {
               case .oneBitPerPixel:
@@ -729,28 +786,6 @@ extension ProjectDocument {
         }
       }
 
-      let regions: [Region] = bankLines.reduce(into: []) { accumulator, element in
-        let bank = element.key
-        accumulator.append(contentsOf: element.value.reduce(into: []) { accumulator, line in
-          switch line.semantic {
-          case let .label(name): fallthrough
-          case let .transferOfControl(_, name):
-            accumulator.append(
-              Region(
-                regionType: Region.Kind.label,
-                name: name,
-                bank: bank,
-                address: line.address!,
-                length: 0
-              )
-            )
-            break
-          default:
-            break
-          }
-        })
-      }
-
       DispatchQueue.main.async {
         self.metadata?.numberOfBanks = disassembly.cpu.numberOfBanks
         self.metadata?.bankMap = bankMap
@@ -759,6 +794,7 @@ extension ProjectDocument {
           bankLines: bankLines,
           bankTextStorage: bankTextStorage,
           regions: regions,
+          regionLookup: regionLookup,
           statistics: statistics
         )
 
