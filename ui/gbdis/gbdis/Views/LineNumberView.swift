@@ -73,7 +73,7 @@ final class LineNumberView: NSRulerView {
   }
 
   func dataColumnWidth() -> CGFloat {
-    return ceil(NSString("|........|").size(withAttributes: textAttributes()).width + columnPadding)
+    return ceil(NSString("$FF $FF $FF ").size(withAttributes: textAttributes()).width + columnPadding)
   }
 
   func processLines(in rect: NSRect,
