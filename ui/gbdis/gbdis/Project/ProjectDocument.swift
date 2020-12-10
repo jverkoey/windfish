@@ -468,27 +468,35 @@ extension RGBDSAssembly.Statement {
     if let operands = operands {
       string.append(NSAttributedString(string: " ", attributes: attributes))
 
-      let operandStrings: [NSAttributedString] = operands.map { operand in
+      let separator = ", "
+      var accumulatedLength = 0
+      let operandStrings: [(String, (Int, String)?)] = operands.map { operand in
         let label: String
         if let scope = scope, operand.starts(with: ".") {
           label = scope + operand
         } else {
           label = operand
         }
+
+        let lengthSoFar = accumulatedLength
+
+        if accumulatedLength > 0 {
+          accumulatedLength += separator.count
+        }
+        accumulatedLength += operand.count
+
         if regionLookup[label] != nil {
-          var linkAttributes = operandAttributes
-          linkAttributes[.link] = "gbdis://jumpto/\(label)"
-          return NSAttributedString(string: operand, attributes: linkAttributes)
+          return (operand, (lengthSoFar, "gbdis://jumpto/\(label)"))
         } else {
-          return NSAttributedString(string: operand, attributes: operandAttributes)
+          return (operand, nil)
         }
       }
-      for (index, operandString) in operandStrings.enumerated() {
-        string.append(operandString)
-        if index < operandStrings.count - 1 {
-          string.append(NSAttributedString(string: ", ", attributes: operandAttributes))
-        }
+      let operandString = NSMutableAttributedString(string: operandStrings.map { $0.0 }.joined(separator: separator),
+                                                    attributes: operandAttributes)
+      operandStrings.filter { $0.1 != nil }.forEach {
+        operandString.addAttribute(.link, value: $0.1!.1, range: NSRange(($0.1!.0..<$0.1!.0 + $0.0.count)))
       }
+      string.append(operandString)
     }
     return string
   }

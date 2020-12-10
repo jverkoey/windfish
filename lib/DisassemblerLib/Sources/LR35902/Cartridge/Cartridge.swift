@@ -3,6 +3,7 @@ import Foundation
 extension LR35902 {
   public final class Cartridge {
     public typealias Location = UInt32
+    public typealias Length = UInt32
 
     public init(rom: Data) {
       self.rom = rom
@@ -20,6 +21,10 @@ extension LR35902.Cartridge {
   public var numberOfBanks: LR35902.Bank {
     return LR35902.Bank((Location(rom.count) + LR35902.bankSize - 1) / LR35902.bankSize)
   }
+
+  var size: Length {
+    return Length(rom.count)
+  }
 }
 
 // MARK: - Accessing ROM data
@@ -32,11 +37,7 @@ extension LR35902.Cartridge {
   public subscript<R: RangeExpression>(range: R) -> Data where R.Bound == Location {
     return rom[range]
   }
-}
 
-// MARK: - Working with locations
-
-extension LR35902.Cartridge {
   /**
    Returns a cartridge location for the given program counter and bank.
    - Parameter pc: The program counter's location.
@@ -72,13 +73,5 @@ extension LR35902.Cartridge {
 
   public static func rangeOf(bank: LR35902.Bank) -> (location: Location, length: Location) {
     return (Location(bank) * Location(LR35902.bankSize), LR35902.bankSize)
-  }
-}
-
-// MARK: - Internal methods
-
-extension LR35902.Cartridge {
-  var size: Location {
-    return Location(rom.count)
   }
 }
