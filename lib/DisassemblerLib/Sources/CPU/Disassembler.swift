@@ -2,16 +2,6 @@ import Foundation
 
 extension InstructionSet {
   /**
-   Disassembles a specification from binary data, if possible.
-
-   If `data` does not contain enough bytes to represent a valid instruction opcode, then nil is returned.
-   */
-  public static func spec(from data: Data) -> SpecType? {
-    var iterator = data.makeIterator()
-    return spec(from: &iterator, table: table)
-  }
-
-  /**
    Disassembles a complete instruction from binary data, if possible.
 
    If `data` does not contain enough bytes to represent a valid instruction, then nil is returned.
@@ -39,6 +29,16 @@ extension InstructionSet {
     }
 
     return InstructionType.init(spec: spec, immediate: nil)
+  }
+
+  /**
+   Disassembles a specification from binary data, if possible.
+
+   If `data` does not contain enough bytes to represent a valid instruction opcode, then nil is returned.
+   */
+  public static func spec(from data: Data) -> SpecType? {
+    var iterator = data.makeIterator()
+    return spec(from: &iterator, table: table)
   }
 }
 
