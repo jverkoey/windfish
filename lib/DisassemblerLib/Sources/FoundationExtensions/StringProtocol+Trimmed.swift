@@ -1,7 +1,7 @@
 import Foundation
 
 extension StringProtocol {
-  func trimmed() -> String {
+  public func trimmed() -> String {
     return trimmingCharacters(in: .whitespaces)
   }
 }
