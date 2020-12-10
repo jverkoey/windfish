@@ -277,7 +277,7 @@ public final class RGBDSAssembler {
           var numericValue: UInt8 = try cast(string: value, negativeType: Int8.self)
           if case .jr = spec {
             // Relative jumps in assembly are written from the point of view of the instruction's beginning.
-            numericValue = numericValue.subtractingReportingOverflow(UInt8(LR35902.Instruction.widths[spec]!.total)).partialValue
+            numericValue = numericValue.subtractingReportingOverflow(UInt8(LR35902.InstructionSet.widths[spec]!.total)).partialValue
           }
           return .init(spec: spec, imm8: numericValue)
         }
@@ -362,13 +362,13 @@ public final class RGBDSAssembler {
 
   static var representations: [String: [LR35902.Instruction.Spec]] = {
     var representations: [String: [LR35902.Instruction.Spec]] = [:]
-    LR35902.Instruction.table.forEach { spec in
+    LR35902.InstructionSet.table.forEach { spec in
       if case .invalid = spec {
         return
       }
       representations[spec.representation, default: []].append(spec)
     }
-    LR35902.Instruction.tableCB.forEach { spec in
+    LR35902.InstructionSet.tableCB.forEach { spec in
       if case .invalid = spec {
         return
       }
@@ -379,10 +379,10 @@ public final class RGBDSAssembler {
 
   static var instructionOpcodeBinary: [LR35902.Instruction.Spec: [UInt8]] = {
     var binary: [LR35902.Instruction.Spec: [UInt8]] = [:]
-    for (byteRepresentation, spec) in LR35902.Instruction.table.enumerated() {
+    for (byteRepresentation, spec) in LR35902.InstructionSet.table.enumerated() {
       binary[spec] = [UInt8(byteRepresentation)]
     }
-    for (byteRepresentation, spec) in LR35902.Instruction.tableCB.enumerated() {
+    for (byteRepresentation, spec) in LR35902.InstructionSet.tableCB.enumerated() {
       binary[spec] = [0xCB, UInt8(byteRepresentation)]
     }
     return binary

@@ -425,7 +425,7 @@ ld hl, sp+$05
   }
 
   func test_allInstructions() throws {
-    for spec in LR35902.Instruction.table {
+    for spec in LR35902.InstructionSet.table {
       guard spec != .invalid else {
         continue
       }
@@ -453,7 +453,7 @@ ld hl, sp+$05
       XCTAssertEqual(disassembly.instructionMap[0x0000]?.spec, spec)
     }
 
-    for spec in LR35902.Instruction.tableCB {
+    for spec in LR35902.InstructionSet.tableCB {
       guard spec != .invalid else {
         continue
       }

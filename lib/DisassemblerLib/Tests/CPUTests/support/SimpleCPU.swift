@@ -22,25 +22,40 @@ struct SimpleCPU {
     }
     let immediate: ImmediateValue?
 
-    indirect enum Spec: Equatable {
+    indirect enum Spec: Hashable {
       case nop
       case cp(Numeric)
       case ld(Numeric, Numeric)
       case call(Condition? = nil, Numeric)
       case sub(Spec)
 
-      enum Numeric: Equatable {
+      enum Numeric: Hashable {
         case imm8
         case imm16
         case a
         case arg(Int)
       }
 
-      enum Condition: Equatable {
+      enum Condition: Hashable {
         case nz
         case z
       }
     }
+  }
+
+  struct InstructionSet: CPU.InstructionSet {
+    static var widths: [SimpleCPU.Instruction.Spec : InstructionWidth<UInt16>] = {
+      return computeAllWidths()
+    }()
+
+    static let table: [Instruction.Spec] = [
+      /* 0x00 */ .nop,
+      /* 0x01 */ .ld(.a, .imm8),
+      /* 0x02 */ .ld(.a, .imm16),
+      /* 0x03 */ .call(.nz, .imm16),
+      /* 0x04 */ .call(nil, .imm16),
+    ]
+    static var prefixTables: [[SimpleCPU.Instruction.Spec]] = []
   }
 }
 

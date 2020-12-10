@@ -33,8 +33,10 @@ public protocol Instruction {
  This protocol is typically implemented as an enum type in which each case defines the shape of a single instruction.
  If the instruction set has prefix instructions (e.g. two-byte instructions in an otherwise single-byte instruction set)
  then the enum can be declared `indirect` in order to support recursion.
+
+ This type conforms to Hashable because instruction specifications are often used as keys in lookup tables.
  */
-public protocol InstructionSpec {
+public protocol InstructionSpec: Hashable {
   /**
    The type to be used for all width expressions.
 
@@ -43,13 +45,9 @@ public protocol InstructionSpec {
    */
   associatedtype WidthType: BinaryInteger
 
-  /**
-   The byte width of the instruction's opcode.
-   */
+  /** The byte width of the instruction's opcode. */
   var opcodeWidth: WidthType { get }
 
-  /**
-   The byte width of the instruction's operands, if any.
-   */
+  /** The byte width of the instruction's operands, if any. */
   var operandWidth: WidthType { get }
 }

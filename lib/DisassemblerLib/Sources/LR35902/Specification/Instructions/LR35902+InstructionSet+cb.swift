@@ -1,7 +1,7 @@
 import Foundation
 
-extension LR35902.Instruction {
-  static let tableCB: [Spec] = [
+extension LR35902.InstructionSet {
+  static let tableCB: [LR35902.Instruction.Spec] = [
     /* 0x00 */ .cb(.rlc(.b)),
     /* 0x01 */ .cb(.rlc(.c)),
     /* 0x02 */ .cb(.rlc(.d)),

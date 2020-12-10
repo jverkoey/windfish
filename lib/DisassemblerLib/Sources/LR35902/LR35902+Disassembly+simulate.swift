@@ -220,7 +220,7 @@ extension LR35902.Disassembly {
 
         step?(instruction, location, state)
 
-        let width = LR35902.Instruction.widths[instruction.spec]!.total
+        let width = LR35902.InstructionSet.widths[instruction.spec]!.total
 
         var thisState = state
         thisState.next = [location + LR35902.CartridgeLocation(width)]

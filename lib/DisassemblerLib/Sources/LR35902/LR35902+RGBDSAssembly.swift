@@ -28,9 +28,9 @@ public final class RGBDSAssembly {
 
   static func assembly(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil, argumentString: String? = nil) -> Statement {
     if let operands = operands(for: instruction, with: disassembly, argumentString: argumentString) {
-      return Statement(opcode: LR35902.Instruction.opcodes[instruction.spec]!, operands: operands.filter { $0.count > 0 })
+      return Statement(opcode: LR35902.InstructionSet.opcodes[instruction.spec]!, operands: operands.filter { $0.count > 0 })
     } else {
-      return Statement(opcode: LR35902.Instruction.opcodes[instruction.spec]!)
+      return Statement(opcode: LR35902.InstructionSet.opcodes[instruction.spec]!)
     }
   }
 
@@ -167,7 +167,7 @@ public final class RGBDSAssembly {
         }
 
       case let LR35902.Instruction.Spec.jr(condition, operand) where operand == .simm8:
-        let jumpAddress = (disassembly.cpu.pc + LR35902.Instruction.widths[instruction.spec]!.total).advanced(by: Int(Int8(bitPattern: instruction.imm8!)))
+        let jumpAddress = (disassembly.cpu.pc + LR35902.InstructionSet.widths[instruction.spec]!.total).advanced(by: Int(Int8(bitPattern: instruction.imm8!)))
         if disassembly.transfersOfControl(at: jumpAddress, in: disassembly.cpu.bank) != nil {
           var addressLabel: String
           if let argumentString = argumentString {

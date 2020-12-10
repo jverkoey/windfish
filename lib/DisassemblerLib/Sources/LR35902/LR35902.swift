@@ -62,13 +62,13 @@ public final class LR35902 {
   /// Returns a specification at the given address, if a valid one exists.
   public func spec(at pc: Address, in bank: Bank) -> Instruction.Spec? {
     let byte = Int(self[pc, bank])
-    let spec = Instruction.table[byte]
+    let spec = InstructionSet.table[byte]
     switch spec {
     case .invalid:
       return nil
     case .cb:
       let byteCB = Int(self[pc + 1, bank])
-      let cbInstruction = Instruction.tableCB[byteCB]
+      let cbInstruction = InstructionSet.tableCB[byteCB]
       if case .invalid = spec {
         return nil
       }
@@ -80,7 +80,7 @@ public final class LR35902 {
 
   /// Returns an instruction at the given address.
   public func instruction(at pc: Address, in bank: Bank, spec: Instruction.Spec) -> Instruction? {
-    let instructionWidth = Instruction.widths[spec]!
+    let instructionWidth = InstructionSet.widths[spec]!
     guard let location = LR35902.cartridgeLocation(for: pc + instructionWidth.opcode, in: bank) else {
       return nil
     }

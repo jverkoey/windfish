@@ -148,7 +148,7 @@ extension LR35902.Disassembly {
             .sorted(by: { $0.sourceLocation < $1.sourceLocation })
             .map {
               let (address, _) = LR35902.addressAndBank(from: $0.sourceLocation)
-              return "\(LR35902.Instruction.opcodes[$0.sourceInstructionSpec]!) @ $\(address.hexString)"
+              return "\(LR35902.InstructionSet.opcodes[$0.sourceInstructionSpec]!) @ $\(address.hexString)"
             }
             .joined(separator: ", ")
           return line("\(label):", comment: "Sources: \(sources)")
@@ -614,7 +614,7 @@ clean:
 
           // Write the instruction as assembly.
           let index = LR35902.cartridgeLocation(for: cpu.pc, in: bank)!
-          let instructionWidth = LR35902.Instruction.widths[instruction.spec]!.total
+          let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!.total
           let bytes = cpu[index..<(index + LR35902.CartridgeLocation(instructionWidth))]
           let instructionScope = labeledContiguousScopes(at: cpu.pc, in: bank).map { $0.label }
           lineGroup.append(Line(semantic: .instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: self)),
@@ -634,7 +634,7 @@ clean:
           } else if let child = followUpCheckMacro(instruction, isLabeled) {
             macroNode = child
           } else {
-            let instructionWidth = LR35902.Instruction.widths[instruction.spec]!.total
+            let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!.total
             try flushMacro(cpu.pc - instructionWidth)
           }
 

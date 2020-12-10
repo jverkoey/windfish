@@ -84,7 +84,7 @@ extension LR35902 {
       }
 
       instructionMap[address] = instruction
-      let instructionRange = Int(address)..<(Int(address) + Int(Instruction.widths[instruction.spec]!.total))
+      let instructionRange = Int(address)..<(Int(address) + Int(InstructionSet.widths[instruction.spec]!.total))
 
       // Remove any overlapping instructions.
       let subRange = instructionRange.dropFirst()
@@ -133,7 +133,7 @@ extension LR35902 {
         let location = LR35902.CartridgeLocation(index)
         if let instruction = instructionMap[location] {
           instructionMap[location] = nil
-          let end = Int(location + LR35902.CartridgeLocation(LR35902.Instruction.widths[instruction.spec]!.total))
+          let end = Int(location + LR35902.CartridgeLocation(LR35902.InstructionSet.widths[instruction.spec]!.total))
           if end > range.upperBound {
             code.remove(integersIn: range.upperBound..<end)
           }
@@ -618,7 +618,7 @@ extension LR35902 {
             cpu.bank = bankChange
           }
 
-          let instructionWidth = Instruction.widths[spec]!
+          let instructionWidth = InstructionSet.widths[spec]!
           advance(instructionWidth.total)
 
           switch spec {
