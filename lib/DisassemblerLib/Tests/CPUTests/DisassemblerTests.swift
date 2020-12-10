@@ -18,4 +18,16 @@ class DisassemblerTests: XCTestCase {
       }
     }
   }
+
+  func testEmptyDataReturnsNil() {
+    let data = Data([])
+    let spec = SimpleCPU.InstructionSet.spec(from: data)
+    XCTAssertNil(spec)
+  }
+
+  func testPartialInstructionReturnsNil() {
+    let data = Data([UInt8(SimpleCPU.InstructionSet.table.firstIndex(of: .prefix(.sub))!)])
+    let spec = SimpleCPU.InstructionSet.spec(from: data)
+    XCTAssertNil(spec)
+  }
 }

@@ -13,7 +13,7 @@ private class IteratorWrapper {
 }
 
 extension InstructionSet {
-  static func spec(from data: Data) -> SpecType? {
+  public static func spec(from data: Data) -> SpecType? {
     let iterator = IteratorWrapper(iterator: data.makeIterator())
     return spec(from: iterator, table: table)
   }
@@ -25,9 +25,8 @@ extension InstructionSet {
     let spec = table[Int(byte)]
     if let prefixTable = Self.prefixTables[spec] {
       return self.spec(from: iterator, table: prefixTable)
-    } else {
-      return spec
     }
+    return spec
   }
 }
 

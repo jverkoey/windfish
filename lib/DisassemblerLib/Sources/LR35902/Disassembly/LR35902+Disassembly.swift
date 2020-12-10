@@ -597,7 +597,7 @@ extension LR35902 {
             continue
           }
 
-          guard let spec = cpu.cartridge.spec(at: cpu.pc, in: cpu.bank),
+          guard let spec = LR35902.InstructionSet.spec(from: self.cpu.cartridge[location...]),
                 let instruction = cpu.cartridge.instruction(at: cpu.pc, in: cpu.bank, spec: spec) else {
             advance(1)
             continue

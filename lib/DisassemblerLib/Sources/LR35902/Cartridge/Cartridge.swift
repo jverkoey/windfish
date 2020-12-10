@@ -29,7 +29,7 @@ extension LR35902.Cartridge {
     return rom[Int(LR35902.Cartridge.cartridgeLocation(for: pc, in: bank)!)]
   }
 
-  public subscript(range: Range<Location>) -> Data {
+  public subscript<R: RangeExpression>(range: R) -> Data where R.Bound == Location {
     return rom[range]
   }
 }
@@ -78,25 +78,6 @@ extension LR35902.Cartridge {
 // MARK: - Extracting instructions from the ROM
 
 extension LR35902.Cartridge {
-  /** Returns a specification at the given address, if a valid one exists. */
-  public func spec(at pc: LR35902.Address, in bank: LR35902.Bank) -> LR35902.Instruction.Spec? {
-    let byte = Int(self[pc, bank])
-    let spec = LR35902.InstructionSet.table[byte]
-    switch spec {
-    case .invalid:
-      return nil
-    case .prefix(.cb):
-      let byteCB = Int(self[pc + 1, bank])
-      let cbInstruction = LR35902.InstructionSet.tableCB[byteCB]
-      if case .invalid = spec {
-        return nil
-      }
-      return cbInstruction
-    default:
-      return spec
-    }
-  }
-
   /** Returns an instruction at the given address. */
   public func instruction(at pc: LR35902.Address, in bank: LR35902.Bank, spec: LR35902.Instruction.Spec) -> LR35902.Instruction? {
     let instructionWidth = LR35902.InstructionSet.widths[spec]!
