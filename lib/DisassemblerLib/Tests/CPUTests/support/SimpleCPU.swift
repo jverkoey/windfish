@@ -45,7 +45,12 @@ struct SimpleCPU {
       /* 0x03 */ .call(.nz, .imm16),
       /* 0x04 */ .call(nil, .imm16),
     ]
-    static var prefixTables: [[Instruction.Spec]] = []
+    static let subTable: [Instruction.Spec] = [
+      /* 0x00 */ .sub(.cp(.imm8)),
+    ]
+    static var prefixTables: [[Instruction.Spec]] = [
+      subTable
+    ]
 
     static var widths: [Instruction.Spec : InstructionWidth<UInt16>] = {
       return computeAllWidths()

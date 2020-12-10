@@ -1,7 +1,7 @@
 import Foundation
 
 /** A computed representation of an instruction's binary width. */
-public struct InstructionWidth<T: BinaryInteger> {
+public struct InstructionWidth<T: BinaryInteger>: Equatable {
   /** The width of the opcode. */
   public let opcode: T
 
@@ -49,7 +49,7 @@ extension InstructionSet {
   /** Calculates the widths for every specification in this set. */
   public static func computeAllWidths() -> [SpecType: InstructionWidth<SpecType.WidthType>] {
     var widths: [SpecType: InstructionWidth<SpecType.WidthType>] = [:]
-    (allSpecs()).forEach { spec in
+    allSpecs().forEach { spec in
       widths[spec] = InstructionWidth(opcode: spec.opcodeWidth, operand: spec.operandWidth)
     }
     return widths
