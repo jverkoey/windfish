@@ -16,20 +16,20 @@ class VisitorTests: XCTestCase {
   }
 
   func testInstructionWithOneOperandIsVisitedOnce() throws {
-    let instruction = SimpleCPU.Instruction(spec: .ld(.imm8))
+    let instruction = SimpleCPU.Instruction(spec: .cp(.a))
 
     var visitCount = 0
-    var visitedOperands: [SimpleCPU.Instruction.Operand] = []
+    var visitedOperands: [SimpleCPU.Instruction.Numeric] = []
     var visitedIndices: [Int] = []
     instruction.spec.visit { (operand, index) in
-      if let operand = operand as? SimpleCPU.Instruction.Operand,
+      if let operand = operand as? SimpleCPU.Instruction.Numeric,
         let index = index {
         visitedOperands.append(operand)
         visitedIndices.append(index)
       }
       visitCount += 1
     }
-    XCTAssertEqual(visitedOperands, [.imm8])
+    XCTAssertEqual(visitedOperands, [.a])
     XCTAssertEqual(visitedIndices, [0])
     XCTAssertEqual(visitCount, 1)
   }
@@ -38,10 +38,10 @@ class VisitorTests: XCTestCase {
     let instruction = SimpleCPU.Instruction(spec: .ld(.a, .imm8))
 
     var visitCount = 0
-    var visitedOperands: [SimpleCPU.Instruction.Operand] = []
+    var visitedOperands: [SimpleCPU.Instruction.Numeric] = []
     var visitedIndices: [Int] = []
     instruction.spec.visit { (operand, index) in
-      if let operand = operand as? SimpleCPU.Instruction.Operand,
+      if let operand = operand as? SimpleCPU.Instruction.Numeric,
         let index = index {
         visitedOperands.append(operand)
         visitedIndices.append(index)
@@ -57,10 +57,10 @@ class VisitorTests: XCTestCase {
     let instruction = SimpleCPU.Instruction(spec: .sub(.ld(.a, .imm8)))
 
     var visitCount = 0
-    var visitedOperands: [SimpleCPU.Instruction.Operand] = []
+    var visitedOperands: [SimpleCPU.Instruction.Numeric] = []
     var visitedIndices: [Int] = []
     instruction.spec.visit { (operand, index) in
-      if let operand = operand as? SimpleCPU.Instruction.Operand,
+      if let operand = operand as? SimpleCPU.Instruction.Numeric,
         let index = index {
         visitedOperands.append(operand)
         visitedIndices.append(index)

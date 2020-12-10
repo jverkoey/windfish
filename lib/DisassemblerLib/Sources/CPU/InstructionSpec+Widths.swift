@@ -15,16 +15,6 @@ public struct InstructionWidth<T: BinaryInteger> {
 }
 
 /**
- An instruction operand that has a width.
- */
-public protocol InstructionOperandWithBinaryFootprint {
-  /**
-   The width of the immediate.
-   */
-  var width: Int { get }
-}
-
-/**
  Calculates the widths for all of the given instructions.
  */
 public func widths<T>(for instructionSet: [T]) -> [T: InstructionWidth<T.WidthType>] where T: InstructionSpec {
@@ -35,7 +25,20 @@ public func widths<T>(for instructionSet: [T]) -> [T: InstructionWidth<T.WidthTy
   return widths
 }
 
-extension InstructionSpec {
+/**
+ An instruction operand that has a width.
+ */
+public protocol InstructionOperandWithBinaryFootprint {
+  /**
+   The width of the immediate.
+   */
+  var width: Int { get }
+}
+
+public protocol InstructionSpecAutoWidthDetermination: InstructionSpec {
+}
+
+extension InstructionSpecAutoWidthDetermination {
   /**
    Extracts the opcode width by adding up recursive specifications.
    */

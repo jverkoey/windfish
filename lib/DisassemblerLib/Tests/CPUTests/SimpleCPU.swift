@@ -13,19 +13,46 @@ struct SimpleCPU {
     var spec: Instruction.Spec
 
     indirect enum Spec: InstructionSpec, Hashable {
+      var opcodeWidth: UInt16 {
+        return 1
+      }
+      var operandWidth: UInt16 {
+        switch self {
+        case let .ld(operand1, operand2):
+          return operand1.width + operand2.width
+        case let .cp(operand):
+          return operand.width
+        case let .sub(spec):
+          return spec.operandWidth
+        default:
+          return 0
+        }
+      }
+
       case nop
-      case ld(Operand)
-      case ld(Operand, Operand)
+      case cp(Numeric)
+      case ld(Numeric, Numeric)
       case sub(Spec)
 
       typealias WidthType = UInt16
     }
 
-    enum Operand: Hashable {
+    enum Numeric: Hashable {
       case imm8
       case imm16
       case a
       case arg(Int)
+
+      var width: UInt16 {
+        switch self {
+        case .imm8:
+          return 1
+        case .imm16:
+          return 2
+        default:
+          return 0
+        }
+      }
     }
   }
 }
