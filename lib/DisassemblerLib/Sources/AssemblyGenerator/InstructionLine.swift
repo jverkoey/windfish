@@ -1,6 +1,6 @@
 import Foundation
 
-import FixedWidthInteger
+import FoundationExtensions
 
 private let codeWidth = 48
 

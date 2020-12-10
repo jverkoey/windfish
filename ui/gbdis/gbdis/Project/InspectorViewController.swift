@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Cocoa
 
 final class InspectorEditorViewController: TabViewController, TabSelectable {
   let deselectedTabImage = NSImage(systemSymbolName: "pencil.circle", accessibilityDescription: nil)!

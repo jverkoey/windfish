@@ -80,7 +80,6 @@
 		667B1B9E2578560A00CE670F /* TextTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextTableCellView.swift; sourceTree = "<group>"; };
 		667B1BA82578563E00CE670F /* ContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewController.swift; sourceTree = "<group>"; };
 		667B1BAD2578565A00CE670F /* OutlineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineViewController.swift; sourceTree = "<group>"; };
-		667B1BE425787ACE00CE670F /* gbdisui-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "gbdisui-Bridging-Header.h"; sourceTree = "<group>"; };
 		667B1C0125789BAE00CE670F /* InspectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InspectorViewController.swift; sourceTree = "<group>"; };
 		66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegionInspectorViewController.swift; sourceTree = "<group>"; };
 		66C617CB257F1AE200E372BA /* TabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewController.swift; sourceTree = "<group>"; };
@@ -141,7 +140,6 @@
 			isa = PBXGroup;
 			children = (
 				66763D7E257AF37900824278 /* Formatters */,
-				667B1BE425787ACE00CE670F /* gbdisui-Bridging-Header.h */,
 				667B1B982578559600CE670F /* AutoLayout */,
 				667B1B8F2578557100CE670F /* FoundationExtensions */,
 				667B1B612578540500CE670F /* Project */,
@@ -592,7 +590,6 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = featherless.gbdis;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "gbdis/gbdisui-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -616,7 +613,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = featherless.gbdis;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_DISABLE_SAFETY_CHECKS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "gbdis/gbdisui-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;

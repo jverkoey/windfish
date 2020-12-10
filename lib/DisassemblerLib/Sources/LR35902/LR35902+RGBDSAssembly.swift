@@ -1,6 +1,6 @@
 import Foundation
 
-import FixedWidthInteger
+import FoundationExtensions
 
 public final class RGBDSAssembly {
 

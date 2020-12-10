@@ -1,7 +1,7 @@
 import Foundation
 
 import CPU
-import FixedWidthInteger
+import FoundationExtensions
 
 public protocol InstructionSpecRepresentable {
   /**

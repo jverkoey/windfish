@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Cocoa
 
 final class TextView: NSTextView {
   var selectedLineRect: NSRect? {

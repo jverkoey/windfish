@@ -27,7 +27,7 @@ let package = Package(
     .target(
       name: "LR35902",
       dependencies: [
-        "FixedWidthInteger",
+        "FoundationExtensions",
         "AssemblyGenerator",
         "CPU",
         "Disassembler",
@@ -35,7 +35,7 @@ let package = Package(
     ),
     .target(
       name: "AssemblyGenerator",
-      dependencies: ["FixedWidthInteger"]),
+      dependencies: ["FoundationExtensions"]),
     .target(
       name: "Disassembler",
       dependencies: ["CPU"]
@@ -45,7 +45,7 @@ let package = Package(
       dependencies: []
     ),
     .target(
-      name: "FixedWidthInteger",
+      name: "FoundationExtensions",
       dependencies: []
     ),
 
@@ -56,10 +56,6 @@ let package = Package(
     .testTarget(
       name: "CPUTests",
       dependencies: ["CPU"]
-    ),
-    .testTarget(
-      name: "DisassemblerTests",
-      dependencies: ["Disassembler"]
     ),
   ]
 )

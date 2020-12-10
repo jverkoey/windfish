@@ -7,15 +7,15 @@ import Foundation
  not exposed via any generic protocols. This protocol exposes the fact that those initializers
  exist on Foundation types.
  */
-protocol BitPatternInitializable {
+public protocol BitPatternInitializable {
   associatedtype CompanionType
   init(bitPattern x: CompanionType)
 }
 
 extension UInt16: BitPatternInitializable {
-  typealias CompanionType = Int16
+  public typealias CompanionType = Int16
 }
 
 extension UInt8: BitPatternInitializable {
-  typealias CompanionType = Int8
+  public typealias CompanionType = Int8
 }
