@@ -18,15 +18,11 @@ let package = Package(
       targets: ["LR35902"]
     )
   ],
-  dependencies: [
-    .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.6.0"),
-  ],
   targets: [
     .target(
       name: "gbdis",
       dependencies: [
         "LR35902",
-        "DisassemblyRequest",
       ]),
 
     .target(
@@ -36,7 +32,6 @@ let package = Package(
         "AssemblyGenerator",
         "CPU",
         "Disassembler",
-        "SwiftProtobuf",
       ]
     ),
     .testTarget(
@@ -66,11 +61,6 @@ let package = Package(
     .target(
       name: "Disassembler",
       dependencies: ["CPU"]
-    ),
-
-    .target(
-      name: "DisassemblyRequest",
-      dependencies: ["SwiftProtobuf", "CPU"]
     ),
   ]
 )
