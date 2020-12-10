@@ -22,4 +22,11 @@ class InstructionSpecTests: XCTestCase {
     XCTAssertEqual(spec.opcodeWidth, 1)
     XCTAssertEqual(spec.operandWidth, 2)
   }
+
+  func test_sub_cp_a() {
+    let spec = SimpleCPU.Instruction.Spec.sub(.cp(.a))
+
+    XCTAssertEqual(spec.opcodeWidth, 2)
+    XCTAssertEqual(spec.operandWidth, 0)
+  }
 }

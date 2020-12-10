@@ -19,10 +19,10 @@ class VisitorTests: XCTestCase {
     let instruction = SimpleCPU.Instruction(spec: .cp(.a))
 
     var visitCount = 0
-    var visitedOperands: [SimpleCPU.Instruction.Numeric] = []
+    var visitedOperands: [SimpleCPU.Instruction.Spec.Numeric] = []
     var visitedIndices: [Int] = []
     instruction.spec.visit { (operand, index) in
-      if let operand = operand as? SimpleCPU.Instruction.Numeric,
+      if let operand = operand as? SimpleCPU.Instruction.Spec.Numeric,
         let index = index {
         visitedOperands.append(operand)
         visitedIndices.append(index)
@@ -38,10 +38,10 @@ class VisitorTests: XCTestCase {
     let instruction = SimpleCPU.Instruction(spec: .ld(.a, .imm8))
 
     var visitCount = 0
-    var visitedOperands: [SimpleCPU.Instruction.Numeric] = []
+    var visitedOperands: [SimpleCPU.Instruction.Spec.Numeric] = []
     var visitedIndices: [Int] = []
     instruction.spec.visit { (operand, index) in
-      if let operand = operand as? SimpleCPU.Instruction.Numeric,
+      if let operand = operand as? SimpleCPU.Instruction.Spec.Numeric,
         let index = index {
         visitedOperands.append(operand)
         visitedIndices.append(index)
@@ -57,10 +57,10 @@ class VisitorTests: XCTestCase {
     let instruction = SimpleCPU.Instruction(spec: .sub(.ld(.a, .imm8)))
 
     var visitCount = 0
-    var visitedOperands: [SimpleCPU.Instruction.Numeric] = []
+    var visitedOperands: [SimpleCPU.Instruction.Spec.Numeric] = []
     var visitedIndices: [Int] = []
     instruction.spec.visit { (operand, index) in
-      if let operand = operand as? SimpleCPU.Instruction.Numeric,
+      if let operand = operand as? SimpleCPU.Instruction.Spec.Numeric,
         let index = index {
         visitedOperands.append(operand)
         visitedIndices.append(index)

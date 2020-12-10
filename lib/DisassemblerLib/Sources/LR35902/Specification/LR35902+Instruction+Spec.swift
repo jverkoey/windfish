@@ -3,7 +3,7 @@ import CPU
 
 extension LR35902.Instruction {
   /// The specification for an LR35902's instruction set.
-  public indirect enum Spec: CPU.InstructionSpec, CPU.InstructionSpecAutoWidthDetermination {
+  public indirect enum Spec: CPU.InstructionSpec, CPU.InstructionSpecAutomaticWidth {
     public typealias WidthType = UInt16
 
     // Loads

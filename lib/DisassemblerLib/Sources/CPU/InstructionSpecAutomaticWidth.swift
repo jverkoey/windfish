@@ -1,7 +1,5 @@
 import Foundation
 
-// TODO: Make this automatic implementation something that can be opted in to because it's less performant.
-
 /**
  A representation of an instruction's width.
  */
@@ -35,10 +33,9 @@ public protocol InstructionOperandWithBinaryFootprint {
   var width: Int { get }
 }
 
-public protocol InstructionSpecAutoWidthDetermination: InstructionSpec {
-}
+public protocol InstructionSpecAutomaticWidth: InstructionSpec {}
 
-extension InstructionSpecAutoWidthDetermination {
+extension InstructionSpecAutomaticWidth {
   /**
    Extracts the opcode width by adding up recursive specifications.
    */

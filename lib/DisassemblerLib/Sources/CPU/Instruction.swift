@@ -3,10 +3,11 @@ import Foundation
 /**
  A concrete representation of a single instruction in a CPU's instruction set.
 
- A instruction provides a complete representation of a specific action that the CPU is able to take.
+ A instruction provides a complete representation of a specific operation that the CPU is able to perform.
 
- Each Instruction has an associated specification (spec). The spec describes the abstract representation of the
- instruction and is primarily used for translating instructions between text and binary representations.
+ Each Instruction has an associated specification (spec). The spec defines the shape and size of the Instruction, but
+ not the conrete values contained within; the Instruction is expected to store the concrete information such as an
+ immediate (imm) value or a memory address.
  */
 public protocol Instruction: Hashable {
   /**
@@ -25,12 +26,13 @@ public protocol Instruction: Hashable {
 }
 
 /**
- An abstract representation of the instructions in a CPU's instruction set.
+ A representation of the shape of instructions found in a CPU's instruction set.
 
- This protocol is expected to be implemented using an enum type where each case defines the shape of a single
- instruction.
+ Implementing this protocol makes it possible to calculate the size of a given instruction.
 
- Implementing this protocol makes it possible to calculate the binary size of a given instruction.
+ This protocol is typically implemented as an enum type in which each case defines the shape of a single instruction.
+ If the instruction set has prefix instructions (e.g. two-byte instructions in an otherwise single-byte instruction set)
+ then the enum can be declared `indirect` in order to support recursion.
  */
 public protocol InstructionSpec: Hashable {
   /**
@@ -42,12 +44,12 @@ public protocol InstructionSpec: Hashable {
   associatedtype WidthType: BinaryInteger
 
   /**
-   The width of the instruction's opcode.
+   The byte width of the instruction's opcode.
    */
   var opcodeWidth: WidthType { get }
 
   /**
-   The width of the instruction's operands, if any.
+   The byte width of the instruction's operands, if any.
    */
   var operandWidth: WidthType { get }
 }
