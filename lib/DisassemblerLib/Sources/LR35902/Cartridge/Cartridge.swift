@@ -37,9 +37,11 @@ extension LR35902.Cartridge {
 // MARK: - Working with locations
 
 extension LR35902.Cartridge {
-  /// Returns a cartridge location for the given program counter and bank.
-  /// - Parameter pc: The program counter's location.
-  /// - Parameter bank: The current bank.
+  /**
+   Returns a cartridge location for the given program counter and bank.
+   - Parameter pc: The program counter's location.
+   - Parameter bank: The current bank.
+   */
   public static func cartridgeLocation(for pc: LR35902.Address, in bank: LR35902.Bank) -> Location? {
     // Bank 0 is permanently addressable from 0x0000...0x3FFF.
     // All other banks map from 0x4000...0x7FFF
@@ -57,9 +59,11 @@ extension LR35902.Cartridge {
     return cartridgeLocation(for: pc, in: (bank == 0) ? 1 : bank)
   }
 
-  /// Returns a cartridge address for the given program counter and bank.
-  /// - Parameter pc: The program counter's location.
-  /// - Parameter bank: The current bank.
+  /**
+   Returns a cartridge address for the given program counter and bank.
+   - Parameter pc: The program counter's location.
+   - Parameter bank: The current bank.
+   */
   public static func addressAndBank(from cartridgeLocation: Location) -> (address: LR35902.Address, bank: LR35902.Bank) {
     let bank = LR35902.Bank(cartridgeLocation / LR35902.bankSize)
     let address = LR35902.Address(cartridgeLocation % LR35902.bankSize + Location((bank > 0) ? 0x4000 : 0x0000))
@@ -74,7 +78,7 @@ extension LR35902.Cartridge {
 // MARK: - Extracting instructions from the ROM
 
 extension LR35902.Cartridge {
-  /// Returns a specification at the given address, if a valid one exists.
+  /** Returns a specification at the given address, if a valid one exists. */
   public func spec(at pc: LR35902.Address, in bank: LR35902.Bank) -> LR35902.Instruction.Spec? {
     let byte = Int(self[pc, bank])
     let spec = LR35902.InstructionSet.table[byte]
@@ -93,7 +97,7 @@ extension LR35902.Cartridge {
     }
   }
 
-  /// Returns an instruction at the given address.
+  /** Returns an instruction at the given address. */
   public func instruction(at pc: LR35902.Address, in bank: LR35902.Bank, spec: LR35902.Instruction.Spec) -> LR35902.Instruction? {
     let instructionWidth = LR35902.InstructionSet.widths[spec]!
     guard let location = LR35902.Cartridge.cartridgeLocation(for: pc + instructionWidth.opcode, in: bank) else {
