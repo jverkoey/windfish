@@ -2,6 +2,11 @@ import Foundation
 
 /** A computed representation of an instruction's binary width. */
 public struct InstructionWidth<T: BinaryInteger>: Equatable {
+  public init(opcode: T, operand: T) {
+    self.opcode = opcode
+    self.operand = operand
+  }
+
   /** The width of the opcode. */
   public let opcode: T
 
