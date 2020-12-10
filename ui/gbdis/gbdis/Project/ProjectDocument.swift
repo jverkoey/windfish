@@ -808,7 +808,7 @@ extension ProjectDocument {
       }
 
       DispatchQueue.main.async {
-        self.metadata?.numberOfBanks = disassembly.cpu.numberOfBanks
+        self.metadata?.numberOfBanks = disassembly.cpu.cartridge.numberOfBanks
         self.metadata?.bankMap = bankMap
         self.disassemblyResults = DisassemblyResults(
           files: disassemblyFiles,

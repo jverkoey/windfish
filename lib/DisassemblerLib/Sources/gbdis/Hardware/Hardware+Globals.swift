@@ -2,7 +2,7 @@ import Foundation
 import LR35902
 import DisassemblyRequest
 
-func populateRequestWithHardwareGlobals(_ request: DisassemblyRequest<LR35902.Address, LR35902.CartridgeLocation, LR35902.Instruction>) {
+func populateRequestWithHardwareGlobals(_ request: DisassemblyRequest<LR35902.Address, LR35902.Cartridge.Location, LR35902.Instruction>) {
   request.addGlobals([
     0x0143: "HW_COLORGAMEBOY HeaderIsColorGB",
     0x0146: "HW_SUPERGAMEBOY HeaderSGBFlag",

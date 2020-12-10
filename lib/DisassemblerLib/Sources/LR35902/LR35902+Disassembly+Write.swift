@@ -147,7 +147,7 @@ extension LR35902.Disassembly {
           let sources = toc
             .sorted(by: { $0.sourceLocation < $1.sourceLocation })
             .map {
-              let (address, _) = LR35902.addressAndBank(from: $0.sourceLocation)
+              let (address, _) = LR35902.Cartridge.addressAndBank(from: $0.sourceLocation)
               return "\(LR35902.InstructionSet.opcodes[$0.sourceInstructionSpec]!) @ $\(address.hexString)"
             }
             .joined(separator: ", ")
@@ -339,7 +339,7 @@ clean:
 
     var macrosAsm: String? = nil
 
-    for bank in UInt8(0)..<UInt8(cpu.numberOfBanks) {
+    for bank in UInt8(0)..<UInt8(cpu.cartridge.numberOfBanks) {
       var bankLines: [Line] = []
       defer {
         var lastLine: Line?
@@ -361,7 +361,7 @@ clean:
 
       cpu.pc = (bank == 0) ? 0x0000 : 0x4000
       cpu.bank = bank
-      let end: LR35902.Address = (bank == 0) ? (cpu.cartridgeSize < 0x4000 ? LR35902.Address(cpu.cartridgeSize) : 0x4000) : 0x8000
+      let end: LR35902.Address = (bank == 0) ? (cpu.cartridge.size < 0x4000 ? LR35902.Address(cpu.cartridge.size) : 0x4000) : 0x8000
 
       var lineBufferAddress: LR35902.Address = cpu.pc
       var lineBuffer: [Line] = []
@@ -550,9 +550,9 @@ clean:
               macro.macro.hasWritten = true
             }
 
-            let lowerBound = LR35902.cartridgeLocation(for: lineBufferAddress, in: bank)!
-            let upperBound = LR35902.cartridgeLocation(for: lastAddress, in: bank)!
-            let bytes = self.cpu[lowerBound..<upperBound]
+            let lowerBound = LR35902.Cartridge.cartridgeLocation(for: lineBufferAddress, in: bank)!
+            let upperBound = LR35902.Cartridge.cartridgeLocation(for: lastAddress, in: bank)!
+            let bytes = self.cpu.cartridge[lowerBound..<upperBound]
 
             let macroArgs = macro.arguments.keys.sorted().map { macro.arguments[$0]! }.joined(separator: ", ")
 
@@ -613,9 +613,9 @@ clean:
           }
 
           // Write the instruction as assembly.
-          let index = LR35902.cartridgeLocation(for: cpu.pc, in: bank)!
+          let index = LR35902.Cartridge.cartridgeLocation(for: cpu.pc, in: bank)!
           let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!.total
-          let bytes = cpu[index..<(index + LR35902.CartridgeLocation(instructionWidth))]
+          let bytes = cpu.cartridge[index..<(index + LR35902.Cartridge.Location(instructionWidth))]
           let instructionScope = labeledContiguousScopes(at: cpu.pc, in: bank).map { $0.label }
           lineGroup.append(Line(semantic: .instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: self)),
                                 address: cpu.pc,
@@ -684,7 +684,7 @@ clean:
             if cpu.pc < 0x4000 {
               global = globals[cpu.pc]
             }
-            accumulator.append(cpu[cpu.pc, bank])
+            accumulator.append(cpu.cartridge[cpu.pc, bank])
             cpu.pc += 1
           } while cpu.pc < end
             && (instructionsToDecode == 0 || instruction(at: cpu.pc, in: bank) == nil)
@@ -728,7 +728,7 @@ clean:
               } else {
                 jumpLocation = "$\(address.hexString)"
               }
-              let bytes = cpu[LR35902.cartridgeLocation(for: chunkPc, in: bank)!..<(LR35902.cartridgeLocation(for: chunkPc, in: bank)! + 2)]
+              let bytes = cpu.cartridge[LR35902.Cartridge.cartridgeLocation(for: chunkPc, in: bank)!..<(LR35902.Cartridge.cartridgeLocation(for: chunkPc, in: bank)! + 2)]
               bankLines.append(Line(semantic: .jumpTable(jumpLocation, index), address: chunkPc, data: bytes))
               chunkPc += LR35902.Address(pair.count)
             }
@@ -780,14 +780,14 @@ clean:
     if let macrosAsm = macrosAsm {
       sources["macros.asm"] = .macros(content: macrosAsm)
     }
-    gameAsm += ((UInt8(0)..<UInt8(cpu.numberOfBanks))
+    gameAsm += ((UInt8(0)..<UInt8(cpu.cartridge.numberOfBanks))
                   .map { "INCLUDE \"bank_\($0.hexString).asm\"" }
                   .joined(separator: "\n") + "\n")
 
     sources["game.asm"] = .game(content: gameAsm)
 
     let disassembledLocations = knownLocations()
-    let bankPercents: [LR35902.Bank: Double] = (0..<cpu.numberOfBanks).reduce(into: [:]) { accumulator, bank in
+    let bankPercents: [LR35902.Bank: Double] = (0..<cpu.cartridge.numberOfBanks).reduce(into: [:]) { accumulator, bank in
       let disassembledBankLocations = disassembledLocations.intersection(
         IndexSet(integersIn: (Int(bank) * Int(LR35902.bankSize))..<(Int(bank + 1) * Int(LR35902.bankSize)))
       )
@@ -795,7 +795,7 @@ clean:
     }
     let statistics = Statistics(
       instructionsDecoded: instructionsDecoded,
-      percent: Double(disassembledLocations.count * 100) / Double(cpu.cartridgeSize),
+      percent: Double(disassembledLocations.count * 100) / Double(cpu.cartridge.size),
       bankPercents: bankPercents
     )
 

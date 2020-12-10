@@ -2,7 +2,7 @@ import Foundation
 import LR35902
 import DisassemblyRequest
 
-func populateRequestWithGameMacros(_ request: DisassemblyRequest<LR35902.Address, LR35902.CartridgeLocation, LR35902.Instruction>) {
+func populateRequestWithGameMacros(_ request: DisassemblyRequest<LR35902.Address, LR35902.Cartridge.Location, LR35902.Instruction>) {
   request.createMacro(named: "jumpTable", pattern: [
     .instruction(.init(spec: .rst(.x00))),
     ]) /*{ args, address, bank in

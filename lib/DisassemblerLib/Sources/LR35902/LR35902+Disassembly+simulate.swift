@@ -8,7 +8,7 @@ extension LR35902.Disassembly {
     }
     struct RegisterState<T: BinaryInteger>: Equatable {
       let value: RegisterValue<T>
-      let sourceLocation: LR35902.CartridgeLocation
+      let sourceLocation: LR35902.Cartridge.Location
     }
     var a: RegisterState<UInt8>?
     var b: RegisterState<UInt8>?
@@ -56,7 +56,7 @@ extension LR35902.Disassembly {
     }
     private var _hl: RegisterState<UInt16>?
     var sp: RegisterState<UInt16>?
-    var next: [LR35902.CartridgeLocation] = []
+    var next: [LR35902.Cartridge.Location] = []
     var ram: [LR35902.Address: RegisterState<UInt8>] = [:]
 
     subscript(numeric: LR35902.Instruction.Numeric) -> RegisterState<UInt8>? {
@@ -112,17 +112,17 @@ extension LR35902.Disassembly {
    ld   [hPreviousJoypadState], a               ; $2832 (00): ReadJoypadState $E0 $CB
    */
   @discardableResult
-  func simulate(range: Range<LR35902.CartridgeLocation>,
+  func simulate(range: Range<LR35902.Cartridge.Location>,
                 initialState: CPUState = CPUState(),
-                step: ((LR35902.Instruction, LR35902.CartridgeLocation, CPUState) -> Void)? = nil)
-    -> [LR35902.CartridgeLocation: CPUState] {
-      var (pc, bank) = LR35902.addressAndBank(from: range.lowerBound)
-      let upperBoundPc = LR35902.addressAndBank(from: range.upperBound).address
+                step: ((LR35902.Instruction, LR35902.Cartridge.Location, CPUState) -> Void)? = nil)
+    -> [LR35902.Cartridge.Location: CPUState] {
+      var (pc, bank) = LR35902.Cartridge.addressAndBank(from: range.lowerBound)
+      let upperBoundPc = LR35902.Cartridge.addressAndBank(from: range.upperBound).address
 
       var state = initialState
 
       // TODO: Store this globally.
-      var states: [LR35902.CartridgeLocation: CPUState] = [:]
+      var states: [LR35902.Cartridge.Location: CPUState] = [:]
 
       let registers8 = LR35902.Instruction.Numeric.registers8
       let registers16: Set<LR35902.Instruction.Numeric> = Set([
@@ -136,7 +136,7 @@ extension LR35902.Disassembly {
           continue
         }
 
-        let location = LR35902.cartridgeLocation(for: pc, in: bank)!
+        let location = LR35902.Cartridge.cartridgeLocation(for: pc, in: bank)!
 
         switch instruction.spec {
         case .ld(let numeric, .imm8) where registers8.contains(numeric):
@@ -244,7 +244,7 @@ extension LR35902.Disassembly {
         let width = LR35902.InstructionSet.widths[instruction.spec]!.total
 
         var thisState = state
-        thisState.next = [location + LR35902.CartridgeLocation(width)]
+        thisState.next = [location + LR35902.Cartridge.Location(width)]
         states[location] = thisState
 
         pc += width

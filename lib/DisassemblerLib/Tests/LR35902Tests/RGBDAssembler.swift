@@ -501,7 +501,7 @@ ld   [$ffcb], a               ; $2832 (00): ReadJoypadState $E0 $CB
     initialState.a = LR35902.Disassembly.CPUState.RegisterState<UInt8>(value: .value(0b0000_1111), sourceLocation: 0)
     initialState.ram[0xffcb] = .init(value: .value(0b0000_1100), sourceLocation: 0)
 
-    let states = disassembly.simulate(range: 0..<LR35902.CartridgeLocation(assembler.buffer.count),
+    let states = disassembly.simulate(range: 0..<LR35902.Cartridge.Location(assembler.buffer.count),
                                       initialState: initialState).sorted(by: { $0.key < $1.key })
     let lastState = states[states.count - 1]
 

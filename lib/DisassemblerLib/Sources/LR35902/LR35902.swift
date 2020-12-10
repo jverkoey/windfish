@@ -1,94 +1,103 @@
 import Foundation
 
 public final class LR35902 {
-  public init(rom: Data) {
-    self.rom = rom
-  }
-
   public typealias Address = UInt16
   public typealias Bank = UInt8
-  public typealias CartridgeLocation = UInt32
-
   public var pc: Address = 0
   public var bank: Bank = 0
 
-  static let bankSize: CartridgeLocation = 0x4000
+  static let bankSize: Cartridge.Location = 0x4000
 
-  // MARK: Internal storage
-  private let rom: Data
+  init(cartridge: Cartridge) {
+    self.cartridge = cartridge
+  }
+  public var cartridge: Cartridge
+}
+
+extension LR35902 {
+  public final class Cartridge {
+    public typealias Location = UInt32
+
+    public init(rom: Data) {
+      self.rom = rom
+    }
+
+    // MARK: Internal storage
+    private let rom: Data
+  }
 }
 
 // MARK: - Information about the ROM
 
-extension LR35902 {
+extension LR35902.Cartridge {
   /** Returns the number of banks in the loaded cartridge. */
-  public var numberOfBanks: Bank {
-    return Bank((CartridgeLocation(rom.count) + LR35902.bankSize - 1) / LR35902.bankSize)
+  public var numberOfBanks: LR35902.Bank {
+    return LR35902.Bank((Location(rom.count) + LR35902.bankSize - 1) / LR35902.bankSize)
   }
 }
 
 // MARK: - Accessing ROM data
 
-extension LR35902 {
-  public subscript(pc: Address, bank: Bank) -> UInt8 {
-    return rom[Int(LR35902.cartridgeLocation(for: pc, in: bank)!)]
+extension LR35902.Cartridge {
+  public subscript(pc: LR35902.Address, bank: LR35902.Bank) -> UInt8 {
+    return rom[Int(LR35902.Cartridge.cartridgeLocation(for: pc, in: bank)!)]
   }
 
-  public subscript(range: Range<CartridgeLocation>) -> Data {
+  public subscript(range: Range<Location>) -> Data {
     return rom[range]
   }
 }
 
 // MARK: - Working with locations
 
-extension LR35902 {
+extension LR35902.Cartridge {
   /// Returns a cartridge location for the given program counter and bank.
   /// - Parameter pc: The program counter's location.
   /// - Parameter bank: The current bank.
-  public static func cartridgeLocation(for pc: Address, in bank: Bank) -> CartridgeLocation? {
+  public static func cartridgeLocation(for pc: LR35902.Address, in bank: LR35902.Bank) -> Location? {
     // Bank 0 is permanently addressable from 0x0000...0x3FFF.
     // All other banks map from 0x4000...0x7FFF
     guard (bank == 0 && pc < 0x4000) || (bank > 0 && pc < 0x8000) else {
       return nil
     }
     if pc < 0x4000 {
-      return CartridgeLocation(pc)
+      return Location(pc)
     } else {
-      return CartridgeLocation(bank) * bankSize + CartridgeLocation(pc - 0x4000)
+      return Location(bank) * LR35902.bankSize + Location(pc - 0x4000)
     }
   }
 
-  public static func safeCartridgeLocation(for pc: Address, in bank: Bank) -> CartridgeLocation? {
+  public static func safeCartridgeLocation(for pc: LR35902.Address, in bank: LR35902.Bank) -> Location? {
     return cartridgeLocation(for: pc, in: (bank == 0) ? 1 : bank)
   }
 
   /// Returns a cartridge address for the given program counter and bank.
   /// - Parameter pc: The program counter's location.
   /// - Parameter bank: The current bank.
-  public static func addressAndBank(from cartridgeLocation: CartridgeLocation) -> (address: Address, bank: Bank) {
-    let bank = Bank(cartridgeLocation / bankSize)
-    let address = Address(cartridgeLocation % bankSize + CartridgeLocation((bank > 0) ? 0x4000 : 0x0000))
+  public static func addressAndBank(from cartridgeLocation: Location) -> (address: LR35902.Address, bank: LR35902.Bank) {
+    let bank = LR35902.Bank(cartridgeLocation / LR35902.bankSize)
+    let address = LR35902.Address(cartridgeLocation % LR35902.bankSize + Location((bank > 0) ? 0x4000 : 0x0000))
     return (address: address, bank: bank)
   }
 
-  public static func rangeOf(bank: Bank) -> (location: CartridgeLocation, length: CartridgeLocation) {
-    return (CartridgeLocation(bank) * CartridgeLocation(LR35902.bankSize), LR35902.bankSize)
+  public static func rangeOf(bank: LR35902.Bank) -> (location: Location, length: Location) {
+    return (Location(bank) * Location(LR35902.bankSize), LR35902.bankSize)
   }
 }
 
 // MARK: - Extracting instructions from the ROM
 
-extension LR35902 {
+extension LR35902.Cartridge {
   /// Returns a specification at the given address, if a valid one exists.
-  public func spec(at pc: Address, in bank: Bank) -> Instruction.Spec? {
+  public func spec(at pc: LR35902.Address, in bank: LR35902.Bank) -> LR35902.Instruction.Spec? {
     let byte = Int(self[pc, bank])
-    let spec = InstructionSet.table[byte]
+    let spec = LR35902.InstructionSet.table[byte]
     switch spec {
     case .invalid:
       return nil
     case .cb:
       let byteCB = Int(self[pc + 1, bank])
-      let cbInstruction = InstructionSet.tableCB[byteCB]
+      let cbInstruction = LR35902.InstructionSet.tableCB[byteCB]
       if case .invalid = spec {
         return nil
       }
@@ -99,9 +108,9 @@ extension LR35902 {
   }
 
   /// Returns an instruction at the given address.
-  public func instruction(at pc: Address, in bank: Bank, spec: Instruction.Spec) -> Instruction? {
-    let instructionWidth = InstructionSet.widths[spec]!
-    guard let location = LR35902.cartridgeLocation(for: pc + instructionWidth.opcode, in: bank) else {
+  public func instruction(at pc: LR35902.Address, in bank: LR35902.Bank, spec: LR35902.Instruction.Spec) -> LR35902.Instruction? {
+    let instructionWidth = LR35902.InstructionSet.widths[spec]!
+    guard let location = LR35902.Cartridge.cartridgeLocation(for: pc + instructionWidth.opcode, in: bank) else {
       return nil
     }
     switch instructionWidth.operand {
@@ -109,17 +118,17 @@ extension LR35902 {
       if location >= rom.count {
         return nil
       }
-      return Instruction(spec: spec, immediate: .imm8(self[pc + instructionWidth.opcode, bank]))
+      return LR35902.Instruction(spec: spec, immediate: .imm8(self[pc + instructionWidth.opcode, bank]))
     case 2:
       if location + 1 >= rom.count {
         return nil
       }
-      let low = Address(self[pc + instructionWidth.opcode, bank])
-      let high = Address(self[pc + instructionWidth.opcode + 1, bank]) << 8
+      let low = LR35902.Address(self[pc + instructionWidth.opcode, bank])
+      let high = LR35902.Address(self[pc + instructionWidth.opcode + 1, bank]) << 8
       let immediate16 = high | low
-      return Instruction(spec: spec, immediate: .imm16(immediate16))
+      return LR35902.Instruction(spec: spec, immediate: .imm16(immediate16))
     default:
-      return Instruction(spec: spec)
+      return LR35902.Instruction(spec: spec)
     }
   }
 }
@@ -132,14 +141,14 @@ extension LR35902 {
     return
       ((bank == 0 && pc < 0x4000)
         || (bank != 0 && pc < 0x8000))
-      && LR35902.cartridgeLocation(for: pc, in: bank)! < cartridgeSize
+      && LR35902.Cartridge.cartridgeLocation(for: pc, in: bank)! < cartridge.size
   }
 }
 
 // MARK: - Internal methods
 
-extension LR35902 {
-  var cartridgeSize: CartridgeLocation {
-    return CartridgeLocation(rom.count)
+extension LR35902.Cartridge {
+  var size: Location {
+    return Location(rom.count)
   }
 }
