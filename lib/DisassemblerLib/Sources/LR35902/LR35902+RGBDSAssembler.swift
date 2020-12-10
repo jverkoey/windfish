@@ -334,7 +334,7 @@ public final class RGBDSAssembler {
           throw Error(lineNumber: lineNumber, error: "No valid instruction found for \(line)")
         }
         let shortestInstruction = instructions.sorted(by: { pair1, pair2 in
-          pair1.spec.instructionWidth < pair2.spec.instructionWidth
+          LR35902.InstructionSet.widths[pair1.spec]!.total < LR35902.InstructionSet.widths[pair2.spec]!.total
         })[0]
 
         self.instructions.append(shortestInstruction)

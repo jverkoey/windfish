@@ -54,35 +54,28 @@ public protocol InstructionSpec: Hashable {
 
 // MARK: - Automatic width computation
 
-/**
- An instruction operand that has a width.
- */
+/** An instruction operand that has a width. */
 public protocol InstructionOperandWithBinaryFootprint {
-  /**
-   The width of the immediate.
-   */
+  /** The width of the immediate. */
   var width: Int { get }
 }
 
 extension InstructionSpec {
-  /**
-   Extracts the opcode width by adding up recursive specifications.
-   */
+  /** Extracts the opcode width by adding up recursive specifications. */
   public var opcodeWidth: WidthType {
+    let sizeOfInstruction: WidthType = 1  // TODO: Evaluate whether this should be configurable.
     guard let operands = Mirror(reflecting: self).children.first else {
-      return 1
+      return sizeOfInstruction
     }
     switch operands.value {
     case let childInstruction as Self:
-      return 1 + childInstruction.opcodeWidth
+      return sizeOfInstruction + childInstruction.opcodeWidth
     default:
-      return 1
+      return sizeOfInstruction
     }
   }
 
-  /**
-   Computes the operand width by adding up the width of any immediate operands.
-   */
+  /** Computes the operand width by adding up the width of any immediate operands. */
   public var operandWidth: WidthType {
     var width: WidthType = 0
     visit { operand in
@@ -91,9 +84,5 @@ extension InstructionSpec {
       }
     }
     return width
-  }
-
-  public var instructionWidth: WidthType {
-    return opcodeWidth + operandWidth
   }
 }

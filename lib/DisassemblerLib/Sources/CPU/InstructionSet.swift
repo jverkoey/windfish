@@ -41,9 +41,7 @@ public protocol InstructionSet {
 // MARK: - Helper methods for computing properties
 
 extension InstructionSet {
-  /**
-   Returns all specifications in this instruction set.
-   */
+  /** Returns all specifications in this instruction set. */
   public static func allSpecs() -> [SpecType] {
     return (table + prefixTables.reduce([], +))
   }
