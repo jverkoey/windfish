@@ -17,7 +17,7 @@ extension LR35902 {
           self = .imm8(data[0])
         case 2:
           let low = UInt16(data[0])
-          let high = UInt16(data[1])
+          let high = UInt16(data[1]) << 8
           let immediate16 = high | low
           self = .imm16(immediate16)
         default:
