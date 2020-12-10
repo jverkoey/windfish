@@ -85,7 +85,7 @@ extension LR35902.Cartridge {
     switch spec {
     case .invalid:
       return nil
-    case .cb:
+    case .prefix(.cb):
       let byteCB = Int(self[pc + 1, bank])
       let cbInstruction = LR35902.InstructionSet.tableCB[byteCB]
       if case .invalid = spec {

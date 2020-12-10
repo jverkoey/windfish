@@ -21,6 +21,8 @@ struct SimpleCPU {
       case cp(Numeric)
       case ld(Numeric, Numeric)
       case call(Condition? = nil, Numeric)
+      case prefix(PrefixTable)
+
       case sub(Spec)
 
       enum Numeric: Hashable {
@@ -34,6 +36,10 @@ struct SimpleCPU {
         case nz
         case z
       }
+
+      enum PrefixTable: Hashable {
+        case sub
+      }
     }
   }
 
@@ -44,12 +50,13 @@ struct SimpleCPU {
       /* 0x02 */ .ld(.a, .imm16),
       /* 0x03 */ .call(.nz, .imm16),
       /* 0x04 */ .call(nil, .imm16),
+      /* 0x05 */ .prefix(.sub),
     ]
     static let subTable: [Instruction.Spec] = [
       /* 0x00 */ .sub(.cp(.imm8)),
     ]
-    static var prefixTables: [[Instruction.Spec]] = [
-      subTable
+    static var prefixTables: [Instruction.Spec: [Instruction.Spec]] = [
+      .prefix(.sub): subTable
     ]
 
     static var widths: [Instruction.Spec : InstructionWidth<UInt16>] = {

@@ -424,12 +424,12 @@ ld hl, sp+$05
     ])
   }
 
-  func test_allInstructions() throws {
+  func testAssemblyAndDisassemblyIsEqual() throws {
     for spec in LR35902.InstructionSet.table {
       guard spec != .invalid else {
         continue
       }
-      if case .cb = spec {
+      if case .prefix = spec {
         continue
       }
       let representation = spec.representation

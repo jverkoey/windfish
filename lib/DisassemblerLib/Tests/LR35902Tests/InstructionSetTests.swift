@@ -220,7 +220,7 @@ class InstructionSetTests: XCTestCase {
       .ret(.z): InstructionWidth(opcode: 1, operand: 0),
       .ret(): InstructionWidth(opcode: 1, operand: 0),
       .jp(.z, .imm16): InstructionWidth(opcode: 1, operand: 2),
-      .cb(.invalid): InstructionWidth(opcode: 2, operand: 0),
+      .prefix(.cb): InstructionWidth(opcode: 1, operand: 0),
       .call(.z, .imm16): InstructionWidth(opcode: 1, operand: 2),
       .call(nil, .imm16): InstructionWidth(opcode: 1, operand: 2),
       .adc(.imm8): InstructionWidth(opcode: 1, operand: 1),

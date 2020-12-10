@@ -229,7 +229,7 @@ extension LR35902 {
       /* 0xc8 */ .ret(.z),
       /* 0xc9 */ .ret(),
       /* 0xca */ .jp(.z, .imm16),
-      /* 0xcb */ .cb(.invalid),
+      /* 0xcb */ .prefix(.cb),
       /* 0xcc */ .call(.z, .imm16),
       /* 0xcd */ .call(nil, .imm16),
       /* 0xce */ .adc(.imm8),
@@ -286,8 +286,8 @@ extension LR35902 {
       /* 0xfe */ .cp(.imm8),
       /* 0xff */ .rst(.x38),
     ]
-    static let prefixTables: [[Instruction.Spec]] = [
-      tableCB
+    static let prefixTables: [Instruction.Spec: [Instruction.Spec]] = [
+      .prefix(.cb): tableCB
     ]
   }
 }

@@ -49,6 +49,8 @@ extension LR35902.Instruction {
     // Complement
     case cpl
 
+    case prefix(PrefixTable)
+
     // 0xCB prefix
     case cb(Spec)
     case rlc(Numeric), rrc(Numeric)
@@ -59,6 +61,10 @@ extension LR35902.Instruction {
 
     // Invalid opcode
     case invalid
+  }
+
+  public enum PrefixTable: Hashable {
+    case cb
   }
 
   /** Numeric operands in LR35902's instruction set. */

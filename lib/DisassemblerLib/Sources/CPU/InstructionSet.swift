@@ -33,7 +33,7 @@ public protocol InstructionSet {
   static var table: [SpecType] { get }
 
   /** Additional tables for multi-byte instructions. */
-  static var prefixTables: [[SpecType]] { get }
+  static var prefixTables: [SpecType: [SpecType]] { get }
 
   /**
    A map of specifications to computed widths.
@@ -48,7 +48,7 @@ public protocol InstructionSet {
 extension InstructionSet {
   /** Returns all specifications in this instruction set. */
   public static func allSpecs() -> [SpecType] {
-    return (table + prefixTables.reduce([], +))
+    return (table + prefixTables.values.reduce([], +))
   }
 
   /** Calculates the widths for every specification in this set. */

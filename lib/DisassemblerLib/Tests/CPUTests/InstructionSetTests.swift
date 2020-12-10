@@ -9,6 +9,7 @@ class InstructionSetTests: XCTestCase {
       .ld(.a, .imm16): InstructionWidth(opcode: 1, operand: 2),
       .call(.nz, .imm16): InstructionWidth(opcode: 1, operand: 2),
       .call(nil, .imm16): InstructionWidth(opcode: 1, operand: 2),
+      .prefix(.sub): InstructionWidth(opcode: 1, operand: 0),
       .sub(.cp(.imm8)): InstructionWidth(opcode: 2, operand: 1),
     ])
   }
