@@ -23,9 +23,7 @@ public protocol Run {
 
   var invocationInstruction: InstructionT? { get }
 
-  /**
-   Runs that were invoked within this run via a control transfer.
-   */
+  /** Runs that were invoked within this run via a control transfer. */
   var children: [Self] { get }
 }
 
@@ -57,9 +55,10 @@ public final class RunGroup<T: Run>: Sequence {
   /**
    Returns all of the ranges visited by the runs in this group.
 
-   - Note: Runs are not an ideal representation of the call graph because runs intentionally do not recurse on themselves.
-   A more ideal representation for scope calculation would be a legitimiate call graph that annotates, for a given instruction, all
-   of the reachable transfers of control. This graph could then reasonably be walked each time we want to calculate scope.
+   - Note: Runs are not an ideal representation of the call graph because runs intentionally do not recurse on
+   themselves. A more ideal representation for scope calculation would be a legitimiate call graph that annotates, for
+   a given instruction, all of the reachable transfers of control. This graph could then reasonably be walked each time
+   we want to calculate scope.
    */
   public lazy var scope: IndexSet = {
     return runs.compactMap { $0.visitedRange }.reduce(into: IndexSet()) { (accumulator, visitedRange) in
