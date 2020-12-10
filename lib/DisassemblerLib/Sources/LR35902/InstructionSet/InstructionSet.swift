@@ -3,6 +3,8 @@ import CPU
 
 extension LR35902 {
   struct InstructionSet: CPU.InstructionSet {
+    typealias InstructionType = LR35902.Instruction
+
     static var widths: [Instruction.Spec: InstructionWidth<UInt16>] = {
       return computeAllWidths()
     }()

@@ -21,8 +21,9 @@ public struct InstructionWidth<T: BinaryInteger>: Equatable {
 
 /** A representation of an instruction set. */
 public protocol InstructionSet {
-  /** The instruction set's instruction specification type. */
-  associatedtype SpecType: InstructionSpec
+  /** The instruction type this set consists of. */
+  associatedtype InstructionType: Instruction
+  typealias SpecType = InstructionType.SpecType
 
   /**
    The primary table of instructions.

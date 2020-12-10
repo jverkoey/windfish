@@ -10,6 +10,25 @@ extension InstructionSet {
     var iterator = data.makeIterator()
     return spec(from: &iterator, table: table)
   }
+
+  public static func instruction(from data: Data, spec: SpecType) -> InstructionType? {
+    guard let instructionWidth = widths[spec] else {
+      return nil
+    }
+    var iterator = data.makeIterator()
+    if instructionWidth.operand > 0 {
+      var operandBytes: [UInt8] = []
+      for _ in 0..<Int(instructionWidth.operand) {
+        guard let byte = iterator.next() else {
+          return nil
+        }
+        operandBytes.append(byte)
+      }
+      return InstructionType.init(spec: spec, immediate: InstructionType.ImmediateType.init(data: Data(operandBytes)))
+    } else {
+      return InstructionType.init(spec: spec, immediate: nil)
+    }
+  }
 }
 
 extension InstructionSet {

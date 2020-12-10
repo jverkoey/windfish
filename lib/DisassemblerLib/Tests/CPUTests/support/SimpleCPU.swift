@@ -7,7 +7,21 @@ struct SimpleCPU {
   struct Instruction: CPU.Instruction {
     let spec: Instruction.Spec
 
-    enum ImmediateValue: Equatable {
+    enum ImmediateValue: CPU.InstructionImmediate {
+      public init?(data: Data) {
+        switch data.count {
+        case 1:
+          self = .imm8(data[0])
+        case 2:
+          let low = UInt16(data[0])
+          let high = UInt16(data[1])
+          let immediate16 = high | low
+          self = .imm16(immediate16)
+        default:
+          return nil
+        }
+      }
+
       case imm8(UInt8)
       case imm16(UInt16)
     }
@@ -44,6 +58,8 @@ struct SimpleCPU {
   }
 
   struct InstructionSet: CPU.InstructionSet {
+    typealias InstructionType = Instruction
+
     static let table: [Instruction.Spec] = [
       /* 0x00 */ .nop,
       /* 0x01 */ .ld(.a, .imm8),

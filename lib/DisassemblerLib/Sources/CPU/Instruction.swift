@@ -18,11 +18,24 @@ public protocol Instruction {
   associatedtype SpecType: InstructionSpec
 
   /**
+   The type of the immediate that is associated with this instruction.
+
+   This type is typically an associated enum where each case supports a specific immediate size.
+   */
+  associatedtype ImmediateType: InstructionImmediate
+
+  /**
    The instruction's specification.
 
-   The returned specification is assumed to be a representation of the concrete instruction.
+   The specification should describe this instruction.
    */
   var spec: SpecType { get }
+
+  /** The instruction's immediate, if one exists. */
+  var immediate: ImmediateType? { get }
+
+  /** Initializes the instruction with a given specification and optional immediate value. */
+  init(spec: SpecType, immediate: ImmediateType?)
 }
 
 /**
@@ -50,6 +63,16 @@ public protocol InstructionSpec: Hashable {
 
   /** The byte width of the instruction's operands, if any. */
   var operandWidth: WidthType { get }
+}
+
+/**
+ A representation of an instruction's immediate value.
+
+ An immediate is one or more bytes of information associated with the instruction.
+ */
+public protocol InstructionImmediate: Hashable {
+  /** Initializes the immediate from a specific set of bytes, if possible. */
+  init?(data: Data)
 }
 
 // MARK: - Automatic width computation

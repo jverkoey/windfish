@@ -10,7 +10,21 @@ extension LR35902 {
     }
 
     public var spec: Spec
-    public enum ImmediateValue: Hashable {
+    public enum ImmediateValue: CPU.InstructionImmediate {
+      public init?(data: Data) {
+        switch data.count {
+        case 1:
+          self = .imm8(data[0])
+        case 2:
+          let low = UInt16(data[0])
+          let high = UInt16(data[1])
+          let immediate16 = high | low
+          self = .imm16(immediate16)
+        default:
+          return nil
+        }
+      }
+
       case imm8(UInt8)
       case imm16(UInt16)
     }
