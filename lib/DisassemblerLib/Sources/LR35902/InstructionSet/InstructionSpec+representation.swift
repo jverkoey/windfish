@@ -1,5 +1,16 @@
 import Foundation
+import Disassembler
 import CPU
+
+extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {
+  public var category: InstructionCategory? {
+    switch self {
+    case .call: return .call
+    case .ret, .reti: return .ret
+    default: return nil
+    }
+  }
+}
 
 extension LR35902.Instruction.Numeric {
   public var representation: InstructionOperandAssemblyRepresentation {
@@ -24,13 +35,13 @@ extension LR35902.Instruction.Numeric {
   }
 }
 
-extension LR35902.Instruction.RestartAddress {
+extension LR35902.Instruction.RestartAddress: InstructionOperandAssemblyRepresentable {
   public var representation: InstructionOperandAssemblyRepresentation {
     return .numeric
   }
 }
 
-extension LR35902.Instruction.Bit {
+extension LR35902.Instruction.Bit: InstructionOperandAssemblyRepresentable {
   public var representation: InstructionOperandAssemblyRepresentation {
     return .numeric
   }
