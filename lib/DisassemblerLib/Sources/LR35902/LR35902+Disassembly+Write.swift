@@ -17,19 +17,19 @@ private func stringWithNewline(_ string: String) -> String {
 
 private func extractArgs(from statement: RGBDSAssembly.Statement, using spec: LR35902.Instruction.Spec, argument: Int) -> [Int: String] {
   var args: [Int: String] = [:]
-  spec.visit { (operand, index) in
-    guard let operand = operand, let index = index else {
+  spec.visit { operand in
+    guard let operand = operand else {
       return
     }
 
-    switch operand {
+    switch operand.value {
     case LR35902.Instruction.Numeric.imm16,
          LR35902.Instruction.Numeric.imm8,
          LR35902.Instruction.Numeric.imm16addr,
          LR35902.Instruction.Numeric.simm8,
          LR35902.Instruction.Numeric.sp_plus_simm8,
          LR35902.Instruction.Numeric.ffimm8addr:
-      args[argument] = Mirror(reflecting: statement).descendant(1, 0, index) as? String
+      args[argument] = Mirror(reflecting: statement).descendant(1, 0, operand.index) as? String
     default:
       break
     }
@@ -39,21 +39,21 @@ private func extractArgs(from statement: RGBDSAssembly.Statement, using spec: LR
 
 private func extractArgTypes(from instruction: LR35902.Instruction.Spec, using spec: LR35902.Instruction.Spec, argument: Int) -> [Int: String] {
   var args: [Int: String] = [:]
-  spec.visit { (operand, index) in
-    guard let operand = operand, let index = index else {
+  spec.visit { operand in
+    guard let operand = operand else {
       return
     }
 
-    switch operand {
+    switch operand.value {
     case LR35902.Instruction.Numeric.imm16,
          LR35902.Instruction.Numeric.imm8,
          LR35902.Instruction.Numeric.imm16addr,
          LR35902.Instruction.Numeric.simm8,
          LR35902.Instruction.Numeric.sp_plus_simm8,
          LR35902.Instruction.Numeric.ffimm8addr:
-      if let operand = Mirror(reflecting: instruction).descendant(0, index) {
+      if let operand = Mirror(reflecting: instruction).descendant(0, operand.index) {
         args[argument] = "\(operand)"
-      } else if let operand = Mirror(reflecting: instruction).descendant(index) {
+      } else if let operand = Mirror(reflecting: instruction).descendant(operand.index) {
         args[argument] = "\(operand)"
       }
     default:

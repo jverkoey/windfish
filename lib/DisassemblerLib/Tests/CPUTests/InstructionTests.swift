@@ -1,6 +1,9 @@
 import XCTest
 @testable import CPU
 
+/**
+ Verify that the instructions store the appropriate values for a variety of instruction shapes.
+ */
 class InstructionTests: XCTestCase {
   func test_nop() {
     let instruction = SimpleCPU.Instruction(spec: .nop, immediate: nil)
@@ -28,5 +31,19 @@ class InstructionTests: XCTestCase {
 
     XCTAssertEqual(instruction.spec, .sub(.cp(.a)))
     XCTAssertNil(instruction.immediate)
+  }
+
+  func test_call_nz_imm16() {
+    let instruction = SimpleCPU.Instruction(spec: .call(.nz, .imm16), immediate: .imm16(0xff11))
+
+    XCTAssertEqual(instruction.spec, .call(.nz, .imm16))
+    XCTAssertEqual(instruction.immediate, .imm16(0xff11))
+  }
+
+  func test_call_imm16() {
+    let instruction = SimpleCPU.Instruction(spec: .call(nil, .imm16), immediate: .imm16(0xff11))
+
+    XCTAssertEqual(instruction.spec, .call(nil, .imm16))
+    XCTAssertEqual(instruction.immediate, .imm16(0xff11))
   }
 }

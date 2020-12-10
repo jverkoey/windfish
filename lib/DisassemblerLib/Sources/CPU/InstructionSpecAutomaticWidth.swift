@@ -56,8 +56,8 @@ extension InstructionSpecAutomaticWidth {
    */
   public var operandWidth: WidthType {
     var width: WidthType = 0
-    visit { (value, _) in
-      if let numeric = value as? InstructionOperandWithBinaryFootprint {
+    visit { operand in
+      if let numeric = operand?.value as? InstructionOperandWithBinaryFootprint {
         width += WidthType(numeric.width)
       }
     }

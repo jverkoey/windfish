@@ -1,6 +1,9 @@
 import XCTest
 @testable import CPU
 
+/**
+ Verify instruction sizes for a variety for specifications.
+ */
 class InstructionSpecTests: XCTestCase {
   func test_nop() {
     let spec = SimpleCPU.Instruction.Spec.nop
@@ -28,5 +31,19 @@ class InstructionSpecTests: XCTestCase {
 
     XCTAssertEqual(spec.opcodeWidth, 2)
     XCTAssertEqual(spec.operandWidth, 0)
+  }
+
+  func test_call_nz_imm16() {
+    let spec = SimpleCPU.Instruction.Spec.call(.nz, .imm16)
+
+    XCTAssertEqual(spec.opcodeWidth, 1)
+    XCTAssertEqual(spec.operandWidth, 2)
+  }
+
+  func test_call_imm16() {
+    let spec = SimpleCPU.Instruction.Spec.call(nil, .imm16)
+
+    XCTAssertEqual(spec.opcodeWidth, 1)
+    XCTAssertEqual(spec.operandWidth, 2)
   }
 }

@@ -26,6 +26,7 @@ struct SimpleCPU {
       case nop
       case cp(Numeric)
       case ld(Numeric, Numeric)
+      case call(Condition? = nil, Numeric)
       case sub(Spec)
 
       enum Numeric: Equatable {
@@ -33,6 +34,11 @@ struct SimpleCPU {
         case imm16
         case a
         case arg(Int)
+      }
+
+      enum Condition: Equatable {
+        case nz
+        case z
       }
     }
   }
@@ -52,11 +58,12 @@ extension SimpleCPU.Instruction.Spec: InstructionSpec {
     switch self {
     case let .ld(operand1, operand2):
       return operand1.width + operand2.width
-    case let .cp(operand):
+    case let .cp(operand): fallthrough
+    case let .call(_, operand):
       return operand.width
     case let .sub(spec):
       return spec.operandWidth
-    default:
+    case .nop:
       return 0
     }
   }

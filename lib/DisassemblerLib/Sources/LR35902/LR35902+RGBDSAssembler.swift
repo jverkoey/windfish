@@ -81,10 +81,10 @@ extension InstructionSpec {
    */
   public var representation: String {
     var operands: [String] = []
-    visit { (value, _) in
+    visit { operand in
       // Optional operands are provided by the visitor as boxed optional types represented as an Any.
       // We can't cast an Any to an Any? using the as? operator, so perform an explicit Optional-type unboxing instead:
-      guard let valueUnboxed = value,
+      guard let valueUnboxed = operand?.value,
             case Optional<Any>.some(let value) = valueUnboxed else {
         return
       }
