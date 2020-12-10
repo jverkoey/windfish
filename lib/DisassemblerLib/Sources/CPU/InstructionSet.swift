@@ -30,7 +30,11 @@ public protocol InstructionSet {
   /** Additional tables for multi-byte instructions. */
   static var prefixTables: [[SpecType]] { get }
 
-  /** A map of specifications to computed widths. */
+  /**
+   A map of specifications to computed widths.
+
+   This is typically implemented by returning the result of `computeAllWidths()`.
+   */
   static var widths: [SpecType: InstructionWidth<SpecType.WidthType>] { get }
 }
 
