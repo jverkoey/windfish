@@ -8,7 +8,7 @@ extension LR35902 {
 
     public let cpu: LR35902
     public init(rom: Data) {
-      cpu = LR35902(cartridge: rom)
+      cpu = LR35902(rom: rom)
     }
 
     public func disassembleAsGameboyCartridge() {

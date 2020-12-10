@@ -1,6 +1,10 @@
 import Foundation
 
 public final class LR35902 {
+  public init(rom: Data) {
+    self.rom = rom
+  }
+
   public typealias Address = UInt16
   public typealias Bank = UInt8
   public typealias CartridgeLocation = UInt32
@@ -8,24 +12,36 @@ public final class LR35902 {
   public var pc: Address = 0
   public var bank: Bank = 0
 
-  public init(cartridge: Data) {
-    self.cartridge = cartridge
-  }
-  private let cartridge: Data
-  var cartridgeSize: CartridgeLocation {
-    return CartridgeLocation(cartridge.count)
-  }
+  static let bankSize: CartridgeLocation = 0x4000
 
-  // MARK: - Accessing ROM data
+  // MARK: Internal storage
+  private let rom: Data
+}
 
+// MARK: - Information about the ROM
+
+extension LR35902 {
+  /** Returns the number of banks in the loaded cartridge. */
+  public var numberOfBanks: Bank {
+    return Bank((CartridgeLocation(rom.count) + LR35902.bankSize - 1) / LR35902.bankSize)
+  }
+}
+
+// MARK: - Accessing ROM data
+
+extension LR35902 {
   public subscript(pc: Address, bank: Bank) -> UInt8 {
-    return cartridge[Int(LR35902.cartridgeLocation(for: pc, in: bank)!)]
+    return rom[Int(LR35902.cartridgeLocation(for: pc, in: bank)!)]
   }
 
   public subscript(range: Range<CartridgeLocation>) -> Data {
-    return cartridge[range]
+    return rom[range]
   }
+}
 
+// MARK: - Working with locations
+
+extension LR35902 {
   /// Returns a cartridge location for the given program counter and bank.
   /// - Parameter pc: The program counter's location.
   /// - Parameter bank: The current bank.
@@ -58,7 +74,11 @@ public final class LR35902 {
   public static func rangeOf(bank: Bank) -> (location: CartridgeLocation, length: CartridgeLocation) {
     return (CartridgeLocation(bank) * CartridgeLocation(LR35902.bankSize), LR35902.bankSize)
   }
+}
 
+// MARK: - Extracting instructions from the ROM
+
+extension LR35902 {
   /// Returns a specification at the given address, if a valid one exists.
   public func spec(at pc: Address, in bank: Bank) -> Instruction.Spec? {
     let byte = Int(self[pc, bank])
@@ -86,12 +106,12 @@ public final class LR35902 {
     }
     switch instructionWidth.operand {
     case 1:
-      if location >= cartridge.count {
+      if location >= rom.count {
         return nil
       }
       return Instruction(spec: spec, immediate: .imm8(self[pc + instructionWidth.opcode, bank]))
     case 2:
-      if location + 1 >= cartridge.count {
+      if location + 1 >= rom.count {
         return nil
       }
       let low = Address(self[pc + instructionWidth.opcode, bank])
@@ -102,17 +122,24 @@ public final class LR35902 {
       return Instruction(spec: spec)
     }
   }
+}
 
+// MARK: - Evaluating the current state of the CPU
+
+extension LR35902 {
+  /** Returns true if the program counter is pointing to addressable memory. */
   func pcIsValid() -> Bool {
     return
       ((bank == 0 && pc < 0x4000)
         || (bank != 0 && pc < 0x8000))
-        && LR35902.cartridgeLocation(for: pc, in: bank)! < cartridgeSize
+      && LR35902.cartridgeLocation(for: pc, in: bank)! < cartridgeSize
   }
+}
 
-  public var numberOfBanks: Bank {
-    return Bank((CartridgeLocation(cartridge.count) + LR35902.bankSize - 1) / LR35902.bankSize)
+// MARK: - Internal methods
+
+extension LR35902 {
+  var cartridgeSize: CartridgeLocation {
+    return CartridgeLocation(rom.count)
   }
-
-  static let bankSize: CartridgeLocation = 0x4000
 }
