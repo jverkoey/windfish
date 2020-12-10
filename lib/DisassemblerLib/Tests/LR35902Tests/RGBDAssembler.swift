@@ -84,7 +84,7 @@ ld bc, $1234
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), imm16: 0x1234)
+      0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(0x1234))
     ])
   }
 
@@ -98,7 +98,7 @@ ld bc, 0x1234
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), imm16: 0x1234)
+      0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(0x1234))
     ])
   }
 
@@ -113,7 +113,7 @@ ld bc, 1234
     XCTAssertTrue(errors.isEmpty)
 
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), imm16: 1234)
+      0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(1234))
     ])
   }
 
@@ -128,7 +128,7 @@ ld bc, -1234
     XCTAssertEqual(errors, [])
 
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), imm16: UInt16(bitPattern: -1234))
+      0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(UInt16(bitPattern: -1234)))
     ])
   }
 
@@ -143,7 +143,7 @@ ld bc, $1234
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), imm16: 0x1234),
+      0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(0x1234)),
       0x0003: LR35902.Instruction(spec: .nop)
     ])
   }
@@ -210,7 +210,7 @@ ld b, 255
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.b, .imm8), imm8: 255),
+      0x0000: LR35902.Instruction(spec: .ld(.b, .imm8), immediate: .imm8(255)),
     ])
   }
 
@@ -224,7 +224,7 @@ ld b, 0xFF
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.b, .imm8), imm8: 255),
+      0x0000: LR35902.Instruction(spec: .ld(.b, .imm8), immediate: .imm8(255)),
     ])
   }
 
@@ -238,7 +238,7 @@ ld [$1234], sp
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.imm16addr, .sp), imm16: 0x1234),
+      0x0000: LR35902.Instruction(spec: .ld(.imm16addr, .sp), immediate: .imm16(0x1234)),
     ])
   }
 
@@ -280,7 +280,7 @@ jr 5
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .jr(nil, .simm8), imm8: 3),
+      0x0000: LR35902.Instruction(spec: .jr(nil, .simm8), immediate: .imm8(3)),
     ])
   }
 
@@ -294,7 +294,7 @@ ld [$FFA0], a
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.ffimm8addr, .a), imm8: 0xA0),
+      0x0000: LR35902.Instruction(spec: .ld(.ffimm8addr, .a), immediate: .imm8(0xA0)),
     ])
   }
 
@@ -308,7 +308,7 @@ ld [$FAA0], a
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.imm16addr, .a), imm16: 0xFAA0),
+      0x0000: LR35902.Instruction(spec: .ld(.imm16addr, .a), immediate: .imm16(0xFAA0)),
     ])
   }
 
@@ -336,7 +336,7 @@ sub 5
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .sub(.imm8), imm8: 5),
+      0x0000: LR35902.Instruction(spec: .sub(.imm8), immediate: .imm8(5)),
     ])
   }
 
@@ -406,7 +406,7 @@ jr nz, 5
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .jr(.nz, .simm8), imm8: 3),
+      0x0000: LR35902.Instruction(spec: .jr(.nz, .simm8), immediate: .imm8(3)),
     ])
   }
 
@@ -420,7 +420,7 @@ ld hl, sp+$05
 
     XCTAssertEqual(errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.hl, .sp_plus_simm8), imm8: 0x05),
+      0x0000: LR35902.Instruction(spec: .ld(.hl, .sp_plus_simm8), immediate: .imm8(0x05)),
     ])
   }
 

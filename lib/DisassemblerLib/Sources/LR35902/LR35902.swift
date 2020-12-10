@@ -89,7 +89,7 @@ public final class LR35902 {
       if location >= cartridge.count {
         return nil
       }
-      return Instruction(spec: spec, imm8: self[pc + instructionWidth.opcode, bank])
+      return Instruction(spec: spec, immediate: .imm8(self[pc + instructionWidth.opcode, bank]))
     case 2:
       if location + 1 >= cartridge.count {
         return nil
@@ -97,7 +97,7 @@ public final class LR35902 {
       let low = Address(self[pc + instructionWidth.opcode, bank])
       let high = Address(self[pc + instructionWidth.opcode + 1, bank]) << 8
       let immediate16 = high | low
-      return Instruction(spec: spec, imm16: immediate16)
+      return Instruction(spec: spec, immediate: .imm16(immediate16))
     default:
       return Instruction(spec: spec)
     }

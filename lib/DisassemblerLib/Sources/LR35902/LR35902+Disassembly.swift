@@ -604,7 +604,7 @@ extension LR35902 {
           }
 
           // STOP must be followed by 0
-          if case .stop = spec, instruction.imm8 != 0 {
+          if case .stop = spec, case let .imm8(immediate) = instruction.immediate, immediate != 0 {
             advance(1)
             continue
           }
@@ -624,22 +624,31 @@ extension LR35902 {
           switch spec {
             // TODO: Rewrite these with a macro dector during disassembly time.
           case .ld(.imm16addr, .a):
-            if (0x2000..<0x4000).contains(instruction.imm16!),
-              let previousInstruction = previousInstruction,
-              case .ld(.a, .imm8) = previousInstruction.spec {
-              register(bankChange: previousInstruction.imm8!, at: instructionAddress, in: instructionBank)
+            if case let .imm16(immediate) = instruction.immediate,
+               (0x2000..<0x4000).contains(immediate),
+               let previousInstruction = previousInstruction,
+               case .ld(.a, .imm8) = previousInstruction.spec {
+              guard case let .imm8(previousImmediate) = previousInstruction.immediate else {
+                preconditionFailure("Invalid immediate associated with instruction")
+              }
+              register(bankChange: previousImmediate, at: instructionAddress, in: instructionBank)
 
-              cpu.bank = previousInstruction.imm8!
+              cpu.bank = previousImmediate
             }
           case .ld(.hladdr, .imm8):
             if case .ld(.hl, .imm16) = previousInstruction?.spec,
-              (0x2000..<0x4000).contains(previousInstruction!.imm16!) {
-              register(bankChange: instruction.imm8!, at: instructionAddress, in: instructionBank)
-              cpu.bank = instruction.imm8!
+               case let .imm16(previousImmediate) = previousInstruction?.immediate,
+               case let .imm8(immediate) = instruction.immediate,
+              (0x2000..<0x4000).contains(previousImmediate) {
+              register(bankChange: immediate, at: instructionAddress, in: instructionBank)
+              cpu.bank = immediate
             }
 
           case .jr(let condition, .simm8):
-            let relativeJumpAmount = Int8(bitPattern: instruction.imm8!)
+            guard case let .imm8(immediate) = instruction.immediate else {
+              preconditionFailure("Invalid immediate associated with instruction")
+            }
+            let relativeJumpAmount = Int8(bitPattern: immediate)
             let jumpTo = cpu.pc.advanced(by: Int(relativeJumpAmount))
             queueRun(run, instructionAddress, jumpTo, instructionBank, instruction)
 
@@ -649,7 +658,10 @@ extension LR35902 {
             }
 
           case .jp(let condition, .imm16):
-            let jumpTo = instruction.imm16!
+            guard case let .imm16(immediate) = instruction.immediate else {
+              preconditionFailure("Invalid immediate associated with instruction")
+            }
+            let jumpTo = immediate
             if jumpTo < 0x4000 || cpu.bank > 0 {
               queueRun(run, instructionAddress, jumpTo, instructionBank, instruction)
             }
@@ -661,14 +673,17 @@ extension LR35902 {
 
           case .call(let condition, .imm16):
             // TODO: Allow the user to define macros like this.
-            if condition == nil,
-              instruction.imm16! == 0x07b9,
-              let previousInstruction = previousInstruction,
-              case .ld(.a, .imm8) = previousInstruction.spec {
-              register(bankChange: previousInstruction.imm8!, at: instructionAddress, in: instructionBank)
-              cpu.bank = previousInstruction.imm8!
+            guard case let .imm16(immediate) = instruction.immediate else {
+              preconditionFailure("Invalid immediate associated with instruction")
             }
-            let jumpTo = instruction.imm16!
+            if condition == nil, immediate == 0x07b9,
+              let previousInstruction = previousInstruction,
+              case .ld(.a, .imm8) = previousInstruction.spec,
+              case let .imm8(previousImmediate) = previousInstruction.immediate {
+              register(bankChange: previousImmediate, at: instructionAddress, in: instructionBank)
+              cpu.bank = previousImmediate
+            }
+            let jumpTo = immediate
             if jumpTo < 0x4000 || cpu.bank > 0 {
               queueRun(run, instructionAddress, jumpTo, instructionBank, instruction)
             }

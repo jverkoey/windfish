@@ -8,7 +8,10 @@ extension LR35902 {
         preconditionFailure()
       } else {
         return { cpu, instruction in
-          cpu.pc = instruction.imm16!
+          guard case let .imm16(immediate) = instruction.immediate else {
+            preconditionFailure("Invalid immediate associated with instruction")
+          }
+          cpu.pc = immediate
         }
       }
       break

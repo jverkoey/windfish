@@ -140,24 +140,39 @@ extension LR35902.Disassembly {
 
         switch instruction.spec {
         case .ld(let numeric, .imm8) where registers8.contains(numeric):
-          state[numeric] = CPUState.RegisterState<UInt8>(value: .value(instruction.imm8!), sourceLocation: location)
+          guard case let .imm8(immediate) = instruction.immediate else {
+            preconditionFailure("Invalid immediate associated with instruction")
+          }
+          state[numeric] = CPUState.RegisterState<UInt8>(value: .value(immediate), sourceLocation: location)
 
         case .ld(let dst, let src) where registers8.contains(dst) && registers8.contains(src):
           let srcValue: CPUState.RegisterState<UInt8>? = state[src]
           state[dst] = srcValue
 
         case .ld(let dst, .imm16addr) where registers8.contains(dst):
-          state[dst] = CPUState.RegisterState<UInt8>(value: .variable(instruction.imm16!), sourceLocation: location)
+          guard case let .imm16(immediate) = instruction.immediate else {
+            preconditionFailure("Invalid immediate associated with instruction")
+          }
+          state[dst] = CPUState.RegisterState<UInt8>(value: .variable(immediate), sourceLocation: location)
 
         case .ld(let dst, .imm16) where registers16.contains(dst):
-          state[dst] = CPUState.RegisterState<UInt16>(value: .value(instruction.imm16!), sourceLocation: location)
+          guard case let .imm16(immediate) = instruction.immediate else {
+            preconditionFailure("Invalid immediate associated with instruction")
+          }
+          state[dst] = CPUState.RegisterState<UInt16>(value: .value(immediate), sourceLocation: location)
 
         case .ld(let numeric, .ffimm8addr) where registers8.contains(numeric):
-          let address = 0xFF00 | LR35902.Address(instruction.imm8!)
+          guard case let .imm8(immediate) = instruction.immediate else {
+            preconditionFailure("Invalid immediate associated with instruction")
+          }
+          let address = 0xFF00 | LR35902.Address(immediate)
           state[numeric] = CPUState.RegisterState<UInt8>(value: .variable(address), sourceLocation: location)
 
         case .ld(.ffimm8addr, let numeric) where registers8.contains(numeric):
-          let address = 0xFF00 | LR35902.Address(instruction.imm8!)
+          guard case let .imm8(immediate) = instruction.immediate else {
+            preconditionFailure("Invalid immediate associated with instruction")
+          }
+          let address = 0xFF00 | LR35902.Address(immediate)
           state.ram[address] = state[numeric]
 
         case .ldi(.hladdr, .a):
@@ -198,13 +213,19 @@ extension LR35902.Disassembly {
           }
 
         case .and(.imm8):
+          guard case let .imm8(immediate) = instruction.immediate else {
+            preconditionFailure("Invalid immediate associated with instruction")
+          }
           if case .value(let dst) = state.a?.value {
-            state.a = .init(value: .value(dst & instruction.imm8!), sourceLocation: location)
+            state.a = .init(value: .value(dst & immediate), sourceLocation: location)
             // TODO: Compute the flag bits.
           }
 
         case .ld(.sp, .imm16):
-          state.sp = .init(value: .value(instruction.imm16!), sourceLocation: location)
+          guard case let .imm16(immediate) = instruction.immediate else {
+            preconditionFailure("Invalid immediate associated with instruction")
+          }
+          state.sp = .init(value: .value(immediate), sourceLocation: location)
 
         case .reti, .ret:
           state.a = nil

@@ -223,7 +223,7 @@ public final class RGBDSAssembler {
 
   public static func instruction(from statement: RGBDSAssembly.Statement, using spec: LR35902.Instruction.Spec) throws -> LR35902.Instruction? {
     if case LR35902.Instruction.Spec.stop = spec {
-      return .init(spec: spec, imm8: 0)
+      return .init(spec: spec, immediate: .imm8(0))
     }
     guard var operands = Mirror(reflecting: spec).children.first else {
       return .init(spec: spec)
@@ -270,7 +270,7 @@ public final class RGBDSAssembler {
       case LR35902.Instruction.Numeric.imm16:
         if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
           let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
-          return .init(spec: spec, imm16: numericValue)
+          return .init(spec: spec, immediate: .imm16(numericValue))
         }
       case LR35902.Instruction.Numeric.imm8, LR35902.Instruction.Numeric.simm8:
         if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
@@ -279,7 +279,7 @@ public final class RGBDSAssembler {
             // Relative jumps in assembly are written from the point of view of the instruction's beginning.
             numericValue = numericValue.subtractingReportingOverflow(UInt8(LR35902.InstructionSet.widths[spec]!.total)).partialValue
           }
-          return .init(spec: spec, imm8: numericValue)
+          return .init(spec: spec, immediate: .imm8(numericValue))
         }
       case LR35902.Instruction.Numeric.ffimm8addr:
         if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
@@ -288,17 +288,17 @@ public final class RGBDSAssembler {
             return nil
           }
           let lowerByteValue = UInt8(numericValue & 0xFF)
-          return .init(spec: spec, imm8: lowerByteValue)
+          return .init(spec: spec, immediate: .imm8(lowerByteValue))
         }
       case LR35902.Instruction.Numeric.sp_plus_simm8:
         if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
           let numericValue: UInt8 = try cast(string: String(value.dropFirst(3).trimmed()), negativeType: Int8.self)
-          return .init(spec: spec, imm8: numericValue)
+          return .init(spec: spec, immediate: .imm8(numericValue))
         }
       case LR35902.Instruction.Numeric.imm16addr:
         if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
           let numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self)
-          return .init(spec: spec, imm16: numericValue)
+          return .init(spec: spec, immediate: .imm16(numericValue))
         }
       default:
         break
@@ -340,12 +340,15 @@ public final class RGBDSAssembler {
         self.instructions.append(shortestInstruction)
 
         self.buffer.append(contentsOf: RGBDSAssembler.instructionOpcodeBinary[shortestInstruction.spec]!)
-        if let imm8 = shortestInstruction.imm8 {
-          self.buffer.append(contentsOf: [imm8])
-        } else if var imm16 = shortestInstruction.imm16 {
-          withUnsafeBytes(of: &imm16) { buffer in
+        switch shortestInstruction.immediate {
+        case let .imm8(immediate):
+          self.buffer.append(contentsOf: [immediate])
+        case var .imm16(immediate):
+          withUnsafeBytes(of: &immediate) { buffer in
             self.buffer.append(contentsOf: Data(buffer))
           }
+        case .none:
+          break
         }
 
       } catch let error as RGBDSAssembler.Error {

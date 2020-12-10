@@ -6,36 +6,26 @@ extension LR35902 {
   public struct Instruction: CPU.Instruction, Hashable {
     public var spec: Spec
 
-    /// Only one of these immediate values may be associated with a given instruction.
-    public let imm8: UInt8?
-    public let imm16: UInt16?
-
-    public init(spec: Spec) {
-      self.spec = spec
-      self.imm8 = nil
-      self.imm16 = nil
+    public enum ImmediateValue: Hashable {
+      case imm8(UInt8)
+      case imm16(UInt16)
     }
+    public let immediate: ImmediateValue?
 
-    public init(spec: Spec, imm8: UInt8) {
+    public init(spec: Spec, immediate: ImmediateValue? = nil) {
       self.spec = spec
-      self.imm8 = imm8
-      self.imm16 = nil
-    }
-
-    public init(spec: Spec, imm16: UInt16) {
-      self.spec = spec
-      self.imm8 = nil
-      self.imm16 = imm16
+      self.immediate = immediate
     }
 
     public func operandData() -> Data? {
-      if let imm8 = imm8 {
-        return Data([imm8])
+      switch immediate {
+      case let .imm8(value):
+        return Data([value])
+      case let .imm16(value):
+        return Data([UInt8(value & 0xff), UInt8((value >> 8) & 0xff)])
+      case .none:
+        return nil
       }
-      if let imm16 = imm16 {
-        return Data([UInt8(imm16 & 0xff), UInt8((imm16 >> 8) & 0xff)])
-      }
-      return nil
     }
   }
 }

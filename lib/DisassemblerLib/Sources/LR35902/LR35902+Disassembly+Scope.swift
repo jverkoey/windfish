@@ -26,14 +26,20 @@ extension LR35902.Disassembly {
 //            }
 
           case .ld(.imm16addr, let numeric) where registers8.contains(numeric):
-            if let global = self.globals[instruction.imm16!],
+            guard case let .imm16(immediate) = instruction.immediate else {
+              preconditionFailure("Invalid immediate associated with instruction")
+            }
+            if let global = self.globals[immediate],
               let dataType = global.dataType,
               let sourceLocation = state.a?.sourceLocation {
               self.typeAtLocation[sourceLocation] = dataType
             }
 
           case .ld(.ffimm8addr, let numeric) where registers8.contains(numeric):
-            let address = 0xFF00 | LR35902.Address(instruction.imm8!)
+            guard case let .imm8(immediate) = instruction.immediate else {
+              preconditionFailure("Invalid immediate associated with instruction")
+            }
+            let address = 0xFF00 | LR35902.Address(immediate)
             if let global = self.globals[address],
               let dataType = global.dataType,
               let sourceLocation = state.a?.sourceLocation {
@@ -48,7 +54,10 @@ extension LR35902.Disassembly {
             }
 
           case .ld(.ffimm8addr, let src) where registers8.contains(src):
-            let address = 0xFF00 | LR35902.Address(instruction.imm8!)
+            guard case let .imm8(immediate) = instruction.immediate else {
+              preconditionFailure("Invalid immediate associated with instruction")
+            }
+            let address = 0xFF00 | LR35902.Address(immediate)
             if let global = self.globals[address],
               let dataType = global.dataType,
               let srcValue: CPUState.RegisterState<UInt8> = state[src] {

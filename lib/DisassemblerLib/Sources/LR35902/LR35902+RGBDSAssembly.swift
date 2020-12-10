@@ -144,11 +144,14 @@ public final class RGBDSAssembly {
       switch instruction.spec {
       case let LR35902.Instruction.Spec.jp(condition, operand) where operand == .imm16,
            let LR35902.Instruction.Spec.call(condition, operand) where operand == .imm16:
-        if disassembly.transfersOfControl(at: instruction.imm16!, in: disassembly.cpu.bank) != nil {
+        guard case let .imm16(immediate) = instruction.immediate else {
+          preconditionFailure("Invalid immediate associated with instruction")
+        }
+        if disassembly.transfersOfControl(at: immediate, in: disassembly.cpu.bank) != nil {
           var addressLabel: String
           if let argumentString = argumentString {
             addressLabel = argumentString
-          } else if let label = disassembly.label(at: instruction.imm16!, in: disassembly.cpu.bank) {
+          } else if let label = disassembly.label(at: immediate, in: disassembly.cpu.bank) {
             if let scope = disassembly.labeledContiguousScopes(at: disassembly.cpu.pc, in: disassembly.cpu.bank).first(where: { labeledScope in
               label.starts(with: "\(labeledScope.label).")
             })?.label {
@@ -157,7 +160,7 @@ public final class RGBDSAssembly {
               addressLabel = label
             }
           } else {
-            addressLabel = "$\(instruction.imm16!.hexString)"
+            addressLabel = "$\(immediate.hexString)"
           }
           if let condition = condition {
             return ["\(condition)", addressLabel]
@@ -167,7 +170,10 @@ public final class RGBDSAssembly {
         }
 
       case let LR35902.Instruction.Spec.jr(condition, operand) where operand == .simm8:
-        let jumpAddress = (disassembly.cpu.pc + LR35902.InstructionSet.widths[instruction.spec]!.total).advanced(by: Int(Int8(bitPattern: instruction.imm8!)))
+        guard case let .imm8(immediate) = instruction.immediate else {
+          preconditionFailure("Invalid immediate associated with instruction")
+        }
+        let jumpAddress = (disassembly.cpu.pc + LR35902.InstructionSet.widths[instruction.spec]!.total).advanced(by: Int(Int8(bitPattern: immediate)))
         if disassembly.transfersOfControl(at: jumpAddress, in: disassembly.cpu.bank) != nil {
           var addressLabel: String
           if let argumentString = argumentString {
@@ -191,50 +197,70 @@ public final class RGBDSAssembly {
         }
 
       case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand1 == .imm16addr:
+        guard case let .imm16(immediate) = instruction.immediate else {
+          preconditionFailure("Invalid immediate associated with instruction")
+        }
+
         var addressLabel: String
         if let argumentString = argumentString {
           addressLabel = argumentString
         } else {
-          addressLabel = "[\(prettify(imm16: instruction.imm16!, with: disassembly))]"
+          addressLabel = "[\(prettify(imm16: immediate, with: disassembly))]"
         }
         return [addressLabel, operand(for: instruction, operand: operand2, with: disassembly, argumentString: argumentString)]
 
       case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .imm16addr:
+        guard case let .imm16(immediate) = instruction.immediate else {
+          preconditionFailure("Invalid immediate associated with instruction")
+        }
+
         var addressLabel: String
         if let argumentString = argumentString {
           addressLabel = argumentString
         } else {
-          addressLabel = "[\(prettify(imm16: instruction.imm16!, with: disassembly))]"
+          addressLabel = "[\(prettify(imm16: immediate, with: disassembly))]"
         }
         return [operand(for: instruction, operand: operand1, with: disassembly, argumentString: argumentString), addressLabel]
 
       case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand1 == .ffimm8addr:
+        guard case let .imm8(immediate) = instruction.immediate else {
+          preconditionFailure("Invalid immediate associated with instruction")
+        }
+
         var addressLabel: String
         if let argumentString = argumentString {
           addressLabel = argumentString
         } else {
-          addressLabel = "[\(prettify(imm16: 0xFF00 | UInt16(instruction.imm8!), with: disassembly))]"
+          addressLabel = "[\(prettify(imm16: 0xFF00 | UInt16(immediate), with: disassembly))]"
         }
         return [addressLabel, operand(for: instruction, operand: operand2, with: disassembly, argumentString: argumentString)]
 
       case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .ffimm8addr:
+        guard case let .imm8(immediate) = instruction.immediate else {
+          preconditionFailure("Invalid immediate associated with instruction")
+        }
+
         var addressLabel: String
         if let argumentString = argumentString {
           addressLabel = argumentString
         } else {
-          addressLabel = "[\(prettify(imm16: 0xFF00 | UInt16(instruction.imm8!), with: disassembly))]"
+          addressLabel = "[\(prettify(imm16: 0xFF00 | UInt16(immediate), with: disassembly))]"
         }
         return [operand(for: instruction, operand: operand1, with: disassembly, argumentString: argumentString), addressLabel]
 
       case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .imm16:
+        guard case let .imm16(immediate) = instruction.immediate else {
+          preconditionFailure("Invalid immediate associated with instruction")
+        }
+
         var addressLabel: String
         // TODO: These are only globals if they're referenced as an address in a subsequent instruction.
         if let argumentString = argumentString {
           addressLabel = argumentString
-        } else if operand1 == .hl, let name = disassembly.globals[instruction.imm16!]?.name {
+        } else if operand1 == .hl, let name = disassembly.globals[immediate]?.name {
           addressLabel = name
         } else {
-          addressLabel = "$\(instruction.imm16!.hexString)"
+          addressLabel = "$\(immediate.hexString)"
         }
         return [operand(for: instruction, operand: operand1, with: disassembly, argumentString: argumentString), addressLabel]
 
@@ -291,31 +317,57 @@ public final class RGBDSAssembly {
     }
     switch operand {
     case .imm8:
-      if let typedValue = typedOperand(for: instruction.imm8!, with: disassembly) {
+      guard case let .imm8(immediate) = instruction.immediate else {
+        preconditionFailure("Invalid immediate associated with instruction")
+      }
+      if let typedValue = typedOperand(for: immediate, with: disassembly) {
         return typedValue
       } else {
-        return "$\(instruction.imm8!.hexString)"
+        return "$\(immediate.hexString)"
       }
+
     case .simm8:
-      let byte = instruction.imm8!
+      guard case let .imm8(immediate) = instruction.immediate else {
+        preconditionFailure("Invalid immediate associated with instruction")
+      }
+      let byte = immediate
       if (byte & UInt8(0x80)) != 0 {
         return "@-$\((0xff - byte + 1 - 2).hexString)"
       } else {
         return "@+$\((byte + 2).hexString)"
       }
-    case .imm16:             return "$\(instruction.imm16!.hexString)"
-    case .ffimm8addr:        return "[$FF\(instruction.imm8!.hexString)]"
-    case .imm16addr:         return "[$\(instruction.imm16!.hexString)]"
+
+    case .imm16:
+      guard case let .imm16(immediate) = instruction.immediate else {
+        preconditionFailure("Invalid immediate associated with instruction")
+      }
+      return "$\(immediate.hexString)"
+
+    case .ffimm8addr:
+      guard case let .imm8(immediate) = instruction.immediate else {
+        preconditionFailure("Invalid immediate associated with instruction")
+      }
+      return "[$FF\(immediate.hexString)]"
+
+    case .imm16addr:
+      guard case let .imm16(immediate) = instruction.immediate else {
+        preconditionFailure("Invalid immediate associated with instruction")
+      }
+      return "[$\(immediate.hexString)]"
+
     case .bcaddr:            return "[bc]"
     case .deaddr:            return "[de]"
     case .hladdr:            return "[hl]"
     case .ffccaddr:          return "[$ff00+c]"
     case .sp_plus_simm8:
-      let signedByte = Int8(bitPattern: instruction.imm8!)
+      guard case let .imm8(immediate) = instruction.immediate else {
+        preconditionFailure("Invalid immediate associated with instruction")
+      }
+      let signedByte = Int8(bitPattern: immediate)
       if signedByte < 0 {
-        return "sp-$\((0xff - instruction.imm8! + 1).hexString)"
+        return "sp-$\((0xff - immediate + 1).hexString)"
       } else {
-        return "sp+$\(instruction.imm8!.hexString)"
+        return "sp+$\(immediate.hexString)"
       }
     case .a, .af, .b, .c, .bc, .d, .e, .de, .h, .l, .hl, .sp: return "\(operand)"
 
