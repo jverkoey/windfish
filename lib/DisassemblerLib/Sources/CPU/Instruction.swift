@@ -9,7 +9,7 @@ import Foundation
  not the conrete values contained within; the Instruction is expected to store the concrete information such as an
  immediate (imm) value or a memory address.
  */
-public protocol Instruction: Hashable {
+public protocol Instruction {
   /**
    The type of the specification that is associated with this instruction.
 
@@ -34,7 +34,7 @@ public protocol Instruction: Hashable {
  If the instruction set has prefix instructions (e.g. two-byte instructions in an otherwise single-byte instruction set)
  then the enum can be declared `indirect` in order to support recursion.
  */
-public protocol InstructionSpec: Hashable {
+public protocol InstructionSpec {
   /**
    The type to be used for all width expressions.
 

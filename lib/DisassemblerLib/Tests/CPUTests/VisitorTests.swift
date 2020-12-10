@@ -4,7 +4,7 @@ import XCTest
 class VisitorTests: XCTestCase {
 
   func testInstructionWithNoOperandsIsVisitedWithNil() throws {
-    let instruction = SimpleCPU.Instruction(spec: .nop)
+    let instruction = SimpleCPU.Instruction(spec: .nop, immediate: nil)
 
     var visitCount = 0
     instruction.spec.visit { (operand, index) in
@@ -16,7 +16,7 @@ class VisitorTests: XCTestCase {
   }
 
   func testInstructionWithOneOperandIsVisitedOnce() throws {
-    let instruction = SimpleCPU.Instruction(spec: .cp(.a))
+    let instruction = SimpleCPU.Instruction(spec: .cp(.a), immediate: nil)
 
     var visitCount = 0
     var visitedOperands: [SimpleCPU.Instruction.Spec.Numeric] = []
@@ -35,7 +35,7 @@ class VisitorTests: XCTestCase {
   }
 
   func testInstructionWithTwoOperandsIsVisitedTwice() throws {
-    let instruction = SimpleCPU.Instruction(spec: .ld(.a, .imm8))
+    let instruction = SimpleCPU.Instruction(spec: .ld(.a, .imm8), immediate: .imm8(128))
 
     var visitCount = 0
     var visitedOperands: [SimpleCPU.Instruction.Spec.Numeric] = []
@@ -54,7 +54,7 @@ class VisitorTests: XCTestCase {
   }
 
   func testNestedInstructionWithTwoOperandsIsVisitedTwice() throws {
-    let instruction = SimpleCPU.Instruction(spec: .sub(.ld(.a, .imm8)))
+    let instruction = SimpleCPU.Instruction(spec: .sub(.ld(.a, .imm8)), immediate: .imm8(128))
 
     var visitCount = 0
     var visitedOperands: [SimpleCPU.Instruction.Spec.Numeric] = []

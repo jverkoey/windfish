@@ -3,7 +3,7 @@ import CPU
 
 extension LR35902 {
   /// A concrete representation of a single LR35902 instruction.
-  public struct Instruction: CPU.Instruction {
+  public struct Instruction: CPU.Instruction, Hashable {
     public var spec: Spec
 
     /// Only one of these immediate values may be associated with a given instruction.

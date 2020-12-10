@@ -1,24 +1,34 @@
-//
-//  File.swift
-//  
-//
-//  Created by Jeff Verkoeyen on 12/9/20.
-//
-
 import Foundation
 import CPU
 
-struct SimpleCPU {
-  struct Instruction: CPU.Instruction {
-    var spec: Instruction.Spec
+/**
+ A barebones implementation of a hypothetical CPU instruction set.
 
-    indirect enum Spec: Hashable {
+ This CPU implements the smallest possible set of protocols and implements all methods explicitly.
+ */
+struct SimpleCPU {
+  /**
+   A concrete representation of a single instruction for this CPU.
+   */
+  struct Instruction: CPU.Instruction {
+    /**
+     The instruction's specification.
+     */
+    let spec: Instruction.Spec
+
+    enum ImmediateValue: Equatable {
+      case imm8(UInt8)
+      case imm16(UInt16)
+    }
+    let immediate: ImmediateValue?
+
+    indirect enum Spec: Equatable {
       case nop
       case cp(Numeric)
       case ld(Numeric, Numeric)
       case sub(Spec)
 
-      enum Numeric: Hashable {
+      enum Numeric: Equatable {
         case imm8
         case imm16
         case a
