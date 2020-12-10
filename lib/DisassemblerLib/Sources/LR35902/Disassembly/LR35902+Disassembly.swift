@@ -597,14 +597,13 @@ extension LR35902 {
             continue
           }
 
-          guard let spec = LR35902.InstructionSet.spec(from: self.cpu.cartridge[location...]),
-                let instruction = cpu.cartridge.instruction(at: cpu.pc, in: cpu.bank, spec: spec) else {
+          guard let instruction = LR35902.InstructionSet.instruction(from: self.cpu.cartridge[location...]) else {
             advance(1)
             continue
           }
 
           // STOP must be followed by 0
-          if case .stop = spec, case let .imm8(immediate) = instruction.immediate, immediate != 0 {
+          if case .stop = instruction.spec, case let .imm8(immediate) = instruction.immediate, immediate != 0 {
             advance(1)
             continue
           }
@@ -618,10 +617,10 @@ extension LR35902 {
             cpu.bank = bankChange
           }
 
-          let instructionWidth = InstructionSet.widths[spec]!
+          let instructionWidth = InstructionSet.widths[instruction.spec]!
           advance(instructionWidth.total)
 
-          switch spec {
+          switch instruction.spec {
             // TODO: Rewrite these with a macro dector during disassembly time.
           case .ld(.imm16addr, .a):
             if case let .imm16(immediate) = instruction.immediate,

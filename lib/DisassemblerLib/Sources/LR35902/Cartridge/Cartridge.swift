@@ -75,35 +75,6 @@ extension LR35902.Cartridge {
   }
 }
 
-// MARK: - Extracting instructions from the ROM
-
-extension LR35902.Cartridge {
-  /** Returns an instruction at the given address. */
-  public func instruction(at pc: LR35902.Address, in bank: LR35902.Bank, spec: LR35902.Instruction.Spec) -> LR35902.Instruction? {
-    let instructionWidth = LR35902.InstructionSet.widths[spec]!
-    guard let location = LR35902.Cartridge.cartridgeLocation(for: pc + instructionWidth.opcode, in: bank) else {
-      return nil
-    }
-    switch instructionWidth.operand {
-    case 1:
-      if location >= rom.count {
-        return nil
-      }
-      return LR35902.Instruction(spec: spec, immediate: .imm8(self[pc + instructionWidth.opcode, bank]))
-    case 2:
-      if location + 1 >= rom.count {
-        return nil
-      }
-      let low = LR35902.Address(self[pc + instructionWidth.opcode, bank])
-      let high = LR35902.Address(self[pc + instructionWidth.opcode + 1, bank]) << 8
-      let immediate16 = high | low
-      return LR35902.Instruction(spec: spec, immediate: .imm16(immediate16))
-    default:
-      return LR35902.Instruction(spec: spec)
-    }
-  }
-}
-
 // MARK: - Internal methods
 
 extension LR35902.Cartridge {
