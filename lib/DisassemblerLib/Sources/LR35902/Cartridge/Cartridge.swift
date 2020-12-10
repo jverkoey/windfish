@@ -31,7 +31,7 @@ extension LR35902.Cartridge {
 
 extension LR35902.Cartridge {
   public subscript(pc: LR35902.Address, bank: LR35902.Bank) -> UInt8 {
-    return rom[Int(LR35902.Cartridge.cartridgeLocation(for: pc, in: bank)!)]
+    return rom[Int(LR35902.Cartridge.location(for: pc, in: bank)!)]
   }
 
   public subscript<R: RangeExpression>(range: R) -> Data where R.Bound == Location {
@@ -43,7 +43,7 @@ extension LR35902.Cartridge {
    - Parameter pc: The program counter's location.
    - Parameter bank: The current bank.
    */
-  public static func cartridgeLocation(for pc: LR35902.Address, in bank: LR35902.Bank) -> Location? {
+  public static func location(for pc: LR35902.Address, in bank: LR35902.Bank) -> Location? {
     // Bank 0 is permanently addressable from 0x0000...0x3FFF.
     // All other banks map from 0x4000...0x7FFF
     guard (bank == 0 && pc < 0x4000) || (bank > 0 && pc < 0x8000) else {
@@ -56,8 +56,8 @@ extension LR35902.Cartridge {
     }
   }
 
-  public static func safeCartridgeLocation(for pc: LR35902.Address, in bank: LR35902.Bank) -> Location? {
-    return cartridgeLocation(for: pc, in: (bank == 0) ? 1 : bank)
+  public static func safeLocation(for pc: LR35902.Address, in bank: LR35902.Bank) -> Location? {
+    return location(for: pc, in: (bank == 0) ? 1 : bank)
   }
 
   /**

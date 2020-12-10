@@ -11,9 +11,9 @@ extension LR35902.Disassembly {
 
     // TODO: Accept a Cartridge.Location here instead.
     init(from startAddress: LR35902.Address, initialBank: LR35902.Bank, upTo endAddress: LR35902.Address? = nil) {
-      self.startAddress = LR35902.Cartridge.safeCartridgeLocation(for: startAddress, in: initialBank)!
+      self.startAddress = LR35902.Cartridge.safeLocation(for: startAddress, in: initialBank)!
       if let endAddress = endAddress, endAddress > 0 {
-        self.endAddress = LR35902.Cartridge.safeCartridgeLocation(for: endAddress - 1, in: initialBank)!
+        self.endAddress = LR35902.Cartridge.safeLocation(for: endAddress - 1, in: initialBank)!
       } else {
         self.endAddress = nil
       }

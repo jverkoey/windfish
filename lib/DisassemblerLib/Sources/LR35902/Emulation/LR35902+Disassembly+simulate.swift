@@ -136,7 +136,7 @@ extension LR35902.Disassembly {
           continue
         }
 
-        let location = LR35902.Cartridge.cartridgeLocation(for: pc, in: bank)!
+        let location = LR35902.Cartridge.location(for: pc, in: bank)!
 
         switch instruction.spec {
         case .ld(let numeric, .imm8) where registers8.contains(numeric):

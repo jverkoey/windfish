@@ -22,6 +22,6 @@ extension LR35902 {
     return
       ((bank == 0 && pc < 0x4000)
         || (bank != 0 && pc < 0x8000))
-      && LR35902.Cartridge.cartridgeLocation(for: pc, in: bank)! < cartridge.size
+      && LR35902.Cartridge.location(for: pc, in: bank)! < cartridge.size
   }
 }

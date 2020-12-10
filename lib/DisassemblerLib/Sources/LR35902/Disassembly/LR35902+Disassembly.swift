@@ -41,14 +41,14 @@ extension LR35902 {
     // MARK: - Transfers of control
 
     func transfersOfControl(at pc: Address, in bank: Bank) -> Set<TransferOfControl>? {
-      guard let cartridgeLocation = LR35902.Cartridge.cartridgeLocation(for: pc, in: bank) else {
+      guard let cartridgeLocation = LR35902.Cartridge.location(for: pc, in: bank) else {
         return nil
       }
       return transfers[cartridgeLocation]
     }
     public func registerTransferOfControl(to pc: Address, in bank: Bank, from fromPc: Address, in fromBank: Bank, spec: Instruction.Spec) {
-      let index = LR35902.Cartridge.cartridgeLocation(for: pc, in: bank)!
-      let fromLocation = LR35902.Cartridge.cartridgeLocation(for: fromPc, in: fromBank)!
+      let index = LR35902.Cartridge.location(for: pc, in: bank)!
+      let fromLocation = LR35902.Cartridge.location(for: fromPc, in: fromBank)!
       let transfer = TransferOfControl(sourceLocation: fromLocation, sourceInstructionSpec: spec)
       transfers[index, default: Set()].insert(transfer)
 
@@ -68,7 +68,7 @@ extension LR35902 {
     // MARK: - Instructions
 
     public func instruction(at pc: Address, in bank: Bank) -> Instruction? {
-      let location = LR35902.Cartridge.cartridgeLocation(for: pc, in: bank)!
+      let location = LR35902.Cartridge.location(for: pc, in: bank)!
       guard code.contains(Int(location)) else {
         return nil
       }
@@ -76,7 +76,7 @@ extension LR35902 {
     }
 
     func register(instruction: Instruction, at pc: Address, in bank: Bank) {
-      let address = LR35902.Cartridge.cartridgeLocation(for: pc, in: bank)!
+      let address = LR35902.Cartridge.location(for: pc, in: bank)!
 
       // Avoid overlapping instructions.
       if code.contains(Int(address)) && instructionMap[address] == nil {
@@ -109,8 +109,8 @@ extension LR35902 {
       setData(at: address..<(address+1), in: bank)
     }
     public func setData(at range: Range<Address>, in bank: Bank, format: DataFormat = .bytes) {
-      let lowerBound = LR35902.Cartridge.cartridgeLocation(for: range.lowerBound, in: bank)!
-      let upperBound = LR35902.Cartridge.cartridgeLocation(for: range.upperBound, in: bank)!
+      let lowerBound = LR35902.Cartridge.location(for: range.lowerBound, in: bank)!
+      let upperBound = LR35902.Cartridge.location(for: range.upperBound, in: bank)!
       let cartRange = lowerBound..<upperBound
       dataBlocks.insert(integersIn: Int(lowerBound + 1)..<Int(upperBound))
       dataFormats[cartRange] = format
@@ -143,7 +143,7 @@ extension LR35902 {
       }
     }
     func formatOfData(at address: Address, in bank: Bank) -> DataFormat? {
-      let location = LR35902.Cartridge.cartridgeLocation(for: address, in: bank)!
+      let location = LR35902.Cartridge.location(for: address, in: bank)!
       return dataFormats.first { pair in
         pair.0.contains(location)
       }?.value
@@ -152,8 +152,8 @@ extension LR35902 {
     private var dataFormats: [Range<Cartridge.Location>: DataFormat] = [:]
 
     public func setJumpTable(at range: Range<Address>, in bank: Bank) {
-      let lowerBound = LR35902.Cartridge.cartridgeLocation(for: range.lowerBound, in: bank)!
-      let upperBound = LR35902.Cartridge.cartridgeLocation(for: range.upperBound, in: bank)!
+      let lowerBound = LR35902.Cartridge.location(for: range.lowerBound, in: bank)!
+      let upperBound = LR35902.Cartridge.location(for: range.upperBound, in: bank)!
       jumpTables.insert(integersIn: Int(lowerBound)..<Int(upperBound))
 
       setData(at: range, in: bank)
@@ -163,15 +163,15 @@ extension LR35902 {
     // MARK: - Text segments
 
     public func setText(at range: Range<Address>, in bank: Bank, lineLength: Int? = nil) {
-      let lowerBound = LR35902.Cartridge.cartridgeLocation(for: range.lowerBound, in: bank)!
-      let upperBound = LR35902.Cartridge.cartridgeLocation(for: range.upperBound, in: bank)!
+      let lowerBound = LR35902.Cartridge.location(for: range.lowerBound, in: bank)!
+      let upperBound = LR35902.Cartridge.location(for: range.upperBound, in: bank)!
       text.insert(integersIn: Int(lowerBound)..<Int(upperBound))
       if let lineLength = lineLength {
         textLengths[lowerBound..<upperBound] = lineLength
       }
     }
     func lineLengthOfText(at address: Address, in bank: Bank) -> Int? {
-      let location = LR35902.Cartridge.cartridgeLocation(for: address, in: bank)!
+      let location = LR35902.Cartridge.location(for: address, in: bank)!
       return textLengths.first { pair in
         pair.0.contains(location)
       }?.value
@@ -186,11 +186,11 @@ extension LR35902 {
     // MARK: - Bank changes
 
     func bankChange(at pc: Address, in bank: Bank) -> Bank? {
-      return bankChanges[LR35902.Cartridge.cartridgeLocation(for: pc, in: bank)!]
+      return bankChanges[LR35902.Cartridge.location(for: pc, in: bank)!]
     }
 
     public func register(bankChange: Bank, at pc: Address, in bank: Bank) {
-      bankChanges[LR35902.Cartridge.cartridgeLocation(for: pc, in: bank)!] = bankChange
+      bankChanges[LR35902.Cartridge.location(for: pc, in: bank)!] = bankChange
     }
     private var bankChanges: [Cartridge.Location: Bank] = [:]
 
@@ -207,7 +207,7 @@ extension LR35902 {
       case ram
     }
     public func type(of address: Address, in bank: Bank) -> ByteType {
-      guard let cartridgeLocation = LR35902.Cartridge.cartridgeLocation(for: address, in: bank) else {
+      guard let cartridgeLocation = LR35902.Cartridge.location(for: address, in: bank) else {
         return .ram
       }
       let index = Int(cartridgeLocation)
@@ -241,7 +241,7 @@ extension LR35902 {
     }
 
     public func setSoftTerminator(at pc: Address, in bank: Bank) {
-      softTerminators[LR35902.Cartridge.cartridgeLocation(for: pc, in: bank)!] = true
+      softTerminators[LR35902.Cartridge.location(for: pc, in: bank)!] = true
     }
     var softTerminators: [LR35902.Cartridge.Location: Bool] = [:]
 
@@ -253,7 +253,7 @@ extension LR35902 {
     }
 
     public func contiguousScopes(at pc: Address, in bank: Bank) -> Set<Range<Cartridge.Location>> {
-      guard let cartridgeLocation = LR35902.Cartridge.cartridgeLocation(for: pc, in: bank) else {
+      guard let cartridgeLocation = LR35902.Cartridge.location(for: pc, in: bank) else {
         return Set()
       }
       return contiguousScopes[effectiveBank(at: pc, in: bank), default: Set()].filter { scope in scope.contains(cartridgeLocation) }
@@ -284,7 +284,7 @@ extension LR35902 {
     // MARK: - Labels
 
     public func label(at pc: Address, in bank: Bank) -> String? {
-      guard let index = LR35902.Cartridge.cartridgeLocation(for: pc, in: bank) else {
+      guard let index = LR35902.Cartridge.location(for: pc, in: bank) else {
         return nil
       }
       // Don't return labels that point to the middle of instructions.
@@ -334,7 +334,7 @@ extension LR35902 {
 
     public func setLabel(at pc: Address, in bank: Bank, named name: String) {
       precondition(!name.contains("."), "Labels cannot contain dots.")
-      guard let cartridgeLocation = LR35902.Cartridge.safeCartridgeLocation(for: pc, in: bank) else {
+      guard let cartridgeLocation = LR35902.Cartridge.safeLocation(for: pc, in: bank) else {
         preconditionFailure("Attempting to set label in non-cart addressable location.")
       }
       labels[cartridgeLocation] = name
@@ -420,20 +420,20 @@ extension LR35902 {
     public func setType(at address: LR35902.Address, in bank: LR35902.Bank, to type: String) {
       precondition(!type.isEmpty, "Invalid type provided.")
       precondition(dataTypes[type] != nil, "\(type) is not a known type.")
-      typeAtLocation[LR35902.Cartridge.cartridgeLocation(for: address, in: bank)!] = type
+      typeAtLocation[LR35902.Cartridge.location(for: address, in: bank)!] = type
     }
     var typeAtLocation: [LR35902.Cartridge.Location: String] = [:]
 
     // MARK: - Comments
 
     public func preComment(at address: Address, in bank: Bank) -> String? {
-      guard let cartridgeLocation = LR35902.Cartridge.cartridgeLocation(for: address, in: bank) else {
+      guard let cartridgeLocation = LR35902.Cartridge.location(for: address, in: bank) else {
         return nil
       }
       return preComments[cartridgeLocation]
     }
     public func setPreComment(at address: Address, in bank: Bank, text: String) {
-      guard let cartridgeLocation = LR35902.Cartridge.cartridgeLocation(for: address, in: bank) else {
+      guard let cartridgeLocation = LR35902.Cartridge.location(for: address, in: bank) else {
         preconditionFailure("Attempting to set pre-comment in non-cart addressable location.")
       }
       preComments[cartridgeLocation] = text
@@ -552,7 +552,7 @@ extension LR35902 {
         if toAddress > 0x8000 {
           return // We can't disassemble in-memory regions.
         }
-        guard LR35902.Cartridge.cartridgeLocation(for: toAddress, in: bank) != nil else {
+        guard LR35902.Cartridge.location(for: toAddress, in: bank) != nil else {
           return // We aren't sure which bank we're in, so we can't safely disassemble it.
         }
         let run = Run(from: toAddress, initialBank: bank)
@@ -577,7 +577,7 @@ extension LR35902 {
         cpu.pc = LR35902.Cartridge.addressAndBank(from: run.startAddress).address
 
         let advance: (Address) -> Void = { amount in
-          let currentCartAddress = LR35902.Cartridge.cartridgeLocation(for: self.cpu.pc, in: self.cpu.bank)!
+          let currentCartAddress = LR35902.Cartridge.location(for: self.cpu.pc, in: self.cpu.bank)!
           run.visitedRange = run.startAddress..<(currentCartAddress + Cartridge.Location(amount))
 
           visitedAddresses.insert(integersIn: Int(currentCartAddress)..<Int(currentCartAddress + Cartridge.Location(amount)))
@@ -587,12 +587,12 @@ extension LR35902 {
 
         var previousInstruction: Instruction? = nil
         linear_sweep: while !run.hasReachedEnd(with: cpu) && cpu.pcIsValid() {
-          let location = LR35902.Cartridge.cartridgeLocation(for: cpu.pc, in: cpu.bank)!
+          let location = LR35902.Cartridge.location(for: cpu.pc, in: cpu.bank)!
           if softTerminators[location] != nil {
             break
           }
-          if data.contains(Int(LR35902.Cartridge.cartridgeLocation(for: cpu.pc, in: cpu.bank)!))
-           || text.contains(Int(LR35902.Cartridge.cartridgeLocation(for: cpu.pc, in: cpu.bank)!)) {
+          if data.contains(Int(LR35902.Cartridge.location(for: cpu.pc, in: cpu.bank)!))
+           || text.contains(Int(LR35902.Cartridge.location(for: cpu.pc, in: cpu.bank)!)) {
             advance(1)
             continue
           }

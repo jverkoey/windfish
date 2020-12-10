@@ -87,7 +87,7 @@ public final class RGBDSAssembly {
     guard let disassembly = disassembly else {
       return nil
     }
-    let location = LR35902.Cartridge.cartridgeLocation(for: disassembly.cpu.pc, in: disassembly.cpu.bank)!
+    let location = LR35902.Cartridge.location(for: disassembly.cpu.pc, in: disassembly.cpu.bank)!
     guard let type = disassembly.typeAtLocation[location],
       let dataType = disassembly.dataTypes[type] else {
       return nil
