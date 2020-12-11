@@ -4,30 +4,6 @@ import CPU
 import FoundationExtensions
 import RGBDS
 
-private func isNumber(_ string: String) -> Bool {
-  return string.hasPrefix("$") || string.hasPrefix("0x") || string.hasPrefix("%") || string.hasPrefix("#") || Int(string) != nil
-}
-
-private func createRepresentation(from statement: RGBDS.Statement) -> String {
-  let operands: [String] = statement.operands.map { operand in
-    if isNumber(operand) {
-      return "#"
-    } else if operand.hasPrefix("[") && operand.hasSuffix("]") && String(operand.dropFirst().dropLast()).lowercased().hasPrefix("$ff") {
-      return "[ff#]"
-    } else if operand.hasPrefix("[") && operand.hasSuffix("]") && isNumber(String(operand.dropFirst().dropLast())) {
-      return "[#]"
-    } else if operand.hasPrefix("sp+") {
-      return "sp+#"
-    }
-    return operand
-  }
-  if !operands.isEmpty {
-    return "\(statement.opcode) \(operands.joined(separator: ", "))"
-  } else {
-    return statement.opcode
-  }
-}
-
 private func cast<T: UnsignedInteger, negT: SignedInteger>(string: String, negativeType: negT.Type)
 throws -> T
 where T: FixedWidthInteger, negT: FixedWidthInteger, T: BitPatternInitializable, T.CompanionType == negT {
@@ -83,7 +59,7 @@ public final class RGBDSAssembler {
 
   public static func specs(for code: String) -> (RGBDS.Statement, [LR35902.Instruction.Spec])? {
     let statement = RGBDS.Statement(fromLine: code)!
-    let representation = createRepresentation(from: statement)
+    let representation = statement.tokenizedString
     guard let specs = LR35902.InstructionSet.tokenStringToSpecs[representation] else {
       return nil
     }

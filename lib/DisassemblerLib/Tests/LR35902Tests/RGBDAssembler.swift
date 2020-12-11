@@ -88,7 +88,7 @@ ld bc, $1234
     ])
   }
 
-  func test_ld_bc_imm16_0xHexIsRepresentable() throws {
+  func test_ld_bc_imm16_0xHexIsNotRepresentable() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
 ld bc, 0x1234
@@ -96,10 +96,8 @@ ld bc, 0x1234
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(0x1234))
-    ])
+    XCTAssertEqual(errors, [.init(lineNumber: 1, error: "Invalid instruction: ld bc, 0x1234")])
+    XCTAssertEqual(disassembly.instructionMap, [:])
   }
 
   func test_ld_bc_imm16_numberIsRepresentable() throws {
@@ -214,7 +212,7 @@ ld b, 255
     ])
   }
 
-  func test_ld_b_imm8_0xHex() throws {
+  func test_ld_b_imm8_0xHexIsNotSupported() throws {
     let assembler = RGBDSAssembler()
     let errors = assembler.assemble(assembly: """
 ld b, 0xFF
@@ -222,10 +220,8 @@ ld b, 0xFF
     let disassembly = LR35902.Disassembly(rom: assembler.buffer)
     disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.b, .imm8), immediate: .imm8(255)),
-    ])
+    XCTAssertEqual(errors, [.init(lineNumber: 1, error: "Invalid instruction: ld b, 0xFF")])
+    XCTAssertEqual(disassembly.instructionMap, [:])
   }
 
   func test_ld_imm16addr_sp() throws {

@@ -159,12 +159,12 @@ extension LR35902.Disassembly {
 
       case let .instruction(_, assembly):
         if detailedComments {
-          return line(assembly.description, address: address!, bank: bank!, scope: scope!, bytes: data!)
+          return line(assembly.formattedString, address: address!, bank: bank!, scope: scope!, bytes: data!)
         } else {
-          return line(assembly.description)
+          return line(assembly.formattedString)
         }
 
-      case let .macroInstruction(_, assembly): return line(assembly.description)
+      case let .macroInstruction(_, assembly): return line(assembly.formattedString)
 
       case let .macro(assembly):
         if detailedComments {
@@ -179,9 +179,9 @@ extension LR35902.Disassembly {
 
       case let .text(statement):
         if detailedComments {
-          return line(statement.description, address: address!, addressType: "text")
+          return line(statement.formattedString, address: address!, addressType: "text")
         } else {
-          return line(statement.description)
+          return line(statement.formattedString)
         }
 
       case let .jumpTable(jumpLocation, index):
@@ -195,43 +195,43 @@ extension LR35902.Disassembly {
         if detailedComments {
           let displayableBytes = data!.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
           let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
-          return line(statement.description, address: address!, addressType: "image1bpp", comment: "|\(bytesAsCharacters)|")
+          return line(statement.formattedString, address: address!, addressType: "image1bpp", comment: "|\(bytesAsCharacters)|")
         } else {
-          return line(statement.description)
+          return line(statement.formattedString)
         }
 
       case let .image2bpp(statement):
         if detailedComments {
           let displayableBytes = data!.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
           let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
-          return line(statement.description, address: address!, addressType: "image2bpp", comment: "|\(bytesAsCharacters)|")
+          return line(statement.formattedString, address: address!, addressType: "image2bpp", comment: "|\(bytesAsCharacters)|")
         } else {
-          return line(statement.description)
+          return line(statement.formattedString)
         }
 
       case let .data(statement):
         if detailedComments {
           let displayableBytes = data!.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
           let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
-          return line(statement.description, address: address!, addressType: "data", comment: "|\(bytesAsCharacters)|")
+          return line(statement.formattedString, address: address!, addressType: "data", comment: "|\(bytesAsCharacters)|")
         } else {
-          return line(statement.description)
+          return line(statement.formattedString)
         }
 
       case let .unknown(statement):
         if detailedComments {
           let displayableBytes = data!.map { ($0 >= 32 && $0 <= 126) ? $0 : 46 }
           let bytesAsCharacters = String(bytes: displayableBytes, encoding: .ascii) ?? ""
-          return line(statement.description, address: address!, addressType: nil, comment: "|\(bytesAsCharacters)|")
+          return line(statement.formattedString, address: address!, addressType: nil, comment: "|\(bytesAsCharacters)|")
         } else {
-          return line(statement.description)
+          return line(statement.formattedString)
         }
 
       case let .global(statement, addressType, _):
         if detailedComments {
-          return line(statement.description, address: address!, addressType: addressType)
+          return line(statement.formattedString, address: address!, addressType: addressType)
         } else {
-          return line(statement.description)
+          return line(statement.formattedString)
         }
       }
     }
