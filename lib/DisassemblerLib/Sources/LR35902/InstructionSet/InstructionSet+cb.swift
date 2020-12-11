@@ -274,5 +274,4 @@ extension LR35902.InstructionSet {
     /* 0xfe */ .cb(.set(.b7, .hladdr)),
     /* 0xff */ .cb(.set(.b7, .a))
   ]
-
 }

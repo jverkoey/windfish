@@ -10,7 +10,12 @@ extension LR35902 {
     }
 
     public var spec: Spec
+    public let immediate: ImmediateValue?
+
     public enum ImmediateValue: CPU.InstructionImmediate {
+      case imm8(UInt8)
+      case imm16(UInt16)
+
       public init?(data: Data) {
         switch data.count {
         case 1:
@@ -25,9 +30,6 @@ extension LR35902 {
         }
       }
 
-      case imm8(UInt8)
-      case imm16(UInt16)
     }
-    public let immediate: ImmediateValue?
   }
 }
