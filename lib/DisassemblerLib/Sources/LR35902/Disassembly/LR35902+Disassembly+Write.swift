@@ -1,7 +1,8 @@
 import Foundation
-import CPU
 
 import AssemblyGenerator
+import CPU
+import RGBDS
 
 extension Array {
   public func chunked(into size: Int) -> [[Element]] {
@@ -15,7 +16,7 @@ private func stringWithNewline(_ string: String) -> String {
   return string + "\n"
 }
 
-private func extractArgs(from statement: RGBDSAssembly.Statement, using spec: LR35902.Instruction.Spec, argument: Int) -> [Int: String] {
+private func extractArgs(from statement: RGBDS.Statement, using spec: LR35902.Instruction.Spec, argument: Int) -> [Int: String] {
   var args: [Int: String] = [:]
   spec.visit { operand in
     guard let operand = operand else {
@@ -85,19 +86,19 @@ extension LR35902.Disassembly {
       case label(labelName: String)
       case section(LR35902.Bank)
       case transferOfControl(Set<TransferOfControl>, String)
-      case instruction(LR35902.Instruction, RGBDSAssembly.Statement)
-      case macroInstruction(LR35902.Instruction, RGBDSAssembly.Statement)
+      case instruction(LR35902.Instruction, RGBDS.Statement)
+      case macroInstruction(LR35902.Instruction, RGBDS.Statement)
       case macro(String)
       case macroDefinition(String)
       case macroTerminator
       case imagePlaceholder(format: ImageFormat)
-      case image1bpp(RGBDSAssembly.Statement)
-      case image2bpp(RGBDSAssembly.Statement)
-      case data(RGBDSAssembly.Statement)
-      case text(RGBDSAssembly.Statement)
+      case image1bpp(RGBDS.Statement)
+      case image2bpp(RGBDS.Statement)
+      case data(RGBDS.Statement)
+      case text(RGBDS.Statement)
       case jumpTable(String, Int)
-      case unknown(RGBDSAssembly.Statement)
-      case global(RGBDSAssembly.Statement, dataTypeName: String, dataType: Datatype)
+      case unknown(RGBDS.Statement)
+      case global(RGBDS.Statement, dataTypeName: String, dataType: Datatype)
     }
 
     init(semantic: Semantic, address: LR35902.Address? = nil, bank: LR35902.Bank? = nil, scope: String? = nil, data: Data? = nil) {
@@ -404,7 +405,7 @@ clean:
         }
         // No further nodes to be traversed; is this the end of a macro?
         if !macroNodeIterator.macros.isEmpty {
-          let instructions = lineBuffer.compactMap { thisLine -> (LR35902.Instruction, RGBDSAssembly.Statement)? in
+          let instructions = lineBuffer.compactMap { thisLine -> (LR35902.Instruction, RGBDS.Statement)? in
             if case let .instruction(instruction, assembly) = thisLine.semantic {
               return (instruction, assembly)
             } else {

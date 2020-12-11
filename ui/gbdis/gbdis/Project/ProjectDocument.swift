@@ -8,6 +8,7 @@
 import Cocoa
 
 import LR35902
+import RGBDS
 
 final class Region: NSObject, Codable {
   struct Kind {
@@ -456,7 +457,7 @@ extension ProjectDocument: NSToolbarDelegate {
   }
 }
 
-extension RGBDSAssembly.Statement {
+extension RGBDS.Statement {
   func attributedString(attributes: [NSAttributedString.Key : Any],
                         opcodeAttributes: [NSAttributedString.Key : Any],
                         operandAttributes: [NSAttributedString.Key : Any],
@@ -464,7 +465,7 @@ extension RGBDSAssembly.Statement {
                         scope: String?) -> NSAttributedString {
     let string = NSMutableAttributedString()
     string.beginEditing()
-    let opcodeName = opcode.padding(toLength: RGBDSAssembly.maxOpcodeNameLength, withPad: " ", startingAt: 0)
+    let opcodeName = opcode.padding(toLength: RGBDS.maxOpcodeNameLength, withPad: " ", startingAt: 0)
     string.append(NSAttributedString(string: opcodeName, attributes: opcodeAttributes))
     if let operands = operands {
       string.append(NSAttributedString(string: " ", attributes: attributes))

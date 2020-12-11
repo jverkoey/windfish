@@ -4,16 +4,16 @@ import CPU
 import FoundationExtensions
 import RGBDS
 
-private func createStatement(from code: String) -> RGBDSAssembly.Statement {
+private func createStatement(from code: String) -> RGBDS.Statement {
   let opcodeAndOperands = code.split(separator: " ", maxSplits: 1)
 
   let opcode = opcodeAndOperands[0].lowercased()
 
   if opcodeAndOperands.count > 1 {
     let operands: [String] = opcodeAndOperands[1].components(separatedBy: ",").map { $0.trimmed() }
-    return RGBDSAssembly.Statement(opcode: opcode, operands: operands)
+    return RGBDS.Statement(opcode: opcode, operands: operands)
   } else {
-    return RGBDSAssembly.Statement(opcode: opcode)
+    return RGBDS.Statement(opcode: opcode)
   }
 }
 
@@ -21,7 +21,7 @@ private func isNumber(_ string: String) -> Bool {
   return string.hasPrefix("$") || string.hasPrefix("0x") || string.hasPrefix("%") || string.hasPrefix("#") || Int(string) != nil
 }
 
-private func createRepresentation(from statement: RGBDSAssembly.Statement) -> String {
+private func createRepresentation(from statement: RGBDS.Statement) -> String {
   if let operands: [String] = statement.operands?.map({ operand in
     if isNumber(operand) {
       return "#"
@@ -93,7 +93,7 @@ public final class RGBDSAssembler {
     let error: String
   }
 
-  public static func specs(for code: String) -> (RGBDSAssembly.Statement, [LR35902.Instruction.Spec])? {
+  public static func specs(for code: String) -> (RGBDS.Statement, [LR35902.Instruction.Spec])? {
     let statement = createStatement(from: code)
     let representation = createRepresentation(from: statement)
     guard let specs = LR35902.InstructionSet.tokenStringToSpecs[representation] else {
@@ -108,7 +108,7 @@ public final class RGBDSAssembler {
     return (code: parts.first?.trimmed(), comment: parts.last?.trimmed())
   }
 
-  public static func instruction(from statement: RGBDSAssembly.Statement, using spec: LR35902.Instruction.Spec) throws -> LR35902.Instruction? {
+  public static func instruction(from statement: RGBDS.Statement, using spec: LR35902.Instruction.Spec) throws -> LR35902.Instruction? {
     if case LR35902.Instruction.Spec.stop = spec {
       return .init(spec: spec, immediate: .imm8(0))
     }

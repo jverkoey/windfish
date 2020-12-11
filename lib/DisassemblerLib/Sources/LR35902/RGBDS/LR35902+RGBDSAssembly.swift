@@ -1,30 +1,9 @@
 import Foundation
 
 import FoundationExtensions
+import RGBDS
 
 public final class RGBDSAssembly {
-
-  public static let maxOpcodeNameLength = 4
-
-  public struct Statement: Equatable, CustomStringConvertible {
-    public let opcode: String
-    public let operands: [String]?
-    public let comments: String?
-    public init(opcode: String, operands: [String]? = nil, comments: String? = nil) {
-      self.opcode = opcode
-      self.operands = operands
-      self.comments = comments
-    }
-
-    public var description: String {
-      let opcodeName = opcode.padding(toLength: maxOpcodeNameLength, withPad: " ", startingAt: 0)
-      if let operands = operands {
-        return "\(opcodeName) \(operands.joined(separator: ", "))"
-      } else {
-        return opcodeName
-      }
-    }
-  }
 
   static func assembly(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil, argumentString: String? = nil) -> Statement {
     if let operands = operands(for: instruction, with: disassembly, argumentString: argumentString) {
