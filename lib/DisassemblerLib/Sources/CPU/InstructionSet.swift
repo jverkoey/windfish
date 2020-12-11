@@ -50,6 +50,20 @@ public protocol InstructionSet {
    This is typically implemented by returning the result of `computeAllOpcodeBytes()`.
    */
   static var opcodeBytes: [SpecType: [UInt8]] { get }
+
+  /** Converts the specification to a binary representation. */
+  static func data(for spec: SpecType) -> Data?
+}
+
+// MARK: - Automatic data representation
+
+extension InstructionSet {
+  public static func data(for spec: SpecType) -> Data? {
+    guard let bytes = opcodeBytes[spec] else {
+      return nil
+    }
+    return Data(bytes)
+  }
 }
 
 // MARK: - Helper methods for computing properties
