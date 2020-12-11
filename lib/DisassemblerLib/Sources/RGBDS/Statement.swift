@@ -14,6 +14,7 @@ public struct Statement: Equatable, CustomStringConvertible {
   }
 
   public init?(fromLine line: String) {
+    // TODO: Consider swapping this with a Scanner.
     let codeAndComments = line.split(separator: ";", maxSplits: 1, omittingEmptySubsequences: false)
     let opcodeAndOperands = codeAndComments[0].trimmed().split(separator: " ", maxSplits: 1, omittingEmptySubsequences: false)
 
