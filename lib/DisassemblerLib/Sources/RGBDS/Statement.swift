@@ -2,6 +2,7 @@ import Foundation
 
 public let maxOpcodeNameLength = 4
 
+/** A concrete representation of a single statement of RGBDS assembly. */
 public struct Statement: Equatable, CustomStringConvertible {
   public let opcode: String
   public let operands: [String]?

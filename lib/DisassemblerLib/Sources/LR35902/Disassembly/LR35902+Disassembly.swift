@@ -1,6 +1,16 @@
 import Foundation
 import Disassembler
 
+extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {
+  public var category: InstructionCategory? {
+    switch self {
+    case .call: return .call
+    case .ret, .reti: return .ret
+    default: return nil
+    }
+  }
+}
+
 extension LR35902 {
 
   /// A class that owns and manages disassembly information for a given ROM.
