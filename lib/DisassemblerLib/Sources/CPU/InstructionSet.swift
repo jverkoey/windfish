@@ -37,11 +37,18 @@ public protocol InstructionSet {
   static var prefixTables: [SpecType: [SpecType]] { get }
 
   /**
-   A map of specifications to computed widths.
+   A cached map of specifications to computed widths.
 
    This is typically implemented by returning the result of `computeAllWidths()`.
    */
   static var widths: [SpecType: InstructionWidth<SpecType.WidthType>] { get }
+
+  /**
+   A cached map of specifications to their binary opcode representations.
+
+   This is typically implemented by returning the result of `computeAllInstructionOpcodes()`.
+   */
+  static var instructionOpcodes: [SpecType: [UInt8]] { get }
 }
 
 // MARK: - Helper methods for computing properties
@@ -59,5 +66,28 @@ extension InstructionSet {
       widths[spec] = InstructionWidth(opcode: spec.opcodeWidth, operand: spec.operandWidth)
     }
     return widths
+  }
+
+  /** Calculates the opcode for every instruction in this set. */
+  public static func computeAllInstructionOpcodes() -> [SpecType: [UInt8]] {
+    var binary: [SpecType: [UInt8]] = [:]
+    computeAllInstructionOpcodes(accumulator: &binary, table: table, prefix: [])
+    return binary
+  }
+
+  /** Recursively computes opcodes by traversing tables when prefixes are encountered. */
+  private static func computeAllInstructionOpcodes(accumulator: inout [SpecType: [UInt8]],
+                                                   table: [SpecType],
+                                                   prefix: [UInt8]) {
+    for (byteRepresentation, spec) in table.enumerated() {
+      let opcode = prefix + [UInt8(byteRepresentation)]
+      if let prefixTable = prefixTables[spec] {
+        computeAllInstructionOpcodes(accumulator: &accumulator,
+                                     table: prefixTable,
+                                     prefix: opcode)
+      } else {
+        accumulator[spec] = opcode
+      }
+    }
   }
 }

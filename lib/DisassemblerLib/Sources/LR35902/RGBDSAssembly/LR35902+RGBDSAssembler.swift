@@ -339,7 +339,7 @@ public final class RGBDSAssembler {
 
         self.instructions.append(shortestInstruction)
 
-        self.buffer.append(contentsOf: RGBDSAssembler.instructionOpcodeBinary[shortestInstruction.spec]!)
+        self.buffer.append(contentsOf: LR35902.InstructionSet.instructionOpcodes[shortestInstruction.spec]!)
         switch shortestInstruction.immediate {
         case let .imm8(immediate):
           self.buffer.append(contentsOf: [immediate])
@@ -379,16 +379,4 @@ public final class RGBDSAssembler {
     }
     return representations
   }()
-
-  static var instructionOpcodeBinary: [LR35902.Instruction.Spec: [UInt8]] = {
-    var binary: [LR35902.Instruction.Spec: [UInt8]] = [:]
-    for (byteRepresentation, spec) in LR35902.InstructionSet.table.enumerated() {
-      binary[spec] = [UInt8(byteRepresentation)]
-    }
-    for (byteRepresentation, spec) in LR35902.InstructionSet.tableCB.enumerated() {
-      binary[spec] = [0xCB, UInt8(byteRepresentation)]
-    }
-    return binary
-  }()
-
 }
