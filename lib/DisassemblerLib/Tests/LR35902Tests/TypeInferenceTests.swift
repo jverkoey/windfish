@@ -16,8 +16,7 @@ extension LR35902.Disassembly.MacroNode: Equatable {
 
 class TypeInferenceTests: XCTestCase {
   func test_something() throws {
-    let assembler = RGBDSAssembler()
-    let results = assembler.assemble(assembly: """
+   let results = RGBDSAssembler.assemble(assembly: """
    ld   a, $44
    ld   [$ff41], a
 """)

@@ -53,9 +53,6 @@ where T: FixedWidthInteger, negT: FixedWidthInteger, T: BitPatternInitializable,
 
 public final class RGBDSAssembler {
 
-  public init() {
-  }
-
   public struct Error: Swift.Error, Equatable {
     let lineNumber: Int?
     let error: String
@@ -134,7 +131,7 @@ public final class RGBDSAssembler {
     return .init(spec: spec)
   }
 
-  public func assemble(assembly: String) -> (instructions: [LR35902.Instruction], data: Data, errors: [Error]) {
+  public static func assemble(assembly: String, assembleToData: Bool = true) -> (instructions: [LR35902.Instruction], data: Data, errors: [Error]) {
     var lineNumber = 1
     var buffer = Data()
     var instructions: [LR35902.Instruction] = []
@@ -167,16 +164,18 @@ public final class RGBDSAssembler {
 
         instructions.append(shortestInstruction)
 
-        buffer.append(contentsOf: LR35902.InstructionSet.data(for: shortestInstruction.spec)!)
-        switch shortestInstruction.immediate {
-        case let .imm8(immediate):
-          buffer.append(contentsOf: [immediate])
-        case var .imm16(immediate):
-          withUnsafeBytes(of: &immediate) { immediateBytes in
-            buffer.append(contentsOf: Data(immediateBytes))
+        if assembleToData {
+          buffer.append(contentsOf: LR35902.InstructionSet.data(for: shortestInstruction.spec)!)
+          switch shortestInstruction.immediate {
+          case let .imm8(immediate):
+            buffer.append(contentsOf: [immediate])
+          case var .imm16(immediate):
+            withUnsafeBytes(of: &immediate) { immediateBytes in
+              buffer.append(contentsOf: Data(immediateBytes))
+            }
+          case .none:
+            break
           }
-        case .none:
-          break
         }
 
       } catch let error as RGBDSAssembler.Error {
