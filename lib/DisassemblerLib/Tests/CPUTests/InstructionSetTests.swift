@@ -26,6 +26,7 @@ class InstructionSetTests: XCTestCase {
     for (key, value) in SimpleCPU.InstructionSet.opcodeBytes {
       XCTAssertEqual(value, opcodes[key], "\(key) mismatched")
     }
+    XCTAssertEqual(SimpleCPU.InstructionSet.opcodeBytes.count, opcodes.count)
   }
 
   func testOpcodeData() {
@@ -42,5 +43,21 @@ class InstructionSetTests: XCTestCase {
       let value = SimpleCPU.InstructionSet.data(for: spec)
       XCTAssertEqual(value, opcodeData[spec], "\(spec) mismatched")
     }
+    XCTAssertEqual(SimpleCPU.InstructionSet.allSpecs().count, opcodeData.count)
+  }
+
+  func testOpcodeStrings() {
+    let opcodeStrings: [SimpleCPU.Instruction.Spec : String] = [
+      .nop: "nop",
+      .ld(.a, .imm8): "ld",
+      .ld(.a, .imm16): "ld",
+      .call(.nz, .imm16): "call",
+      .call(nil, .imm16): "call",
+      .sub(.cp(.imm8)): "cp",
+    ]
+    for (key, value) in SimpleCPU.InstructionSet.opcodeStrings {
+      XCTAssertEqual(value, opcodeStrings[key], "\(key) mismatched")
+    }
+    XCTAssertEqual(SimpleCPU.InstructionSet.opcodeStrings.count, opcodeStrings.count)
   }
 }

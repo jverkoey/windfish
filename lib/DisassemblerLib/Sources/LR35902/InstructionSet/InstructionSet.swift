@@ -9,14 +9,12 @@ extension LR35902 {
       return computeAllWidths()
     }()
 
-    static var opcodes: [Instruction.Spec: String] = {
-      return allSpecs().reduce(into: [:]) { accumulator, spec in
-        accumulator[spec] = spec.opcode
-      }
-    }()
-
     static var opcodeBytes: [Instruction.Spec : [UInt8]] = {
       return computeAllOpcodeBytes()
+    }()
+
+    static var opcodeStrings: [SpecType : String] = {
+      return computeAllOpcodeStrings()
     }()
 
     static let table: [Instruction.Spec] = [

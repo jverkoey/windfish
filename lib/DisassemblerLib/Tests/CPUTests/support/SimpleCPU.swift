@@ -82,6 +82,10 @@ struct SimpleCPU {
     static var opcodeBytes: [Instruction.Spec : [UInt8]] = {
       return computeAllOpcodeBytes()
     }()
+
+    static var opcodeStrings: [SpecType : String] = {
+      return computeAllOpcodeStrings()
+    }()
   }
 }
 

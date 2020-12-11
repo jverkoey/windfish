@@ -45,25 +45,21 @@ public protocol InstructionSet {
   static var widths: [SpecType: InstructionWidth<SpecType.WidthType>] { get }
 
   /**
-   A cached map of specifications to their binary opcode representations.
+   A cached map of specifications to their opcode binary representations.
 
    This is typically implemented by returning the result of `computeAllOpcodeBytes()`.
    */
   static var opcodeBytes: [SpecType: [UInt8]] { get }
 
+  /**
+   A cached map of specifications to their opcode string representations.
+
+   This is typically implemented by returning the result of `computeAllOpcodeStrings()`.
+   */
+  static var opcodeStrings: [SpecType: String] { get }
+
   /** Converts the specification to a binary representation. */
   static func data(for spec: SpecType) -> Data?
-}
-
-// MARK: - Automatic data representation
-
-extension InstructionSet {
-  public static func data(for spec: SpecType) -> Data? {
-    guard let bytes = opcodeBytes[spec] else {
-      return nil
-    }
-    return Data(bytes)
-  }
 }
 
 // MARK: - Helper methods for computing properties
@@ -91,8 +87,14 @@ extension InstructionSet {
    */
   public static func computeAllOpcodeBytes() -> [SpecType: [UInt8]] {
     var binary: [SpecType: [UInt8]] = [:]
-    computeAllOpcodeBytes(accumulator: &binary, table: table, prefix: [])
+    computeOpcodeBytes(for: table, prefix: [], accumulator: &binary)
     return binary
+  }
+
+  public static func computeAllOpcodeStrings() -> [SpecType: String] {
+    return allSpecs().reduce(into: [:]) { accumulator, spec in
+      accumulator[spec] = computeOpcodeString(for: spec)
+    }
   }
 }
 
@@ -100,18 +102,31 @@ extension InstructionSet {
 
 extension InstructionSet {
   /** Recursively computes opcodes by traversing tables when prefixes are encountered. */
-  private static func computeAllOpcodeBytes(accumulator: inout [SpecType: [UInt8]],
-                                            table: [SpecType],
-                                            prefix: [UInt8]) {
+  private static func computeOpcodeBytes(for table: [SpecType],
+                                         prefix: [UInt8],
+                                         accumulator: inout [SpecType: [UInt8]]) {
     for (byteRepresentation, spec) in table.enumerated() {
       let opcode = prefix + [UInt8(byteRepresentation)]
       if let prefixTable = prefixTables[spec] {
-        computeAllOpcodeBytes(accumulator: &accumulator,
-                              table: prefixTable,
-                              prefix: opcode)
+        computeOpcodeBytes(for: prefixTable, prefix: opcode, accumulator: &accumulator)
       } else {
         accumulator[spec] = opcode
       }
+    }
+  }
+
+  private static func computeOpcodeString(for spec: SpecType) -> String? {
+    // Prefix table specifications don't have a corresponding opcode.
+    if prefixTables[spec] != nil {
+      return nil
+    }
+    if let child = Mirror(reflecting: spec).children.first {
+      if let childInstruction = child.value as? SpecType {
+        return computeOpcodeString(for: childInstruction)
+      }
+      return child.label!
+    } else {
+      return "\("\(spec)".split(separator: ".").last!)"
     }
   }
 }
