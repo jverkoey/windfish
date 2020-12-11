@@ -107,7 +107,7 @@ extension InstructionSet {
 // MARK: - Internal methods
 
 extension InstructionSet {
-  /** Recursively computes opcodes by traversing tables when prefixes are encountered. */
+  /** Recursively computes an opcode's bytes by traversing tables when prefixes are encountered. */
   private static func computeOpcodeBytes(for table: [SpecType],
                                          prefix: [UInt8],
                                          accumulator: inout [SpecType: [UInt8]]) {
@@ -121,6 +121,7 @@ extension InstructionSet {
     }
   }
 
+  /** Recursively computes an opcode's string by traversing tables when prefixes are encountered. */
   private static func computeOpcodeString(for spec: SpecType) -> String? {
     // Prefix table specifications don't have a corresponding opcode.
     if prefixTables[spec] != nil {

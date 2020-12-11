@@ -31,6 +31,7 @@ let package = Package(
         "AssemblyGenerator",
         "CPU",
         "Disassembler",
+        "RGBDS",
       ]
     ),
     .target(
@@ -42,6 +43,10 @@ let package = Package(
     ),
     .target(
       name: "CPU",
+      dependencies: []
+    ),
+    .target(
+      name: "RGBDS",
       dependencies: []
     ),
     .target(

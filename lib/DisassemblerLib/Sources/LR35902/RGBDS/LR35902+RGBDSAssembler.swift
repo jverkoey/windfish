@@ -2,6 +2,7 @@ import Foundation
 
 import CPU
 import FoundationExtensions
+import RGBDS
 
 public protocol InstructionSpecRepresentable {
   /**
@@ -17,46 +18,6 @@ public protocol InstructionSpecRepresentable {
    - #: Any numeric value.
    */
   var representation: String { get }
-}
-
-/**
- An abstract representation of an instruction's operand.
- */
-public protocol InstructionOperandAssemblyRepresentable {
-  /**
-   The operand's abstract representation.
-   */
-  var representation: InstructionOperandAssemblyRepresentation { get }
-}
-
-/**
- Possible types of abstract representations for instruction operands.
- */
-public enum InstructionOperandAssemblyRepresentation {
-  /**
-   A numeric representation.
-   */
-  case numeric
-
-  /**
-   An address representation.
-   */
-  case address
-
-  /**
-   An FF## address representation.
-   */
-  case ffaddress
-
-  /**
-   A stack pointer offset representation.
-   */
-  case stackPointerOffset
-
-  /**
-   A specific representation.
-   */
-  case specific(String)
 }
 
 extension InstructionSpec {
@@ -87,19 +48,8 @@ extension InstructionSpec {
         return
       }
 
-      if let representable = value as? InstructionOperandAssemblyRepresentable {
-        switch representable.representation {
-        case .numeric:
-          operands.append("#")
-        case .address:
-          operands.append("[#]")
-        case .ffaddress:
-          operands.append("[ff#]")
-        case .stackPointerOffset:
-          operands.append("sp+#")
-        case let .specific(string):
-          operands.append(string)
-        }
+      if let representable = value as? InstructionOperandTokenizable {
+        operands.append(representable.token.asString())
       } else {
         operands.append("\(value)")
       }
