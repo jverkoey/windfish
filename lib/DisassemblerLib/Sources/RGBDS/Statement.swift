@@ -66,33 +66,9 @@ extension Statement {
   }
 
   private static func createTokenizedString(opcode: String, operands: [String]) -> String {
-    let operands: [String] = operands.map { operand in
-      if isNumber(operand) {
-        return "#"
-      } else if operand.hasPrefix("[") && operand.hasSuffix("]") && String(operand.dropFirst().dropLast()).lowercased().hasPrefix("$ff") {
-        return "[ff#]"
-      } else if operand.hasPrefix("[") && operand.hasSuffix("]") && isNumber(String(operand.dropFirst().dropLast())) {
-        return "[#]"
-      } else if operand.hasPrefix("sp+") {
-        return "sp+#"
-      }
-      return operand
-    }
     if !operands.isEmpty {
-      return "\(opcode) \(operands.joined(separator: ", "))"
+      return "\(opcode) \(operands.map { InstructionOperandToken(string: $0).asString() }.joined(separator: ", "))"
     }
     return opcode
-  }
-
-  private static func isNumber(_ string: String) -> Bool {
-    // https://rgbds.gbdev.io/docs/v0.4.2/rgbasm.5#Numeric_Formats
-    return
-      string.hasPrefix("$") // Hex
-      || string.hasPrefix("&") // Octal
-      || string.hasPrefix("%") // Binary
-      || string.hasPrefix("#") // Placeholder
-      || string.hasPrefix("`") // Gameboy graphics
-      || Int(string) != nil
-      || (string.contains(".") && Float(string) != nil)
   }
 }
