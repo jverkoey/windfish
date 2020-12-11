@@ -15,4 +15,16 @@ class InstructionOperandTokenTests: XCTestCase {
     XCTAssertEqual(InstructionOperandToken(string: "[$ff]"), .address)
     XCTAssertEqual(InstructionOperandToken(string: "sp+$ff"), .stackPointerOffset)
   }
+
+  func testAsString() {
+    XCTAssertEqual(InstructionOperandToken(string: "foo").asString(), "foo")
+    XCTAssertEqual(InstructionOperandToken(string: "123").asString(), "#")
+    XCTAssertEqual(InstructionOperandToken(string: "$123").asString(), "#")
+    XCTAssertEqual(InstructionOperandToken(string: "%123").asString(), "#")
+    XCTAssertEqual(InstructionOperandToken(string: "`123").asString(), "#")
+    XCTAssertEqual(InstructionOperandToken(string: "[$abcd]").asString(), "[#]")
+    XCTAssertEqual(InstructionOperandToken(string: "[$ffcd]").asString(), "[ff#]")
+    XCTAssertEqual(InstructionOperandToken(string: "[$ff]").asString(), "[#]")
+    XCTAssertEqual(InstructionOperandToken(string: "sp+$ff").asString(), "sp+#")
+  }
 }

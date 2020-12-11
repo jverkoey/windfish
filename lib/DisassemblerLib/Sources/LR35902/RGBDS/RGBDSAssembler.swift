@@ -4,6 +4,16 @@ import CPU
 import FoundationExtensions
 import RGBDS
 
+extension LR35902.InstructionSet {
+  public static func specs(for statement: RGBDS.Statement) -> [LR35902.Instruction.Spec]? {
+    let representation = statement.tokenizedString
+    guard let specs = tokenStringToSpecs[representation] else {
+      return nil
+    }
+    return specs
+  }
+}
+
 private func cast<T: UnsignedInteger, negT: SignedInteger>(string: String, negativeType: negT.Type)
 throws -> T
 where T: FixedWidthInteger, negT: FixedWidthInteger, T: BitPatternInitializable, T.CompanionType == negT {
@@ -55,14 +65,6 @@ public final class RGBDSAssembler {
   public struct Error: Swift.Error, Equatable {
     let lineNumber: Int?
     let error: String
-  }
-
-  public static func specs(for statement: RGBDS.Statement) -> [LR35902.Instruction.Spec]? {
-    let representation = statement.tokenizedString
-    guard let specs = LR35902.InstructionSet.tokenStringToSpecs[representation] else {
-      return nil
-    }
-    return specs
   }
 
   public static func instruction(from statement: RGBDS.Statement, using spec: LR35902.Instruction.Spec) throws -> LR35902.Instruction? {
@@ -152,7 +154,7 @@ public final class RGBDSAssembler {
         return
       }
 
-      guard let specs = RGBDSAssembler.specs(for: statement) else {
+      guard let specs = LR35902.InstructionSet.specs(for: statement) else {
         errors.append(Error(lineNumber: lineNumber, error: "Invalid instruction: \(line)"))
         return
       }
