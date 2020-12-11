@@ -57,19 +57,12 @@ public final class RGBDSAssembler {
     let error: String
   }
 
-  public static func specs(for code: String) -> (RGBDS.Statement, [LR35902.Instruction.Spec])? {
-    let statement = RGBDS.Statement(fromLine: code)!
+  public static func specs(for statement: RGBDS.Statement) -> [LR35902.Instruction.Spec]? {
     let representation = statement.tokenizedString
     guard let specs = LR35902.InstructionSet.tokenStringToSpecs[representation] else {
       return nil
     }
-
-    return (statement, specs)
-  }
-
-  public static func codeAndComments(from line: String) -> (code: String?, comment: String?) {
-    let parts = line.split(separator: ";", maxSplits: 1, omittingEmptySubsequences: false)
-    return (code: parts.first?.trimmed(), comment: parts.last?.trimmed())
+    return specs
   }
 
   public static func instruction(from statement: RGBDS.Statement, using spec: LR35902.Instruction.Spec) throws -> LR35902.Instruction? {
@@ -155,11 +148,11 @@ public final class RGBDSAssembler {
         lineNumber += 1
       }
 
-      guard let code = RGBDSAssembler.codeAndComments(from: line).code, code.count > 0 else {
+      guard let statement = RGBDS.Statement(fromLine: line) else {
         return
       }
 
-      guard let (statement, specs) = RGBDSAssembler.specs(for: code) else {
+      guard let specs = RGBDSAssembler.specs(for: statement) else {
         errors.append(Error(lineNumber: lineNumber, error: "Invalid instruction: \(line)"))
         return
       }

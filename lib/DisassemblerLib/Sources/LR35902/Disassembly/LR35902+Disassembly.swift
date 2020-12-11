@@ -1,5 +1,7 @@
 import Foundation
+
 import Disassembler
+import RGBDS
 
 extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {
   public var category: InstructionCategory? {
@@ -491,10 +493,10 @@ extension LR35902 {
     public func defineMacro(named name: String, template: String) {
       var patterns: [MacroLine] = []
       template.enumerateLines { line, _ in
-        guard let code = RGBDSAssembler.codeAndComments(from: line).code, code.count > 0 else {
+        guard let statement = RGBDS.Statement(fromLine: line) else {
           return
         }
-        guard let (statement, specs) = RGBDSAssembler.specs(for: code) else {
+        guard let specs = RGBDSAssembler.specs(for: statement) else {
           preconditionFailure()
         }
         guard specs.count == 1 else {
