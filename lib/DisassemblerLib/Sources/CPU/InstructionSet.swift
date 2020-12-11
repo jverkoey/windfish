@@ -80,7 +80,7 @@ extension InstructionSet {
   }
 
   /**
-   Calculates the opcode for every instruction in this set.
+   Calculates the opcode bytes for every instruction in this set.
 
    Assumes that each instruction specification's opcode byte corresponds to its index in its corresponding instruction
    table.
@@ -91,6 +91,12 @@ extension InstructionSet {
     return binary
   }
 
+  /**
+   Calculates the opcode string for every instruction in this set.
+
+   Assumes that the name of the enum case in the specification's enum definition is exactly the opcode's string
+   representation.
+   */
   public static func computeAllOpcodeStrings() -> [SpecType: String] {
     return allSpecs().reduce(into: [:]) { accumulator, spec in
       accumulator[spec] = computeOpcodeString(for: spec)

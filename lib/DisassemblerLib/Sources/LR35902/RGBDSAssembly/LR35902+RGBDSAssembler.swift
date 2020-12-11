@@ -7,7 +7,7 @@ public protocol InstructionSpecRepresentable {
   /**
    The assembly opcode for this instruction.
    */
-  var opcode2: String { get }
+  var opcode: String { get }
 
   /**
    An abstract representation of this instruction in assembly.
@@ -63,10 +63,10 @@ extension InstructionSpec {
   /**
    Extracts the opcode from the name of the first part of the spec.
    */
-  public var opcode2: String {
+  public var opcode: String {
     if let child = Mirror(reflecting: self).children.first {
       if let childInstruction = child.value as? Self {
-        return childInstruction.opcode2
+        return childInstruction.opcode
       }
       return child.label!
     } else {
@@ -104,7 +104,7 @@ extension InstructionSpec {
         operands.append("\(value)")
       }
     }
-    var representationParts = [opcode2]
+    var representationParts = [opcode]
     if !operands.isEmpty {
       representationParts.append(operands.joined(separator: ", "))
     }
