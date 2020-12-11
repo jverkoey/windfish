@@ -432,7 +432,7 @@ ld hl, sp+$05
       if case .prefix = spec {
         continue
       }
-      let representation = spec.representation
+      let representation = LR35902.InstructionSet.specToTokenString[spec]!
 
       let assembly: String
       switch spec {
@@ -457,7 +457,7 @@ ld hl, sp+$05
       guard spec != .invalid else {
         continue
       }
-      let representation = spec.representation
+      let representation = LR35902.InstructionSet.specToTokenString[spec]!
 
       let assembly: String
       switch spec {

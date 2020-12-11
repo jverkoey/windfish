@@ -4,65 +4,52 @@ import CPU
 import FoundationExtensions
 import RGBDS
 
-public protocol InstructionSpecRepresentable {
+extension LR35902.InstructionSet {
   /**
-   The assembly opcode for this instruction.
+   A cached map of specifications to their tokenized representation.
+
+   This is typically implemented by returning the result of `computeAllOpcodeStrings()`.
    */
-  var opcode: String { get }
+  static var specToTokenString: [SpecType: String] = {
+    return computeAllTokenStrings()
+  }()
 
   /**
-   An abstract representation of this instruction in assembly.
+   A cached map of specifications to their tokenized representation.
 
-   The following wildcards are permitted:
-
-   - #: Any numeric value.
+   This is typically implemented by returning the result of `computeAllOpcodeStrings()`.
    */
-  var representation: String { get }
-}
+  static var tokenStringToSpecs: [String: [SpecType]] = {
+    return .init(specToTokenString.map { ($0.value, [$0.key]) }, uniquingKeysWith: +)
+  }()
 
-extension InstructionSpec {
-  /**
-   Extracts the opcode from the name of the first part of the spec.
-   */
-  public var opcode: String {
-    if let child = Mirror(reflecting: self).children.first {
-      if let childInstruction = child.value as? Self {
-        return childInstruction.opcode
+  private static func computeAllTokenStrings() -> [SpecType: String] {
+    return allSpecs().reduce(into: [:]) { accumulator, spec in
+      var operands: [String] = []
+      spec.visit { operand in
+        // Optional operands are provided by the visitor as boxed optional types represented as an Any.
+        // We can't cast an Any to an Any? using the as? operator, so perform an explicit Optional-type unboxing instead:
+        guard let valueUnboxed = operand?.value,
+              case Optional<Any>.some(let value) = valueUnboxed else {
+          return
+        }
+
+        if let representable = value as? InstructionOperandTokenizable {
+          operands.append(representable.token.asString())
+        } else {
+          operands.append("\(value)")
+        }
       }
-      return child.label!
-    } else {
-      return "\("\(self)".split(separator: ".").last!)"
-    }
-  }
-
-  /**
-   Returns a generic representation of the instruction by visiting each of the operands and returning their representable versions.
-   */
-  public var representation: String {
-    var operands: [String] = []
-    visit { operand in
-      // Optional operands are provided by the visitor as boxed optional types represented as an Any.
-      // We can't cast an Any to an Any? using the as? operator, so perform an explicit Optional-type unboxing instead:
-      guard let valueUnboxed = operand?.value,
-            case Optional<Any>.some(let value) = valueUnboxed else {
+      guard let opcode = opcodeStrings[spec] else {
         return
       }
-
-      if let representable = value as? InstructionOperandTokenizable {
-        operands.append(representable.token.asString())
-      } else {
-        operands.append("\(value)")
+      var representationParts = [opcode]
+      if !operands.isEmpty {
+        representationParts.append(operands.joined(separator: ", "))
       }
+      accumulator[spec] = representationParts.joined(separator: " ")
     }
-    var representationParts = [opcode]
-    if !operands.isEmpty {
-      representationParts.append(operands.joined(separator: ", "))
-    }
-    return representationParts.joined(separator: " ")
   }
-}
-
-extension LR35902.Instruction.Spec: InstructionSpecRepresentable {
 }
 
 private func createStatement(from code: String) -> RGBDSAssembly.Statement {
@@ -157,7 +144,7 @@ public final class RGBDSAssembler {
   public static func specs(for code: String) -> (RGBDSAssembly.Statement, [LR35902.Instruction.Spec])? {
     let statement = createStatement(from: code)
     let representation = createRepresentation(from: statement)
-    guard let specs = RGBDSAssembler.representations[representation] else {
+    guard let specs = LR35902.InstructionSet.tokenStringToSpecs[representation] else {
       return nil
     }
 
@@ -310,21 +297,4 @@ public final class RGBDSAssembler {
     }
     return errors
   }
-
-  static var representations: [String: [LR35902.Instruction.Spec]] = {
-    var representations: [String: [LR35902.Instruction.Spec]] = [:]
-    LR35902.InstructionSet.table.forEach { spec in
-      if case .invalid = spec {
-        return
-      }
-      representations[spec.representation, default: []].append(spec)
-    }
-    LR35902.InstructionSet.tableCB.forEach { spec in
-      if case .invalid = spec {
-        return
-      }
-      representations[spec.representation, default: []].append(spec)
-    }
-    return representations
-  }()
 }
