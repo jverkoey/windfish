@@ -463,6 +463,7 @@ extension RGBDSAssembly.Statement {
                         regionLookup: [String: Region],
                         scope: String?) -> NSAttributedString {
     let string = NSMutableAttributedString()
+    string.beginEditing()
     let opcodeName = opcode.padding(toLength: RGBDSAssembly.maxOpcodeNameLength, withPad: " ", startingAt: 0)
     string.append(NSAttributedString(string: opcodeName, attributes: opcodeAttributes))
     if let operands = operands {
@@ -498,6 +499,7 @@ extension RGBDSAssembly.Statement {
       }
       string.append(operandString)
     }
+    string.endEditing()
     return string
   }
 }
