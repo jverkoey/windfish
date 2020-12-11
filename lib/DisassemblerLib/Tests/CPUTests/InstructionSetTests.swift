@@ -24,7 +24,7 @@ class InstructionSetTests: XCTestCase {
       .prefix(.sub): [5],
       .sub(.cp(.imm8)): [5, 0],
     ]
-    for (key, value) in SimpleCPU.InstructionSet.instructionOpcodes {
+    for (key, value) in SimpleCPU.InstructionSet.opcodeBytes {
       XCTAssertEqual(value, opcodes[key], "\(key) mismatched")
     }
   }

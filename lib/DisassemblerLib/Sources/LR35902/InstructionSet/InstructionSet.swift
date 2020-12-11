@@ -15,8 +15,8 @@ extension LR35902 {
       }
     }()
 
-    static var instructionOpcodes: [Instruction.Spec : [UInt8]] = {
-      return computeAllInstructionOpcodes()
+    static var opcodeBytes: [Instruction.Spec : [UInt8]] = {
+      return computeAllOpcodeBytes()
     }()
 
     static let table: [Instruction.Spec] = [

@@ -17,7 +17,7 @@ extension LR35902.Instruction {
 
 extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {
   public func asData() -> Data? {
-    return Data(LR35902.InstructionSet.instructionOpcodes[self]!)
+    return Data(LR35902.InstructionSet.opcodeBytes[self]!)
   }
 
   public var category: InstructionCategory? {

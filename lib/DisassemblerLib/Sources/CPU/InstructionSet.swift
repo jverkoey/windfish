@@ -24,6 +24,7 @@ public protocol InstructionSet {
   /** The instruction type this set consists of. */
   associatedtype InstructionType: Instruction
   typealias SpecType = InstructionType.SpecType
+  typealias InstructionTable = [SpecType]
 
   /**
    The primary table of instructions.
@@ -31,10 +32,10 @@ public protocol InstructionSet {
    The array's index is meant to correspond to the binary opcode value of the instruction. When no instruction is
    available for a given index, provide an invalid instruction specification as filler.
    */
-  static var table: [SpecType] { get }
+  static var table: InstructionTable { get }
 
   /** Additional tables for multi-byte instructions. */
-  static var prefixTables: [SpecType: [SpecType]] { get }
+  static var prefixTables: [SpecType: InstructionTable] { get }
 
   /**
    A cached map of specifications to computed widths.
@@ -46,9 +47,9 @@ public protocol InstructionSet {
   /**
    A cached map of specifications to their binary opcode representations.
 
-   This is typically implemented by returning the result of `computeAllInstructionOpcodes()`.
+   This is typically implemented by returning the result of `computeAllOpcodeBytes()`.
    */
-  static var instructionOpcodes: [SpecType: [UInt8]] { get }
+  static var opcodeBytes: [SpecType: [UInt8]] { get }
 }
 
 // MARK: - Helper methods for computing properties
@@ -68,23 +69,32 @@ extension InstructionSet {
     return widths
   }
 
-  /** Calculates the opcode for every instruction in this set. */
-  public static func computeAllInstructionOpcodes() -> [SpecType: [UInt8]] {
+  /**
+   Calculates the opcode for every instruction in this set.
+
+   Assumes that each instruction specification's opcode byte corresponds to its index in its corresponding instruction
+   table.
+   */
+  public static func computeAllOpcodeBytes() -> [SpecType: [UInt8]] {
     var binary: [SpecType: [UInt8]] = [:]
-    computeAllInstructionOpcodes(accumulator: &binary, table: table, prefix: [])
+    computeAllOpcodeBytes(accumulator: &binary, table: table, prefix: [])
     return binary
   }
+}
 
+// MARK: - Internal methods
+
+extension InstructionSet {
   /** Recursively computes opcodes by traversing tables when prefixes are encountered. */
-  private static func computeAllInstructionOpcodes(accumulator: inout [SpecType: [UInt8]],
-                                                   table: [SpecType],
-                                                   prefix: [UInt8]) {
+  private static func computeAllOpcodeBytes(accumulator: inout [SpecType: [UInt8]],
+                                            table: [SpecType],
+                                            prefix: [UInt8]) {
     for (byteRepresentation, spec) in table.enumerated() {
       let opcode = prefix + [UInt8(byteRepresentation)]
       if let prefixTable = prefixTables[spec] {
-        computeAllInstructionOpcodes(accumulator: &accumulator,
-                                     table: prefixTable,
-                                     prefix: opcode)
+        computeAllOpcodeBytes(accumulator: &accumulator,
+                              table: prefixTable,
+                              prefix: opcode)
       } else {
         accumulator[spec] = opcode
       }

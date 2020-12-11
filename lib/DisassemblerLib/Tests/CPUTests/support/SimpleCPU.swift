@@ -79,8 +79,8 @@ struct SimpleCPU {
       return computeAllWidths()
     }()
 
-    static var instructionOpcodes: [Instruction.Spec : [UInt8]] = {
-      return computeAllInstructionOpcodes()
+    static var opcodeBytes: [Instruction.Spec : [UInt8]] = {
+      return computeAllOpcodeBytes()
     }()
   }
 }
