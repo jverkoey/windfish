@@ -56,12 +56,6 @@ public final class RGBDSAssembler {
   public init() {
   }
 
-  public var buffer = Data()
-
-  // TODO: Allow comments to be represented in the assembly as well for use in macros.
-  // This will need to become an enum of comments, newlines, or instructions.
-  public var instructions: [LR35902.Instruction] = []
-
   public struct Error: Swift.Error, Equatable {
     let lineNumber: Int?
     let error: String
@@ -140,9 +134,10 @@ public final class RGBDSAssembler {
     return .init(spec: spec)
   }
 
-  // TODO: Allow generation of list of instructions instead of just data.
-  public func assemble(assembly: String) -> [Error] {
+  public func assemble(assembly: String) -> (instructions: [LR35902.Instruction], data: Data, errors: [Error]) {
     var lineNumber = 1
+    var buffer = Data()
+    var instructions: [LR35902.Instruction] = []
     var errors: [Error] = []
 
     assembly.enumerateLines { (line, stop) in
@@ -160,25 +155,25 @@ public final class RGBDSAssembler {
       }
 
       do {
-        let instructions: [LR35902.Instruction] = try specs.compactMap { spec in
+        let potentialInstructions: [LR35902.Instruction] = try specs.compactMap { spec in
           try RGBDSAssembler.instruction(from: statement, using: spec)
         }
-        guard instructions.count > 0 else {
+        guard potentialInstructions.count > 0 else {
           throw Error(lineNumber: lineNumber, error: "No valid instruction found for \(line)")
         }
-        let shortestInstruction = instructions.sorted(by: { pair1, pair2 in
+        let shortestInstruction = potentialInstructions.sorted(by: { pair1, pair2 in
           LR35902.InstructionSet.widths[pair1.spec]!.total < LR35902.InstructionSet.widths[pair2.spec]!.total
         })[0]
 
-        self.instructions.append(shortestInstruction)
+        instructions.append(shortestInstruction)
 
-        self.buffer.append(contentsOf: LR35902.InstructionSet.data(for: shortestInstruction.spec)!)
+        buffer.append(contentsOf: LR35902.InstructionSet.data(for: shortestInstruction.spec)!)
         switch shortestInstruction.immediate {
         case let .imm8(immediate):
-          self.buffer.append(contentsOf: [immediate])
+          buffer.append(contentsOf: [immediate])
         case var .imm16(immediate):
-          withUnsafeBytes(of: &immediate) { buffer in
-            self.buffer.append(contentsOf: Data(buffer))
+          withUnsafeBytes(of: &immediate) { immediateBytes in
+            buffer.append(contentsOf: Data(immediateBytes))
           }
         case .none:
           break
@@ -193,6 +188,6 @@ public final class RGBDSAssembler {
       } catch {
       }
     }
-    return errors
+    return (instructions: instructions, data: buffer, errors: errors)
   }
 }

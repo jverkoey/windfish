@@ -4,41 +4,41 @@ import XCTest
 class RGBDAssembler: XCTestCase {
   func test_nop_failsWithExtraOperand() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 nop nop
 """)
 
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [RGBDSAssembler.Error(lineNumber: 1, error: "Invalid instruction: nop nop")])
+    XCTAssertEqual(results.errors, [RGBDSAssembler.Error(lineNumber: 1, error: "Invalid instruction: nop nop")])
   }
 
   func test_nop_failsWithExtraOperandAtCorrectLine() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 
 ; This is a comment-only line
 nop nop
 """)
 
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [RGBDSAssembler.Error(lineNumber: 3, error: "Invalid instruction: nop nop")])
+    XCTAssertEqual(results.errors, [RGBDSAssembler.Error(lineNumber: 3, error: "Invalid instruction: nop nop")])
   }
 
   func test_newline_doesNotCauseParseFailures() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 nop
 
 nop
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .nop),
       0x0001: LR35902.Instruction(spec: .nop)
@@ -47,27 +47,27 @@ nop
 
   func test_nop_1() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 nop
 """)
 
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [0x0000: LR35902.Instruction(spec: .nop)])
   }
 
   func test_nop_2() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 nop
 nop
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .nop),
       0x0001: LR35902.Instruction(spec: .nop)
@@ -76,13 +76,13 @@ nop
 
   func test_ld_bc_imm16_dollarHexIsRepresentable() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 ld bc, $1234
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(0x1234))
     ])
@@ -90,25 +90,25 @@ ld bc, $1234
 
   func test_ld_bc_imm16_0xHexIsNotRepresentable() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 ld bc, 0x1234
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [.init(lineNumber: 1, error: "Invalid instruction: ld bc, 0x1234")])
+    XCTAssertEqual(results.errors, [.init(lineNumber: 1, error: "Invalid instruction: ld bc, 0x1234")])
     XCTAssertEqual(disassembly.instructionMap, [:])
   }
 
   func test_ld_bc_imm16_numberIsRepresentable() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 ld bc, 1234
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertTrue(errors.isEmpty)
+    XCTAssertTrue(results.errors.isEmpty)
 
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(1234))
@@ -117,13 +117,13 @@ ld bc, 1234
 
   func test_ld_bc_imm16_negativeNumberIsRepresentable() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 ld bc, -1234
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
 
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(UInt16(bitPattern: -1234)))
@@ -132,14 +132,14 @@ ld bc, -1234
 
   func test_ld_bc_imm16_nop() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 ld bc, $1234
     nop
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(0x1234)),
       0x0003: LR35902.Instruction(spec: .nop)
@@ -148,37 +148,37 @@ ld bc, $1234
 
   func test_ld_bc_imm16_unrepresentableNumberFails() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 ld bc, $12342342342
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [RGBDSAssembler.Error(lineNumber: 1, error: "Unable to represent $12342342342 as a UInt16")])
+    XCTAssertEqual(results.errors, [RGBDSAssembler.Error(lineNumber: 1, error: "Unable to represent $12342342342 as a UInt16")])
     XCTAssertEqual(disassembly.instructionMap, [:])
   }
 
   func test_ld_bc_imm16_emptyNumberFails() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 ld bc, $
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [RGBDSAssembler.Error(lineNumber: 1, error: "Unable to represent $ as a UInt16")])
+    XCTAssertEqual(results.errors, [RGBDSAssembler.Error(lineNumber: 1, error: "Unable to represent $ as a UInt16")])
     XCTAssertEqual(disassembly.instructionMap, [:])
   }
 
   func test_ld_bcAddress_a() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 ld [bc], a
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .ld(.bcaddr, .a)),
     ])
@@ -186,13 +186,13 @@ ld [bc], a
 
   func test_inc_bc() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 inc bc
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .inc(.bc)),
     ])
@@ -200,13 +200,13 @@ inc bc
 
   func test_ld_b_imm8() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 ld b, 255
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .ld(.b, .imm8), immediate: .imm8(255)),
     ])
@@ -214,25 +214,25 @@ ld b, 255
 
   func test_ld_b_imm8_0xHexIsNotSupported() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 ld b, 0xFF
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [.init(lineNumber: 1, error: "Invalid instruction: ld b, 0xFF")])
+    XCTAssertEqual(results.errors, [.init(lineNumber: 1, error: "Invalid instruction: ld b, 0xFF")])
     XCTAssertEqual(disassembly.instructionMap, [:])
   }
 
   func test_ld_imm16addr_sp() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 ld [$1234], sp
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .ld(.imm16addr, .sp), immediate: .imm16(0x1234)),
     ])
@@ -240,13 +240,13 @@ ld [$1234], sp
 
   func test_ld_a_bcaddr() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 ld a, [bc]
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .ld(.a, .bcaddr)),
     ])
@@ -254,13 +254,13 @@ ld a, [bc]
 
   func test_rrca() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 rrca
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .rrca),
     ])
@@ -268,13 +268,13 @@ rrca
 
   func test_jr() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 jr 5
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .jr(nil, .simm8), immediate: .imm8(3)),
     ])
@@ -282,13 +282,13 @@ jr 5
 
   func test_ld_ffimm8_a() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 ld [$FFA0], a
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .ld(.ffimm8addr, .a), immediate: .imm8(0xA0)),
     ])
@@ -296,13 +296,13 @@ ld [$FFA0], a
 
   func test_ld_imm16_a() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 ld [$FAA0], a
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .ld(.imm16addr, .a), immediate: .imm16(0xFAA0)),
     ])
@@ -310,13 +310,13 @@ ld [$FAA0], a
 
   func test_ret_z() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 ret z
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .ret(.z)),
     ])
@@ -324,13 +324,13 @@ ret z
 
   func test_sub_imm8() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 sub 5
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .sub(.imm8), immediate: .imm8(5)),
     ])
@@ -338,13 +338,13 @@ sub 5
 
   func test_rst() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 rst $38
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .rst(.x38)),
     ])
@@ -352,13 +352,13 @@ rst $38
 
   func test_rlc_b() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 rlc b
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .cb(.rlc(.b))),
     ])
@@ -366,13 +366,13 @@ rlc b
 
   func test_bit_2_b() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 bit 2, b
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .cb(.bit(.b2, .b))),
     ])
@@ -380,13 +380,13 @@ bit 2, b
 
   func test_set_6_hladdr() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 set 6, [hl]
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .cb(.set(.b6, .hladdr))),
     ])
@@ -394,13 +394,13 @@ set 6, [hl]
 
   func test_jr_cond() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 jr nz, 5
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .jr(.nz, .simm8), immediate: .imm8(3)),
     ])
@@ -408,13 +408,13 @@ jr nz, 5
 
   func test_ld_hl_spimm8() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 ld hl, sp+$05
 """)
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
       0x0000: LR35902.Instruction(spec: .ld(.hl, .sp_plus_simm8), immediate: .imm8(0x05)),
     ])
@@ -441,11 +441,11 @@ ld hl, sp+$05
       }
 
       let assembler = RGBDSAssembler()
-      let errors = assembler.assemble(assembly: assembly)
-      let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-      disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+      let results = assembler.assemble(assembly: assembly)
+      let disassembly = LR35902.Disassembly(rom: results.data)
+      disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-      XCTAssertEqual(errors, [], "Spec: \(spec)")
+      XCTAssertEqual(results.errors, [], "Spec: \(spec)")
       XCTAssertEqual(disassembly.instructionMap[0x0000]?.spec, spec)
     }
 
@@ -468,18 +468,18 @@ ld hl, sp+$05
       }
 
       let assembler = RGBDSAssembler()
-      let errors = assembler.assemble(assembly: assembly)
-      let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-      disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+      let results = assembler.assemble(assembly: assembly)
+      let disassembly = LR35902.Disassembly(rom: results.data)
+      disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-      XCTAssertEqual(errors, [], "Spec: \(spec)")
+      XCTAssertEqual(results.errors, [], "Spec: \(spec)")
       XCTAssertEqual(disassembly.instructionMap[0x0000]?.spec, spec)
     }
   }
 
   func testBoo() {
     let assembler = RGBDSAssembler()
-    let _ = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
 ld   c, a                                    ; $282A (00): ReadJoypadState $4F
 ld   a, [$ffcb]               ; $282B (00): ReadJoypadState $F0 $CB
 xor  c                                       ; $282D (00): ReadJoypadState $A9
@@ -489,15 +489,15 @@ ld   a, c                                    ; $2831 (00): ReadJoypadState $79
 ld   [$ffcb], a               ; $2832 (00): ReadJoypadState $E0 $CB
 """)
 
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
-    disassembly.disassemble(range: 0..<LR35902.Address(assembler.buffer.count), inBank: 0x00)
+    let disassembly = LR35902.Disassembly(rom: results.data)
+    disassembly.disassemble(range: 0..<LR35902.Address(results.data.count), inBank: 0x00)
 
     var initialState = LR35902.Disassembly.CPUState()
 
     initialState.a = LR35902.Disassembly.CPUState.RegisterState<UInt8>(value: .value(0b0000_1111), sourceLocation: 0)
     initialState.ram[0xffcb] = .init(value: .value(0b0000_1100), sourceLocation: 0)
 
-    let states = disassembly.simulate(range: 0..<LR35902.Cartridge.Location(assembler.buffer.count),
+    let states = disassembly.simulate(range: 0..<LR35902.Cartridge.Location(results.data.count),
                                       initialState: initialState).sorted(by: { $0.key < $1.key })
     let lastState = states[states.count - 1]
 

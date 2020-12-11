@@ -17,13 +17,13 @@ extension LR35902.Disassembly.MacroNode: Equatable {
 class TypeInferenceTests: XCTestCase {
   func test_something() throws {
     let assembler = RGBDSAssembler()
-    let errors = assembler.assemble(assembly: """
+    let results = assembler.assemble(assembly: """
    ld   a, $44
    ld   [$ff41], a
 """)
-    XCTAssertEqual(errors, [])
+    XCTAssertEqual(results.errors, [])
 
-    let disassembly = LR35902.Disassembly(rom: assembler.buffer)
+    let disassembly = LR35902.Disassembly(rom: results.data)
 
     disassembly.createDatatype(named: "STATF", bitmask: [
       0b0100_0000: "STATF_LYC",
@@ -36,7 +36,7 @@ class TypeInferenceTests: XCTestCase {
       0b0000_0000: "STATF_HB"
     ])
     disassembly.createGlobal(at: 0xff41, named: "gbSTAT", dataType: "STATF")
-    disassembly.disassemble(range: 0..<UInt16(assembler.buffer.count), inBank: 0x00)
+    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
     let (source, _) = try! disassembly.generateSource()
     let bank00Source = source.sources["bank_00.asm"]
