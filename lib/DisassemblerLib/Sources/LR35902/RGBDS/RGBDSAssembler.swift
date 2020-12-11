@@ -9,7 +9,7 @@ private func isNumber(_ string: String) -> Bool {
 }
 
 private func createRepresentation(from statement: RGBDS.Statement) -> String {
-  if let operands: [String] = statement.operands?.map({ operand in
+  let operands: [String] = statement.operands.map { operand in
     if isNumber(operand) {
       return "#"
     } else if operand.hasPrefix("[") && operand.hasSuffix("]") && String(operand.dropFirst().dropLast()).lowercased().hasPrefix("$ff") {
@@ -20,7 +20,8 @@ private func createRepresentation(from statement: RGBDS.Statement) -> String {
       return "sp+#"
     }
     return operand
-  }) {
+  }
+  if !operands.isEmpty {
     return "\(statement.opcode) \(operands.joined(separator: ", "))"
   } else {
     return statement.opcode
@@ -126,54 +127,41 @@ public final class RGBDSAssembler {
       defer {
         index += 1
       }
+      let value = statement.operands[index]
       switch child.value {
       case let restartAddress as LR35902.Instruction.RestartAddress:
-        if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
-          let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
-          if numericValue != restartAddress.rawValue {
-            return nil
-          }
+        let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
+        if numericValue != restartAddress.rawValue {
+          return nil
         }
       case let bit as LR35902.Instruction.Bit:
-        if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
-          let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
-          if numericValue != bit.rawValue {
-            return nil
-          }
+        let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
+        if numericValue != bit.rawValue {
+          return nil
         }
       case LR35902.Instruction.Numeric.imm16:
-        if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
-          let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
-          return .init(spec: spec, immediate: .imm16(numericValue))
-        }
+        let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
+        return .init(spec: spec, immediate: .imm16(numericValue))
       case LR35902.Instruction.Numeric.imm8, LR35902.Instruction.Numeric.simm8:
-        if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
-          var numericValue: UInt8 = try cast(string: value, negativeType: Int8.self)
-          if case .jr = spec {
-            // Relative jumps in assembly are written from the point of view of the instruction's beginning.
-            numericValue = numericValue.subtractingReportingOverflow(UInt8(LR35902.InstructionSet.widths[spec]!.total)).partialValue
-          }
-          return .init(spec: spec, immediate: .imm8(numericValue))
+        var numericValue: UInt8 = try cast(string: value, negativeType: Int8.self)
+        if case .jr = spec {
+          // Relative jumps in assembly are written from the point of view of the instruction's beginning.
+          numericValue = numericValue.subtractingReportingOverflow(UInt8(LR35902.InstructionSet.widths[spec]!.total)).partialValue
         }
+        return .init(spec: spec, immediate: .imm8(numericValue))
       case LR35902.Instruction.Numeric.ffimm8addr:
-        if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
-          let numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self)
-          if (numericValue & 0xFF00) != 0xFF00 {
-            return nil
-          }
-          let lowerByteValue = UInt8(numericValue & 0xFF)
-          return .init(spec: spec, immediate: .imm8(lowerByteValue))
+        let numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self)
+        if (numericValue & 0xFF00) != 0xFF00 {
+          return nil
         }
+        let lowerByteValue = UInt8(numericValue & 0xFF)
+        return .init(spec: spec, immediate: .imm8(lowerByteValue))
       case LR35902.Instruction.Numeric.sp_plus_simm8:
-        if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
-          let numericValue: UInt8 = try cast(string: String(value.dropFirst(3).trimmed()), negativeType: Int8.self)
-          return .init(spec: spec, immediate: .imm8(numericValue))
-        }
+        let numericValue: UInt8 = try cast(string: String(value.dropFirst(3).trimmed()), negativeType: Int8.self)
+        return .init(spec: spec, immediate: .imm8(numericValue))
       case LR35902.Instruction.Numeric.imm16addr:
-        if let value = Mirror(reflecting: statement).descendant(1, 0, index) as? String {
-          let numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self)
-          return .init(spec: spec, immediate: .imm16(numericValue))
-        }
+        let numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self)
+        return .init(spec: spec, immediate: .imm16(numericValue))
       default:
         break
       }

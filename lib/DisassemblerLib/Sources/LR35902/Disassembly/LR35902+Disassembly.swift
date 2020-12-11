@@ -507,7 +507,7 @@ extension LR35902 {
         if let instruction = try? RGBDSAssembler.instruction(from: statement, using: spec) {
           patterns.append(.instruction(instruction))
         } else {
-          guard let argumentNumber = statement.operands?.first(where: { $0.contains("#") }) else {
+          guard let argumentNumber = statement.operands.first(where: { $0.contains("#") }) else {
             preconditionFailure()
           }
           let scanner = Scanner(string: argumentNumber)

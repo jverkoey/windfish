@@ -11,7 +11,21 @@ class StatementTests: XCTestCase {
     XCTAssertEqual(statement.operands, ["a", "b"])
   }
 
-  func testOnlyComment() throws {
+  func testWellFormedLineWithExcessiveSpaceExtractsAllParts() throws {
+    let statement = try XCTUnwrap(Statement(fromLine: "     ld       a   ,    b      ; some comment"))
+
+    XCTAssertEqual(statement.opcode, "ld")
+    XCTAssertEqual(statement.operands, ["a", "b"])
+  }
+
+  func testOnlyOpcode() throws {
+    let statement = try XCTUnwrap(Statement(fromLine: "nop"))
+
+    XCTAssertEqual(statement.opcode, "nop")
+    XCTAssertEqual(statement.operands, [])
+  }
+
+  func testOnlyCommentIsNotAStatement() throws {
     XCTAssertNil(Statement(fromLine: "; some comment"))
   }
 }

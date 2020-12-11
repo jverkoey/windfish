@@ -467,7 +467,7 @@ extension RGBDS.Statement {
     string.beginEditing()
     let opcodeName = opcode.padding(toLength: RGBDS.maxOpcodeNameLength, withPad: " ", startingAt: 0)
     string.append(NSAttributedString(string: opcodeName, attributes: opcodeAttributes))
-    if let operands = operands {
+    if !operands.isEmpty {
       string.append(NSAttributedString(string: " ", attributes: attributes))
 
       let separator = ", "
