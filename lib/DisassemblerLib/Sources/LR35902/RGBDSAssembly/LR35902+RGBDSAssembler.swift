@@ -73,9 +73,7 @@ extension InstructionSpec {
       return "\("\(self)".split(separator: ".").last!)"
     }
   }
-}
 
-extension InstructionSpec {
   /**
    Returns a generic representation of the instruction by visiting each of the operands and returning their representable versions.
    */
