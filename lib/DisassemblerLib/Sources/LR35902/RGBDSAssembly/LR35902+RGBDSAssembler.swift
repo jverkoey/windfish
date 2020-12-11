@@ -339,7 +339,7 @@ public final class RGBDSAssembler {
 
         self.instructions.append(shortestInstruction)
 
-        self.buffer.append(contentsOf: LR35902.InstructionSet.opcodeBytes[shortestInstruction.spec]!)
+        self.buffer.append(contentsOf: LR35902.InstructionSet.data(for: shortestInstruction.spec)!)
         switch shortestInstruction.immediate {
         case let .imm8(immediate):
           self.buffer.append(contentsOf: [immediate])

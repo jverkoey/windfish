@@ -2,24 +2,7 @@ import Foundation
 import Disassembler
 import CPU
 
-extension LR35902.Instruction {
-  public func operandData() -> Data? {
-    switch immediate {
-    case let .imm8(value):
-      return Data([value])
-    case let .imm16(value):
-      return Data([UInt8(value & 0xff), UInt8((value >> 8) & 0xff)])
-    case .none:
-      return nil
-    }
-  }
-}
-
 extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {
-  public func asData() -> Data? {
-    return Data(LR35902.InstructionSet.opcodeBytes[self]!)
-  }
-
   public var category: InstructionCategory? {
     switch self {
     case .call: return .call
