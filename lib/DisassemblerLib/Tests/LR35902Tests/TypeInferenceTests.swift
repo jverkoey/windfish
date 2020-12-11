@@ -52,7 +52,7 @@ SECTION "ROM Bank 00", ROM0[$00]
         LR35902.Disassembly.Line(semantic: .section(0), address: nil, bank: nil, scope: nil, data: nil),
         LR35902.Disassembly.Line(semantic: .empty, address: nil, bank: nil, scope: nil, data: nil),
         LR35902.Disassembly.Line(semantic: .instruction(.init(spec: .ld(.a, .imm8), immediate: .imm8(68)),
-                                                        .init(opcode: "ld", operands: ["a", "STATF_LYC | STATF_LYCF"], comments: nil)),
+                                                        .init(opcode: "ld", operands: ["a", "STATF_LYC | STATF_LYCF"])),
                                  address: 0, bank: 0, scope: "", data: Data([0x3e, 0x44])),
         LR35902.Disassembly.Line(semantic: .instruction(.init(spec: .ld(.ffimm8addr, .a), immediate: .imm8(65)),
                                                         .init(opcode: "ld", operands: ["[gbSTAT]", "a"])),

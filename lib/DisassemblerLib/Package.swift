@@ -47,7 +47,9 @@ let package = Package(
     ),
     .target(
       name: "RGBDS",
-      dependencies: []
+      dependencies: [
+        "FoundationExtensions",
+      ]
     ),
     .target(
       name: "FoundationExtensions",
@@ -61,6 +63,10 @@ let package = Package(
     .testTarget(
       name: "CPUTests",
       dependencies: ["CPU"]
+    ),
+    .testTarget(
+      name: "RGBDSTests",
+      dependencies: ["RGBDS"]
     ),
   ]
 )

@@ -4,19 +4,6 @@ import CPU
 import FoundationExtensions
 import RGBDS
 
-private func createStatement(from code: String) -> RGBDS.Statement {
-  let opcodeAndOperands = code.split(separator: " ", maxSplits: 1)
-
-  let opcode = opcodeAndOperands[0].lowercased()
-
-  if opcodeAndOperands.count > 1 {
-    let operands: [String] = opcodeAndOperands[1].components(separatedBy: ",").map { $0.trimmed() }
-    return RGBDS.Statement(opcode: opcode, operands: operands)
-  } else {
-    return RGBDS.Statement(opcode: opcode)
-  }
-}
-
 private func isNumber(_ string: String) -> Bool {
   return string.hasPrefix("$") || string.hasPrefix("0x") || string.hasPrefix("%") || string.hasPrefix("#") || Int(string) != nil
 }
@@ -94,7 +81,7 @@ public final class RGBDSAssembler {
   }
 
   public static func specs(for code: String) -> (RGBDS.Statement, [LR35902.Instruction.Spec])? {
-    let statement = createStatement(from: code)
+    let statement = RGBDS.Statement(fromLine: code)!
     let representation = createRepresentation(from: statement)
     guard let specs = LR35902.InstructionSet.tokenStringToSpecs[representation] else {
       return nil

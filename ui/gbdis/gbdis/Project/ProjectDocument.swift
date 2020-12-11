@@ -481,12 +481,7 @@ extension RGBDS.Statement {
         }
 
         let lengthSoFar = accumulatedLength
-
-        if accumulatedLength > 0 {
-          accumulatedLength += separator.count
-        }
-        accumulatedLength += operand.count
-
+        accumulatedLength += operand.count + separator.count
         if regionLookup[label] != nil {
           return (operand, (lengthSoFar, "gbdis://jumpto/\(label)"))
         } else {
