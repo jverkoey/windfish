@@ -736,24 +736,24 @@ clean:
             break
           case .unknown:
             for chunk in accumulator.chunked(into: 8) {
-              bankLines.append(Line(semantic: .unknown(RGBDSAssembly.statement(for: chunk)), address: chunkPc, data: Data(chunk)))
+              bankLines.append(Line(semantic: .unknown(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
               chunkPc += LR35902.Address(chunk.count)
             }
           case .data:
             for chunk in accumulator.chunked(into: 8) {
-              bankLines.append(Line(semantic: .data(RGBDSAssembly.statement(for: chunk)), address: chunkPc, data: Data(chunk)))
+              bankLines.append(Line(semantic: .data(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
               chunkPc += LR35902.Address(chunk.count)
             }
           case .image2bpp:
             bankLines.append(Line(semantic: .imagePlaceholder(format: .twoBitsPerPixel), address: chunkPc, data: Data(accumulator)))
             for chunk in accumulator.chunked(into: 8) {
-              bankLines.append(Line(semantic: .image2bpp(RGBDSAssembly.statement(for: chunk)), address: chunkPc, data: Data(chunk)))
+              bankLines.append(Line(semantic: .image2bpp(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
               chunkPc += LR35902.Address(chunk.count)
             }
           case .image1bpp:
             bankLines.append(Line(semantic: .imagePlaceholder(format: .oneBitPerPixel), address: chunkPc, data: Data(accumulator)))
             for chunk in accumulator.chunked(into: 8) {
-              bankLines.append(Line(semantic: .image1bpp(RGBDSAssembly.statement(for: chunk)), address: chunkPc, data: Data(chunk)))
+              bankLines.append(Line(semantic: .image1bpp(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
               chunkPc += LR35902.Address(chunk.count)
             }
           case .code:
@@ -766,7 +766,7 @@ clean:
              let dataTypeName = global.dataType,
              let dataType = dataTypes[dataTypeName],
              let globalValue = globalValue {
-            bankLines.append(Line(semantic: .global(RGBDSAssembly.statement(for: globalValue), dataTypeName: dataTypeName, dataType: dataType), address: chunkPc, data: globalData))
+            bankLines.append(Line(semantic: .global(RGBDS.Statement(representingBytesWithConstant: globalValue), dataTypeName: dataTypeName, dataType: dataType), address: chunkPc, data: globalData))
           }
 
           lineBuffer.append(Line(semantic: .empty))

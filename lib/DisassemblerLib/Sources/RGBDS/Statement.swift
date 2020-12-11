@@ -26,6 +26,16 @@ public struct Statement: Equatable {
     self.formattedString = Statement.createString(opcode: opcode, operands: operands)
   }
 
+  /** Initializes the statement as a data representation of the given bytes. */
+  public init(representingBytes bytes: [UInt8]) {
+    self.init(opcode: "db", operands: bytes.map { "$\($0.hexString)" })
+  }
+
+  /** Initializes the statement as a data representation using a named constant. */
+  public init(representingBytesWithConstant constant: String) {
+    self.init(opcode: "db", operands: [constant])
+  }
+
   /** Extracts a statement from the given line, if a statement exists. */
   public init?(fromLine line: String) {
     let codeAndComments = line.split(separator: ";", maxSplits: 1, omittingEmptySubsequences: false)

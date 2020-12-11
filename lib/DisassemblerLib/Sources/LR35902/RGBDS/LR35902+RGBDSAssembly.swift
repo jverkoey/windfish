@@ -13,14 +13,6 @@ public final class RGBDSAssembly {
     }
   }
 
-  public static func statement(for bytes: [UInt8]) -> Statement {
-    return Statement(opcode: "db", operands: bytes.map { "$\($0.hexString)" })
-  }
-
-  public static func statement(for value: String) -> Statement {
-    return Statement(opcode: "db", operands: [value])
-  }
-
   private static func flatten(asciiCodes: [UInt8], characterMap: [UInt8: String]) -> String {
     return asciiCodes.map {
       if let string = characterMap[$0] {

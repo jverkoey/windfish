@@ -138,4 +138,14 @@ class StatementTests: XCTestCase {
     XCTAssertEqual(statement.tokenizedString, "ld a, 0xff00")
   }
 
+  // MARK: - Data statements
+
+  func testDataStatement() throws {
+    let statement = try XCTUnwrap(Statement(representingBytes: [0x00, 0xfa]))
+
+    XCTAssertEqual(statement.opcode, "db")
+    XCTAssertEqual(statement.operands, ["$00", "$FA"])
+    XCTAssertEqual(statement.formattedString, "db   $00, $FA")
+    XCTAssertEqual(statement.tokenizedString, "db #, #")
+  }
 }
