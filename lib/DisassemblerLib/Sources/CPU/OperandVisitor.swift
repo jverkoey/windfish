@@ -40,7 +40,13 @@ extension InstructionSpec {
       if case Optional<Any>.none = child.value {
         continue
       }
-      try visitor((value: child.value, index: index), &shouldStop)
+      // Optional parameters that are non-nil will be wrapped in an Optional<Any> type. To access the actual
+      // underlying operand value we need to unbox it using explicit Optional<Any> notation.
+      guard case Optional<Any>.some(let value) = child.value else {
+        return
+      }
+
+      try visitor((value: value, index: index), &shouldStop)
       if shouldStop {
         break
       }

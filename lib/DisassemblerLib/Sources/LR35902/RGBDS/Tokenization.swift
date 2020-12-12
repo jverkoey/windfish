@@ -2,6 +2,41 @@ import Foundation
 
 import RGBDS
 
+extension LR35902.Instruction.Numeric: InstructionOperandTokenizable {
+  public var token: InstructionOperandToken {
+    switch self {
+    case .bcaddr:
+      return .specific("[bc]")
+    case .deaddr:
+      return .specific("[de]")
+    case .hladdr:
+      return .specific("[hl]")
+    case .imm16addr:
+      return .address
+    case .ffimm8addr:
+      return .ffaddress
+    case .sp_plus_simm8:
+      return .stackPointerOffset
+    case .imm8, .simm8, .imm16:
+      return .numeric
+    default:
+      return .specific("\(self)")
+    }
+  }
+}
+
+extension LR35902.Instruction.RestartAddress: InstructionOperandTokenizable {
+  public var token: InstructionOperandToken {
+    return .numeric
+  }
+}
+
+extension LR35902.Instruction.Bit: InstructionOperandTokenizable {
+  public var token: InstructionOperandToken {
+    return .numeric
+  }
+}
+
 extension LR35902.InstructionSet {
   /**
    A cached map of specifications to their tokenized representation.
@@ -25,17 +60,13 @@ extension LR35902.InstructionSet {
     return allSpecs().reduce(into: [:]) { accumulator, spec in
       var operands: [String] = []
       try! spec.visit { operand, _ in
-        // Optional operands are provided by the visitor as boxed optional types represented as an Any.
-        // We can't cast an Any to an Any? using the as? operator, so perform an explicit Optional-type unboxing instead:
-        guard let valueUnboxed = operand?.value,
-              case Optional<Any>.some(let value) = valueUnboxed else {
+        guard let operand = operand else {
           return
         }
-
-        if let representable = value as? InstructionOperandTokenizable {
+        if let representable = operand.value as? InstructionOperandTokenizable {
           operands.append(representable.token.asString())
         } else {
-          operands.append("\(value)")
+          operands.append("\(operand.value)")
         }
       }
       guard let opcode = opcodeStrings[spec] else {
