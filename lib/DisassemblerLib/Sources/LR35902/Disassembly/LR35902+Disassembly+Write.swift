@@ -807,7 +807,7 @@ clean:
     return (Source(sources: sources), statistics)
   }
 
-  public struct Statistics {
+  public struct Statistics: Equatable {
     public let instructionsDecoded: Int
     public let percent: Double
     public let bankPercents: [LR35902.Bank: Double]
