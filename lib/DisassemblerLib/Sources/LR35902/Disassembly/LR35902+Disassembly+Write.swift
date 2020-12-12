@@ -439,7 +439,7 @@ clean:
                     let argument = argumentOrNil else {
                 return iter
               }
-              let args = extractArgs(from: RGBDSDisassembler.assembly(for: zipped.1.0), using: spec, argument: Int(argument))
+              let args = extractArgs(from: RGBDSDisassembler.statement(for: zipped.1.0), using: spec, argument: Int(argument))
               return iter.merging(args, uniquingKeysWith: { first, second in
                 if first != second {
                   anyArgumentMismatches = true
@@ -542,7 +542,7 @@ clean:
                 } else {
                   argumentString = nil
                 }
-                let macroAssembly = RGBDSDisassembler.assembly(for: macroInstruction, with: self, argumentString: argumentString)
+                let macroAssembly = RGBDSDisassembler.statement(for: macroInstruction, with: self, argumentString: argumentString)
                 return Line(semantic: .macroInstruction(macroInstruction, macroAssembly))
               })
               lines.append(Line(semantic: .macroTerminator))
@@ -618,7 +618,7 @@ clean:
           let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!.total
           let bytes = cpu.cartridge[index..<(index + LR35902.Cartridge.Location(instructionWidth))]
           let instructionScope = labeledContiguousScopes(at: cpu.pc, in: bank).map { $0.label }
-          lineGroup.append(Line(semantic: .instruction(instruction, RGBDSDisassembler.assembly(for: instruction, with: self)),
+          lineGroup.append(Line(semantic: .instruction(instruction, RGBDSDisassembler.statement(for: instruction, with: self)),
                                 address: cpu.pc,
                                 bank: cpu.bank,
                                 scope: instructionScope.sorted().joined(separator: ", "),

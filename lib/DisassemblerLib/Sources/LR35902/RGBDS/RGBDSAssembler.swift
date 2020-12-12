@@ -5,10 +5,10 @@ import FoundationExtensions
 import RGBDS
 
 /** Turns RGBDS assembly code into LR35902 instructions. */
-public final class RGBDSAssembler {
+final class RGBDSAssembler {
 
   /** An error that occurred during parsing of RGBDS assembly. */
-  public struct Error: Swift.Error, Equatable {
+  struct Error: Swift.Error, Equatable {
     let lineNumber: Int
     let message: String
   }
@@ -18,7 +18,7 @@ public final class RGBDSAssembler {
 
    If any portion of the assembly fails, then errors will also be returned.
    */
-  public static func assemble(assembly: String) -> (instructions: [LR35902.Instruction], errors: [Error]) {
+  static func assemble(assembly: String) -> (instructions: [LR35902.Instruction], errors: [Error]) {
     var lineNumber = 1
     var instructions: [LR35902.Instruction] = []
     var errors: [Error] = []
@@ -72,7 +72,7 @@ public final class RGBDSAssembler {
 
    It is assumed that the specifications loosely match the statement's tokenizedString representation.
    */
-  public static func instruction(from statement: RGBDS.Statement, using spec: LR35902.Instruction.Spec) throws -> LR35902.Instruction? {
+  static func instruction(from statement: RGBDS.Statement, using spec: LR35902.Instruction.Spec) throws -> LR35902.Instruction? {
     if case LR35902.Instruction.Spec.stop = spec {
       // stop is always followed by a zero byte
       return .init(spec: spec, immediate: .imm8(0))

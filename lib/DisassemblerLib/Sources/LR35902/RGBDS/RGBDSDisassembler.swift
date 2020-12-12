@@ -4,84 +4,17 @@ import FoundationExtensions
 import RGBDS
 
 /** Turns LR3902 instructions into RGBDS assembly language. */
-public final class RGBDSDisassembler {
+final class RGBDSDisassembler {
 
-  public static func textLine(for bytes: [UInt8], characterMap: [UInt8: String], address: LR35902.Address) -> LR35902.Disassembly.Line {
+  static func textLine(for bytes: [UInt8], characterMap: [UInt8: String], address: LR35902.Address) -> LR35902.Disassembly.Line {
     return LR35902.Disassembly.Line(semantic: .text(RGBDS.statement(for: bytes, characterMap: characterMap)), address: address, data: Data(bytes))
   }
 
-  static func assembly(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil, argumentString: String? = nil) -> Statement {
+  static func statement(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil, argumentString: String? = nil) -> Statement {
     if let operands = operands(for: instruction, with: disassembly, argumentString: argumentString) {
       return Statement(opcode: LR35902.InstructionSet.opcodeStrings[instruction.spec]!, operands: operands.filter { $0.count > 0 })
     } else {
       return Statement(opcode: LR35902.InstructionSet.opcodeStrings[instruction.spec]!)
-    }
-  }
-
-  private static func typedValue(for imm8: UInt8, with representation: LR35902.Disassembly.Datatype.Representation) -> String {
-    switch representation {
-    case .binary:
-      return RGBDS.NumericPrefix.binary.rawValue + imm8.binaryString
-    case .decimal:
-      return "\(imm8)"
-    case .hexadecimal:
-      return RGBDS.NumericPrefix.hexadecimal.rawValue + imm8.hexString
-    }
-  }
-
-  private static func typedOperand(for imm8: UInt8, with disassembly: LR35902.Disassembly?) -> String? {
-    guard let disassembly = disassembly else {
-      return nil
-    }
-    let location = LR35902.Cartridge.location(for: disassembly.cpu.pc, in: disassembly.cpu.bank)!
-    guard let type = disassembly.typeAtLocation[location],
-      let dataType = disassembly.dataTypes[type] else {
-      return nil
-    }
-    switch dataType.interpretation {
-    case .bitmask:
-      var namedValues: UInt8 = 0
-      let bitmaskValues = dataType.namedValues.filter { value, _ in
-        if imm8 == 0 {
-          return value == 0
-        }
-        if value != 0 && (imm8 & value) == value {
-          namedValues = namedValues | value
-          return true
-        }
-        return false
-      }.values
-      var parts = bitmaskValues.sorted()
-
-      if namedValues != imm8 {
-        let remainingBits = imm8 & ~(namedValues)
-        parts.append(typedValue(for: remainingBits, with: dataType.representation))
-      }
-      return parts.joined(separator: " | ")
-
-    case .enumerated:
-      let possibleValues = dataType.namedValues.filter { value, _ in value == imm8 }.values
-      precondition(possibleValues.count <= 1, "Multiple possible values found.")
-      if let value = possibleValues.first {
-        return value
-      }
-
-    default:
-      break
-    }
-
-    // Fall-through case.
-    return typedValue(for: imm8, with: dataType.representation)
-  }
-
-  /// Returns one of a label, a global, or a hexadecimal representation of a given imm16 value.
-  private static func prettify(imm16: UInt16, with disassembly: LR35902.Disassembly) -> String {
-    if let label = disassembly.label(at: imm16, in: disassembly.cpu.bank) {
-      return label
-    } else if let global = disassembly.globals[imm16] {
-      return global.name
-    } else {
-      return "$\(imm16.hexString)"
     }
   }
 
@@ -215,6 +148,73 @@ public final class RGBDSDisassembler {
       }
     }
     return operands(for: instruction, spec: instruction.spec, with: disassembly, argumentString: argumentString)
+  }
+
+  private static func typedValue(for imm8: UInt8, with representation: LR35902.Disassembly.Datatype.Representation) -> String {
+    switch representation {
+    case .binary:
+      return RGBDS.NumericPrefix.binary.rawValue + imm8.binaryString
+    case .decimal:
+      return "\(imm8)"
+    case .hexadecimal:
+      return RGBDS.NumericPrefix.hexadecimal.rawValue + imm8.hexString
+    }
+  }
+
+  private static func typedOperand(for imm8: UInt8, with disassembly: LR35902.Disassembly?) -> String? {
+    guard let disassembly = disassembly else {
+      return nil
+    }
+    let location = LR35902.Cartridge.location(for: disassembly.cpu.pc, in: disassembly.cpu.bank)!
+    guard let type = disassembly.typeAtLocation[location],
+      let dataType = disassembly.dataTypes[type] else {
+      return nil
+    }
+    switch dataType.interpretation {
+    case .bitmask:
+      var namedValues: UInt8 = 0
+      let bitmaskValues = dataType.namedValues.filter { value, _ in
+        if imm8 == 0 {
+          return value == 0
+        }
+        if value != 0 && (imm8 & value) == value {
+          namedValues = namedValues | value
+          return true
+        }
+        return false
+      }.values
+      var parts = bitmaskValues.sorted()
+
+      if namedValues != imm8 {
+        let remainingBits = imm8 & ~(namedValues)
+        parts.append(typedValue(for: remainingBits, with: dataType.representation))
+      }
+      return parts.joined(separator: " | ")
+
+    case .enumerated:
+      let possibleValues = dataType.namedValues.filter { value, _ in value == imm8 }.values
+      precondition(possibleValues.count <= 1, "Multiple possible values found.")
+      if let value = possibleValues.first {
+        return value
+      }
+
+    default:
+      break
+    }
+
+    // Fall-through case.
+    return typedValue(for: imm8, with: dataType.representation)
+  }
+
+  /// Returns one of a label, a global, or a hexadecimal representation of a given imm16 value.
+  private static func prettify(imm16: UInt16, with disassembly: LR35902.Disassembly) -> String {
+    if let label = disassembly.label(at: imm16, in: disassembly.cpu.bank) {
+      return label
+    } else if let global = disassembly.globals[imm16] {
+      return global.name
+    } else {
+      return "$\(imm16.hexString)"
+    }
   }
 
   private static func operands(for instruction: LR35902.Instruction, spec: LR35902.Instruction.Spec, with disassembly: LR35902.Disassembly?, argumentString: String?) -> [String]? {
