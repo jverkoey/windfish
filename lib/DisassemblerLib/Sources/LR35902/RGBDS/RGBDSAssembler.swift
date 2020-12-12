@@ -4,17 +4,20 @@ import CPU
 import FoundationExtensions
 import RGBDS
 
+/** Turns RGBDS assembly code into both an intermediate and binary representation. */
 public final class RGBDSAssembler {
 
+  /** An error that occurred during parsing of RGBDS assembly. */
   public struct Error: Swift.Error, Equatable {
     let lineNumber: Int
-    let error: String
+    let message: String
   }
 
-  public struct StringError: Swift.Error, Equatable {
-    public let error: String
-  }
+  /**
+   Assembles the given code into both an intermediary format and its corresponding data representation.
 
+   If any portion of the assembly fails, then errors will also be returned.
+   */
   public static func assemble(assembly: String) -> (instructions: [LR35902.Instruction], data: Data, errors: [Error]) {
     var lineNumber = 1
     var buffer = Data()
@@ -34,30 +37,31 @@ public final class RGBDSAssembler {
         buffer.append(LR35902.InstructionSet.data(representing: instruction))
 
       } catch let error as StringError {
-        errors.append(.init(lineNumber: lineNumber, error: error.error))
+        errors.append(.init(lineNumber: lineNumber, message: error.message))
       } catch let error as RGBDSAssembler.Error {
         errors.append(error)
       } catch {
-        errors.append(.init(lineNumber: lineNumber, error: "Unknown error"))
+        errors.append(.init(lineNumber: lineNumber, message: "Unknown error"))
       }
     }
     return (instructions: instructions, data: buffer, errors: errors)
   }
 
+  /** Creates an instruction from the given line, if the line contains a parsable instruction statement. */
   private static func instruction(from line: String) throws -> LR35902.Instruction? {
     guard let statement = RGBDS.Statement(fromLine: line) else {
       return nil
     }
     let specs = LR35902.InstructionSet.specs(for: statement)
     if specs.isEmpty {
-      throw StringError(error: "No valid instruction found for \(statement.formattedString)")
+      throw StringError(message: "No valid instruction found for \(statement.formattedString)")
     }
     let potentialInstructions: [LR35902.Instruction] = try specs.compactMap { spec in
       try RGBDSAssembler.instruction(from: statement, using: spec)
     }
     guard potentialInstructions.count == 1,
           let instruction = potentialInstructions.first else {
-      throw StringError(error: "Unable to resolve instruction for \(statement.formattedString)")
+      throw StringError(message: "Unable to resolve instruction for \(statement.formattedString)")
     }
     return instruction
   }
@@ -90,7 +94,7 @@ public final class RGBDSAssembler {
 
       case let restartAddress as LR35902.Instruction.RestartAddress:
         guard let numericValue: UInt16 = RGBDS.integer(from: value) else {
-          throw StringError(error: "Unable to represent \(value) as a \(UInt16.self)")
+          throw StringError(message: "Unable to represent \(value) as a \(UInt16.self)")
         }
         if numericValue != restartAddress.rawValue {
           instruction = nil
@@ -99,7 +103,7 @@ public final class RGBDSAssembler {
 
       case let bit as LR35902.Instruction.Bit:
         guard let numericValue: UInt8 = RGBDS.integer(from: value) else {
-          throw StringError(error: "Unable to represent \(value) as a \(UInt8.self)")
+          throw StringError(message: "Unable to represent \(value) as a \(UInt8.self)")
         }
         if numericValue != bit.rawValue {
           instruction = nil
@@ -108,13 +112,13 @@ public final class RGBDSAssembler {
 
       case LR35902.Instruction.Numeric.imm16:
         guard let numericValue: UInt16 = RGBDS.integer(from: value) else {
-          throw StringError(error: "Unable to represent \(value) as a \(UInt16.self)")
+          throw StringError(message: "Unable to represent \(value) as a \(UInt16.self)")
         }
         instruction = .init(spec: spec, immediate: .imm16(numericValue))
 
       case LR35902.Instruction.Numeric.imm8, LR35902.Instruction.Numeric.simm8:
         guard var numericValue: UInt8 = RGBDS.integer(from: value) else {
-          throw StringError(error: "Unable to represent \(value) as a \(UInt8.self)")
+          throw StringError(message: "Unable to represent \(value) as a \(UInt8.self)")
         }
         if case .jr = spec {
           // Relative jumps in assembly are written from the point of view of the instruction's beginning.
@@ -124,7 +128,7 @@ public final class RGBDSAssembler {
 
       case LR35902.Instruction.Numeric.ffimm8addr:
         guard let numericValue: UInt16 = RGBDS.integer(fromAddress: value) else {
-          throw StringError(error: "Unable to represent \(value) as a \(UInt16.self)")
+          throw StringError(message: "Unable to represent \(value) as a \(UInt16.self)")
         }
         if (numericValue & 0xFF00) != 0xFF00 {
           instruction = nil
@@ -135,13 +139,13 @@ public final class RGBDSAssembler {
 
       case LR35902.Instruction.Numeric.sp_plus_simm8:
         guard let numericValue: UInt8 = RGBDS.integer(fromStackPointer: value) else {
-          throw StringError(error: "Unable to represent \(value) as a \(UInt8.self)")
+          throw StringError(message: "Unable to represent \(value) as a \(UInt8.self)")
         }
         instruction = .init(spec: spec, immediate: .imm8(numericValue))
 
       case LR35902.Instruction.Numeric.imm16addr:
         guard let numericValue: UInt16 = RGBDS.integer(fromAddress: value) else {
-          throw StringError(error: "Unable to represent \(value) as a \(UInt16.self)")
+          throw StringError(message: "Unable to represent \(value) as a \(UInt16.self)")
         }
         instruction = .init(spec: spec, immediate: .imm16(numericValue))
       default:
@@ -149,5 +153,10 @@ public final class RGBDSAssembler {
       }
     }
     return instruction
+  }
+
+  /** Internal error type that can be thrown without needing awareness of the parsing context (i.e. line number). */
+  private struct StringError: Swift.Error, Equatable {
+    public let message: String
   }
 }
