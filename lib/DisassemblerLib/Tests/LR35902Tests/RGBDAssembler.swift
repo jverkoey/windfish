@@ -391,7 +391,7 @@ ld hl, sp+$05
   }
 
   func testAssemblyAndDisassemblyIsEqual() throws {
-    for spec in LR35902.InstructionSet.table {
+    for spec in LR35902.InstructionSet.allSpecs() {
       guard spec != .invalid else {
         continue
       }
@@ -404,30 +404,6 @@ ld hl, sp+$05
       switch spec {
       case .ld(.ffimm8addr, _), .ld(_, .ffimm8addr):
         assembly = representation.replacingOccurrences(of: "ff#", with: "$FF00")
-      case let .rst(address):
-        assembly = representation.replacingOccurrences(of: "#", with: "\(address.rawValue)")
-      default:
-        assembly = representation.replacingOccurrences(of: "#", with: "0")
-      }
-
-      let results = RGBDSAssembler.assemble(assembly: assembly)
-      let disassembly = LR35902.Disassembly(rom: results.data)
-      disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
-
-      XCTAssertEqual(results.errors, [], "Spec: \(spec)")
-      XCTAssertEqual(disassembly.instructionMap[0x0000]?.spec, spec)
-    }
-
-    for spec in LR35902.InstructionSet.tableCB {
-      guard spec != .invalid else {
-        continue
-      }
-      let representation = LR35902.InstructionSet.specToTokenString[spec]!
-
-      let assembly: String
-      switch spec {
-      case .ld(.ffimm8addr, _), .ld(_, .ffimm8addr):
-        assembly = representation.replacingOccurrences(of: "#", with: "$FF00")
       case let .rst(address):
         assembly = representation.replacingOccurrences(of: "#", with: "\(address.rawValue)")
       case let .cb(.bit(bit, _)), let .cb(.res(bit, _)), let .cb(.set(bit, _)):

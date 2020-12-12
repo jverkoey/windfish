@@ -158,6 +158,7 @@ public final class RGBDSAssembler {
         guard potentialInstructions.count > 0 else {
           throw Error(lineNumber: lineNumber, error: "No valid instruction found for \(line)")
         }
+        precondition(potentialInstructions.count == 1, "Ambiguous instruction detected.")
         let shortestInstruction = potentialInstructions.sorted(by: { pair1, pair2 in
           LR35902.InstructionSet.widths[pair1.spec]!.total < LR35902.InstructionSet.widths[pair2.spec]!.total
         })[0]
