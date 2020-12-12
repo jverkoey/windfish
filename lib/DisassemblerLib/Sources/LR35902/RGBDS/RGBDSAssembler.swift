@@ -90,7 +90,7 @@ public final class RGBDSAssembler {
       switch operand.value {
 
       case let restartAddress as LR35902.Instruction.RestartAddress:
-        guard let numericValue: UInt16 = cast(string: value) else {
+        guard let numericValue: UInt16 = RGBDS.integer(from: value) else {
           throw StringError(error: "Unable to represent \(value) as a \(UInt16.self)")
         }
         if numericValue != restartAddress.rawValue {
@@ -99,7 +99,7 @@ public final class RGBDSAssembler {
         }
 
       case let bit as LR35902.Instruction.Bit:
-        guard let numericValue: UInt8 = cast(string: value) else {
+        guard let numericValue: UInt8 = RGBDS.integer(from: value) else {
           throw StringError(error: "Unable to represent \(value) as a \(UInt8.self)")
         }
         if numericValue != bit.rawValue {
@@ -108,13 +108,13 @@ public final class RGBDSAssembler {
         }
 
       case LR35902.Instruction.Numeric.imm16:
-        guard let numericValue: UInt16 = cast(string: value) else {
+        guard let numericValue: UInt16 = RGBDS.integer(from: value) else {
           throw StringError(error: "Unable to represent \(value) as a \(UInt16.self)")
         }
         instruction = .init(spec: spec, immediate: .imm16(numericValue))
 
       case LR35902.Instruction.Numeric.imm8, LR35902.Instruction.Numeric.simm8:
-        guard var numericValue: UInt8 = cast(string: value) else {
+        guard var numericValue: UInt8 = RGBDS.integer(from: value) else {
           throw StringError(error: "Unable to represent \(value) as a \(UInt8.self)")
         }
         if case .jr = spec {
@@ -124,7 +124,7 @@ public final class RGBDSAssembler {
         instruction = .init(spec: spec, immediate: .imm8(numericValue))
 
       case LR35902.Instruction.Numeric.ffimm8addr:
-        guard let numericValue: UInt16 = cast(string: String(value.dropFirst().dropLast().trimmed())) else {
+        guard let numericValue: UInt16 = RGBDS.integer(fromAddress: value) else {
           throw StringError(error: "Unable to represent \(value) as a \(UInt16.self)")
         }
         if (numericValue & 0xFF00) != 0xFF00 {
@@ -135,13 +135,13 @@ public final class RGBDSAssembler {
         instruction = .init(spec: spec, immediate: .imm8(lowerByteValue))
 
       case LR35902.Instruction.Numeric.sp_plus_simm8:
-        guard let numericValue: UInt8 = cast(string: String(value.dropFirst(3).trimmed())) else {
+        guard let numericValue: UInt8 = RGBDS.integer(fromStackPointer: value) else {
           throw StringError(error: "Unable to represent \(value) as a \(UInt8.self)")
         }
         instruction = .init(spec: spec, immediate: .imm8(numericValue))
 
       case LR35902.Instruction.Numeric.imm16addr:
-        guard let numericValue: UInt16 = cast(string: String(value.dropFirst().dropLast().trimmed())) else {
+        guard let numericValue: UInt16 = RGBDS.integer(fromAddress: value) else {
           throw StringError(error: "Unable to represent \(value) as a \(UInt16.self)")
         }
         instruction = .init(spec: spec, immediate: .imm16(numericValue))

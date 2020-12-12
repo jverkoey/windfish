@@ -75,17 +75,31 @@ public protocol InstructionOperandTokenizable {
   var token: InstructionOperandToken { get }
 }
 
+/**
+ Prefixes for numeric types in RGBDS assembly.
+
+ Defined at https://rgbds.gbdev.io/docs/v0.4.2/rgbasm.5#Numeric_Formats
+ */
+private enum NumericPrefix: String {
+  case hexadecimal = "$"
+  case octal = "&"
+  case binary = "%"
+  case placeholder = "#"
+  case gameboyGraphics = "`"
+}
+
 private func isNumber(_ string: String) -> Bool {
-  // https://rgbds.gbdev.io/docs/v0.4.2/rgbasm.5#Numeric_Formats
   return
-    string.hasPrefix("$") // Hex
-    || string.hasPrefix("&") // Octal
-    || string.hasPrefix("%") // Binary
-    || string.hasPrefix("#") // Placeholder
-    || string.hasPrefix("`") // Gameboy graphics
+    string.hasPrefix(NumericPrefix.hexadecimal.rawValue)
+    || string.hasPrefix(NumericPrefix.octal.rawValue)
+    || string.hasPrefix(NumericPrefix.binary.rawValue)
+    || string.hasPrefix(NumericPrefix.placeholder.rawValue)
+    || string.hasPrefix(NumericPrefix.gameboyGraphics.rawValue)
     || Int(string) != nil
     || (string.contains(".") && Float(string) != nil)
 }
+
+// MARK: - RGBDS string -> number conversions
 
 /**
  Enables generic methods to create Foundation integers from bit pattern representations.
@@ -107,8 +121,19 @@ extension UInt8: BitPatternInitializable {
   public typealias CompanionType = Int8
 }
 
-// TODO: Make this private.
-public func cast<T: UnsignedInteger>(string: String) -> T?
+public func integer<T: UnsignedInteger>(fromAddress string: String) -> T?
+    where T: FixedWidthInteger,
+          T: BitPatternInitializable {
+  return integer(from: String(string.dropFirst().dropLast().trimmed()))
+}
+
+public func integer<T: UnsignedInteger>(fromStackPointer string: String) -> T?
+where T: FixedWidthInteger,
+      T: BitPatternInitializable {
+  return integer(from: String(string.dropFirst(3).trimmed()))
+}
+
+public func integer<T: UnsignedInteger>(from string: String) -> T?
     where T: FixedWidthInteger,
           T: BitPatternInitializable {
   var value = string
@@ -119,13 +144,13 @@ public func cast<T: UnsignedInteger>(string: String) -> T?
 
   var numericPart: String
   var radix: Int
-  if value.starts(with: "$") {
+  if value.starts(with: NumericPrefix.hexadecimal.rawValue) {
     numericPart = String(value.dropFirst())
     radix = 16
-  } else if value.starts(with: "0x") {
-    numericPart = String(value.dropFirst(2))
-    radix = 16
-  } else if value.starts(with: "%") {
+  } else if value.starts(with: NumericPrefix.octal.rawValue) {
+    numericPart = String(value.dropFirst())
+    radix = 8
+  } else if value.starts(with: NumericPrefix.binary.rawValue) {
     numericPart = String(value.dropFirst())
     radix = 2
   } else {
