@@ -6,6 +6,7 @@ import RGBDS
 /** Turns LR3902 instructions into RGBDS assembly language. */
 final class RGBDSDisassembler {
 
+  /** Creates an RGBDS statement for the given instruction. */
   static func statement(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil, argumentString: String? = nil) -> Statement {
     if let operands = operands(for: instruction, with: disassembly, argumentString: argumentString) {
       return Statement(opcode: LR35902.InstructionSet.opcodeStrings[instruction.spec]!, operands: operands.filter { $0.count > 0 })
@@ -15,134 +16,137 @@ final class RGBDSDisassembler {
   }
 
   private static func operands(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil, argumentString: String?) -> [String]? {
-    if let disassembly = disassembly {
-      switch instruction.spec {
-      case let LR35902.Instruction.Spec.jp(condition, operand) where operand == .imm16,
-           let LR35902.Instruction.Spec.call(condition, operand) where operand == .imm16:
-        guard case let .imm16(immediate) = instruction.immediate else {
-          preconditionFailure("Invalid immediate associated with instruction")
-        }
-        if disassembly.transfersOfControl(at: immediate, in: disassembly.cpu.bank) != nil {
-          var addressLabel: String
-          if let argumentString = argumentString {
-            addressLabel = argumentString
-          } else if let label = disassembly.label(at: immediate, in: disassembly.cpu.bank) {
-            if let scope = disassembly.labeledContiguousScopes(at: disassembly.cpu.pc, in: disassembly.cpu.bank).first(where: { labeledScope in
-              label.starts(with: "\(labeledScope.label).")
-            })?.label {
-              addressLabel = label.replacingOccurrences(of: "\(scope).", with: ".")
-            } else {
-              addressLabel = label
-            }
+    guard let disassembly = disassembly else {
+      return operands(for: instruction, spec: instruction.spec, with: nil, argumentString: argumentString)
+    }
+
+    switch instruction.spec {
+    case let LR35902.Instruction.Spec.jp(condition, operand) where operand == .imm16,
+         let LR35902.Instruction.Spec.call(condition, operand) where operand == .imm16:
+      guard case let .imm16(immediate) = instruction.immediate else {
+        preconditionFailure("Invalid immediate associated with instruction")
+      }
+      if disassembly.transfersOfControl(at: immediate, in: disassembly.cpu.bank) != nil {
+        var addressLabel: String
+        if let argumentString = argumentString {
+          addressLabel = argumentString
+        } else if let label = disassembly.label(at: immediate, in: disassembly.cpu.bank) {
+          if let scope = disassembly.labeledContiguousScopes(at: disassembly.cpu.pc, in: disassembly.cpu.bank).first(where: { labeledScope in
+            label.starts(with: "\(labeledScope.label).")
+          })?.label {
+            addressLabel = label.replacingOccurrences(of: "\(scope).", with: ".")
           } else {
-            addressLabel = "$\(immediate.hexString)"
+            addressLabel = label
           }
-          if let condition = condition {
-            return ["\(condition)", addressLabel]
-          } else {
-            return [addressLabel]
-          }
-        }
-
-      case let LR35902.Instruction.Spec.jr(condition, operand) where operand == .simm8:
-        guard case let .imm8(immediate) = instruction.immediate else {
-          preconditionFailure("Invalid immediate associated with instruction")
-        }
-        let jumpAddress = (disassembly.cpu.pc + LR35902.InstructionSet.widths[instruction.spec]!.total).advanced(by: Int(Int8(bitPattern: immediate)))
-        if disassembly.transfersOfControl(at: jumpAddress, in: disassembly.cpu.bank) != nil {
-          var addressLabel: String
-          if let argumentString = argumentString {
-            addressLabel = argumentString
-          } else if let label = disassembly.label(at: jumpAddress, in: disassembly.cpu.bank) {
-            if let scope = disassembly.labeledContiguousScopes(at: disassembly.cpu.pc, in: disassembly.cpu.bank).first(where: { labeledScope in
-              label.starts(with: "\(labeledScope.label).")
-            })?.label {
-              addressLabel = label.replacingOccurrences(of: "\(scope).", with: ".")
-            } else {
-              addressLabel = label
-            }
-          } else {
-            addressLabel = "$\(jumpAddress.hexString)"
-          }
-          if let condition = condition {
-            return ["\(condition)", addressLabel]
-          } else {
-            return [addressLabel]
-          }
-        }
-
-      case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand1 == .imm16addr:
-        guard case let .imm16(immediate) = instruction.immediate else {
-          preconditionFailure("Invalid immediate associated with instruction")
-        }
-
-        var addressLabel: String
-        if let argumentString = argumentString {
-          addressLabel = argumentString
-        } else {
-          addressLabel = "[\(prettify(imm16: immediate, with: disassembly))]"
-        }
-        return [addressLabel, operand(for: instruction, operand: operand2, with: disassembly, argumentString: argumentString)]
-
-      case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .imm16addr:
-        guard case let .imm16(immediate) = instruction.immediate else {
-          preconditionFailure("Invalid immediate associated with instruction")
-        }
-
-        var addressLabel: String
-        if let argumentString = argumentString {
-          addressLabel = argumentString
-        } else {
-          addressLabel = "[\(prettify(imm16: immediate, with: disassembly))]"
-        }
-        return [operand(for: instruction, operand: operand1, with: disassembly, argumentString: argumentString), addressLabel]
-
-      case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand1 == .ffimm8addr:
-        guard case let .imm8(immediate) = instruction.immediate else {
-          preconditionFailure("Invalid immediate associated with instruction")
-        }
-
-        var addressLabel: String
-        if let argumentString = argumentString {
-          addressLabel = argumentString
-        } else {
-          addressLabel = "[\(prettify(imm16: 0xFF00 | UInt16(immediate), with: disassembly))]"
-        }
-        return [addressLabel, operand(for: instruction, operand: operand2, with: disassembly, argumentString: argumentString)]
-
-      case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .ffimm8addr:
-        guard case let .imm8(immediate) = instruction.immediate else {
-          preconditionFailure("Invalid immediate associated with instruction")
-        }
-
-        var addressLabel: String
-        if let argumentString = argumentString {
-          addressLabel = argumentString
-        } else {
-          addressLabel = "[\(prettify(imm16: 0xFF00 | UInt16(immediate), with: disassembly))]"
-        }
-        return [operand(for: instruction, operand: operand1, with: disassembly, argumentString: argumentString), addressLabel]
-
-      case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .imm16:
-        guard case let .imm16(immediate) = instruction.immediate else {
-          preconditionFailure("Invalid immediate associated with instruction")
-        }
-
-        var addressLabel: String
-        // TODO: These are only globals if they're referenced as an address in a subsequent instruction.
-        if let argumentString = argumentString {
-          addressLabel = argumentString
-        } else if operand1 == .hl, let name = disassembly.globals[immediate]?.name {
-          addressLabel = name
         } else {
           addressLabel = "$\(immediate.hexString)"
         }
-        return [operand(for: instruction, operand: operand1, with: disassembly, argumentString: argumentString), addressLabel]
-
-      default:
-        break
+        if let condition = condition {
+          return ["\(condition)", addressLabel]
+        } else {
+          return [addressLabel]
+        }
       }
+
+    case let LR35902.Instruction.Spec.jr(condition, operand) where operand == .simm8:
+      guard case let .imm8(immediate) = instruction.immediate else {
+        preconditionFailure("Invalid immediate associated with instruction")
+      }
+      let jumpAddress = (disassembly.cpu.pc + LR35902.InstructionSet.widths[instruction.spec]!.total).advanced(by: Int(Int8(bitPattern: immediate)))
+      if disassembly.transfersOfControl(at: jumpAddress, in: disassembly.cpu.bank) != nil {
+        var addressLabel: String
+        if let argumentString = argumentString {
+          addressLabel = argumentString
+        } else if let label = disassembly.label(at: jumpAddress, in: disassembly.cpu.bank) {
+          if let scope = disassembly.labeledContiguousScopes(at: disassembly.cpu.pc, in: disassembly.cpu.bank).first(where: { labeledScope in
+            label.starts(with: "\(labeledScope.label).")
+          })?.label {
+            addressLabel = label.replacingOccurrences(of: "\(scope).", with: ".")
+          } else {
+            addressLabel = label
+          }
+        } else {
+          addressLabel = "$\(jumpAddress.hexString)"
+        }
+        if let condition = condition {
+          return ["\(condition)", addressLabel]
+        } else {
+          return [addressLabel]
+        }
+      }
+
+    case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand1 == .imm16addr:
+      guard case let .imm16(immediate) = instruction.immediate else {
+        preconditionFailure("Invalid immediate associated with instruction")
+      }
+
+      var addressLabel: String
+      if let argumentString = argumentString {
+        addressLabel = argumentString
+      } else {
+        addressLabel = "[\(prettify(imm16: immediate, with: disassembly))]"
+      }
+      return [addressLabel, operand(for: instruction, operand: operand2, with: disassembly, argumentString: argumentString)]
+
+    case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .imm16addr:
+      guard case let .imm16(immediate) = instruction.immediate else {
+        preconditionFailure("Invalid immediate associated with instruction")
+      }
+
+      var addressLabel: String
+      if let argumentString = argumentString {
+        addressLabel = argumentString
+      } else {
+        addressLabel = "[\(prettify(imm16: immediate, with: disassembly))]"
+      }
+      return [operand(for: instruction, operand: operand1, with: disassembly, argumentString: argumentString), addressLabel]
+
+    case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand1 == .ffimm8addr:
+      guard case let .imm8(immediate) = instruction.immediate else {
+        preconditionFailure("Invalid immediate associated with instruction")
+      }
+
+      var addressLabel: String
+      if let argumentString = argumentString {
+        addressLabel = argumentString
+      } else {
+        addressLabel = "[\(prettify(imm16: 0xFF00 | UInt16(immediate), with: disassembly))]"
+      }
+      return [addressLabel, operand(for: instruction, operand: operand2, with: disassembly, argumentString: argumentString)]
+
+    case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .ffimm8addr:
+      guard case let .imm8(immediate) = instruction.immediate else {
+        preconditionFailure("Invalid immediate associated with instruction")
+      }
+
+      var addressLabel: String
+      if let argumentString = argumentString {
+        addressLabel = argumentString
+      } else {
+        addressLabel = "[\(prettify(imm16: 0xFF00 | UInt16(immediate), with: disassembly))]"
+      }
+      return [operand(for: instruction, operand: operand1, with: disassembly, argumentString: argumentString), addressLabel]
+
+    case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .imm16:
+      guard case let .imm16(immediate) = instruction.immediate else {
+        preconditionFailure("Invalid immediate associated with instruction")
+      }
+
+      var addressLabel: String
+      // TODO: These are only globals if they're referenced as an address in a subsequent instruction.
+      if let argumentString = argumentString {
+        addressLabel = argumentString
+      } else if operand1 == .hl, let name = disassembly.globals[immediate]?.name {
+        addressLabel = name
+      } else {
+        addressLabel = "$\(immediate.hexString)"
+      }
+      return [operand(for: instruction, operand: operand1, with: disassembly, argumentString: argumentString), addressLabel]
+
+    default:
+      break
     }
+
     return operands(for: instruction, spec: instruction.spec, with: disassembly, argumentString: argumentString)
   }
 
