@@ -78,8 +78,7 @@ public final class RGBDSAssembler {
     // Assume that the instruction is fine as-is, but allow it to be nil'd out if validation does not pass.
     var instruction: LR35902.Instruction? = .init(spec: spec)
 
-    // Visit each operand, looking up the corresponding statement operand value for the current operand index when
-    // needed.
+    // Visit each operand, validating and extracting the statement's corresponding operand value when needed.
     try spec.visit { operand, shouldStop in
       guard let operand = operand else {
         // Base case of no operands.
@@ -151,5 +150,4 @@ public final class RGBDSAssembler {
     }
     return instruction
   }
-
 }
