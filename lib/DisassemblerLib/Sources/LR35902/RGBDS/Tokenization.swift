@@ -24,7 +24,7 @@ extension LR35902.InstructionSet {
   private static func computeAllTokenStrings() -> [SpecType: String] {
     return allSpecs().reduce(into: [:]) { accumulator, spec in
       var operands: [String] = []
-      try! spec.visit { operand in
+      try! spec.visit { operand, _ in
         // Optional operands are provided by the visitor as boxed optional types represented as an Any.
         // We can't cast an Any to an Any? using the as? operator, so perform an explicit Optional-type unboxing instead:
         guard let valueUnboxed = operand?.value,

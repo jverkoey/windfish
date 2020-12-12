@@ -109,6 +109,9 @@ public final class RGBDSAssembler {
   /**
    Attempts to create an instruction with the given specification from the given statement.
 
+   If the specification has any numeric operand, then the operand's value will be extracted from the statement. If the
+   operand value does not match the specification's value or width, then no instruction will be returned.
+
    It is assumed that the specifications loosely match the statement's tokenizedString representation.
    */
   public static func instruction(from statement: RGBDS.Statement, using spec: LR35902.Instruction.Spec) throws -> LR35902.Instruction? {
@@ -116,12 +119,9 @@ public final class RGBDSAssembler {
       // stop is always followed by a zero byte
       return .init(spec: spec, immediate: .imm8(0))
     }
-    var instruction: LR35902.Instruction? = nil
-    var failed = false
-    try spec.visit { operand in
-      guard !failed else {
-        return
-      }
+    // Assume that the instruction is fine as-is.
+    var instruction: LR35902.Instruction? = .init(spec: spec)
+    try spec.visit { operand, shouldStop in
       guard let operand = operand else {
         instruction = .init(spec: spec)
         return
@@ -131,12 +131,14 @@ public final class RGBDSAssembler {
       case let restartAddress as LR35902.Instruction.RestartAddress:
         let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
         if numericValue != restartAddress.rawValue {
-          failed = true
+          instruction = nil
+          shouldStop = true
         }
       case let bit as LR35902.Instruction.Bit:
         let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
         if numericValue != bit.rawValue {
-          failed = true
+          instruction = nil
+          shouldStop = true
         }
       case LR35902.Instruction.Numeric.imm16:
         let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
@@ -151,7 +153,8 @@ public final class RGBDSAssembler {
       case LR35902.Instruction.Numeric.ffimm8addr:
         let numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self)
         if (numericValue & 0xFF00) != 0xFF00 {
-          failed = true
+          instruction = nil
+          shouldStop = true
         }
         let lowerByteValue = UInt8(numericValue & 0xFF)
         instruction = .init(spec: spec, immediate: .imm8(lowerByteValue))
@@ -164,9 +167,6 @@ public final class RGBDSAssembler {
       default:
         break
       }
-    }
-    if !failed && instruction == nil {
-      instruction = .init(spec: spec)
     }
     return instruction
   }

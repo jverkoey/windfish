@@ -18,7 +18,7 @@ private func stringWithNewline(_ string: String) -> String {
 
 private func extractArgs(from statement: RGBDS.Statement, using spec: LR35902.Instruction.Spec, argument: Int) -> [Int: String] {
   var args: [Int: String] = [:]
-  try! spec.visit { operand in
+  try! spec.visit { operand, _ in
     guard let operand = operand else {
       return
     }
@@ -40,7 +40,7 @@ private func extractArgs(from statement: RGBDS.Statement, using spec: LR35902.In
 
 private func extractArgTypes(from instruction: LR35902.Instruction.Spec, using spec: LR35902.Instruction.Spec, argument: Int) -> [Int: String] {
   var args: [Int: String] = [:]
-  try! spec.visit { operand in
+  try! spec.visit { operand, _ in
     guard let operand = operand else {
       return
     }

@@ -8,7 +8,7 @@ private final class VisitorMonitor {
     let operandIndex: Int?
   }
   var visited: [Visited] = []
-  func visit(_ operand: (value: Any, index: Int)?) {
+  func visit(_ operand: (value: Any, index: Int)?, shouldStop: inout Bool) {
     visited.append(Visited(numericValue: operand?.value as? SimpleCPU.Instruction.Spec.Numeric,
                            conditionValue: operand?.value as? SimpleCPU.Instruction.Spec.Condition,
                            operandIndex: operand?.index))
