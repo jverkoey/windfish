@@ -2,7 +2,9 @@ import Foundation
 
 import RGBDS
 
-extension LR35902.Instruction.Numeric: InstructionOperandTokenizable {
+// MARK: - Operand tokenization for RGBDS
+
+extension LR35902.Instruction.Numeric: RGBDS.InstructionOperandTokenizable {
   public var token: InstructionOperandToken {
     switch self {
     case .bcaddr:
@@ -25,17 +27,19 @@ extension LR35902.Instruction.Numeric: InstructionOperandTokenizable {
   }
 }
 
-extension LR35902.Instruction.RestartAddress: InstructionOperandTokenizable {
+extension LR35902.Instruction.RestartAddress: RGBDS.InstructionOperandTokenizable {
   public var token: InstructionOperandToken {
     return .numeric
   }
 }
 
-extension LR35902.Instruction.Bit: InstructionOperandTokenizable {
+extension LR35902.Instruction.Bit: RGBDS.InstructionOperandTokenizable {
   public var token: InstructionOperandToken {
     return .numeric
   }
 }
+
+// MARK: - RGBDS statement -> specifications lookup
 
 extension LR35902.InstructionSet {
   /** Returns all possible specifications for the given statement. */
