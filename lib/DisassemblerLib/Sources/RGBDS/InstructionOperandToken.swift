@@ -87,16 +87,8 @@ private func isNumber(_ string: String) -> Bool {
     || (string.contains(".") && Float(string) != nil)
 }
 
-public struct StringError: Swift.Error, Equatable {
-  public init(error: String) {
-    self.error = error
-  }
-
-  public let error: String
-}
-
 // TODO: Make this private.
-public func cast<T: UnsignedInteger, negT: SignedInteger>(string: String, negativeType: negT.Type) throws -> T where T: FixedWidthInteger, negT: FixedWidthInteger, T: BitPatternInitializable, T.CompanionType == negT {
+public func cast<T: UnsignedInteger, negT: SignedInteger>(string: String, negativeType: negT.Type) -> T? where T: FixedWidthInteger, negT: FixedWidthInteger, T: BitPatternInitializable, T.CompanionType == negT {
   var value = string
   let isNegative = value.starts(with: "-")
   if isNegative {
@@ -121,13 +113,13 @@ public func cast<T: UnsignedInteger, negT: SignedInteger>(string: String, negati
 
   if isNegative {
     guard let negativeValue = negT(numericPart, radix: radix) else {
-      throw StringError(error: "Unable to represent \(value) as a \(T.self)")
+      return nil
     }
     return T(bitPattern: -negativeValue)
   }
 
   guard let numericValue = T(numericPart, radix: radix) else {
-    throw StringError(error: "Unable to represent \(value) as a \(T.self)")
+    return nil
   }
 
   return numericValue

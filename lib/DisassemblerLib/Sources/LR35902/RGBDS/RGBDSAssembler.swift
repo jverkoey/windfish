@@ -21,6 +21,10 @@ public final class RGBDSAssembler {
     let error: String
   }
 
+  public struct StringError: Swift.Error, Equatable {
+    public let error: String
+  }
+
   public static func assemble(assembly: String) -> (instructions: [LR35902.Instruction], data: Data, errors: [Error]) {
     var lineNumber = 1
     var buffer = Data()
@@ -39,7 +43,7 @@ public final class RGBDSAssembler {
         instructions.append(instruction)
         buffer.append(LR35902.InstructionSet.data(representing: instruction))
 
-      } catch let error as RGBDS.StringError {
+      } catch let error as StringError {
         errors.append(.init(lineNumber: lineNumber, error: error.error))
       } catch let error as RGBDSAssembler.Error {
         errors.append(error)
@@ -55,14 +59,14 @@ public final class RGBDSAssembler {
       return nil
     }
     guard let specs = LR35902.InstructionSet.specs(for: statement) else {
-      throw RGBDS.StringError(error: "No valid instruction found for \(statement.formattedString)")
+      throw StringError(error: "No valid instruction found for \(statement.formattedString)")
     }
     let potentialInstructions: [LR35902.Instruction] = try specs.compactMap { spec in
       try RGBDSAssembler.instruction(from: statement, using: spec)
     }
     guard potentialInstructions.count == 1,
           let instruction = potentialInstructions.first else {
-      throw RGBDS.StringError(error: "Unable to resolve instruction for \(statement.formattedString)")
+      throw StringError(error: "Unable to resolve instruction for \(statement.formattedString)")
     }
     return instruction
   }
@@ -94,29 +98,39 @@ public final class RGBDSAssembler {
       let value = statement.operands[operand.index]
       switch operand.value {
       case let restartAddress as LR35902.Instruction.RestartAddress:
-        let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
+        guard let numericValue: UInt16 = cast(string: value, negativeType: Int16.self) else {
+          throw StringError(error: "Unable to represent \(value) as a \(UInt16.self)")
+        }
         if numericValue != restartAddress.rawValue {
           instruction = nil
           shouldStop = true
         }
       case let bit as LR35902.Instruction.Bit:
-        let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
+        guard let numericValue: UInt8 = cast(string: value, negativeType: Int8.self) else {
+          throw StringError(error: "Unable to represent \(value) as a \(UInt8.self)")
+        }
         if numericValue != bit.rawValue {
           instruction = nil
           shouldStop = true
         }
       case LR35902.Instruction.Numeric.imm16:
-        let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
+        guard let numericValue: UInt16 = cast(string: value, negativeType: Int16.self) else {
+          throw StringError(error: "Unable to represent \(value) as a \(UInt16.self)")
+        }
         instruction = .init(spec: spec, immediate: .imm16(numericValue))
       case LR35902.Instruction.Numeric.imm8, LR35902.Instruction.Numeric.simm8:
-        var numericValue: UInt8 = try cast(string: value, negativeType: Int8.self)
+        guard var numericValue: UInt8 = cast(string: value, negativeType: Int8.self) else {
+          throw StringError(error: "Unable to represent \(value) as a \(UInt8.self)")
+        }
         if case .jr = spec {
           // Relative jumps in assembly are written from the point of view of the instruction's beginning.
           numericValue = numericValue.subtractingReportingOverflow(UInt8(LR35902.InstructionSet.widths[spec]!.total)).partialValue
         }
         instruction = .init(spec: spec, immediate: .imm8(numericValue))
       case LR35902.Instruction.Numeric.ffimm8addr:
-        let numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self)
+        guard let numericValue: UInt16 = cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self) else {
+          throw StringError(error: "Unable to represent \(value) as a \(UInt16.self)")
+        }
         if (numericValue & 0xFF00) != 0xFF00 {
           instruction = nil
           shouldStop = true
@@ -124,10 +138,14 @@ public final class RGBDSAssembler {
         let lowerByteValue = UInt8(numericValue & 0xFF)
         instruction = .init(spec: spec, immediate: .imm8(lowerByteValue))
       case LR35902.Instruction.Numeric.sp_plus_simm8:
-        let numericValue: UInt8 = try cast(string: String(value.dropFirst(3).trimmed()), negativeType: Int8.self)
+        guard let numericValue: UInt8 = cast(string: String(value.dropFirst(3).trimmed()), negativeType: Int8.self) else {
+          throw StringError(error: "Unable to represent \(value) as a \(UInt8.self)")
+        }
         instruction = .init(spec: spec, immediate: .imm8(numericValue))
       case LR35902.Instruction.Numeric.imm16addr:
-        let numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self)
+        guard let numericValue: UInt16 = cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self) else {
+          throw StringError(error: "Unable to represent \(value) as a \(UInt16.self)")
+        }
         instruction = .init(spec: spec, immediate: .imm16(numericValue))
       default:
         break
