@@ -13,13 +13,13 @@ extension InstructionSpec {
 
    - parameter visitor: Invoked for each non-nil operand of the specification.
    */
-  public func visit(visitor: ((value: Any, index: Int)?) -> Void) {
+  public func visit(visitor: ((value: Any, index: Int)?) throws -> Void) throws {
     guard let operands = Mirror(reflecting: self).children.first else {
-      visitor(nil)
+      try visitor(nil)
       return
     }
     if let subSpec = operands.value as? Self {
-      subSpec.visit(visitor: visitor)
+      try subSpec.visit(visitor: visitor)
       return
     }
 
@@ -39,7 +39,7 @@ extension InstructionSpec {
       if case Optional<Any>.none = child.value {
         continue
       }
-      visitor((value: child.value, index: index))
+      try visitor((value: child.value, index: index))
       index += 1
     }
   }

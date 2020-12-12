@@ -21,7 +21,7 @@ class VisitorTests: XCTestCase {
     let instruction = SimpleCPU.Instruction(spec: .nop, immediate: nil)
 
     let monitor = VisitorMonitor()
-    instruction.spec.visit(visitor: monitor.visit)
+    try instruction.spec.visit(visitor: monitor.visit)
     XCTAssertEqual(monitor.visited, [
       .init(numericValue: nil, conditionValue: nil, operandIndex: nil)
     ])
@@ -31,7 +31,7 @@ class VisitorTests: XCTestCase {
     let instruction = SimpleCPU.Instruction(spec: .cp(.a), immediate: nil)
 
     let monitor = VisitorMonitor()
-    instruction.spec.visit(visitor: monitor.visit)
+    try instruction.spec.visit(visitor: monitor.visit)
 
     XCTAssertEqual(monitor.visited, [
       .init(numericValue: SimpleCPU.Instruction.Spec.Numeric.a, conditionValue: nil, operandIndex: 0)
@@ -42,7 +42,7 @@ class VisitorTests: XCTestCase {
     let instruction = SimpleCPU.Instruction(spec: .ld(.a, .imm8), immediate: .imm8(128))
 
     let monitor = VisitorMonitor()
-    instruction.spec.visit(visitor: monitor.visit)
+    try instruction.spec.visit(visitor: monitor.visit)
 
     XCTAssertEqual(monitor.visited, [
       .init(numericValue: SimpleCPU.Instruction.Spec.Numeric.a, conditionValue: nil, operandIndex: 0),
@@ -54,7 +54,7 @@ class VisitorTests: XCTestCase {
     let instruction = SimpleCPU.Instruction(spec: .sub(.ld(.a, .imm8)), immediate: .imm8(128))
 
     let monitor = VisitorMonitor()
-    instruction.spec.visit(visitor: monitor.visit)
+    try instruction.spec.visit(visitor: monitor.visit)
 
     XCTAssertEqual(monitor.visited, [
       .init(numericValue: SimpleCPU.Instruction.Spec.Numeric.a, conditionValue: nil, operandIndex: 0),
@@ -66,7 +66,7 @@ class VisitorTests: XCTestCase {
     let instruction = SimpleCPU.Instruction(spec: .call(nil, .imm8), immediate: .imm8(128))
 
     let monitor = VisitorMonitor()
-    instruction.spec.visit(visitor: monitor.visit)
+    try instruction.spec.visit(visitor: monitor.visit)
 
     XCTAssertEqual(monitor.visited, [
       .init(numericValue: SimpleCPU.Instruction.Spec.Numeric.imm8, conditionValue: nil, operandIndex: 0)
@@ -77,7 +77,7 @@ class VisitorTests: XCTestCase {
     let instruction = SimpleCPU.Instruction(spec: .call(.nz, .imm8), immediate: .imm8(128))
 
     let monitor = VisitorMonitor()
-    instruction.spec.visit(visitor: monitor.visit)
+    try instruction.spec.visit(visitor: monitor.visit)
 
     XCTAssertEqual(monitor.visited, [
       .init(numericValue: nil, conditionValue: SimpleCPU.Instruction.Spec.Condition.nz, operandIndex: 0),

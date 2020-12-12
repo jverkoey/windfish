@@ -56,79 +56,6 @@ public final class RGBDSAssembler {
     let error: String
   }
 
-  public static func instruction(from statement: RGBDS.Statement, using spec: LR35902.Instruction.Spec) throws -> LR35902.Instruction? {
-    if case LR35902.Instruction.Spec.stop = spec {
-      return .init(spec: spec, immediate: .imm8(0))
-    }
-    guard var operands = Mirror(reflecting: spec).children.first else {
-      return .init(spec: spec)
-    }
-    while let subSpec = operands.value as? LR35902.Instruction.Spec {
-      guard let subOperands = Mirror(reflecting: subSpec).children.first else {
-        return .init(spec: spec)
-      }
-      operands = subOperands
-    }
-
-    let children: Mirror.Children
-    let reflectedChildren = Mirror(reflecting: operands.value).children
-    if reflectedChildren.count > 0 {
-      children = reflectedChildren
-    } else {
-      children = Mirror.Children([(label: nil, value: operands.value)])
-    }
-    var index = 0
-    for child in children {
-      // Any isn't nullable, even though it might represent a null value (e.g. a .jr(nil, .imm8) spec with an
-      // optional first argument), so we need to use Optional<Any>.none to represent an optional argument in this case.
-      if case Optional<Any>.none = child.value {
-        continue
-      }
-      defer {
-        index += 1
-      }
-      let value = statement.operands[index]
-      switch child.value {
-      case let restartAddress as LR35902.Instruction.RestartAddress:
-        let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
-        if numericValue != restartAddress.rawValue {
-          return nil
-        }
-      case let bit as LR35902.Instruction.Bit:
-        let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
-        if numericValue != bit.rawValue {
-          return nil
-        }
-      case LR35902.Instruction.Numeric.imm16:
-        let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
-        return .init(spec: spec, immediate: .imm16(numericValue))
-      case LR35902.Instruction.Numeric.imm8, LR35902.Instruction.Numeric.simm8:
-        var numericValue: UInt8 = try cast(string: value, negativeType: Int8.self)
-        if case .jr = spec {
-          // Relative jumps in assembly are written from the point of view of the instruction's beginning.
-          numericValue = numericValue.subtractingReportingOverflow(UInt8(LR35902.InstructionSet.widths[spec]!.total)).partialValue
-        }
-        return .init(spec: spec, immediate: .imm8(numericValue))
-      case LR35902.Instruction.Numeric.ffimm8addr:
-        let numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self)
-        if (numericValue & 0xFF00) != 0xFF00 {
-          return nil
-        }
-        let lowerByteValue = UInt8(numericValue & 0xFF)
-        return .init(spec: spec, immediate: .imm8(lowerByteValue))
-      case LR35902.Instruction.Numeric.sp_plus_simm8:
-        let numericValue: UInt8 = try cast(string: String(value.dropFirst(3).trimmed()), negativeType: Int8.self)
-        return .init(spec: spec, immediate: .imm8(numericValue))
-      case LR35902.Instruction.Numeric.imm16addr:
-        let numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self)
-        return .init(spec: spec, immediate: .imm16(numericValue))
-      default:
-        break
-      }
-    }
-    return .init(spec: spec)
-  }
-
   public struct StringError: Swift.Error, Equatable {
     let error: String
   }
@@ -178,4 +105,70 @@ public final class RGBDSAssembler {
     }
     return instruction
   }
+
+  /**
+   Attempts to create an instruction with the given specification from the given statement.
+
+   It is assumed that the specifications loosely match the statement's tokenizedString representation.
+   */
+  public static func instruction(from statement: RGBDS.Statement, using spec: LR35902.Instruction.Spec) throws -> LR35902.Instruction? {
+    if case LR35902.Instruction.Spec.stop = spec {
+      // stop is always followed by a zero byte
+      return .init(spec: spec, immediate: .imm8(0))
+    }
+    var instruction: LR35902.Instruction? = nil
+    var failed = false
+    try spec.visit { operand in
+      guard !failed else {
+        return
+      }
+      guard let operand = operand else {
+        instruction = .init(spec: spec)
+        return
+      }
+      let value = statement.operands[operand.index]
+      switch operand.value {
+      case let restartAddress as LR35902.Instruction.RestartAddress:
+        let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
+        if numericValue != restartAddress.rawValue {
+          failed = true
+        }
+      case let bit as LR35902.Instruction.Bit:
+        let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
+        if numericValue != bit.rawValue {
+          failed = true
+        }
+      case LR35902.Instruction.Numeric.imm16:
+        let numericValue: UInt16 = try cast(string: value, negativeType: Int16.self)
+        instruction = .init(spec: spec, immediate: .imm16(numericValue))
+      case LR35902.Instruction.Numeric.imm8, LR35902.Instruction.Numeric.simm8:
+        var numericValue: UInt8 = try cast(string: value, negativeType: Int8.self)
+        if case .jr = spec {
+          // Relative jumps in assembly are written from the point of view of the instruction's beginning.
+          numericValue = numericValue.subtractingReportingOverflow(UInt8(LR35902.InstructionSet.widths[spec]!.total)).partialValue
+        }
+        instruction = .init(spec: spec, immediate: .imm8(numericValue))
+      case LR35902.Instruction.Numeric.ffimm8addr:
+        let numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self)
+        if (numericValue & 0xFF00) != 0xFF00 {
+          failed = true
+        }
+        let lowerByteValue = UInt8(numericValue & 0xFF)
+        instruction = .init(spec: spec, immediate: .imm8(lowerByteValue))
+      case LR35902.Instruction.Numeric.sp_plus_simm8:
+        let numericValue: UInt8 = try cast(string: String(value.dropFirst(3).trimmed()), negativeType: Int8.self)
+        instruction = .init(spec: spec, immediate: .imm8(numericValue))
+      case LR35902.Instruction.Numeric.imm16addr:
+        let numericValue: UInt16 = try cast(string: String(value.dropFirst().dropLast().trimmed()), negativeType: Int16.self)
+        instruction = .init(spec: spec, immediate: .imm16(numericValue))
+      default:
+        break
+      }
+    }
+    if !failed && instruction == nil {
+      instruction = .init(spec: spec)
+    }
+    return instruction
+  }
+
 }
