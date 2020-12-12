@@ -8,7 +8,7 @@ import Foundation
  exist on Foundation types.
  */
 public protocol BitPatternInitializable {
-  associatedtype CompanionType
+  associatedtype CompanionType: FixedWidthInteger, SignedInteger
   init(bitPattern x: CompanionType)
 }
 

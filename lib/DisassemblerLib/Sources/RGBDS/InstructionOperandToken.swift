@@ -88,7 +88,9 @@ private func isNumber(_ string: String) -> Bool {
 }
 
 // TODO: Make this private.
-public func cast<T: UnsignedInteger, negT: SignedInteger>(string: String, negativeType: negT.Type) -> T? where T: FixedWidthInteger, negT: FixedWidthInteger, T: BitPatternInitializable, T.CompanionType == negT {
+public func cast<T: UnsignedInteger>(string: String) -> T?
+    where T: FixedWidthInteger,
+          T: BitPatternInitializable {
   var value = string
   let isNegative = value.starts(with: "-")
   if isNegative {
@@ -112,7 +114,7 @@ public func cast<T: UnsignedInteger, negT: SignedInteger>(string: String, negati
   }
 
   if isNegative {
-    guard let negativeValue = negT(numericPart, radix: radix) else {
+    guard let negativeValue = T.CompanionType(numericPart, radix: radix) else {
       return nil
     }
     return T(bitPattern: -negativeValue)
