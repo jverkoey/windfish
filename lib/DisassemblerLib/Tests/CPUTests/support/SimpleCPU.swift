@@ -22,6 +22,17 @@ struct SimpleCPU {
         }
       }
 
+      public func asData() -> Data {
+        switch self {
+        case let .imm8(immediate):
+          return Data([immediate])
+        case var .imm16(immediate):
+          return withUnsafeBytes(of: &immediate) { immediateBytes in
+            return Data(immediateBytes)
+          }
+        }
+      }
+
       case imm8(UInt8)
       case imm16(UInt16)
     }

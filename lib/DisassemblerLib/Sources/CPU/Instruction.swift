@@ -73,6 +73,9 @@ public protocol InstructionSpec: Hashable {
 public protocol InstructionImmediate: Hashable {
   /** Initializes the immediate from a specific set of bytes, if possible. */
   init?(data: Data)
+
+  /** Converts the immediate to a data representation of itself. */
+  func asData() -> Data
 }
 
 // MARK: - Automatic width computation

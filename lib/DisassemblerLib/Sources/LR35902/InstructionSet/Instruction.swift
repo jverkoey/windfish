@@ -30,6 +30,16 @@ extension LR35902 {
         }
       }
 
+      public func asData() -> Data {
+        switch self {
+        case let .imm8(immediate):
+          return Data([immediate])
+        case let .imm16(immediate):
+          let low = UInt8(immediate & 0xFF)
+          let high = UInt8((immediate >> 8) & 0xFF)
+          return Data([low, high])
+        }
+      }
     }
   }
 }
