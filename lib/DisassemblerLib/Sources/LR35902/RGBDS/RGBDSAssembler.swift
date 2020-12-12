@@ -14,7 +14,7 @@ public final class RGBDSAssembler {
   }
 
   /**
-   Assembles the given code into both an intermediary format and its corresponding data representation.
+   Assembles the assembly code into an intermediary format.
 
    If any portion of the assembly fails, then errors will also be returned.
    */
