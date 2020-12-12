@@ -18,9 +18,8 @@ public final class RGBDSAssembler {
 
    If any portion of the assembly fails, then errors will also be returned.
    */
-  public static func assemble(assembly: String) -> (instructions: [LR35902.Instruction], data: Data, errors: [Error]) {
+  public static func assemble(assembly: String) -> (instructions: [LR35902.Instruction], errors: [Error]) {
     var lineNumber = 1
-    var buffer = Data()
     var instructions: [LR35902.Instruction] = []
     var errors: [Error] = []
 
@@ -34,7 +33,6 @@ public final class RGBDSAssembler {
           return
         }
         instructions.append(instruction)
-        buffer.append(LR35902.InstructionSet.data(representing: instruction))
 
       } catch let error as StringError {
         errors.append(.init(lineNumber: lineNumber, message: error.message))
@@ -44,7 +42,7 @@ public final class RGBDSAssembler {
         errors.append(.init(lineNumber: lineNumber, message: "Unknown error"))
       }
     }
-    return (instructions: instructions, data: buffer, errors: errors)
+    return (instructions: instructions, errors: errors)
   }
 
   /** Creates an instruction from the given line, if the line contains a parsable instruction statement. */

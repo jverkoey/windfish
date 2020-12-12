@@ -22,7 +22,9 @@ class TypeInferenceTests: XCTestCase {
 """)
     XCTAssertEqual(results.errors, [])
 
-    let disassembly = LR35902.Disassembly(rom: results.data)
+    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+
+    let disassembly = LR35902.Disassembly(rom: data)
 
     disassembly.createDatatype(named: "STATF", bitmask: [
       0b0100_0000: "STATF_LYC",
@@ -35,7 +37,7 @@ class TypeInferenceTests: XCTestCase {
       0b0000_0000: "STATF_HB"
     ])
     disassembly.createGlobal(at: 0xff41, named: "gbSTAT", dataType: "STATF")
-    disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
+    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     let (source, _) = try! disassembly.generateSource()
     let bank00Source = source.sources["bank_00.asm"]
