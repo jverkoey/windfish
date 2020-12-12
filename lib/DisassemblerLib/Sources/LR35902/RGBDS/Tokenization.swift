@@ -38,6 +38,15 @@ extension LR35902.Instruction.Bit: InstructionOperandTokenizable {
 }
 
 extension LR35902.InstructionSet {
+  /** Returns all possible specifications for the given statement. */
+  public static func specs(for statement: RGBDS.Statement) -> [LR35902.Instruction.Spec] {
+    let representation = statement.tokenizedString
+    guard let specs = tokenStringToSpecs[representation] else {
+      return []
+    }
+    return specs
+  }
+
   /**
    A cached map of specifications to their tokenized representation.
 

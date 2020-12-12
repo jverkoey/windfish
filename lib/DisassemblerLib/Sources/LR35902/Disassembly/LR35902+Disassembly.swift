@@ -496,7 +496,8 @@ extension LR35902 {
         guard let statement = RGBDS.Statement(fromLine: line) else {
           return
         }
-        guard let specs = LR35902.InstructionSet.specs(for: statement) else {
+        let specs = LR35902.InstructionSet.specs(for: statement)
+        if specs.isEmpty {
           preconditionFailure()
         }
 

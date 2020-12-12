@@ -4,16 +4,6 @@ import CPU
 import FoundationExtensions
 import RGBDS
 
-extension LR35902.InstructionSet {
-  public static func specs(for statement: RGBDS.Statement) -> [LR35902.Instruction.Spec]? {
-    let representation = statement.tokenizedString
-    guard let specs = tokenStringToSpecs[representation] else {
-      return nil
-    }
-    return specs
-  }
-}
-
 public final class RGBDSAssembler {
 
   public struct Error: Swift.Error, Equatable {
@@ -58,7 +48,8 @@ public final class RGBDSAssembler {
     guard let statement = RGBDS.Statement(fromLine: line) else {
       return nil
     }
-    guard let specs = LR35902.InstructionSet.specs(for: statement) else {
+    let specs = LR35902.InstructionSet.specs(for: statement)
+    if specs.isEmpty {
       throw StringError(error: "No valid instruction found for \(statement.formattedString)")
     }
     let potentialInstructions: [LR35902.Instruction] = try specs.compactMap { spec in
