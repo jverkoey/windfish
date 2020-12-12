@@ -10,7 +10,7 @@ nop nop
     let disassembly = LR35902.Disassembly(rom: results.data)
     disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(results.errors, [RGBDSAssembler.Error(lineNumber: 1, error: "No valid instruction found for nop nop")])
+    XCTAssertEqual(results.errors, [RGBDSAssembler.Error(lineNumber: 1, error: "No valid instruction found for nop  nop")])
   }
 
   func test_nop_failsWithExtraOperandAtCorrectLine() throws {
@@ -23,7 +23,7 @@ nop nop
     let disassembly = LR35902.Disassembly(rom: results.data)
     disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(results.errors, [RGBDSAssembler.Error(lineNumber: 3, error: "No valid instruction found for nop nop")])
+    XCTAssertEqual(results.errors, [RGBDSAssembler.Error(lineNumber: 3, error: "No valid instruction found for nop  nop")])
   }
 
   func test_newline_doesNotCauseParseFailures() throws {
@@ -89,7 +89,7 @@ ld bc, 0x1234
     let disassembly = LR35902.Disassembly(rom: results.data)
     disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(results.errors, [.init(lineNumber: 1, error: "No valid instruction found for ld bc, 0x1234")])
+    XCTAssertEqual(results.errors, [.init(lineNumber: 1, error: "No valid instruction found for ld   bc, 0x1234")])
     XCTAssertEqual(disassembly.instructionMap, [:])
   }
 
@@ -204,7 +204,7 @@ ld b, 0xFF
     let disassembly = LR35902.Disassembly(rom: results.data)
     disassembly.disassemble(range: 0..<UInt16(results.data.count), inBank: 0x00)
 
-    XCTAssertEqual(results.errors, [.init(lineNumber: 1, error: "No valid instruction found for ld b, 0xFF")])
+    XCTAssertEqual(results.errors, [.init(lineNumber: 1, error: "No valid instruction found for ld   b, 0xFF")])
     XCTAssertEqual(disassembly.instructionMap, [:])
   }
 

@@ -39,20 +39,20 @@ private func cast<T: UnsignedInteger, negT: SignedInteger>(string: String, negat
 
   if isNegative {
     guard let negativeValue = negT(numericPart, radix: radix) else {
-      throw RGBDSAssembler.Error(lineNumber: nil, error: "Unable to represent \(value) as a UInt16")
+      throw RGBDSAssembler.StringError(error: "Unable to represent \(value) as a UInt16")
     }
     return T(bitPattern: -negativeValue)
   } else if let numericValue = T(numericPart, radix: radix) {
     return numericValue
   }
 
-  throw RGBDSAssembler.Error(lineNumber: nil, error: "Unable to represent \(value) as a UInt16")
+  throw RGBDSAssembler.StringError(error: "Unable to represent \(value) as a UInt16")
 }
 
 public final class RGBDSAssembler {
 
   public struct Error: Swift.Error, Equatable {
-    let lineNumber: Int?
+    let lineNumber: Int
     let error: String
   }
 
@@ -129,17 +129,23 @@ public final class RGBDSAssembler {
     return .init(spec: spec)
   }
 
-  private static func instruction(from statement: RGBDS.Statement) throws -> LR35902.Instruction? {
-    guard let specs = LR35902.InstructionSet.specs(for: statement) else {
+  public struct StringError: Swift.Error, Equatable {
+    let error: String
+  }
+
+  private static func instruction(from line: String) throws -> LR35902.Instruction? {
+    guard let statement = RGBDS.Statement(fromLine: line) else {
       return nil
     }
-
+    guard let specs = LR35902.InstructionSet.specs(for: statement) else {
+      throw StringError(error: "No valid instruction found for \(statement.formattedString)")
+    }
     let potentialInstructions: [LR35902.Instruction] = try specs.compactMap { spec in
       try RGBDSAssembler.instruction(from: statement, using: spec)
     }
     guard potentialInstructions.count == 1,
           let instruction = potentialInstructions.first else {
-      return nil
+      throw StringError(error: "Unable to resolve instruction for \(statement.formattedString)")
     }
     return instruction
   }
@@ -156,11 +162,8 @@ public final class RGBDSAssembler {
       }
 
       do {
-        guard let statement = RGBDS.Statement(fromLine: line) else {
+        guard let instruction = try self.instruction(from: line) else {
           return
-        }
-        guard let instruction = try instruction(from: statement) else {
-          throw Error(lineNumber: lineNumber, error: "No valid instruction found for \(line)")
         }
         instructions.append(instruction)
 
@@ -178,12 +181,10 @@ public final class RGBDSAssembler {
           }
         }
 
+      } catch let error as RGBDSAssembler.StringError {
+        errors.append(.init(lineNumber: lineNumber, error: error.error))
       } catch let error as RGBDSAssembler.Error {
-        if error.lineNumber == nil {
-          errors.append(.init(lineNumber: lineNumber, error: error.error))
-        } else {
-          errors.append(error)
-        }
+        errors.append(error)
       } catch {
       }
     }
