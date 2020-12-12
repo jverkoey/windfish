@@ -16,7 +16,7 @@ private func codeColumn(_ code: String) -> String {
   return "\(code)".padding(toLength: codeWidth, withPad: " ", startingAt: 0)
 }
 
-public func line(comment: String) -> String {
+func line(comment: String) -> String {
   var lines: [String] = []
   comment.enumerateLines { line, _ in
     lines.append(line)
@@ -26,7 +26,7 @@ public func line(comment: String) -> String {
   }.joined(separator: "\n")
 }
 
-public func line(_ code: String, comment: String?) -> String {
+func line(_ code: String, comment: String?) -> String {
   if let comment = comment {
     if code.count > codeWidth {
       return "\(codeColumn("")) ; \(comment)\n\(code)"
@@ -38,24 +38,24 @@ public func line(_ code: String, comment: String?) -> String {
   }
 }
 
-public func line<T: FixedWidthInteger>(_ code: String, address: T, addressType: String?) -> String {
+func line<T: FixedWidthInteger>(_ code: String, address: T, addressType: String?) -> String {
   return line("    \(code)", comment: addressAndType(address, type: addressType))
 }
 
-public func line(_ code: String, addressType: String?) -> String {
+func line(_ code: String, addressType: String?) -> String {
   return line("    \(code)", comment: addressType)
 }
 
-public func line(_ code: String) -> String {
+func line(_ code: String) -> String {
   return "    \(code)"
 }
 
-public func line<T: FixedWidthInteger>(_ code: String, address: T, addressType: String?, comment: String) -> String {
+func line<T: FixedWidthInteger>(_ code: String, address: T, addressType: String?, comment: String) -> String {
   let aAndT = addressAndType(address, type: addressType)
   return line("    \(code)", comment: "\(aAndT) \(comment)")
 }
 
-public func line(_ code: String, addressType: String?, comment: String) -> String {
+func line(_ code: String, addressType: String?, comment: String) -> String {
   if let addressType = addressType {
     return line("    \(code)", comment: "\(addressType) \(comment)")
   } else {
@@ -63,7 +63,7 @@ public func line(_ code: String, addressType: String?, comment: String) -> Strin
   }
 }
 
-public func line<T: FixedWidthInteger>(_ code: String, address: T, bank: UInt8, scope: String, bytes: Data) -> String {
+func line<T: FixedWidthInteger>(_ code: String, address: T, bank: UInt8, scope: String, bytes: Data) -> String {
   let comment: String
   if !scope.isEmpty {
     comment = "$\(address.hexString) (\(bank.hexString)): \(scope) \(bytes.map { "$\($0.hexString)" }.joined(separator: " "))"
@@ -73,7 +73,7 @@ public func line<T: FixedWidthInteger>(_ code: String, address: T, bank: UInt8, 
   return line("    \(code)", comment: comment)
 }
 
-public func line(_ code: String, bytes: Data) -> String {
+func line(_ code: String, bytes: Data) -> String {
   let comment = bytes.map { "$\($0.hexString)" }.joined(separator: " ")
   return line("    \(code)", comment: comment)
 }

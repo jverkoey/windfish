@@ -28,15 +28,11 @@ let package = Package(
       name: "LR35902",
       dependencies: [
         "FoundationExtensions",
-        "AssemblyGenerator",
         "CPU",
         "Disassembler",
         "RGBDS",
       ]
     ),
-    .target(
-      name: "AssemblyGenerator",
-      dependencies: ["FoundationExtensions"]),
     .target(
       name: "Disassembler",
       dependencies: ["CPU"]
