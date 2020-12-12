@@ -500,7 +500,6 @@ extension LR35902 {
           preconditionFailure()
         }
 
-        // TODO: This doesn't work for ambiguous statements; should it?
         guard specs.count == 1 else {
           preconditionFailure()
         }

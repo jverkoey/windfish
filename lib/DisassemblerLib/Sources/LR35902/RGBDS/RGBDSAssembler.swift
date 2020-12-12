@@ -133,23 +133,6 @@ public final class RGBDSAssembler {
     let error: String
   }
 
-  private static func instruction(from line: String) throws -> LR35902.Instruction? {
-    guard let statement = RGBDS.Statement(fromLine: line) else {
-      return nil
-    }
-    guard let specs = LR35902.InstructionSet.specs(for: statement) else {
-      throw StringError(error: "No valid instruction found for \(statement.formattedString)")
-    }
-    let potentialInstructions: [LR35902.Instruction] = try specs.compactMap { spec in
-      try RGBDSAssembler.instruction(from: statement, using: spec)
-    }
-    guard potentialInstructions.count == 1,
-          let instruction = potentialInstructions.first else {
-      throw StringError(error: "Unable to resolve instruction for \(statement.formattedString)")
-    }
-    return instruction
-  }
-
   public static func assemble(assembly: String) -> (instructions: [LR35902.Instruction], data: Data, errors: [Error]) {
     var lineNumber = 1
     var buffer = Data()
@@ -162,12 +145,13 @@ public final class RGBDSAssembler {
       }
 
       do {
-        guard let instruction = try self.instruction(from: line) else {
+        guard let instruction = try instruction(from: line) else {
           return
         }
         instructions.append(instruction)
 
         buffer.append(contentsOf: LR35902.InstructionSet.opcodeBytes[instruction.spec]!)
+
         switch instruction.immediate {
         case let .imm8(immediate):
           buffer.append(contentsOf: [immediate])
@@ -184,8 +168,26 @@ public final class RGBDSAssembler {
       } catch let error as RGBDSAssembler.Error {
         errors.append(error)
       } catch {
+        errors.append(.init(lineNumber: lineNumber, error: "Unknown error"))
       }
     }
     return (instructions: instructions, data: buffer, errors: errors)
+  }
+
+  private static func instruction(from line: String) throws -> LR35902.Instruction? {
+    guard let statement = RGBDS.Statement(fromLine: line) else {
+      return nil
+    }
+    guard let specs = LR35902.InstructionSet.specs(for: statement) else {
+      throw StringError(error: "No valid instruction found for \(statement.formattedString)")
+    }
+    let potentialInstructions: [LR35902.Instruction] = try specs.compactMap { spec in
+      try RGBDSAssembler.instruction(from: statement, using: spec)
+    }
+    guard potentialInstructions.count == 1,
+          let instruction = potentialInstructions.first else {
+      throw StringError(error: "Unable to resolve instruction for \(statement.formattedString)")
+    }
+    return instruction
   }
 }
