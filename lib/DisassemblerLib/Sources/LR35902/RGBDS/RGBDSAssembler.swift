@@ -14,49 +14,10 @@ extension LR35902.InstructionSet {
   }
 }
 
-private func cast<T: UnsignedInteger, negT: SignedInteger>(string: String, negativeType: negT.Type) throws -> T where T: FixedWidthInteger, negT: FixedWidthInteger, T: BitPatternInitializable, T.CompanionType == negT {
-  var value = string
-  let isNegative = value.starts(with: "-")
-  if isNegative {
-    value = String(value.dropFirst(1))
-  }
-
-  var numericPart: String
-  var radix: Int
-  if value.starts(with: "$") {
-    numericPart = String(value.dropFirst())
-    radix = 16
-  } else if value.starts(with: "0x") {
-    numericPart = String(value.dropFirst(2))
-    radix = 16
-  } else if value.starts(with: "%") {
-    numericPart = String(value.dropFirst())
-    radix = 2
-  } else {
-    numericPart = value
-    radix = 10
-  }
-
-  if isNegative {
-    guard let negativeValue = negT(numericPart, radix: radix) else {
-      throw RGBDSAssembler.StringError(error: "Unable to represent \(value) as a UInt16")
-    }
-    return T(bitPattern: -negativeValue)
-  } else if let numericValue = T(numericPart, radix: radix) {
-    return numericValue
-  }
-
-  throw RGBDSAssembler.StringError(error: "Unable to represent \(value) as a UInt16")
-}
-
 public final class RGBDSAssembler {
 
   public struct Error: Swift.Error, Equatable {
     let lineNumber: Int
-    let error: String
-  }
-
-  public struct StringError: Swift.Error, Equatable {
     let error: String
   }
 
@@ -78,7 +39,7 @@ public final class RGBDSAssembler {
         instructions.append(instruction)
         buffer.append(LR35902.InstructionSet.data(representing: instruction))
 
-      } catch let error as RGBDSAssembler.StringError {
+      } catch let error as RGBDS.StringError {
         errors.append(.init(lineNumber: lineNumber, error: error.error))
       } catch let error as RGBDSAssembler.Error {
         errors.append(error)
@@ -94,14 +55,14 @@ public final class RGBDSAssembler {
       return nil
     }
     guard let specs = LR35902.InstructionSet.specs(for: statement) else {
-      throw StringError(error: "No valid instruction found for \(statement.formattedString)")
+      throw RGBDS.StringError(error: "No valid instruction found for \(statement.formattedString)")
     }
     let potentialInstructions: [LR35902.Instruction] = try specs.compactMap { spec in
       try RGBDSAssembler.instruction(from: statement, using: spec)
     }
     guard potentialInstructions.count == 1,
           let instruction = potentialInstructions.first else {
-      throw StringError(error: "Unable to resolve instruction for \(statement.formattedString)")
+      throw RGBDS.StringError(error: "Unable to resolve instruction for \(statement.formattedString)")
     }
     return instruction
   }
@@ -119,11 +80,15 @@ public final class RGBDSAssembler {
       // stop is always followed by a zero byte
       return .init(spec: spec, immediate: .imm8(0))
     }
-    // Assume that the instruction is fine as-is.
+    // Assume that the instruction is fine as-is, but allow it to be nil'd out if validation does not pass.
     var instruction: LR35902.Instruction? = .init(spec: spec)
+
+    // Visit each operand, looking up the corresponding statement operand value for the current operand index when
+    // needed.
     try spec.visit { operand, shouldStop in
       guard let operand = operand else {
-        instruction = .init(spec: spec)
+        // Base case of no operands.
+        shouldStop = true
         return
       }
       let value = statement.operands[operand.index]

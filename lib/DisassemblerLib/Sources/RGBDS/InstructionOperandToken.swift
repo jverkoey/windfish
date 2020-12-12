@@ -1,5 +1,7 @@
 import Foundation
 
+import FoundationExtensions
+
 /** An operand token represents one operand of an instruction in RGBDS assembly. */
 public enum InstructionOperandToken: Equatable {
   /** A generic numeric token. Examples: 123, 0xff, 0b10101010. */
@@ -83,4 +85,47 @@ private func isNumber(_ string: String) -> Bool {
     || string.hasPrefix("`") // Gameboy graphics
     || Int(string) != nil
     || (string.contains(".") && Float(string) != nil)
+}
+
+public struct StringError: Swift.Error, Equatable {
+  public init(error: String) {
+    self.error = error
+  }
+
+  public let error: String
+}
+
+public func cast<T: UnsignedInteger, negT: SignedInteger>(string: String, negativeType: negT.Type) throws -> T where T: FixedWidthInteger, negT: FixedWidthInteger, T: BitPatternInitializable, T.CompanionType == negT {
+  var value = string
+  let isNegative = value.starts(with: "-")
+  if isNegative {
+    value = String(value.dropFirst(1))
+  }
+
+  var numericPart: String
+  var radix: Int
+  if value.starts(with: "$") {
+    numericPart = String(value.dropFirst())
+    radix = 16
+  } else if value.starts(with: "0x") {
+    numericPart = String(value.dropFirst(2))
+    radix = 16
+  } else if value.starts(with: "%") {
+    numericPart = String(value.dropFirst())
+    radix = 2
+  } else {
+    numericPart = value
+    radix = 10
+  }
+
+  if isNegative {
+    guard let negativeValue = negT(numericPart, radix: radix) else {
+      throw StringError(error: "Unable to represent \(value) as a UInt16")
+    }
+    return T(bitPattern: -negativeValue)
+  } else if let numericValue = T(numericPart, radix: radix) {
+    return numericValue
+  }
+
+  throw StringError(error: "Unable to represent \(value) as a UInt16")
 }
