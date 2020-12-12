@@ -5,7 +5,7 @@ import Foundation
 
  Defined at https://rgbds.gbdev.io/docs/v0.4.2/rgbasm.5#Numeric_Formats
  */
-enum NumericPrefix: String {
+public enum NumericPrefix: String {
   case hexadecimal = "$"
   case octal = "&"
   case binary = "%"
