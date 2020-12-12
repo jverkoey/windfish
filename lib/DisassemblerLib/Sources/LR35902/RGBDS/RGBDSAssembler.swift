@@ -149,11 +149,7 @@ public final class RGBDSAssembler {
           return
         }
         instructions.append(instruction)
-
-        buffer.append(contentsOf: LR35902.InstructionSet.opcodeBytes[instruction.spec]!)
-        if let data = instruction.immediate?.asData() {
-          buffer.append(data)
-        }
+        buffer.append(LR35902.InstructionSet.data(representing: instruction))
 
       } catch let error as RGBDSAssembler.StringError {
         errors.append(.init(lineNumber: lineNumber, error: error.error))

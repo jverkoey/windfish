@@ -57,6 +57,27 @@ public protocol InstructionSet {
    This is typically implemented by returning the result of `computeAllOpcodeStrings()`.
    */
   static var opcodeStrings: [SpecType: String] { get }
+
+  /** Returns the data representation of an instruction. */
+  static func data(representing instruction: InstructionType) -> Data
+}
+
+// MARK: - Default implementations
+
+extension InstructionSet {
+  /**
+   Returns the data representation of an instruction.
+
+   This default implementation uses the pre-computed opcode table and its assumptions.
+   */
+  public static func data(representing instruction: InstructionType) -> Data {
+    var buffer = Data()
+    buffer.append(contentsOf: opcodeBytes[instruction.spec]!)
+    if let data = instruction.immediate?.asData() {
+      buffer.append(data)
+    }
+    return buffer
+  }
 }
 
 // MARK: - Helper methods for computing properties
