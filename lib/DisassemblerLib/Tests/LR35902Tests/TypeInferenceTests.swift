@@ -63,25 +63,34 @@ SECTION "ROM Bank 00", ROM0[$00]
   }
 
   func test_somethingelse() throws {
-    let disassembly = LR35902.Disassembly(rom: Data())
-
-    disassembly.defineMacro(named: "assign", template: """
-ld a, #2
-ld [#1], a
+    let results = RGBDSAssembler.assemble(assembly: """
+ld   hl, $44
+inc  [hl]
 """)
+    XCTAssertEqual(results.errors, [])
+
+    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+
+    let disassembly = LR35902.Disassembly(rom: data)
+
+    disassembly.defineMacro(named: "plusPlusHL", template: """
+ld hl, #1
+inc [hl]
+""")
+    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(disassembly.macroTree, LR35902.Disassembly.MacroNode(
       children: [
-        .any(.ld(.a, .imm8)): LR35902.Disassembly.MacroNode(
+        .any(.ld(.hl, .imm16)): LR35902.Disassembly.MacroNode(
           children: [
-            .any(.ld(.imm16addr, .a)): LR35902.Disassembly.MacroNode(
+            .instruction(.init(spec: .inc(.hladdr))): LR35902.Disassembly.MacroNode(
               children: [:],
               macros: [
                 .init(
-                  name: "assign",
+                  name: "plusPlusHL",
                   macroLines: [
-                    .any(.ld(.a, .imm8), argument: 2),
-                    .any(.ld(.imm16addr, .a), argument: 1)
+                    .any(.ld(.hl, .imm16), argument: 1),
+                    .instruction(.init(spec: .inc(.hladdr)))
                   ],
                   validArgumentValues: nil,
                   action: nil
@@ -94,5 +103,16 @@ ld [#1], a
       ],
       macros: []
     ))
+
+    let (source, _) = try! disassembly.generateSource()
+    let bank00Source = source.sources["bank_00.asm"]
+    if case let .bank(bank, content, _) = bank00Source {
+      XCTAssertEqual(bank, 0)
+      XCTAssertEqual(content, """
+SECTION "ROM Bank 00", ROM0[$00]
+
+    plusPlusHL $0044
+""")
+    }
   }
 }

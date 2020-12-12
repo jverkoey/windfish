@@ -434,7 +434,7 @@ ld hl, sp+$05
       let assembly: String
       switch spec {
       case .ld(.ffimm8addr, _), .ld(_, .ffimm8addr):
-        assembly = representation.replacingOccurrences(of: "ff#", with: "$FF00")
+        assembly = representation.replacingOccurrences(of: "#", with: "$FF00")
       case let .rst(address):
         assembly = representation.replacingOccurrences(of: "#", with: "\(address.rawValue)")
       case let .cb(.bit(bit, _)), let .cb(.res(bit, _)), let .cb(.set(bit, _)):

@@ -30,7 +30,7 @@ private func extractArgs(from statement: RGBDS.Statement, using spec: LR35902.In
          LR35902.Instruction.Numeric.simm8,
          LR35902.Instruction.Numeric.sp_plus_simm8,
          LR35902.Instruction.Numeric.ffimm8addr:
-      args[argument] = Mirror(reflecting: statement).descendant(1, 0, operand.index) as? String
+      args[argument] = Mirror(reflecting: statement).descendant(1, operand.index) as? String
     default:
       break
     }
@@ -778,6 +778,8 @@ clean:
           cpu.bank = bank
         }
       }
+
+      try flushMacro(cpu.pc)
 
       flush()
     }

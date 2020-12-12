@@ -21,7 +21,7 @@ class StatementTests: XCTestCase {
     XCTAssertEqual(statement.opcode, "ld")
     XCTAssertEqual(statement.operands, ["a", "[$ff00]"])
     XCTAssertEqual(statement.formattedString, "ld   a, [$ff00]")
-    XCTAssertEqual(statement.tokenizedString, "ld a, [ff#]")
+    XCTAssertEqual(statement.tokenizedString, "ld a, [#]")
   }
 
   func testWellFormedLineWithExcessiveSpaceAndStringExtractsAllParts() throws {

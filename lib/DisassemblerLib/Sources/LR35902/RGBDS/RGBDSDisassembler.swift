@@ -15,6 +15,23 @@ final class RGBDSDisassembler {
     }
   }
 
+  // TODO: Continue breaking this apart.
+  private static func addressLabel(_ disassembly: LR35902.Disassembly, _ argumentString: String?, address immediate: (UInt16)) -> String {
+    if let argumentString = argumentString {
+      return argumentString
+    } else if let label = disassembly.label(at: immediate, in: disassembly.cpu.bank) {
+      if let scope = disassembly.labeledContiguousScopes(at: disassembly.cpu.pc, in: disassembly.cpu.bank).first(where: { labeledScope in
+        label.starts(with: "\(labeledScope.label).")
+      })?.label {
+        return label.replacingOccurrences(of: "\(scope).", with: ".")
+      } else {
+        return label
+      }
+    } else {
+      return "$\(immediate.hexString)"
+    }
+  }
+
   private static func operands(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil, argumentString: String?) -> [String]? {
     guard let disassembly = disassembly else {
       return operands(for: instruction, spec: instruction.spec, with: nil, argumentString: argumentString)
@@ -26,26 +43,14 @@ final class RGBDSDisassembler {
       guard case let .imm16(immediate) = instruction.immediate else {
         preconditionFailure("Invalid immediate associated with instruction")
       }
-      if disassembly.transfersOfControl(at: immediate, in: disassembly.cpu.bank) != nil {
-        var addressLabel: String
-        if let argumentString = argumentString {
-          addressLabel = argumentString
-        } else if let label = disassembly.label(at: immediate, in: disassembly.cpu.bank) {
-          if let scope = disassembly.labeledContiguousScopes(at: disassembly.cpu.pc, in: disassembly.cpu.bank).first(where: { labeledScope in
-            label.starts(with: "\(labeledScope.label).")
-          })?.label {
-            addressLabel = label.replacingOccurrences(of: "\(scope).", with: ".")
-          } else {
-            addressLabel = label
-          }
-        } else {
-          addressLabel = "$\(immediate.hexString)"
-        }
-        if let condition = condition {
-          return ["\(condition)", addressLabel]
-        } else {
-          return [addressLabel]
-        }
+      guard disassembly.transfersOfControl(at: immediate, in: disassembly.cpu.bank) != nil else {
+        break
+      }
+      let addressLabel = self.addressLabel(disassembly, argumentString, address: immediate)
+      if let condition = condition {
+        return ["\(condition)", addressLabel]
+      } else {
+        return [addressLabel]
       }
 
     case let LR35902.Instruction.Spec.jr(condition, operand) where operand == .simm8:
@@ -54,20 +59,7 @@ final class RGBDSDisassembler {
       }
       let jumpAddress = (disassembly.cpu.pc + LR35902.InstructionSet.widths[instruction.spec]!.total).advanced(by: Int(Int8(bitPattern: immediate)))
       if disassembly.transfersOfControl(at: jumpAddress, in: disassembly.cpu.bank) != nil {
-        var addressLabel: String
-        if let argumentString = argumentString {
-          addressLabel = argumentString
-        } else if let label = disassembly.label(at: jumpAddress, in: disassembly.cpu.bank) {
-          if let scope = disassembly.labeledContiguousScopes(at: disassembly.cpu.pc, in: disassembly.cpu.bank).first(where: { labeledScope in
-            label.starts(with: "\(labeledScope.label).")
-          })?.label {
-            addressLabel = label.replacingOccurrences(of: "\(scope).", with: ".")
-          } else {
-            addressLabel = label
-          }
-        } else {
-          addressLabel = "$\(jumpAddress.hexString)"
-        }
+        let addressLabel = self.addressLabel(disassembly, argumentString, address: jumpAddress)
         if let condition = condition {
           return ["\(condition)", addressLabel]
         } else {

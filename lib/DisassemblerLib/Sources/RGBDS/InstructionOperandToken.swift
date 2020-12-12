@@ -10,9 +10,6 @@ public enum InstructionOperandToken: Equatable {
   /** An generic address token. Examples: [$abcd], [$dd]. */
   case address
 
-  /** An generic FF## address token. Examples: [$ff12]. */
-  case ffaddress
-
   /** A generic stack pointer offset token. Examples: sp+$fa. */
   case stackPointerOffset
 
@@ -34,10 +31,6 @@ public enum InstructionOperandToken: Equatable {
 
     if string.hasPrefix("[") && string.hasSuffix("]") {
       let withinBrackets = String(string.dropFirst().dropLast())
-      if withinBrackets.lowercased().hasPrefix("$ff") && withinBrackets.count == 5 {
-        self = .ffaddress
-        return
-      }
       if isNumber(withinBrackets) {
         self = .address
         return
@@ -59,8 +52,6 @@ public enum InstructionOperandToken: Equatable {
       return "#"
     case .address:
       return "[#]"
-    case .ffaddress:
-      return "[ff#]"
     case .stackPointerOffset:
       return "sp+#"
     case let .specific(string):

@@ -57,11 +57,13 @@ final class RGBDSAssembler {
     let potentialInstructions: [LR35902.Instruction] = try specs.compactMap { spec in
       try RGBDSAssembler.instruction(from: statement, using: spec)
     }
-    guard potentialInstructions.count == 1,
-          let instruction = potentialInstructions.first else {
-      throw StringError(message: "Unable to resolve instruction for \(statement.formattedString)")
+    guard potentialInstructions.count > 0 else {
+      throw StringError(message: "No valid instruction found for \(statement.formattedString)")
     }
-    return instruction
+    let shortestInstruction = potentialInstructions.sorted(by: { pair1, pair2 in
+      LR35902.InstructionSet.widths[pair1.spec]!.total < LR35902.InstructionSet.widths[pair2.spec]!.total
+    })[0]
+    return shortestInstruction
   }
 
   /**
@@ -94,18 +96,20 @@ final class RGBDSAssembler {
         guard let numericValue: UInt16 = RGBDS.integer(from: value) else {
           throw StringError(message: "Unable to represent \(value) as a \(UInt16.self)")
         }
-        if numericValue != restartAddress.rawValue {
+        guard numericValue == restartAddress.rawValue else {
           instruction = nil
           shouldStop = true
+          break
         }
 
       case let bit as LR35902.Instruction.Bit:
         guard let numericValue: UInt8 = RGBDS.integer(from: value) else {
           throw StringError(message: "Unable to represent \(value) as a \(UInt8.self)")
         }
-        if numericValue != bit.rawValue {
+        guard numericValue == bit.rawValue else {
           instruction = nil
           shouldStop = true
+          break
         }
 
       case LR35902.Instruction.Numeric.imm16:
@@ -128,9 +132,10 @@ final class RGBDSAssembler {
         guard let numericValue: UInt16 = RGBDS.integer(fromAddress: value) else {
           throw StringError(message: "Unable to represent \(value) as a \(UInt16.self)")
         }
-        if (numericValue & 0xFF00) != 0xFF00 {
+        guard (numericValue & 0xFF00) == 0xFF00 else {
           instruction = nil
           shouldStop = true
+          break
         }
         let lowerByteValue = UInt8(numericValue & 0xFF)
         instruction = .init(spec: spec, immediate: .imm8(lowerByteValue))

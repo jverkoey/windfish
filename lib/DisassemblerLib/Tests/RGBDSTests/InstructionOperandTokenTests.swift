@@ -11,7 +11,7 @@ class InstructionOperandTokenTests: XCTestCase {
     XCTAssertEqual(InstructionOperandToken(string: "%123"), .numeric)
     XCTAssertEqual(InstructionOperandToken(string: "`123"), .numeric)
     XCTAssertEqual(InstructionOperandToken(string: "[$abcd]"), .address)
-    XCTAssertEqual(InstructionOperandToken(string: "[$ffcd]"), .ffaddress)
+    XCTAssertEqual(InstructionOperandToken(string: "[$ffcd]"), .address)
     XCTAssertEqual(InstructionOperandToken(string: "[$ff]"), .address)
     XCTAssertEqual(InstructionOperandToken(string: "sp+$ff"), .stackPointerOffset)
   }
@@ -23,7 +23,7 @@ class InstructionOperandTokenTests: XCTestCase {
     XCTAssertEqual(InstructionOperandToken(string: "%123").asString(), "#")
     XCTAssertEqual(InstructionOperandToken(string: "`123").asString(), "#")
     XCTAssertEqual(InstructionOperandToken(string: "[$abcd]").asString(), "[#]")
-    XCTAssertEqual(InstructionOperandToken(string: "[$ffcd]").asString(), "[ff#]")
+    XCTAssertEqual(InstructionOperandToken(string: "[$ffcd]").asString(), "[#]")
     XCTAssertEqual(InstructionOperandToken(string: "[$ff]").asString(), "[#]")
     XCTAssertEqual(InstructionOperandToken(string: "sp+$ff").asString(), "sp+#")
   }
