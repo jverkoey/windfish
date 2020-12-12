@@ -499,6 +499,8 @@ extension LR35902 {
         guard let specs = LR35902.InstructionSet.specs(for: statement) else {
           preconditionFailure()
         }
+
+        // TODO: This doesn't work for ambiguous statements; should it?
         guard specs.count == 1 else {
           preconditionFailure()
         }
@@ -506,17 +508,14 @@ extension LR35902 {
           preconditionFailure()
         }
 
-        if let instruction = try? RGBDSAssembler.instruction(from: statement, using: spec) {
-          patterns.append(.instruction(instruction))
-        } else {
-          guard let argumentNumber = statement.operands.first(where: { $0.contains("#") }) else {
-            preconditionFailure()
-          }
+        if let argumentNumber = statement.operands.first(where: { $0.contains("#") }) {
           let scanner = Scanner(string: argumentNumber)
           _ = scanner.scanUpToString("#")
           _ = scanner.scanCharacter()
           let argument = scanner.scanUInt64()
           patterns.append(.any(spec, argument: argument, argumentText: nil))
+        } else if let instruction = try? RGBDSAssembler.instruction(from: statement, using: spec) {
+          patterns.append(.instruction(instruction))
         }
       }
       defineMacro(named: name, instructions: patterns)

@@ -150,7 +150,7 @@ public final class RGBDSAssembler {
     return instruction
   }
 
-  public static func assemble(assembly: String, assembleToData: Bool = true) -> (instructions: [LR35902.Instruction], data: Data, errors: [Error]) {
+  public static func assemble(assembly: String) -> (instructions: [LR35902.Instruction], data: Data, errors: [Error]) {
     var lineNumber = 1
     var buffer = Data()
     var instructions: [LR35902.Instruction] = []
@@ -167,18 +167,16 @@ public final class RGBDSAssembler {
         }
         instructions.append(instruction)
 
-        if assembleToData {
-          buffer.append(contentsOf: LR35902.InstructionSet.data(for: instruction.spec)!)
-          switch instruction.immediate {
-          case let .imm8(immediate):
-            buffer.append(contentsOf: [immediate])
-          case var .imm16(immediate):
-            withUnsafeBytes(of: &immediate) { immediateBytes in
-              buffer.append(contentsOf: Data(immediateBytes))
-            }
-          case .none:
-            break
+        buffer.append(contentsOf: LR35902.InstructionSet.opcodeBytes[instruction.spec]!)
+        switch instruction.immediate {
+        case let .imm8(immediate):
+          buffer.append(contentsOf: [immediate])
+        case var .imm16(immediate):
+          withUnsafeBytes(of: &immediate) { immediateBytes in
+            buffer.append(contentsOf: Data(immediateBytes))
           }
+        case .none:
+          break
         }
 
       } catch let error as RGBDSAssembler.StringError {

@@ -57,9 +57,6 @@ public protocol InstructionSet {
    This is typically implemented by returning the result of `computeAllOpcodeStrings()`.
    */
   static var opcodeStrings: [SpecType: String] { get }
-
-  /** Converts the specification to a binary representation. */
-  static func data(for spec: SpecType) -> Data?
 }
 
 // MARK: - Helper methods for computing properties

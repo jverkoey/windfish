@@ -30,17 +30,17 @@ class InstructionSetTests: XCTestCase {
   }
 
   func testOpcodeData() {
-    let opcodeData: [SimpleCPU.Instruction.Spec : Data?] = [
-      .nop: Data([0]),
-      .ld(.a, .imm8): Data([1]),
-      .ld(.a, .imm16): Data([2]),
-      .call(.nz, .imm16): Data([3]),
-      .call(nil, .imm16): Data([4]),
+    let opcodeData: [SimpleCPU.Instruction.Spec : [UInt8]?] = [
+      .nop: [0],
+      .ld(.a, .imm8): [1],
+      .ld(.a, .imm16): [2],
+      .call(.nz, .imm16): [3],
+      .call(nil, .imm16): [4],
       .prefix(.sub): nil,
-      .sub(.cp(.imm8)): Data([5, 0]),
+      .sub(.cp(.imm8)): [5, 0],
     ]
     for spec in SimpleCPU.InstructionSet.allSpecs() {
-      let value = SimpleCPU.InstructionSet.data(for: spec)
+      let value = SimpleCPU.InstructionSet.opcodeBytes[spec]
       XCTAssertEqual(value, opcodeData[spec], "\(spec) mismatched")
     }
     XCTAssertEqual(SimpleCPU.InstructionSet.allSpecs().count, opcodeData.count)
