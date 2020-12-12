@@ -6,10 +6,6 @@ import RGBDS
 /** Turns LR3902 instructions into RGBDS assembly language. */
 final class RGBDSDisassembler {
 
-  static func textLine(for bytes: [UInt8], characterMap: [UInt8: String], address: LR35902.Address) -> LR35902.Disassembly.Line {
-    return LR35902.Disassembly.Line(semantic: .text(RGBDS.statement(for: bytes, characterMap: characterMap)), address: address, data: Data(bytes))
-  }
-
   static func statement(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil, argumentString: String? = nil) -> Statement {
     if let operands = operands(for: instruction, with: disassembly, argumentString: argumentString) {
       return Statement(opcode: LR35902.InstructionSet.opcodeStrings[instruction.spec]!, operands: operands.filter { $0.count > 0 })

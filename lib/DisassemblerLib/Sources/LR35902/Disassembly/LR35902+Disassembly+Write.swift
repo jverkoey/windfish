@@ -72,6 +72,10 @@ func prettify(_ label: String) -> String {
   return ".\(parts.last!)"
 }
 
+func textLine(for bytes: [UInt8], characterMap: [UInt8: String], address: LR35902.Address) -> LR35902.Disassembly.Line {
+  return LR35902.Disassembly.Line(semantic: .text(RGBDS.statement(for: bytes, characterMap: characterMap)), address: address, data: Data(bytes))
+}
+
 extension LR35902.Disassembly {
   public struct Line: Equatable {
     public enum ImageFormat {
@@ -711,7 +715,7 @@ clean:
           case .text:
             let lineLength = lineLengthOfText(at: initialPc, in: bank) ?? 36
             for chunk in accumulator.chunked(into: lineLength) {
-              bankLines.append(RGBDSDisassembler.textLine(for: chunk, characterMap: characterMap, address: chunkPc))
+              bankLines.append(textLine(for: chunk, characterMap: characterMap, address: chunkPc))
               chunkPc += LR35902.Address(chunk.count)
             }
           case .jumpTable:
