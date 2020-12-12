@@ -58,7 +58,7 @@ final class RGBDSAssembler {
       try RGBDSAssembler.instruction(from: statement, using: spec)
     }
     guard potentialInstructions.count > 0 else {
-      throw StringError(message: "No valid instruction found for \(statement.formattedString)")
+      throw StringError(message: "No instruction was able to represent \(statement.formattedString)")
     }
     let shortestInstruction = potentialInstructions.sorted(by: { pair1, pair2 in
       LR35902.InstructionSet.widths[pair1.spec]!.total < LR35902.InstructionSet.widths[pair2.spec]!.total
