@@ -75,19 +75,6 @@ public protocol InstructionOperandTokenizable {
   var token: InstructionOperandToken { get }
 }
 
-/**
- Prefixes for numeric types in RGBDS assembly.
-
- Defined at https://rgbds.gbdev.io/docs/v0.4.2/rgbasm.5#Numeric_Formats
- */
-private enum NumericPrefix: String {
-  case hexadecimal = "$"
-  case octal = "&"
-  case binary = "%"
-  case placeholder = "#"
-  case gameboyGraphics = "`"
-}
-
 private func isNumber(_ string: String) -> Bool {
   return
     string.hasPrefix(NumericPrefix.hexadecimal.rawValue)
