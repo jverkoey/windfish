@@ -439,7 +439,7 @@ clean:
                     let argument = argumentOrNil else {
                 return iter
               }
-              let args = extractArgs(from: RGBDSAssembly.assembly(for: zipped.1.0), using: spec, argument: Int(argument))
+              let args = extractArgs(from: RGBDSDisassembler.assembly(for: zipped.1.0), using: spec, argument: Int(argument))
               return iter.merging(args, uniquingKeysWith: { first, second in
                 if first != second {
                   anyArgumentMismatches = true
@@ -542,7 +542,7 @@ clean:
                 } else {
                   argumentString = nil
                 }
-                let macroAssembly = RGBDSAssembly.assembly(for: macroInstruction, with: self, argumentString: argumentString)
+                let macroAssembly = RGBDSDisassembler.assembly(for: macroInstruction, with: self, argumentString: argumentString)
                 return Line(semantic: .macroInstruction(macroInstruction, macroAssembly))
               })
               lines.append(Line(semantic: .macroTerminator))
@@ -618,7 +618,7 @@ clean:
           let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!.total
           let bytes = cpu.cartridge[index..<(index + LR35902.Cartridge.Location(instructionWidth))]
           let instructionScope = labeledContiguousScopes(at: cpu.pc, in: bank).map { $0.label }
-          lineGroup.append(Line(semantic: .instruction(instruction, RGBDSAssembly.assembly(for: instruction, with: self)),
+          lineGroup.append(Line(semantic: .instruction(instruction, RGBDSDisassembler.assembly(for: instruction, with: self)),
                                 address: cpu.pc,
                                 bank: cpu.bank,
                                 scope: instructionScope.sorted().joined(separator: ", "),
@@ -711,7 +711,7 @@ clean:
           case .text:
             let lineLength = lineLengthOfText(at: initialPc, in: bank) ?? 36
             for chunk in accumulator.chunked(into: lineLength) {
-              bankLines.append(RGBDSAssembly.textLine(for: chunk, characterMap: characterMap, address: chunkPc))
+              bankLines.append(RGBDSDisassembler.textLine(for: chunk, characterMap: characterMap, address: chunkPc))
               chunkPc += LR35902.Address(chunk.count)
             }
           case .jumpTable:

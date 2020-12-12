@@ -4,7 +4,7 @@ import CPU
 import FoundationExtensions
 import RGBDS
 
-/** Turns RGBDS assembly code into both an intermediate and binary representation. */
+/** Turns RGBDS assembly code into LR35902 instructions. */
 public final class RGBDSAssembler {
 
   /** An error that occurred during parsing of RGBDS assembly. */

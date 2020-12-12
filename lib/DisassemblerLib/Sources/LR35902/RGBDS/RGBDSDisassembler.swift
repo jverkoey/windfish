@@ -3,7 +3,8 @@ import Foundation
 import FoundationExtensions
 import RGBDS
 
-public final class RGBDSAssembly {
+/** Turns LR3902 instructions into RGBDS assembly language. */
+public final class RGBDSDisassembler {
 
   static func assembly(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil, argumentString: String? = nil) -> Statement {
     if let operands = operands(for: instruction, with: disassembly, argumentString: argumentString) {
@@ -11,16 +12,6 @@ public final class RGBDSAssembly {
     } else {
       return Statement(opcode: LR35902.InstructionSet.opcodeStrings[instruction.spec]!)
     }
-  }
-
-  private static func flatten(asciiCodes: [UInt8], characterMap: [UInt8: String]) -> String {
-    return asciiCodes.map {
-      if let string = characterMap[$0] {
-        return string
-      } else {
-        return String(bytes: [$0], encoding: .ascii)!
-      }
-    }.joined()
   }
 
   public static func textLine(for bytes: [UInt8], characterMap: [UInt8: String], address: LR35902.Address) -> LR35902.Disassembly.Line {
@@ -31,14 +22,14 @@ public final class RGBDSAssembly {
         asciiCharacterAccumulator.append(byte)
       } else {
         if asciiCharacterAccumulator.count > 0 {
-          accumulator.append("\"\(flatten(asciiCodes: asciiCharacterAccumulator, characterMap: characterMap))\"")
+          accumulator.append("\"\(RGBDS.asciiString(for: asciiCharacterAccumulator, characterMap: characterMap))\"")
           asciiCharacterAccumulator.removeAll()
         }
         accumulator.append("$\(byte.hexString)")
       }
     }
     if asciiCharacterAccumulator.count > 0 {
-      accumulator.append("\"\(flatten(asciiCodes: asciiCharacterAccumulator, characterMap: characterMap))\"")
+      accumulator.append("\"\(RGBDS.asciiString(for: asciiCharacterAccumulator, characterMap: characterMap))\"")
     }
     return LR35902.Disassembly.Line(semantic: .text(Statement(opcode: "db", operands: accumulator)), address: address, data: Data(bytes))
   }
