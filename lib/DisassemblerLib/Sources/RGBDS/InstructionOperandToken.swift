@@ -95,6 +95,7 @@ public struct StringError: Swift.Error, Equatable {
   public let error: String
 }
 
+// TODO: Make this private.
 public func cast<T: UnsignedInteger, negT: SignedInteger>(string: String, negativeType: negT.Type) throws -> T where T: FixedWidthInteger, negT: FixedWidthInteger, T: BitPatternInitializable, T.CompanionType == negT {
   var value = string
   let isNegative = value.starts(with: "-")
@@ -120,12 +121,14 @@ public func cast<T: UnsignedInteger, negT: SignedInteger>(string: String, negati
 
   if isNegative {
     guard let negativeValue = negT(numericPart, radix: radix) else {
-      throw StringError(error: "Unable to represent \(value) as a UInt16")
+      throw StringError(error: "Unable to represent \(value) as a \(T.self)")
     }
     return T(bitPattern: -negativeValue)
-  } else if let numericValue = T(numericPart, radix: radix) {
-    return numericValue
   }
 
-  throw StringError(error: "Unable to represent \(value) as a UInt16")
+  guard let numericValue = T(numericPart, radix: radix) else {
+    throw StringError(error: "Unable to represent \(value) as a \(T.self)")
+  }
+
+  return numericValue
 }
