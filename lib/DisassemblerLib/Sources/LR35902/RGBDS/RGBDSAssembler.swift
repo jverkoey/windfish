@@ -14,9 +14,7 @@ extension LR35902.InstructionSet {
   }
 }
 
-private func cast<T: UnsignedInteger, negT: SignedInteger>(string: String, negativeType: negT.Type)
-throws -> T
-where T: FixedWidthInteger, negT: FixedWidthInteger, T: BitPatternInitializable, T.CompanionType == negT {
+private func cast<T: UnsignedInteger, negT: SignedInteger>(string: String, negativeType: negT.Type) throws -> T where T: FixedWidthInteger, negT: FixedWidthInteger, T: BitPatternInitializable, T.CompanionType == negT {
   var value = string
   let isNegative = value.starts(with: "-")
   if isNegative {
@@ -131,6 +129,21 @@ public final class RGBDSAssembler {
     return .init(spec: spec)
   }
 
+  private static func instruction(from statement: RGBDS.Statement) throws -> LR35902.Instruction? {
+    guard let specs = LR35902.InstructionSet.specs(for: statement) else {
+      return nil
+    }
+
+    let potentialInstructions: [LR35902.Instruction] = try specs.compactMap { spec in
+      try RGBDSAssembler.instruction(from: statement, using: spec)
+    }
+    guard potentialInstructions.count == 1,
+          let instruction = potentialInstructions.first else {
+      return nil
+    }
+    return instruction
+  }
+
   public static func assemble(assembly: String, assembleToData: Bool = true) -> (instructions: [LR35902.Instruction], data: Data, errors: [Error]) {
     var lineNumber = 1
     var buffer = Data()
@@ -142,32 +155,18 @@ public final class RGBDSAssembler {
         lineNumber += 1
       }
 
-      guard let statement = RGBDS.Statement(fromLine: line) else {
-        return
-      }
-
-      guard let specs = LR35902.InstructionSet.specs(for: statement) else {
-        errors.append(Error(lineNumber: lineNumber, error: "Invalid instruction: \(line)"))
-        return
-      }
-
       do {
-        let potentialInstructions: [LR35902.Instruction] = try specs.compactMap { spec in
-          try RGBDSAssembler.instruction(from: statement, using: spec)
+        guard let statement = RGBDS.Statement(fromLine: line) else {
+          return
         }
-        guard potentialInstructions.count > 0 else {
+        guard let instruction = try instruction(from: statement) else {
           throw Error(lineNumber: lineNumber, error: "No valid instruction found for \(line)")
         }
-        precondition(potentialInstructions.count == 1, "Ambiguous instruction detected.")
-        let shortestInstruction = potentialInstructions.sorted(by: { pair1, pair2 in
-          LR35902.InstructionSet.widths[pair1.spec]!.total < LR35902.InstructionSet.widths[pair2.spec]!.total
-        })[0]
-
-        instructions.append(shortestInstruction)
+        instructions.append(instruction)
 
         if assembleToData {
-          buffer.append(contentsOf: LR35902.InstructionSet.data(for: shortestInstruction.spec)!)
-          switch shortestInstruction.immediate {
+          buffer.append(contentsOf: LR35902.InstructionSet.data(for: instruction.spec)!)
+          switch instruction.immediate {
           case let .imm8(immediate):
             buffer.append(contentsOf: [immediate])
           case var .imm16(immediate):
