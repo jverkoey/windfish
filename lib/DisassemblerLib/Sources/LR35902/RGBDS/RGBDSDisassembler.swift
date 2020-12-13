@@ -62,32 +62,6 @@ final class RGBDSDisassembler {
 
       return [addressLabel]
 
-    case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand1 == .ffimm8addr:
-      guard case let .imm8(immediate) = instruction.immediate else {
-        preconditionFailure("Invalid immediate associated with instruction")
-      }
-
-      var addressLabel: String
-      if let argumentString = context.argumentString {
-        addressLabel = argumentString
-      } else {
-        addressLabel = "[\(prettify(imm16: 0xFF00 | UInt16(immediate), with: context))]"
-      }
-      return [addressLabel, operand(for: instruction, operand: operand2, with: context)]
-
-    case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .ffimm8addr:
-      guard case let .imm8(immediate) = instruction.immediate else {
-        preconditionFailure("Invalid immediate associated with instruction")
-      }
-
-      var addressLabel: String
-      if let argumentString = context.argumentString {
-        addressLabel = argumentString
-      } else {
-        addressLabel = "[\(prettify(imm16: 0xFF00 | UInt16(immediate), with: context))]"
-      }
-      return [operand(for: instruction, operand: operand1, with: context), addressLabel]
-
     case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .imm16:
       guard case let .imm16(immediate) = instruction.immediate else {
         preconditionFailure("Invalid immediate associated with instruction")
@@ -199,6 +173,15 @@ extension RGBDSDisassembler {
     case .hladdr:
       return "[hl]"
 
+    case .ffimm8addr:
+      guard case let .imm8(immediate) = instruction.immediate else {
+        preconditionFailure("Invalid immediate associated with instruction")
+      }
+      if let context = context {
+        return "[\(prettify(imm16: 0xFF00 | UInt16(immediate), with: context))]"
+      }
+      return "[$FF\(immediate.hexString)]"
+
     case .imm8:
       guard case let .imm8(immediate) = instruction.immediate else {
         preconditionFailure("Invalid immediate associated with instruction")
@@ -266,12 +249,6 @@ extension RGBDSDisassembler {
 
     case .bcaddr:
       return "[bc]"
-
-    case .ffimm8addr:
-      guard case let .imm8(immediate) = instruction.immediate else {
-        preconditionFailure("Invalid immediate associated with instruction")
-      }
-      return "[$FF\(immediate.hexString)]"
 
     case .zeroimm8:
       preconditionFailure("This operand is not meant to be represented in source")
