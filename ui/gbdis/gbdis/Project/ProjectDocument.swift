@@ -89,13 +89,13 @@ final class Global: NSObject, Codable {
 }
 
 final class Macro: NSObject, Codable {
-  internal init(name: String, code: String) {
+  internal init(name: String, source: String) {
     self.name = name
-    self.code = code
+    self.source = source
   }
 
   @objc dynamic var name: String
-  @objc dynamic var code: String
+  @objc dynamic var source: String
 }
 
 class ProjectConfiguration: NSObject, Codable {
@@ -602,6 +602,10 @@ extension ProjectDocument {
         default:
           break
         }
+      }
+
+      for macro in self.configuration.macros {
+        disassembly.defineMacro(named: macro.name, template: macro.source)
       }
 
       //            disassembly.disassembleAsGameboyCartridge()

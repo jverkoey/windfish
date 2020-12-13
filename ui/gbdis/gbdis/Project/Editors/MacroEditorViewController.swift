@@ -2,6 +2,30 @@ import Foundation
 import Cocoa
 import LR35902
 
+final class TextViewStringTransformer: ValueTransformer {
+  override class func transformedValueClass() -> AnyClass {
+    return NSAttributedString.self
+  }
+
+  override class func allowsReverseTransformation() -> Bool {
+    return true
+  }
+
+  override func transformedValue(_ value: Any?) -> Any? {
+    guard let string = value as? String else {
+      return nil
+    }
+    return NSAttributedString(string: string, attributes: DefaultCodeAttributes())
+  }
+
+  override func reverseTransformedValue(_ value: Any?) -> Any? {
+    guard let attributedString = value as? NSAttributedString else {
+      return nil
+    }
+    return attributedString.string
+  }
+}
+
 final class MacroEditorViewController: NSViewController, TabSelectable {
   let deselectedTabImage = NSImage(systemSymbolName: "chevron.left.slash.chevron.right", accessibilityDescription: nil)!
   let selectedTabImage = NSImage(systemSymbolName: "chevron.left.slash.chevron.right", accessibilityDescription: nil)!
@@ -9,12 +33,10 @@ final class MacroEditorViewController: NSViewController, TabSelectable {
   let document: ProjectDocument
   let elementsController = NSArrayController()
   var tableView: EditorTableView?
-  let representationController = NSArrayController()
-  let interpretationController = NSArrayController()
   private var selectionObserver: NSKeyValueObservation?
 
-  let mappingElementsController = NSArrayController()
-  var mappingTableView: EditorTableView?
+  var sourceContainerView: NSScrollView?
+  var sourceTextView: NSTextView?
 
   private struct Column {
     let name: String
@@ -26,14 +48,6 @@ final class MacroEditorViewController: NSViewController, TabSelectable {
     self.document = document
 
     super.init(nibName: nil, bundle: nil)
-
-    representationController.addObject(DataType.Representation.decimal)
-    representationController.addObject(DataType.Representation.hexadecimal)
-    representationController.addObject(DataType.Representation.binary)
-
-    interpretationController.addObject(DataType.Interpretation.any)
-    interpretationController.addObject(DataType.Interpretation.bitmask)
-    interpretationController.addObject(DataType.Interpretation.enumerated)
   }
 
   required init?(coder: NSCoder) {
@@ -51,9 +65,7 @@ final class MacroEditorViewController: NSViewController, TabSelectable {
     self.tableView = tableView
 
     let columns = [
-      Column(name: "Name", identifier: .name, width: 180),
-      Column(name: "Representation", identifier: .representation, width: 100),
-      Column(name: "Interpretation", identifier: .interpretation, width: 120),
+      Column(name: "Name", identifier: .name, width: 200),
     ]
 
     for columnInfo in columns {
@@ -64,24 +76,18 @@ final class MacroEditorViewController: NSViewController, TabSelectable {
       tableView.tableView?.addTableColumn(column)
     }
 
-    let mappingTableView = EditorTableView(elementsController: mappingElementsController)
-    mappingTableView.translatesAutoresizingMaskIntoConstraints = false
-    mappingTableView.delegate = self
-    mappingTableView.tableView?.delegate = self
-    view.addSubview(mappingTableView)
-    self.mappingTableView = mappingTableView
+    let containerView = CreateScrollView(bounds: view.bounds)
+    containerView.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(containerView)
 
-    let mappingColumns = [
-      Column(name: "Name", identifier: .name, width: 180),
-      Column(name: "Value", identifier: .value, width: 100),
-    ]
-    for columnInfo in mappingColumns {
-      let column = NSTableColumn(identifier: columnInfo.identifier)
-      column.isEditable = false
-      column.headerCell.stringValue = columnInfo.name
-      column.width = columnInfo.width
-      mappingTableView.tableView?.addTableColumn(column)
-    }
+    let textView = CreateTextView(bounds: view.bounds)
+    textView.isEditable = true
+    textView.allowsUndo = true
+    textView.isSelectable = true
+    containerView.documentView = textView
+
+    self.sourceContainerView = containerView
+    self.sourceTextView = textView
 
     let safeAreas = view.safeAreaLayoutGuide
     NSLayoutConstraint.activate([
@@ -89,29 +95,26 @@ final class MacroEditorViewController: NSViewController, TabSelectable {
       tableView.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
       tableView.topAnchor.constraint(equalTo: safeAreas.topAnchor),
 
-      tableView.bottomAnchor.constraint(equalTo: mappingTableView.topAnchor),
+      tableView.bottomAnchor.constraint(equalTo: containerView.topAnchor),
 
-      mappingTableView.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
-      mappingTableView.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
-      mappingTableView.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
-      mappingTableView.heightAnchor.constraint(equalToConstant: 200)
+      containerView.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
+      containerView.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
+      containerView.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
+      containerView.heightAnchor.constraint(equalToConstant: 200)
     ])
 
-    elementsController.bind(.contentArray, to: document.configuration, withKeyPath: "dataTypes", options: nil)
+    elementsController.bind(.contentArray, to: document.configuration, withKeyPath: "macros", options: nil)
     tableView.tableView?.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
     tableView.tableView?.bind(.selectionIndexes, to: elementsController, withKeyPath:"selectionIndexes", options: nil)
     tableView.tableView?.bind(.sortDescriptors, to: elementsController, withKeyPath: "sortDescriptors", options: nil)
 
     selectionObserver = elementsController.observe(\.selectedObjects, options: []) { (controller, change) in
       if let selectedObject = controller.selectedObjects.first {
-        self.mappingElementsController.bind(.contentArray, to: selectedObject, withKeyPath: "mappings", options: nil)
+        textView.bind(.attributedString, to: selectedObject, withKeyPath: "source", options: [.valueTransformer: TextViewStringTransformer()])
       } else {
-        self.mappingElementsController.unbind(.contentArray)
+        textView.unbind(.attributedString)
       }
     }
-    mappingTableView.tableView?.bind(.content, to: mappingElementsController, withKeyPath: "arrangedObjects", options: nil)
-    mappingTableView.tableView?.bind(.selectionIndexes, to: mappingElementsController, withKeyPath:"selectionIndexes", options: nil)
-    mappingTableView.tableView?.bind(.sortDescriptors, to: mappingElementsController, withKeyPath: "sortDescriptors", options: nil)
 
     elementsController.setSelectionIndexes(IndexSet())
   }
@@ -119,57 +122,32 @@ final class MacroEditorViewController: NSViewController, TabSelectable {
 
 extension MacroEditorViewController: EditorTableViewDelegate {
   func editorTableViewCreateElement(_ tableView: EditorTableView) -> String {
-    if tableView == self.tableView {
-      document.configuration.dataTypes.append(
-        DataType(name: "New data type", representation: DataType.Representation.decimal, interpretation: DataType.Interpretation.any, mappings: [])
-      )
-      return "Create Data Type"
-    } else if tableView == self.mappingTableView {
-      guard let selectedObject = elementsController.selectedObjects.first as? DataType else {
-        preconditionFailure()
-      }
-      selectedObject.mappings.append(DataType.Mapping(name: "Variable", value: 1))
-      return "Create Data Type Mapping"
-    }
-    preconditionFailure()
+    document.configuration.macros.append(
+      Macro(name: "newmacro", source: """
+; Write your macro as RGBDS assembly
+; Macro args can be specified by replacing an
+; instruction's operand with a # followed by the
+; argument number. E.g. ld a, #1
+; Arguments use 1-based indexing; there is no
+; argument 0.
+""")
+    )
+    return "Create Macro"
   }
 
   func editorTableViewDeleteSelectedElements(_ tableView: EditorTableView) -> String {
-    if tableView == self.tableView {
-      document.configuration.dataTypes.removeAll { dataType in
-        elementsController.selectedObjects.contains { $0 as! DataType === dataType }
-      }
-      return "Delete Data Type"
-    } else if tableView == self.mappingTableView {
-      guard let selectedObject = elementsController.selectedObjects.first as? DataType else {
-        preconditionFailure()
-      }
-      selectedObject.mappings.removeAll { mapping in
-        mappingElementsController.selectedObjects.contains { $0 as! DataType.Mapping === mapping }
-      }
-      return "Delete Data Type Mapping"
+    document.configuration.macros.removeAll { dataType in
+      elementsController.selectedObjects.contains { $0 as! Macro === dataType }
     }
-    preconditionFailure()
+    return "Delete Macro"
   }
 
   func editorTableViewStashElements(_ tableView: EditorTableView) -> Any {
-    if tableView == self.tableView {
-      return document.configuration.dataTypes
-    } else if tableView == self.mappingTableView {
-      return self.mappingElementsController.content!
-    }
-    preconditionFailure()
+    return document.configuration.macros
   }
 
   func editorTableView(_ tableView: EditorTableView, restoreElements elements: Any) {
-    if tableView == self.tableView {
-      document.configuration.dataTypes = elements as! [DataType]
-      return
-    } else if tableView == self.mappingTableView {
-      self.mappingElementsController.content = elements
-      return
-    }
-    preconditionFailure()
+    document.configuration.macros = elements as! [Macro]
   }
 }
 
@@ -189,52 +167,6 @@ extension MacroEditorViewController: NSTableViewDelegate {
         view = TextTableCellView()
         view.identifier = identifier
       }
-      view.textField?.bind(.value, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
-      return view
-    case .representation:
-      let identifier = NSUserInterfaceItemIdentifier.typeCell
-      let view: TypeTableCellView
-      if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TypeTableCellView {
-        view = recycledView
-      } else {
-        view = TypeTableCellView()
-        view.identifier = identifier
-      }
-      view.popupButton.bind(.content, to: representationController, withKeyPath: "arrangedObjects", options: nil)
-      view.popupButton.bind(.selectedObject, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
-      return view
-    case .interpretation:
-      let identifier = NSUserInterfaceItemIdentifier.typeCell
-      let view: TypeTableCellView
-      if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TypeTableCellView {
-        view = recycledView
-      } else {
-        view = TypeTableCellView()
-        view.identifier = identifier
-      }
-      view.popupButton.bind(.content, to: interpretationController, withKeyPath: "arrangedObjects", options: nil)
-      view.popupButton.bind(.selectedObject, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
-      return view
-    case .value:
-      let identifier = NSUserInterfaceItemIdentifier.numberCell
-      let view: TextTableCellView
-      if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TextTableCellView {
-        view = recycledView
-      } else {
-        view = TextTableCellView()
-        view.identifier = identifier
-      }
-
-      if let selectedObject = elementsController.selectedObjects.first as? DataType {
-        if selectedObject.representation == DataType.Representation.hexadecimal {
-          view.textField?.formatter = UInt8HexFormatter()
-        } else if selectedObject.representation == DataType.Representation.binary {
-          view.textField?.formatter = UInt8BinaryFormatter()
-        } else {
-          view.textField?.formatter = NumberFormatter()
-        }
-      }
-
       view.textField?.bind(.value, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
       return view
     default:

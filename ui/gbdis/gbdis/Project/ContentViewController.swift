@@ -11,6 +11,33 @@ import Cocoa
 import Combine
 import LR35902
 
+func CreateScrollView(bounds: NSRect) -> NSScrollView {
+  let scrollView = NSScrollView()
+  scrollView.frame = bounds
+  scrollView.hasVerticalScroller = true
+  scrollView.borderType = .noBorder
+  return scrollView
+}
+
+func CreateTextView(bounds: NSRect) -> NSTextView {
+  let textView = NSTextView()
+  textView.isVerticallyResizable = true
+  textView.autoresizingMask = [.width]
+  textView.textContainer?.containerSize = NSSize(width: bounds.width,
+                                                 height: CGFloat.greatestFiniteMagnitude)
+  textView.textContainer?.widthTracksTextView = true
+  textView.focusRingType = .none
+  textView.drawsBackground = false
+  return textView
+}
+
+func DefaultCodeAttributes() -> [NSAttributedString.Key : Any] {
+  return [
+    .foregroundColor: NSColor.textColor,
+    .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
+  ]
+}
+
 final class ContentViewController: NSViewController {
   var containerView: NSScrollView?
   var textView: NSTextView?
@@ -45,10 +72,7 @@ final class ContentViewController: NSViewController {
     } else if let filename = filename {
       let string = String(data: document.disassemblyResults!.files[filename]!, encoding: .utf8)!
 
-      let storage = NSTextStorage(string: string, attributes: [
-        .foregroundColor: NSColor.textColor,
-        .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
-      ])
+      let storage = NSTextStorage(string: string, attributes: DefaultCodeAttributes())
       textStorage = storage
     } else {
       textStorage = NSTextStorage()
@@ -112,29 +136,20 @@ final class ContentViewController: NSViewController {
     view.wantsLayer = true
     view.layer?.backgroundColor = NSColor.textBackgroundColor.cgColor
 
-    let containerView = NSScrollView()
-    self.containerView = containerView
-    containerView.frame = view.bounds
+    let containerView = CreateScrollView(bounds: view.bounds)
     containerView.translatesAutoresizingMaskIntoConstraints = false
-    containerView.hasVerticalScroller = true
-    containerView.borderType = .noBorder
     view.addSubview(containerView)
 
-    let textView = NSTextView()
-    self.textView = textView
-    textView.isVerticallyResizable = true
-    textView.autoresizingMask = [.width]
-    textView.textContainer?.containerSize = NSSize(width: containerView.contentSize.width,
-                                                   height: CGFloat.greatestFiniteMagnitude)
-    textView.textContainer?.widthTracksTextView = true
-    textView.focusRingType = .none
+    let textView = CreateTextView(bounds: view.bounds)
     textView.isEditable = false
     textView.allowsUndo = false
     textView.isSelectable = true
-    textView.drawsBackground = false
     textView.usesFindBar = true
     textView.isIncrementalSearchingEnabled = true
     containerView.documentView = textView
+
+    self.containerView = containerView
+    self.textView = textView
 
     let lineNumbersRuler = LineNumberView(scrollView: containerView, orientation: .verticalRuler)
     lineNumbersRuler.clientView = textView
