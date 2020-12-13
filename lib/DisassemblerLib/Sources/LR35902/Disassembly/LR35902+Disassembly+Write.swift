@@ -550,9 +550,10 @@ clean:
                 let context = RGBDSDisassembler.Context(
                   address: self.cpu.pc,
                   bank: self.cpu.bank,
-                  disassembly: self
+                  disassembly: self,
+                  argumentString: argumentString
                 )
-                let macroAssembly = RGBDSDisassembler.statement(for: macroInstruction, with: context, argumentString: argumentString)
+                let macroAssembly = RGBDSDisassembler.statement(for: macroInstruction, with: context)
                 return Line(semantic: .macroInstruction(macroInstruction, macroAssembly))
               })
               lines.append(Line(semantic: .macroTerminator))
@@ -631,7 +632,8 @@ clean:
           let context = RGBDSDisassembler.Context(
             address: self.cpu.pc,
             bank: self.cpu.bank,
-            disassembly: self
+            disassembly: self,
+            argumentString: nil
           )
           lineGroup.append(Line(semantic: .instruction(instruction, RGBDSDisassembler.statement(for: instruction, with: context)),
                                 address: cpu.pc,
