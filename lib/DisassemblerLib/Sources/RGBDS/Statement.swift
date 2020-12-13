@@ -6,14 +6,19 @@ public let maxOpcodeNameLength = 4
 
 /** A concrete representation of a single executable statement of RGBDS assembly. */
 public struct Statement: Equatable {
+  // BEGIN ORDER MATTERS DUE TO MIRROR DESCENDANT ASSUMPTIONS
   /** The statement's instruction code. */
   public let opcode: String
 
   /** The statement's operands, separated as one operand per element. */
   public let operands: [String]
+  // END ORDER MATTERS DUE TO MIRROR DESCENDANT ASSUMPTIONS
 
   /** A concise, formatted RGBDS assembly string representation of this statement. */
   public let formattedString: String
+
+  /** The statement's instruction code padded for presentation. */
+  public let formattedOpcode: String
 
   /** A tokenized representation of this statement that can be used for generalized lookups. */
   public let tokenizedString: String
@@ -22,8 +27,15 @@ public struct Statement: Equatable {
   public init(opcode: String, operands: [String] = []) {
     self.opcode = opcode
     self.operands = operands
+    let formattedOpcode: String
+    if opcode.count < maxOpcodeNameLength {
+      formattedOpcode = opcode.padding(toLength: maxOpcodeNameLength, withPad: " ", startingAt: 0)
+    } else {
+      formattedOpcode = opcode
+    }
+    self.formattedOpcode = formattedOpcode
     self.tokenizedString = Statement.createTokenizedString(opcode: opcode, operands: operands)
-    self.formattedString = Statement.createString(opcode: opcode, operands: operands)
+    self.formattedString = Statement.createFormattedString(opcode: formattedOpcode, operands: operands)
   }
 
   /** Initializes the statement as a data representation of the given bytes. */
@@ -47,6 +59,13 @@ public struct Statement: Equatable {
     } else {
       return nil
     }
+    let formattedOpcode: String
+    if opcode.count < maxOpcodeNameLength {
+      formattedOpcode = opcode.padding(toLength: maxOpcodeNameLength, withPad: " ", startingAt: 0)
+    } else {
+      formattedOpcode = opcode
+    }
+    self.formattedOpcode = formattedOpcode
 
     if opcodeAndOperands.count > 1 {
       let quote = "\""
@@ -61,16 +80,16 @@ public struct Statement: Equatable {
       self.operands = []
     }
     self.tokenizedString = Statement.createTokenizedString(opcode: opcode, operands: operands)
-    self.formattedString = Statement.createString(opcode: opcode, operands: operands)
+    self.formattedString = Statement.createFormattedString(opcode: formattedOpcode, operands: operands)
   }
 }
 
 // MARK: - Internal methods
 
 extension Statement {
-  private static func createString(opcode: String, operands: [String]) -> String {
+  private static func createFormattedString(opcode: String, operands: [String]) -> String {
     if !operands.isEmpty {
-      return "\(opcode.padding(toLength: maxOpcodeNameLength, withPad: " ", startingAt: 0)) \(operands.joined(separator: ", "))"
+      return "\(opcode) \(operands.joined(separator: ", "))"
     }
     return opcode
   }

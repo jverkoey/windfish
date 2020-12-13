@@ -92,7 +92,7 @@ extension LR35902.Disassembly {
       case transferOfControl(Set<TransferOfControl>, String)
       case instruction(LR35902.Instruction, RGBDS.Statement)
       case macroInstruction(LR35902.Instruction, RGBDS.Statement)
-      case macro(String)
+      case macro(RGBDS.Statement)
       case macroDefinition(String)
       case macroTerminator
       case imagePlaceholder(format: ImageFormat)
@@ -172,9 +172,9 @@ extension LR35902.Disassembly {
 
       case let .macro(assembly):
         if detailedComments {
-          return line(assembly, address: address!, bank: bank!, scope: scope!, bytes: data!)
+          return line(assembly.formattedString, address: address!, bank: bank!, scope: scope!, bytes: data!)
         } else {
-          return line(assembly)
+          return line(assembly.formattedString)
         }
 
       case let .macroDefinition(name):         return "\(name): MACRO"
@@ -579,7 +579,7 @@ clean:
             let upperBound = LR35902.Cartridge.location(for: lastAddress, in: bank)!
             let bytes = self.cpu.cartridge[lowerBound..<upperBound]
 
-            let macroArgs = macro.arguments.keys.sorted().map { macro.arguments[$0]! }.joined(separator: ", ")
+            let macroArgs = macro.arguments.keys.sorted().map { macro.arguments[$0]! }
 
             let firstInstruction = lineBuffer.firstIndex { line in if case .instruction = line.semantic { return true } else { return false} }!
             let lastInstruction = lineBuffer.lastIndex { line in if case .instruction = line.semantic { return true } else { return false} }!
@@ -590,8 +590,9 @@ clean:
               bank = self.cpu.bank
             }
             let macroScopes = self.labeledContiguousScopes(at: lineBufferAddress, in: bank).map { $0.label }
+            let statement = RGBDS.Statement(opcode: macro.macro.name, operands: macroArgs)
             lineBuffer.replaceSubrange(firstInstruction...lastInstruction,
-                                       with: [Line(semantic: .macro("\(macro.macro.name) \(macroArgs)"),
+                                       with: [Line(semantic: .macro(statement),
                                                    address: lineBufferAddress,
                                                    bank: bank,
                                                    scope: macroScopes.sorted().joined(separator: ", "),

@@ -488,8 +488,7 @@ extension RGBDS.Statement {
                         scope: String?) -> NSAttributedString {
     let string = NSMutableAttributedString()
     string.beginEditing()
-    let opcodeName = opcode.padding(toLength: RGBDS.maxOpcodeNameLength, withPad: " ", startingAt: 0)
-    string.append(NSAttributedString(string: opcodeName, attributes: opcodeAttributes))
+    string.append(NSAttributedString(string: formattedOpcode, attributes: opcodeAttributes))
     if !operands.isEmpty {
       string.append(NSAttributedString(string: " ", attributes: attributes))
 
@@ -683,8 +682,6 @@ extension ProjectDocument {
                 .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
               ]))
             case .section: fallthrough
-            case .macro: fallthrough
-            case .macroInstruction: fallthrough
             case .macroDefinition: fallthrough
             case .macroTerminator: fallthrough
             case .jumpTable:
@@ -696,6 +693,8 @@ extension ProjectDocument {
             case let .global(assembly, _, _): fallthrough
             case let .image1bpp(assembly): fallthrough
             case let .image2bpp(assembly): fallthrough
+            case let .macroInstruction(_, assembly):fallthrough
+            case let .macro(assembly): fallthrough
             case let .instruction(_, assembly):
               accumulator.append(NSAttributedString(string: "    ",
                                                     attributes: baseAttributes))
