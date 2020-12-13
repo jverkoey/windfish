@@ -569,7 +569,6 @@ extension LR35902 {
       let macroLines: [MacroLine]
       let validArgumentValues: [Int: IndexSet]?
       let action: (([Int: String], LR35902.Address, LR35902.Bank) -> Void)?
-      var hasWritten = false
 
       init(name: String, macroLines: [MacroLine], validArgumentValues: [Int: IndexSet]?, action: (([Int: String], LR35902.Address, LR35902.Bank) -> Void)?) {
         self.name = name

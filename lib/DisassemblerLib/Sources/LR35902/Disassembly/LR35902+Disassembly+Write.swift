@@ -343,6 +343,7 @@ clean:
     var instructionsDecoded = 0
 
     var macrosAsm: String? = nil
+    var writtenMacros = Set<String>()
 
     for bank in UInt8(0)..<UInt8(cpu.cartridge.numberOfBanks) {
       var bankLines: [Line] = []
@@ -489,7 +490,8 @@ clean:
           precondition(validMacros.count <= 1, "More than one macro matched.")
 
           if let macro = validMacros.first {
-            if !macro.macro.hasWritten {
+            if !writtenMacros.contains(macro.macro.name) {
+              writtenMacros.insert(macro.macro.name)
               if macrosAsm == nil {
                 macrosAsm = ""
                 gameAsm += "INCLUDE \"macros.asm\"\n"
@@ -571,8 +573,6 @@ clean:
               })
               lines.append(Line(semantic: .macroTerminator))
               macrosAsm?.append(linesAsString(lines))
-
-              macro.macro.hasWritten = true
             }
 
             let lowerBound = LR35902.Cartridge.location(for: lineBufferAddress, in: bank)!
