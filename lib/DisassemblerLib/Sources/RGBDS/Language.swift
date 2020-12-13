@@ -18,6 +18,11 @@ public func asHexString<T: FixedWidthInteger>(_ imm: T) -> String {
   return NumericPrefix.hexadecimal.rawValue + imm.hexString
 }
 
+/** Returns the given immediate as a hexadecimal address representation in RGBDS assembly. */
+public func asHexAddressString<T: FixedWidthInteger>(_ imm: T) -> String {
+  return "[" + asHexString(imm) + "]"
+}
+
 /** The quote character used in RGBDS assembly. */
 let quoteCharacter = "\""
 

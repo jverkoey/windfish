@@ -41,6 +41,7 @@ final class RGBDSDisassembler {
       return operands(for: instruction, spec: instruction.spec, with: nil)
     }
 
+    // Special case specification handling.
     switch instruction.spec {
     case let LR35902.Instruction.Spec.jp(condition, operand) where operand == .imm16,
          let LR35902.Instruction.Spec.call(condition, operand) where operand == .imm16:
@@ -70,32 +71,6 @@ final class RGBDSDisassembler {
           return [addressLabel]
         }
       }
-
-    case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand1 == .imm16addr:
-      guard case let .imm16(immediate) = instruction.immediate else {
-        preconditionFailure("Invalid immediate associated with instruction")
-      }
-
-      var addressLabel: String
-      if let argumentString = context.argumentString {
-        addressLabel = argumentString
-      } else {
-        addressLabel = "[\(prettify(imm16: immediate, with: context))]"
-      }
-      return [addressLabel, operand(for: instruction, operand: operand2, with: context)]
-
-    case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .imm16addr:
-      guard case let .imm16(immediate) = instruction.immediate else {
-        preconditionFailure("Invalid immediate associated with instruction")
-      }
-
-      var addressLabel: String
-      if let argumentString = context.argumentString {
-        addressLabel = argumentString
-      } else {
-        addressLabel = "[\(prettify(imm16: immediate, with: context))]"
-      }
-      return [operand(for: instruction, operand: operand1, with: context), addressLabel]
 
     case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand1 == .ffimm8addr:
       guard case let .imm8(immediate) = instruction.immediate else {
@@ -143,6 +118,7 @@ final class RGBDSDisassembler {
       break
     }
 
+    // Generic case specification handling.
     return operands(for: instruction, spec: instruction.spec, with: context)
   }
 
@@ -238,25 +214,33 @@ final class RGBDSDisassembler {
       return nil
     }
     switch operandReflection.value {
+    
     case let childInstruction as LR35902.Instruction.Spec:
       return operands(for: instruction, spec: childInstruction, with: context)
+
     case let tuple as (LR35902.Instruction.Condition?, LR35902.Instruction.Numeric):
       if let condition = tuple.0 {
         return ["\(condition)", operand(for: instruction, operand: tuple.1, with: context)]
       } else {
         return [operand(for: instruction, operand: tuple.1, with: context)]
       }
+
     case let condition as LR35902.Instruction.Condition:
       return ["\(condition)"]
+
     case let tuple as (LR35902.Instruction.Numeric, LR35902.Instruction.Numeric):
       return [operand(for: instruction, operand: tuple.0, with: context),
               operand(for: instruction, operand: tuple.1, with: context)]
+
     case let tuple as (LR35902.Instruction.Bit, LR35902.Instruction.Numeric):
       return ["\(tuple.0.rawValue)", operand(for: instruction, operand: tuple.1, with: context)]
+
     case let operandValue as LR35902.Instruction.Numeric:
       return [operand(for: instruction, operand: operandValue, with: context)]
+
     case let address as LR35902.Instruction.RestartAddress:
       return ["\(address)".replacingOccurrences(of: "x", with: "$")]
+
     default:
       return nil
     }
@@ -284,7 +268,7 @@ final class RGBDSDisassembler {
       if let typedValue = typedOperand(for: immediate, with: context) {
         return typedValue
       } else {
-        return "$\(immediate.hexString)"
+        return RGBDS.asHexString(immediate)
       }
 
     case .simm8:
@@ -302,7 +286,7 @@ final class RGBDSDisassembler {
       guard case let .imm16(immediate) = instruction.immediate else {
         preconditionFailure("Invalid immediate associated with instruction")
       }
-      return "$\(immediate.hexString)"
+      return RGBDS.asHexString(immediate)
 
     case .ffimm8addr:
       guard case let .imm8(immediate) = instruction.immediate else {
@@ -314,7 +298,10 @@ final class RGBDSDisassembler {
       guard case let .imm16(immediate) = instruction.immediate else {
         preconditionFailure("Invalid immediate associated with instruction")
       }
-      return "[$\(immediate.hexString)]"
+      if let context = context {
+        return "[\(prettify(imm16: immediate, with: context))]"
+      }
+      return RGBDS.asHexAddressString(immediate)
 
     case .bcaddr:            return "[bc]"
     case .deaddr:            return "[de]"
@@ -330,7 +317,8 @@ final class RGBDSDisassembler {
       } else {
         return "sp+$\(immediate.hexString)"
       }
-    case .a, .af, .b, .c, .bc, .d, .e, .de, .h, .l, .hl, .sp: return "\(operand)"
+    case .a, .af, .b, .c, .bc, .d, .e, .de, .h, .l, .hl, .sp:
+      return "\(operand)"
 
     case .zeroimm8:
       return ""
