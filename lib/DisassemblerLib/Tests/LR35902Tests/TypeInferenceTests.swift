@@ -115,4 +115,83 @@ SECTION "ROM Bank 00", ROM0[$00]
 """)
     }
   }
+
+  func test_somethingelse3() throws {
+    let results = RGBDSAssembler.assemble(assembly: """
+ld   a, 1
+ld   [$2100], a
+call $4100
+""")
+    XCTAssertEqual(results.errors, [])
+
+    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+
+    let disassembly = LR35902.Disassembly(rom: data)
+
+    disassembly.defineMacro(named: "callcb", instructions: [
+      .any(.ld(.a, .imm8), argumentText: "bank(\\1)"),
+      .instruction(.init(spec: .ld(.imm16addr, .a), immediate: .imm16(0x2100))),
+      .any(.call(nil, .imm16), argument: 1)
+    ], validArgumentValues: [
+      1: IndexSet(integersIn: 0x4000..<0x8000)
+    ])
+    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
+
+    XCTAssertEqual(disassembly.macroTree, LR35902.Disassembly.MacroNode(
+      children: [
+        .any(.ld(.a, .imm8)): LR35902.Disassembly.MacroNode(
+          children: [
+            .instruction(.init(spec: .ld(.imm16addr, .a), immediate: .imm16(0x2100))): LR35902.Disassembly.MacroNode(
+              children: [
+                .any(.call(nil, .imm16)): LR35902.Disassembly.MacroNode(
+                  children: [:],
+                  macros:[
+                    .init(
+                      name: "callcb",
+                      macroLines: [
+                        .any(.ld(.a, .imm8), argumentText: "bank(\\1)"),
+                        .instruction(.init(spec: .ld(.imm16addr, .a), immediate: .imm16(0x2100))),
+                        .any(.call(nil, .imm16), argument: 1)
+                      ],
+                      validArgumentValues: [
+                        1: IndexSet(integersIn: 0x4000..<0x8000)
+                      ],
+                      action: nil
+                    )
+                  ]
+                )
+              ]
+            )
+          ],
+          macros: []
+        )
+      ],
+      macros: []
+    ))
+
+    let (source, _) = try! disassembly.generateSource()
+    let bank00Source = source.sources["bank_00.asm"]
+    if case let .bank(bank, content, _) = bank00Source {
+      XCTAssertEqual(bank, 0)
+      XCTAssertEqual(content, """
+SECTION "ROM Bank 00", ROM0[$00]
+
+    callcb toc_01_4100
+""")
+    }
+
+    let macrosSource = source.sources["macros.asm"]
+    if case let .macros(content) = macrosSource {
+      XCTAssertEqual(content, """
+
+; Arguments:
+; - 1 type: nil: valid values in $4000..<$8000
+callcb: MACRO
+    ld   a, bank(\\1)
+    ld   [$2100], a
+    call \\1
+    ENDM
+""")
+    }
+  }
 }

@@ -19,7 +19,8 @@ final class RGBDSDisassembler {
   private static func addressLabel(_ disassembly: LR35902.Disassembly, _ argumentString: String?, address immediate: (UInt16)) -> String {
     if let argumentString = argumentString {
       return argumentString
-    } else if let label = disassembly.label(at: immediate, in: disassembly.cpu.bank) {
+    }
+    if let label = disassembly.label(at: immediate, in: disassembly.cpu.bank) {
       if let scope = disassembly.labeledContiguousScopes(at: disassembly.cpu.pc, in: disassembly.cpu.bank).first(where: { labeledScope in
         label.starts(with: "\(labeledScope.label).")
       })?.label {
@@ -27,9 +28,9 @@ final class RGBDSDisassembler {
       } else {
         return label
       }
-    } else {
-      return "$\(immediate.hexString)"
     }
+
+    return RGBDS.NumericPrefix.hexadecimal.rawValue + immediate.hexString
   }
 
   private static func operands(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil, argumentString: String?) -> [String]? {
