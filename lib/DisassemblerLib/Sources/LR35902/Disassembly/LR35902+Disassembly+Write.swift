@@ -546,7 +546,12 @@ clean:
                 } else {
                   argumentString = nil
                 }
-                let macroAssembly = RGBDSDisassembler.statement(for: macroInstruction, with: self, argumentString: argumentString)
+                let context = RGBDSDisassembler.Context(
+                  address: self.cpu.pc,
+                  bank: self.cpu.bank,
+                  disassembly: self
+                )
+                let macroAssembly = RGBDSDisassembler.statement(for: macroInstruction, with: context, argumentString: argumentString)
                 return Line(semantic: .macroInstruction(macroInstruction, macroAssembly))
               })
               lines.append(Line(semantic: .macroTerminator))
@@ -622,7 +627,12 @@ clean:
           let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!.total
           let bytes = cpu.cartridge[index..<(index + LR35902.Cartridge.Location(instructionWidth))]
           let instructionScope = labeledContiguousScopes(at: cpu.pc, in: bank).map { $0.label }
-          lineGroup.append(Line(semantic: .instruction(instruction, RGBDSDisassembler.statement(for: instruction, with: self)),
+          let context = RGBDSDisassembler.Context(
+            address: self.cpu.pc,
+            bank: self.cpu.bank,
+            disassembly: self
+          )
+          lineGroup.append(Line(semantic: .instruction(instruction, RGBDSDisassembler.statement(for: instruction, with: context)),
                                 address: cpu.pc,
                                 bank: cpu.bank,
                                 scope: instructionScope.sorted().joined(separator: ", "),

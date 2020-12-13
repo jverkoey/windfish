@@ -13,7 +13,7 @@ class EndToEndTests: XCTestCase {
     let path = try XCTUnwrap(Bundle.module.path(forResource: "Resources/2048", ofType: "gb"))
     let rom = try Data(contentsOf: URL(fileURLWithPath: path))
 
-    // ~0.238
+    // ~0.241
     measure {
       let disassembly = LR35902.Disassembly(rom: rom)
       disassembly.disassembleAsGameboyCartridge()
@@ -25,7 +25,7 @@ class EndToEndTests: XCTestCase {
     let path = try XCTUnwrap(Bundle.module.path(forResource: "Resources/2048", ofType: "gb"))
     let rom = try Data(contentsOf: URL(fileURLWithPath: path))
 
-    // 1,540,000
+    // 1,530,000
     measure(metrics: [XCTCPUMetric(limitingToCurrentThread: true)]) {
       let disassembly = LR35902.Disassembly(rom: rom)
       disassembly.disassembleAsGameboyCartridge()

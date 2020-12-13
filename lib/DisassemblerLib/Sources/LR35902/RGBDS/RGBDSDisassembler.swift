@@ -6,6 +6,12 @@ import RGBDS
 /** Turns LR3902 instructions into RGBDS assembly language. */
 final class RGBDSDisassembler {
 
+  struct Context {
+    let address: LR35902.Address
+    let bank: LR35902.Bank
+    let disassembly: LR35902.Disassembly
+  }
+
   /**
    Creates an RGBDS statement for the given instruction.
 
@@ -13,12 +19,14 @@ final class RGBDSDisassembler {
    - Parameter disassembly: Optional additional context for the instruction, such as label names.
    - Parameter argumentString: Overrides any numerical value with the given string. Primarily used for macros.
    */
-  static func statement(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil, argumentString: String? = nil) -> Statement {
+  static func statement(for instruction: LR35902.Instruction,
+                        with context: Context? = nil,
+                        argumentString: String? = nil) -> Statement {
     guard let opcode = LR35902.InstructionSet.opcodeStrings[instruction.spec] else {
       preconditionFailure("Could not find opcode for \(instruction.spec).")
     }
 
-    if let operands = operands(for: instruction, with: disassembly, argumentString: argumentString) {
+    if let operands = operands(for: instruction, with: context, argumentString: argumentString) {
       // Operands should never be empty.
       precondition(operands.first(where: { $0.isEmpty }) == nil)
 
@@ -28,27 +36,10 @@ final class RGBDSDisassembler {
   }
 
   // TODO: Continue breaking this apart.
-  private static func addressLabel(_ disassembly: LR35902.Disassembly, _ argumentString: String?, address immediate: (UInt16)) -> String {
-    // TODO: Why do we always assume that if there's an argument string that we should return it here?
-    if let argumentString = argumentString {
-      return argumentString
-    }
-
-    if let label = disassembly.label(at: immediate, in: disassembly.cpu.bank) {
-      if let scope = disassembly.labeledContiguousScopes(at: disassembly.cpu.pc, in: disassembly.cpu.bank).first(where: { labeledScope in
-        label.starts(with: "\(labeledScope.label).")
-      })?.label {
-        return label.replacingOccurrences(of: "\(scope).", with: ".")
-      } else {
-        return label
-      }
-    }
-
-    return RGBDS.asHexString(immediate)
-  }
-
-  private static func operands(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil, argumentString: String?) -> [String]? {
-    guard let disassembly = disassembly else {
+  private static func operands(for instruction: LR35902.Instruction,
+                               with context: Context?,
+                               argumentString: String?) -> [String]? {
+    guard let context = context else {
       return operands(for: instruction, spec: instruction.spec, with: nil, argumentString: argumentString)
     }
 
@@ -58,10 +49,10 @@ final class RGBDSDisassembler {
       guard case let .imm16(immediate) = instruction.immediate else {
         preconditionFailure("Invalid immediate associated with instruction")
       }
-      guard disassembly.transfersOfControl(at: immediate, in: disassembly.cpu.bank) != nil else {
+      guard context.disassembly.transfersOfControl(at: immediate, in: context.bank) != nil else {
         break
       }
-      let addressLabel = self.addressLabel(disassembly, argumentString, address: immediate)
+      let addressLabel = self.addressLabel(context, argumentString, address: immediate)
       if let condition = condition {
         return ["\(condition)", addressLabel]
       } else {
@@ -72,9 +63,9 @@ final class RGBDSDisassembler {
       guard case let .imm8(immediate) = instruction.immediate else {
         preconditionFailure("Invalid immediate associated with instruction")
       }
-      let jumpAddress = (disassembly.cpu.pc + LR35902.InstructionSet.widths[instruction.spec]!.total).advanced(by: Int(Int8(bitPattern: immediate)))
-      if disassembly.transfersOfControl(at: jumpAddress, in: disassembly.cpu.bank) != nil {
-        let addressLabel = self.addressLabel(disassembly, argumentString, address: jumpAddress)
+      let jumpAddress = (context.address + LR35902.InstructionSet.widths[instruction.spec]!.total).advanced(by: Int(Int8(bitPattern: immediate)))
+      if context.disassembly.transfersOfControl(at: jumpAddress, in: context.bank) != nil {
+        let addressLabel = self.addressLabel(context, argumentString, address: jumpAddress)
         if let condition = condition {
           return ["\(condition)", addressLabel]
         } else {
@@ -91,9 +82,9 @@ final class RGBDSDisassembler {
       if let argumentString = argumentString {
         addressLabel = argumentString
       } else {
-        addressLabel = "[\(prettify(imm16: immediate, with: disassembly))]"
+        addressLabel = "[\(prettify(imm16: immediate, with: context))]"
       }
-      return [addressLabel, operand(for: instruction, operand: operand2, with: disassembly, argumentString: argumentString)]
+      return [addressLabel, operand(for: instruction, operand: operand2, with: context, argumentString: argumentString)]
 
     case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .imm16addr:
       guard case let .imm16(immediate) = instruction.immediate else {
@@ -104,9 +95,9 @@ final class RGBDSDisassembler {
       if let argumentString = argumentString {
         addressLabel = argumentString
       } else {
-        addressLabel = "[\(prettify(imm16: immediate, with: disassembly))]"
+        addressLabel = "[\(prettify(imm16: immediate, with: context))]"
       }
-      return [operand(for: instruction, operand: operand1, with: disassembly, argumentString: argumentString), addressLabel]
+      return [operand(for: instruction, operand: operand1, with: context, argumentString: argumentString), addressLabel]
 
     case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand1 == .ffimm8addr:
       guard case let .imm8(immediate) = instruction.immediate else {
@@ -117,9 +108,9 @@ final class RGBDSDisassembler {
       if let argumentString = argumentString {
         addressLabel = argumentString
       } else {
-        addressLabel = "[\(prettify(imm16: 0xFF00 | UInt16(immediate), with: disassembly))]"
+        addressLabel = "[\(prettify(imm16: 0xFF00 | UInt16(immediate), with: context))]"
       }
-      return [addressLabel, operand(for: instruction, operand: operand2, with: disassembly, argumentString: argumentString)]
+      return [addressLabel, operand(for: instruction, operand: operand2, with: context, argumentString: argumentString)]
 
     case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .ffimm8addr:
       guard case let .imm8(immediate) = instruction.immediate else {
@@ -130,9 +121,9 @@ final class RGBDSDisassembler {
       if let argumentString = argumentString {
         addressLabel = argumentString
       } else {
-        addressLabel = "[\(prettify(imm16: 0xFF00 | UInt16(immediate), with: disassembly))]"
+        addressLabel = "[\(prettify(imm16: 0xFF00 | UInt16(immediate), with: context))]"
       }
-      return [operand(for: instruction, operand: operand1, with: disassembly, argumentString: argumentString), addressLabel]
+      return [operand(for: instruction, operand: operand1, with: context, argumentString: argumentString), addressLabel]
 
     case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand2 == .imm16:
       guard case let .imm16(immediate) = instruction.immediate else {
@@ -143,18 +134,18 @@ final class RGBDSDisassembler {
       // TODO: These are only globals if they're referenced as an address in a subsequent instruction.
       if let argumentString = argumentString {
         addressLabel = argumentString
-      } else if operand1 == .hl, let name = disassembly.globals[immediate]?.name {
+      } else if operand1 == .hl, let name = context.disassembly.globals[immediate]?.name {
         addressLabel = name
       } else {
         addressLabel = "$\(immediate.hexString)"
       }
-      return [operand(for: instruction, operand: operand1, with: disassembly, argumentString: argumentString), addressLabel]
+      return [operand(for: instruction, operand: operand1, with: context, argumentString: argumentString), addressLabel]
 
     default:
       break
     }
 
-    return operands(for: instruction, spec: instruction.spec, with: disassembly, argumentString: argumentString)
+    return operands(for: instruction, spec: instruction.spec, with: context, argumentString: argumentString)
   }
 
   private static func typedValue(for imm8: UInt8, with representation: LR35902.Disassembly.Datatype.Representation) -> String {
@@ -168,13 +159,32 @@ final class RGBDSDisassembler {
     }
   }
 
-  private static func typedOperand(for imm8: UInt8, with disassembly: LR35902.Disassembly?) -> String? {
-    guard let disassembly = disassembly else {
+  private static func addressLabel(_ context: Context, _ argumentString: String?, address immediate: (UInt16)) -> String {
+    // TODO: Why do we always assume that if there's an argument string that we should return it here?
+    if let argumentString = argumentString {
+      return argumentString
+    }
+
+    if let label = context.disassembly.label(at: immediate, in: context.bank) {
+      if let scope = context.disassembly.labeledContiguousScopes(at: context.address, in: context.bank).first(where: { labeledScope in
+        label.starts(with: "\(labeledScope.label).")
+      })?.label {
+        return label.replacingOccurrences(of: "\(scope).", with: ".")
+      } else {
+        return label
+      }
+    }
+
+    return RGBDS.asHexString(immediate)
+  }
+
+  private static func typedOperand(for imm8: UInt8, with context: Context?) -> String? {
+    guard let context = context else {
       return nil
     }
-    let location = LR35902.Cartridge.location(for: disassembly.cpu.pc, in: disassembly.cpu.bank)!
-    guard let type = disassembly.typeAtLocation[location],
-      let dataType = disassembly.dataTypes[type] else {
+    let location = LR35902.Cartridge.location(for: context.address, in: context.bank)!
+    guard let type = context.disassembly.typeAtLocation[location],
+          let dataType = context.disassembly.dataTypes[type] else {
       return nil
     }
     switch dataType.interpretation {
@@ -214,39 +224,39 @@ final class RGBDSDisassembler {
   }
 
   /// Returns one of a label, a global, or a hexadecimal representation of a given imm16 value.
-  private static func prettify(imm16: UInt16, with disassembly: LR35902.Disassembly) -> String {
-    if let label = disassembly.label(at: imm16, in: disassembly.cpu.bank) {
+  private static func prettify(imm16: UInt16, with context: Context) -> String {
+    if let label = context.disassembly.label(at: imm16, in: context.bank) {
       return label
-    } else if let global = disassembly.globals[imm16] {
+    } else if let global = context.disassembly.globals[imm16] {
       return global.name
     } else {
       return "$\(imm16.hexString)"
     }
   }
 
-  private static func operands(for instruction: LR35902.Instruction, spec: LR35902.Instruction.Spec, with disassembly: LR35902.Disassembly?, argumentString: String?) -> [String]? {
+  private static func operands(for instruction: LR35902.Instruction, spec: LR35902.Instruction.Spec, with context: Context?, argumentString: String?) -> [String]? {
     let mirror = Mirror(reflecting: spec)
     guard let operandReflection = mirror.children.first else {
       return nil
     }
     switch operandReflection.value {
     case let childInstruction as LR35902.Instruction.Spec:
-      return operands(for: instruction, spec: childInstruction, with: disassembly, argumentString: argumentString)
+      return operands(for: instruction, spec: childInstruction, with: context, argumentString: argumentString)
     case let tuple as (LR35902.Instruction.Condition?, LR35902.Instruction.Numeric):
       if let condition = tuple.0 {
-        return ["\(condition)", operand(for: instruction, operand: tuple.1, with: disassembly, argumentString: argumentString)]
+        return ["\(condition)", operand(for: instruction, operand: tuple.1, with: context, argumentString: argumentString)]
       } else {
-        return [operand(for: instruction, operand: tuple.1, with: disassembly, argumentString: argumentString)]
+        return [operand(for: instruction, operand: tuple.1, with: context, argumentString: argumentString)]
       }
     case let condition as LR35902.Instruction.Condition:
       return ["\(condition)"]
     case let tuple as (LR35902.Instruction.Numeric, LR35902.Instruction.Numeric):
-      return [operand(for: instruction, operand: tuple.0, with: disassembly, argumentString: argumentString),
-              operand(for: instruction, operand: tuple.1, with: disassembly, argumentString: argumentString)]
+      return [operand(for: instruction, operand: tuple.0, with: context, argumentString: argumentString),
+              operand(for: instruction, operand: tuple.1, with: context, argumentString: argumentString)]
     case let tuple as (LR35902.Instruction.Bit, LR35902.Instruction.Numeric):
-      return ["\(tuple.0.rawValue)", operand(for: instruction, operand: tuple.1, with: disassembly, argumentString: argumentString)]
+      return ["\(tuple.0.rawValue)", operand(for: instruction, operand: tuple.1, with: context, argumentString: argumentString)]
     case let operandValue as LR35902.Instruction.Numeric:
-      return [operand(for: instruction, operand: operandValue, with: disassembly, argumentString: argumentString)]
+      return [operand(for: instruction, operand: operandValue, with: context, argumentString: argumentString)]
     case let address as LR35902.Instruction.RestartAddress:
       return ["\(address)".replacingOccurrences(of: "x", with: "$")]
     default:
@@ -254,7 +264,7 @@ final class RGBDSDisassembler {
     }
   }
 
-  private static func operand(for instruction: LR35902.Instruction, operand: LR35902.Instruction.Numeric, with disassembly: LR35902.Disassembly?, argumentString: String?) -> String {
+  private static func operand(for instruction: LR35902.Instruction, operand: LR35902.Instruction.Numeric, with context: Context?, argumentString: String?) -> String {
     if let argumentString = argumentString {
       switch operand {
       case LR35902.Instruction.Numeric.imm16,
@@ -273,7 +283,7 @@ final class RGBDSDisassembler {
       guard case let .imm8(immediate) = instruction.immediate else {
         preconditionFailure("Invalid immediate associated with instruction")
       }
-      if let typedValue = typedOperand(for: immediate, with: disassembly) {
+      if let typedValue = typedOperand(for: immediate, with: context) {
         return typedValue
       } else {
         return "$\(immediate.hexString)"
