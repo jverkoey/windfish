@@ -88,10 +88,33 @@ final class Global: NSObject, Codable {
   @objc dynamic var dataType: String
 }
 
+final class Macro: NSObject, Codable {
+  internal init(name: String, code: String) {
+    self.name = name
+    self.code = code
+  }
+
+  @objc dynamic var name: String
+  @objc dynamic var code: String
+}
+
 class ProjectConfiguration: NSObject, Codable {
   @objc dynamic var regions: [Region] = []
   @objc dynamic var dataTypes: [DataType] = []
   @objc dynamic var globals: [Global] = []
+  @objc dynamic var macros: [Macro] = []
+
+  override init() {
+    super.init()
+  }
+
+  required init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: Self.CodingKeys)
+    regions = (try? container.decode(Array<Region>.self, forKey: .regions)) ?? []
+    dataTypes = (try? container.decode(Array<DataType>.self, forKey: .dataTypes)) ?? []
+    globals = (try? container.decode(Array<Global>.self, forKey: .globals)) ?? []
+    macros = (try? container.decode(Array<Macro>.self, forKey: .macros)) ?? []
+  }
 }
 
 final class DisassemblyResults: NSObject {
