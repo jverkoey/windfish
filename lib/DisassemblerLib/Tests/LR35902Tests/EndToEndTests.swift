@@ -13,7 +13,7 @@ class EndToEndTests: XCTestCase {
     let path = try XCTUnwrap(Bundle.module.path(forResource: "Resources/2048", ofType: "gb"))
     let rom = try Data(contentsOf: URL(fileURLWithPath: path))
 
-    // ~0.213
+    // ~0.252
     measure {
       let disassembly = LR35902.Disassembly(rom: rom)
       disassembly.disassembleAsGameboyCartridge()

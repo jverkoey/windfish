@@ -455,25 +455,42 @@ extension LR35902 {
     // MARK: - Macros
 
     public enum MacroLine: Hashable {
-      case any(Instruction.Spec, argument: UInt64? = nil, argumentText: String? = nil)
+      case any([Instruction.Spec], argument: UInt64? = nil, argumentText: String? = nil)
+      case arg(Instruction.Spec, argument: UInt64? = nil, argumentText: String? = nil)
       case instruction(Instruction)
 
-      func asEdge() -> MacroTreeEdge {
+      func asEdges() -> [MacroTreeEdge] {
         switch self {
-        case .any(let spec, _, _):          return .any(spec)
-        case .instruction(let instruction): return .instruction(instruction)
+        case .any(let specs, _, _):         return specs.map { .arg($0) }
+        case .arg(let spec, _, _):          return [.arg(spec)]
+        case .instruction(let instruction): return [.instruction(instruction)]
         }
       }
-      func spec() -> Instruction.Spec {
+      func specs() -> [Instruction.Spec] {
         switch self {
-        case .any(let spec, _, _):          return spec
-        case .instruction(let instruction): return instruction.spec
+        case .any(let specs, _, _):         return specs
+        case .arg(let spec, _, _):          return [spec]
+        case .instruction(let instruction): return [instruction.spec]
         }
       }
     }
     enum MacroTreeEdge: Hashable {
-      case any(Instruction.Spec)
+      case arg(Instruction.Spec)
       case instruction(Instruction)
+
+      func resolve(into line: MacroLine) -> MacroLine {
+        switch line {
+        case let .any(_, argument, argumentText):
+          guard case let .arg(spec) = self else {
+            preconditionFailure("Mismatched types")
+          }
+          return .arg(spec, argument: argument, argumentText: argumentText)
+        case let .arg(spec, argument, argumentText):
+          return .arg(spec, argument: argument, argumentText: argumentText)
+        case let .instruction(instruction):
+          return .instruction(instruction)
+        }
+      }
     }
     // TODO: Verify that each instruction actually exists in the instruction table.
     public func defineMacro(named name: String,
@@ -482,30 +499,42 @@ extension LR35902 {
                             action: (([Int: String], LR35902.Address, LR35902.Bank) -> Void)? = nil) {
       precondition(!macroNames.contains(name))
       macroNames.insert(name)
-      let leaf = instructions.reduce(macroTree, { node, line in
-        let edge = line.asEdge()
-        let child = node.children[edge, default: MacroNode()]
-        node.children[edge] = child
-        return child
-      })
-      leaf.macros.append(.init(name: name, macroLines: instructions, validArgumentValues: validArgumentValues, action: action))
+
+      let macro = Macro(name: name, macroLines: instructions, validArgumentValues: validArgumentValues, action: action)
+      walkTree(lines: instructions, node: macroTree, macro: macro)
+    }
+    private func walkTree(lines: [MacroLine], node: MacroNode, macro: Macro, lineHistory: [MacroLine] = []) {
+      guard let line = lines.first else {
+        node.macros.append(Macro(name: macro.name,
+                                 macroLines: lineHistory,
+                                 validArgumentValues: macro.validArgumentValues,
+                                 action: macro.action))
+        return
+      }
+      for edge in line.asEdges() {
+        let child: MacroNode
+        if let existingChild = node.children[edge] {
+          child = existingChild
+        } else {
+          child = MacroNode()
+          node.children[edge] = child
+        }
+        walkTree(lines: Array<MacroLine>(lines.dropFirst()),
+                 node: child,
+                 macro: macro,
+                 lineHistory: lineHistory + [edge.resolve(into: line)])
+      }
     }
     public func defineMacro(named name: String, template: String) {
-      var patterns: [MacroLine] = []
+      var lines: [MacroLine] = []
       template.enumerateLines { line, _ in
         guard let statement = RGBDS.Statement(fromLine: line) else {
           return
         }
         let specs = LR35902.InstructionSet.specs(for: statement)
-        if specs.isEmpty {
-          preconditionFailure()
-        }
 
-        guard specs.count == 1 else {
-          preconditionFailure()
-        }
-        guard let spec = specs.first else {
-          preconditionFailure()
+        guard !specs.isEmpty else {
+          preconditionFailure("No instruction specification found matching this statement: \(line).")
         }
 
         if let argumentNumber = statement.operands.first(where: { $0.contains("#") }) {
@@ -513,12 +542,25 @@ extension LR35902 {
           _ = scanner.scanUpToString("#")
           _ = scanner.scanCharacter()
           let argument = scanner.scanUInt64()
-          patterns.append(.any(spec, argument: argument, argumentText: nil))
-        } else if let instruction = try? RGBDSAssembler.instruction(from: statement, using: spec) {
-          patterns.append(.instruction(instruction))
+          if specs.count > 1 {
+            lines.append(.any(specs, argument: argument, argumentText: nil))
+          } else {
+            lines.append(.arg(specs.first!, argument: argument, argumentText: nil))
+          }
+        } else {
+          let potentialInstructions: [LR35902.Instruction] = try! specs.compactMap { spec in
+            try RGBDSAssembler.instruction(from: statement, using: spec)
+          }
+          guard potentialInstructions.count > 0 else {
+            preconditionFailure("No instruction was able to represent \(statement.formattedString)")
+          }
+          let shortestInstruction = potentialInstructions.sorted(by: { pair1, pair2 in
+            LR35902.InstructionSet.widths[pair1.spec]!.total < LR35902.InstructionSet.widths[pair2.spec]!.total
+          })[0]
+          lines.append(.instruction(shortestInstruction))
         }
       }
-      defineMacro(named: name, instructions: patterns)
+      defineMacro(named: name, instructions: lines)
     }
     private var macroNames = Set<String>()
 

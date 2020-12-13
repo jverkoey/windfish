@@ -62,6 +62,95 @@ SECTION "ROM Bank 00", ROM0[$00]
     }
   }
 
+  func testAmbiguousMacro() throws {
+    let results = RGBDSAssembler.assemble(assembly: """
+ld   a, [$abcd]
+and  a
+jr   z, -$03
+""")
+    XCTAssertEqual(results.errors, [])
+
+    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+
+    let disassembly = LR35902.Disassembly(rom: data)
+
+    disassembly.defineMacro(named: "macro", template: """
+ld   a, [#1]
+and  a
+jr   z, #2
+""")
+    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
+
+    let tree = LR35902.Disassembly.MacroNode(
+      children: [
+        .arg(.ld(.a, .imm16addr)): LR35902.Disassembly.MacroNode(
+          children: [
+            .instruction(.init(spec: .and(.a))): LR35902.Disassembly.MacroNode(
+              children: [
+                .arg(.jr(.z, .simm8)): LR35902.Disassembly.MacroNode(
+                  children: [:],
+                  macros: [
+                    .init(
+                      name: "macro",
+                      macroLines: [
+                        .arg(.ld(.a, .imm16addr), argument: 1),
+                        .instruction(.init(spec: .and(.a))),
+                        .arg(.jr(.z, .simm8), argument: 2),
+                      ],
+                      validArgumentValues: nil,
+                      action: nil
+                    )
+                  ]
+                )
+              ],
+              macros: []
+            )
+          ],
+          macros: []
+        ),
+        .arg(.ld(.a, .ffimm8addr)): LR35902.Disassembly.MacroNode(
+          children: [
+            .instruction(.init(spec: .and(.a))): LR35902.Disassembly.MacroNode(
+              children: [
+                .arg(.jr(.z, .simm8)): LR35902.Disassembly.MacroNode(
+                  children: [:],
+                  macros: [
+                    .init(
+                      name: "macro",
+                      macroLines: [
+                        .arg(.ld(.a, .ffimm8addr), argument: 1),
+                        .instruction(.init(spec: .and(.a))),
+                        .arg(.jr(.z, .simm8), argument: 2),
+                      ],
+                      validArgumentValues: nil,
+                      action: nil
+                    )
+                  ]
+                )
+              ],
+              macros: []
+            )
+          ],
+          macros: []
+        )
+      ],
+      macros: []
+    )
+    XCTAssertEqual(disassembly.macroTree, tree)
+
+    let (source, _) = try! disassembly.generateSource()
+    let bank00Source = source.sources["bank_00.asm"]
+    if case let .bank(bank, content, _) = bank00Source {
+      XCTAssertEqual(bank, 0)
+      XCTAssertEqual(content, """
+SECTION "ROM Bank 00", ROM0[$00]
+
+    macro [$ABCD], @-$03
+
+""")
+    }
+  }
+
   func test_somethingelse() throws {
     let results = RGBDSAssembler.assemble(assembly: """
 ld   hl, $44
@@ -81,7 +170,7 @@ inc [hl]
 
     XCTAssertEqual(disassembly.macroTree, LR35902.Disassembly.MacroNode(
       children: [
-        .any(.ld(.hl, .imm16)): LR35902.Disassembly.MacroNode(
+        .arg(.ld(.hl, .imm16)): LR35902.Disassembly.MacroNode(
           children: [
             .instruction(.init(spec: .inc(.hladdr))): LR35902.Disassembly.MacroNode(
               children: [:],
@@ -89,7 +178,7 @@ inc [hl]
                 .init(
                   name: "plusPlusHL",
                   macroLines: [
-                    .any(.ld(.hl, .imm16), argument: 1),
+                    .arg(.ld(.hl, .imm16), argument: 1),
                     .instruction(.init(spec: .inc(.hladdr)))
                   ],
                   validArgumentValues: nil,
@@ -202,9 +291,9 @@ call $4100
     let disassembly = LR35902.Disassembly(rom: data)
 
     disassembly.defineMacro(named: "callcb", instructions: [
-      .any(.ld(.a, .imm8), argumentText: "bank(\\1)"),
+      .arg(.ld(.a, .imm8), argumentText: "bank(\\1)"),
       .instruction(.init(spec: .ld(.imm16addr, .a), immediate: .imm16(0x2100))),
-      .any(.call(nil, .imm16), argument: 1)
+      .arg(.call(nil, .imm16), argument: 1)
     ], validArgumentValues: [
       1: IndexSet(integersIn: 0x4000..<0x8000)
     ])
@@ -212,19 +301,19 @@ call $4100
 
     XCTAssertEqual(disassembly.macroTree, LR35902.Disassembly.MacroNode(
       children: [
-        .any(.ld(.a, .imm8)): LR35902.Disassembly.MacroNode(
+        .arg(.ld(.a, .imm8)): LR35902.Disassembly.MacroNode(
           children: [
             .instruction(.init(spec: .ld(.imm16addr, .a), immediate: .imm16(0x2100))): LR35902.Disassembly.MacroNode(
               children: [
-                .any(.call(nil, .imm16)): LR35902.Disassembly.MacroNode(
+                .arg(.call(nil, .imm16)): LR35902.Disassembly.MacroNode(
                   children: [:],
                   macros:[
                     .init(
                       name: "callcb",
                       macroLines: [
-                        .any(.ld(.a, .imm8), argumentText: "bank(\\1)"),
+                        .arg(.ld(.a, .imm8), argumentText: "bank(\\1)"),
                         .instruction(.init(spec: .ld(.imm16addr, .a), immediate: .imm16(0x2100))),
-                        .any(.call(nil, .imm16), argument: 1)
+                        .arg(.call(nil, .imm16), argument: 1)
                       ],
                       validArgumentValues: [
                         1: IndexSet(integersIn: 0x4000..<0x8000)

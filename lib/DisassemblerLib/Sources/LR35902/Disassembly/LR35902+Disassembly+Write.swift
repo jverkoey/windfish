@@ -381,7 +381,7 @@ clean:
 
       let initialCheckMacro: (LR35902.Instruction) -> MacroNode? = { instruction in
         let asInstruction = MacroTreeEdge.instruction(instruction)
-        let asAny = MacroTreeEdge.any(instruction.spec)
+        let asAny = MacroTreeEdge.arg(instruction.spec)
         guard macroNode == nil, let child = self.macroTree.children[asInstruction] ?? self.macroTree.children[asAny] else {
           return nil
         }
@@ -394,9 +394,9 @@ clean:
           return nil
         }
         let asInstruction = MacroTreeEdge.instruction(instruction)
-        let asAny = MacroTreeEdge.any(instruction.spec)
+        let asArg = MacroTreeEdge.arg(instruction.spec)
         // Only descend the tree if we're not a label.
-        guard !isLabeled, let child = macroNodeIterator.children[asInstruction] ?? macroNodeIterator.children[asAny] else {
+        guard !isLabeled, let child = macroNodeIterator.children[asInstruction] ?? macroNodeIterator.children[asArg] else {
           return nil
         }
         return child
@@ -421,7 +421,7 @@ clean:
             // Extract the arguments.
             var anyArgumentMismatches = false
             let arguments: [Int: String] = zip(macro.macroLines, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
-              guard case let .any(spec, argumentOrNil, _) = zipped.0,
+              guard case let .arg(spec, argumentOrNil, _) = zipped.0,
                     let argument = argumentOrNil else {
                 return iter
               }
@@ -439,7 +439,7 @@ clean:
 
             // Arguments without any label replacements.
             let rawArguments: [Int: String] = zip(macro.macroLines, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
-              guard case let .any(spec, argumentOrNil, _) = zipped.0,
+              guard case let .arg(spec, argumentOrNil, _) = zipped.0,
                     let argument = argumentOrNil else {
                 return iter
               }
@@ -500,10 +500,10 @@ clean:
               if !macro.arguments.isEmpty {
                 lines.append(Line(semantic: .macroComment(comment: "Arguments:")))
 
-                let macroSpecs: [LR35902.Instruction.Spec] = macro.macro.macroLines.map { $0.spec() }
+                let macroSpecs: [LR35902.Instruction.Spec] = macro.macro.macroLines.map { $0.specs() }.reduce([], +)
 
                 let argumentTypes: [Int: String] = zip(macro.macro.macroLines, macroSpecs).reduce([:], { (iter, zipped) -> [Int: String] in
-                  guard case let .any(spec, argumentOrNil, _) = zipped.0,
+                  guard case let .arg(spec, argumentOrNil, _) = zipped.0,
                         let argument = argumentOrNil else {
                     return iter
                   }
@@ -534,9 +534,10 @@ clean:
               lines.append(Line(semantic: .macroDefinition(macro.macro.name)))
               lines.append(contentsOf: zip(macro.macro.macroLines, instructions).map { line, instruction in
                 var macroInstruction = instruction.0
-                macroInstruction.spec = line.spec()
+
                 let argumentString: String?
-                if case let .any(_, argumentOrNil, argumentText) = line {
+                switch line {
+                case let .arg(spec, argumentOrNil, argumentText):
                   if let argumentText = argumentText {
                     argumentString = argumentText
                   } else if let argument = argumentOrNil {
@@ -544,9 +545,21 @@ clean:
                   } else {
                     argumentString = nil
                   }
-                } else {
+                  macroInstruction.spec = spec
+                case let .any(specs, argument: argumentOrNil, argumentText: argumentText):
+                  if let argumentText = argumentText {
+                    argumentString = argumentText
+                  } else if let argument = argumentOrNil {
+                    argumentString = "\\\(argument)"
+                  } else {
+                    argumentString = nil
+                  }
+                  macroInstruction.spec = specs.first!
+                case let .instruction(instruction):
+                  macroInstruction.spec = instruction.spec
                   argumentString = nil
                 }
+
                 let context = RGBDSDisassembler.Context(
                   address: self.cpu.pc,
                   bank: self.cpu.bank,
