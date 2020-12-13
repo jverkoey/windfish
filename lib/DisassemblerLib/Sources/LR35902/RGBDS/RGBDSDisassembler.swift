@@ -35,6 +35,8 @@ final class RGBDSDisassembler {
     return Statement(opcode: opcode)
   }
 
+  // MARK: - Operand assembly generation
+
   // TODO: Continue breaking this apart.
   private static func operands(for instruction: LR35902.Instruction, with context: Context?) -> [String]? {
     guard let context = context else {
@@ -43,20 +45,21 @@ final class RGBDSDisassembler {
 
     // Special case specification handling.
     switch instruction.spec {
+    // jp and call should use labels if those labels are transfers of control.
     case let LR35902.Instruction.Spec.jp(condition, operand) where operand == .imm16,
          let LR35902.Instruction.Spec.call(condition, operand) where operand == .imm16:
       guard case let .imm16(immediate) = instruction.immediate else {
         preconditionFailure("Invalid immediate associated with instruction")
       }
       guard context.disassembly.transfersOfControl(at: immediate, in: context.bank) != nil else {
-        break
+        break // Fall through to the default handler.
       }
       let addressLabel = self.addressLabel(context, address: immediate)
       if let condition = condition {
         return ["\(condition)", addressLabel]
-      } else {
-        return [addressLabel]
       }
+
+      return [addressLabel]
 
     case let LR35902.Instruction.Spec.jr(condition, operand) where operand == .simm8:
       guard case let .imm8(immediate) = instruction.immediate else {
@@ -133,10 +136,12 @@ final class RGBDSDisassembler {
       return operands(for: instruction, spec: childInstruction, with: context)
 
     case let tuple as (LR35902.Instruction.Condition?, LR35902.Instruction.Numeric):
+      let numericOperand = operand(for: instruction, operand: tuple.1, with: context)
+
       if let condition = tuple.0 {
-        return ["\(condition)", operand(for: instruction, operand: tuple.1, with: context)]
+        return ["\(condition)", numericOperand]
       } else {
-        return [operand(for: instruction, operand: tuple.1, with: context)]
+        return [numericOperand]
       }
 
     case let condition as LR35902.Instruction.Condition:
@@ -213,6 +218,7 @@ final class RGBDSDisassembler {
         preconditionFailure("Invalid immediate associated with instruction")
       }
       if let context = context {
+        // Always rpresent imm16addr as a label if possible.
         return "[\(prettify(imm16: immediate, with: context))]"
       }
       return RGBDS.asHexAddressString(immediate)
@@ -246,7 +252,7 @@ final class RGBDSDisassembler {
     } else if let global = context.disassembly.globals[imm16] {
       return global.name
     } else {
-      return "$\(imm16.hexString)"
+      return RGBDS.asHexString(imm16)
     }
   }
 
