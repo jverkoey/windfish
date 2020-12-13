@@ -13,6 +13,11 @@ public enum NumericPrefix: String {
   case gameboyGraphics = "`"
 }
 
+/** Returns the given immediate as a hexadecimal representation in RGBDS assembly. */
+public func asHexString<T: FixedWidthInteger>(_ imm: T) -> String {
+  return NumericPrefix.hexadecimal.rawValue + imm.hexString
+}
+
 /** The quote character used in RGBDS assembly. */
 let quoteCharacter = "\""
 

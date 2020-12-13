@@ -16,7 +16,7 @@ public func statement(for asciiCodes: [UInt8], characterMap: [UInt8: String]) ->
         operands.append(quoteCharacter + asciiString(for: stringRepresentableBytes, characterMap: characterMap) + quoteCharacter)
         stringRepresentableBytes.removeAll()
       }
-      operands.append(NumericPrefix.hexadecimal.rawValue + byte.hexString)
+      operands.append(RGBDS.asHexString(byte))
     }
   }
   if stringRepresentableBytes.count > 0 {

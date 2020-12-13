@@ -29,9 +29,11 @@ final class RGBDSDisassembler {
 
   // TODO: Continue breaking this apart.
   private static func addressLabel(_ disassembly: LR35902.Disassembly, _ argumentString: String?, address immediate: (UInt16)) -> String {
+    // TODO: Why do we always assume that if there's an argument string that we should return it here?
     if let argumentString = argumentString {
       return argumentString
     }
+
     if let label = disassembly.label(at: immediate, in: disassembly.cpu.bank) {
       if let scope = disassembly.labeledContiguousScopes(at: disassembly.cpu.pc, in: disassembly.cpu.bank).first(where: { labeledScope in
         label.starts(with: "\(labeledScope.label).")
@@ -42,7 +44,7 @@ final class RGBDSDisassembler {
       }
     }
 
-    return RGBDS.NumericPrefix.hexadecimal.rawValue + immediate.hexString
+    return RGBDS.asHexString(immediate)
   }
 
   private static func operands(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil, argumentString: String?) -> [String]? {
@@ -162,7 +164,7 @@ final class RGBDSDisassembler {
     case .decimal:
       return "\(imm8)"
     case .hexadecimal:
-      return RGBDS.NumericPrefix.hexadecimal.rawValue + imm8.hexString
+      return RGBDS.asHexString(imm8)
     }
   }
 
