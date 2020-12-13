@@ -55,7 +55,7 @@ final class RGBDSDisassembler {
       guard context.disassembly.transfersOfControl(at: immediate, in: context.bank) != nil else {
         break // Fall through to the default handler.
       }
-      let addressLabel = self.addressLabel(context, address: immediate)
+      let addressLabel = self.addressLabel(context, address: immediate) ?? RGBDS.asHexString(immediate)
       if let condition = condition {
         return ["\(condition)", addressLabel]
       }
@@ -108,27 +108,8 @@ final class RGBDSDisassembler {
       break
     }
 
-    // Generic case specification handling.
+    // Generic case.
     return operands(for: instruction, spec: instruction.spec, with: context)
-  }
-
-  private static func addressLabel(_ context: Context, address immediate: (UInt16)) -> String {
-    // TODO: Why do we always assume that if there's an argument string that we should return it here?
-    if let argumentString = context.argumentString {
-      return argumentString
-    }
-
-    if let label = context.disassembly.label(at: immediate, in: context.bank) {
-      if let scope = context.disassembly.labeledContiguousScopes(at: context.address, in: context.bank).first(where: { labeledScope in
-        label.starts(with: "\(labeledScope.label).")
-      })?.label {
-        return label.replacingOccurrences(of: "\(scope).", with: ".")
-      } else {
-        return label
-      }
-    }
-
-    return RGBDS.asHexString(immediate)
   }
 }
 
@@ -236,7 +217,9 @@ extension RGBDSDisassembler {
       if let context = context {
         let jumpAddress = (context.address + LR35902.InstructionSet.widths[instruction.spec]!.total).advanced(by: Int(Int8(bitPattern: immediate)))
         if context.disassembly.transfersOfControl(at: jumpAddress, in: context.bank) != nil {
-          return self.addressLabel(context, address: jumpAddress)
+          if let label = addressLabel(context, address: jumpAddress) {
+            return label
+          }
         }
       }
 
@@ -245,6 +228,7 @@ extension RGBDSDisassembler {
         return "@-" + RGBDS.asHexString(0xff - byte + 1 - 2)
       }
 
+      // TODO: Document why we offset this byte by two.
       return "@+" + RGBDS.asHexString(byte + 2)
 
     case .deaddr:
@@ -275,10 +259,10 @@ extension RGBDSDisassembler {
       }
       let signedByte = Int8(bitPattern: immediate)
       if signedByte < 0 {
-        return "sp-$\((0xff - immediate + 1).hexString)"
+        return "sp-" + RGBDS.asHexString(0xff - immediate + 1)
       }
 
-      return "sp+$\(immediate.hexString)"
+      return "sp+" + RGBDS.asHexString(immediate)
 
     case .bcaddr:
       return "[bc]"
@@ -365,6 +349,24 @@ extension RGBDSDisassembler {
     } else {
       return RGBDS.asHexString(imm16)
     }
+  }
+
+  private static func addressLabel(_ context: Context, address immediate: (UInt16)) -> String? {
+    // TODO: Why do we always assume that if there's an argument string that we should return it here?
+    if let argumentString = context.argumentString {
+      return argumentString
+    }
+
+    if let label = context.disassembly.label(at: immediate, in: context.bank) {
+      if let scope = context.disassembly.labeledContiguousScopes(at: context.address, in: context.bank).first(where: { labeledScope in
+        label.starts(with: "\(labeledScope.label).")
+      })?.label {
+        return label.replacingOccurrences(of: "\(scope).", with: ".")
+      }
+
+      return label
+    }
+    return nil
   }
 
   /** Returns the immediate formatted with the given representation. */
