@@ -6,13 +6,25 @@ import RGBDS
 /** Turns LR3902 instructions into RGBDS assembly language. */
 final class RGBDSDisassembler {
 
-  /** Creates an RGBDS statement for the given instruction. */
+  /**
+   Creates an RGBDS statement for the given instruction.
+
+   - Parameter instruction: Assembly code will be generated for this instruction.
+   - Parameter disassembly: Optional additional context for the instruction, such as label names.
+   - Parameter argumentString: Overrides any numerical value with the given string. Primarily used for macros.
+   */
   static func statement(for instruction: LR35902.Instruction, with disassembly: LR35902.Disassembly? = nil, argumentString: String? = nil) -> Statement {
-    if let operands = operands(for: instruction, with: disassembly, argumentString: argumentString) {
-      return Statement(opcode: LR35902.InstructionSet.opcodeStrings[instruction.spec]!, operands: operands.filter { $0.count > 0 })
-    } else {
-      return Statement(opcode: LR35902.InstructionSet.opcodeStrings[instruction.spec]!)
+    guard let opcode = LR35902.InstructionSet.opcodeStrings[instruction.spec] else {
+      preconditionFailure("Could not find opcode for \(instruction.spec).")
     }
+
+    if let operands = operands(for: instruction, with: disassembly, argumentString: argumentString) {
+      // Operands should never be empty.
+      precondition(operands.first(where: { $0.isEmpty }) == nil)
+
+      return Statement(opcode: opcode, operands: operands)
+    }
+    return Statement(opcode: opcode)
   }
 
   // TODO: Continue breaking this apart.
