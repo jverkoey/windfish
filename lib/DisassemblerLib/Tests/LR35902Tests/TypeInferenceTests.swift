@@ -162,6 +162,33 @@ SECTION "ROM Bank 00", ROM0[$00]
     }
   }
 
+  func test_jr_simm8() {
+    let results = RGBDSAssembler.assemble(assembly: """
+nop
+jr -$01
+""")
+    XCTAssertEqual(results.errors, [])
+
+    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+
+    let disassembly = LR35902.Disassembly(rom: data)
+    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
+
+    let (source, _) = try! disassembly.generateSource()
+    let bank00Source = source.sources["bank_00.asm"]
+    if case let .bank(bank, content, _) = bank00Source {
+      XCTAssertEqual(bank, 0)
+      XCTAssertEqual(content, """
+SECTION "ROM Bank 00", ROM0[$00]
+
+toc_00_0000:
+    nop
+    jr   toc_00_0000
+
+""")
+    }
+  }
+
   func test_somethingelse3() throws {
     let results = RGBDSAssembler.assemble(assembly: """
 ld   a, 1

@@ -73,6 +73,7 @@ private func isNumber(_ string: String) -> Bool {
     || string.hasPrefix(NumericPrefix.binary.rawValue)
     || string.hasPrefix(NumericPrefix.placeholder.rawValue)
     || string.hasPrefix(NumericPrefix.gameboyGraphics.rawValue)
+    || (string.hasPrefix("-") && isNumber(String(string.dropFirst())))
     || Int(string) != nil
     || (string.contains(".") && Float(string) != nil)
 }

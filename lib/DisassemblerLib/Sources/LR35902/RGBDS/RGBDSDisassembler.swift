@@ -62,20 +62,6 @@ final class RGBDSDisassembler {
 
       return [addressLabel]
 
-    case let LR35902.Instruction.Spec.jr(condition, operand) where operand == .simm8:
-      guard case let .imm8(immediate) = instruction.immediate else {
-        preconditionFailure("Invalid immediate associated with instruction")
-      }
-      let jumpAddress = (context.address + LR35902.InstructionSet.widths[instruction.spec]!.total).advanced(by: Int(Int8(bitPattern: immediate)))
-      if context.disassembly.transfersOfControl(at: jumpAddress, in: context.bank) != nil {
-        let addressLabel = self.addressLabel(context, address: jumpAddress)
-        if let condition = condition {
-          return ["\(condition)", addressLabel]
-        } else {
-          return [addressLabel]
-        }
-      }
-
     case let LR35902.Instruction.Spec.ld(operand1, operand2) where operand1 == .ffimm8addr:
       guard case let .imm8(immediate) = instruction.immediate else {
         preconditionFailure("Invalid immediate associated with instruction")
@@ -199,39 +185,46 @@ final class RGBDSDisassembler {
         break
       }
     }
+
+    // This switch is a glorified if/else statement, so the most frequent combinations of operands are evaluated first.
     switch operand {
+    case .a, .af, .b, .c, .bc, .d, .e, .de, .h, .l, .hl, .sp:
+      return "\(operand)"
+
+    case .hladdr:
+      return "[hl]"
+
     case .imm8:
       guard case let .imm8(immediate) = instruction.immediate else {
         preconditionFailure("Invalid immediate associated with instruction")
       }
+
       if let typedValue = typedOperand(for: immediate, with: context) {
         return typedValue
-      } else {
-        return RGBDS.asHexString(immediate)
       }
+
+      return RGBDS.asHexString(immediate)
 
     case .simm8:
       guard case let .imm8(immediate) = instruction.immediate else {
         preconditionFailure("Invalid immediate associated with instruction")
       }
+      if let context = context {
+        let jumpAddress = (context.address + LR35902.InstructionSet.widths[instruction.spec]!.total).advanced(by: Int(Int8(bitPattern: immediate)))
+        if context.disassembly.transfersOfControl(at: jumpAddress, in: context.bank) != nil {
+          return self.addressLabel(context, address: jumpAddress)
+        }
+      }
+
       let byte = immediate
       if (byte & UInt8(0x80)) != 0 {
         return "@-" + RGBDS.asHexString(0xff - byte + 1 - 2)
-      } else {
-        return "@+" + RGBDS.asHexString(byte + 2)
       }
 
-    case .imm16:
-      guard case let .imm16(immediate) = instruction.immediate else {
-        preconditionFailure("Invalid immediate associated with instruction")
-      }
-      return RGBDS.asHexString(immediate)
+      return "@+" + RGBDS.asHexString(byte + 2)
 
-    case .ffimm8addr:
-      guard case let .imm8(immediate) = instruction.immediate else {
-        preconditionFailure("Invalid immediate associated with instruction")
-      }
-      return "[$FF\(immediate.hexString)]"
+    case .deaddr:
+      return "[de]"
 
     case .imm16addr:
       guard case let .imm16(immediate) = instruction.immediate else {
@@ -243,10 +236,15 @@ final class RGBDSDisassembler {
       }
       return RGBDS.asHexAddressString(immediate)
 
-    case .bcaddr:            return "[bc]"
-    case .deaddr:            return "[de]"
-    case .hladdr:            return "[hl]"
-    case .ffccaddr:          return "[$ff00+c]"
+    case .imm16:
+      guard case let .imm16(immediate) = instruction.immediate else {
+        preconditionFailure("Invalid immediate associated with instruction")
+      }
+      return RGBDS.asHexString(immediate)
+
+    case .ffccaddr:
+      return "[$ff00+c]"
+
     case .sp_plus_simm8:
       guard case let .imm8(immediate) = instruction.immediate else {
         preconditionFailure("Invalid immediate associated with instruction")
@@ -254,11 +252,18 @@ final class RGBDSDisassembler {
       let signedByte = Int8(bitPattern: immediate)
       if signedByte < 0 {
         return "sp-$\((0xff - immediate + 1).hexString)"
-      } else {
-        return "sp+$\(immediate.hexString)"
       }
-    case .a, .af, .b, .c, .bc, .d, .e, .de, .h, .l, .hl, .sp:
-      return "\(operand)"
+
+      return "sp+$\(immediate.hexString)"
+
+    case .bcaddr:
+      return "[bc]"
+
+    case .ffimm8addr:
+      guard case let .imm8(immediate) = instruction.immediate else {
+        preconditionFailure("Invalid immediate associated with instruction")
+      }
+      return "[$FF\(immediate.hexString)]"
 
     case .zeroimm8:
       preconditionFailure("This operand is not meant to be represented in source")
