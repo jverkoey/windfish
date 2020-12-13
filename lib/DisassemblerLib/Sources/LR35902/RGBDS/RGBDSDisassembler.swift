@@ -122,92 +122,6 @@ final class RGBDSDisassembler {
     return operands(for: instruction, spec: instruction.spec, with: context)
   }
 
-  private static func typedValue(for imm8: UInt8, with representation: LR35902.Disassembly.Datatype.Representation) -> String {
-    switch representation {
-    case .binary:
-      return RGBDS.NumericPrefix.binary.rawValue + imm8.binaryString
-    case .decimal:
-      return "\(imm8)"
-    case .hexadecimal:
-      return RGBDS.asHexString(imm8)
-    }
-  }
-
-  private static func addressLabel(_ context: Context, address immediate: (UInt16)) -> String {
-    // TODO: Why do we always assume that if there's an argument string that we should return it here?
-    if let argumentString = context.argumentString {
-      return argumentString
-    }
-
-    if let label = context.disassembly.label(at: immediate, in: context.bank) {
-      if let scope = context.disassembly.labeledContiguousScopes(at: context.address, in: context.bank).first(where: { labeledScope in
-        label.starts(with: "\(labeledScope.label).")
-      })?.label {
-        return label.replacingOccurrences(of: "\(scope).", with: ".")
-      } else {
-        return label
-      }
-    }
-
-    return RGBDS.asHexString(immediate)
-  }
-
-  private static func typedOperand(for imm8: UInt8, with context: Context?) -> String? {
-    guard let context = context else {
-      return nil
-    }
-    let location = LR35902.Cartridge.location(for: context.address, in: context.bank)!
-    guard let type = context.disassembly.typeAtLocation[location],
-          let dataType = context.disassembly.dataTypes[type] else {
-      return nil
-    }
-    switch dataType.interpretation {
-    case .bitmask:
-      var namedValues: UInt8 = 0
-      let bitmaskValues = dataType.namedValues.filter { value, _ in
-        if imm8 == 0 {
-          return value == 0
-        }
-        if value != 0 && (imm8 & value) == value {
-          namedValues = namedValues | value
-          return true
-        }
-        return false
-      }.values
-      var parts = bitmaskValues.sorted()
-
-      if namedValues != imm8 {
-        let remainingBits = imm8 & ~(namedValues)
-        parts.append(typedValue(for: remainingBits, with: dataType.representation))
-      }
-      return parts.joined(separator: " | ")
-
-    case .enumerated:
-      let possibleValues = dataType.namedValues.filter { value, _ in value == imm8 }.values
-      precondition(possibleValues.count <= 1, "Multiple possible values found.")
-      if let value = possibleValues.first {
-        return value
-      }
-
-    default:
-      break
-    }
-
-    // Fall-through case.
-    return typedValue(for: imm8, with: dataType.representation)
-  }
-
-  /// Returns one of a label, a global, or a hexadecimal representation of a given imm16 value.
-  private static func prettify(imm16: UInt16, with context: Context) -> String {
-    if let label = context.disassembly.label(at: imm16, in: context.bank) {
-      return label
-    } else if let global = context.disassembly.globals[imm16] {
-      return global.name
-    } else {
-      return "$\(imm16.hexString)"
-    }
-  }
-
   private static func operands(for instruction: LR35902.Instruction, spec: LR35902.Instruction.Spec, with context: Context?) -> [String]? {
     let mirror = Mirror(reflecting: spec)
     guard let operandReflection = mirror.children.first else {
@@ -323,5 +237,91 @@ final class RGBDSDisassembler {
     case .zeroimm8:
       return ""
     }
+  }
+
+  /// Returns one of a label, a global, or a hexadecimal representation of a given imm16 value.
+  private static func prettify(imm16: UInt16, with context: Context) -> String {
+    if let label = context.disassembly.label(at: imm16, in: context.bank) {
+      return label
+    } else if let global = context.disassembly.globals[imm16] {
+      return global.name
+    } else {
+      return "$\(imm16.hexString)"
+    }
+  }
+
+  private static func addressLabel(_ context: Context, address immediate: (UInt16)) -> String {
+    // TODO: Why do we always assume that if there's an argument string that we should return it here?
+    if let argumentString = context.argumentString {
+      return argumentString
+    }
+
+    if let label = context.disassembly.label(at: immediate, in: context.bank) {
+      if let scope = context.disassembly.labeledContiguousScopes(at: context.address, in: context.bank).first(where: { labeledScope in
+        label.starts(with: "\(labeledScope.label).")
+      })?.label {
+        return label.replacingOccurrences(of: "\(scope).", with: ".")
+      } else {
+        return label
+      }
+    }
+
+    return RGBDS.asHexString(immediate)
+  }
+
+  private static func typedValue(for imm8: UInt8, with representation: LR35902.Disassembly.Datatype.Representation) -> String {
+    switch representation {
+    case .binary:
+      return RGBDS.NumericPrefix.binary.rawValue + imm8.binaryString
+    case .decimal:
+      return "\(imm8)"
+    case .hexadecimal:
+      return RGBDS.asHexString(imm8)
+    }
+  }
+
+  private static func typedOperand(for imm8: UInt8, with context: Context?) -> String? {
+    guard let context = context else {
+      return nil
+    }
+    let location = LR35902.Cartridge.location(for: context.address, in: context.bank)!
+    guard let type = context.disassembly.typeAtLocation[location],
+          let dataType = context.disassembly.dataTypes[type] else {
+      return nil
+    }
+    switch dataType.interpretation {
+    case .bitmask:
+      var namedValues: UInt8 = 0
+      let bitmaskValues = dataType.namedValues.filter { value, _ in
+        if imm8 == 0 {
+          return value == 0
+        }
+        if value != 0 && (imm8 & value) == value {
+          namedValues = namedValues | value
+          return true
+        }
+        return false
+      }.values
+      var parts = bitmaskValues.sorted()
+
+      if namedValues != imm8 {
+        let remainingBits = imm8 & ~(namedValues)
+        parts.append(typedValue(for: remainingBits, with: dataType.representation))
+      }
+      return parts.joined(separator: " | ")
+
+    case .enumerated:
+      let possibleValues = dataType.namedValues.filter { value, _ in value == imm8 }.values
+      precondition(possibleValues.count <= 1, "Multiple possible values found.")
+      if let value = possibleValues.first {
+        return value
+      }
+
+    default:
+      break
+    }
+
+    // Fall-through case.
+    return typedValue(for: imm8, with: dataType.representation)
   }
 }
