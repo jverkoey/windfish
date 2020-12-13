@@ -45,6 +45,7 @@ final class RGBDSDisassembler {
 
     // Special case specification handling.
     switch instruction.spec {
+
     // jp and call should use labels if those labels are transfers of control.
     case let LR35902.Instruction.Spec.jp(condition, operand) where operand == .imm16,
          let LR35902.Instruction.Spec.call(condition, operand) where operand == .imm16:
@@ -125,55 +126,74 @@ final class RGBDSDisassembler {
     return operands(for: instruction, spec: instruction.spec, with: context)
   }
 
+  /**
+   Generic resolution of operands to RGBDS assembly.
+
+   No specification assumptions are made here; this handler is intentionally a generic catch-all.
+
+   This method can recurse as needed when specifications are nested.
+
+   - Parameter instruction: The instruction whose operands are to be returned.
+   - Parameter spec: The spec being used to extract the operands. May be a nested spec of the instruction's spec.
+   */
   private static func operands(for instruction: LR35902.Instruction, spec: LR35902.Instruction.Spec, with context: Context?) -> [String]? {
     let mirror = Mirror(reflecting: spec)
     guard let operandReflection = mirror.children.first else {
-      return nil
+      return nil  // This specification has no operands.
     }
+
+    // This switch is a glorified if/else statement, so the most frequent combinations of operands are evaluated first.
     switch operandReflection.value {
-    
+
+    case let tuple as (LR35902.Instruction.Numeric, LR35902.Instruction.Numeric):
+      return [
+        operand(for: instruction, operand: tuple.0, with: context),
+        operand(for: instruction, operand: tuple.1, with: context)
+      ]
+
+    case let operandValue as LR35902.Instruction.Numeric:
+      return [operand(for: instruction, operand: operandValue, with: context)]
+
+    case Optional<Any>.none:
+      return nil
+
     case let childInstruction as LR35902.Instruction.Spec:
       return operands(for: instruction, spec: childInstruction, with: context)
+
+    case let condition as LR35902.Instruction.Condition:
+      return ["\(condition)"]
+
+    case let tuple as (LR35902.Instruction.Bit, LR35902.Instruction.Numeric):
+      return [
+        "\(tuple.0.rawValue)",
+        operand(for: instruction, operand: tuple.1, with: context)
+      ]
+
+    case let address as LR35902.Instruction.RestartAddress:
+      // Restart addresses use an x prefix because dollar signs can't be represented in Swift enum case names, but the
+      // addresses are technically hexadecimal.
+      return ["\(address)".replacingOccurrences(of: "x", with: RGBDS.NumericPrefix.hexadecimal.rawValue)]
 
     case let tuple as (LR35902.Instruction.Condition?, LR35902.Instruction.Numeric):
       let numericOperand = operand(for: instruction, operand: tuple.1, with: context)
 
       if let condition = tuple.0 {
         return ["\(condition)", numericOperand]
-      } else {
-        return [numericOperand]
       }
 
-    case let condition as LR35902.Instruction.Condition:
-      return ["\(condition)"]
-
-    case let tuple as (LR35902.Instruction.Numeric, LR35902.Instruction.Numeric):
-      return [operand(for: instruction, operand: tuple.0, with: context),
-              operand(for: instruction, operand: tuple.1, with: context)]
-
-    case let tuple as (LR35902.Instruction.Bit, LR35902.Instruction.Numeric):
-      return ["\(tuple.0.rawValue)", operand(for: instruction, operand: tuple.1, with: context)]
-
-    case let operandValue as LR35902.Instruction.Numeric:
-      return [operand(for: instruction, operand: operandValue, with: context)]
-
-    case let address as LR35902.Instruction.RestartAddress:
-      return ["\(address)".replacingOccurrences(of: "x", with: "$")]
+      return [numericOperand]
 
     default:
-      return nil
+      preconditionFailure("Unhandled operand type")
     }
   }
 
   private static func operand(for instruction: LR35902.Instruction, operand: LR35902.Instruction.Numeric, with context: Context?) -> String {
     if let argumentString = context?.argumentString {
       switch operand {
-      case LR35902.Instruction.Numeric.imm16,
-           LR35902.Instruction.Numeric.imm8,
-           LR35902.Instruction.Numeric.imm16addr,
-           LR35902.Instruction.Numeric.simm8,
-           LR35902.Instruction.Numeric.sp_plus_simm8,
-           LR35902.Instruction.Numeric.ffimm8addr:
+      case .imm16, .imm8, .imm16addr, .simm8, .sp_plus_simm8, .ffimm8addr:
+        // We only replace immediate values with argument strings.
+        // TODO: This is overly restrictive because arguments can technically be used for anything.
         return argumentString
       default:
         break
@@ -196,9 +216,9 @@ final class RGBDSDisassembler {
       }
       let byte = immediate
       if (byte & UInt8(0x80)) != 0 {
-        return "@-$\((0xff - byte + 1 - 2).hexString)"
+        return "@-" + RGBDS.asHexString(0xff - byte + 1 - 2)
       } else {
-        return "@+$\((byte + 2).hexString)"
+        return "@+" + RGBDS.asHexString(byte + 2)
       }
 
     case .imm16:
@@ -241,7 +261,7 @@ final class RGBDSDisassembler {
       return "\(operand)"
 
     case .zeroimm8:
-      return ""
+      preconditionFailure("This operand is not meant to be represented in source")
     }
   }
 

@@ -81,7 +81,7 @@ extension LR35902.Instruction {
 
     case ffimm8addr, ffccaddr
 
-    case zeroimm8
+    case zeroimm8  // Used solely as a placeholder for stop's extra null byte
 
     static let registers8: Set<LR35902.Instruction.Numeric> = Set([
       .a,
