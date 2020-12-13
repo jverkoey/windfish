@@ -19,6 +19,7 @@
 		66763D732579F26000824278 /* RegionEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66763D722579F26000824278 /* RegionEditorViewController.swift */; };
 		66763D80257AF38200824278 /* LR35902AddressFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66763D7F257AF38200824278 /* LR35902AddressFormatter.swift */; };
 		66763D97257C0D4900824278 /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66763D96257C0D4900824278 /* TextView.swift */; };
+		66783F802585B694008C34FA /* MacroEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66783F7F2585B694008C34FA /* MacroEditorViewController.swift */; };
 		667B1B632578541F00CE670F /* NotificationNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1B622578541F00CE670F /* NotificationNames.swift */; };
 		667B1B75257854BB00CE670F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 667B1B72257854BB00CE670F /* Assets.xcassets */; };
 		667B1B8B2578554600CE670F /* ProjectOutlineNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1B8A2578554600CE670F /* ProjectOutlineNode.swift */; };
@@ -70,6 +71,7 @@
 		66763D722579F26000824278 /* RegionEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionEditorViewController.swift; sourceTree = "<group>"; };
 		66763D7F257AF38200824278 /* LR35902AddressFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LR35902AddressFormatter.swift; sourceTree = "<group>"; };
 		66763D96257C0D4900824278 /* TextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
+		66783F7F2585B694008C34FA /* MacroEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroEditorViewController.swift; sourceTree = "<group>"; };
 		667B1B622578541F00CE670F /* NotificationNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationNames.swift; sourceTree = "<group>"; };
 		667B1B72257854BB00CE670F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		667B1B73257854BB00CE670F /* gbdis.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = gbdis.entitlements; sourceTree = "<group>"; };
@@ -207,6 +209,17 @@
 			path = CellViews;
 			sourceTree = "<group>";
 		};
+		66783F842585B69F008C34FA /* Editors */ = {
+			isa = PBXGroup;
+			children = (
+				66763D722579F26000824278 /* RegionEditorViewController.swift */,
+				66C617DB257F202B00E372BA /* DataTypeEditorViewController.swift */,
+				66C617EB257F30C200E372BA /* GlobalEditorViewController.swift */,
+				66783F7F2585B694008C34FA /* MacroEditorViewController.swift */,
+			);
+			path = Editors;
+			sourceTree = "<group>";
+		};
 		667B1B612578540500CE670F /* Project */ = {
 			isa = PBXGroup;
 			children = (
@@ -216,9 +229,7 @@
 				667B1BAD2578565A00CE670F /* OutlineViewController.swift */,
 				667B1BA82578563E00CE670F /* ContentViewController.swift */,
 				667B1C0125789BAE00CE670F /* InspectorViewController.swift */,
-				66763D722579F26000824278 /* RegionEditorViewController.swift */,
-				66C617DB257F202B00E372BA /* DataTypeEditorViewController.swift */,
-				66C617EB257F30C200E372BA /* GlobalEditorViewController.swift */,
+				66783F842585B69F008C34FA /* Editors */,
 				66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */,
 			);
 			path = Project;
@@ -411,6 +422,7 @@
 				667B1BAE2578565A00CE670F /* OutlineViewController.swift in Sources */,
 				665D4F5D2575F75400C3A03B /* ProjectDocument.swift in Sources */,
 				665D4FAE257727CA00C3A03B /* HorizontalLine.swift in Sources */,
+				66783F802585B694008C34FA /* MacroEditorViewController.swift in Sources */,
 				667B1C0225789BAE00CE670F /* InspectorViewController.swift in Sources */,
 				66C617CC257F1AE200E372BA /* TabViewController.swift in Sources */,
 			);
