@@ -3,9 +3,10 @@ import Foundation
 import FoundationExtensions
 import RGBDS
 
-/** Turns LR3902 instructions into RGBDS assembly language. */
+/** Turns LR3902 instructions into RGBDS assembly. */
 final class RGBDSDisassembler {
 
+  /** The context within which an instruction should be turned into RGBDS assembly. */
   struct Context {
     let address: LR35902.Address
     let bank: LR35902.Bank

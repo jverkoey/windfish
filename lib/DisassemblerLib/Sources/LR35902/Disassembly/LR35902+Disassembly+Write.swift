@@ -443,7 +443,8 @@ clean:
                     let argument = argumentOrNil else {
                 return iter
               }
-              let args = extractArgs(from: RGBDSDisassembler.statement(for: zipped.1.0), using: spec, argument: Int(argument))
+              let statement = RGBDSDisassembler.statement(for: zipped.1.0)
+              let args = extractArgs(from: statement, using: spec, argument: Int(argument))
               return iter.merging(args, uniquingKeysWith: { first, second in
                 if first != second {
                   anyArgumentMismatches = true
