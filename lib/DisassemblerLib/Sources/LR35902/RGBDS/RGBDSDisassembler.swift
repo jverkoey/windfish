@@ -112,8 +112,31 @@ final class RGBDSDisassembler {
     return operands(for: instruction, spec: instruction.spec, with: context)
   }
 
+  private static func addressLabel(_ context: Context, address immediate: (UInt16)) -> String {
+    // TODO: Why do we always assume that if there's an argument string that we should return it here?
+    if let argumentString = context.argumentString {
+      return argumentString
+    }
+
+    if let label = context.disassembly.label(at: immediate, in: context.bank) {
+      if let scope = context.disassembly.labeledContiguousScopes(at: context.address, in: context.bank).first(where: { labeledScope in
+        label.starts(with: "\(labeledScope.label).")
+      })?.label {
+        return label.replacingOccurrences(of: "\(scope).", with: ".")
+      } else {
+        return label
+      }
+    }
+
+    return RGBDS.asHexString(immediate)
+  }
+}
+
+// MARK: - Operand disassembly
+
+extension RGBDSDisassembler {
   /**
-   Generic resolution of operands to RGBDS assembly.
+   Generic transformation of an instruction's operands to their RGBDS assembly equivalent.
 
    No specification assumptions are made here; this handler is intentionally a generic catch-all.
 
@@ -174,6 +197,7 @@ final class RGBDSDisassembler {
     }
   }
 
+  /** Generic transformation of a single instruction operands to its RGBDS assembly equivalent. */
   private static func operand(for instruction: LR35902.Instruction, operand: LR35902.Instruction.Numeric, with context: Context?) -> String {
     if let argumentString = context?.argumentString {
       switch operand {
@@ -199,7 +223,7 @@ final class RGBDSDisassembler {
         preconditionFailure("Invalid immediate associated with instruction")
       }
 
-      if let typedValue = typedOperand(for: immediate, with: context) {
+      if let context = context, let typedValue = typedOperand(for: immediate, with: context) {
         return typedValue
       }
 
@@ -269,8 +293,70 @@ final class RGBDSDisassembler {
       preconditionFailure("This operand is not meant to be represented in source")
     }
   }
+}
 
-  /// Returns one of a label, a global, or a hexadecimal representation of a given imm16 value.
+// MARK: - Typed operands
+
+extension RGBDSDisassembler {
+  /** Returns an immediate 8 bit value represented as the inferred type at the context's execution location. */
+  private static func typedOperand(for imm8: UInt8, with context: Context) -> String? {
+    let location = LR35902.Cartridge.location(for: context.address, in: context.bank)!
+    guard let type = context.disassembly.typeAtLocation[location],
+          let dataType = context.disassembly.dataTypes[type] else {
+      return nil  // No known data type.
+    }
+
+    switch dataType.interpretation {
+
+    case .bitmask:
+      // First, extract all of the bits that exactly match a named value.
+      var namedValues: UInt8 = 0
+      let bitmaskValues = dataType.namedValues.filter { value, _ in
+        if value == 0 {
+          // Only return this named value if the immediate is exactly 0, otherwise we would include it in every
+          // expression.
+          return imm8 == 0
+        }
+        if (imm8 & value) == value {
+          namedValues = namedValues | value
+          return true
+        }
+        return false
+      }.values
+
+      // Sort the named values for readability.
+      var parts = bitmaskValues.sorted()
+
+      // If there are any remaining bits in the mask, binary or those as well.
+      if namedValues != imm8 {
+        let remainingBits = imm8 & ~(namedValues)
+        parts.append(literal(for: remainingBits, using: dataType.representation))
+      }
+
+      return parts.joined(separator: " | ")
+
+    case .enumerated:
+      let possibleValues = dataType.namedValues.filter { value, _ in value == imm8 }.values
+      precondition(possibleValues.count <= 1, "Multiple possible values found.")
+      if let value = possibleValues.first {
+        return value
+      }
+
+      // If no enums matched, then fall-through.
+
+    case .any:
+      break  // Fall-through.
+    }
+
+    // Fall-through case represents the immediate as a literal numeric value.
+    return literal(for: imm8, using: dataType.representation)
+  }
+}
+
+// MARK: - Formatting literals
+
+extension RGBDSDisassembler {
+  /** Returns one of a label, a global, or a hexadecimal representation of a given imm16 value. */
   private static func prettify(imm16: UInt16, with context: Context) -> String {
     if let label = context.disassembly.label(at: imm16, in: context.bank) {
       return label
@@ -281,78 +367,15 @@ final class RGBDSDisassembler {
     }
   }
 
-  private static func addressLabel(_ context: Context, address immediate: (UInt16)) -> String {
-    // TODO: Why do we always assume that if there's an argument string that we should return it here?
-    if let argumentString = context.argumentString {
-      return argumentString
-    }
-
-    if let label = context.disassembly.label(at: immediate, in: context.bank) {
-      if let scope = context.disassembly.labeledContiguousScopes(at: context.address, in: context.bank).first(where: { labeledScope in
-        label.starts(with: "\(labeledScope.label).")
-      })?.label {
-        return label.replacingOccurrences(of: "\(scope).", with: ".")
-      } else {
-        return label
-      }
-    }
-
-    return RGBDS.asHexString(immediate)
-  }
-
-  private static func typedValue(for imm8: UInt8, with representation: LR35902.Disassembly.Datatype.Representation) -> String {
+  /** Returns the immediate formatted with the given representation. */
+  private static func literal(for imm8: UInt8, using representation: LR35902.Disassembly.Datatype.Representation) -> String {
     switch representation {
     case .binary:
-      return RGBDS.NumericPrefix.binary.rawValue + imm8.binaryString
+      return RGBDS.asBinaryString(imm8)
     case .decimal:
-      return "\(imm8)"
+      return RGBDS.asDecimalString(imm8)
     case .hexadecimal:
       return RGBDS.asHexString(imm8)
     }
-  }
-
-  private static func typedOperand(for imm8: UInt8, with context: Context?) -> String? {
-    guard let context = context else {
-      return nil
-    }
-    let location = LR35902.Cartridge.location(for: context.address, in: context.bank)!
-    guard let type = context.disassembly.typeAtLocation[location],
-          let dataType = context.disassembly.dataTypes[type] else {
-      return nil
-    }
-    switch dataType.interpretation {
-    case .bitmask:
-      var namedValues: UInt8 = 0
-      let bitmaskValues = dataType.namedValues.filter { value, _ in
-        if imm8 == 0 {
-          return value == 0
-        }
-        if value != 0 && (imm8 & value) == value {
-          namedValues = namedValues | value
-          return true
-        }
-        return false
-      }.values
-      var parts = bitmaskValues.sorted()
-
-      if namedValues != imm8 {
-        let remainingBits = imm8 & ~(namedValues)
-        parts.append(typedValue(for: remainingBits, with: dataType.representation))
-      }
-      return parts.joined(separator: " | ")
-
-    case .enumerated:
-      let possibleValues = dataType.namedValues.filter { value, _ in value == imm8 }.values
-      precondition(possibleValues.count <= 1, "Multiple possible values found.")
-      if let value = possibleValues.first {
-        return value
-      }
-
-    default:
-      break
-    }
-
-    // Fall-through case.
-    return typedValue(for: imm8, with: dataType.representation)
   }
 }

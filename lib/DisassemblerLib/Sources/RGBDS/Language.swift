@@ -13,6 +13,16 @@ public enum NumericPrefix: String {
   case gameboyGraphics = "`"
 }
 
+/** Returns the given immediate as a decimal representation in RGBDS assembly. */
+public func asDecimalString<T: FixedWidthInteger>(_ imm: T) -> String {
+  return "\(imm)"
+}
+
+/** Returns the given immediate as a binary representation in RGBDS assembly. */
+public func asBinaryString<T: FixedWidthInteger>(_ imm: T) -> String {
+  return NumericPrefix.binary.rawValue + imm.binaryString
+}
+
 /** Returns the given immediate as a hexadecimal representation in RGBDS assembly. */
 public func asHexString<T: FixedWidthInteger>(_ imm: T) -> String {
   return NumericPrefix.hexadecimal.rawValue + imm.hexString
