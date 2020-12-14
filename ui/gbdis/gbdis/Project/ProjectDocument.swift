@@ -659,6 +659,10 @@ extension ProjectDocument {
         .foregroundColor: NSColor.systemGreen,
         .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
       ]
+      let macroNameAttributes: [NSAttributedString.Key : Any] = [
+        .foregroundColor: NSColor.systemBrown,
+        .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
+      ]
       let operandAttributes: [NSAttributedString.Key : Any] = baseAttributes
 
       let bankTextStorage: [LR35902.Bank: NSAttributedString] = disassembledSource.sources.compactMapValues {
@@ -693,16 +697,22 @@ extension ProjectDocument {
             case let .global(assembly, _, _): fallthrough
             case let .image1bpp(assembly): fallthrough
             case let .image2bpp(assembly): fallthrough
-            case let .macroInstruction(_, assembly):fallthrough
-            case let .macro(assembly): fallthrough
+            case let .macroInstruction(_, assembly): fallthrough
             case let .instruction(_, assembly):
-              accumulator.append(NSAttributedString(string: "    ",
-                                                    attributes: baseAttributes))
+              accumulator.append(NSAttributedString(string: "    ", attributes: baseAttributes))
               accumulator.append(assembly.attributedString(attributes: baseAttributes,
                                                            opcodeAttributes: opcodeAttributes,
                                                            operandAttributes: operandAttributes,
                                                            regionLookup: regionLookup,
                                                            scope: line.scope))
+            case let .macro(assembly):
+              accumulator.append(NSAttributedString(string: "    ", attributes: baseAttributes))
+              accumulator.append(assembly.attributedString(attributes: baseAttributes,
+                                                           opcodeAttributes: macroNameAttributes,
+                                                           operandAttributes: operandAttributes,
+                                                           regionLookup: regionLookup,
+                                                           scope: line.scope))
+
             case let .imagePlaceholder(format):
               switch format {
               case .oneBitPerPixel:
