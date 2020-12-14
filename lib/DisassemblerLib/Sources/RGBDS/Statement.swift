@@ -38,7 +38,7 @@ public struct Statement {
     }
     self.formattedOpcode = formattedOpcode
     self.tokenizedString = Statement.createTokenizedString(opcode: opcode, operands: operands)
-    self.formattedString = Statement.createFormattedString(opcode: formattedOpcode, operands: operands)
+    self.formattedString = Statement.createFormattedString(opcode: opcode, formattedOpcode: formattedOpcode, operands: operands)
   }
 
   /** Initializes the statement as a data representation of the given bytes. */
@@ -83,7 +83,7 @@ public struct Statement {
       self.operands = []
     }
     self.tokenizedString = Statement.createTokenizedString(opcode: opcode, operands: operands)
-    self.formattedString = Statement.createFormattedString(opcode: formattedOpcode, operands: operands)
+    self.formattedString = Statement.createFormattedString(opcode: opcode, formattedOpcode: formattedOpcode, operands: operands)
   }
 }
 
@@ -96,9 +96,9 @@ extension Statement: Equatable {
 // MARK: - Internal methods
 
 extension Statement {
-  private static func createFormattedString(opcode: String, operands: [String]) -> String {
+  private static func createFormattedString(opcode: String, formattedOpcode: String, operands: [String]) -> String {
     if !operands.isEmpty {
-      return "\(opcode) \(operands.joined(separator: ", "))"
+      return "\(formattedOpcode) \(operands.joined(separator: ", "))"
     }
     return opcode
   }
