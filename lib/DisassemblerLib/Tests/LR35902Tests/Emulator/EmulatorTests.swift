@@ -39,16 +39,16 @@ ld   [$ffcb], a
 
     var initialState = LR35902.CPUState()
 
-    initialState.a = LR35902.CPUState.RegisterState<UInt8>(value: .value(0b0000_1111), sourceLocation: 0)
-    initialState.ram[0xffcb] = .init(value: .value(0b0000_1100), sourceLocation: 0)
+    initialState.a = LR35902.CPUState.RegisterState<UInt8>(value: .literal(0b0000_1111), sourceLocation: 0)
+    initialState.ram[0xffcb] = .init(value: .literal(0b0000_1100), sourceLocation: 0)
 
     let states = disassembly.simulate(range: 0..<disassembly.cpu.cartridge.size,
                                       initialState: initialState).sorted(by: { $0.key < $1.key })
     let lastState = states[states.count - 1]
 
-    XCTAssertEqual(lastState.value.a, .init(value: .value(0b0000_1111), sourceLocation: 0))
-    XCTAssertEqual(lastState.value.c, .init(value: .value(0b0000_1111), sourceLocation: 0))
-    XCTAssertEqual(lastState.value.ram[0xffcb], .init(value: .value(0b0000_1111), sourceLocation: 0))
-    XCTAssertEqual(lastState.value.ram[0xffcc], .init(value: .value(0b0000_0011), sourceLocation: 4))
+    XCTAssertEqual(lastState.value.a, .init(value: .literal(0b0000_1111), sourceLocation: 0))
+    XCTAssertEqual(lastState.value.c, .init(value: .literal(0b0000_1111), sourceLocation: 0))
+    XCTAssertEqual(lastState.value.ram[0xffcb], .init(value: .literal(0b0000_1111), sourceLocation: 0))
+    XCTAssertEqual(lastState.value.ram[0xffcc], .init(value: .literal(0b0000_0011), sourceLocation: 4))
   }
 }
