@@ -452,34 +452,4 @@ ld hl, sp+$05
       XCTAssertEqual(disassembly.instructionMap[0x0000]?.spec, spec)
     }
   }
-
-  func testBoo() {
-    let results = RGBDSAssembler.assemble(assembly: """
-ld   c, a                                    ; $282A (00): ReadJoypadState $4F
-ld   a, [$ffcb]               ; $282B (00): ReadJoypadState $F0 $CB
-xor  c                                       ; $282D (00): ReadJoypadState $A9
-and  c                                       ; $282E (00): ReadJoypadState $A1
-ld   [$ffcc], a                       ; $282F (00): ReadJoypadState $E0 $CC
-ld   a, c                                    ; $2831 (00): ReadJoypadState $79
-ld   [$ffcb], a               ; $2832 (00): ReadJoypadState $E0 $CB
-""")
-
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
-    disassembly.disassemble(range: 0..<LR35902.Address(data.count), inBank: 0x00)
-
-    var initialState = LR35902.CPUState()
-
-    initialState.a = LR35902.CPUState.RegisterState<UInt8>(value: .value(0b0000_1111), sourceLocation: 0)
-    initialState.ram[0xffcb] = .init(value: .value(0b0000_1100), sourceLocation: 0)
-
-    let states = disassembly.simulate(range: 0..<LR35902.Cartridge.Location(data.count),
-                                      initialState: initialState).sorted(by: { $0.key < $1.key })
-    let lastState = states[states.count - 1]
-
-    XCTAssertEqual(lastState.value.a, .init(value: .value(0b0000_1111), sourceLocation: 0))
-    XCTAssertEqual(lastState.value.c, .init(value: .value(0b0000_1111), sourceLocation: 0))
-    XCTAssertEqual(lastState.value.ram[0xffcb], .init(value: .value(0b0000_1111), sourceLocation: 0))
-    XCTAssertEqual(lastState.value.ram[0xffcc], .init(value: .value(0b0000_0011), sourceLocation: 4))
-  }
 }

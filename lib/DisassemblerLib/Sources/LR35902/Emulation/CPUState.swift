@@ -2,6 +2,32 @@ import Foundation
 
 extension LR35902 {
   struct CPUState {
+    init(a: UInt8? = nil, b: UInt8? = nil,
+         c: UInt8? = nil, d: UInt8? = nil,
+         e: UInt8? = nil,
+         h: UInt8? = nil, l: UInt8? = nil) {
+      if let a = a {
+        self.a = .init(value: .value(a), sourceLocation: 0)
+      }
+      if let b = b {
+        self.b = .init(value: .value(b), sourceLocation: 0)
+      }
+      if let c = c {
+        self.c = .init(value: .value(c), sourceLocation: 0)
+      }
+      if let d = d {
+        self.d = .init(value: .value(d), sourceLocation: 0)
+      }
+      if let e = e {
+        self.e = .init(value: .value(e), sourceLocation: 0)
+      }
+      if let h = h {
+        self.h = .init(value: .value(h), sourceLocation: 0)
+      }
+      if let l = l {
+        self.l = .init(value: .value(l), sourceLocation: 0)
+      }
+    }
     enum RegisterValue<T: BinaryInteger>: Equatable {
       case variable(LR35902.Address)
       case value(T)
@@ -67,6 +93,8 @@ extension LR35902 {
         case .c: return c
         case .d: return d
         case .e: return e
+        case .h: return h
+        case .l: return l
         default: return nil
         }
       }
@@ -77,6 +105,8 @@ extension LR35902 {
         case .c: c = newValue
         case .d: d = newValue
         case .e: e = newValue
+        case .h: h = newValue
+        case .l: l = newValue
         default: break
         }
       }
