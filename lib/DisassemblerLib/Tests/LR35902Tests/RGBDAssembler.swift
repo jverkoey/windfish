@@ -468,9 +468,9 @@ ld   [$ffcb], a               ; $2832 (00): ReadJoypadState $E0 $CB
     let disassembly = LR35902.Disassembly(rom: data)
     disassembly.disassemble(range: 0..<LR35902.Address(data.count), inBank: 0x00)
 
-    var initialState = LR35902.Disassembly.CPUState()
+    var initialState = LR35902.CPUState()
 
-    initialState.a = LR35902.Disassembly.CPUState.RegisterState<UInt8>(value: .value(0b0000_1111), sourceLocation: 0)
+    initialState.a = LR35902.CPUState.RegisterState<UInt8>(value: .value(0b0000_1111), sourceLocation: 0)
     initialState.ram[0xffcb] = .init(value: .value(0b0000_1100), sourceLocation: 0)
 
     let states = disassembly.simulate(range: 0..<LR35902.Cartridge.Location(data.count),

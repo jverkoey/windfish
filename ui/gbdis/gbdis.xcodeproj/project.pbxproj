@@ -235,6 +235,7 @@
 				667B1BAD2578565A00CE670F /* OutlineViewController.swift */,
 				667B1BA82578563E00CE670F /* ContentViewController.swift */,
 				667B1C0125789BAE00CE670F /* InspectorViewController.swift */,
+				66ABD4B125871B00007F2788 /* Emulator */,
 				66783F842585B69F008C34FA /* Editors */,
 				66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */,
 			);
@@ -273,6 +274,13 @@
 				66ABD4A925871479007F2788 /* OpcodeDocumentation.swift */,
 			);
 			path = LR35902;
+			sourceTree = "<group>";
+		};
+		66ABD4B125871B00007F2788 /* Emulator */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Emulator;
 			sourceTree = "<group>";
 		};
 		66C617CA257F1AD500E372BA /* ViewControllers */ = {
