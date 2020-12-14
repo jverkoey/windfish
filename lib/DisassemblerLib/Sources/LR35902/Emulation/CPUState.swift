@@ -76,6 +76,7 @@ extension LR35902 {
       get {
         switch numeric {
         case .bc: return bc
+        case .de: return de
         case .hl: return hl
         default: return nil
         }
@@ -83,6 +84,7 @@ extension LR35902 {
       set {
         switch numeric {
         case .bc: bc = newValue
+        case .de: de = newValue
         case .hl: hl = newValue
         default: break
         }
