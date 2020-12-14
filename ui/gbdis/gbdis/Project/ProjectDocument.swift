@@ -494,7 +494,7 @@ extension RGBDS.Statement {
 
       let separator = ", "
       var accumulatedLength = 0
-      let operandStrings: [(String, (Int, String)?)] = operands.map { operand in
+      let operandStrings: [(String, (Int, String, String)?)] = operands.map { operand in
         let label: String
         if let scope = scope, operand.starts(with: ".") {
           label = scope + operand
@@ -505,7 +505,7 @@ extension RGBDS.Statement {
         let lengthSoFar = accumulatedLength
         accumulatedLength += operand.count + separator.count
         if regionLookup[label] != nil {
-          return (operand, (lengthSoFar, "gbdis://jumpto/\(label)"))
+          return (operand, (lengthSoFar, "gbdis://jumpto/\(label)", "Jump to \(label)"))
         } else {
           return (operand, nil)
         }
@@ -513,7 +513,9 @@ extension RGBDS.Statement {
       let operandString = NSMutableAttributedString(string: operandStrings.map { $0.0 }.joined(separator: separator),
                                                     attributes: operandAttributes)
       operandStrings.filter { $0.1 != nil }.forEach {
-        operandString.addAttribute(.link, value: $0.1!.1, range: NSRange(($0.1!.0..<$0.1!.0 + $0.0.count)))
+        let range = NSRange(($0.1!.0..<$0.1!.0 + $0.0.count))
+        operandString.addAttribute(.link, value: $0.1!.1, range: range)
+        operandString.addAttribute(.toolTip, value: $0.1!.2, range: range)
       }
       string.append(operandString)
     }
