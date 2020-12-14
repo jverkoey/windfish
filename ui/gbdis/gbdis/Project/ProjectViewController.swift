@@ -14,6 +14,7 @@ final class ProjectViewController: NSViewController {
   let containerView = NSView()
   let horizontalLine = HorizontalLine()
   let progressIndicator = NSProgressIndicator()
+  let statisticsView = StatisticsView()
   let splitViewController: NSSplitViewController
 
   let sidebarViewController: OutlineViewController
@@ -23,6 +24,7 @@ final class ProjectViewController: NSViewController {
   private var selectedFileDidChangeSubscriber: AnyCancellable?
   private var selectedRegionDidChangeSubscriber: AnyCancellable?
   private var didCreateRegionSubscriber: AnyCancellable?
+  private var disassembledSubscriber: AnyCancellable?
 
   init(document: ProjectDocument) {
     self.document = document
@@ -65,7 +67,7 @@ final class ProjectViewController: NSViewController {
   override func loadView() {
     view = NSView()
 
-    for subview in [containerView, horizontalLine, progressIndicator] {
+    for subview in [containerView, horizontalLine, progressIndicator, statisticsView] {
       subview.translatesAutoresizingMaskIntoConstraints = false
       view.addSubview(subview)
     }
@@ -82,6 +84,9 @@ final class ProjectViewController: NSViewController {
     progressIndicator.style = .spinning
     progressIndicator.isHidden = true
 
+    let bottomBarLayoutGuide = NSLayoutGuide()
+    view.addLayoutGuide(bottomBarLayoutGuide)
+
     NSLayoutConstraint.activate([
       // Container view
       containerView.leftAnchor.constraint(equalTo: view.leftAnchor),
@@ -94,9 +99,19 @@ final class ProjectViewController: NSViewController {
       horizontalLine.rightAnchor.constraint(equalTo: view.rightAnchor),
       horizontalLine.topAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -1),
 
+      // Bottom bar layout guide
+      bottomBarLayoutGuide.leftAnchor.constraint(equalTo: view.leftAnchor),
+      bottomBarLayoutGuide.rightAnchor.constraint(equalTo: view.rightAnchor),
+      bottomBarLayoutGuide.topAnchor.constraint(equalTo: containerView.bottomAnchor),
+      bottomBarLayoutGuide.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+
       // Progress indicator
-      progressIndicator.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
-      progressIndicator.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -7)
+      progressIndicator.leadingAnchor.constraint(equalToSystemSpacingAfter: bottomBarLayoutGuide.leadingAnchor, multiplier: 1),
+      progressIndicator.bottomAnchor.constraint(equalTo: bottomBarLayoutGuide.bottomAnchor, constant: -7),
+
+      // Statistics view
+      statisticsView.leadingAnchor.constraint(equalToSystemSpacingAfter: progressIndicator.trailingAnchor, multiplier: 1),
+      statisticsView.centerYAnchor.constraint(equalTo: bottomBarLayoutGuide.centerYAnchor),
     ] + constraints(for: splitViewController.view, filling: containerView))
 
     var lastSelectedFile: String? = nil
@@ -140,6 +155,12 @@ final class ProjectViewController: NSViewController {
         }
         self.inspectorViewController.tabViewController.tabViewController.selectedTabViewItemIndex = 0
         self.inspectorViewController.regionEditorViewController.elementsController.setSelectedObjects([region])
+      })
+
+    disassembledSubscriber = NotificationCenter.default.publisher(for: .disassembled, object: document)
+      .receive(on: RunLoop.main)
+      .sink(receiveValue: { notification in
+        self.statisticsView.statistics = self.document.disassemblyResults?.statistics
       })
 
     if document.isDisassembling {

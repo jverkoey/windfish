@@ -29,6 +29,7 @@
 		667B1BA92578563E00CE670F /* ContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1BA82578563E00CE670F /* ContentViewController.swift */; };
 		667B1BAE2578565A00CE670F /* OutlineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1BAD2578565A00CE670F /* OutlineViewController.swift */; };
 		667B1C0225789BAE00CE670F /* InspectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1C0125789BAE00CE670F /* InspectorViewController.swift */; };
+		66ABD4A425870117007F2788 /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ABD4A325870117007F2788 /* StatisticsView.swift */; };
 		66C617C6257F04D600E372BA /* RegionInspectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */; };
 		66C617CC257F1AE200E372BA /* TabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617CB257F1AE200E372BA /* TabViewController.swift */; };
 		66C617DC257F202B00E372BA /* DataTypeEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617DB257F202B00E372BA /* DataTypeEditorViewController.swift */; };
@@ -83,6 +84,7 @@
 		667B1BA82578563E00CE670F /* ContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewController.swift; sourceTree = "<group>"; };
 		667B1BAD2578565A00CE670F /* OutlineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineViewController.swift; sourceTree = "<group>"; };
 		667B1C0125789BAE00CE670F /* InspectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InspectorViewController.swift; sourceTree = "<group>"; };
+		66ABD4A325870117007F2788 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
 		66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegionInspectorViewController.swift; sourceTree = "<group>"; };
 		66C617CB257F1AE200E372BA /* TabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewController.swift; sourceTree = "<group>"; };
 		66C617DB257F202B00E372BA /* DataTypeEditorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataTypeEditorViewController.swift; sourceTree = "<group>"; };
@@ -189,6 +191,7 @@
 				66763D96257C0D4900824278 /* TextView.swift */,
 				66521DA8257C996B0088C97B /* LineNumberView.swift */,
 				66C617E3257F24E000E372BA /* EditorTableView.swift */,
+				66ABD4A325870117007F2788 /* StatisticsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -415,6 +418,7 @@
 				66763D732579F26000824278 /* RegionEditorViewController.swift in Sources */,
 				665D4F5B2575F75400C3A03B /* ProjectViewController.swift in Sources */,
 				667B1B632578541F00CE670F /* NotificationNames.swift in Sources */,
+				66ABD4A425870117007F2788 /* StatisticsView.swift in Sources */,
 				667B1B8B2578554600CE670F /* ProjectOutlineNode.swift in Sources */,
 				665D4F592575F75400C3A03B /* AppDelegate.swift in Sources */,
 				66763D97257C0D4900824278 /* TextView.swift in Sources */,
