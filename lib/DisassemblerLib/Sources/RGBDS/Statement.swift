@@ -5,7 +5,7 @@ import FoundationExtensions
 public let maxOpcodeNameLength = 4
 
 /** A concrete representation of a single executable statement of RGBDS assembly. */
-public struct Statement: Equatable {
+public struct Statement {
   // BEGIN ORDER MATTERS DUE TO MIRROR DESCENDANT ASSUMPTIONS
   /** The statement's instruction code. */
   public let opcode: String
@@ -22,6 +22,9 @@ public struct Statement: Equatable {
 
   /** A tokenized representation of this statement that can be used for generalized lookups. */
   public let tokenizedString: String
+
+  /** Optional context that may be associated with this statement, typically an instruction specification.*/
+  public var context: Any?
 
   /** Initializes the statement with an opcode and operands. */
   public init(opcode: String, operands: [String] = []) {
@@ -81,6 +84,12 @@ public struct Statement: Equatable {
     }
     self.tokenizedString = Statement.createTokenizedString(opcode: opcode, operands: operands)
     self.formattedString = Statement.createFormattedString(opcode: formattedOpcode, operands: operands)
+  }
+}
+
+extension Statement: Equatable {
+  public static func == (lhs: Statement, rhs: Statement) -> Bool {
+    return lhs.opcode == rhs.opcode && lhs.operands == rhs.operands
   }
 }
 

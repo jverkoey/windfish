@@ -488,7 +488,14 @@ extension RGBDS.Statement {
                         scope: String?) -> NSAttributedString {
     let string = NSMutableAttributedString()
     string.beginEditing()
-    string.append(NSAttributedString(string: formattedOpcode, attributes: opcodeAttributes))
+    if let spec = context as? LR35902.Instruction.Spec,
+       let documentation = opcodeDocumentation[spec] {
+      var attributesWithDocs = opcodeAttributes
+      attributesWithDocs[.toolTip] = documentation
+      string.append(NSAttributedString(string: formattedOpcode, attributes: attributesWithDocs))
+    } else {
+      string.append(NSAttributedString(string: formattedOpcode, attributes: opcodeAttributes))
+    }
     if !operands.isEmpty {
       string.append(NSAttributedString(string: " ", attributes: attributes))
 

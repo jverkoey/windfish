@@ -26,12 +26,18 @@ final class RGBDSDisassembler {
       preconditionFailure("Could not find opcode for \(instruction.spec).")
     }
 
+    var statement: Statement
     if let operands = operands(for: instruction, with: context) {
       // Operands should never be empty.
       precondition(operands.first(where: { $0.isEmpty }) == nil)
 
-      return Statement(opcode: opcode, operands: operands)
+      statement = Statement(opcode: opcode, operands: operands)
+    } else {
+      statement = Statement(opcode: opcode)
     }
-    return Statement(opcode: opcode)
+
+    statement.context = instruction.spec
+
+    return statement
   }
 }

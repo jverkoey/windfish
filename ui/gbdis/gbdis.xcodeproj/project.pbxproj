@@ -30,6 +30,7 @@
 		667B1BAE2578565A00CE670F /* OutlineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1BAD2578565A00CE670F /* OutlineViewController.swift */; };
 		667B1C0225789BAE00CE670F /* InspectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1C0125789BAE00CE670F /* InspectorViewController.swift */; };
 		66ABD4A425870117007F2788 /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ABD4A325870117007F2788 /* StatisticsView.swift */; };
+		66ABD4AA25871479007F2788 /* OpcodeDocumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ABD4A925871479007F2788 /* OpcodeDocumentation.swift */; };
 		66C617C6257F04D600E372BA /* RegionInspectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */; };
 		66C617CC257F1AE200E372BA /* TabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617CB257F1AE200E372BA /* TabViewController.swift */; };
 		66C617DC257F202B00E372BA /* DataTypeEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617DB257F202B00E372BA /* DataTypeEditorViewController.swift */; };
@@ -85,6 +86,7 @@
 		667B1BAD2578565A00CE670F /* OutlineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineViewController.swift; sourceTree = "<group>"; };
 		667B1C0125789BAE00CE670F /* InspectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InspectorViewController.swift; sourceTree = "<group>"; };
 		66ABD4A325870117007F2788 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
+		66ABD4A925871479007F2788 /* OpcodeDocumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpcodeDocumentation.swift; sourceTree = "<group>"; };
 		66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegionInspectorViewController.swift; sourceTree = "<group>"; };
 		66C617CB257F1AE200E372BA /* TabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewController.swift; sourceTree = "<group>"; };
 		66C617DB257F202B00E372BA /* DataTypeEditorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataTypeEditorViewController.swift; sourceTree = "<group>"; };
@@ -143,6 +145,7 @@
 		665D4F572575F75400C3A03B /* gbdis */ = {
 			isa = PBXGroup;
 			children = (
+				66ABD4A825871458007F2788 /* LR35902 */,
 				66763D7E257AF37900824278 /* Formatters */,
 				667B1B982578559600CE670F /* AutoLayout */,
 				667B1B8F2578557100CE670F /* FoundationExtensions */,
@@ -262,6 +265,14 @@
 				667B1B99257855AE00CE670F /* CommonConstraints.swift */,
 			);
 			path = AutoLayout;
+			sourceTree = "<group>";
+		};
+		66ABD4A825871458007F2788 /* LR35902 */ = {
+			isa = PBXGroup;
+			children = (
+				66ABD4A925871479007F2788 /* OpcodeDocumentation.swift */,
+			);
+			path = LR35902;
 			sourceTree = "<group>";
 		};
 		66C617CA257F1AD500E372BA /* ViewControllers */ = {
@@ -425,6 +436,7 @@
 				665D4F8D2575F92500C3A03B /* main.swift in Sources */,
 				667B1BAE2578565A00CE670F /* OutlineViewController.swift in Sources */,
 				665D4F5D2575F75400C3A03B /* ProjectDocument.swift in Sources */,
+				66ABD4AA25871479007F2788 /* OpcodeDocumentation.swift in Sources */,
 				665D4FAE257727CA00C3A03B /* HorizontalLine.swift in Sources */,
 				66783F802585B694008C34FA /* MacroEditorViewController.swift in Sources */,
 				667B1C0225789BAE00CE670F /* InspectorViewController.swift in Sources */,
