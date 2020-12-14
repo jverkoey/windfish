@@ -3,7 +3,7 @@ import XCTest
 
 class CPUStateTests: XCTestCase {
 
-  // MARK: - Initialization
+  // MARK: - 8-bit initialization
 
   func test_initializes_a() throws {
     var mutatedState = LR35902.CPUState()
@@ -62,5 +62,84 @@ class CPUStateTests: XCTestCase {
   func test_hl_is_h_and_l() throws {
     let state = LR35902.CPUState(h: 0x01, l: 0x20)
     XCTAssertEqual(state.hl, LR35902.CPUState.RegisterState<UInt16>(value: .literal(0x0120), sourceLocation: 0))
+  }
+
+  // MARK: - 8-bit subscripts
+
+  func test_a_subscript() throws {
+    let state = LR35902.CPUState(a: 1)
+    XCTAssertEqual(state[.a], LR35902.CPUState.RegisterState<UInt8>(value: .literal(1), sourceLocation: 0))
+  }
+
+  func test_b_subscript() throws {
+    let state = LR35902.CPUState(b: 1)
+    XCTAssertEqual(state[.b], LR35902.CPUState.RegisterState<UInt8>(value: .literal(1), sourceLocation: 0))
+  }
+
+  func test_c_subscript() throws {
+    let state = LR35902.CPUState(c: 1)
+    XCTAssertEqual(state[.c], LR35902.CPUState.RegisterState<UInt8>(value: .literal(1), sourceLocation: 0))
+  }
+
+  func test_d_subscript() throws {
+    let state = LR35902.CPUState(d: 1)
+    XCTAssertEqual(state[.d], LR35902.CPUState.RegisterState<UInt8>(value: .literal(1), sourceLocation: 0))
+  }
+
+  func test_e_subscript() throws {
+    let state = LR35902.CPUState(e: 1)
+    XCTAssertEqual(state[.e], LR35902.CPUState.RegisterState<UInt8>(value: .literal(1), sourceLocation: 0))
+  }
+
+  func test_h_subscript() throws {
+    let state = LR35902.CPUState(h: 1)
+    XCTAssertEqual(state[.h], LR35902.CPUState.RegisterState<UInt8>(value: .literal(1), sourceLocation: 0))
+  }
+
+  func test_l_subscript() throws {
+    let state = LR35902.CPUState(l: 1)
+    XCTAssertEqual(state[.l], LR35902.CPUState.RegisterState<UInt8>(value: .literal(1), sourceLocation: 0))
+  }
+
+  func test_a_subscript_setter() throws {
+    var state = LR35902.CPUState()
+    state[.a] = LR35902.CPUState.RegisterState<UInt8>(value: .literal(1), sourceLocation: 0)
+    XCTAssertEqual(state[.a], LR35902.CPUState.RegisterState<UInt8>(value: .literal(1), sourceLocation: 0))
+  }
+
+  func test_b_subscript_setter() throws {
+    var state = LR35902.CPUState()
+    state[.b] = LR35902.CPUState.RegisterState<UInt8>(value: .literal(1), sourceLocation: 0)
+    XCTAssertEqual(state[.b], LR35902.CPUState.RegisterState<UInt8>(value: .literal(1), sourceLocation: 0))
+  }
+
+  func test_c_subscript_setter() throws {
+    var state = LR35902.CPUState()
+    state[.c] = LR35902.CPUState.RegisterState<UInt8>(value: .literal(1), sourceLocation: 0)
+    XCTAssertEqual(state[.c], LR35902.CPUState.RegisterState<UInt8>(value: .literal(1), sourceLocation: 0))
+  }
+
+  func test_d_subscript_setter() throws {
+    var state = LR35902.CPUState()
+    state[.d] = LR35902.CPUState.RegisterState<UInt8>(value: .literal(1), sourceLocation: 0)
+    XCTAssertEqual(state[.d], LR35902.CPUState.RegisterState<UInt8>(value: .literal(1), sourceLocation: 0))
+  }
+
+  func test_e_subscript_setter() throws {
+    var state = LR35902.CPUState()
+    state[.e] = LR35902.CPUState.RegisterState<UInt8>(value: .literal(1), sourceLocation: 0)
+    XCTAssertEqual(state[.e], LR35902.CPUState.RegisterState<UInt8>(value: .literal(1), sourceLocation: 0))
+  }
+
+  func test_h_subscript_setter() throws {
+    var state = LR35902.CPUState()
+    state[.h] = LR35902.CPUState.RegisterState<UInt8>(value: .literal(1), sourceLocation: 0)
+    XCTAssertEqual(state[.h], LR35902.CPUState.RegisterState<UInt8>(value: .literal(1), sourceLocation: 0))
+  }
+
+  func test_l_subscript_setter() throws {
+    var state = LR35902.CPUState()
+    state[.l] = LR35902.CPUState.RegisterState<UInt8>(value: .literal(1), sourceLocation: 0)
+    XCTAssertEqual(state[.l], LR35902.CPUState.RegisterState<UInt8>(value: .literal(1), sourceLocation: 0))
   }
 }
