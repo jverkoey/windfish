@@ -4,26 +4,17 @@
 import PackageDescription
 
 let package = Package(
-  name: "DisassemblerLib",
+  name: "Windfish",
   platforms: [
-    .iOS("13.0"),
     .macOS("10.15")
   ],
   products: [
-    .executable(
-      name: "gbdis",
-      targets: ["gbdis"]),
     .library(
       name: "LR35902",
       targets: ["LR35902"]
     )
   ],
   targets: [
-    .target(
-      name: "gbdis",
-      dependencies: [
-        "LR35902",
-      ]),
     .target(
       name: "LR35902",
       dependencies: [
