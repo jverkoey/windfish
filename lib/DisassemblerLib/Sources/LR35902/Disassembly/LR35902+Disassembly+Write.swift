@@ -1,6 +1,5 @@
 import Foundation
 
-import AssemblyGenerator
 import CPU
 import RGBDS
 
