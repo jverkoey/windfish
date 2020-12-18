@@ -9,6 +9,9 @@ struct SimpleCPU {
     let immediate: ImmediateValue?
 
     enum ImmediateValue: CPU.InstructionImmediate {
+      case imm8(UInt8)
+      case imm16(UInt16)
+
       public init?(data: Data) {
         switch data.count {
         case 1:
@@ -34,8 +37,6 @@ struct SimpleCPU {
         }
       }
 
-      case imm8(UInt8)
-      case imm16(UInt16)
     }
 
     /** The shape of an instruction for this CPU. */
