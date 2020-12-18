@@ -3,7 +3,7 @@
 The Windfish disassembler is written in Swift. It relies heavily on Swift language features to provide a disassembly library that is
 both flexible and expressive.
 
-## The CPU
+## Defining a hypothetical CPU
 
 At its core, Windfish defines an protocol-based representation of a CPU and the instructions it is able to execute.
 
