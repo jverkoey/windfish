@@ -4,7 +4,7 @@ Windfish is a disassembler for Gameboy ROMs that can generate [RBGDS](https://gi
 
 ## Background
 
-This project was originally initiated to support [archaelogical efforts]https://kemenaran.winosx.com/posts/category-disassembling-links-awakening) aimed at understanding the implementation details behind Link's Awakening for the original Gameboy. The name "Windfish" is a reference to the main focus of the Link's Awakening storyline.
+This project was originally initiated to support [archaelogical efforts](https://kemenaran.winosx.com/posts/category-disassembling-links-awakening) aimed at understanding the implementation details behind Link's Awakening for the original Gameboy. The name "Windfish" is a reference to the main focus of the Link's Awakening storyline.
 
 ## Overview
 
