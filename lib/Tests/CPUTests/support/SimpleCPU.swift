@@ -5,7 +5,8 @@ import CPU
 struct SimpleCPU {
   /** A concrete representation of a single instruction for this CPU. */
   struct Instruction: CPU.Instruction {
-    let spec: Instruction.Spec
+    let spec: Spec
+    let immediate: ImmediateValue?
 
     enum ImmediateValue: CPU.InstructionImmediate {
       public init?(data: Data) {
@@ -36,7 +37,6 @@ struct SimpleCPU {
       case imm8(UInt8)
       case imm16(UInt16)
     }
-    let immediate: ImmediateValue?
 
     /** The shape of an instruction for this CPU. */
     indirect enum Spec: CPU.InstructionSpec {
