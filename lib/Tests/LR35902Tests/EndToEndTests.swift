@@ -63,10 +63,9 @@ class EndToEndTests: XCTestCase {
 
     let updateGoldens = false
 
-    let goldensPath = try XCTUnwrap(Bundle.module.resourcePath)
-    let goldensUrl = URL(fileURLWithPath: goldensPath).appendingPathComponent("Resources/goldens")
     try disassemblyFiles.forEach { key, value in
-      let goldenUrl = goldensUrl.appendingPathComponent(key)
+      let path = try XCTUnwrap(Bundle.module.path(forResource: key, ofType: nil, inDirectory: "Resources/goldens"))
+      let goldenUrl = URL(fileURLWithPath: path)
       if updateGoldens {
         try value.write(to: goldenUrl, atomically: true, encoding: .utf8)
         print(goldenUrl)
