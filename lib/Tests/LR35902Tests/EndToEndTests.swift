@@ -9,7 +9,7 @@ class EndToEndTests: XCTestCase {
     XCTAssertNotNil(path)
   }
 
-  func testWallTimePerformance() throws {
+  func disable_testWallTimePerformance() throws {
     let path = try XCTUnwrap(Bundle.module.path(forResource: "Resources/2048", ofType: "gb"))
     let rom = try Data(contentsOf: URL(fileURLWithPath: path))
 
@@ -21,7 +21,7 @@ class EndToEndTests: XCTestCase {
     }
   }
 
-  func testCPUPerformance() throws {
+  func disable_testCPUPerformance() throws {
     let path = try XCTUnwrap(Bundle.module.path(forResource: "Resources/2048", ofType: "gb"))
     let rom = try Data(contentsOf: URL(fileURLWithPath: path))
 
