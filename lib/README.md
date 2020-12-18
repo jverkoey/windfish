@@ -31,3 +31,27 @@ enum Spec: CPU.InstructionSpec {
   }
 }
 ```
+
+This specification allows us to represent any of the following instructions:
+
+```swift
+.nop
+.cp(.a)
+.cp(.imm8)
+.ld(.a, .imm8)
+.call(nil, .imm16)
+.call(.z, .imm16)
+```
+
+These specifications can be used to create an instruction table where each index maps to the binary value of a corresponding instruction specification:
+
+```swift
+static let table: [Instruction.Spec] = [
+  /* 0x00 */ .nop,
+  /* 0x01 */ .ld(.a, .imm8),
+  /* 0x02 */ .ld(.a, .imm16),
+  /* 0x03 */ .call(.nz, .imm16),
+  /* 0x04 */ .call(nil, .imm16),
+  /* 0x05 */ .prefix(.sub),
+]
+```
