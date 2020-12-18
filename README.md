@@ -2,6 +2,10 @@
 
 Windfish is a disassembler for Gameboy ROMs that can generate [RBGDS](https://github.com/gbdev/rgbds)-compatible assembly code.
 
+## Background
+
+This project was originally initiated to support [archaelogical efforts]https://kemenaran.winosx.com/posts/category-disassembling-links-awakening) aimed at understanding the implementation details behind Link's Awakening for the original Gameboy. The name "Windfish" is a reference to the main focus of the Link's Awakening storyline.
+
 ## Overview
 
 The core design principle of the Windfish disassembler is to maximize legibility of generated assembly code with minimal configuration.
@@ -16,7 +20,7 @@ Windfish supports several powerful features for disassembling Gameboy ROMs, incl
 - **Macros**: Common assembly patterns can be registered and, when detected, generated as RGBDS macros.
 - **Scope awareness**: Contiguous blocks of scope are inferred during disassembly.
 
-## Usage
+## KoholintIsland
 
 ![The Koholint Island frontend for Windfish](docs/koholintisland.png)
 
