@@ -7,7 +7,7 @@ both flexible and expressive.
 
 At its core, Windfish defines an protocol-based representation of a CPU and the instructions it is able to execute.
 
-Implementing a CPU starts by implementing the `InstructionSpec` protocol, typically as an enum. The `InstructionSpec` type both defines the potential shape of an instruction and the assembly language names of the instructions. In the example below, we define an instruction specification that is able to represent four different types of operations, most accepting one or more operands:
+Implementing a CPU starts by implementing the `InstructionSpec` protocol, typically as an enum. The `InstructionSpec` type defines both the potential shape of an instruction and the assembly language names of the instructions. In the example below, we define an instruction specification that is able to represent four different types of operations, most accepting one or more operands:
 
 ```swift
 enum Spec: CPU.InstructionSpec {
