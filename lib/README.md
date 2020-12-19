@@ -5,7 +5,7 @@ both flexible and expressive.
 
 ## Defining a hypothetical CPU
 
-At its core, Windfish defines an protocol-based representation of a CPU and the instructions it is able to execute.
+At its core, Windfish defines a protocol-based representation of an abstract CPU's instruction set that supports bi-directional coding between binary and semantic representations of the instructions.
 
 ### Defining the shape of an instruction
 
@@ -45,7 +45,7 @@ This specification allows us to represent any of the following instructions:
 .call(.z, .imm16)
 ```
 
-### Defining the instruction set
+### Defining an instruction set
 
 Instruction specifications can be used to create an instruction table where each index maps to the binary value of a corresponding instruction specification:
 
@@ -56,11 +56,47 @@ static let table: [Instruction.Spec] = [
   /* 0x02 */ .ld(.a, .imm16),
   /* 0x03 */ .call(.nz, .imm16),
   /* 0x04 */ .call(nil, .imm16),
-  /* 0x05 */ .prefix(.sub),
 ]
 ```
 
-### Defining the instruction
+This table is then stored within an `InstructionSet`:
+
+```swift
+struct InstructionSet: CPU.InstructionSet {
+  typealias InstructionType = Instruction
+
+  static let table: [Instruction.Spec] = [
+    /* 0x00 */ .nop,
+    /* 0x01 */ .ld(.a, .imm8),
+    /* 0x02 */ .ld(.a, .imm16),
+    /* 0x03 */ .call(.nz, .imm16),
+    /* 0x04 */ .call(nil, .imm16),
+  ]
+  static var prefixTables: [Instruction.Spec: [Instruction.Spec]] = []
+}
+```
+
+The `InstructionSet` type defines common methods for working with an instruction set including the ability to compute the width of an instruction and converting the instruction's opcode to byte and assembly representations. 
+
+```swift
+struct InstructionSet: CPU.InstructionSet {
+  // ...
+
+  static var widths: [Instruction.Spec : InstructionWidth<UInt16>] = {
+    return computeAllWidths()
+  }()
+
+  static var opcodeBytes: [Instruction.Spec : [UInt8]] = {
+    return computeAllOpcodeBytes()
+  }()
+
+  static var opcodeStrings: [Instruction.Spec : String] = {
+    return computeAllOpcodeStrings()
+  }()
+}
+```
+
+### Defining an instruction
 
 Instruction specifications form the basis by which real instructions are represented. A real instruction consists of both an instruction specification and any optional immediate values associated with the instruction. 
 

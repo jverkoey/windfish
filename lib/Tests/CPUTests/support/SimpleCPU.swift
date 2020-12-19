@@ -95,7 +95,7 @@ struct SimpleCPU {
       return computeAllOpcodeBytes()
     }()
 
-    static var opcodeStrings: [SpecType : String] = {
+    static var opcodeStrings: [Instruction.Spec : String] = {
       return computeAllOpcodeStrings()
     }()
   }
