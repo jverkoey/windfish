@@ -93,7 +93,7 @@ ld   e, a
     XCTAssertEqual(trace[2].value.bank, 0x00)
   }
 
-  func test_ld_a_addr__xor_imm8__ld_e_a() {
+  func test_ld_a_addr__and_imm8__ld_e_a() {
     let disassembly = disassemblyInitialized(with: """
 ld   a, [$D6FD]
 and  %01111111
@@ -113,6 +113,7 @@ ld   e, a
     XCTAssertEqual(trace[0].value.pc, 0x0003)
     XCTAssertEqual(trace[0].value.bank, 0x00)
 
+    // TODO: a should capture the and operation that affected it here somehow.
     XCTAssertEqual(trace[1].value.a, .init(value: .variable(0xD6FD), sourceLocation: 0))
     XCTAssertEqual(trace[1].value.b, nil)
     XCTAssertEqual(trace[1].value.c, nil)
