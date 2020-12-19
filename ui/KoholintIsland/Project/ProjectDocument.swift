@@ -135,6 +135,30 @@ final class DisassemblyResults: NSObject {
     self.disassembly = disassembly
   }
 
+  func lineFor(address: LR35902.Address, bank: LR35902.Bank) -> Int? {
+    guard let bankLines = bankLines?[bank] else {
+      return nil
+    }
+    guard let lineIndex = bankLines.firstIndex(where: { line in
+      switch line.semantic {
+      case .instruction, .macro:
+        if let lineAddress = line.address {
+          return lineAddress >= address
+        }
+        fallthrough
+      default:
+        return false
+      }
+    }) else {
+      return nil
+    }
+    if let lineAddress = bankLines[lineIndex].address, lineAddress > address {
+      // In between lines, so return the previous line.
+      return lineIndex - 1
+    }
+    return lineIndex
+  }
+
   var files: [String: Data]
   var bankLines: [LR35902.Bank: [LR35902.Disassembly.Line]]?
   var bankTextStorage: [LR35902.Bank: NSAttributedString]?
@@ -166,7 +190,13 @@ class ProjectDocument: NSDocument {
   @objc dynamic var disassemblyResults: DisassemblyResults?
   var metadata: ProjectMetadata?
   var configuration = ProjectConfiguration()
-  var cpuState = LR35902.CPUState(pc: 0x100, bank: 0x00)
+  var cpuState = LR35902.CPUState(pc: 0x100, bank: 0x00) {
+    didSet {
+      if oldValue.pc != cpuState.pc || oldValue.bank != cpuState.bank {
+        NotificationCenter.default.post(name: .didChangeEmulationLocation, object: self)
+      }
+    }
+  }
 
   override init() {
     super.init()
