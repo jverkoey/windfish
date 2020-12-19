@@ -55,8 +55,6 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   let programCounterTextField = NSTextField()
   let instructionAssemblyLabel = CreateLabel()
 
-  var cpuState = LR35902.CPUState(pc: 0x100, bank: 0x00)
-
   init(document: ProjectDocument) {
     self.document = document
 
@@ -102,7 +100,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
     programCounterTextField.translatesAutoresizingMaskIntoConstraints = false
     programCounterTextField.formatter = LR35902AddressFormatter()
-    programCounterTextField.stringValue = programCounterTextField.formatter!.string(for: cpuState.pc)!
+    programCounterTextField.stringValue = programCounterTextField.formatter!.string(for: document.cpuState.pc)!
     programCounterTextField.identifier = .programCounter
     programCounterTextField.delegate = self
     view.addSubview(programCounterTextField)
@@ -116,7 +114,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     let bankTextField = NSTextField()
     bankTextField.translatesAutoresizingMaskIntoConstraints = false
     bankTextField.formatter = UInt8HexFormatter()
-    bankTextField.stringValue = programCounterTextField.formatter!.string(for: cpuState.bank)!
+    bankTextField.stringValue = programCounterTextField.formatter!.string(for: document.cpuState.bank)!
     bankTextField.identifier = .bank
     bankTextField.delegate = self
     view.addSubview(bankTextField)
@@ -199,18 +197,18 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       }
       switch register.state {
       case "Unknown":
-        self.cpuState.clear(register.register)
+        self.document.cpuState.clear(register.register)
       case "Literal":
         if LR35902.Instruction.Numeric.registers8.contains(register.register) {
-          self.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt8>(value: .literal(UInt8(register.value)), sourceLocation: register.sourceLocation)
+          self.document.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt8>(value: .literal(UInt8(register.value)), sourceLocation: register.sourceLocation)
         } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
-          self.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt16>(value: .literal(register.value), sourceLocation: register.sourceLocation)
+          self.document.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt16>(value: .literal(register.value), sourceLocation: register.sourceLocation)
         }
       case "Address":
         if LR35902.Instruction.Numeric.registers8.contains(register.register) {
-          self.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt8>(value: .variable(register.value), sourceLocation: register.sourceLocation)
+          self.document.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt8>(value: .variable(register.value), sourceLocation: register.sourceLocation)
         } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
-          self.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt16>(value: .variable(register.value), sourceLocation: register.sourceLocation)
+          self.document.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt16>(value: .variable(register.value), sourceLocation: register.sourceLocation)
         }
       default:
         preconditionFailure()
@@ -298,12 +296,12 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       guard let instruction = currentInstruction() else {
         return
       }
-      cpuState = cpuState.emulate(instruction: instruction)
-      programCounterTextField.objectValue = cpuState.pc
+      document.cpuState = document.cpuState.emulate(instruction: instruction)
+      programCounterTextField.objectValue = document.cpuState.pc
       updateInstructionAssembly()
       updateRegisters()
 
-      ramController.content = cpuState.ram.map { address, value -> RAMValue in
+      ramController.content = document.cpuState.ram.map { address, value -> RAMValue in
         switch value.value {
         case .literal(let literalValue):
           return RAMValue(address: address, state: "Literal", value: UInt16(literalValue), sourceLocation: value.sourceLocation)
@@ -323,9 +321,9 @@ extension EmulatorViewController: NSTextFieldDelegate {
     }
     switch identifier {
     case .bank:
-      cpuState.bank = textField.objectValue as! LR35902.Bank
+      document.cpuState.bank = textField.objectValue as! LR35902.Bank
     case .programCounter:
-      cpuState.pc = textField.objectValue as! LR35902.Address
+      document.cpuState.pc = textField.objectValue as! LR35902.Address
     default:
       preconditionFailure()
     }
@@ -334,7 +332,7 @@ extension EmulatorViewController: NSTextFieldDelegate {
   }
 
   private func currentInstruction() -> LR35902.Instruction? {
-    return document.disassemblyResults?.disassembly?.instruction(at: cpuState.pc, in: cpuState.bank)
+    return document.disassemblyResults?.disassembly?.instruction(at: document.cpuState.pc, in: document.cpuState.bank)
   }
 
   private func updateInstructionAssembly() {
@@ -347,8 +345,8 @@ extension EmulatorViewController: NSTextFieldDelegate {
     }
 
     let context = RGBDSDisassembler.Context(
-      address: cpuState.pc,
-      bank: cpuState.bank,
+      address: document.cpuState.pc,
+      bank: document.cpuState.bank,
       disassembly: disassembly,
       argumentString: nil
     )
@@ -359,7 +357,7 @@ extension EmulatorViewController: NSTextFieldDelegate {
   func updateRegisters() {
     for register in cpuController.arrangedObjects as! [CPURegister] {
       if LR35902.Instruction.Numeric.registers8.contains(register.register) {
-        let value: LR35902.CPUState.RegisterState<UInt8>? = self.cpuState[register.register]
+        let value: LR35902.CPUState.RegisterState<UInt8>? = self.document.cpuState[register.register]
 
         register.sourceLocation = value?.sourceLocation ?? 0
 
@@ -375,7 +373,7 @@ extension EmulatorViewController: NSTextFieldDelegate {
           register.value = address
         }
       } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
-        let value: LR35902.CPUState.RegisterState<UInt16>? = self.cpuState[register.register]
+        let value: LR35902.CPUState.RegisterState<UInt16>? = self.document.cpuState[register.register]
 
         register.sourceLocation = value?.sourceLocation ?? 0
 

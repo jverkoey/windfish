@@ -166,6 +166,7 @@ class ProjectDocument: NSDocument {
   @objc dynamic var disassemblyResults: DisassemblyResults?
   var metadata: ProjectMetadata?
   var configuration = ProjectConfiguration()
+  var cpuState = LR35902.CPUState(pc: 0x100, bank: 0x00)
 
   override init() {
     super.init()
