@@ -30,6 +30,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   let cpuController = NSArrayController()
   let registerStateController = NSArrayController()
   var tableView: NSTableView?
+  let instructionAssemblyLabel = CreateLabel()
 
   var cpuState = LR35902.CPUState(pc: 0x100, bank: 0x00)
 
@@ -87,7 +88,6 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     instructionLabel.stringValue = "Instruction:"
     view.addSubview(instructionLabel)
 
-    let instructionAssemblyLabel = CreateLabel()
     instructionAssemblyLabel.translatesAutoresizingMaskIntoConstraints = false
     instructionAssemblyLabel.stringValue = "call $2881"
     instructionAssemblyLabel.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
@@ -176,6 +176,8 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     tableView.bind(.content, to: cpuController, withKeyPath: "arrangedObjects", options: nil)
     tableView.bind(.selectionIndexes, to: cpuController, withKeyPath:"selectionIndexes", options: nil)
     tableView.bind(.sortDescriptors, to: cpuController, withKeyPath: "sortDescriptors", options: nil)
+
+    updateInstructionAssembly()
   }
 }
 
@@ -188,13 +190,32 @@ extension EmulatorViewController: NSTextFieldDelegate {
     switch identifier {
     case .bank:
       cpuState.bank = textField.objectValue as! LR35902.Bank
-      break
     case .programCounter:
       cpuState.pc = textField.objectValue as! LR35902.Address
-      break
     default:
       preconditionFailure()
     }
+
+    updateInstructionAssembly()
+  }
+
+  private func updateInstructionAssembly() {
+    guard let disassembly = document.disassemblyResults?.disassembly else {
+      return
+    }
+    guard let instruction = disassembly.instruction(at: cpuState.pc, in: cpuState.bank) else {
+      instructionAssemblyLabel.stringValue = "No instruction detected"
+      return
+    }
+
+    let context = RGBDSDisassembler.Context(
+      address: cpuState.pc,
+      bank: cpuState.bank,
+      disassembly: disassembly,
+      argumentString: nil
+    )
+    let statement = RGBDSDisassembler.statement(for: instruction, with: context)
+    instructionAssemblyLabel.stringValue = statement.formattedString
   }
 }
 

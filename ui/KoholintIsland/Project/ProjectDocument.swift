@@ -117,13 +117,22 @@ class ProjectConfiguration: NSObject, Codable {
 }
 
 final class DisassemblyResults: NSObject {
-  internal init(files: [String : Data], bankLines: [LR35902.Bank : [LR35902.Disassembly.Line]]? = nil, bankTextStorage: [LR35902.Bank: NSAttributedString]? = nil, regions: [Region]? = nil, regionLookup: [String: Region]? = nil, statistics: LR35902.Disassembly.Statistics? = nil) {
+  internal init(
+    files: [String : Data],
+    bankLines: [LR35902.Bank : [LR35902.Disassembly.Line]]? = nil,
+    bankTextStorage: [LR35902.Bank: NSAttributedString]? = nil,
+    regions: [Region]? = nil,
+    regionLookup: [String: Region]? = nil,
+    statistics: LR35902.Disassembly.Statistics? = nil,
+    disassembly: LR35902.Disassembly? = nil
+  ) {
     self.files = files
     self.bankLines = bankLines
     self.bankTextStorage = bankTextStorage
     self.regions = regions
     self.regionLookup = regionLookup
     self.statistics = statistics
+    self.disassembly = disassembly
   }
 
   var files: [String: Data]
@@ -132,6 +141,7 @@ final class DisassemblyResults: NSObject {
   @objc dynamic var regions: [Region]?
   var regionLookup: [String: Region]?
   var statistics: LR35902.Disassembly.Statistics?
+  var disassembly: LR35902.Disassembly?
 }
 
 struct ProjectMetadata: Codable {
@@ -866,7 +876,8 @@ extension ProjectDocument {
           bankTextStorage: bankTextStorage,
           regions: regions,
           regionLookup: regionLookup,
-          statistics: statistics
+          statistics: statistics,
+          disassembly: disassembly
         )
 
         self.isDisassembling = false

@@ -4,14 +4,21 @@ import FoundationExtensions
 import RGBDS
 
 /** Turns LR3902 instructions into RGBDS assembly. */
-final class RGBDSDisassembler {
+public final class RGBDSDisassembler {
 
   /** The context within which an instruction should be turned into RGBDS assembly. */
-  struct Context {
-    let address: LR35902.Address
-    let bank: LR35902.Bank
-    let disassembly: LR35902.Disassembly
-    let argumentString: String?
+  public struct Context {
+    public init(address: LR35902.Address, bank: LR35902.Bank, disassembly: LR35902.Disassembly, argumentString: String?) {
+      self.address = address
+      self.bank = bank
+      self.disassembly = disassembly
+      self.argumentString = argumentString
+    }
+
+    public let address: LR35902.Address
+    public let bank: LR35902.Bank
+    public let disassembly: LR35902.Disassembly
+    public let argumentString: String?
   }
 
   /**
@@ -21,7 +28,7 @@ final class RGBDSDisassembler {
    - Parameter disassembly: Optional additional context for the instruction, such as label names.
    - Parameter argumentString: Overrides any numerical value with the given string. Primarily used for macros.
    */
-  static func statement(for instruction: LR35902.Instruction, with context: Context? = nil) -> Statement {
+  public static func statement(for instruction: LR35902.Instruction, with context: Context? = nil) -> Statement {
     guard let opcode = LR35902.InstructionSet.opcodeStrings[instruction.spec] else {
       preconditionFailure("Could not find opcode for \(instruction.spec).")
     }
