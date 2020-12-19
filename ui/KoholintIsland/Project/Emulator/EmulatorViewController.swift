@@ -86,8 +86,11 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     controls.segmentStyle = .smallSquare
     controls.segmentCount = 2
     controls.setImage(NSImage(systemSymbolName: "arrowshape.bounce.forward.fill", accessibilityDescription: nil)!, forSegment: 0)
+    controls.setImage(NSImage(systemSymbolName: "clear", accessibilityDescription: nil)!, forSegment: 1)
     controls.setWidth(40, forSegment: 0)
+    controls.setWidth(40, forSegment: 1)
     controls.setEnabled(true, forSegment: 0)
+    controls.setEnabled(true, forSegment: 1)
     controls.target = self
     controls.action = #selector(performControlAction(_:))
     view.addSubview(controls)
@@ -300,15 +303,20 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       programCounterTextField.objectValue = document.cpuState.pc
       updateInstructionAssembly()
       updateRegisters()
-
-      ramController.content = document.cpuState.ram.map { address, value -> RAMValue in
-        switch value.value {
-        case .literal(let literalValue):
-          return RAMValue(address: address, state: "Literal", value: UInt16(literalValue), sourceLocation: value.sourceLocation)
-        case .variable(let address):
-          return RAMValue(address: address, state: "Address", value: address, sourceLocation: value.sourceLocation)
-        }
+      updateRAM()
+    } else if sender.selectedSegment == 1 {  // Clear
+      var state = document.cpuState
+      for register in LR35902.Instruction.Numeric.registers8 {
+        state.clear(register)
       }
+      for register in LR35902.Instruction.Numeric.registers16 {
+        state.clear(register)
+      }
+      state.ram.removeAll()
+      document.cpuState = state
+
+      updateRegisters()
+      updateRAM()
     }
   }
 }
@@ -388,6 +396,17 @@ extension EmulatorViewController: NSTextFieldDelegate {
           register.state = "Address"
           register.value = address
         }
+      }
+    }
+  }
+
+  func updateRAM() {
+    ramController.content = document.cpuState.ram.map { address, value -> RAMValue in
+      switch value.value {
+      case .literal(let literalValue):
+        return RAMValue(address: address, state: "Literal", value: UInt16(literalValue), sourceLocation: value.sourceLocation)
+      case .variable(let address):
+        return RAMValue(address: address, state: "Address", value: address, sourceLocation: value.sourceLocation)
       }
     }
   }
