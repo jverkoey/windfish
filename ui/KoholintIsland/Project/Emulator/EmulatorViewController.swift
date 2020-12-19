@@ -9,20 +9,23 @@ extension NSUserInterfaceItemIdentifier {
   static let register = NSUserInterfaceItemIdentifier("name")
   static let registerState = NSUserInterfaceItemIdentifier("state")
   static let registerValue = NSUserInterfaceItemIdentifier("value")
+  static let registerSourceLocation = NSUserInterfaceItemIdentifier("sourceLocation")
 }
 
 private final class CPURegister: NSObject {
-  init(name: String, register: LR35902.Instruction.Numeric, state: String, value: UInt16) {
+  init(name: String, register: LR35902.Instruction.Numeric, state: String, value: UInt16, sourceLocation: LR35902.Cartridge.Location) {
     self.name = name
     self.register = register
     self.state = state
     self.value = value
+    self.sourceLocation = sourceLocation
   }
 
   @objc dynamic var name: String
   var register: LR35902.Instruction.Numeric
   @objc dynamic var state: String
   @objc dynamic var value: UInt16
+  @objc dynamic var sourceLocation: LR35902.Cartridge.Location
 }
 
 final class EmulatorViewController: NSViewController, TabSelectable {
@@ -130,6 +133,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       Column(name: "Register", identifier: .register, width: 50),
       Column(name: "State", identifier: .registerState, width: 100),
       Column(name: "Value", identifier: .registerValue, width: 50),
+      Column(name: "Source", identifier: .registerSourceLocation, width: 50),
     ]
 
     for columnInfo in columns {
@@ -141,14 +145,14 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     }
 
     let registers = [
-      CPURegister(name: "a", register: .a, state: "Unknown", value: 0),
-      CPURegister(name: "b", register: .b, state: "Unknown", value: 0),
-      CPURegister(name: "c", register: .c, state: "Unknown", value: 0),
-      CPURegister(name: "d", register: .d, state: "Unknown", value: 0),
-      CPURegister(name: "e", register: .e, state: "Unknown", value: 0),
-      CPURegister(name: "h", register: .h, state: "Unknown", value: 0),
-      CPURegister(name: "l", register: .l, state: "Unknown", value: 0),
-      CPURegister(name: "sp", register: .sp, state: "Unknown", value: 0),
+      CPURegister(name: "a", register: .a, state: "Unknown", value: 0, sourceLocation: 0),
+      CPURegister(name: "b", register: .b, state: "Unknown", value: 0, sourceLocation: 0),
+      CPURegister(name: "c", register: .c, state: "Unknown", value: 0, sourceLocation: 0),
+      CPURegister(name: "d", register: .d, state: "Unknown", value: 0, sourceLocation: 0),
+      CPURegister(name: "e", register: .e, state: "Unknown", value: 0, sourceLocation: 0),
+      CPURegister(name: "h", register: .h, state: "Unknown", value: 0, sourceLocation: 0),
+      CPURegister(name: "l", register: .l, state: "Unknown", value: 0, sourceLocation: 0),
+      CPURegister(name: "sp", register: .sp, state: "Unknown", value: 0, sourceLocation: 0),
     ]
     let didChangeRegister: (CPURegister) -> Void = { [weak self] register in
       guard let self = self else {
@@ -159,15 +163,15 @@ final class EmulatorViewController: NSViewController, TabSelectable {
         self.cpuState.clear(register.register)
       case "Literal":
         if LR35902.Instruction.Numeric.registers8.contains(register.register) {
-          self.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt8>(value: .literal(UInt8(register.value)), sourceLocation: 0)
+          self.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt8>(value: .literal(UInt8(register.value)), sourceLocation: register.sourceLocation)
         } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
-          self.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt16>(value: .literal(register.value), sourceLocation: 0)
+          self.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt16>(value: .literal(register.value), sourceLocation: register.sourceLocation)
         }
       case "Address":
         if LR35902.Instruction.Numeric.registers8.contains(register.register) {
-          self.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt8>(value: .variable(register.value), sourceLocation: 0)
+          self.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt8>(value: .variable(register.value), sourceLocation: register.sourceLocation)
         } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
-          self.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt16>(value: .variable(register.value), sourceLocation: 0)
+          self.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt16>(value: .variable(register.value), sourceLocation: register.sourceLocation)
         }
       default:
         preconditionFailure()
@@ -177,6 +181,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       registerObservers.append(contentsOf: [
         register.observe(\.state) { register, _ in didChangeRegister(register) },
         register.observe(\.value) { register, _ in didChangeRegister(register) },
+        register.observe(\.sourceLocation) { register, _ in didChangeRegister(register) },
       ])
     }
     cpuController.add(contentsOf: registers)
@@ -250,6 +255,9 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       for register in cpuController.arrangedObjects as! [CPURegister] {
         if LR35902.Instruction.Numeric.registers8.contains(register.register) {
           let value: LR35902.CPUState.RegisterState<UInt8>? = self.cpuState[register.register]
+
+          register.sourceLocation = value?.sourceLocation ?? 0
+
           switch value?.value {
           case .none:
             register.state = "Unknown"
@@ -263,6 +271,9 @@ final class EmulatorViewController: NSViewController, TabSelectable {
           }
         } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
           let value: LR35902.CPUState.RegisterState<UInt16>? = self.cpuState[register.register]
+
+          register.sourceLocation = value?.sourceLocation ?? 0
+
           switch value?.value {
           case .none:
             register.state = "Unknown"
@@ -352,7 +363,7 @@ extension EmulatorViewController: NSTableViewDelegate {
       view.popupButton.bind(.content, to: registerStateController, withKeyPath: "arrangedObjects", options: nil)
       view.popupButton.bind(.selectedObject, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
       return view
-    case .registerValue:
+    case .registerValue, .registerSourceLocation:
       let identifier = NSUserInterfaceItemIdentifier.addressCell
       let view: TextTableCellView
       if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TextTableCellView {
