@@ -13,7 +13,7 @@ extension LR35902.Disassembly {
    ld   [hPreviousJoypadState], a               ; $2832 (00): ReadJoypadState $E0 $CB
    */
   @discardableResult
-  func simulate(range: Range<LR35902.Cartridge.Location>,
+  func trace(range: Range<LR35902.Cartridge.Location>,
                 initialState: LR35902.CPUState = LR35902.CPUState(),
                 step: ((LR35902.Instruction, LR35902.Cartridge.Location, LR35902.CPUState) -> Void)? = nil)
     -> [LR35902.Cartridge.Location: LR35902.CPUState] {
@@ -26,10 +26,7 @@ extension LR35902.Disassembly {
       var states: [LR35902.Cartridge.Location: LR35902.CPUState] = [:]
 
       let registers8 = LR35902.Instruction.Numeric.registers8
-      let registers16: Set<LR35902.Instruction.Numeric> = Set([
-        .bc,
-        .hl,
-      ])
+      let registers16 = LR35902.Instruction.Numeric.registers16
 
       while pc < upperBoundPc {
         guard let instruction = self.instruction(at: pc, in: bank) else {

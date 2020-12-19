@@ -42,7 +42,7 @@ ld   [$ffcb], a
     initialState.a = LR35902.CPUState.RegisterState<UInt8>(value: .literal(0b0000_1111), sourceLocation: 0)
     initialState.ram[0xffcb] = .init(value: .literal(0b0000_1100), sourceLocation: 0)
 
-    let states = disassembly.simulate(range: 0..<disassembly.cpu.cartridge.size,
+    let states = disassembly.trace(range: 0..<disassembly.cpu.cartridge.size,
                                       initialState: initialState).sorted(by: { $0.key < $1.key })
     let lastState = states[states.count - 1]
 

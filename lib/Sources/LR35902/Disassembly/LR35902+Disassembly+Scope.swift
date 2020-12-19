@@ -13,7 +13,7 @@ extension LR35902.Disassembly {
           continue
         }
 
-        simulate(range: visitedRange) { instruction, location, state in
+        trace(range: visitedRange) { instruction, location, state in
           switch instruction.spec {
             // TODO: This only works if we're simulating the run as part of the linear sweep.
             // TODO: Fold the simulation logic into the linear sweep somehow.
