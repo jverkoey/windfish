@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 import Cocoa
 
 import LR35902
@@ -51,6 +52,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   }
 
   private var programCounterObserver: NSKeyValueObservation?
+  private var disassembledSubscriber: AnyCancellable?
 
   override func loadView() {
     view = NSView()
@@ -89,7 +91,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     view.addSubview(instructionLabel)
 
     instructionAssemblyLabel.translatesAutoresizingMaskIntoConstraints = false
-    instructionAssemblyLabel.stringValue = "call $2881"
+    instructionAssemblyLabel.stringValue = "Waiting for disassembly results..."
     instructionAssemblyLabel.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
     view.addSubview(instructionAssemblyLabel)
 
@@ -178,6 +180,12 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     tableView.bind(.sortDescriptors, to: cpuController, withKeyPath: "sortDescriptors", options: nil)
 
     updateInstructionAssembly()
+
+    disassembledSubscriber = NotificationCenter.default.publisher(for: .disassembled, object: document)
+      .receive(on: RunLoop.main)
+      .sink(receiveValue: { notification in
+        self.updateInstructionAssembly()
+      })
   }
 }
 
