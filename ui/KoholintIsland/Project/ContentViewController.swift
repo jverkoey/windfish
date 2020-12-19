@@ -18,12 +18,11 @@ func CreateScrollView(bounds: NSRect) -> NSScrollView {
   return scrollView
 }
 
-func CreateTextView(bounds: NSRect) -> NSTextView {
-  let textView = NSTextView()
+func CreateTextView(bounds: NSRect) -> CodeTextView {
+  let textView = CodeTextView()
   textView.isVerticallyResizable = true
   textView.autoresizingMask = [.width]
-  textView.textContainer?.containerSize = NSSize(width: bounds.width,
-                                                 height: CGFloat.greatestFiniteMagnitude)
+  textView.textContainer?.containerSize = NSSize(width: bounds.width, height: CGFloat.greatestFiniteMagnitude)
   textView.textContainer?.widthTracksTextView = true
   textView.focusRingType = .none
   textView.drawsBackground = false
@@ -39,7 +38,7 @@ func DefaultCodeAttributes() -> [NSAttributedString.Key : Any] {
 
 final class ContentViewController: NSViewController {
   var containerView: NSScrollView?
-  var textView: NSTextView?
+  var textView: CodeTextView?
   var lineNumbersRuler: LineNumberView?
 
   var filename: String?
@@ -80,6 +79,9 @@ final class ContentViewController: NSViewController {
 
   var textStorage = NSTextStorage() {
     didSet {
+      if oldValue.string != textStorage.string {
+        textView?.highlightedLine = nil
+      }
       let originalOffset = containerView?.documentVisibleRect.origin
       textView?.layoutManager?.replaceTextStorage(textStorage)
       textView?.linkTextAttributes = [
@@ -103,19 +105,7 @@ final class ContentViewController: NSViewController {
   var lineAnalysis: LineAnalysis? {
     didSet {
       lineNumbersRuler?.lineAnalysis = lineAnalysis
-
-      // TODO: This needs to happen between analysis and setting of the storage.
-      // 1. Set new storage.
-      // 2. Analyze and mutate the storage if needed.
-      // 3. Set the storage.
-//      if let lineAnalysis = lineAnalysis, lineAnalysis.lineRanges.count > 0 {
-//        refreshFileContents()
-//
-//        let range = lineAnalysis.lineRanges[20]
-//        let imageAttachment = NSTextAttachment()
-//        imageAttachment.image = NSImage(systemSymbolName: "pencil.circle", accessibilityDescription: nil)
-//        textStorage.insert(NSAttributedString(attachment: imageAttachment), at: range.lowerBound)
-//      }
+      textView?.lineAnalysis = lineAnalysis
     }
   }
 

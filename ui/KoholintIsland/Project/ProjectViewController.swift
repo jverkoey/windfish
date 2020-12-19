@@ -203,6 +203,8 @@ final class ProjectViewController: NSViewController {
       return
     }
 
+    self.contentViewController.textView?.highlightedLine = lineIndex
+
     let lineRange = analysis.lineRanges[lineIndex]
     let glyphGraph = layoutManager.glyphRange(forCharacterRange: lineRange, actualCharacterRange: nil)
     let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphGraph, in: textContainer)
