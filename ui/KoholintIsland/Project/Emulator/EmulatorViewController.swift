@@ -4,6 +4,7 @@ import Cocoa
 import LR35902
 
 extension NSUserInterfaceItemIdentifier {
+  static let programCounter = NSUserInterfaceItemIdentifier("pc")
   static let register = NSUserInterfaceItemIdentifier("name")
   static let registerState = NSUserInterfaceItemIdentifier("state")
   static let registerValue = NSUserInterfaceItemIdentifier("value")
@@ -25,15 +26,30 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   let deselectedTabImage = NSImage(systemSymbolName: "cpu", accessibilityDescription: nil)!
   let selectedTabImage = NSImage(systemSymbolName: "cpu", accessibilityDescription: nil)!
 
+  let document: ProjectDocument
   let cpuController = NSArrayController()
   let registerStateController = NSArrayController()
   var tableView: NSTableView?
+
+  var cpuState = LR35902.CPUState(pc: 0x100, bank: 0x00)
+
+  init(document: ProjectDocument) {
+    self.document = document
+
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
 
   private struct Column {
     let name: String
     let identifier: NSUserInterfaceItemIdentifier
     let width: CGFloat
   }
+
+  private var programCounterObserver: NSKeyValueObservation?
 
   override func loadView() {
     view = NSView()
@@ -46,8 +62,10 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
     let programCounterTextField = NSTextField()
     programCounterTextField.translatesAutoresizingMaskIntoConstraints = false
-    programCounterTextField.stringValue = "0x0100"
     programCounterTextField.formatter = LR35902AddressFormatter()
+    programCounterTextField.stringValue = programCounterTextField.formatter!.string(for: cpuState.pc)!
+    programCounterTextField.identifier = .programCounter
+    programCounterTextField.delegate = self
     view.addSubview(programCounterTextField)
 
     let bankLabel = CreateLabel()
@@ -58,9 +76,22 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
     let bankTextField = NSTextField()
     bankTextField.translatesAutoresizingMaskIntoConstraints = false
-    bankTextField.stringValue = "0x00"
     bankTextField.formatter = UInt8HexFormatter()
+    bankTextField.stringValue = programCounterTextField.formatter!.string(for: cpuState.bank)!
+    bankTextField.identifier = .bank
+    bankTextField.delegate = self
     view.addSubview(bankTextField)
+
+    let instructionLabel = CreateLabel()
+    instructionLabel.translatesAutoresizingMaskIntoConstraints = false
+    instructionLabel.stringValue = "Instruction:"
+    view.addSubview(instructionLabel)
+
+    let instructionAssemblyLabel = CreateLabel()
+    instructionAssemblyLabel.translatesAutoresizingMaskIntoConstraints = false
+    instructionAssemblyLabel.stringValue = "call $2881"
+    instructionAssemblyLabel.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
+    view.addSubview(instructionAssemblyLabel)
 
     let containerView = NSScrollView()
     containerView.translatesAutoresizingMaskIntoConstraints = false
@@ -127,16 +158,43 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       bankTextField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
       bankTextField.topAnchor.constraint(equalTo: bankLabel.topAnchor),
 
+      instructionLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
+      instructionLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -4),
+      instructionLabel.topAnchor.constraint(equalTo: bankLabel.bottomAnchor),
+      instructionLabel.topAnchor.constraint(equalTo: bankTextField.bottomAnchor),
+
+      instructionAssemblyLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
+      instructionAssemblyLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -4),
+      instructionAssemblyLabel.topAnchor.constraint(equalTo: instructionLabel.bottomAnchor),
+
       containerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
       containerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-      containerView.topAnchor.constraint(equalToSystemSpacingBelow: bankLabel.bottomAnchor, multiplier: 1),
-      containerView.topAnchor.constraint(equalToSystemSpacingBelow: bankTextField.bottomAnchor, multiplier: 1),
+      containerView.topAnchor.constraint(equalToSystemSpacingBelow: instructionAssemblyLabel.bottomAnchor, multiplier: 1),
       containerView.heightAnchor.constraint(equalToConstant: 200),
     ])
 
     tableView.bind(.content, to: cpuController, withKeyPath: "arrangedObjects", options: nil)
     tableView.bind(.selectionIndexes, to: cpuController, withKeyPath:"selectionIndexes", options: nil)
     tableView.bind(.sortDescriptors, to: cpuController, withKeyPath: "sortDescriptors", options: nil)
+  }
+}
+
+extension EmulatorViewController: NSTextFieldDelegate {
+  func controlTextDidEndEditing(_ obj: Notification) {
+    guard let textField = obj.object as? NSTextField,
+          let identifier = textField.identifier else {
+      preconditionFailure()
+    }
+    switch identifier {
+    case .bank:
+      cpuState.bank = textField.objectValue as! LR35902.Bank
+      break
+    case .programCounter:
+      cpuState.pc = textField.objectValue as! LR35902.Address
+      break
+    default:
+      preconditionFailure()
+    }
   }
 }
 

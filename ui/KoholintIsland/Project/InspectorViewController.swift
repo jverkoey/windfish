@@ -47,7 +47,7 @@ final class InspectorViewController: NSViewController {
     editorTabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: MacroEditorViewController(document: document)))
     tabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: editorTabViewController))
     tabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: RegionInspectorViewController(document: document)))
-    tabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: EmulatorViewController()))
+    tabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: EmulatorViewController(document: document)))
 
     addChild(tabViewController)
     view.addSubview(tabViewController.view)
