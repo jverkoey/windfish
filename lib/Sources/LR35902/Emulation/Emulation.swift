@@ -1,7 +1,13 @@
 import Foundation
 
 extension LR35902.CPUState {
-  public func emulate(instruction: LR35902.Instruction) -> LR35902.CPUState {
+  /**
+   Emulates the given instruction and returns the advanced CPU state.
+
+   - Parameter followControlFlow: If enabled, emulation will follow any transfers of control flow. Otherwise, control
+   flow changes will be ignored and the instruction will be immediately stepped over.
+   */
+  public func emulate(instruction: LR35902.Instruction, followControlFlow: Bool = false) -> LR35902.CPUState {
     let registers8 = LR35902.Instruction.Numeric.registers8
     let registers16 = LR35902.Instruction.Numeric.registers16
 

@@ -84,13 +84,16 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     controls.translatesAutoresizingMaskIntoConstraints = false
     controls.trackingMode = .momentary
     controls.segmentStyle = .smallSquare
-    controls.segmentCount = 2
+    controls.segmentCount = 3
     controls.setImage(NSImage(systemSymbolName: "arrowshape.bounce.forward.fill", accessibilityDescription: nil)!, forSegment: 0)
-    controls.setImage(NSImage(systemSymbolName: "clear", accessibilityDescription: nil)!, forSegment: 1)
+    controls.setImage(NSImage(systemSymbolName: "arrow.down.to.line.alt", accessibilityDescription: nil)!, forSegment: 1)
+    controls.setImage(NSImage(systemSymbolName: "clear", accessibilityDescription: nil)!, forSegment: 2)
     controls.setWidth(40, forSegment: 0)
     controls.setWidth(40, forSegment: 1)
+    controls.setWidth(40, forSegment: 2)
     controls.setEnabled(true, forSegment: 0)
     controls.setEnabled(true, forSegment: 1)
+    controls.setEnabled(true, forSegment: 2)
     controls.target = self
     controls.action = #selector(performControlAction(_:))
     view.addSubview(controls)
@@ -299,12 +302,18 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       guard let instruction = currentInstruction() else {
         return
       }
+
+      // TODO: Step into and through any control flow.
+
       document.cpuState = document.cpuState.emulate(instruction: instruction)
       programCounterTextField.objectValue = document.cpuState.pc
       updateInstructionAssembly()
       updateRegisters()
       updateRAM()
-    } else if sender.selectedSegment == 1 {  // Clear
+    } else if sender.selectedSegment == 1 {  // Step into
+      // TODO: Only allow this if the instruction causes a transfer of control flow.
+
+    } else if sender.selectedSegment == 2 {  // Clear
       var state = document.cpuState
       for register in LR35902.Instruction.Numeric.registers8 {
         state.clear(register)
