@@ -3,6 +3,14 @@ import Cocoa
 
 import LR35902
 
+func CreateLabel() -> NSTextField {
+  let label = NSTextField()
+  label.isBezeled = false
+  label.isEditable = false
+  label.drawsBackground = false
+  return label
+}
+
 final class StatisticsView: NSView {
   var statistics: LR35902.Disassembly.Statistics? {
     didSet {
@@ -14,17 +22,11 @@ final class StatisticsView: NSView {
   private let percentDecodedLabel: NSTextField
 
   override init(frame frameRect: NSRect) {
-    instructionsDecodedLabel = NSTextField()
+    instructionsDecodedLabel = CreateLabel()
     instructionsDecodedLabel.translatesAutoresizingMaskIntoConstraints = false
-    instructionsDecodedLabel.isBezeled = false
-    instructionsDecodedLabel.isEditable = false
-    instructionsDecodedLabel.drawsBackground = false
 
-    percentDecodedLabel = NSTextField()
+    percentDecodedLabel = CreateLabel()
     percentDecodedLabel.translatesAutoresizingMaskIntoConstraints = false
-    percentDecodedLabel.isBezeled = false
-    percentDecodedLabel.isEditable = false
-    percentDecodedLabel.drawsBackground = false
 
     super.init(frame: frameRect)
 

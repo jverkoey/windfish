@@ -38,6 +38,28 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   override func loadView() {
     view = NSView()
 
+    let programCounterLabel = CreateLabel()
+    programCounterLabel.translatesAutoresizingMaskIntoConstraints = false
+    programCounterLabel.stringValue = "Program counter:"
+    programCounterLabel.alignment = .right
+    view.addSubview(programCounterLabel)
+
+    let programCounterTextField = NSTextField()
+    programCounterTextField.translatesAutoresizingMaskIntoConstraints = false
+    programCounterTextField.stringValue = "0x0100"
+    view.addSubview(programCounterTextField)
+
+    let bankLabel = CreateLabel()
+    bankLabel.translatesAutoresizingMaskIntoConstraints = false
+    bankLabel.stringValue = "Bank:"
+    bankLabel.alignment = .right
+    view.addSubview(bankLabel)
+
+    let bankTextField = NSTextField()
+    bankTextField.translatesAutoresizingMaskIntoConstraints = false
+    bankTextField.stringValue = "0x00"
+    view.addSubview(bankTextField)
+
     let containerView = NSScrollView()
     containerView.translatesAutoresizingMaskIntoConstraints = false
     containerView.hasVerticalScroller = true
@@ -50,6 +72,9 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     containerView.documentView = tableView
     view.addSubview(containerView)
     self.tableView = tableView
+
+    let textFieldAlignmentGuide = NSLayoutGuide()
+    view.addLayoutGuide(textFieldAlignmentGuide)
 
     let columns = [
       Column(name: "Register", identifier: .register, width: 100),
@@ -81,9 +106,29 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     registerStateController.addObject("Address")
 
     NSLayoutConstraint.activate([
+      programCounterLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
+      programCounterLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+
+      bankLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
+      bankLabel.topAnchor.constraint(equalTo: programCounterLabel.bottomAnchor),
+
+      textFieldAlignmentGuide.leadingAnchor.constraint(equalTo: programCounterLabel.trailingAnchor),
+      textFieldAlignmentGuide.leadingAnchor.constraint(equalTo: bankLabel.trailingAnchor),
+      textFieldAlignmentGuide.widthAnchor.constraint(equalToConstant: 8),
+
+      programCounterTextField.leadingAnchor.constraint(equalTo: textFieldAlignmentGuide.trailingAnchor),
+      programCounterTextField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+      programCounterTextField.topAnchor.constraint(equalTo: programCounterLabel.topAnchor),
+      bankLabel.topAnchor.constraint(equalTo: programCounterTextField.bottomAnchor),
+
+      bankTextField.leadingAnchor.constraint(equalTo: textFieldAlignmentGuide.trailingAnchor),
+      bankTextField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+      bankTextField.topAnchor.constraint(equalTo: bankLabel.topAnchor),
+
       containerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
       containerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-      containerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+      containerView.topAnchor.constraint(equalToSystemSpacingBelow: bankLabel.bottomAnchor, multiplier: 1),
+      containerView.topAnchor.constraint(equalToSystemSpacingBelow: bankTextField.bottomAnchor, multiplier: 1),
       containerView.heightAnchor.constraint(equalToConstant: 200),
     ])
 
