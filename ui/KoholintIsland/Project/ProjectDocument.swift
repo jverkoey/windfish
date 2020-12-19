@@ -139,24 +139,31 @@ final class DisassemblyResults: NSObject {
     guard let bankLines = bankLines?[bank] else {
       return nil
     }
-    guard let lineIndex = bankLines.firstIndex(where: { line in
+    var previousLineIndex: Int?
+    var lineIndex: Int?
+    outerLoop: for (index, line) in bankLines.enumerated() {
       switch line.semantic {
       case .instruction, .macro:
         if let lineAddress = line.address {
-          return lineAddress >= address
+          if lineAddress >= address {
+            lineIndex = index
+            break outerLoop
+          }
         }
+        previousLineIndex = index
         fallthrough
       default:
-        return false
+        break
       }
-    }) else {
+    }
+    guard let foundLineIndex = lineIndex else {
       return nil
     }
-    if let lineAddress = bankLines[lineIndex].address, lineAddress > address {
+    if let lineAddress = bankLines[foundLineIndex].address, lineAddress > address, let previousLineIndex = previousLineIndex {
       // In between lines, so return the previous line.
-      return lineIndex - 1
+      return previousLineIndex
     }
-    return lineIndex
+    return foundLineIndex
   }
 
   var files: [String: Data]
