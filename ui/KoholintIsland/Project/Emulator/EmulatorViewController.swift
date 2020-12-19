@@ -127,7 +127,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     view.addLayoutGuide(textFieldAlignmentGuide)
 
     let columns = [
-      Column(name: "Register", identifier: .register, width: 100),
+      Column(name: "Register", identifier: .register, width: 50),
       Column(name: "State", identifier: .registerState, width: 100),
       Column(name: "Value", identifier: .registerValue, width: 50),
     ]
@@ -245,6 +245,24 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       cpuState = cpuState.emulate(instruction: instruction)
       programCounterTextField.objectValue = cpuState.pc
       updateInstructionAssembly()
+
+      for register in cpuController.arrangedObjects as! [CPURegister] {
+        if LR35902.Instruction.Numeric.registers8.contains(register.register) {
+          let value: LR35902.CPUState.RegisterState<UInt8>? = self.cpuState[register.register]
+          switch value?.value {
+          case .none:
+            register.state = "Unknown"
+            register.value = 0
+          case .literal(let value):
+            register.state = "Literal"
+            register.value = UInt16(value)
+          case .variable(let address):
+            register.state = "Address"
+            register.value = address
+          }
+        } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
+        }
+      }
     }
   }
 }
