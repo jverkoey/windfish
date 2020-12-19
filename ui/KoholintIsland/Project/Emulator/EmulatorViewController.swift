@@ -47,6 +47,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     let programCounterTextField = NSTextField()
     programCounterTextField.translatesAutoresizingMaskIntoConstraints = false
     programCounterTextField.stringValue = "0x0100"
+    programCounterTextField.formatter = LR35902AddressFormatter()
     view.addSubview(programCounterTextField)
 
     let bankLabel = CreateLabel()
@@ -58,6 +59,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     let bankTextField = NSTextField()
     bankTextField.translatesAutoresizingMaskIntoConstraints = false
     bankTextField.stringValue = "0x00"
+    bankTextField.formatter = UInt8HexFormatter()
     view.addSubview(bankTextField)
 
     let containerView = NSScrollView()
