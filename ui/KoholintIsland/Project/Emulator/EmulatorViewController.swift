@@ -305,7 +305,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
       // TODO: Step into and through any control flow.
 
-      document.cpuState = document.cpuState.emulate(instruction: instruction)
+      document.cpuState = document.cpuState.emulate(instruction: instruction, followControlFlow: true)
       programCounterTextField.objectValue = document.cpuState.pc
       updateInstructionAssembly()
       updateRegisters()

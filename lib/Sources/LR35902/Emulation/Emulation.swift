@@ -12,6 +12,7 @@ extension LR35902.CPUState {
     let registers16 = LR35902.Instruction.Numeric.registers16
 
     let location = LR35902.Cartridge.location(for: pc, in: bank)!
+    let width = LR35902.InstructionSet.widths[instruction.spec]!.total
 
     var state = self
 
@@ -21,22 +22,26 @@ extension LR35902.CPUState {
         preconditionFailure("Invalid immediate associated with instruction")
       }
       state[numeric] = LR35902.CPUState.RegisterState<UInt8>(value: .literal(immediate), sourceLocation: location)
+      state.pc += width
 
     case .ld(let dst, let src) where registers8.contains(dst) && registers8.contains(src):
       let srcValue: LR35902.CPUState.RegisterState<UInt8>? = state[src]
       state[dst] = srcValue
+      state.pc += width
 
     case .ld(let dst, .imm16addr) where registers8.contains(dst):
       guard case let .imm16(immediate) = instruction.immediate else {
         preconditionFailure("Invalid immediate associated with instruction")
       }
       state[dst] = LR35902.CPUState.RegisterState<UInt8>(value: .variable(immediate), sourceLocation: location)
+      state.pc += width
 
     case .ld(let dst, .imm16) where registers16.contains(dst):
       guard case let .imm16(immediate) = instruction.immediate else {
         preconditionFailure("Invalid immediate associated with instruction")
       }
       state[dst] = LR35902.CPUState.RegisterState<UInt16>(value: .literal(immediate), sourceLocation: location)
+      state.pc += width
 
     case .ld(let numeric, .ffimm8addr) where registers8.contains(numeric):
       guard case let .imm8(immediate) = instruction.immediate else {
@@ -44,6 +49,7 @@ extension LR35902.CPUState {
       }
       let address = 0xFF00 | LR35902.Address(immediate)
       state[numeric] = LR35902.CPUState.RegisterState<UInt8>(value: .variable(address), sourceLocation: location)
+      state.pc += width
 
     case .ld(.ffimm8addr, let numeric) where registers8.contains(numeric):
       guard case let .imm8(immediate) = instruction.immediate else {
@@ -51,26 +57,31 @@ extension LR35902.CPUState {
       }
       let address = 0xFF00 | LR35902.Address(immediate)
       state.ram[address] = state[numeric]
+      state.pc += width
 
     case .ldi(.hladdr, .a):
       if case .literal(let dst) = state.hl?.value {
         let srcValue: LR35902.CPUState.RegisterState<UInt8>? = state.a
         state.ram[LR35902.Address(dst)] = srcValue
       }
+      state.pc += width
 
     case .ldi(.a, .hladdr):
       if case .literal(let dst) = state.hl?.value {
         state.a = state.ram[LR35902.Address(dst)]
       }
+      state.pc += width
 
     case .xor(.a):
       state.a = .init(value: .literal(0), sourceLocation: location)
+      state.pc += width
 
     case .xor(let numeric) where numeric == .imm8:
       if case .literal(let dst) = state.a?.value,
          case .imm8(let src) = instruction.immediate {
         state.a = .init(value: .literal(dst ^ src), sourceLocation: location)
       }
+      state.pc += width
 
     case .xor(let numeric) where registers8.contains(numeric):
       if case .literal(let dst) = state.a?.value,
@@ -84,6 +95,7 @@ extension LR35902.CPUState {
                 case .literal(let src) = register.value {
         state.a = .init(value: .literal(dst ^ src), sourceLocation: location)
       }
+      state.pc += width
 
     case .and(let numeric) where registers8.contains(numeric):
       if case .literal(let dst) = state.a?.value,
@@ -94,6 +106,7 @@ extension LR35902.CPUState {
       } else {
         state.a = nil
       }
+      state.pc += width
 
     case .and(.imm8):
       guard case let .imm8(immediate) = instruction.immediate else {
@@ -103,12 +116,24 @@ extension LR35902.CPUState {
         state.a = .init(value: .literal(dst & immediate), sourceLocation: location)
         // TODO: Compute the flag bits.
       }
+      state.pc += width
+
+    case .jp(nil, .imm16):
+      if followControlFlow {
+        guard case let .imm16(immediate) = instruction.immediate else {
+          preconditionFailure("Invalid immediate associated with instruction")
+        }
+        state.pc = immediate
+      } else {
+        state.pc += width
+      }
 
     case .ld(.sp, .imm16):
       guard case let .imm16(immediate) = instruction.immediate else {
         preconditionFailure("Invalid immediate associated with instruction")
       }
       state.sp = .init(value: .literal(immediate), sourceLocation: location)
+      state.pc += width
 
     case .reti, .ret:
       state.a = nil
@@ -116,15 +141,14 @@ extension LR35902.CPUState {
       state.hl = nil
       state.sp = nil
       state.ram.removeAll()
+      state.pc += width
 
     // TODO: For calls, we need to look up the affected registers and arguments.
     default:
-      break
+      state.pc += width
     }
 
-    let width = LR35902.InstructionSet.widths[instruction.spec]!.total
     state.next = [location + LR35902.Cartridge.Location(width)]
-    state.pc += width
 
     return state
   }
