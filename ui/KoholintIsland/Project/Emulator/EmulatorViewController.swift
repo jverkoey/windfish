@@ -148,6 +148,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       CPURegister(name: "e", register: .e, state: "Unknown", value: 0),
       CPURegister(name: "h", register: .h, state: "Unknown", value: 0),
       CPURegister(name: "l", register: .l, state: "Unknown", value: 0),
+      CPURegister(name: "sp", register: .sp, state: "Unknown", value: 0),
     ]
     let didChangeRegister: (CPURegister) -> Void = { [weak self] register in
       guard let self = self else {
@@ -221,7 +222,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       containerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
       containerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
       containerView.topAnchor.constraint(equalToSystemSpacingBelow: instructionAssemblyLabel.bottomAnchor, multiplier: 1),
-      containerView.heightAnchor.constraint(equalToConstant: 200),
+      containerView.heightAnchor.constraint(equalToConstant: 220),
     ])
 
     tableView.bind(.content, to: cpuController, withKeyPath: "arrangedObjects", options: nil)
@@ -261,6 +262,18 @@ final class EmulatorViewController: NSViewController, TabSelectable {
             register.value = address
           }
         } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
+          let value: LR35902.CPUState.RegisterState<UInt16>? = self.cpuState[register.register]
+          switch value?.value {
+          case .none:
+            register.state = "Unknown"
+            register.value = 0
+          case .literal(let value):
+            register.state = "Literal"
+            register.value = value
+          case .variable(let address):
+            register.state = "Address"
+            register.value = address
+          }
         }
       }
     }

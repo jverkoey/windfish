@@ -94,6 +94,7 @@ extension LR35902.Instruction {
       .bc,
       .de,
       .hl,
+      .sp,
     ])
 
     public var width: Int {

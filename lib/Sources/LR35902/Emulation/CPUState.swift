@@ -84,6 +84,7 @@ extension LR35902 {
         case .bc: return bc
         case .de: return de
         case .hl: return hl
+        case .sp: return sp
         default: return nil
         }
       }
@@ -92,6 +93,7 @@ extension LR35902 {
         case .bc: bc = newValue
         case .de: de = newValue
         case .hl: hl = newValue
+        case .sp: sp = newValue
         default: break
         }
       }
@@ -110,6 +112,7 @@ extension LR35902 {
       case .bc: bc = nil
       case .de: de = nil
       case .hl: hl = nil
+      case .sp: sp = nil
       default:
         preconditionFailure()
       }
