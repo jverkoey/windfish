@@ -31,6 +31,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   let cpuController = NSArrayController()
   let registerStateController = NSArrayController()
   var tableView: NSTableView?
+  let programCounterTextField = NSTextField()
   let instructionAssemblyLabel = CreateLabel()
 
   var cpuState = LR35902.CPUState(pc: 0x100, bank: 0x00)
@@ -57,13 +58,24 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   override func loadView() {
     view = NSView()
 
+    let controls = NSSegmentedControl()
+    controls.translatesAutoresizingMaskIntoConstraints = false
+    controls.trackingMode = .momentary
+    controls.segmentStyle = .smallSquare
+    controls.segmentCount = 2
+    controls.setImage(NSImage(systemSymbolName: "arrowshape.bounce.forward.fill", accessibilityDescription: nil)!, forSegment: 0)
+    controls.setWidth(40, forSegment: 0)
+    controls.setEnabled(true, forSegment: 0)
+    controls.target = self
+    controls.action = #selector(performControlAction(_:))
+    view.addSubview(controls)
+
     let programCounterLabel = CreateLabel()
     programCounterLabel.translatesAutoresizingMaskIntoConstraints = false
     programCounterLabel.stringValue = "Program counter:"
     programCounterLabel.alignment = .right
     view.addSubview(programCounterLabel)
 
-    let programCounterTextField = NSTextField()
     programCounterTextField.translatesAutoresizingMaskIntoConstraints = false
     programCounterTextField.formatter = LR35902AddressFormatter()
     programCounterTextField.stringValue = programCounterTextField.formatter!.string(for: cpuState.pc)!
@@ -141,8 +153,12 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     registerStateController.addObject("Address")
 
     NSLayoutConstraint.activate([
+      controls.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+      controls.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+      controls.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+
       programCounterLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
-      programCounterLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+      programCounterLabel.topAnchor.constraint(equalToSystemSpacingBelow: controls.bottomAnchor, multiplier: 1),
 
       bankLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
       bankLabel.topAnchor.constraint(equalTo: programCounterLabel.bottomAnchor),
@@ -187,6 +203,17 @@ final class EmulatorViewController: NSViewController, TabSelectable {
         self.updateInstructionAssembly()
       })
   }
+
+  @objc func performControlAction(_ sender: NSSegmentedControl) {
+    if sender.selectedSegment == 0 {
+      guard let instruction = currentInstruction() else {
+        return
+      }
+      cpuState = cpuState.emulate(instruction: instruction)
+      programCounterTextField.objectValue = cpuState.pc
+      updateInstructionAssembly()
+    }
+  }
 }
 
 extension EmulatorViewController: NSTextFieldDelegate {
@@ -207,11 +234,15 @@ extension EmulatorViewController: NSTextFieldDelegate {
     updateInstructionAssembly()
   }
 
+  private func currentInstruction() -> LR35902.Instruction? {
+    return document.disassemblyResults?.disassembly?.instruction(at: cpuState.pc, in: cpuState.bank)
+  }
+
   private func updateInstructionAssembly() {
     guard let disassembly = document.disassemblyResults?.disassembly else {
       return
     }
-    guard let instruction = disassembly.instruction(at: cpuState.pc, in: cpuState.bank) else {
+    guard let instruction = currentInstruction() else {
       instructionAssemblyLabel.stringValue = "No instruction detected"
       return
     }

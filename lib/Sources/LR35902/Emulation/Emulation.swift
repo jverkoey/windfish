@@ -1,7 +1,7 @@
 import Foundation
 
 extension LR35902.CPUState {
-  func emulate(instruction: LR35902.Instruction) -> LR35902.CPUState {
+  public func emulate(instruction: LR35902.Instruction) -> LR35902.CPUState {
     let registers8 = LR35902.Instruction.Numeric.registers8
     let registers16 = LR35902.Instruction.Numeric.registers16
 
