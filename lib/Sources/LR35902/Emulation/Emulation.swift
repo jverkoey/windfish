@@ -128,6 +128,25 @@ extension LR35902.CPUState {
         state.pc += width
       }
 
+    case .call(nil, .imm16):
+      if followControlFlow {
+        guard case let .imm16(immediate) = instruction.immediate else {
+          preconditionFailure("Invalid immediate associated with instruction")
+        }
+        if case .literal(var sp) = state.sp?.value {
+          let pcMSB = UInt8((pc & 0xFF00) >> 8)
+          let pcLSB = UInt8(pc & 0x00FF)
+          sp -= 1
+          state.ram[sp] = .init(value: .literal(pcMSB), sourceLocation: location)
+          sp -= 1
+          state.ram[sp] = .init(value: .literal(pcLSB), sourceLocation: location)
+          state.sp = .init(value: .literal(sp), sourceLocation: location)
+        }
+        state.pc = immediate
+      } else {
+        state.pc += width
+      }
+
     case .ld(.sp, .imm16):
       guard case let .imm16(immediate) = instruction.immediate else {
         preconditionFailure("Invalid immediate associated with instruction")

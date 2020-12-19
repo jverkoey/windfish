@@ -280,6 +280,10 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       ramTableView.heightAnchor.constraint(equalToConstant: 220),
     ])
 
+    ramController.sortDescriptors = [
+      NSSortDescriptor(key: NSUserInterfaceItemIdentifier.address.rawValue, ascending: true),
+    ]
+
     tableView.bind(.content, to: cpuController, withKeyPath: "arrangedObjects", options: nil)
     tableView.bind(.selectionIndexes, to: cpuController, withKeyPath:"selectionIndexes", options: nil)
     tableView.bind(.sortDescriptors, to: cpuController, withKeyPath: "sortDescriptors", options: nil)
@@ -289,6 +293,8 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     ramTableView.tableView?.bind(.sortDescriptors, to: ramController, withKeyPath: "sortDescriptors", options: nil)
 
     updateInstructionAssembly()
+    updateRegisters()
+    updateRAM()
 
     disassembledSubscriber = NotificationCenter.default.publisher(for: .disassembled, object: document)
       .receive(on: RunLoop.main)
@@ -414,8 +420,8 @@ extension EmulatorViewController: NSTextFieldDelegate {
       switch value.value {
       case .literal(let literalValue):
         return RAMValue(address: address, state: "Literal", value: UInt16(literalValue), sourceLocation: value.sourceLocation)
-      case .variable(let address):
-        return RAMValue(address: address, state: "Address", value: address, sourceLocation: value.sourceLocation)
+      case .variable(let variableAddress):
+        return RAMValue(address: address, state: "Address", value: variableAddress, sourceLocation: value.sourceLocation)
       }
     }
   }

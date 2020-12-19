@@ -125,6 +125,8 @@ extension LR35902 {
         self.sourceLocation = sourceLocation
       }
 
+      // TODO: Allow variable source to be stored alongside the literal value so that both can be tracked.
+
       public enum Value: Equatable {
         /** The register's value is defined by the value of some bytes in ram (which may not be known). */
         case variable(LR35902.Address)
@@ -172,6 +174,7 @@ extension LR35902.CPUState {
        c: UInt8? = nil, d: UInt8? = nil,
        e: UInt8? = nil,
        h: UInt8? = nil, l: UInt8? = nil,
+       sp: UInt16? = nil,
        pc: LR35902.Address = 0, bank: LR35902.Bank = 0) {
     if let a = a {
       self.a = .init(value: .literal(a), sourceLocation: 0)
@@ -193,6 +196,9 @@ extension LR35902.CPUState {
     }
     if let l = l {
       self.l = .init(value: .literal(l), sourceLocation: 0)
+    }
+    if let sp = sp {
+      self.sp = .init(value: .literal(sp), sourceLocation: 0)
     }
     self.pc = pc
     self.bank = bank
