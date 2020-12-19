@@ -10,7 +10,7 @@ extension NSUserInterfaceItemIdentifier {
 }
 
 private final class CPURegister: NSObject {
-  init(name: String, state: String, value: String) {
+  init(name: String, state: String, value: UInt16) {
     self.name = name
     self.state = state
     self.value = value
@@ -18,7 +18,7 @@ private final class CPURegister: NSObject {
 
   @objc dynamic var name: String
   @objc dynamic var state: String
-  @objc dynamic var value: String
+  @objc dynamic var value: UInt16
 }
 
 final class EmulatorViewController: NSViewController, TabSelectable {
@@ -26,6 +26,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   let selectedTabImage = NSImage(systemSymbolName: "cpu", accessibilityDescription: nil)!
 
   let cpuController = NSArrayController()
+  let registerStateController = NSArrayController()
   var tableView: NSTableView?
 
   private struct Column {
@@ -65,15 +66,19 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     }
 
     cpuController.add(contentsOf: [
-      CPURegister(name: "a", state: "Unknown", value: ""),
-      CPURegister(name: "b", state: "Unknown", value: ""),
-      CPURegister(name: "c", state: "Unknown", value: ""),
-      CPURegister(name: "d", state: "Unknown", value: ""),
-      CPURegister(name: "e", state: "Unknown", value: ""),
-      CPURegister(name: "h", state: "Unknown", value: ""),
-      CPURegister(name: "l", state: "Unknown", value: ""),
+      CPURegister(name: "a", state: "Unknown", value: 0),
+      CPURegister(name: "b", state: "Unknown", value: 0),
+      CPURegister(name: "c", state: "Unknown", value: 0),
+      CPURegister(name: "d", state: "Unknown", value: 0),
+      CPURegister(name: "e", state: "Unknown", value: 0),
+      CPURegister(name: "h", state: "Unknown", value: 0),
+      CPURegister(name: "l", state: "Unknown", value: 0),
     ])
     cpuController.setSelectionIndexes(IndexSet())
+
+    registerStateController.addObject("Unknown")
+    registerStateController.addObject("Literal")
+    registerStateController.addObject("Address")
 
     NSLayoutConstraint.activate([
       containerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
@@ -95,7 +100,7 @@ extension EmulatorViewController: NSTableViewDelegate {
     }
 
     switch tableColumn.identifier {
-    case .register, .registerState, .registerValue:
+    case .register:
       let identifier = NSUserInterfaceItemIdentifier.textCell
       let view: TextTableCellView
       if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TextTableCellView {
@@ -103,6 +108,30 @@ extension EmulatorViewController: NSTableViewDelegate {
       } else {
         view = TextTableCellView()
         view.identifier = identifier
+      }
+      view.textField?.bind(.value, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
+      return view
+    case .registerState:
+      let identifier = NSUserInterfaceItemIdentifier.typeCell
+      let view: TypeTableCellView
+      if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TypeTableCellView {
+        view = recycledView
+      } else {
+        view = TypeTableCellView()
+        view.identifier = identifier
+      }
+      view.popupButton.bind(.content, to: registerStateController, withKeyPath: "arrangedObjects", options: nil)
+      view.popupButton.bind(.selectedObject, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
+      return view
+    case .registerValue:
+      let identifier = NSUserInterfaceItemIdentifier.addressCell
+      let view: TextTableCellView
+      if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TextTableCellView {
+        view = recycledView
+      } else {
+        view = TextTableCellView()
+        view.identifier = identifier
+        view.textField?.formatter = LR35902AddressFormatter()
       }
       view.textField?.bind(.value, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
       return view
