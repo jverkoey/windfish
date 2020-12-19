@@ -44,10 +44,10 @@ extension LR35902 {
     var next: [LR35902.Cartridge.Location] = []
 
     /** Program counter. */
-    var pc: Address = 0
+    var pc: Address
 
     /** Selected bank. */
-    var bank: Bank = 0
+    var bank: Bank
 
     // MARK: Subscript access of instructions using LR35902 instruction specifications
     /** 8-bit register subscript. */
@@ -145,7 +145,8 @@ extension LR35902.CPUState {
   init(a: UInt8? = nil, b: UInt8? = nil,
        c: UInt8? = nil, d: UInt8? = nil,
        e: UInt8? = nil,
-       h: UInt8? = nil, l: UInt8? = nil) {
+       h: UInt8? = nil, l: UInt8? = nil,
+       pc: LR35902.Address = 0, bank: LR35902.Bank = 0) {
     if let a = a {
       self.a = .init(value: .literal(a), sourceLocation: 0)
     }
@@ -167,5 +168,7 @@ extension LR35902.CPUState {
     if let l = l {
       self.l = .init(value: .literal(l), sourceLocation: 0)
     }
+    self.pc = pc
+    self.bank = bank
   }
 }

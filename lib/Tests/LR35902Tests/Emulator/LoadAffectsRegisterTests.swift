@@ -9,7 +9,7 @@ ld   a, 1
     let states = disassembly.trace(range: 0..<disassembly.cpu.cartridge.size)
 
     let state = try XCTUnwrap(states[LR35902.Cartridge.Location(0x0000)])
-    assertEqual(state, LR35902.CPUState(a: 1))
+    assertEqual(state, LR35902.CPUState(a: 1, pc: 0x0002, bank: 0x00))
   }
 
   func test_ld_b() throws {
@@ -19,7 +19,7 @@ ld   b, 1
     let states = disassembly.trace(range: 0..<disassembly.cpu.cartridge.size)
 
     let state = try XCTUnwrap(states[LR35902.Cartridge.Location(0x0000)])
-    assertEqual(state, LR35902.CPUState(b: 1))
+    assertEqual(state, LR35902.CPUState(b: 1, pc: 0x0002, bank: 0x00))
   }
 
   func test_ld_c() throws {
@@ -29,7 +29,7 @@ ld   c, 1
     let states = disassembly.trace(range: 0..<disassembly.cpu.cartridge.size)
 
     let state = try XCTUnwrap(states[LR35902.Cartridge.Location(0x0000)])
-    assertEqual(state, LR35902.CPUState(c: 1))
+    assertEqual(state, LR35902.CPUState(c: 1, pc: 0x0002, bank: 0x00))
   }
 
   func test_ld_d() throws {
@@ -39,7 +39,7 @@ ld   d, 1
     let states = disassembly.trace(range: 0..<disassembly.cpu.cartridge.size)
 
     let state = try XCTUnwrap(states[LR35902.Cartridge.Location(0x0000)])
-    assertEqual(state, LR35902.CPUState(d: 1))
+    assertEqual(state, LR35902.CPUState(d: 1, pc: 0x0002, bank: 0x00))
   }
 
   func test_ld_e() throws {
@@ -49,7 +49,7 @@ ld   e, 1
     let states = disassembly.trace(range: 0..<disassembly.cpu.cartridge.size)
 
     let state = try XCTUnwrap(states[LR35902.Cartridge.Location(0x0000)])
-    assertEqual(state, LR35902.CPUState(e: 1))
+    assertEqual(state, LR35902.CPUState(e: 1, pc: 0x0002, bank: 0x00))
   }
 
   func test_ld_h() throws {
@@ -59,7 +59,7 @@ ld   h, 1
     let states = disassembly.trace(range: 0..<disassembly.cpu.cartridge.size)
 
     let state = try XCTUnwrap(states[LR35902.Cartridge.Location(0x0000)])
-    assertEqual(state, LR35902.CPUState(h: 1))
+    assertEqual(state, LR35902.CPUState(h: 1, pc: 0x0002, bank: 0x00))
   }
 
   func test_ld_l() throws {
@@ -69,6 +69,6 @@ ld   l, 1
     let states = disassembly.trace(range: 0..<disassembly.cpu.cartridge.size)
 
     let state = try XCTUnwrap(states[LR35902.Cartridge.Location(0x0000)])
-    assertEqual(state, LR35902.CPUState(l: 1))
+    assertEqual(state, LR35902.CPUState(l: 1, pc: 0x0002, bank: 0x00))
   }
 }

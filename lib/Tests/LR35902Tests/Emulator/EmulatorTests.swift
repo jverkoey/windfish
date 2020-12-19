@@ -52,7 +52,7 @@ ld   [$ffcb], a
     XCTAssertEqual(lastState.value.c, .init(value: .literal(0b0000_1111), sourceLocation: 0))
     XCTAssertEqual(lastState.value.ram[0xffcb], .init(value: .literal(0b0000_1111), sourceLocation: 0))
     XCTAssertEqual(lastState.value.ram[0xffcc], .init(value: .literal(0b0000_0011), sourceLocation: 4))
-    XCTAssertEqual(lastState.value.pc, 0x0008)
+    XCTAssertEqual(lastState.value.pc, 0x000A)
     XCTAssertEqual(lastState.value.bank, 0x00)
   }
 }
