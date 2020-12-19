@@ -28,14 +28,30 @@ private final class CPURegister: NSObject {
   @objc dynamic var sourceLocation: LR35902.Cartridge.Location
 }
 
+private final class RAMValue: NSObject {
+  init(address: LR35902.Address, state: String, value: UInt16, sourceLocation: LR35902.Cartridge.Location) {
+    self.address = address
+    self.state = state
+    self.value = value
+    self.sourceLocation = sourceLocation
+  }
+
+  @objc dynamic var address: LR35902.Address
+  @objc dynamic var state: String
+  @objc dynamic var value: UInt16
+  @objc dynamic var sourceLocation: LR35902.Cartridge.Location
+}
+
 final class EmulatorViewController: NSViewController, TabSelectable {
   let deselectedTabImage = NSImage(systemSymbolName: "cpu", accessibilityDescription: nil)!
   let selectedTabImage = NSImage(systemSymbolName: "cpu", accessibilityDescription: nil)!
 
   let document: ProjectDocument
   let cpuController = NSArrayController()
+  let ramController = NSArrayController()
   let registerStateController = NSArrayController()
   var tableView: NSTableView?
+  var ramTableView: EditorTableView?
   let programCounterTextField = NSTextField()
   let instructionAssemblyLabel = CreateLabel()
 
@@ -63,6 +79,8 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
   override func loadView() {
     view = NSView()
+
+    // MARK: Views
 
     let controls = NSSegmentedControl()
     controls.translatesAutoresizingMaskIntoConstraints = false
@@ -126,8 +144,16 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     view.addSubview(containerView)
     self.tableView = tableView
 
+    let ramTableView = EditorTableView(elementsController: ramController)
+    ramTableView.translatesAutoresizingMaskIntoConstraints = false
+    ramTableView.tableView?.delegate = self
+    view.addSubview(ramTableView)
+    self.ramTableView = ramTableView
+
     let textFieldAlignmentGuide = NSLayoutGuide()
     view.addLayoutGuide(textFieldAlignmentGuide)
+
+    // MARK: Model
 
     let columns = [
       Column(name: "Register", identifier: .register, width: 50),
@@ -135,13 +161,26 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       Column(name: "Value", identifier: .registerValue, width: 50),
       Column(name: "Source", identifier: .registerSourceLocation, width: 50),
     ]
-
     for columnInfo in columns {
       let column = NSTableColumn(identifier: columnInfo.identifier)
       column.isEditable = false
       column.headerCell.stringValue = columnInfo.name
       column.width = columnInfo.width
       tableView.addTableColumn(column)
+    }
+
+    let ramColumns = [
+      Column(name: "Address", identifier: .address, width: 50),
+      Column(name: "State", identifier: .registerState, width: 100),
+      Column(name: "Value", identifier: .registerValue, width: 50),
+      Column(name: "Source", identifier: .registerSourceLocation, width: 50),
+    ]
+    for columnInfo in ramColumns {
+      let column = NSTableColumn(identifier: columnInfo.identifier)
+      column.isEditable = false
+      column.headerCell.stringValue = columnInfo.name
+      column.width = columnInfo.width
+      ramTableView.tableView?.addTableColumn(column)
     }
 
     let registers = [
@@ -191,6 +230,8 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     registerStateController.addObject("Literal")
     registerStateController.addObject("Address")
 
+    // MARK: Layout
+
     NSLayoutConstraint.activate([
       controls.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
       controls.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
@@ -228,11 +269,20 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       containerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
       containerView.topAnchor.constraint(equalToSystemSpacingBelow: instructionAssemblyLabel.bottomAnchor, multiplier: 1),
       containerView.heightAnchor.constraint(equalToConstant: 220),
+
+      ramTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+      ramTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+      ramTableView.topAnchor.constraint(equalToSystemSpacingBelow: containerView.bottomAnchor, multiplier: 1),
+      ramTableView.heightAnchor.constraint(equalToConstant: 220),
     ])
 
     tableView.bind(.content, to: cpuController, withKeyPath: "arrangedObjects", options: nil)
     tableView.bind(.selectionIndexes, to: cpuController, withKeyPath:"selectionIndexes", options: nil)
     tableView.bind(.sortDescriptors, to: cpuController, withKeyPath: "sortDescriptors", options: nil)
+
+    ramTableView.tableView?.bind(.content, to: ramController, withKeyPath: "arrangedObjects", options: nil)
+    ramTableView.tableView?.bind(.selectionIndexes, to: ramController, withKeyPath:"selectionIndexes", options: nil)
+    ramTableView.tableView?.bind(.sortDescriptors, to: ramController, withKeyPath: "sortDescriptors", options: nil)
 
     updateInstructionAssembly()
 
@@ -244,47 +294,21 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   }
 
   @objc func performControlAction(_ sender: NSSegmentedControl) {
-    if sender.selectedSegment == 0 {
+    if sender.selectedSegment == 0 {  // Step forward
       guard let instruction = currentInstruction() else {
         return
       }
       cpuState = cpuState.emulate(instruction: instruction)
       programCounterTextField.objectValue = cpuState.pc
       updateInstructionAssembly()
+      updateRegisters()
 
-      for register in cpuController.arrangedObjects as! [CPURegister] {
-        if LR35902.Instruction.Numeric.registers8.contains(register.register) {
-          let value: LR35902.CPUState.RegisterState<UInt8>? = self.cpuState[register.register]
-
-          register.sourceLocation = value?.sourceLocation ?? 0
-
-          switch value?.value {
-          case .none:
-            register.state = "Unknown"
-            register.value = 0
-          case .literal(let value):
-            register.state = "Literal"
-            register.value = UInt16(value)
-          case .variable(let address):
-            register.state = "Address"
-            register.value = address
-          }
-        } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
-          let value: LR35902.CPUState.RegisterState<UInt16>? = self.cpuState[register.register]
-
-          register.sourceLocation = value?.sourceLocation ?? 0
-
-          switch value?.value {
-          case .none:
-            register.state = "Unknown"
-            register.value = 0
-          case .literal(let value):
-            register.state = "Literal"
-            register.value = value
-          case .variable(let address):
-            register.state = "Address"
-            register.value = address
-          }
+      ramController.content = cpuState.ram.map { address, value -> RAMValue in
+        switch value.value {
+        case .literal(let literalValue):
+          return RAMValue(address: address, state: "Literal", value: UInt16(literalValue), sourceLocation: value.sourceLocation)
+        case .variable(let address):
+          return RAMValue(address: address, state: "Address", value: address, sourceLocation: value.sourceLocation)
         }
       }
     }
@@ -331,6 +355,44 @@ extension EmulatorViewController: NSTextFieldDelegate {
     let statement = RGBDSDisassembler.statement(for: instruction, with: context)
     instructionAssemblyLabel.stringValue = statement.formattedString
   }
+
+  func updateRegisters() {
+    for register in cpuController.arrangedObjects as! [CPURegister] {
+      if LR35902.Instruction.Numeric.registers8.contains(register.register) {
+        let value: LR35902.CPUState.RegisterState<UInt8>? = self.cpuState[register.register]
+
+        register.sourceLocation = value?.sourceLocation ?? 0
+
+        switch value?.value {
+        case .none:
+          register.state = "Unknown"
+          register.value = 0
+        case .literal(let value):
+          register.state = "Literal"
+          register.value = UInt16(value)
+        case .variable(let address):
+          register.state = "Address"
+          register.value = address
+        }
+      } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
+        let value: LR35902.CPUState.RegisterState<UInt16>? = self.cpuState[register.register]
+
+        register.sourceLocation = value?.sourceLocation ?? 0
+
+        switch value?.value {
+        case .none:
+          register.state = "Unknown"
+          register.value = 0
+        case .literal(let value):
+          register.state = "Literal"
+          register.value = value
+        case .variable(let address):
+          register.state = "Address"
+          register.value = address
+        }
+      }
+    }
+  }
 }
 
 extension EmulatorViewController: NSTableViewDelegate {
@@ -363,7 +425,7 @@ extension EmulatorViewController: NSTableViewDelegate {
       view.popupButton.bind(.content, to: registerStateController, withKeyPath: "arrangedObjects", options: nil)
       view.popupButton.bind(.selectedObject, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
       return view
-    case .registerValue, .registerSourceLocation:
+    case .registerValue, .registerSourceLocation, .address:
       let identifier = NSUserInterfaceItemIdentifier.addressCell
       let view: TextTableCellView
       if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TextTableCellView {
