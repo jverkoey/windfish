@@ -12,13 +12,15 @@ extension NSUserInterfaceItemIdentifier {
 }
 
 private final class CPURegister: NSObject {
-  init(name: String, state: String, value: UInt16) {
+  init(name: String, register: LR35902.Instruction.Numeric, state: String, value: UInt16) {
     self.name = name
+    self.register = register
     self.state = state
     self.value = value
   }
 
   @objc dynamic var name: String
+  var register: LR35902.Instruction.Numeric
   @objc dynamic var state: String
   @objc dynamic var value: UInt16
 }
@@ -53,6 +55,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   }
 
   private var programCounterObserver: NSKeyValueObservation?
+  private var registerObservers: [NSKeyValueObservation] = []
   private var disassembledSubscriber: AnyCancellable?
 
   override func loadView() {
@@ -137,15 +140,45 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       tableView.addTableColumn(column)
     }
 
-    cpuController.add(contentsOf: [
-      CPURegister(name: "a", state: "Unknown", value: 0),
-      CPURegister(name: "b", state: "Unknown", value: 0),
-      CPURegister(name: "c", state: "Unknown", value: 0),
-      CPURegister(name: "d", state: "Unknown", value: 0),
-      CPURegister(name: "e", state: "Unknown", value: 0),
-      CPURegister(name: "h", state: "Unknown", value: 0),
-      CPURegister(name: "l", state: "Unknown", value: 0),
-    ])
+    let registers = [
+      CPURegister(name: "a", register: .a, state: "Unknown", value: 0),
+      CPURegister(name: "b", register: .b, state: "Unknown", value: 0),
+      CPURegister(name: "c", register: .c, state: "Unknown", value: 0),
+      CPURegister(name: "d", register: .d, state: "Unknown", value: 0),
+      CPURegister(name: "e", register: .e, state: "Unknown", value: 0),
+      CPURegister(name: "h", register: .h, state: "Unknown", value: 0),
+      CPURegister(name: "l", register: .l, state: "Unknown", value: 0),
+    ]
+    let didChangeRegister: (CPURegister) -> Void = { [weak self] register in
+      guard let self = self else {
+        return
+      }
+      switch register.state {
+      case "Unknown":
+        self.cpuState.clear(register.register)
+      case "Literal":
+        if LR35902.Instruction.Numeric.registers8.contains(register.register) {
+          self.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt8>(value: .literal(UInt8(register.value)), sourceLocation: 0)
+        } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
+          self.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt16>(value: .literal(register.value), sourceLocation: 0)
+        }
+      case "Address":
+        if LR35902.Instruction.Numeric.registers8.contains(register.register) {
+          self.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt8>(value: .variable(register.value), sourceLocation: 0)
+        } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
+          self.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt16>(value: .variable(register.value), sourceLocation: 0)
+        }
+      default:
+        preconditionFailure()
+      }
+    }
+    for register in registers {
+      registerObservers.append(contentsOf: [
+        register.observe(\.state) { register, _ in didChangeRegister(register) },
+        register.observe(\.value) { register, _ in didChangeRegister(register) },
+      ])
+    }
+    cpuController.add(contentsOf: registers)
     cpuController.setSelectionIndexes(IndexSet())
 
     registerStateController.addObject("Unknown")

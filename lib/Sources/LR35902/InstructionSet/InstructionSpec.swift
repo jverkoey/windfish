@@ -83,14 +83,14 @@ extension LR35902.Instruction {
 
     case zeroimm8  // Used solely as a placeholder for stop's extra null byte
 
-    static let registers8: Set<LR35902.Instruction.Numeric> = Set([
+    public static let registers8: Set<LR35902.Instruction.Numeric> = Set([
       .a,
       .b, .c,
       .d, .e,
       .h, .l,
     ])
 
-    static let registers16: Set<LR35902.Instruction.Numeric> = Set([
+    public static let registers16: Set<LR35902.Instruction.Numeric> = Set([
       .bc,
       .de,
       .hl,

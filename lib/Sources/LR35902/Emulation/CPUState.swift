@@ -51,7 +51,7 @@ extension LR35902 {
 
     // MARK: Subscript access of instructions using LR35902 instruction specifications
     /** 8-bit register subscript. */
-    subscript(numeric: LR35902.Instruction.Numeric) -> RegisterState<UInt8>? {
+    public subscript(numeric: LR35902.Instruction.Numeric) -> RegisterState<UInt8>? {
       get {
         switch numeric {
         case .a: return a
@@ -78,7 +78,7 @@ extension LR35902 {
       }
     }
     /** 16-bit register subscript. */
-    subscript(numeric: LR35902.Instruction.Numeric) -> RegisterState<UInt16>? {
+    public subscript(numeric: LR35902.Instruction.Numeric) -> RegisterState<UInt16>? {
       get {
         switch numeric {
         case .bc: return bc
@@ -97,8 +97,31 @@ extension LR35902 {
       }
     }
 
+    /** Resets the register state to nil. */
+    public mutating func clear(_ numeric: LR35902.Instruction.Numeric) {
+      switch numeric {
+      case .a: a = nil
+      case .b: b = nil
+      case .c: c = nil
+      case .d: d = nil
+      case .e: e = nil
+      case .h: h = nil
+      case .l: l = nil
+      case .bc: bc = nil
+      case .de: de = nil
+      case .hl: hl = nil
+      default:
+        preconditionFailure()
+      }
+    }
+
     /** The state of an specific register. */
     public struct RegisterState<T: BinaryInteger>: Equatable {
+      public init(value: Value, sourceLocation: LR35902.Cartridge.Location) {
+        self.value = value
+        self.sourceLocation = sourceLocation
+      }
+
       public enum Value: Equatable {
         /** The register's value is defined by the value of some bytes in ram (which may not be known). */
         case variable(LR35902.Address)
