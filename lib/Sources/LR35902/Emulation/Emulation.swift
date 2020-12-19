@@ -1,26 +1,5 @@
 import Foundation
 
-extension LR35902 {
-  func logic(for spec: Instruction.Spec) -> ((LR35902, Instruction) -> Void) {
-    switch spec {
-    case let .jp(condition, .imm16):
-      if condition != nil {
-        preconditionFailure()
-      } else {
-        return { cpu, instruction in
-          guard case let .imm16(immediate) = instruction.immediate else {
-            preconditionFailure("Invalid immediate associated with instruction")
-          }
-          cpu.pc = immediate
-        }
-      }
-      break
-    default:
-      preconditionFailure()
-    }
-  }
-}
-
 extension LR35902.CPUState {
   func emulate(instruction: LR35902.Instruction) -> LR35902.CPUState {
     let registers8 = LR35902.Instruction.Numeric.registers8
@@ -80,6 +59,12 @@ extension LR35902.CPUState {
 
     case .xor(.a):
       state.a = .init(value: .literal(0), sourceLocation: location)
+
+    case .xor(let numeric) where numeric == .imm8:
+      if case .literal(let dst) = state.a?.value,
+         case .imm8(let src) = instruction.immediate {
+        state.a = .init(value: .literal(dst ^ src), sourceLocation: location)
+      }
 
     case .xor(let numeric) where registers8.contains(numeric):
       if case .literal(let dst) = state.a?.value,

@@ -38,12 +38,9 @@ extension LR35902.Disassembly {
       }
 
       let location = LR35902.Cartridge.location(for: state.pc, in: state.bank)!
-
       let postState = state.emulate(instruction: instruction)
-
       step?(instruction, location, postState)
       states[location] = postState
-
       state = postState
     }
 
