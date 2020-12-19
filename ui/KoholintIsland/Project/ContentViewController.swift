@@ -100,7 +100,6 @@ final class ContentViewController: NSViewController {
 
   let document: ProjectDocument
   private var disassembledSubscriber: AnyCancellable?
-  private var didChangeEmulationLocationSubscriber: AnyCancellable?
 
   private var didProcessEditingSubscriber: AnyCancellable?
   var lineAnalysis: LineAnalysis? {
@@ -177,13 +176,6 @@ final class ContentViewController: NSViewController {
         self.lineAnalysis = nil
         lineNumbersRuler.needsDisplay = true
       })
-
-    didChangeEmulationLocationSubscriber = NotificationCenter.default.publisher(for: .didChangeEmulationLocation, object: document)
-      .receive(on: RunLoop.main)
-      .sink(receiveValue: { notification in
-        textView.emulationLine = self.document.disassemblyResults?.lineFor(address: self.document.cpuState.pc, bank: self.document.cpuState.bank)
-      })
-
   }
 }
 

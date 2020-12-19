@@ -7,6 +7,8 @@
 import Cocoa
 import Combine
 
+import LR35902
+
 final class ProjectViewController: NSViewController {
 
   let document: ProjectDocument
@@ -24,6 +26,7 @@ final class ProjectViewController: NSViewController {
   private var selectedRegionDidChangeSubscriber: AnyCancellable?
   private var didCreateRegionSubscriber: AnyCancellable?
   private var disassembledSubscriber: AnyCancellable?
+  private var didChangeEmulationLocationSubscriber: AnyCancellable?
 
   init(document: ProjectDocument) {
     self.document = document
@@ -162,17 +165,25 @@ final class ProjectViewController: NSViewController {
         self.statisticsView.statistics = self.document.disassemblyResults?.statistics
       })
 
+    didChangeEmulationLocationSubscriber = NotificationCenter.default.publisher(for: .didChangeEmulationLocation, object: document)
+      .receive(on: RunLoop.main)
+      .sink(receiveValue: { notification in
+        self.contentViewController.textView?.emulationLine = self.document.disassemblyResults?.lineFor(address: self.document.cpuState.pc, bank: self.document.cpuState.bank)
+
+        self.jumpTo(address: self.document.cpuState.pc, bank: self.document.cpuState.bank)
+      })
+
     if document.isDisassembling {
       startProgressIndicator()
     }
   }
 
-  func showRegion(_ region: Region) {
+  func jumpTo(address: LR35902.Address, bank: LR35902.Bank, highlight: Bool = false) {
     guard let metadata = self.document.metadata else {
       return
     }
     let fileName = metadata.bankMap.first { key, value in
-      value == region.bank
+      value == bank
     }?.key
     guard let index = self.sidebarViewController.treeController.arrangedObjects.descendant(at: IndexPath(indexes: [0]))?.children?.firstIndex(where: { node in
       (node.representedObject as? ProjectOutlineNode)?.title == fileName
@@ -181,7 +192,7 @@ final class ProjectViewController: NSViewController {
     }
     self.sidebarViewController.treeController.setSelectionIndexPath(IndexPath(indexes: [0, index]))
 
-    guard let lineIndex = self.document.disassemblyResults?.lineFor(address: region.address, bank: region.bank) else {
+    guard let lineIndex = self.document.disassemblyResults?.lineFor(address: address, bank: bank) else {
       return
     }
 
@@ -194,12 +205,18 @@ final class ProjectViewController: NSViewController {
       return
     }
 
-    self.contentViewController.textView?.highlightedLine = lineIndex
+    if highlight {
+      self.contentViewController.textView?.highlightedLine = lineIndex
+    }
 
     let lineRange = analysis.lineRanges[lineIndex]
     let glyphGraph = layoutManager.glyphRange(forCharacterRange: lineRange, actualCharacterRange: nil)
     let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphGraph, in: textContainer)
     self.contentViewController.textView?.scroll(boundingRect.offsetBy(dx: 0, dy: -containerView.bounds.height / 2).origin)
+  }
+
+  func showRegion(_ region: Region) {
+    jumpTo(address: region.address, bank: region.bank, highlight: true)
   }
 
   private let splitViewResorationIdentifier = "com.featherless.restorationId:SplitViewController"
