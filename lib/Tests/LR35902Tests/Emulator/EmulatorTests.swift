@@ -21,6 +21,8 @@ func assertEqual(_ state1: LR35902.CPUState, _ state2: LR35902.CPUState, file: S
   XCTAssertEqual(state1.l, state2.l, "l mismatch", file: file, line: line)
   XCTAssertEqual(state1.sp, state2.sp, "sp mismatch", file: file, line: line)
   XCTAssertEqual(state1.ram, state2.ram, "ram mismatch", file: file, line: line)
+  XCTAssertEqual(state1.pc, state2.pc, "pc mismatch", file: file, line: line)
+  XCTAssertEqual(state1.bank, state2.bank, "bank mismatch", file: file, line: line)
 }
 
 class EmulatorTests: XCTestCase {
@@ -50,5 +52,7 @@ ld   [$ffcb], a
     XCTAssertEqual(lastState.value.c, .init(value: .literal(0b0000_1111), sourceLocation: 0))
     XCTAssertEqual(lastState.value.ram[0xffcb], .init(value: .literal(0b0000_1111), sourceLocation: 0))
     XCTAssertEqual(lastState.value.ram[0xffcc], .init(value: .literal(0b0000_0011), sourceLocation: 4))
+    XCTAssertEqual(lastState.value.pc, 0x0008)
+    XCTAssertEqual(lastState.value.bank, 0x00)
   }
 }

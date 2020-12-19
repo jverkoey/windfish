@@ -3,6 +3,8 @@ import Foundation
 public final class LR35902 {
   public typealias Address = UInt16
   public typealias Bank = UInt8
+
+  // TODO: Move these into the disassembler and CPUState so that they can be tracked independently.
   public var pc: Address = 0
   public var bank: Bank = 0
 

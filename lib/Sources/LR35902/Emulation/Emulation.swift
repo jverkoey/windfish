@@ -19,4 +19,8 @@ extension LR35902 {
       preconditionFailure()
     }
   }
+
+  func emulate(instruction: Instruction, cpuState: CPUState) -> CPUState {
+    return cpuState
+  }
 }

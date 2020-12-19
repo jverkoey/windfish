@@ -40,8 +40,14 @@ extension LR35902 {
     /** Random access memory. */
     var ram: [LR35902.Address: RegisterState<UInt8>] = [:]
 
-    // MARK: Stack pointer
+    // One or more addresses that this state can move to upon execution.
     var next: [LR35902.Cartridge.Location] = []
+
+    /** Program counter. */
+    var pc: Address = 0
+
+    /** Selected bank. */
+    var bank: Bank = 0
 
     // MARK: Subscript access of instructions using LR35902 instruction specifications
     /** 8-bit register subscript. */
