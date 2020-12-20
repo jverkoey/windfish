@@ -212,6 +212,8 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     instructionAssemblyLabel.translatesAutoresizingMaskIntoConstraints = false
     instructionAssemblyLabel.stringValue = "Waiting for disassembly results..."
     instructionAssemblyLabel.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
+    instructionAssemblyLabel.maximumNumberOfLines = 5
+    instructionAssemblyLabel.lineBreakStrategy = .standard
     view.addSubview(instructionAssemblyLabel)
 
     let containerView = NSScrollView()
@@ -283,33 +285,24 @@ final class EmulatorViewController: NSViewController, TabSelectable {
         return
       }
       if LR35902.Instruction.Numeric.registers8.contains(register.register) {
-        let registerValue: UInt8?
+        let registerValue: UInt8
         if let result = register.value?.numberRepresentation(UInt8.self) {
           register.valueRepresentation = result.0
           registerValue = result.1
         } else {
-          registerValue = nil
+          registerValue = 0
         }
-        let registerSourceLocation = register.sourceLocation?.addressAndBankRepresentation()
-        if registerSourceLocation == nil && registerValue == nil {
-          self.document.cpuState.clear(register.register)
-        } else {
-          self.document.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt8>(value: registerValue, sourceLocation: registerSourceLocation, variableLocation: register.variableAddress)
-        }
+        self.document.cpuState[register.register] = registerValue
+
       } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
-        let registerValue: UInt16?
+        let registerValue: UInt16
         if let result = register.value?.numberRepresentation(UInt16.self) {
           register.valueRepresentation = result.0
           registerValue = result.1
         } else {
-          registerValue = nil
+          registerValue = 0
         }
-        let registerSourceLocation = register.sourceLocation?.addressAndBankRepresentation()
-        if registerSourceLocation == nil && registerValue == nil {
-          self.document.cpuState.clear(register.register)
-        } else {
-          self.document.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt16>(value: registerValue, sourceLocation: registerSourceLocation, variableLocation: register.variableAddress)
-        }
+        self.document.cpuState[register.register] = registerValue
       }
     }
     for register in registers {
@@ -356,7 +349,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       instructionLabel.topAnchor.constraint(equalTo: bankTextField.bottomAnchor),
 
       instructionAssemblyLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
-      instructionAssemblyLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -4),
+      instructionAssemblyLabel.widthAnchor.constraint(lessThanOrEqualToConstant: 400),
       instructionAssemblyLabel.topAnchor.constraint(equalTo: instructionLabel.bottomAnchor),
 
       containerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
@@ -474,28 +467,30 @@ extension EmulatorViewController: NSTextFieldDelegate {
 
     for register in cpuController.arrangedObjects as! [CPURegister] {
       if LR35902.Instruction.Numeric.registers8.contains(register.register) {
-        let value: LR35902.CPUState.RegisterState<UInt8>? = self.document.cpuState[register.register]
+        let value = self.document.cpuState[register.register] as UInt8
+        register.value = value.stringWithRepresentation(register.valueRepresentation)
 
-        register.sourceLocation = value?.sourceLocation?.stringWithAddressAndBank()
-        register.variableAddress = value?.variableLocation ?? 0
-        if let variableLocation = value?.variableLocation {
-          register.variableName = globalMap[variableLocation]?.name
+        let trace = self.document.cpuState.registerTraces[register.register]
+        register.sourceLocation = trace?.sourceLocation?.stringWithAddressAndBank()
+        register.variableAddress = trace?.loadAddress ?? 0
+        if let loadAddress = trace?.loadAddress {
+          register.variableName = globalMap[loadAddress]?.name
         } else {
           register.variableName = nil
         }
-        register.value = value?.value?.stringWithRepresentation(register.valueRepresentation)
 
       } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
-        let value: LR35902.CPUState.RegisterState<UInt16>? = self.document.cpuState[register.register]
+        let value = self.document.cpuState[register.register] as UInt16
+        register.value = value.stringWithRepresentation(register.valueRepresentation)
 
-        register.sourceLocation = value?.sourceLocation?.stringWithAddressAndBank()
-        register.variableAddress = value?.variableLocation ?? 0
-        if let variableLocation = value?.variableLocation {
-          register.variableName = globalMap[variableLocation]?.name
+        let trace = self.document.cpuState.registerTraces[register.register]
+        register.sourceLocation = trace?.sourceLocation?.stringWithAddressAndBank()
+        register.variableAddress = trace?.loadAddress ?? 0
+        if let loadAddress = trace?.loadAddress {
+          register.variableName = globalMap[loadAddress]?.name
         } else {
           register.variableName = nil
         }
-        register.value = value?.value?.stringWithRepresentation(register.valueRepresentation)
       }
     }
   }
@@ -506,17 +501,12 @@ extension EmulatorViewController: NSTextFieldDelegate {
     }
     ramController.content = document.cpuState.ram.map { address, value -> RAMValue in
       let globalName = globalMap[address]?.name
-      let valueString: String
-      if let hexString = value.value?.hexString {
-        valueString = "0x" + hexString
-      } else {
-        valueString = ""
-      }
+      let valueString = "0x" + value.hexString
       return RAMValue(address: address,
                       variableName: globalName,
                       value: valueString,
-                      sourceLocation: value.sourceLocation?.stringWithAddressAndBank(),
-                      variableAddress: value.variableLocation ?? 0)
+                      sourceLocation: nil,
+                      variableAddress: 0)
     }
   }
 }

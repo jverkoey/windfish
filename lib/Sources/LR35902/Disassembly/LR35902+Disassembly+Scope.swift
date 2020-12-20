@@ -31,7 +31,7 @@ extension LR35902.Disassembly {
             }
             if let global = self.globals[immediate],
               let dataType = global.dataType,
-              let sourceLocation = state.a?.sourceLocation {
+              let sourceLocation = state.registerTraces[.a]?.sourceLocation {
               self.typeAtLocation[sourceLocation] = dataType
             }
 
@@ -42,12 +42,12 @@ extension LR35902.Disassembly {
             let address = 0xFF00 | LR35902.Address(immediate)
             if let global = self.globals[address],
               let dataType = global.dataType,
-              let sourceLocation = state.a?.sourceLocation {
+              let sourceLocation = state.registerTraces[.a]?.sourceLocation {
               self.typeAtLocation[sourceLocation] = dataType
             }
 
           case .cp(_):
-            if let address = state.a?.variableLocation,
+            if let address = state.registerTraces[.a]?.loadAddress,
               let global = self.globals[address],
               let dataType = global.dataType {
               self.typeAtLocation[location] = dataType
@@ -60,13 +60,12 @@ extension LR35902.Disassembly {
             let address = 0xFF00 | LR35902.Address(immediate)
             if let global = self.globals[address],
               let dataType = global.dataType,
-              let srcValue: LR35902.CPUState.RegisterState<UInt8> = state[src],
-              let sourceLocation = srcValue.sourceLocation {
+              let sourceLocation = state.registerTraces[src]?.sourceLocation {
               self.typeAtLocation[sourceLocation] = dataType
             }
 
           case .and(.imm8):
-            if let address = state.a?.variableLocation,
+            if let address = state.registerTraces[.a]?.loadAddress,
               let global = self.globals[address],
               let dataType = global.dataType,
               let type = self.dataTypes[dataType],

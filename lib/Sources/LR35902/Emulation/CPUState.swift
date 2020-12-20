@@ -8,233 +8,202 @@ extension LR35902 {
    support emulation of a block of instructions that might be reached from unknown locations or a variety of states.
    */
   public struct CPUState {
-
     // MARK: 8-bit registers
-    public var a: RegisterState<UInt8>?
-    public var b: RegisterState<UInt8>?
-    public var c: RegisterState<UInt8>?
-    public var d: RegisterState<UInt8>?
-    public var e: RegisterState<UInt8>?
-    public var h: RegisterState<UInt8>?
-    public var l: RegisterState<UInt8>?
+    public var a: UInt8 = 0
+    public var b: UInt8 = 0
+    public var c: UInt8 = 0
+    public var d: UInt8 = 0
+    public var e: UInt8 = 0
+    public var h: UInt8 = 0
+    public var l: UInt8 = 0
+
+    /** Flag register bits. */
+    public var fzero: Bool = false
+    public var fsubtract: Bool = false
+    public var fhalfcarry: Bool = false
+    public var fcarry: Bool = false
+
+    /** Flag register. */
+    public var f: UInt8 {
+      get {
+        return
+          (fzero        ? 0b1000_0000 : 0)
+          | (fsubtract  ? 0b0100_0000 : 0)
+          | (fhalfcarry ? 0b0010_0000 : 0)
+          | (fcarry     ? 0b0001_0000 : 0)
+      }
+      set {
+        fzero       = newValue & 0b1000_0000 != 0
+        fsubtract   = newValue & 0b0100_0000 != 0
+        fhalfcarry  = newValue & 0b0010_0000 != 0
+        fcarry      = newValue & 0b0001_0000 != 0
+      }
+    }
 
     // MARK: 16-bit registers
     // Note that, though these registers are ultimately backed by the underlying 8 bit registers, each 16-bit register
     // also stores the state value that was directly assigned to it.
-    public var bc: RegisterState<UInt16>? {
-      get { return get(high: b, low: c) ?? _bc }
-      set { set(register: &_bc, newValue: newValue, high: &b, low: &c) }
+    public var bc: UInt16 {
+      get { return UInt16(b) << 8 | UInt16(c) }
+      set {
+        b = UInt8(newValue >> 8)
+        c = UInt8(newValue & 0x00FF)
+      }
     }
-    public var de: RegisterState<UInt16>? {
-      get { return get(high: d, low: e) ?? _de }
-      set { set(register: &_de, newValue: newValue, high: &d, low: &e) }
+    public var de: UInt16 {
+      get { return UInt16(d) << 8 | UInt16(e) }
+      set {
+        d = UInt8(newValue >> 8)
+        e = UInt8(newValue & 0x00FF)
+      }
     }
-    public var hl: RegisterState<UInt16>? {
-      get { return get(high: h, low: l) ?? _hl }
-      set { set(register: &_hl, newValue: newValue, high: &h, low: &l) }
+    public var hl: UInt16 {
+      get { return UInt16(h) << 8 | UInt16(l) }
+      set {
+        h = UInt8(newValue >> 8)
+        l = UInt8(newValue & 0x00FF)
+      }
     }
 
     /** Stack pointer. */
-    public var sp: RegisterState<UInt16>?
+    public var sp: UInt16 = 0
 
     /** Random access memory. */
-    public var ram: [LR35902.Address: RegisterState<UInt8>] = [:]
+    public var ram: [LR35902.Address: UInt8] = [:]
 
     // One or more addresses that this state can move to upon execution.
     public var next: [LR35902.Cartridge.Location] = []
 
     /** Program counter. */
-    public var pc: Address
+    public var pc: Address = 0
 
     /** Selected bank. */
-    public var bank: Bank
+    public var bank: Bank = 0
 
-    /** Flag register. */
-    public var f: RegisterState<UInt8>? {
-      get {
-        if let sourceLocation = fzero?.sourceLocation,
-           let fzero = fzero?.value,
-           let fsubtract = fsubtract?.value,
-           let fhalfcarry = fhalfcarry?.value,
-           let fcarry = fcarry?.value {
-          return RegisterState<UInt8>(value:
-                                        (fzero        ? 0b1000_0000 : 0)
-                                        | (fsubtract  ? 0b0100_0000 : 0)
-                                        | (fhalfcarry ? 0b0010_0000 : 0)
-                                        | (fcarry     ? 0b0001_0000 : 0),
-                                      sourceLocation: sourceLocation)
-        }
-        return _f
-      }
-      set {
-        if let sourceLocation = newValue?.sourceLocation,
-           let value = newValue?.value {
-          fzero       = .init(value: value & 0b1000_0000 != 0, sourceLocation: sourceLocation)
-          fsubtract   = .init(value: value & 0b0100_0000 != 0, sourceLocation: sourceLocation)
-          fhalfcarry  = .init(value: value & 0b0010_0000 != 0, sourceLocation: sourceLocation)
-          fcarry      = .init(value: value & 0b0001_0000 != 0, sourceLocation: sourceLocation)
-        }
-        _f = newValue
-      }
+    /** Trace information for a given register. */
+    public var registerTraces: [LR35902.Instruction.Numeric: RegisterTrace] = [:]
+
+    /** Initializes the state with initial immediate values. */
+    public init(a: UInt8 = 0, b: UInt8 = 0, c: UInt8 = 0, d: UInt8 = 0, e: UInt8 = 0, h: UInt8 = 0, l: UInt8 = 0, fzero: Bool = false, fsubtract: Bool = false, fhalfcarry: Bool = false, fcarry: Bool = false, sp: UInt16 = 0, ram: [LR35902.Address : UInt8] = [:], next: [LR35902.Cartridge.Location] = [], pc: LR35902.Address = 0, bank: LR35902.Bank = 0, registerTraces: [LR35902.Instruction.Numeric : LR35902.CPUState.RegisterTrace] = [:]) {
+      self.a = a
+      self.b = b
+      self.c = c
+      self.d = d
+      self.e = e
+      self.h = h
+      self.l = l
+      self.fzero = fzero
+      self.fsubtract = fsubtract
+      self.fhalfcarry = fhalfcarry
+      self.fcarry = fcarry
+      self.sp = sp
+      self.ram = ram
+      self.next = next
+      self.pc = pc
+      self.bank = bank
+      self.registerTraces = registerTraces
     }
+  }
+}
 
-    /** Flag register bits. */
-    public var fzero: RegisterState<Bool>?
-    public var fsubtract: RegisterState<Bool>?
-    public var fhalfcarry: RegisterState<Bool>?
-    public var fcarry: RegisterState<Bool>?
+// MARK: - Subscript access
 
-    // MARK: Subscript access of instructions using LR35902 instruction specifications
-    /** 8-bit register subscript. */
-    public subscript(numeric: LR35902.Instruction.Numeric) -> RegisterState<UInt8>? {
-      get {
-        switch numeric {
-        case .a: return a
-        case .b: return b
-        case .c: return c
-        case .d: return d
-        case .e: return e
-        case .h: return h
-        case .l: return l
-        default: return nil
-        }
-      }
-      set {
-        switch numeric {
-        case .a: a = newValue
-        case .b: b = newValue
-        case .c: c = newValue
-        case .d: d = newValue
-        case .e: e = newValue
-        case .h: h = newValue
-        case .l: l = newValue
-        default: break
-        }
-      }
-    }
-    /** 16-bit register subscript. */
-    public subscript(numeric: LR35902.Instruction.Numeric) -> RegisterState<UInt16>? {
-      get {
-        switch numeric {
-        case .bc: return bc
-        case .de: return de
-        case .hl: return hl
-        case .sp: return sp
-        default: return nil
-        }
-      }
-      set {
-        switch numeric {
-        case .bc: bc = newValue
-        case .de: de = newValue
-        case .hl: hl = newValue
-        case .sp: sp = newValue
-        default: break
-        }
-      }
-    }
-
-    /** Resets the register state to nil. */
-    public mutating func clear(_ numeric: LR35902.Instruction.Numeric) {
+extension LR35902.CPUState {
+  // MARK: Subscript access of instructions using LR35902 instruction specifications
+  /** 8-bit register subscript. */
+  public subscript(numeric: LR35902.Instruction.Numeric) -> UInt8 {
+    get {
       switch numeric {
-      case .a: a = nil
-      case .b: b = nil
-      case .c: c = nil
-      case .d: d = nil
-      case .e: e = nil
-      case .h: h = nil
-      case .l: l = nil
-      case .bc: bc = nil
-      case .de: de = nil
-      case .hl: hl = nil
-      case .sp: sp = nil
+      case .a: return a
+      case .b: return b
+      case .c: return c
+      case .d: return d
+      case .e: return e
+      case .h: return h
+      case .l: return l
       default:
         preconditionFailure()
       }
     }
-
-    /** The state of an specific register. */
-    public struct RegisterState<T: Equatable>: Equatable {
-      public init(value: T?, sourceLocation: LR35902.Cartridge.Location? = nil, variableLocation: LR35902.Address? = nil) {
-        self.value = value
-        self.sourceLocation = sourceLocation
-        self.variableLocation = variableLocation
+    set {
+      switch numeric {
+      case .a: a = newValue
+      case .b: b = newValue
+      case .c: c = newValue
+      case .d: d = newValue
+      case .e: e = newValue
+      case .h: h = newValue
+      case .l: l = newValue
+      default:
+        preconditionFailure()
       }
-
-      /** The register's value represented as a literal, if known. */
-      public var value: T?
-
-      /** The address from which the value was loaded. */
-      public let variableLocation: LR35902.Address?
-
-      /** The cartridge location from which this register's value was loaded, if known. */
-      public let sourceLocation: LR35902.Cartridge.Location?
     }
+  }
+  /** 16-bit register subscript. */
+  public subscript(numeric: LR35902.Instruction.Numeric) -> UInt16 {
+    get {
+      switch numeric {
+      case .bc: return bc
+      case .de: return de
+      case .hl: return hl
+      case .sp: return sp
+      default:
+        preconditionFailure()
+      }
+    }
+    set {
+      switch numeric {
+      case .bc: bc = newValue
+      case .de: de = newValue
+      case .hl: hl = newValue
+      case .sp: sp = newValue
+      default:
+        preconditionFailure()
+      }
+    }
+  }
 
-    private var _f: RegisterState<UInt8>?
-    private var _bc: RegisterState<UInt16>?
-    private var _de: RegisterState<UInt16>?
-    private var _hl: RegisterState<UInt16>?
+  /** Resets the register state. */
+  public mutating func clear(_ numeric: LR35902.Instruction.Numeric) {
+    switch numeric {
+    case .a: a = 0
+    case .b: b = 0
+    case .c: c = 0
+    case .d: d = 0
+    case .e: e = 0
+    case .h: h = 0
+    case .l: l = 0
+    case .bc: bc = 0
+    case .de: de = 0
+    case .hl: hl = 0
+    case .sp: sp = 0
+    default:
+      preconditionFailure()
+    }
+    registerTraces.removeValue(forKey: numeric)
   }
 }
 
 extension LR35902.CPUState {
-  private func get(high: RegisterState<UInt8>?, low: RegisterState<UInt8>?) -> RegisterState<UInt16>? {
-    // TODO: Find a better way to store sourceLocation that's bound across both registers as this is likely to break in some cases.
-    if let sourceLocation = high?.sourceLocation,
-       let high = high?.value,
-       let low = low?.value {
-      return RegisterState<UInt16>(value: UInt16(high) << 8 | UInt16(low), sourceLocation: sourceLocation)
+  /** Trace information for a specific register. */
+  public struct RegisterTrace: Equatable {
+    public init(sourceLocation: LR35902.Cartridge.Location) {
+      self.sourceLocation = sourceLocation
+      self.loadAddress = nil
     }
-    return nil
-  }
+    public init(loadAddress: LR35902.Address) {
+      self.sourceLocation = nil
+      self.loadAddress = loadAddress
+    }
+    public init(sourceLocation: LR35902.Cartridge.Location, loadAddress: LR35902.Address) {
+      self.sourceLocation = sourceLocation
+      self.loadAddress = loadAddress
+    }
 
-  private func set(register: inout RegisterState<UInt16>?, newValue: RegisterState<UInt16>?,
-                   high: inout RegisterState<UInt8>?, low: inout RegisterState<UInt8>?) {
-    if let sourceLocation = newValue?.sourceLocation,
-       let value = newValue?.value {
-      high = .init(value: UInt8(value >> 8), sourceLocation: sourceLocation)
-      low = .init(value: UInt8(value & 0x00FF), sourceLocation: sourceLocation)
-    }
-    register = newValue
-  }
-}
+    /** The address from which the value was loaded, if known. */
+    public let loadAddress: LR35902.Address?
 
-extension LR35902.CPUState {
-  /** Initializes the state with initial immediate values. */
-  public init(
-    a: UInt8? = nil,
-    b: UInt8? = nil, c: UInt8? = nil,
-    d: UInt8? = nil, e: UInt8? = nil,
-    h: UInt8? = nil, l: UInt8? = nil,
-    sp: UInt16? = nil,
-    pc: LR35902.Address = 0, bank: LR35902.Bank = 0
-  ) {
-    if let a = a {
-      self.a = .init(value: a)
-    }
-    if let b = b {
-      self.b = .init(value: b)
-    }
-    if let c = c {
-      self.c = .init(value: c)
-    }
-    if let d = d {
-      self.d = .init(value: d)
-    }
-    if let e = e {
-      self.e = .init(value: e)
-    }
-    if let h = h {
-      self.h = .init(value: h)
-    }
-    if let l = l {
-      self.l = .init(value: l)
-    }
-    if let sp = sp {
-      self.sp = .init(value: sp)
-    }
-    self.pc = pc
-    self.bank = bank
+    /** The cartridge location at which this register's value was loaded, if known. */
+    public let sourceLocation: LR35902.Cartridge.Location?
   }
 }
