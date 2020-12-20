@@ -48,7 +48,8 @@ extension LR35902.CPUState {
         preconditionFailure("Invalid immediate associated with instruction")
       }
       let address = 0xFF00 | LR35902.Address(immediate)
-      state[numeric] = LR35902.CPUState.RegisterState<UInt8>(value: nil, sourceLocation: location, variableLocation: address)
+      let value = ram[address]
+      state[numeric] = LR35902.CPUState.RegisterState<UInt8>(value: value?.value, sourceLocation: location, variableLocation: address)
       state.pc += width
 
     case .ld(.ffimm8addr, let numeric) where registers8.contains(numeric):
