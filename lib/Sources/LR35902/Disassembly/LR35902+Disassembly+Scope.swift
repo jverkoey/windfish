@@ -47,7 +47,7 @@ extension LR35902.Disassembly {
             }
 
           case .cp(_):
-            if case .variable(let address) = state.a?.value,
+            if let address = state.a?.variableLocation,
               let global = self.globals[address],
               let dataType = global.dataType {
               self.typeAtLocation[location] = dataType
@@ -65,7 +65,7 @@ extension LR35902.Disassembly {
             }
 
           case .and(.imm8):
-            if case .variable(let address) = state.a?.value,
+            if let address = state.a?.variableLocation,
               let global = self.globals[address],
               let dataType = global.dataType,
               let type = self.dataTypes[dataType],

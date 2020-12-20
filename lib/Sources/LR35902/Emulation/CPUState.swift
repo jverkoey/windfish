@@ -120,21 +120,17 @@ extension LR35902 {
 
     /** The state of an specific register. */
     public struct RegisterState<T: BinaryInteger>: Equatable {
-      public init(value: Value, sourceLocation: LR35902.Cartridge.Location) {
+      public init(value: T?, sourceLocation: LR35902.Cartridge.Location, variableLocation: LR35902.Address? = nil) {
         self.value = value
         self.sourceLocation = sourceLocation
+        self.variableLocation = variableLocation
       }
 
-      // TODO: Allow variable source to be stored alongside the literal value so that both can be tracked.
+      /** The register's value represented as a literal, if known. */
+      public let value: T?
 
-      public enum Value: Equatable {
-        /** The register's value is defined by the value of some bytes in ram (which may not be known). */
-        case variable(LR35902.Address)
-
-        /** The register's value is defined by a literal (and is known). */
-        case literal(T)
-      }
-      public let value: Value
+      /** The address from which the value was loaded. */
+      public let variableLocation: LR35902.Address?
 
       /** The cartridge location from which this register's value was loaded. */
       public let sourceLocation: LR35902.Cartridge.Location
@@ -150,9 +146,9 @@ extension LR35902.CPUState {
   private func get(high: RegisterState<UInt8>?, low: RegisterState<UInt8>?) -> RegisterState<UInt16>? {
     // TODO: Find a better way to store sourceLocation that's bound across both registers as this is likely to break in some cases.
     if let sourceLocation = high?.sourceLocation,
-       case .literal(let high) = high?.value,
-       case .literal(let low) = low?.value {
-      return RegisterState<UInt16>(value: .literal(UInt16(high) << 8 | UInt16(low)), sourceLocation: sourceLocation)
+       let high = high?.value,
+       let low = low?.value {
+      return RegisterState<UInt16>(value: UInt16(high) << 8 | UInt16(low), sourceLocation: sourceLocation)
     }
     return nil
   }
@@ -160,9 +156,9 @@ extension LR35902.CPUState {
   private func set(register: inout RegisterState<UInt16>?, newValue: RegisterState<UInt16>?,
                    high: inout RegisterState<UInt8>?, low: inout RegisterState<UInt8>?) {
     if let sourceLocation = newValue?.sourceLocation,
-       case .literal(let value) = newValue?.value {
-      high = .init(value: .literal(UInt8(value >> 8)), sourceLocation: sourceLocation)
-      low = .init(value: .literal(UInt8(value & 0x00FF)), sourceLocation: sourceLocation)
+       let value = newValue?.value {
+      high = .init(value: UInt8(value >> 8), sourceLocation: sourceLocation)
+      low = .init(value: UInt8(value & 0x00FF), sourceLocation: sourceLocation)
     }
     register = newValue
   }
@@ -177,28 +173,28 @@ extension LR35902.CPUState {
        sp: UInt16? = nil,
        pc: LR35902.Address = 0, bank: LR35902.Bank = 0) {
     if let a = a {
-      self.a = .init(value: .literal(a), sourceLocation: 0)
+      self.a = .init(value: a, sourceLocation: 0)
     }
     if let b = b {
-      self.b = .init(value: .literal(b), sourceLocation: 0)
+      self.b = .init(value: b, sourceLocation: 0)
     }
     if let c = c {
-      self.c = .init(value: .literal(c), sourceLocation: 0)
+      self.c = .init(value: c, sourceLocation: 0)
     }
     if let d = d {
-      self.d = .init(value: .literal(d), sourceLocation: 0)
+      self.d = .init(value: d, sourceLocation: 0)
     }
     if let e = e {
-      self.e = .init(value: .literal(e), sourceLocation: 0)
+      self.e = .init(value: e, sourceLocation: 0)
     }
     if let h = h {
-      self.h = .init(value: .literal(h), sourceLocation: 0)
+      self.h = .init(value: h, sourceLocation: 0)
     }
     if let l = l {
-      self.l = .init(value: .literal(l), sourceLocation: 0)
+      self.l = .init(value: l, sourceLocation: 0)
     }
     if let sp = sp {
-      self.sp = .init(value: .literal(sp), sourceLocation: 0)
+      self.sp = .init(value: sp, sourceLocation: 0)
     }
     self.pc = pc
     self.bank = bank

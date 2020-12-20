@@ -59,7 +59,7 @@ ld   e, a
 
     let trace = disassembly.trace(range: 0..<disassembly.cpu.cartridge.size).sorted(by: { $0.key < $1.key })
 
-    XCTAssertEqual(trace[0].value.a, .init(value: .literal(0x01), sourceLocation: 0))
+    XCTAssertEqual(trace[0].value.a, .init(value: 0x01, sourceLocation: 0))
     XCTAssertEqual(trace[0].value.b, nil)
     XCTAssertEqual(trace[0].value.c, nil)
     XCTAssertEqual(trace[0].value.d, nil)
@@ -70,7 +70,7 @@ ld   e, a
     XCTAssertEqual(trace[0].value.pc, 0x0002)
     XCTAssertEqual(trace[0].value.bank, 0x00)
 
-    XCTAssertEqual(trace[1].value.a, .init(value: .literal(0xE1), sourceLocation: 2))
+    XCTAssertEqual(trace[1].value.a, .init(value: 0xE1, sourceLocation: 2))
     XCTAssertEqual(trace[1].value.b, nil)
     XCTAssertEqual(trace[1].value.c, nil)
     XCTAssertEqual(trace[1].value.d, nil)
@@ -81,11 +81,11 @@ ld   e, a
     XCTAssertEqual(trace[1].value.pc, 0x0004)
     XCTAssertEqual(trace[1].value.bank, 0x00)
 
-    XCTAssertEqual(trace[2].value.a, .init(value: .literal(0xE1), sourceLocation: 2))
+    XCTAssertEqual(trace[2].value.a, .init(value: 0xE1, sourceLocation: 2))
     XCTAssertEqual(trace[2].value.b, nil)
     XCTAssertEqual(trace[2].value.c, nil)
     XCTAssertEqual(trace[2].value.d, nil)
-    XCTAssertEqual(trace[2].value.e, .init(value: .literal(0xE1), sourceLocation: 2))
+    XCTAssertEqual(trace[2].value.e, .init(value: 0xE1, sourceLocation: 2))
     XCTAssertEqual(trace[2].value.h, nil)
     XCTAssertEqual(trace[2].value.l, nil)
     XCTAssertEqual(trace[2].value.ram, [:])
@@ -102,7 +102,7 @@ ld   e, a
 
     let trace = disassembly.trace(range: 0..<disassembly.cpu.cartridge.size).sorted(by: { $0.key < $1.key })
 
-    XCTAssertEqual(trace[0].value.a, .init(value: .variable(0xD6FD), sourceLocation: 0))
+    XCTAssertEqual(trace[0].value.a, .init(value: nil, sourceLocation: 0, variableLocation: 0xD6FD))
     XCTAssertEqual(trace[0].value.b, nil)
     XCTAssertEqual(trace[0].value.c, nil)
     XCTAssertEqual(trace[0].value.d, nil)
@@ -114,7 +114,7 @@ ld   e, a
     XCTAssertEqual(trace[0].value.bank, 0x00)
 
     // TODO: a should capture the and operation that affected it here somehow.
-    XCTAssertEqual(trace[1].value.a, .init(value: .variable(0xD6FD), sourceLocation: 0))
+    XCTAssertEqual(trace[1].value.a, .init(value: nil, sourceLocation: 0, variableLocation: 0xD6FD))
     XCTAssertEqual(trace[1].value.b, nil)
     XCTAssertEqual(trace[1].value.c, nil)
     XCTAssertEqual(trace[1].value.d, nil)
@@ -125,11 +125,11 @@ ld   e, a
     XCTAssertEqual(trace[1].value.pc, 0x0005)
     XCTAssertEqual(trace[1].value.bank, 0x00)
 
-    XCTAssertEqual(trace[2].value.a, .init(value: .variable(0xD6FD), sourceLocation: 0))
+    XCTAssertEqual(trace[2].value.a, .init(value: nil, sourceLocation: 0, variableLocation: 0xD6FD))
     XCTAssertEqual(trace[2].value.b, nil)
     XCTAssertEqual(trace[2].value.c, nil)
     XCTAssertEqual(trace[2].value.d, nil)
-    XCTAssertEqual(trace[2].value.e, .init(value: .variable(0xD6FD), sourceLocation: 0))
+    XCTAssertEqual(trace[2].value.e, .init(value: nil, sourceLocation: 0, variableLocation: 0xD6FD))
     XCTAssertEqual(trace[2].value.h, nil)
     XCTAssertEqual(trace[2].value.l, nil)
     XCTAssertEqual(trace[2].value.ram, [:])
@@ -150,17 +150,17 @@ ld   [$ffcb], a
 
     var initialState = LR35902.CPUState()
 
-    initialState.a = LR35902.CPUState.RegisterState<UInt8>(value: .literal(0b0000_1111), sourceLocation: 0)
-    initialState.ram[0xffcb] = .init(value: .literal(0b0000_1100), sourceLocation: 0)
+    initialState.a = LR35902.CPUState.RegisterState<UInt8>(value: 0b0000_1111, sourceLocation: 0)
+    initialState.ram[0xffcb] = .init(value: 0b0000_1100, sourceLocation: 0)
 
     let states = disassembly.trace(range: 0..<disassembly.cpu.cartridge.size,
                                       initialState: initialState).sorted(by: { $0.key < $1.key })
     let lastState = states[states.count - 1]
 
-    XCTAssertEqual(lastState.value.a, .init(value: .literal(0b0000_1111), sourceLocation: 0))
-    XCTAssertEqual(lastState.value.c, .init(value: .literal(0b0000_1111), sourceLocation: 0))
-    XCTAssertEqual(lastState.value.ram[0xffcb], .init(value: .literal(0b0000_1111), sourceLocation: 0))
-    XCTAssertEqual(lastState.value.ram[0xffcc], .init(value: .literal(0b0000_0011), sourceLocation: 4))
+    XCTAssertEqual(lastState.value.a, .init(value: 0b0000_1111, sourceLocation: 0))
+    XCTAssertEqual(lastState.value.c, .init(value: 0b0000_1111, sourceLocation: 0))
+    XCTAssertEqual(lastState.value.ram[0xffcb], .init(value: 0b0000_1111, sourceLocation: 0))
+    XCTAssertEqual(lastState.value.ram[0xffcc], .init(value: 0b0000_0011, sourceLocation: 4))
     XCTAssertEqual(lastState.value.pc, 0x000A)
     XCTAssertEqual(lastState.value.bank, 0x00)
   }
