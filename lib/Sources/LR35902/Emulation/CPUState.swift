@@ -120,7 +120,7 @@ extension LR35902 {
 
     /** The state of an specific register. */
     public struct RegisterState<T: BinaryInteger>: Equatable {
-      public init(value: T?, sourceLocation: LR35902.Cartridge.Location, variableLocation: LR35902.Address? = nil) {
+      public init(value: T?, sourceLocation: LR35902.Cartridge.Location? = nil, variableLocation: LR35902.Address? = nil) {
         self.value = value
         self.sourceLocation = sourceLocation
         self.variableLocation = variableLocation
@@ -132,8 +132,8 @@ extension LR35902 {
       /** The address from which the value was loaded. */
       public let variableLocation: LR35902.Address?
 
-      /** The cartridge location from which this register's value was loaded. */
-      public let sourceLocation: LR35902.Cartridge.Location
+      /** The cartridge location from which this register's value was loaded, if known. */
+      public let sourceLocation: LR35902.Cartridge.Location?
     }
 
     private var _bc: RegisterState<UInt16>?
@@ -173,28 +173,28 @@ extension LR35902.CPUState {
        sp: UInt16? = nil,
        pc: LR35902.Address = 0, bank: LR35902.Bank = 0) {
     if let a = a {
-      self.a = .init(value: a, sourceLocation: 0)
+      self.a = .init(value: a)
     }
     if let b = b {
-      self.b = .init(value: b, sourceLocation: 0)
+      self.b = .init(value: b)
     }
     if let c = c {
-      self.c = .init(value: c, sourceLocation: 0)
+      self.c = .init(value: c)
     }
     if let d = d {
-      self.d = .init(value: d, sourceLocation: 0)
+      self.d = .init(value: d)
     }
     if let e = e {
-      self.e = .init(value: e, sourceLocation: 0)
+      self.e = .init(value: e)
     }
     if let h = h {
-      self.h = .init(value: h, sourceLocation: 0)
+      self.h = .init(value: h)
     }
     if let l = l {
-      self.l = .init(value: l, sourceLocation: 0)
+      self.l = .init(value: l)
     }
     if let sp = sp {
-      self.sp = .init(value: sp, sourceLocation: 0)
+      self.sp = .init(value: sp)
     }
     self.pc = pc
     self.bank = bank

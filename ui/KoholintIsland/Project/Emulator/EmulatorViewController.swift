@@ -36,6 +36,33 @@ extension String {
     }
     return (.decimal, value)
   }
+
+  /** Returns a numerical representation of the hexadecimal string. */
+  fileprivate func hexRepresentation<T: FixedWidthInteger>(_ type: T.Type) -> T? {
+    if isEmpty {
+      return nil
+    }
+
+    if hasPrefix("0x") {
+      return T(dropFirst(2), radix: 16)
+    }
+
+    return T(self, radix: 16)
+  }
+
+  /** Returns a numerical representation of the hexadecimal string. */
+  fileprivate func addressAndBankRepresentation() -> LR35902.Cartridge.Location? {
+    if isEmpty {
+      return nil
+    }
+
+    let parts = self.split(separator: ".", maxSplits: 1)
+    guard let bank = LR35902.Bank(parts[0], radix: 16),
+          let address = LR35902.Address(parts[1].dropFirst(2), radix: 16) else {
+      return nil
+    }
+    return LR35902.Cartridge.location(for: address, in: bank)
+  }
 }
 
 extension FixedWidthInteger {
@@ -50,8 +77,16 @@ extension FixedWidthInteger {
   }
 }
 
+extension LR35902.Cartridge.Location {
+  /** Returns a string representation of the integer in the given representation format. */
+  fileprivate func stringWithAddressAndBank() -> String {
+    let (address, bank) = LR35902.Cartridge.addressAndBank(from: self)
+    return  bank.hexString + "." + address.stringWithRepresentation(.hex)
+  }
+}
+
 private final class CPURegister: NSObject {
-  init(name: String, register: LR35902.Instruction.Numeric, value: String?, sourceLocation: LR35902.Cartridge.Location, variableAddress: LR35902.Address) {
+  init(name: String, register: LR35902.Instruction.Numeric, value: String?, sourceLocation: String?, variableAddress: LR35902.Address) {
     self.name = name
     self.register = register
     self.value = value
@@ -63,12 +98,12 @@ private final class CPURegister: NSObject {
   var register: LR35902.Instruction.Numeric
   @objc dynamic var value: String?
   var valueRepresentation: NumericalRepresentation = .hex
-  @objc dynamic var sourceLocation: LR35902.Cartridge.Location
+  @objc dynamic var sourceLocation: String?
   @objc dynamic var variableAddress: LR35902.Address
 }
 
 private final class RAMValue: NSObject {
-  init(address: LR35902.Address, name: String?, value: String, sourceLocation: LR35902.Cartridge.Location, variableAddress: LR35902.Address) {
+  init(address: LR35902.Address, name: String?, value: String, sourceLocation: String?, variableAddress: LR35902.Address) {
     self.address = address
     self.name = name
     self.value = value
@@ -79,7 +114,7 @@ private final class RAMValue: NSObject {
   @objc dynamic var address: LR35902.Address
   @objc dynamic var name: String?
   @objc dynamic var value: String
-  @objc dynamic var sourceLocation: LR35902.Cartridge.Location
+  @objc dynamic var sourceLocation: String?
   @objc dynamic var variableAddress: LR35902.Address
 }
 
@@ -203,7 +238,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     let columns = [
       Column(name: "Register", identifier: .register, width: 50),
       Column(name: "Value", identifier: .registerValue, width: 50),
-      Column(name: "Source", identifier: .registerSourceLocation, width: 50),
+      Column(name: "Source", identifier: .registerSourceLocation, width: 65),
       Column(name: "Variable", identifier: .registerVariableAddress, width: 50),
     ]
     for columnInfo in columns {
@@ -218,7 +253,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       Column(name: "Address", identifier: .address, width: 50),
       Column(name: "Name", identifier: .name, width: 50),
       Column(name: "Value", identifier: .registerValue, width: 50),
-      Column(name: "Source", identifier: .registerSourceLocation, width: 50),
+      Column(name: "Source", identifier: .registerSourceLocation, width: 65),
       Column(name: "Variable", identifier: .registerVariableAddress, width: 50),
     ]
     for columnInfo in ramColumns {
@@ -230,39 +265,52 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     }
 
     let registers = [
-      CPURegister(name: "a", register: .a, value: "", sourceLocation: 0, variableAddress: 0),
-      CPURegister(name: "b", register: .b, value: "", sourceLocation: 0, variableAddress: 0),
-      CPURegister(name: "c", register: .c, value: "", sourceLocation: 0, variableAddress: 0),
-      CPURegister(name: "d", register: .d, value: "", sourceLocation: 0, variableAddress: 0),
-      CPURegister(name: "e", register: .e, value: "", sourceLocation: 0, variableAddress: 0),
-      CPURegister(name: "h", register: .h, value: "", sourceLocation: 0, variableAddress: 0),
-      CPURegister(name: "l", register: .l, value: "", sourceLocation: 0, variableAddress: 0),
-      CPURegister(name: "sp", register: .sp, value: "", sourceLocation: 0, variableAddress: 0),
+      CPURegister(name: "a", register: .a, value: nil, sourceLocation: nil, variableAddress: 0),
+      CPURegister(name: "b", register: .b, value: nil, sourceLocation: nil, variableAddress: 0),
+      CPURegister(name: "c", register: .c, value: nil, sourceLocation: nil, variableAddress: 0),
+      CPURegister(name: "d", register: .d, value: nil, sourceLocation: nil, variableAddress: 0),
+      CPURegister(name: "e", register: .e, value: nil, sourceLocation: nil, variableAddress: 0),
+      CPURegister(name: "h", register: .h, value: nil, sourceLocation: nil, variableAddress: 0),
+      CPURegister(name: "l", register: .l, value: nil, sourceLocation: nil, variableAddress: 0),
+      CPURegister(name: "sp", register: .sp, value: nil, sourceLocation: nil, variableAddress: 0),
     ]
     let didChangeRegister: (CPURegister) -> Void = { [weak self] register in
       guard let self = self else {
         return
       }
       if LR35902.Instruction.Numeric.registers8.contains(register.register) {
+        let registerValue: UInt8?
         if let result = register.value?.numberRepresentation(UInt8.self) {
           register.valueRepresentation = result.0
-          self.document.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt8>(value: result.1, sourceLocation: register.sourceLocation)
+          registerValue = result.1
         } else {
+          registerValue = nil
+        }
+        let registerSourceLocation = register.sourceLocation?.addressAndBankRepresentation()
+        if registerSourceLocation == nil && registerValue == nil {
           self.document.cpuState.clear(register.register)
+        } else {
+          self.document.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt8>(value: registerValue, sourceLocation: registerSourceLocation)
         }
       } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
+        let registerValue: UInt16?
         if let result = register.value?.numberRepresentation(UInt16.self) {
           register.valueRepresentation = result.0
-          self.document.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt16>(value: result.1, sourceLocation: register.sourceLocation)
+          registerValue = result.1
         } else {
+          registerValue = nil
+        }
+        let registerSourceLocation = register.sourceLocation?.addressAndBankRepresentation()
+        if registerSourceLocation == nil && registerValue == nil {
           self.document.cpuState.clear(register.register)
+        } else {
+          self.document.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt16>(value: registerValue, sourceLocation: registerSourceLocation)
         }
       }
     }
     for register in registers {
       registerObservers.append(contentsOf: [
         register.observe(\.value) { register, _ in didChangeRegister(register) },
-        register.observe(\.sourceLocation) { register, _ in didChangeRegister(register) },
       ])
     }
     cpuController.add(contentsOf: registers)
@@ -420,14 +468,14 @@ extension EmulatorViewController: NSTextFieldDelegate {
       if LR35902.Instruction.Numeric.registers8.contains(register.register) {
         let value: LR35902.CPUState.RegisterState<UInt8>? = self.document.cpuState[register.register]
 
-        register.sourceLocation = value?.sourceLocation ?? 0
+        register.sourceLocation = value?.sourceLocation?.stringWithAddressAndBank()
         register.value = value?.value?.stringWithRepresentation(register.valueRepresentation)
         register.variableAddress = value?.variableLocation ?? 0
 
       } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
         let value: LR35902.CPUState.RegisterState<UInt16>? = self.document.cpuState[register.register]
 
-        register.sourceLocation = value?.sourceLocation ?? 0
+        register.sourceLocation = value?.sourceLocation?.stringWithAddressAndBank()
         register.value = value?.value?.stringWithRepresentation(register.valueRepresentation)
         register.variableAddress = value?.variableLocation ?? 0
       }
@@ -446,7 +494,11 @@ extension EmulatorViewController: NSTextFieldDelegate {
       } else {
         valueString = ""
       }
-      return RAMValue(address: address, name: globalName, value: valueString, sourceLocation: value.sourceLocation, variableAddress: value.variableLocation ?? 0)
+      return RAMValue(address: address,
+                      name: globalName,
+                      value: valueString,
+                      sourceLocation: value.sourceLocation?.stringWithAddressAndBank(),
+                      variableAddress: value.variableLocation ?? 0)
     }
   }
 }
@@ -483,7 +535,21 @@ extension EmulatorViewController: NSTableViewDelegate {
       view.textField?.bind(.value, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
       return view
 
-    case .registerSourceLocation, .address, .registerVariableAddress:
+    case .registerSourceLocation, .registerVariableAddress:
+      let identifier = NSUserInterfaceItemIdentifier.addressCell
+      let view: TextTableCellView
+      if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TextTableCellView {
+        view = recycledView
+      } else {
+        view = TextTableCellView()
+        view.identifier = identifier
+        view.textField?.formatter = LR35902AddressFormatter()
+      }
+      view.textField?.isEditable = false
+      view.textField?.bind(.value, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
+      return view
+
+    case .address:
       let identifier = NSUserInterfaceItemIdentifier.addressCell
       let view: TextTableCellView
       if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TextTableCellView {
@@ -495,6 +561,7 @@ extension EmulatorViewController: NSTableViewDelegate {
       }
       view.textField?.bind(.value, to: view, withKeyPath: "objectValue.\(tableColumn.identifier.rawValue)", options: nil)
       return view
+
     default:
       preconditionFailure()
     }

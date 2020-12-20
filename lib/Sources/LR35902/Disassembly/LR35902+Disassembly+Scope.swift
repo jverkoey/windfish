@@ -60,8 +60,9 @@ extension LR35902.Disassembly {
             let address = 0xFF00 | LR35902.Address(immediate)
             if let global = self.globals[address],
               let dataType = global.dataType,
-              let srcValue: LR35902.CPUState.RegisterState<UInt8> = state[src] {
-              self.typeAtLocation[srcValue.sourceLocation] = dataType
+              let srcValue: LR35902.CPUState.RegisterState<UInt8> = state[src],
+              let sourceLocation = srcValue.sourceLocation {
+              self.typeAtLocation[sourceLocation] = dataType
             }
 
           case .and(.imm8):
