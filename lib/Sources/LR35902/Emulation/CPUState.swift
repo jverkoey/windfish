@@ -49,6 +49,41 @@ extension LR35902 {
     /** Selected bank. */
     public var bank: Bank
 
+    /** Flag register. */
+    public var f: RegisterState<UInt8>? {
+      get {
+        if let sourceLocation = fzero?.sourceLocation,
+           let fzero = fzero?.value,
+           let fsubtract = fsubtract?.value,
+           let fhalfcarry = fhalfcarry?.value,
+           let fcarry = fcarry?.value {
+          return RegisterState<UInt8>(value:
+                                        (fzero        ? 0b1000_0000 : 0)
+                                        | (fsubtract  ? 0b0100_0000 : 0)
+                                        | (fhalfcarry ? 0b0010_0000 : 0)
+                                        | (fcarry     ? 0b0001_0000 : 0),
+                                      sourceLocation: sourceLocation)
+        }
+        return _f
+      }
+      set {
+        if let sourceLocation = newValue?.sourceLocation,
+           let value = newValue?.value {
+          fzero       = .init(value: value & 0b1000_0000 != 0, sourceLocation: sourceLocation)
+          fsubtract   = .init(value: value & 0b0100_0000 != 0, sourceLocation: sourceLocation)
+          fhalfcarry  = .init(value: value & 0b0010_0000 != 0, sourceLocation: sourceLocation)
+          fcarry      = .init(value: value & 0b0001_0000 != 0, sourceLocation: sourceLocation)
+        }
+        _f = newValue
+      }
+    }
+
+    /** Flag register bits. */
+    public var fzero: RegisterState<Bool>?
+    public var fsubtract: RegisterState<Bool>?
+    public var fhalfcarry: RegisterState<Bool>?
+    public var fcarry: RegisterState<Bool>?
+
     // MARK: Subscript access of instructions using LR35902 instruction specifications
     /** 8-bit register subscript. */
     public subscript(numeric: LR35902.Instruction.Numeric) -> RegisterState<UInt8>? {
@@ -119,7 +154,7 @@ extension LR35902 {
     }
 
     /** The state of an specific register. */
-    public struct RegisterState<T: BinaryInteger>: Equatable {
+    public struct RegisterState<T: Equatable>: Equatable {
       public init(value: T?, sourceLocation: LR35902.Cartridge.Location? = nil, variableLocation: LR35902.Address? = nil) {
         self.value = value
         self.sourceLocation = sourceLocation
@@ -136,6 +171,7 @@ extension LR35902 {
       public let sourceLocation: LR35902.Cartridge.Location?
     }
 
+    private var _f: RegisterState<UInt8>?
     private var _bc: RegisterState<UInt16>?
     private var _de: RegisterState<UInt16>?
     private var _hl: RegisterState<UInt16>?
@@ -166,12 +202,14 @@ extension LR35902.CPUState {
 
 extension LR35902.CPUState {
   /** Initializes the state with initial immediate values. */
-  public init(a: UInt8? = nil, b: UInt8? = nil,
-       c: UInt8? = nil, d: UInt8? = nil,
-       e: UInt8? = nil,
-       h: UInt8? = nil, l: UInt8? = nil,
-       sp: UInt16? = nil,
-       pc: LR35902.Address = 0, bank: LR35902.Bank = 0) {
+  public init(
+    a: UInt8? = nil,
+    b: UInt8? = nil, c: UInt8? = nil,
+    d: UInt8? = nil, e: UInt8? = nil,
+    h: UInt8? = nil, l: UInt8? = nil,
+    sp: UInt16? = nil,
+    pc: LR35902.Address = 0, bank: LR35902.Bank = 0
+  ) {
     if let a = a {
       self.a = .init(value: a)
     }

@@ -199,6 +199,7 @@ class ProjectDocument: NSDocument {
   var configuration = ProjectConfiguration()
   var cpuState: LR35902.CPUState = {
     var state = LR35902.CPUState(a: 0x01, b: 0x00, c: 0x13, d: 0x00, e: 0xD8, h: 0x01, l: 0x4D, sp: 0xFFFE, pc: 0x100, bank: 0x00)
+    state.f = .init(value: 0xB0)
     state.ram[0xFF05] = .init(value: 0x00, sourceLocation: nil)
     state.ram[0xFF06] = .init(value: 0x00, sourceLocation: nil)
     state.ram[0xFF07] = .init(value: 0x00, sourceLocation: nil)
