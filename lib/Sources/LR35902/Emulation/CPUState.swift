@@ -71,9 +71,6 @@ extension LR35902 {
     /** Random access memory. */
     public var ram: [LR35902.Address: UInt8] = [:]
 
-    // One or more addresses that this state can move to upon execution.
-    public var next: [LR35902.Cartridge.Location] = []
-
     /** Program counter. */
     public var pc: Address = 0
 
@@ -84,7 +81,7 @@ extension LR35902 {
     public var registerTraces: [LR35902.Instruction.Numeric: RegisterTrace] = [:]
 
     /** Initializes the state with initial immediate values. */
-    public init(a: UInt8 = 0, b: UInt8 = 0, c: UInt8 = 0, d: UInt8 = 0, e: UInt8 = 0, h: UInt8 = 0, l: UInt8 = 0, fzero: Bool = false, fsubtract: Bool = false, fhalfcarry: Bool = false, fcarry: Bool = false, sp: UInt16 = 0, ram: [LR35902.Address : UInt8] = [:], next: [LR35902.Cartridge.Location] = [], pc: LR35902.Address = 0, bank: LR35902.Bank = 0, registerTraces: [LR35902.Instruction.Numeric : LR35902.CPUState.RegisterTrace] = [:]) {
+    public init(a: UInt8 = 0, b: UInt8 = 0, c: UInt8 = 0, d: UInt8 = 0, e: UInt8 = 0, h: UInt8 = 0, l: UInt8 = 0, fzero: Bool = false, fsubtract: Bool = false, fhalfcarry: Bool = false, fcarry: Bool = false, sp: UInt16 = 0, ram: [LR35902.Address : UInt8] = [:], pc: LR35902.Address = 0, bank: LR35902.Bank = 0, registerTraces: [LR35902.Instruction.Numeric : LR35902.CPUState.RegisterTrace] = [:]) {
       self.a = a
       self.b = b
       self.c = c
@@ -98,7 +95,6 @@ extension LR35902 {
       self.fcarry = fcarry
       self.sp = sp
       self.ram = ram
-      self.next = next
       self.pc = pc
       self.bank = bank
       self.registerTraces = registerTraces

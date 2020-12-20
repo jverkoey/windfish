@@ -151,8 +151,6 @@ extension LR35902.CPUState {
       state.pc += width
     }
 
-    state.next = [location + LR35902.Cartridge.Location(width)]
-
     return state
   }
 }
