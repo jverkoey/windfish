@@ -127,7 +127,7 @@ extension LR35902 {
       }
 
       /** The register's value represented as a literal, if known. */
-      public let value: T?
+      public var value: T?
 
       /** The address from which the value was loaded. */
       public let variableLocation: LR35902.Address?

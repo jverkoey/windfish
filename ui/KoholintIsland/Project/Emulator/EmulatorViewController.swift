@@ -7,6 +7,7 @@ import LR35902
 extension NSUserInterfaceItemIdentifier {
   static let programCounter = NSUserInterfaceItemIdentifier("pc")
   static let register = NSUserInterfaceItemIdentifier("name")
+  static let variableName = NSUserInterfaceItemIdentifier("variableName")
   static let registerValue = NSUserInterfaceItemIdentifier("value")
   static let registerSourceLocation = NSUserInterfaceItemIdentifier("sourceLocation")
   static let registerVariableAddress = NSUserInterfaceItemIdentifier("variableAddress")
@@ -86,12 +87,13 @@ extension LR35902.Cartridge.Location {
 }
 
 private final class CPURegister: NSObject {
-  init(name: String, register: LR35902.Instruction.Numeric, value: String?, sourceLocation: String?, variableAddress: LR35902.Address) {
+  init(name: String, register: LR35902.Instruction.Numeric, value: String?, sourceLocation: String?, variableAddress: LR35902.Address, variableName: String? = nil) {
     self.name = name
     self.register = register
     self.value = value
     self.sourceLocation = sourceLocation
     self.variableAddress = variableAddress
+    self.variableName = variableName
   }
 
   @objc dynamic var name: String
@@ -100,19 +102,20 @@ private final class CPURegister: NSObject {
   var valueRepresentation: NumericalRepresentation = .hex
   @objc dynamic var sourceLocation: String?
   @objc dynamic var variableAddress: LR35902.Address
+  @objc dynamic var variableName: String?
 }
 
 private final class RAMValue: NSObject {
-  init(address: LR35902.Address, name: String?, value: String, sourceLocation: String?, variableAddress: LR35902.Address) {
+  init(address: LR35902.Address, variableName: String?, value: String, sourceLocation: String?, variableAddress: LR35902.Address) {
     self.address = address
-    self.name = name
+    self.variableName = variableName
     self.value = value
     self.sourceLocation = sourceLocation
     self.variableAddress = variableAddress
   }
 
   @objc dynamic var address: LR35902.Address
-  @objc dynamic var name: String?
+  @objc dynamic var variableName: String?
   @objc dynamic var value: String
   @objc dynamic var sourceLocation: String?
   @objc dynamic var variableAddress: LR35902.Address
@@ -240,6 +243,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       Column(name: "Value", identifier: .registerValue, width: 50),
       Column(name: "Source", identifier: .registerSourceLocation, width: 65),
       Column(name: "Variable", identifier: .registerVariableAddress, width: 50),
+      Column(name: "Name", identifier: .variableName, width: 50),
     ]
     for columnInfo in columns {
       let column = NSTableColumn(identifier: columnInfo.identifier)
@@ -251,8 +255,8 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
     let ramColumns = [
       Column(name: "Address", identifier: .address, width: 50),
-      Column(name: "Name", identifier: .name, width: 50),
-      Column(name: "Value", identifier: .registerValue, width: 50),
+      Column(name: "Name", identifier: .variableName, width: 50),
+      Column(name: "Value", identifier: .registerValue, width: 40),
       Column(name: "Source", identifier: .registerSourceLocation, width: 65),
       Column(name: "Variable", identifier: .registerVariableAddress, width: 50),
     ]
@@ -290,7 +294,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
         if registerSourceLocation == nil && registerValue == nil {
           self.document.cpuState.clear(register.register)
         } else {
-          self.document.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt8>(value: registerValue, sourceLocation: registerSourceLocation)
+          self.document.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt8>(value: registerValue, sourceLocation: registerSourceLocation, variableLocation: register.variableAddress)
         }
       } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
         let registerValue: UInt16?
@@ -304,7 +308,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
         if registerSourceLocation == nil && registerValue == nil {
           self.document.cpuState.clear(register.register)
         } else {
-          self.document.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt16>(value: registerValue, sourceLocation: registerSourceLocation)
+          self.document.cpuState[register.register] = LR35902.CPUState.RegisterState<UInt16>(value: registerValue, sourceLocation: registerSourceLocation, variableLocation: register.variableAddress)
         }
       }
     }
@@ -464,20 +468,34 @@ extension EmulatorViewController: NSTextFieldDelegate {
   }
 
   func updateRegisters() {
+    let globalMap = document.configuration.globals.reduce(into: [:]) { accumulator, global in
+      accumulator[global.address] = global
+    }
+
     for register in cpuController.arrangedObjects as! [CPURegister] {
       if LR35902.Instruction.Numeric.registers8.contains(register.register) {
         let value: LR35902.CPUState.RegisterState<UInt8>? = self.document.cpuState[register.register]
 
         register.sourceLocation = value?.sourceLocation?.stringWithAddressAndBank()
-        register.value = value?.value?.stringWithRepresentation(register.valueRepresentation)
         register.variableAddress = value?.variableLocation ?? 0
+        if let variableLocation = value?.variableLocation {
+          register.variableName = globalMap[variableLocation]?.name
+        } else {
+          register.variableName = nil
+        }
+        register.value = value?.value?.stringWithRepresentation(register.valueRepresentation)
 
       } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
         let value: LR35902.CPUState.RegisterState<UInt16>? = self.document.cpuState[register.register]
 
         register.sourceLocation = value?.sourceLocation?.stringWithAddressAndBank()
-        register.value = value?.value?.stringWithRepresentation(register.valueRepresentation)
         register.variableAddress = value?.variableLocation ?? 0
+        if let variableLocation = value?.variableLocation {
+          register.variableName = globalMap[variableLocation]?.name
+        } else {
+          register.variableName = nil
+        }
+        register.value = value?.value?.stringWithRepresentation(register.valueRepresentation)
       }
     }
   }
@@ -495,7 +513,7 @@ extension EmulatorViewController: NSTextFieldDelegate {
         valueString = ""
       }
       return RAMValue(address: address,
-                      name: globalName,
+                      variableName: globalName,
                       value: valueString,
                       sourceLocation: value.sourceLocation?.stringWithAddressAndBank(),
                       variableAddress: value.variableLocation ?? 0)
@@ -510,7 +528,7 @@ extension EmulatorViewController: NSTableViewDelegate {
     }
 
     switch tableColumn.identifier {
-    case .register, .name:
+    case .register, .name, .variableName:
       let identifier = NSUserInterfaceItemIdentifier.textCell
       let view: TextTableCellView
       if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TextTableCellView {

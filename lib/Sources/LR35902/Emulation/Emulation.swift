@@ -163,7 +163,15 @@ extension LR35902.CPUState {
       state.ram.removeAll()
       state.pc += width
 
-    // TODO: For calls, we need to look up the affected registers and arguments.
+    case .cb(.res(let bit, let numeric)) where registers8.contains(numeric):
+      if var register: LR35902.CPUState.RegisterState<UInt8> = state[numeric] {
+        if let value = register.value {
+          register.value = value & ~(1 << bit.rawValue)
+          state[numeric] = register
+        }
+      }
+      state.pc += width
+
     default:
       state.pc += width
     }
