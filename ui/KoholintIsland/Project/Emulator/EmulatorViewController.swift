@@ -26,13 +26,15 @@ private final class CPURegister: NSObject {
 }
 
 private final class RAMValue: NSObject {
-  init(address: LR35902.Address, value: UInt16, sourceLocation: LR35902.Cartridge.Location) {
+  init(address: LR35902.Address, name: String?, value: UInt16, sourceLocation: LR35902.Cartridge.Location) {
     self.address = address
+    self.name = name
     self.value = value
     self.sourceLocation = sourceLocation
   }
 
   @objc dynamic var address: LR35902.Address
+  @objc dynamic var name: String?
   @objc dynamic var value: UInt16
   @objc dynamic var sourceLocation: LR35902.Cartridge.Location
 }
@@ -169,6 +171,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
     let ramColumns = [
       Column(name: "Address", identifier: .address, width: 50),
+      Column(name: "Name", identifier: .name, width: 50),
       Column(name: "Value", identifier: .registerValue, width: 50),
       Column(name: "Source", identifier: .registerSourceLocation, width: 50),
     ]
@@ -374,8 +377,12 @@ extension EmulatorViewController: NSTextFieldDelegate {
   }
 
   func updateRAM() {
+    let globalMap = document.configuration.globals.reduce(into: [:]) { accumulator, global in
+      accumulator[global.address] = global
+    }
     ramController.content = document.cpuState.ram.map { address, value -> RAMValue in
-      return RAMValue(address: address, value: UInt16(value.value ?? 0), sourceLocation: value.sourceLocation)
+      let globalName = globalMap[address]?.name
+      return RAMValue(address: address, name: globalName, value: UInt16(value.value ?? 0), sourceLocation: value.sourceLocation)
     }
   }
 }
@@ -387,7 +394,7 @@ extension EmulatorViewController: NSTableViewDelegate {
     }
 
     switch tableColumn.identifier {
-    case .register:
+    case .register, .name:
       let identifier = NSUserInterfaceItemIdentifier.textCell
       let view: TextTableCellView
       if let recycledView = tableView.makeView(withIdentifier: identifier, owner: self) as? TextTableCellView {
