@@ -30,6 +30,14 @@ extension LR35902 {
       state.registerTraces[dst] = state.registerTraces[src]
       state.pc += width
 
+    case .add(let dst, let src) where registers16.contains(dst) && registers16.contains(src):
+      let originalValue: UInt16 = state[dst]
+      (state[dst], state.fcarry) = state[dst].addingReportingOverflow(state[src] as UInt16)
+      state.fsubtract = false
+      state.fhalfcarry = (((state[src] & UInt16(0x0FFF)) + (originalValue & 0x0FFF)) & 0b0001_0000_0000_0000) == 0b0001_0000_0000_0000
+      state.registerTraces[dst] = state.registerTraces[src]
+      state.pc += width
+
     case .ld(let dst, .imm16addr) where registers8.contains(dst):
       guard case let .imm16(immediate) = instruction.immediate else {
         preconditionFailure("Invalid immediate associated with instruction")
@@ -150,6 +158,14 @@ extension LR35902 {
 
     case .dec(let numeric) where registers8.contains(numeric):
       state.set(numeric8: numeric, to: state.get(numeric8: numeric) &- 1)
+      state.pc += width
+
+    case .ld(.imm16addr, .sp):
+      guard case let .imm16(immediate) = instruction.immediate else {
+        preconditionFailure("Invalid immediate associated with instruction")
+      }
+      memory.write(UInt8(state.sp & 0xFF), to: immediate)
+      memory.write(UInt8(state.sp >> 8), to: immediate + 1)
       state.pc += width
 
     case .rlca:

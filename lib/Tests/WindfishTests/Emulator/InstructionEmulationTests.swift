@@ -209,4 +209,96 @@ class InstructionEmulationTests: XCTestCase {
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
   }
+
+  func test_ld_imm16addr_sp() {
+    var cpu = LR35902(sp: 0xabcd)
+    var memory: AddressableMemory = TestMemory()
+    let mutatedCpu = cpu.emulate(instruction: .init(spec: LR35902.InstructionSet.table[0x08], immediate: .imm16(0x1234)), memory: &memory, followControlFlow: true)
+
+    // Expected mutations
+    cpu.pc += 3
+
+    assertEqual(cpu, mutatedCpu)
+    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).writes, [
+      .init(byte: 0xcd, address: 0x1234),
+      .init(byte: 0xab, address: 0x1235)
+    ])
+  }
+
+  func test_add_hl_bc() {
+    var cpu = LR35902(fzero: true, fsubtract: true, fhalfcarry: true, fcarry: true)
+    cpu.bc = 0b1111_0000
+    cpu.hl = 0b0000_1111
+    var memory: AddressableMemory = TestMemory()
+    let mutatedCpu = cpu.emulate(instruction: .init(spec: LR35902.InstructionSet.table[0x09]), memory: &memory, followControlFlow: true)
+
+    // Expected mutations
+    cpu.hl = 0b1111_1111
+    cpu.fcarry = false
+    cpu.fhalfcarry = false
+    cpu.fsubtract = false
+    cpu.pc += 1
+
+    assertEqual(cpu, mutatedCpu)
+    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).writes, [])
+  }
+
+  func test_add_hl_bc_low_to_high_overflow() {
+    var cpu = LR35902(fzero: true, fsubtract: true, fhalfcarry: true, fcarry: true)
+    cpu.bc = 0b0000_0000_0000_0001
+    cpu.hl = 0b0000_0000_1111_1111
+    var memory: AddressableMemory = TestMemory()
+    let mutatedCpu = cpu.emulate(instruction: .init(spec: LR35902.InstructionSet.table[0x09]), memory: &memory, followControlFlow: true)
+
+    // Expected mutations
+    cpu.hl = 0b0000_0001_0000_0000
+    cpu.fcarry = false
+    cpu.fhalfcarry = false
+    cpu.fsubtract = false
+    cpu.pc += 1
+
+    assertEqual(cpu, mutatedCpu)
+    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).writes, [])
+  }
+
+  func test_add_hl_bc_overflow() {
+    var cpu = LR35902(fzero: true, fsubtract: true, fhalfcarry: false, fcarry: false)
+    cpu.bc = 1
+    cpu.hl = 0xffff
+    var memory: AddressableMemory = TestMemory()
+    let mutatedCpu = cpu.emulate(instruction: .init(spec: LR35902.InstructionSet.table[0x09]), memory: &memory, followControlFlow: true)
+
+    // Expected mutations
+    cpu.hl = 0b0000_0000_0000_0000
+    cpu.fcarry = true
+    cpu.fhalfcarry = true
+    cpu.fsubtract = false
+    cpu.pc += 1
+
+    assertEqual(cpu, mutatedCpu)
+    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).writes, [])
+  }
+
+  func test_add_hl_bc_low_to_high_halfcarry() {
+    var cpu = LR35902(fzero: true, fsubtract: true, fhalfcarry: false, fcarry: true)
+    cpu.bc = 0b0000_0000_0000_0001
+    cpu.hl = 0b0000_1111_1111_1111
+    var memory: AddressableMemory = TestMemory()
+    let mutatedCpu = cpu.emulate(instruction: .init(spec: LR35902.InstructionSet.table[0x09]), memory: &memory, followControlFlow: true)
+
+    // Expected mutations
+    cpu.hl = 0b0001_0000_0000_0000
+    cpu.fcarry = false
+    cpu.fhalfcarry = true
+    cpu.fsubtract = false
+    cpu.pc += 1
+
+    assertEqual(cpu, mutatedCpu)
+    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).writes, [])
+  }
 }
