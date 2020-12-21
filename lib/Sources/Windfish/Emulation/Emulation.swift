@@ -136,6 +136,15 @@ extension LR35902 {
       state.registerTraces[.sp] = .init(sourceLocation: location)
       state.pc += width
 
+    case .ld(.bcaddr, let src) where registers8.contains(src):
+      memory.write(state[src], to: LR35902.Address(state.b) << 8 | LR35902.Address(state.c))
+      state.pc += width
+
+    case .inc(let numeric) where registers16.contains(numeric):
+      let value = state.get(numeric16: numeric)
+      state.set(numeric16: numeric, to: value.addingReportingOverflow(1).partialValue)
+      state.pc += width
+
     case .reti, .ret:
       state.registerTraces.removeValue(forKey: .a)
       state.registerTraces.removeValue(forKey: .bc)

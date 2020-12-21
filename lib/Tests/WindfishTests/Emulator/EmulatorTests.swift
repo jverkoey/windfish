@@ -13,6 +13,10 @@ func disassemblyInitialized(with assembly: String) -> Disassembler {
 /** Asserts that two CPU states are equal. */
 func assertEqual(_ state1: LR35902, _ state2: LR35902, file: StaticString = #file, line: UInt = #line) {
   XCTAssertEqual(state1.a, state2.a, "a mismatch", file: file, line: line)
+  XCTAssertEqual(state1.fzero, state2.fzero, "fzero mismatch", file: file, line: line)
+  XCTAssertEqual(state1.fsubtract, state2.fsubtract, "fsubtract mismatch", file: file, line: line)
+  XCTAssertEqual(state1.fhalfcarry, state2.fhalfcarry, "fhalfcarry mismatch", file: file, line: line)
+  XCTAssertEqual(state1.fcarry, state2.fcarry, "fcarry mismatch", file: file, line: line)
   XCTAssertEqual(state1.b, state2.b, "b mismatch", file: file, line: line)
   XCTAssertEqual(state1.c, state2.c, "c mismatch", file: file, line: line)
   XCTAssertEqual(state1.d, state2.d, "d mismatch", file: file, line: line)

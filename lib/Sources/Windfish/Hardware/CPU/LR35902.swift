@@ -141,25 +141,28 @@ extension LR35902 {
   }
   /** 16-bit register subscript. */
   public subscript(numeric: LR35902.Instruction.Numeric) -> UInt16 {
-    get {
-      switch numeric {
-      case .bc: return bc
-      case .de: return de
-      case .hl: return hl
-      case .sp: return sp
-      default:
-        preconditionFailure()
-      }
+    get { return get(numeric16: numeric) }
+    set { set(numeric16: numeric, to: newValue) }
+  }
+
+  public func get(numeric16: LR35902.Instruction.Numeric) -> UInt16 {
+    switch numeric16 {
+    case .bc: return bc
+    case .de: return de
+    case .hl: return hl
+    case .sp: return sp
+    default:
+      preconditionFailure()
     }
-    set {
-      switch numeric {
-      case .bc: bc = newValue
-      case .de: de = newValue
-      case .hl: hl = newValue
-      case .sp: sp = newValue
-      default:
-        preconditionFailure()
-      }
+  }
+  public mutating func set(numeric16: LR35902.Instruction.Numeric, to newValue: UInt16) {
+    switch numeric16 {
+    case .bc: bc = newValue
+    case .de: de = newValue
+    case .hl: hl = newValue
+    case .sp: sp = newValue
+    default:
+      preconditionFailure()
     }
   }
 
