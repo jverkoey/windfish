@@ -35,6 +35,7 @@ final class CodeTextView: NSTextView {
     }
 
     if let emulationLine = emulationLine,
+       emulationLine < lineAnalysis.lineRanges.count,
        let range = Range(lineAnalysis.lineRanges[emulationLine], in: self.string) {
       let lineRange = self.string.lineRange(for: range)
       let glyphRange = layoutManager.glyphRange(forCharacterRange: NSRange(lineRange, in: self.string), actualCharacterRange: nil)

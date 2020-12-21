@@ -197,7 +197,7 @@ class ProjectDocument: NSDocument {
   @objc dynamic var disassemblyResults: DisassemblyResults?
   var metadata: ProjectMetadata?
   var configuration = ProjectConfiguration()
-  var memory = MainMemory()
+  var memory = Gameboy.Memory()
   var cpuState: LR35902 = {
     var state = LR35902(a: 0x01, b: 0x00, c: 0x13, d: 0x00, e: 0xD8, h: 0x01, l: 0x4D, sp: 0xFFFE, pc: 0x100, bank: 0x00)
     state.f = 0xB0

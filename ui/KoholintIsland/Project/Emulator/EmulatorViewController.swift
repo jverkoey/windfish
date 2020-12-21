@@ -396,7 +396,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
       var memory: AddressableMemory = document.memory
       document.cpuState = document.cpuState.emulate(instruction: instruction, memory: &memory, followControlFlow: true)
-      document.memory = memory as! MainMemory
+      document.memory = memory as! Gameboy.Memory
 
       programCounterTextField.objectValue = document.cpuState.pc
       updateInstructionAssembly()
