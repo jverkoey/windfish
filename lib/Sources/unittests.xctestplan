@@ -26,15 +26,15 @@
     {
       "target" : {
         "containerPath" : "container:..\/lib",
-        "identifier" : "LR35902Tests",
-        "name" : "LR35902Tests"
+        "identifier" : "RGBDSTests",
+        "name" : "RGBDSTests"
       }
     },
     {
       "target" : {
-        "containerPath" : "container:..\/lib",
-        "identifier" : "RGBDSTests",
-        "name" : "RGBDSTests"
+        "containerPath" : "container:",
+        "identifier" : "WindfishTests",
+        "name" : "WindfishTests"
       }
     }
   ],

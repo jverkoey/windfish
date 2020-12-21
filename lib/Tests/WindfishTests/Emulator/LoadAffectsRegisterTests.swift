@@ -9,7 +9,7 @@ ld   a, 1
     let states = disassembly.trace(range: 0..<disassembly.cartridge.size)
 
     let state = try XCTUnwrap(states[Gameboy.Cartridge.Location(0x0000)])
-    assertEqual(state, LR35902(a: 1, pc: 0x0002, bank: 0x00))
+    assertEqual(state, LR35902(a: 1, pc: 0x0002))
   }
 
   func test_ld_b() throws {
@@ -19,7 +19,7 @@ ld   b, 1
     let states = disassembly.trace(range: 0..<disassembly.cartridge.size)
 
     let state = try XCTUnwrap(states[Gameboy.Cartridge.Location(0x0000)])
-    assertEqual(state, LR35902(b: 1, pc: 0x0002, bank: 0x00))
+    assertEqual(state, LR35902(b: 1, pc: 0x0002))
   }
 
   func test_ld_c() throws {
@@ -29,7 +29,7 @@ ld   c, 1
     let states = disassembly.trace(range: 0..<disassembly.cartridge.size)
 
     let state = try XCTUnwrap(states[Gameboy.Cartridge.Location(0x0000)])
-    assertEqual(state, LR35902(c: 1, pc: 0x0002, bank: 0x00))
+    assertEqual(state, LR35902(c: 1, pc: 0x0002))
   }
 
   func test_ld_d() throws {
@@ -39,7 +39,7 @@ ld   d, 1
     let states = disassembly.trace(range: 0..<disassembly.cartridge.size)
 
     let state = try XCTUnwrap(states[Gameboy.Cartridge.Location(0x0000)])
-    assertEqual(state, LR35902(d: 1, pc: 0x0002, bank: 0x00))
+    assertEqual(state, LR35902(d: 1, pc: 0x0002))
   }
 
   func test_ld_e() throws {
@@ -49,7 +49,7 @@ ld   e, 1
     let states = disassembly.trace(range: 0..<disassembly.cartridge.size)
 
     let state = try XCTUnwrap(states[Gameboy.Cartridge.Location(0x0000)])
-    assertEqual(state, LR35902(e: 1, pc: 0x0002, bank: 0x00))
+    assertEqual(state, LR35902(e: 1, pc: 0x0002))
   }
 
   func test_ld_h() throws {
@@ -59,7 +59,7 @@ ld   h, 1
     let states = disassembly.trace(range: 0..<disassembly.cartridge.size)
 
     let state = try XCTUnwrap(states[Gameboy.Cartridge.Location(0x0000)])
-    assertEqual(state, LR35902(h: 1, pc: 0x0002, bank: 0x00))
+    assertEqual(state, LR35902(h: 1, pc: 0x0002))
   }
 
   func test_ld_l() throws {
@@ -69,6 +69,6 @@ ld   l, 1
     let states = disassembly.trace(range: 0..<disassembly.cartridge.size)
 
     let state = try XCTUnwrap(states[Gameboy.Cartridge.Location(0x0000)])
-    assertEqual(state, LR35902(l: 1, pc: 0x0002, bank: 0x00))
+    assertEqual(state, LR35902(l: 1, pc: 0x0002))
   }
 }

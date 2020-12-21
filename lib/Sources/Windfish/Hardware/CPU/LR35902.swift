@@ -11,19 +11,19 @@ public struct LR35902 {
   public typealias Bank = UInt8
 
   // MARK: 8-bit registers
-  public var a: UInt8 = 0
-  public var b: UInt8 = 0
-  public var c: UInt8 = 0
-  public var d: UInt8 = 0
-  public var e: UInt8 = 0
-  public var h: UInt8 = 0
-  public var l: UInt8 = 0
+  public var a: UInt8 = 0x01
+  public var b: UInt8 = 0x00
+  public var c: UInt8 = 0x13
+  public var d: UInt8 = 0x00
+  public var e: UInt8 = 0xD8
+  public var h: UInt8 = 0x01
+  public var l: UInt8 = 0x4D
 
   /** Flag register bits. */
-  public var fzero: Bool = false
+  public var fzero: Bool = true
   public var fsubtract: Bool = false
-  public var fhalfcarry: Bool = false
-  public var fcarry: Bool = false
+  public var fhalfcarry: Bool = true
+  public var fcarry: Bool = true
 
   /** Flag register. */
   public var f: UInt8 {
@@ -68,18 +68,21 @@ public struct LR35902 {
   }
 
   /** Stack pointer. */
-  public var sp: UInt16 = 0
+  public var sp: UInt16 = 0xFFFE
 
   /** Program counter. */
-  public var pc: Address = 0
+  public var pc: Address = 0x100
 
   /** Selected bank. */
-  public var bank: Bank = 0
+  public var bank: Bank = 0x00
 
   /** Trace information for a given register. */
   public var registerTraces: [LR35902.Instruction.Numeric: RegisterTrace] = [:]
 
-  /** Initializes the state with initial immediate values. */
+  /** Initializes the state with boot values. */
+  public init() {}
+
+  /** Initializes the state with specific values. */
   public init(a: UInt8 = 0, b: UInt8 = 0, c: UInt8 = 0, d: UInt8 = 0, e: UInt8 = 0, h: UInt8 = 0, l: UInt8 = 0, fzero: Bool = false, fsubtract: Bool = false, fhalfcarry: Bool = false, fcarry: Bool = false, sp: UInt16 = 0, pc: LR35902.Address = 0, bank: LR35902.Bank = 0, registerTraces: [LR35902.Instruction.Numeric : LR35902.RegisterTrace] = [:]) {
     self.a = a
     self.b = b
@@ -96,6 +99,10 @@ public struct LR35902 {
     self.pc = pc
     self.bank = bank
     self.registerTraces = registerTraces
+  }
+
+  public static func zeroed() -> LR35902 {
+    return LR35902(a: 0, b: 0, c: 0, d: 0, e: 0, h: 0, l: 0, fzero: false, fsubtract: false, fhalfcarry: false, fcarry: false, sp: 0, pc: 0, bank: 0, registerTraces: [:])
   }
 }
 

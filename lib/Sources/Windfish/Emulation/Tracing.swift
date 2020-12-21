@@ -29,7 +29,7 @@ extension Disassembler {
    */
   @discardableResult
   func trace(range: Range<Gameboy.Cartridge.Location>,
-             initialState: LR35902 = LR35902(),
+             initialState: LR35902 = LR35902.zeroed(),
              step: ((LR35902.Instruction, Gameboy.Cartridge.Location, LR35902) -> Void)? = nil)
   -> [Gameboy.Cartridge.Location: LR35902] {
     var state = initialState
