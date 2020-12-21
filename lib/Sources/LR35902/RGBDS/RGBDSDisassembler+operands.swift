@@ -228,7 +228,7 @@ extension RGBDSDisassembler {
 extension RGBDSDisassembler {
   /** Returns an immediate 8 bit value represented as the inferred type at the context's execution location. */
   private static func typedOperand(for imm8: UInt8, with context: Context) -> String? {
-    let location = LR35902.Cartridge.location(for: context.address, in: context.bank)!
+    let location = Gameboy.Cartridge.location(for: context.address, in: context.bank)!
     guard let type = context.disassembly.typeAtLocation[location],
           let dataType = context.disassembly.dataTypes[type] else {
       return nil  // No known data type.
@@ -314,7 +314,7 @@ extension RGBDSDisassembler {
   }
 
   /** Returns the immediate formatted with the given representation. */
-  private static func literal(for imm8: UInt8, using representation: LR35902.Disassembly.Datatype.Representation) -> String {
+  private static func literal(for imm8: UInt8, using representation: Disassembler.Datatype.Representation) -> String {
     switch representation {
     case .binary:
       return RGBDS.asBinaryString(imm8)

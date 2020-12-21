@@ -1,14 +1,14 @@
 import XCTest
 @testable import LR35902
 
-extension LR35902.Disassembly.Macro: Equatable {
-  public static func == (lhs: LR35902.Disassembly.Macro, rhs: LR35902.Disassembly.Macro) -> Bool {
+extension Disassembler.Macro: Equatable {
+  public static func == (lhs: Disassembler.Macro, rhs: Disassembler.Macro) -> Bool {
     return lhs.name == rhs.name && lhs.validArgumentValues == rhs.validArgumentValues && lhs.macroLines == rhs.macroLines
   }
 }
 
-extension LR35902.Disassembly.MacroNode: Equatable {
-  public static func == (lhs: LR35902.Disassembly.MacroNode, rhs: LR35902.Disassembly.MacroNode) -> Bool {
+extension Disassembler.MacroNode: Equatable {
+  public static func == (lhs: Disassembler.MacroNode, rhs: Disassembler.MacroNode) -> Bool {
     return lhs.macros == rhs.macros && lhs.children == rhs.children
   }
 
@@ -24,7 +24,7 @@ class TypeInferenceTests: XCTestCase {
 
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
 
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
 
     disassembly.createDatatype(named: "STATF", bitmask: [
       0b0100_0000: "STATF_LYC",
@@ -50,12 +50,12 @@ SECTION "ROM Bank 00", ROM0[$00]
     ld   [gbSTAT], a
 """)
       XCTAssertEqual(lines, [
-        LR35902.Disassembly.Line(semantic: .section(0), address: nil, bank: nil, scope: nil, data: nil),
-        LR35902.Disassembly.Line(semantic: .empty, address: nil, bank: nil, scope: nil, data: nil),
-        LR35902.Disassembly.Line(semantic: .instruction(.init(spec: .ld(.a, .imm8), immediate: .imm8(68)),
+        Disassembler.Line(semantic: .section(0), address: nil, bank: nil, scope: nil, data: nil),
+        Disassembler.Line(semantic: .empty, address: nil, bank: nil, scope: nil, data: nil),
+        Disassembler.Line(semantic: .instruction(.init(spec: .ld(.a, .imm8), immediate: .imm8(68)),
                                                         .init(opcode: "ld", operands: ["a", "STATF_LYC | STATF_LYCF"])),
                                  address: 0, bank: 0, scope: "", data: Data([0x3e, 0x44])),
-        LR35902.Disassembly.Line(semantic: .instruction(.init(spec: .ld(.ffimm8addr, .a), immediate: .imm8(65)),
+        Disassembler.Line(semantic: .instruction(.init(spec: .ld(.ffimm8addr, .a), immediate: .imm8(65)),
                                                         .init(opcode: "ld", operands: ["[gbSTAT]", "a"])),
                                  address: 2, bank: 0, scope: "", data: Data([0xe0, 0x41]))
       ])
@@ -72,7 +72,7 @@ jr   z, -$03
 
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
 
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
 
     disassembly.defineMacro(named: "macro", template: """
 ld   a, [#1]
@@ -81,13 +81,13 @@ jr   z, #2
 """)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
-    let tree = LR35902.Disassembly.MacroNode(
+    let tree = Disassembler.MacroNode(
       children: [
-        .arg(.ld(.a, .imm16addr)): LR35902.Disassembly.MacroNode(
+        .arg(.ld(.a, .imm16addr)): Disassembler.MacroNode(
           children: [
-            .instruction(.init(spec: .and(.a))): LR35902.Disassembly.MacroNode(
+            .instruction(.init(spec: .and(.a))): Disassembler.MacroNode(
               children: [
-                .arg(.jr(.z, .simm8)): LR35902.Disassembly.MacroNode(
+                .arg(.jr(.z, .simm8)): Disassembler.MacroNode(
                   children: [:],
                   macros: [
                     .init(
@@ -108,11 +108,11 @@ jr   z, #2
           ],
           macros: []
         ),
-        .arg(.ld(.a, .ffimm8addr)): LR35902.Disassembly.MacroNode(
+        .arg(.ld(.a, .ffimm8addr)): Disassembler.MacroNode(
           children: [
-            .instruction(.init(spec: .and(.a))): LR35902.Disassembly.MacroNode(
+            .instruction(.init(spec: .and(.a))): Disassembler.MacroNode(
               children: [
-                .arg(.jr(.z, .simm8)): LR35902.Disassembly.MacroNode(
+                .arg(.jr(.z, .simm8)): Disassembler.MacroNode(
                   children: [:],
                   macros: [
                     .init(
@@ -160,7 +160,7 @@ inc  [hl]
 
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
 
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
 
     disassembly.defineMacro(named: "plusPlusHL", template: """
 ld hl, #1
@@ -168,11 +168,11 @@ inc [hl]
 """)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
-    XCTAssertEqual(disassembly.macroTree, LR35902.Disassembly.MacroNode(
+    XCTAssertEqual(disassembly.macroTree, Disassembler.MacroNode(
       children: [
-        .arg(.ld(.hl, .imm16)): LR35902.Disassembly.MacroNode(
+        .arg(.ld(.hl, .imm16)): Disassembler.MacroNode(
           children: [
-            .instruction(.init(spec: .inc(.hladdr))): LR35902.Disassembly.MacroNode(
+            .instruction(.init(spec: .inc(.hladdr))): Disassembler.MacroNode(
               children: [:],
               macros: [
                 .init(
@@ -213,7 +213,7 @@ nop
 
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
 
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     let (source, _) = try! disassembly.generateSource()
@@ -236,7 +236,7 @@ ld [$abcd], a
 
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
 
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     let (source, _) = try! disassembly.generateSource()
@@ -260,7 +260,7 @@ jr -$01
 
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
 
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     let (source, _) = try! disassembly.generateSource()
@@ -288,7 +288,7 @@ call $4100
 
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
 
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
 
     disassembly.defineMacro(named: "callcb", instructions: [
       .arg(.ld(.a, .imm8), argumentText: "bank(\\1)"),
@@ -299,13 +299,13 @@ call $4100
     ])
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
-    XCTAssertEqual(disassembly.macroTree, LR35902.Disassembly.MacroNode(
+    XCTAssertEqual(disassembly.macroTree, Disassembler.MacroNode(
       children: [
-        .arg(.ld(.a, .imm8)): LR35902.Disassembly.MacroNode(
+        .arg(.ld(.a, .imm8)): Disassembler.MacroNode(
           children: [
-            .instruction(.init(spec: .ld(.imm16addr, .a), immediate: .imm16(0x2100))): LR35902.Disassembly.MacroNode(
+            .instruction(.init(spec: .ld(.imm16addr, .a), immediate: .imm16(0x2100))): Disassembler.MacroNode(
               children: [
-                .arg(.call(nil, .imm16)): LR35902.Disassembly.MacroNode(
+                .arg(.call(nil, .imm16)): Disassembler.MacroNode(
                   children: [:],
                   macros:[
                     .init(

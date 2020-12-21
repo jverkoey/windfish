@@ -8,7 +8,7 @@ nop nop
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
 
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [RGBDSAssembler.Error(lineNumber: 1, message: "No valid instruction found for nop  nop")])
@@ -23,7 +23,7 @@ nop nop
 
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
 
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [RGBDSAssembler.Error(lineNumber: 3, message: "No valid instruction found for nop  nop")])
@@ -36,7 +36,7 @@ nop
 nop
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -52,7 +52,7 @@ nop
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
 
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -65,7 +65,7 @@ nop
 nop
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -80,7 +80,7 @@ nop
 ld bc, $1234
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -94,7 +94,7 @@ ld bc, $1234
 ld bc, 0x1234
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [.init(lineNumber: 1, message: "No valid instruction found for ld   bc, 0x1234")])
@@ -106,7 +106,7 @@ ld bc, 0x1234
 ld bc, 1234
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertTrue(results.errors.isEmpty)
@@ -121,7 +121,7 @@ ld bc, 1234
 ld bc, -1234
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -137,7 +137,7 @@ ld bc, $1234
     nop
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -152,7 +152,7 @@ ld bc, $1234
 ld bc, $12342342342
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [RGBDSAssembler.Error(lineNumber: 1, message: "Unable to represent $12342342342 as a UInt16")])
@@ -164,7 +164,7 @@ ld bc, $12342342342
 ld bc, $
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [RGBDSAssembler.Error(lineNumber: 1, message: "Unable to represent $ as a UInt16")])
@@ -176,7 +176,7 @@ ld bc, $
 ld [bc], a
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -190,7 +190,7 @@ ld [bc], a
 inc bc
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -204,7 +204,7 @@ inc bc
 ld b, 255
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -218,7 +218,7 @@ ld b, 255
 ld b, 0xFF
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [.init(lineNumber: 1, message: "No valid instruction found for ld   b, 0xFF")])
@@ -230,7 +230,7 @@ ld b, 0xFF
 ld [$1234], sp
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -244,7 +244,7 @@ ld [$1234], sp
 ld a, [bc]
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -258,7 +258,7 @@ ld a, [bc]
 rrca
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -272,7 +272,7 @@ rrca
 jr 5
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -286,7 +286,7 @@ jr 5
 ld [$FFA0], a
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -300,7 +300,7 @@ ld [$FFA0], a
 ld [$FAA0], a
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -314,7 +314,7 @@ ld [$FAA0], a
 ret z
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -328,7 +328,7 @@ ret z
 sub 5
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -342,7 +342,7 @@ sub 5
 rst $38
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -356,7 +356,7 @@ rst $38
 rlc b
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -370,7 +370,7 @@ rlc b
 bit 2, b
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -384,7 +384,7 @@ bit 2, b
 set 6, [hl]
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -398,7 +398,7 @@ set 6, [hl]
 jr nz, 5
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -412,7 +412,7 @@ jr nz, 5
 ld hl, sp+$05
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(results.errors, [])
@@ -445,7 +445,7 @@ ld hl, sp+$05
 
       let results = RGBDSAssembler.assemble(assembly: assembly)
       let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-      let disassembly = LR35902.Disassembly(rom: data)
+      let disassembly = Disassembler(data: data)
       disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
       XCTAssertEqual(results.errors, [], "Spec: \(spec)")

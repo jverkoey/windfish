@@ -52,7 +52,7 @@ extension String {
   }
 
   /** Returns a numerical representation of the hexadecimal string. */
-  fileprivate func addressAndBankRepresentation() -> LR35902.Cartridge.Location? {
+  fileprivate func addressAndBankRepresentation() -> Gameboy.Cartridge.Location? {
     if isEmpty {
       return nil
     }
@@ -62,7 +62,7 @@ extension String {
           let address = LR35902.Address(parts[1].dropFirst(2), radix: 16) else {
       return nil
     }
-    return LR35902.Cartridge.location(for: address, in: bank)
+    return Gameboy.Cartridge.location(for: address, in: bank)
   }
 }
 
@@ -78,10 +78,10 @@ extension FixedWidthInteger {
   }
 }
 
-extension LR35902.Cartridge.Location {
+extension Gameboy.Cartridge.Location {
   /** Returns a string representation of the integer in the given representation format. */
   fileprivate func stringWithAddressAndBank() -> String {
-    let (address, bank) = LR35902.Cartridge.addressAndBank(from: self)
+    let (address, bank) = Gameboy.Cartridge.addressAndBank(from: self)
     return  bank.hexString + "." + address.stringWithRepresentation(.hex)
   }
 }
@@ -394,7 +394,10 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
       // TODO: Step into and through any control flow.
 
-      document.cpuState = document.cpuState.emulate(instruction: instruction, followControlFlow: true)
+      var memory: AddressableMemory = document.memory
+      document.cpuState = document.cpuState.emulate(instruction: instruction, memory: &memory, followControlFlow: true)
+      document.memory = memory as! MainMemory
+
       programCounterTextField.objectValue = document.cpuState.pc
       updateInstructionAssembly()
       updateRegisters()
@@ -410,7 +413,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       for register in LR35902.Instruction.Numeric.registers16 {
         state.clear(register)
       }
-      state.ram.removeAll()
+      // TODO: Reset RAM.
       document.cpuState = state
 
       updateRegisters()
@@ -496,18 +499,19 @@ extension EmulatorViewController: NSTextFieldDelegate {
   }
 
   func updateRAM() {
-    let globalMap = document.configuration.globals.reduce(into: [:]) { accumulator, global in
-      accumulator[global.address] = global
-    }
-    ramController.content = document.cpuState.ram.map { address, value -> RAMValue in
-      let globalName = globalMap[address]?.name
-      let valueString = "0x" + value.hexString
-      return RAMValue(address: address,
-                      variableName: globalName,
-                      value: valueString,
-                      sourceLocation: nil,
-                      variableAddress: 0)
-    }
+    // TODO: Make this handle the various memory regions better.
+//    let globalMap = document.configuration.globals.reduce(into: [:]) { accumulator, global in
+//      accumulator[global.address] = global
+//    }
+//    ramController.content = document.memoryUnit.map { address, value -> RAMValue in
+//      let globalName = globalMap[address]?.name
+//      let valueString = "0x" + value.hexString
+//      return RAMValue(address: address,
+//                      variableName: globalName,
+//                      value: valueString,
+//                      sourceLocation: nil,
+//                      variableAddress: 0)
+//    }
   }
 }
 

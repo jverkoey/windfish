@@ -119,12 +119,12 @@ class ProjectConfiguration: NSObject, Codable {
 final class DisassemblyResults: NSObject {
   internal init(
     files: [String : Data],
-    bankLines: [LR35902.Bank : [LR35902.Disassembly.Line]]? = nil,
+    bankLines: [LR35902.Bank : [Disassembler.Line]]? = nil,
     bankTextStorage: [LR35902.Bank: NSAttributedString]? = nil,
     regions: [Region]? = nil,
     regionLookup: [String: Region]? = nil,
-    statistics: LR35902.Disassembly.Statistics? = nil,
-    disassembly: LR35902.Disassembly? = nil
+    statistics: Disassembler.Statistics? = nil,
+    disassembly: Disassembler? = nil
   ) {
     self.files = files
     self.bankLines = bankLines
@@ -167,12 +167,12 @@ final class DisassemblyResults: NSObject {
   }
 
   var files: [String: Data]
-  var bankLines: [LR35902.Bank: [LR35902.Disassembly.Line]]?
+  var bankLines: [LR35902.Bank: [Disassembler.Line]]?
   var bankTextStorage: [LR35902.Bank: NSAttributedString]?
   @objc dynamic var regions: [Region]?
   var regionLookup: [String: Region]?
-  var statistics: LR35902.Disassembly.Statistics?
-  var disassembly: LR35902.Disassembly?
+  var statistics: Disassembler.Statistics?
+  var disassembly: Disassembler?
 }
 
 struct ProjectMetadata: Codable {
@@ -197,40 +197,10 @@ class ProjectDocument: NSDocument {
   @objc dynamic var disassemblyResults: DisassemblyResults?
   var metadata: ProjectMetadata?
   var configuration = ProjectConfiguration()
-  var cpuState: LR35902.CPUState = {
-    var state = LR35902.CPUState(a: 0x01, b: 0x00, c: 0x13, d: 0x00, e: 0xD8, h: 0x01, l: 0x4D, sp: 0xFFFE, pc: 0x100, bank: 0x00)
+  var memory = MainMemory()
+  var cpuState: LR35902 = {
+    var state = LR35902(a: 0x01, b: 0x00, c: 0x13, d: 0x00, e: 0xD8, h: 0x01, l: 0x4D, sp: 0xFFFE, pc: 0x100, bank: 0x00)
     state.f = 0xB0
-    state.ram[0xFF05] = 0x00
-    state.ram[0xFF06] = 0x00
-    state.ram[0xFF07] = 0x00
-    state.ram[0xFF10] = 0x80
-    state.ram[0xFF11] = 0xBF
-    state.ram[0xFF12] = 0xF3
-    state.ram[0xFF14] = 0xBF
-    state.ram[0xFF16] = 0x3F
-    state.ram[0xFF17] = 0x00
-    state.ram[0xFF19] = 0xBF
-    state.ram[0xFF1A] = 0x7F
-    state.ram[0xFF1B] = 0xFF
-    state.ram[0xFF1C] = 0x9F
-    state.ram[0xFF1E] = 0xBF
-    state.ram[0xFF20] = 0xFF
-    state.ram[0xFF21] = 0x00
-    state.ram[0xFF22] = 0x00
-    state.ram[0xFF23] = 0xBF
-    state.ram[0xFF24] = 0x77
-    state.ram[0xFF25] = 0xF3
-    state.ram[0xFF26] = 0xF1
-    state.ram[0xFF40] = 0x91
-    state.ram[0xFF42] = 0x00
-    state.ram[0xFF43] = 0x00
-    state.ram[0xFF45] = 0x00
-    state.ram[0xFF47] = 0xFC
-    state.ram[0xFF48] = 0xFF
-    state.ram[0xFF49] = 0xFF
-    state.ram[0xFF4A] = 0x00
-    state.ram[0xFF4B] = 0x00
-    state.ram[0xFFFF] = 0x00
     return state
   }() {
     didSet {
@@ -624,13 +594,13 @@ extension ProjectDocument {
     self.contentViewController?.startProgressIndicator()
 
     DispatchQueue.global(qos: .userInitiated).async {
-      let disassembly = LR35902.Disassembly(rom: romData)
+      let disassembly = Disassembler(data: romData)
 
       for dataType in self.configuration.dataTypes {
         let mappingDict = dataType.mappings.reduce(into: [:]) { accumulator, mapping in
           accumulator[mapping.value] = mapping.name
         }
-        let representation: LR35902.Disassembly.Datatype.Representation
+        let representation: Disassembler.Datatype.Representation
         switch dataType.representation {
         case DataType.Representation.binary:
           representation = .binary
@@ -706,7 +676,7 @@ extension ProjectDocument {
           accumulator[element.key] = number
         }
       })
-      let bankLines: [LR35902.Bank: [LR35902.Disassembly.Line]] = disassembledSource.sources.compactMapValues {
+      let bankLines: [LR35902.Bank: [Disassembler.Line]] = disassembledSource.sources.compactMapValues {
         switch $0 {
         case .bank(_, _, let lines):
           return lines
@@ -941,7 +911,7 @@ extension ProjectDocument {
       }
 
       DispatchQueue.main.async {
-        self.metadata?.numberOfBanks = disassembly.cpu.cartridge.numberOfBanks
+        self.metadata?.numberOfBanks = disassembly.cartridge.numberOfBanks
         self.metadata?.bankMap = bankMap
         self.disassemblyResults = DisassemblyResults(
           files: disassemblyFiles,

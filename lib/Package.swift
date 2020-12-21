@@ -20,13 +20,8 @@ let package = Package(
       dependencies: [
         "FoundationExtensions",
         "CPU",
-        "Disassembler",
         "RGBDS",
       ]
-    ),
-    .target(
-      name: "Disassembler",
-      dependencies: ["CPU"]
     ),
     .target(
       name: "CPU",

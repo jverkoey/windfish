@@ -13,39 +13,25 @@ public protocol InstructionSpecDisassemblyInfo {
   var category: InstructionCategory? { get }
 }
 
-public protocol Run {
-  associatedtype AddressT: BinaryInteger
-  associatedtype InstructionT: Instruction
-  associatedtype SpecT: InstructionSpecDisassemblyInfo where SpecT == InstructionT.SpecType
-
-  var startAddress: AddressT { get }
-  var visitedRange: Range<AddressT>? { get }
-
-  var invocationInstruction: InstructionT? { get }
-
-  /** Runs that were invoked within this run via a control transfer. */
-  var children: [Self] { get }
-}
-
-public final class RunGroup<T: Run>: Sequence {
-  init(runs: [T]) {
+public final class RunGroup: Sequence {
+  init(runs: [Disassembler.Run]) {
     self.runs = runs
   }
 
-  fileprivate let runs: [T]
+  fileprivate let runs: [Disassembler.Run]
 
-  public func makeIterator() -> IndexingIterator<[T]> {
+  public func makeIterator() -> IndexingIterator<[Disassembler.Run]> {
     return runs.makeIterator()
   }
 
-  public var first: T? {
+  public var first: Disassembler.Run? {
     return runs.first
   }
 
   /**
    The run group's starting address.
    */
-  public lazy var startAddress: T.AddressT? = {
+  public lazy var startAddress: Gameboy.Cartridge.Location? = {
     guard let firstRun = runs.first else {
       return nil
     }
@@ -66,27 +52,27 @@ public final class RunGroup<T: Run>: Sequence {
     }
   }()
 
-  public lazy var firstContiguousScopeRange: Range<T.AddressT>? = {
+  public lazy var firstContiguousScopeRange: Range<Gameboy.Cartridge.Location>? = {
     if let startAddress = startAddress {
       if let range = scope.rangeView.first(where: { $0.lowerBound == Int(startAddress) }) {
-        return Range<T.AddressT>(uncheckedBounds: (T.AddressT(range.lowerBound),
-                                                   T.AddressT(range.upperBound)))
+        return Range<Gameboy.Cartridge.Location>(uncheckedBounds: (Gameboy.Cartridge.Location(range.lowerBound),
+                                                                   Gameboy.Cartridge.Location(range.upperBound)))
       } else if let range = scope.rangeView.first(where: { $0.contains(Int(startAddress)) }) {
-        return Range<T.AddressT>(uncheckedBounds: (startAddress, T.AddressT(range.upperBound)))
+        return Range<Gameboy.Cartridge.Location>(uncheckedBounds: (startAddress, Gameboy.Cartridge.Location(range.upperBound)))
       }
     }
     return nil
   }()
 }
 
-extension Run {
+extension Disassembler.Run {
   /**
    Breaks this run apart into call groups.
 
    - Returns: a collection of arrays of Runs, where each array of Runs is part of a single call invocation.
    */
-  public func runGroups() -> [RunGroup<Self>] {
-    var runGroups: [RunGroup<Self>] = []
+  public func runGroups() -> [RunGroup] {
+    var runGroups: [RunGroup] = []
 
     var sanityCheckSeenRuns = 0
 
@@ -113,7 +99,7 @@ extension Run {
         }
       }
 
-      runGroups.append(RunGroup<Self>(runs: runGroup))
+      runGroups.append(RunGroup(runs: runGroup))
     }
 
     assert(sanityCheckSeenRuns == (runGroups.reduce(0) { $0 + $1.runs.count }))

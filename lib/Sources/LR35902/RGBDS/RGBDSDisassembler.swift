@@ -8,7 +8,7 @@ public final class RGBDSDisassembler {
 
   /** The context within which an instruction should be turned into RGBDS assembly. */
   public struct Context {
-    public init(address: LR35902.Address, bank: LR35902.Bank, disassembly: LR35902.Disassembly, argumentString: String?) {
+    public init(address: LR35902.Address, bank: LR35902.Bank, disassembly: Disassembler, argumentString: String?) {
       self.address = address
       self.bank = bank
       self.disassembly = disassembly
@@ -17,7 +17,7 @@ public final class RGBDSDisassembler {
 
     public let address: LR35902.Address
     public let bank: LR35902.Bank
-    public let disassembly: LR35902.Disassembly
+    public let disassembly: Disassembler
     public let argumentString: String?
   }
 

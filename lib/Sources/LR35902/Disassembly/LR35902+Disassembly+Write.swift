@@ -71,11 +71,11 @@ func prettify(_ label: String) -> String {
   return ".\(parts.last!)"
 }
 
-func textLine(for bytes: [UInt8], characterMap: [UInt8: String], address: LR35902.Address) -> LR35902.Disassembly.Line {
-  return LR35902.Disassembly.Line(semantic: .text(RGBDS.statement(for: bytes, characterMap: characterMap)), address: address, data: Data(bytes))
+func textLine(for bytes: [UInt8], characterMap: [UInt8: String], address: LR35902.Address) -> Disassembler.Line {
+  return Disassembler.Line(semantic: .text(RGBDS.statement(for: bytes, characterMap: characterMap)), address: address, data: Data(bytes))
 }
 
-extension LR35902.Disassembly {
+extension Disassembler {
   public struct Line: Equatable {
     public enum ImageFormat {
       case oneBitPerPixel
@@ -151,7 +151,7 @@ extension LR35902.Disassembly {
           let sources = toc
             .sorted(by: { $0.sourceLocation < $1.sourceLocation })
             .map {
-              let (address, _) = LR35902.Cartridge.addressAndBank(from: $0.sourceLocation)
+              let (address, _) = Gameboy.Cartridge.addressAndBank(from: $0.sourceLocation)
               return "\(LR35902.InstructionSet.opcodeStrings[$0.sourceInstructionSpec]!) @ $\(address.hexString)"
             }
             .joined(separator: ", ")
@@ -344,7 +344,7 @@ clean:
     var macrosAsm: String? = nil
     var writtenMacros = Set<String>()
 
-    for bank in UInt8(0)..<UInt8(cpu.cartridge.numberOfBanks) {
+    for bankToWrite in UInt8(0)..<UInt8(cartridge.numberOfBanks) {
       var bankLines: [Line] = []
       defer {
         var lastLine: Line?
@@ -355,20 +355,20 @@ clean:
           lastLine = thisLine
           return true
         }
-        sources["bank_\(bank.hexString).asm"] = .bank(number: bank, content: linesAsString(filteredBankLines), lines: filteredBankLines)
+        sources["bank_\(bankToWrite.hexString).asm"] = .bank(number: bankToWrite, content: linesAsString(filteredBankLines), lines: filteredBankLines)
       }
 
       let linesAsString: ([Line]) -> String = { lines in
         return lines.map { $0.asString(detailedComments: false) }.joined(separator: "\n")
       }
 
-      bankLines.append(Line(semantic: .section(bank)))
+      bankLines.append(Line(semantic: .section(bankToWrite)))
 
-      cpu.pc = (bank == 0) ? 0x0000 : 0x4000
-      cpu.bank = bank
-      let end: LR35902.Address = (bank == 0) ? (cpu.cartridge.size < 0x4000 ? LR35902.Address(cpu.cartridge.size) : 0x4000) : 0x8000
+      var writeContext = (pc: LR35902.Address((bankToWrite == 0) ? 0x0000 : 0x4000),
+                          bank: bankToWrite)
+      let end: LR35902.Address = (writeContext.bank == 0) ? (cartridge.size < 0x4000 ? LR35902.Address(cartridge.size) : 0x4000) : 0x8000
 
-      var lineBufferAddress: LR35902.Address = cpu.pc
+      var lineBufferAddress: LR35902.Address = writeContext.pc
       var lineBuffer: [Line] = []
       lineBuffer.append(Line(semantic: .empty))
       var macroNode: MacroNode? = nil
@@ -417,7 +417,7 @@ clean:
             }
           }
 
-          let macros: [(macro: LR35902.Disassembly.Macro, arguments: [Int: String], rawArguments: [Int: String])] = macroNodeIterator.macros.compactMap { macro in
+          let macros: [(macro: Disassembler.Macro, arguments: [Int: String], rawArguments: [Int: String])] = macroNodeIterator.macros.compactMap { macro in
             // Extract the arguments.
             var anyArgumentMismatches = false
             let arguments: [Int: String] = zip(macro.macroLines, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
@@ -562,8 +562,8 @@ clean:
                 }
 
                 let context = RGBDSDisassembler.Context(
-                  address: self.cpu.pc,
-                  bank: self.cpu.bank,
+                  address: writeContext.pc,
+                  bank: writeContext.bank,
                   disassembly: self,
                   argumentString: argumentString
                 )
@@ -574,9 +574,9 @@ clean:
               macrosAsm?.append(linesAsString(lines))
             }
 
-            let lowerBound = LR35902.Cartridge.location(for: lineBufferAddress, in: bank)!
-            let upperBound = LR35902.Cartridge.location(for: lastAddress, in: bank)!
-            let bytes = self.cpu.cartridge[lowerBound..<upperBound]
+            let lowerBound = Gameboy.Cartridge.location(for: lineBufferAddress, in: writeContext.bank)!
+            let upperBound = Gameboy.Cartridge.location(for: lastAddress, in: writeContext.bank)!
+            let bytes = self.cartridgeData[lowerBound..<upperBound]
 
             let macroArgs = macro.arguments.keys.sorted().map { macro.arguments[$0]! }
 
@@ -586,7 +586,7 @@ clean:
             if case .instruction = lineBuffer[lastInstruction].semantic {
               bank = lineBuffer[lastInstruction].bank!
             } else {
-              bank = self.cpu.bank
+              bank = writeContext.bank
             }
             let macroScopes = self.labeledContiguousScopes(at: lineBufferAddress, in: bank).map { $0.label }
             let statement = RGBDS.Statement(opcode: macro.macro.name, operands: macroArgs)
@@ -600,7 +600,7 @@ clean:
             if let action = macro.macro.action {
               action(macro.arguments, lineBufferAddress, bank)
             }
-            lineBufferAddress = self.cpu.pc
+            lineBufferAddress = writeContext.pc
           } else {
             flush()
           }
@@ -610,84 +610,84 @@ clean:
         macroNode = nil
       }
 
-      while cpu.pc < end {
+      while writeContext.pc < end {
         var isLabeled = false
         var lineGroup: [Line] = []
-        if let preComment = preComment(at: cpu.pc, in: bank) {
+        if let preComment = preComment(at: writeContext.pc, in: writeContext.bank) {
           lineGroup.append(Line(semantic: .empty))
           lineGroup.append(Line(semantic: .preComment(comment: preComment)))
         }
-        if let label = label(at: cpu.pc, in: bank) {
-          if let transfersOfControl = transfersOfControl(at: cpu.pc, in: bank) {
-            lineGroup.append(Line(semantic: .transferOfControl(transfersOfControl, label), address: cpu.pc, bank: cpu.bank))
+        if let label = label(at: writeContext.pc, in: bankToWrite) {
+          if let transfersOfControl = transfersOfControl(at: writeContext.pc, in: bankToWrite) {
+            lineGroup.append(Line(semantic: .transferOfControl(transfersOfControl, label), address: writeContext.pc, bank: writeContext.bank))
           } else {
-            let instructionScope = labeledContiguousScopes(at: cpu.pc, in: bank).map { $0.label }
+            let instructionScope = labeledContiguousScopes(at: writeContext.pc, in: bankToWrite).map { $0.label }
             let scope = instructionScope.sorted().joined(separator: ", ")
-            lineGroup.append(Line(semantic: .empty, address: cpu.pc, bank: cpu.bank, scope: scope))
-            lineGroup.append(Line(semantic: .label(labelName: label), address: cpu.pc, bank: cpu.bank, scope: scope))
+            lineGroup.append(Line(semantic: .empty, address: writeContext.pc, bank: writeContext.bank, scope: scope))
+            lineGroup.append(Line(semantic: .label(labelName: label), address: writeContext.pc, bank: writeContext.bank, scope: scope))
           }
           isLabeled = true
         }
 
-        if instructionsToDecode > 0, let instruction = instruction(at: cpu.pc, in: bank) {
+        if instructionsToDecode > 0, let instruction = instruction(at: writeContext.pc, in: bankToWrite) {
           instructionsToDecode -= 1
           instructionsDecoded += 1
 
-          if let bankChange = bankChange(at: cpu.pc, in: bank) {
-            cpu.bank = bankChange
+          if let bankChange = bankChange(at: writeContext.pc, in: writeContext.bank) {
+            writeContext.bank = bankChange
           }
 
           // Write the instruction as assembly.
-          let index = LR35902.Cartridge.location(for: cpu.pc, in: bank)!
+          let index = Gameboy.Cartridge.location(for: writeContext.pc, in: bankToWrite)!
           let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!.total
-          let bytes = cpu.cartridge[index..<(index + LR35902.Cartridge.Location(instructionWidth))]
-          let instructionScope = labeledContiguousScopes(at: cpu.pc, in: bank).map { $0.label }
+          let bytes = cartridgeData[index..<(index + Gameboy.Cartridge.Location(instructionWidth))]
+          let instructionScope = labeledContiguousScopes(at: writeContext.pc, in: bankToWrite).map { $0.label }
           let context = RGBDSDisassembler.Context(
-            address: self.cpu.pc,
-            bank: self.cpu.bank,
+            address: writeContext.pc,
+            bank: writeContext.bank,
             disassembly: self,
             argumentString: nil
           )
           lineGroup.append(Line(semantic: .instruction(instruction, RGBDSDisassembler.statement(for: instruction, with: context)),
-                                address: cpu.pc,
-                                bank: cpu.bank,
+                                address: writeContext.pc,
+                                bank: writeContext.bank,
                                 scope: instructionScope.sorted().joined(separator: ", "),
                                 data: bytes))
 
-          cpu.pc += instructionWidth
+          writeContext.pc += instructionWidth
 
           // TODO: Start a macro descent for every instruction.
 
           if let child = initialCheckMacro(instruction) {
             flush()
-            lineBufferAddress = self.cpu.pc - instructionWidth
+            lineBufferAddress = writeContext.pc - instructionWidth
             macroNode = child
           } else if let child = followUpCheckMacro(instruction, isLabeled) {
             macroNode = child
           } else {
             let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!.total
-            try flushMacro(cpu.pc - instructionWidth)
+            try flushMacro(writeContext.pc - instructionWidth)
           }
 
           // Handle context changes.
           switch instruction.spec {
           case .jp(let condition, _), .jr(let condition, _):
-            let instructionScope = labeledContiguousScopes(at: cpu.pc, in: bank).map { $0.label }
+            let instructionScope = labeledContiguousScopes(at: writeContext.pc, in: bankToWrite).map { $0.label }
             let scope = instructionScope.sorted().joined(separator: ", ")
             lineGroup.append(Line(semantic: .empty, scope: scope))
             if condition == nil {
-              cpu.bank = bank
+              writeContext.bank = bankToWrite
             }
           case .ret(let condition):
             lineGroup.append(Line(semantic: .newline))
             if condition == nil {
               lineGroup.append(Line(semantic: .empty))
-              cpu.bank = bank
+              writeContext.bank = bankToWrite
             }
           case .reti:
             lineGroup.append(Line(semantic: .newline))
             lineGroup.append(Line(semantic: .empty))
-            cpu.bank = bank
+            writeContext.bank = bankToWrite
           default:
             break
           }
@@ -696,31 +696,31 @@ clean:
 
           // Immediately start looking for the next macro.
           if let child = initialCheckMacro(instruction) {
-            lineBufferAddress = self.cpu.pc - instructionWidth
+            lineBufferAddress = writeContext.pc - instructionWidth
             macroNode = child
           }
 
         } else {
-          try flushMacro(cpu.pc)
+          try flushMacro(writeContext.pc)
 
           lineBuffer.append(contentsOf: lineGroup)
           flush()
 
           // Accumulate bytes until the next instruction or transfer of control.
           var accumulator: [UInt8] = []
-          let initialPc = cpu.pc
-          let initialType = type(of: cpu.pc, in: bank)
+          let initialPc = writeContext.pc
+          let initialType = type(of: writeContext.pc, in: bankToWrite)
           var global: Global?
           repeat {
-            if cpu.pc < 0x4000 {
-              global = globals[cpu.pc]
+            if writeContext.pc < 0x4000 {
+              global = globals[writeContext.pc]
             }
-            accumulator.append(cpu.cartridge[cpu.pc, bank])
-            cpu.pc += 1
-          } while cpu.pc < end
-            && (instructionsToDecode == 0 || instruction(at: cpu.pc, in: bank) == nil)
-            && label(at: cpu.pc, in: bank) == nil
-            && type(of: cpu.pc, in: bank) == initialType
+            accumulator.append(cartridgeData[Int(Gameboy.Cartridge.location(for: writeContext.pc, in: bankToWrite)!)])
+            writeContext.pc += 1
+          } while writeContext.pc < end
+            && (instructionsToDecode == 0 || instruction(at: writeContext.pc, in: bankToWrite) == nil)
+            && label(at: writeContext.pc, in: bankToWrite) == nil
+            && type(of: writeContext.pc, in: bankToWrite) == initialType
             && global == nil
 
           let globalValue: String?
@@ -739,7 +739,7 @@ clean:
           var chunkPc = initialPc
           switch initialType {
           case .text:
-            let lineLength = lineLengthOfText(at: initialPc, in: bank) ?? 36
+            let lineLength = lineLengthOfText(at: initialPc, in: bankToWrite) ?? 36
             for chunk in accumulator.chunked(into: lineLength) {
               bankLines.append(textLine(for: chunk, characterMap: characterMap, address: chunkPc))
               chunkPc += LR35902.Address(chunk.count)
@@ -749,17 +749,17 @@ clean:
               let address = (LR35902.Address(pair[1]) << 8) | LR35902.Address(pair[0])
               let jumpLocation: String
               let effectiveBank: LR35902.Bank
-              if let changedBank = bankChange(at: chunkPc, in: bank) {
+              if let changedBank = bankChange(at: chunkPc, in: bankToWrite) {
                 effectiveBank = changedBank
               } else {
-                effectiveBank = cpu.bank
+                effectiveBank = writeContext.bank
               }
               if let label = label(at: address, in: effectiveBank) {
                 jumpLocation = label
               } else {
                 jumpLocation = "$\(address.hexString)"
               }
-              let bytes = cpu.cartridge[LR35902.Cartridge.location(for: chunkPc, in: bank)!..<(LR35902.Cartridge.location(for: chunkPc, in: bank)! + 2)]
+              let bytes = cartridgeData[Gameboy.Cartridge.location(for: chunkPc, in: bankToWrite)!..<(Gameboy.Cartridge.location(for: chunkPc, in: bankToWrite)! + 2)]
               bankLines.append(Line(semantic: .jumpTable(jumpLocation, index), address: chunkPc, data: bytes))
               chunkPc += LR35902.Address(pair.count)
             }
@@ -800,12 +800,12 @@ clean:
           }
 
           lineBuffer.append(Line(semantic: .empty))
-          lineBufferAddress = cpu.pc
-          cpu.bank = bank
+          lineBufferAddress = writeContext.pc
+          writeContext.bank = bankToWrite
         }
       }
 
-      try flushMacro(cpu.pc)
+      try flushMacro(writeContext.pc)
 
       flush()
     }
@@ -813,22 +813,22 @@ clean:
     if let macrosAsm = macrosAsm {
       sources["macros.asm"] = .macros(content: macrosAsm)
     }
-    gameAsm += ((UInt8(0)..<UInt8(cpu.cartridge.numberOfBanks))
+    gameAsm += ((UInt8(0)..<UInt8(cartridge.numberOfBanks))
                   .map { "INCLUDE \"bank_\($0.hexString).asm\"" }
                   .joined(separator: "\n") + "\n")
 
     sources["game.asm"] = .game(content: gameAsm)
 
     let disassembledLocations = knownLocations()
-    let bankPercents: [LR35902.Bank: Double] = (0..<cpu.cartridge.numberOfBanks).reduce(into: [:]) { accumulator, bank in
+    let bankPercents: [LR35902.Bank: Double] = (0..<cartridge.numberOfBanks).reduce(into: [:]) { accumulator, bank in
       let disassembledBankLocations = disassembledLocations.intersection(
-        IndexSet(integersIn: (Int(bank) * Int(LR35902.bankSize))..<(Int(bank + 1) * Int(LR35902.bankSize)))
+        IndexSet(integersIn: (Int(bank) * Int(Gameboy.Cartridge.bankSize))..<(Int(bank + 1) * Int(Gameboy.Cartridge.bankSize)))
       )
-      accumulator[bank] = Double(disassembledBankLocations.count * 100) / Double(LR35902.bankSize)
+      accumulator[bank] = Double(disassembledBankLocations.count * 100) / Double(Gameboy.Cartridge.bankSize)
     }
     let statistics = Statistics(
       instructionsDecoded: instructionsDecoded,
-      percent: Double(disassembledLocations.count * 100) / Double(cpu.cartridge.size),
+      percent: Double(disassembledLocations.count * 100) / Double(cartridge.size),
       bankPercents: bankPercents
     )
 

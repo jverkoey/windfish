@@ -12,7 +12,7 @@ func CreateLabel() -> NSTextField {
 }
 
 final class StatisticsView: NSView {
-  var statistics: LR35902.Disassembly.Statistics? {
+  var statistics: Disassembler.Statistics? {
     didSet {
       resetLabels()
     }

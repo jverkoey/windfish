@@ -5,7 +5,7 @@ final class LR35902InstructionTests: XCTestCase {
 
   func test_nop() throws {
     let data = Data([0])
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     let instruction = disassembly.instruction(at: 0x0000, in: 0x00)!
@@ -14,7 +14,7 @@ final class LR35902InstructionTests: XCTestCase {
 
   func test_ld_bc_imm16() throws {
     let data = Data([0x01, 0x12, 0x34])
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     let instruction = disassembly.instruction(at: 0x0000, in: 0x00)!
@@ -23,7 +23,7 @@ final class LR35902InstructionTests: XCTestCase {
 
   func test_ld_bcadd_a() throws {
     let data = Data([0x02])
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     let instruction = disassembly.instruction(at: 0x0000, in: 0x00)!
@@ -32,7 +32,7 @@ final class LR35902InstructionTests: XCTestCase {
 
   func test_inc_bc() throws {
     let data = Data([0x03])
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     let instruction = disassembly.instruction(at: 0x0000, in: 0x00)!
@@ -41,7 +41,7 @@ final class LR35902InstructionTests: XCTestCase {
 
   func test_inc_b() throws {
     let data = Data([0x04])
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     let instruction = disassembly.instruction(at: 0x0000, in: 0x00)!
@@ -50,7 +50,7 @@ final class LR35902InstructionTests: XCTestCase {
 
   func test_dec_b() throws {
     let data = Data([0x05])
-    let disassembly = LR35902.Disassembly(rom: data)
+    let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     let instruction = disassembly.instruction(at: 0x0000, in: 0x00)!

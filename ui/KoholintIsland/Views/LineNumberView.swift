@@ -18,7 +18,7 @@ private let scopeColumnWidth: CGFloat = 8
 private let columnPadding: CGFloat = 4
 
 final class LineNumberView: NSRulerView {
-  var bankLines: [LR35902.Disassembly.Line]?
+  var bankLines: [Disassembler.Line]?
   weak var delegate: LineNumberViewDelegate?
 
   private let font = NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
@@ -76,10 +76,10 @@ final class LineNumberView: NSRulerView {
   }
 
   func processLines(in rect: NSRect,
-                    dataHandler: ((LR35902.Disassembly.Line.Semantic, Data, NSRect) -> Void)? = nil,
-                    scopeHandler: ((LR35902.Disassembly.Line?, LR35902.Disassembly.Line, LR35902.Disassembly.Line?, NSRect) -> Void)? = nil,
+                    dataHandler: ((Disassembler.Line.Semantic, Data, NSRect) -> Void)? = nil,
+                    scopeHandler: ((Disassembler.Line?, Disassembler.Line, Disassembler.Line?, NSRect) -> Void)? = nil,
                     bankHandler: ((LR35902.Bank, NSRect) -> Void)? = nil,
-                    handler: (Int, NSString, NSRect, LR35902.Disassembly.Line.Semantic) -> Bool) {
+                    handler: (Int, NSString, NSRect, Disassembler.Line.Semantic) -> Bool) {
     guard let textView = clientView as? NSTextView else {
       return
     }

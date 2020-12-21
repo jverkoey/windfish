@@ -1,17 +1,17 @@
 import XCTest
 @testable import LR35902
 
-func disassemblyInitialized(with assembly: String) -> LR35902.Disassembly {
+func disassemblyInitialized(with assembly: String) -> Disassembler {
   let results = RGBDSAssembler.assemble(assembly: assembly)
 
   let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-  let disassembly = LR35902.Disassembly(rom: data)
+  let disassembly = Disassembler(data: data)
   disassembly.disassemble(range: 0..<LR35902.Address(data.count), inBank: 0x00)
   return disassembly
 }
 
 /** Asserts that two CPU states are equal. */
-func assertEqual(_ state1: LR35902.CPUState, _ state2: LR35902.CPUState, file: StaticString = #file, line: UInt = #line) {
+func assertEqual(_ state1: LR35902, _ state2: LR35902, file: StaticString = #file, line: UInt = #line) {
   XCTAssertEqual(state1.a, state2.a, "a mismatch", file: file, line: line)
   XCTAssertEqual(state1.b, state2.b, "b mismatch", file: file, line: line)
   XCTAssertEqual(state1.c, state2.c, "c mismatch", file: file, line: line)
@@ -20,7 +20,6 @@ func assertEqual(_ state1: LR35902.CPUState, _ state2: LR35902.CPUState, file: S
   XCTAssertEqual(state1.h, state2.h, "h mismatch", file: file, line: line)
   XCTAssertEqual(state1.l, state2.l, "l mismatch", file: file, line: line)
   XCTAssertEqual(state1.sp, state2.sp, "sp mismatch", file: file, line: line)
-  XCTAssertEqual(state1.ram, state2.ram, "ram mismatch", file: file, line: line)
   XCTAssertEqual(state1.pc, state2.pc, "pc mismatch", file: file, line: line)
   XCTAssertEqual(state1.bank, state2.bank, "bank mismatch", file: file, line: line)
 }
@@ -35,7 +34,7 @@ xor  $E0
 ld   e, a
 """)
 
-    let states = disassembly.trace(range: 0..<disassembly.cpu.cartridge.size).sorted(by: { $0.key < $1.key })
+    let states = disassembly.trace(range: 0..<disassembly.cartridge.size).sorted(by: { $0.key < $1.key })
     let lastState = states[states.count - 1]
 
     XCTAssertEqual(lastState.value.a, 0xE0)
@@ -45,7 +44,6 @@ ld   e, a
     XCTAssertEqual(lastState.value.e, 0xE0)
     XCTAssertEqual(lastState.value.h, 0)
     XCTAssertEqual(lastState.value.l, 0)
-    XCTAssertEqual(lastState.value.ram, [:])
     XCTAssertEqual(lastState.value.pc, 0x0004)
     XCTAssertEqual(lastState.value.bank, 0x00)
   }
@@ -57,7 +55,7 @@ xor  $E0
 ld   e, a
 """)
 
-    let trace = disassembly.trace(range: 0..<disassembly.cpu.cartridge.size).sorted(by: { $0.key < $1.key })
+    let trace = disassembly.trace(range: 0..<disassembly.cartridge.size).sorted(by: { $0.key < $1.key })
 
     XCTAssertEqual(trace[0].value.a, 0x01)
     XCTAssertEqual(trace[0].value.b, 0)
@@ -66,7 +64,6 @@ ld   e, a
     XCTAssertEqual(trace[0].value.e, 0)
     XCTAssertEqual(trace[0].value.h, 0)
     XCTAssertEqual(trace[0].value.l, 0)
-    XCTAssertEqual(trace[0].value.ram, [:])
     XCTAssertEqual(trace[0].value.pc, 0x0002)
     XCTAssertEqual(trace[0].value.bank, 0x00)
 
@@ -77,7 +74,6 @@ ld   e, a
     XCTAssertEqual(trace[0].value.e, 0)
     XCTAssertEqual(trace[1].value.h, 0)
     XCTAssertEqual(trace[1].value.l, 0)
-    XCTAssertEqual(trace[1].value.ram, [:])
     XCTAssertEqual(trace[1].value.pc, 0x0004)
     XCTAssertEqual(trace[1].value.bank, 0x00)
 
@@ -88,7 +84,6 @@ ld   e, a
     XCTAssertEqual(trace[2].value.e, 0xE1)
     XCTAssertEqual(trace[2].value.h, 0)
     XCTAssertEqual(trace[2].value.l, 0)
-    XCTAssertEqual(trace[2].value.ram, [:])
     XCTAssertEqual(trace[2].value.pc, 0x0005)
     XCTAssertEqual(trace[2].value.bank, 0x00)
   }
@@ -100,7 +95,7 @@ and  %01111111
 ld   e, a
 """)
 
-    let trace = disassembly.trace(range: 0..<disassembly.cpu.cartridge.size).sorted(by: { $0.key < $1.key })
+    let trace = disassembly.trace(range: 0..<disassembly.cartridge.size).sorted(by: { $0.key < $1.key })
 
     XCTAssertEqual(trace[0].value.a, 0)
     XCTAssertEqual(trace[0].value.b, 0)
@@ -109,7 +104,6 @@ ld   e, a
     XCTAssertEqual(trace[0].value.e, 0)
     XCTAssertEqual(trace[0].value.h, 0)
     XCTAssertEqual(trace[0].value.l, 0)
-    XCTAssertEqual(trace[0].value.ram, [:])
     XCTAssertEqual(trace[0].value.pc, 0x0003)
     XCTAssertEqual(trace[0].value.bank, 0x00)
 
@@ -121,7 +115,6 @@ ld   e, a
     XCTAssertEqual(trace[0].value.e, 0)
     XCTAssertEqual(trace[1].value.h, 0)
     XCTAssertEqual(trace[1].value.l, 0)
-    XCTAssertEqual(trace[1].value.ram, [:])
     XCTAssertEqual(trace[1].value.pc, 0x0005)
     XCTAssertEqual(trace[1].value.bank, 0x00)
 
@@ -132,7 +125,6 @@ ld   e, a
     XCTAssertEqual(trace[2].value.e, 0)
     XCTAssertEqual(trace[2].value.h, 0)
     XCTAssertEqual(trace[2].value.l, 0)
-    XCTAssertEqual(trace[2].value.ram, [:])
     XCTAssertEqual(trace[2].value.pc, 0x0006)
     XCTAssertEqual(trace[2].value.bank, 0x00)
   }
@@ -148,19 +140,16 @@ ld   a, c
 ld   [$ffcb], a
 """)
 
-    var initialState = LR35902.CPUState()
+    var initialState = LR35902()
 
     initialState.a = 0b0000_1111
-    initialState.ram[0xffcb] = 0b0000_1100
 
-    let states = disassembly.trace(range: 0..<disassembly.cpu.cartridge.size,
-                                      initialState: initialState).sorted(by: { $0.key < $1.key })
+    let states = disassembly.trace(range: 0..<disassembly.cartridge.size,
+                                   initialState: initialState).sorted(by: { $0.key < $1.key })
     let lastState = states[states.count - 1]
 
     XCTAssertEqual(lastState.value.a, 0b0000_1111)
     XCTAssertEqual(lastState.value.c, 0b0000_1111)
-    XCTAssertEqual(lastState.value.ram[0xffcb], 0b0000_1111)
-    XCTAssertEqual(lastState.value.ram[0xffcc], 0b0000_0011)
     XCTAssertEqual(lastState.value.pc, 0x000A)
     XCTAssertEqual(lastState.value.bank, 0x00)
   }

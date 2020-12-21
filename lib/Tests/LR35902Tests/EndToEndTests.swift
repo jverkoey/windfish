@@ -15,7 +15,7 @@ class EndToEndTests: XCTestCase {
 
     // ~0.255
     measure {
-      let disassembly = LR35902.Disassembly(rom: rom)
+      let disassembly = Disassembler(data: rom)
       disassembly.disassembleAsGameboyCartridge()
       _ = try! disassembly.generateSource()
     }
@@ -27,7 +27,7 @@ class EndToEndTests: XCTestCase {
 
     // 1,540,000
     measure(metrics: [XCTCPUMetric(limitingToCurrentThread: true)]) {
-      let disassembly = LR35902.Disassembly(rom: rom)
+      let disassembly = Disassembler(data: rom)
       disassembly.disassembleAsGameboyCartridge()
       _ = try! disassembly.generateSource()
     }
@@ -37,12 +37,12 @@ class EndToEndTests: XCTestCase {
     let path = try XCTUnwrap(Bundle.module.path(forResource: "Resources/2048", ofType: "gb"))
     let rom = try Data(contentsOf: URL(fileURLWithPath: path))
 
-    let disassembly = LR35902.Disassembly(rom: rom)
+    let disassembly = Disassembler(data: rom)
     disassembly.disassembleAsGameboyCartridge()
     let (disassembledSource, statistics) = try! disassembly.generateSource()
     XCTAssertEqual(
       statistics,
-      LR35902.Disassembly.Statistics(instructionsDecoded: 1310, percent: 6.5704345703125, bankPercents: [
+      Disassembler.Statistics(instructionsDecoded: 1310, percent: 6.5704345703125, bankPercents: [
         0: 13.140869140625,
         1: 0
       ])
