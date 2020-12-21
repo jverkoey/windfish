@@ -19,10 +19,33 @@ public struct LR35902 {
   public var h: UInt8 = 0x01
   public var l: UInt8 = 0x4D
 
-  /** Flag register bits. */
+  /**
+   The zero flag (Z).
+
+   This flag is set when the result of a math operation is zero or two values match when using the CP instruction.
+   */
   public var fzero: Bool = true
+
+  /**
+   The subtract flag (N).
+
+   This flag is set if a subtraction was performed in the last math instruction.
+   */
   public var fsubtract: Bool = false
+
+  /**
+   The half-carry flag flag (H).
+
+   This flag is set if a carry occurred from the lower nibble in the last math operation.
+   */
   public var fhalfcarry: Bool = true
+
+  /**
+   The carry flag (C).
+
+   This flag is set if a carry occurred from the last math operation or if register A is the smaller value when
+   executing the CP instruction.
+   */
   public var fcarry: Bool = true
 
   /** Flag register. */
@@ -112,37 +135,40 @@ extension LR35902 {
   // MARK: Subscript access of instructions using LR35902 instruction specifications
   /** 8-bit register subscript. */
   public subscript(numeric: LR35902.Instruction.Numeric) -> UInt8 {
-    get {
-      switch numeric {
-      case .a: return a
-      case .b: return b
-      case .c: return c
-      case .d: return d
-      case .e: return e
-      case .h: return h
-      case .l: return l
-      default:
-        preconditionFailure()
-      }
-    }
-    set {
-      switch numeric {
-      case .a: a = newValue
-      case .b: b = newValue
-      case .c: c = newValue
-      case .d: d = newValue
-      case .e: e = newValue
-      case .h: h = newValue
-      case .l: l = newValue
-      default:
-        preconditionFailure()
-      }
-    }
+    get { return get(numeric8: numeric) }
+    set { set(numeric8: numeric, to: newValue) }
   }
   /** 16-bit register subscript. */
   public subscript(numeric: LR35902.Instruction.Numeric) -> UInt16 {
     get { return get(numeric16: numeric) }
     set { set(numeric16: numeric, to: newValue) }
+  }
+
+  public func get(numeric8: LR35902.Instruction.Numeric) -> UInt8 {
+    switch numeric8 {
+    case .a: return a
+    case .b: return b
+    case .c: return c
+    case .d: return d
+    case .e: return e
+    case .h: return h
+    case .l: return l
+    default:
+      preconditionFailure()
+    }
+  }
+  public mutating func set(numeric8: LR35902.Instruction.Numeric, to newValue: UInt8) {
+    switch numeric8 {
+    case .a: a = newValue
+    case .b: b = newValue
+    case .c: c = newValue
+    case .d: d = newValue
+    case .e: e = newValue
+    case .h: h = newValue
+    case .l: l = newValue
+    default:
+      preconditionFailure()
+    }
   }
 
   public func get(numeric16: LR35902.Instruction.Numeric) -> UInt16 {

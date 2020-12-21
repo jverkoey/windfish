@@ -141,8 +141,21 @@ extension LR35902 {
       state.pc += width
 
     case .inc(let numeric) where registers16.contains(numeric):
-      let value = state.get(numeric16: numeric)
-      state.set(numeric16: numeric, to: value.addingReportingOverflow(1).partialValue)
+      state.set(numeric16: numeric, to: state.get(numeric16: numeric) &+ 1)
+      state.pc += width
+
+    case .inc(let numeric) where registers8.contains(numeric):
+      state.set(numeric8: numeric, to: state.get(numeric8: numeric) &+ 1)
+      state.pc += width
+
+    case .dec(let numeric) where registers8.contains(numeric):
+      state.set(numeric8: numeric, to: state.get(numeric8: numeric) &- 1)
+      state.pc += width
+
+    case .rlca:
+      let msb = (state.a & 0b1000_0000) >> 7
+      state.a = (state.a << 1) | msb
+      state.fcarry = (state.a & 0x01) != 0
       state.pc += width
 
     case .reti, .ret:
