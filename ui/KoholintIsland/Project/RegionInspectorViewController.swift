@@ -6,7 +6,7 @@
 
 import Foundation
 import Cocoa
-import LR35902
+import Windfish
 
 final class RegionInspectorViewController: NSViewController, TabSelectable {
   let deselectedTabImage = NSImage(systemSymbolName: "book", accessibilityDescription: nil)!

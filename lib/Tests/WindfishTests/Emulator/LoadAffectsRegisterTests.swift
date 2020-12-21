@@ -1,5 +1,5 @@
 import XCTest
-@testable import LR35902
+@testable import Windfish
 
 class LoadAffectsRegisterTests: XCTestCase {
   func test_ld_a() throws {

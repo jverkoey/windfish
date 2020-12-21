@@ -5,7 +5,7 @@
 //
 
 import Foundation
-import LR35902
+import Windfish
 
 final class UInt8HexFormatter: Formatter {
   override func string(for obj: Any?) -> String? {

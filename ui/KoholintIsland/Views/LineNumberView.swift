@@ -6,7 +6,7 @@
 
 import Foundation
 import Cocoa
-import LR35902
+import Windfish
 import Combine
 
 protocol LineNumberViewDelegate: NSObject {

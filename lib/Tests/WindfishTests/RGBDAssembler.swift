@@ -1,5 +1,5 @@
 import XCTest
-@testable import LR35902
+@testable import Windfish
 
 class RGBDAssembler: XCTestCase {
   func test_nop_failsWithExtraOperand() throws {

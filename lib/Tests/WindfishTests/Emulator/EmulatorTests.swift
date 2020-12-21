@@ -1,5 +1,5 @@
 import XCTest
-@testable import LR35902
+@testable import Windfish
 
 func disassemblyInitialized(with assembly: String) -> Disassembler {
   let results = RGBDSAssembler.assemble(assembly: assembly)

@@ -1,7 +1,7 @@
 import Foundation
 import Cocoa
 
-import LR35902
+import Windfish
 
 func CreateLabel() -> NSTextField {
   let label = NSTextField()

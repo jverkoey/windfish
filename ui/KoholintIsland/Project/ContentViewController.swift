@@ -8,7 +8,7 @@ import Foundation
 import Darwin
 import Cocoa
 import Combine
-import LR35902
+import Windfish
 
 func CreateScrollView(bounds: NSRect) -> NSScrollView {
   let scrollView = NSScrollView()

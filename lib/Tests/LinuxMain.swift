@@ -1,7 +1,7 @@
 import XCTest
 
 import CPUTests
-import LR35902Tests
+import WindfishTests
 
 var tests = [XCTestCaseEntry]()
 tests += CPUTests.__allTests()

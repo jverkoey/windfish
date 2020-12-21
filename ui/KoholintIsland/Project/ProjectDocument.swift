@@ -6,7 +6,7 @@
 
 import Cocoa
 
-import LR35902
+import Windfish
 import RGBDS
 
 final class Region: NSObject, Codable {

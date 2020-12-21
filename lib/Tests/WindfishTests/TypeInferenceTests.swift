@@ -1,5 +1,5 @@
 import XCTest
-@testable import LR35902
+@testable import Windfish
 
 extension Disassembler.Macro: Equatable {
   public static func == (lhs: Disassembler.Macro, rhs: Disassembler.Macro) -> Bool {

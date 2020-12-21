@@ -1,6 +1,6 @@
 import Foundation
 import Cocoa
-import LR35902
+import Windfish
 
 final class TextViewStringTransformer: ValueTransformer {
   override class func transformedValueClass() -> AnyClass {

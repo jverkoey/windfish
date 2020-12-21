@@ -2,7 +2,7 @@ import Foundation
 import Combine
 import Cocoa
 
-import LR35902
+import Windfish
 
 extension NSUserInterfaceItemIdentifier {
   static let programCounter = NSUserInterfaceItemIdentifier("pc")

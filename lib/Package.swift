@@ -10,13 +10,13 @@ let package = Package(
   ],
   products: [
     .library(
-      name: "LR35902",
-      targets: ["LR35902"]
+      name: "Windfish",
+      targets: ["Windfish"]
     )
   ],
   targets: [
     .target(
-      name: "LR35902",
+      name: "Windfish",
       dependencies: [
         "FoundationExtensions",
         "CPU",
@@ -39,8 +39,8 @@ let package = Package(
     ),
 
     .testTarget(
-      name: "LR35902Tests",
-      dependencies: ["LR35902"],
+      name: "WindfishTests",
+      dependencies: ["Windfish"],
       resources: [
         .copy("Resources"),
       ]
