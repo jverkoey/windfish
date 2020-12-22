@@ -2,7 +2,8 @@ import Foundation
 
 public struct IORegisterMemory: AddressableMemory {
   public let addressableRanges: [ClosedRange<LR35902.Address>] = [
-    0xFF00...0xFF7F,
+    0xFF05...0xFF26,
+    0xFF47...0xFF4B,
     0xFFFF...0xFFFF
   ]
 
@@ -28,10 +29,6 @@ public struct IORegisterMemory: AddressableMemory {
     case NR50 = 0xFF24
     case NR51 = 0xFF25
     case NR52 = 0xFF26
-    case LCDC = 0xFF40
-    case SCY  = 0xFF42
-    case SCX  = 0xFF43
-    case LYC  = 0xFF45
     case BGP  = 0xFF47
     case OBP0 = 0xFF48
     case OBP1 = 0xFF49
@@ -61,10 +58,6 @@ public struct IORegisterMemory: AddressableMemory {
     .NR50: 0x77,
     .NR51: 0xF3,
     .NR52: 0xF1,
-    .LCDC: 0x91,
-    .SCY:  0x00,
-    .SCX:  0x00,
-    .LYC:  0x00,
     .BGP:  0xFC,
     .OBP0: 0xFF,
     .OBP1: 0xFF,
