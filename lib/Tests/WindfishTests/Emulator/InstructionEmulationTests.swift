@@ -2,11 +2,11 @@ import XCTest
 @testable import Windfish
 
 /** Circumvent immutability of the TestMemory struct by tracking reads in a class instance. */
-private class MemoryReadTracer {
+class MemoryReadTracer {
   var reads: [LR35902.Address] = []
 }
 
-private struct TestMemory: AddressableMemory {
+struct TestMemory: AddressableMemory {
   init(defaultReadValue: UInt8 = 0x00) {
     self.defaultReadValue = defaultReadValue
   }
