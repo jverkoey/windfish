@@ -1,6 +1,11 @@
 import Foundation
 
 public struct IORegisterMemory: AddressableMemory {
+  public let addressableRanges: [ClosedRange<LR35902.Address>] = [
+    0xFF00...0xFF7F,
+    0xFFFF...0xFFFF
+  ]
+
   enum IOAddresses: LR35902.Address {
     case TIMA = 0xFF05
     case TMA  = 0xFF06

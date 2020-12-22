@@ -195,6 +195,17 @@ extension LR35902 {
       state[numeric] = (state[numeric] as UInt8) & ~(1 << bit.rawValue)
       state.pc += width
 
+    case .cp(.imm8):
+      guard case let .imm8(immediate) = instruction.immediate else {
+        preconditionFailure("Invalid immediate associated with instruction")
+      }
+      state.fsubtract = true
+      let result = state.a.subtractingReportingOverflow(immediate)
+      state.fzero = result.partialValue == 0
+      state.fcarry = result.overflow
+      state.fhalfcarry = (state.a & 0x0f) < (immediate & 0x0f)
+      state.pc += width
+
     case .nop:
       state.pc += width
 

@@ -1,6 +1,10 @@
 import Foundation
 
 public struct TracerMemory: AddressableMemory {
+  public var addressableRanges: [ClosedRange<LR35902.Address>] = [
+    0x0000...0xFFFF
+  ]
+
   public func read(from address: LR35902.Address) -> UInt8 {
     return 0x00
   }

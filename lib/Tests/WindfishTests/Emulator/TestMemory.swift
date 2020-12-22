@@ -7,6 +7,10 @@ class MemoryReadTracer {
 }
 
 struct TestMemory: AddressableMemory {
+  public let addressableRanges: [ClosedRange<LR35902.Address>] = [
+    0x0000...0xFFFF
+  ]
+
   init(defaultReadValue: UInt8 = 0x00) {
     self.defaultReadValue = defaultReadValue
   }

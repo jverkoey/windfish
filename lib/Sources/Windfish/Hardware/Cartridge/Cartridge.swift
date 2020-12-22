@@ -3,6 +3,10 @@ import Foundation
 extension Gameboy {
   /** A representation of a Gameboy cartridge as addressable memory at a given moment. */
   public struct Cartridge: AddressableMemory {
+    public var addressableRanges: [ClosedRange<LR35902.Address>] = [
+      0x0000...0x7FFF
+    ]
+
     public typealias Location = UInt32
     public typealias Length = UInt32
 

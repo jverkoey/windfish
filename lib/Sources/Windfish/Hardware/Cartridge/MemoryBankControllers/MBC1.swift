@@ -3,6 +3,10 @@ import Foundation
 extension Gameboy.Cartridge {
   /** Implementation of the MBC1 memory bank controller. */
   struct MBC1: AddressableMemory {
+    public var addressableRanges: [ClosedRange<LR35902.Address>] = [
+      0x0000...0x7FFF
+    ]
+
     init(data: Data) {
       self.data = data
     }

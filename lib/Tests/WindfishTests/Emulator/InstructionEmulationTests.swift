@@ -417,4 +417,80 @@ class InstructionEmulationTests: XCTestCase {
       .a: .init(sourceLocation: Gameboy.Cartridge.location(for: initialCpu.pc, in: initialCpu.bank)!, loadAddress: 0xffab)
     ])
   }
+
+  func test_FE_cp_imm8_equal() {
+    let initialCpu = LR35902(a: 0xab, fzero: false, fsubtract: false, fhalfcarry: true, fcarry: true)
+    var cpu = initialCpu
+    var memory: AddressableMemory = TestMemory()
+    let mutatedCpu = cpu.emulate(instruction: .init(spec: LR35902.InstructionSet.table[0xFE], immediate: .imm8(0xab)), memory: &memory, followControlFlow: true)
+
+    // Expected mutations
+    cpu.fzero = true
+    cpu.fsubtract = true
+    cpu.fhalfcarry = false
+    cpu.fcarry = false
+    cpu.pc += 2
+
+    assertEqual(cpu, mutatedCpu)
+    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
+  }
+
+  func test_FE_cp_imm8_greater() {
+    let initialCpu = LR35902(a: 0xac, fzero: true, fsubtract: false, fhalfcarry: true, fcarry: true)
+    var cpu = initialCpu
+    var memory: AddressableMemory = TestMemory()
+    let mutatedCpu = cpu.emulate(instruction: .init(spec: LR35902.InstructionSet.table[0xFE], immediate: .imm8(0xab)), memory: &memory, followControlFlow: true)
+
+    // Expected mutations
+    cpu.fzero = false
+    cpu.fsubtract = true
+    cpu.fhalfcarry = false
+    cpu.fcarry = false
+    cpu.pc += 2
+
+    assertEqual(cpu, mutatedCpu)
+    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
+  }
+
+  func test_FE_cp_imm8_less() {
+    let initialCpu = LR35902(a: 0b0000_0001, fzero: true, fsubtract: false, fhalfcarry: false, fcarry: false)
+    var cpu = initialCpu
+    var memory: AddressableMemory = TestMemory()
+    let mutatedCpu = cpu.emulate(instruction: .init(spec: LR35902.InstructionSet.table[0xFE], immediate: .imm8(0b0000_0010)), memory: &memory, followControlFlow: true)
+
+    // Expected mutations
+    cpu.fzero = false
+    cpu.fsubtract = true
+    cpu.fhalfcarry = true
+    cpu.fcarry = true
+    cpu.pc += 2
+
+    assertEqual(cpu, mutatedCpu)
+    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
+  }
+
+  func test_FE_cp_imm8_less_high() {
+    let initialCpu = LR35902(a: 0b0010_0000, fzero: true, fsubtract: false, fhalfcarry: true, fcarry: false)
+    var cpu = initialCpu
+    var memory: AddressableMemory = TestMemory()
+    let mutatedCpu = cpu.emulate(instruction: .init(spec: LR35902.InstructionSet.table[0xFE], immediate: .imm8(0b0011_0000)), memory: &memory, followControlFlow: true)
+
+    // Expected mutations
+    cpu.fzero = false
+    cpu.fsubtract = true
+    cpu.fhalfcarry = false
+    cpu.fcarry = true
+    cpu.pc += 2
+
+    assertEqual(cpu, mutatedCpu)
+    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
+  }
 }
