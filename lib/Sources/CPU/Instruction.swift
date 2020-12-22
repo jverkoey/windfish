@@ -87,7 +87,7 @@ public protocol InstructionOperandWithBinaryFootprint {
 }
 
 extension InstructionSpec {
-  /** Extracts the opcode width by adding up recursive specifications. */
+  /** Extracts the opcode width by adding up specifications recursively. */
   public var opcodeWidth: WidthType {
     let sizeOfInstruction: WidthType = 1  // TODO: Evaluate whether this should be configurable.
     guard let operands = Mirror(reflecting: self).children.first else {
