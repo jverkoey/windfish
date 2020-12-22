@@ -133,6 +133,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   var ramTableView: EditorTableView?
   let programCounterTextField = NSTextField()
   let instructionAssemblyLabel = CreateLabel()
+  let instructionBytesLabel = CreateLabel()
 
   init(document: ProjectDocument) {
     self.document = document
@@ -215,6 +216,18 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     instructionAssemblyLabel.maximumNumberOfLines = 5
     instructionAssemblyLabel.lineBreakStrategy = .standard
     view.addSubview(instructionAssemblyLabel)
+
+    let instructionBytesLabelHeader = CreateLabel()
+    instructionBytesLabelHeader.translatesAutoresizingMaskIntoConstraints = false
+    instructionBytesLabelHeader.stringValue = "Instruction bytes:"
+    view.addSubview(instructionBytesLabelHeader)
+
+    instructionBytesLabel.translatesAutoresizingMaskIntoConstraints = false
+    instructionBytesLabel.stringValue = "Waiting for disassembly results..."
+    instructionBytesLabel.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
+    instructionBytesLabel.maximumNumberOfLines = 5
+    instructionBytesLabel.lineBreakStrategy = .standard
+    view.addSubview(instructionBytesLabel)
 
     let containerView = NSScrollView()
     containerView.translatesAutoresizingMaskIntoConstraints = false
@@ -352,9 +365,17 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       instructionAssemblyLabel.widthAnchor.constraint(lessThanOrEqualToConstant: 400),
       instructionAssemblyLabel.topAnchor.constraint(equalTo: instructionLabel.bottomAnchor),
 
+      instructionBytesLabelHeader.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
+      instructionBytesLabelHeader.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -4),
+      instructionBytesLabelHeader.topAnchor.constraint(equalTo: instructionAssemblyLabel.bottomAnchor),
+
+      instructionBytesLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
+      instructionBytesLabel.widthAnchor.constraint(lessThanOrEqualToConstant: 400),
+      instructionBytesLabel.topAnchor.constraint(equalTo: instructionBytesLabelHeader.bottomAnchor),
+
       containerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
       containerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-      containerView.topAnchor.constraint(equalToSystemSpacingBelow: instructionAssemblyLabel.bottomAnchor, multiplier: 1),
+      containerView.topAnchor.constraint(equalToSystemSpacingBelow: instructionBytesLabel.bottomAnchor, multiplier: 1),
       containerView.heightAnchor.constraint(equalToConstant: 220),
 
       ramTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
@@ -450,6 +471,7 @@ extension EmulatorViewController: NSTextFieldDelegate {
     }
     guard let instruction = currentInstruction() else {
       instructionAssemblyLabel.stringValue = "No instruction detected"
+      instructionBytesLabel.stringValue = ""
       return
     }
 
@@ -461,6 +483,9 @@ extension EmulatorViewController: NSTextFieldDelegate {
     )
     let statement = RGBDSDisassembler.statement(for: instruction, with: context)
     instructionAssemblyLabel.stringValue = statement.formattedString
+
+    let bytes = LR35902.InstructionSet.opcodeBytes[instruction.spec]! + [UInt8](instruction.immediate?.asData() ?? Data())
+    instructionBytesLabel.stringValue = bytes.map { "0x" + $0.hexString }.joined(separator: " ")
   }
 
   func updateRegisters() {

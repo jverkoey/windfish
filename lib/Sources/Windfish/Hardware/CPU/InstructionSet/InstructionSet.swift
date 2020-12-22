@@ -2,22 +2,22 @@ import Foundation
 import CPU
 
 extension LR35902 {
-  struct InstructionSet: CPU.InstructionSet {
-    typealias InstructionType = LR35902.Instruction
+  public struct InstructionSet: CPU.InstructionSet {
+    public typealias InstructionType = LR35902.Instruction
 
-    static var widths: [Instruction.Spec: InstructionWidth<UInt16>] = {
+    public static var widths: [Instruction.Spec: InstructionWidth<UInt16>] = {
       return computeAllWidths()
     }()
 
-    static var opcodeBytes: [Instruction.Spec : [UInt8]] = {
+    public static var opcodeBytes: [Instruction.Spec : [UInt8]] = {
       return computeAllOpcodeBytes()
     }()
 
-    static var opcodeStrings: [SpecType : String] = {
+    public static var opcodeStrings: [SpecType : String] = {
       return computeAllOpcodeStrings()
     }()
 
-    static let table: [Instruction.Spec] = [
+    public static let table: [Instruction.Spec] = [
       /* 0x00 */ .nop,
       /* 0x01 */ .ld(.bc, .imm16),
       /* 0x02 */ .ld(.bcaddr, .a),
@@ -290,7 +290,7 @@ extension LR35902 {
       /* 0xfe */ .cp(.imm8),
       /* 0xff */ .rst(.x38),
     ]
-    static let prefixTables: [Instruction.Spec: [Instruction.Spec]] = [
+    public static let prefixTables: [Instruction.Spec: [Instruction.Spec]] = [
       .prefix(.cb): tableCB
     ]
   }
