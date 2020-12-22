@@ -7,6 +7,9 @@ private class MemoryReadTracer {
 }
 
 private struct TestMemory: AddressableMemory {
+  init(defaultReadValue: UInt8 = 0x00) {
+    self.defaultReadValue = defaultReadValue
+  }
   func read(from address: LR35902.Address) -> UInt8 {
     readMonitor.reads.append(address)
     return defaultReadValue
@@ -301,4 +304,49 @@ class InstructionEmulationTests: XCTestCase {
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
   }
+
+  func test_ld_a_bcaddr() {
+    var cpu = LR35902(b: 0x12, c: 0x34)
+    var memory: AddressableMemory = TestMemory(defaultReadValue: 0xab)
+    let mutatedCpu = cpu.emulate(instruction: .init(spec: LR35902.InstructionSet.table[0x0A]), memory: &memory, followControlFlow: true)
+
+    // Expected mutations
+    cpu.a = 0xab
+    cpu.pc += 1
+
+    assertEqual(cpu, mutatedCpu)
+    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [0x1234])
+    XCTAssertEqual((memory as! TestMemory).writes, [])
+  }
+
+  func test_dec_bc() {
+    var cpu = LR35902.zeroed()
+    cpu.bc = 0x0001
+    var memory: AddressableMemory = TestMemory(defaultReadValue: 0xab)
+    let mutatedCpu = cpu.emulate(instruction: .init(spec: LR35902.InstructionSet.table[0x0B]), memory: &memory, followControlFlow: true)
+
+    // Expected mutations
+    cpu.bc = 0x0000
+    cpu.pc += 1
+
+    assertEqual(cpu, mutatedCpu)
+    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).writes, [])
+  }
+
+  func test_dec_bc_underflow() {
+    var cpu = LR35902.zeroed()
+    cpu.bc = 0x0000
+    var memory: AddressableMemory = TestMemory(defaultReadValue: 0xab)
+    let mutatedCpu = cpu.emulate(instruction: .init(spec: LR35902.InstructionSet.table[0x0B]), memory: &memory, followControlFlow: true)
+
+    // Expected mutations
+    cpu.bc = 0xFFFF
+    cpu.pc += 1
+
+    assertEqual(cpu, mutatedCpu)
+    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).writes, [])
+  }
+
 }

@@ -144,8 +144,14 @@ extension LR35902 {
       state.registerTraces[.sp] = .init(sourceLocation: location)
       state.pc += width
 
-    case .ld(.bcaddr, let src) where registers8.contains(src):
-      memory.write(state[src], to: LR35902.Address(state.b) << 8 | LR35902.Address(state.c))
+    case .ld(.a, .bcaddr):
+      let address = LR35902.Address(state.b) << 8 | LR35902.Address(state.c)
+      state.a = memory.read(from: address)
+      state.registerTraces[.a] = .init(sourceLocation: location, loadAddress: address)
+      state.pc += width
+
+    case .ld(.bcaddr, .a):
+      memory.write(state.a, to: LR35902.Address(state.b) << 8 | LR35902.Address(state.c))
       state.pc += width
 
     case .inc(let numeric) where registers16.contains(numeric):
@@ -158,6 +164,10 @@ extension LR35902 {
 
     case .dec(let numeric) where registers8.contains(numeric):
       state.set(numeric8: numeric, to: state.get(numeric8: numeric) &- 1)
+      state.pc += width
+
+    case .dec(let numeric) where registers16.contains(numeric):
+      state.set(numeric16: numeric, to: state.get(numeric16: numeric) &- 1)
       state.pc += width
 
     case .ld(.imm16addr, .sp):
