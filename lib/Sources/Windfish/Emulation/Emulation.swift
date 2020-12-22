@@ -195,7 +195,13 @@ extension LR35902 {
       state[numeric] = (state[numeric] as UInt8) & ~(1 << bit.rawValue)
       state.pc += width
 
+    case .nop:
+      state.pc += width
+
     default:
+      if followControlFlow {
+        preconditionFailure("Unhandled instruction.")
+      }
       state.pc += width
     }
 

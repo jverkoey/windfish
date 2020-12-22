@@ -1,7 +1,7 @@
 {
   "configurations" : [
     {
-      "id" : "A167DE2F-6A9A-4201-8435-7E72FE5A664D",
+      "id" : "928AAF09-0947-45B9-9C7F-3A5DA916864E",
       "name" : "Configuration 1",
       "options" : {
 
@@ -9,14 +9,11 @@
     }
   ],
   "defaultOptions" : {
-    "targetForVariableExpansion" : {
-      "containerPath" : "container:KoholintIsland.xcodeproj",
-      "identifier" : "665D4F542575F75400C3A03B",
-      "name" : "KoholintIsland"
-    }
+
   },
   "testTargets" : [
     {
+      "parallelizable" : true,
       "target" : {
         "containerPath" : "container:..\/lib",
         "identifier" : "CPUTests",
@@ -24,6 +21,7 @@
       }
     },
     {
+      "parallelizable" : true,
       "target" : {
         "containerPath" : "container:..\/lib",
         "identifier" : "RGBDSTests",
@@ -31,8 +29,9 @@
       }
     },
     {
+      "parallelizable" : true,
       "target" : {
-        "containerPath" : "container:",
+        "containerPath" : "container:..\/lib",
         "identifier" : "WindfishTests",
         "name" : "WindfishTests"
       }
