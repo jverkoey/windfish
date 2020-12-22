@@ -1,5 +1,27 @@
 import Foundation
 
 public struct Gameboy {
-  public var cartridge: Cartridge
+  public init(cartridge: Gameboy.Cartridge) {
+    self.cartridge = cartridge
+    self._memory.mapRegion(to: self.cartridge)
+  }
+
+  public let cartridge: Cartridge
+  public var memory: AddressableMemory {
+    get { return _memory }
+    set { _memory = newValue as! Memory }
+  }
+  public var cpu = LR35902.zeroed()
+
+  public mutating func addMemoryTracer(_ tracer: AddressableMemory) {
+    _memory.tracers.append(tracer)
+  }
+
+  public func advance() -> Gameboy {
+    var mutated = self
+    mutated.cpu = cpu.advance(memory: &mutated.memory)
+    return mutated
+  }
+
+  private var _memory = Memory()
 }

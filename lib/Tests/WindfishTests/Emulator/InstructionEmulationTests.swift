@@ -11,7 +11,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 1
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -28,7 +28,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 3
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [
       .bc: .init(sourceLocation: Gameboy.Cartridge.location(for: initialCpu.pc, in: initialCpu.bank)!)
@@ -44,7 +44,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 1
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [.init(byte: 0x12, address: 0xabcd)])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -59,7 +59,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 1
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -74,7 +74,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 1
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -89,7 +89,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 1
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -104,7 +104,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 1
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -119,7 +119,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 1
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -134,7 +134,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 1
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -150,7 +150,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 2
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [
       .b: .init(sourceLocation: Gameboy.Cartridge.location(for: initialCpu.pc, in: initialCpu.bank)!)
@@ -168,7 +168,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 1
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -184,7 +184,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 1
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -200,7 +200,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 1
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -214,7 +214,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 3
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [
       .init(byte: 0xcd, address: 0x1234),
       .init(byte: 0xab, address: 0x1235)
@@ -237,7 +237,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 1
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -257,7 +257,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 1
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -277,7 +277,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 1
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -297,7 +297,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 1
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -313,7 +313,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 1
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [0x1234])
+    XCTAssertEqual((memory as! TestMemory).reads, [0x1234])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [
       .a: .init(sourceLocation: Gameboy.Cartridge.location(for: initialCpu.pc, in: initialCpu.bank)!, loadAddress: 0x1234)
@@ -331,7 +331,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 1
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -347,7 +347,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 1
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -361,7 +361,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc = 0xabcd
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -376,7 +376,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.sp -= 2
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [
       .init(byte: 0x01, address: 0xFFFC),
       .init(byte: 0x00, address: 0xFFFB)
@@ -393,7 +393,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 2
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [
       .init(byte: 0x12, address: 0xffab)
     ])
@@ -411,7 +411,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 2
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [0xffab])
+    XCTAssertEqual((memory as! TestMemory).reads, [0xffab])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [
       .a: .init(sourceLocation: Gameboy.Cartridge.location(for: initialCpu.pc, in: initialCpu.bank)!, loadAddress: 0xffab)
@@ -432,7 +432,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 2
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -451,7 +451,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 2
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -470,7 +470,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 2
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -489,7 +489,7 @@ class InstructionEmulationTests: XCTestCase {
     cpu.pc += 2
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }

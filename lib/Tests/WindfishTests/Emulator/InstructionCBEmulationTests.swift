@@ -12,7 +12,7 @@ class InstructionCBEmulationTests: XCTestCase {
     cpu.pc += 2
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
@@ -27,7 +27,7 @@ class InstructionCBEmulationTests: XCTestCase {
     cpu.pc += 2
 
     assertEqual(cpu, mutatedCpu)
-    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
     XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }

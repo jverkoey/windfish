@@ -12,20 +12,22 @@ func disassemblyInitialized(with assembly: String) -> Disassembler {
 
 /** Asserts that two CPU states are equal. */
 func assertEqual(_ state1: LR35902, _ state2: LR35902, file: StaticString = #file, line: UInt = #line) {
-  XCTAssertEqual(state1.a, state2.a, "a mismatch", file: file, line: line)
+  XCTAssertEqual(state1.a.hexString, state2.a.hexString, "a mismatch", file: file, line: line)
+  XCTAssertEqual(state1.b.hexString, state2.b.hexString, "b mismatch", file: file, line: line)
+  XCTAssertEqual(state1.c.hexString, state2.c.hexString, "c mismatch", file: file, line: line)
+  XCTAssertEqual(state1.d.hexString, state2.d.hexString, "d mismatch", file: file, line: line)
+  XCTAssertEqual(state1.e.hexString, state2.e.hexString, "e mismatch", file: file, line: line)
+  XCTAssertEqual(state1.h.hexString, state2.h.hexString, "h mismatch", file: file, line: line)
+  XCTAssertEqual(state1.l.hexString, state2.l.hexString, "l mismatch", file: file, line: line)
+
   XCTAssertEqual(state1.fzero, state2.fzero, "fzero mismatch", file: file, line: line)
   XCTAssertEqual(state1.fsubtract, state2.fsubtract, "fsubtract mismatch", file: file, line: line)
   XCTAssertEqual(state1.fhalfcarry, state2.fhalfcarry, "fhalfcarry mismatch", file: file, line: line)
   XCTAssertEqual(state1.fcarry, state2.fcarry, "fcarry mismatch", file: file, line: line)
-  XCTAssertEqual(state1.b, state2.b, "b mismatch", file: file, line: line)
-  XCTAssertEqual(state1.c, state2.c, "c mismatch", file: file, line: line)
-  XCTAssertEqual(state1.d, state2.d, "d mismatch", file: file, line: line)
-  XCTAssertEqual(state1.e, state2.e, "e mismatch", file: file, line: line)
-  XCTAssertEqual(state1.h, state2.h, "h mismatch", file: file, line: line)
-  XCTAssertEqual(state1.l, state2.l, "l mismatch", file: file, line: line)
-  XCTAssertEqual(state1.sp, state2.sp, "sp mismatch", file: file, line: line)
-  XCTAssertEqual(state1.pc, state2.pc, "pc mismatch", file: file, line: line)
-  XCTAssertEqual(state1.bank, state2.bank, "bank mismatch", file: file, line: line)
+  
+  XCTAssertEqual(state1.sp.hexString, state2.sp.hexString, "sp mismatch", file: file, line: line)
+  XCTAssertEqual(state1.pc.hexString, state2.pc.hexString, "pc mismatch", file: file, line: line)
+  XCTAssertEqual(state1.bank.hexString, state2.bank.hexString, "bank mismatch", file: file, line: line)
 }
 
 class EmulatorTests: XCTestCase {

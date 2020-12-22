@@ -102,6 +102,20 @@ public struct LR35902 {
   /** Trace information for a given register. */
   public var registerTraces: [LR35902.Instruction.Numeric: RegisterTrace] = [:]
 
+  struct MachineInstruction {
+    typealias MicroCode = [(inout LR35902, inout AddressableMemory) -> Void]
+    internal init(spec: LR35902.Instruction.Spec? = nil, microcode: MicroCode = []) {
+      self.spec = spec
+      self.microcode = microcode
+    }
+
+    let spec: Instruction.Spec?
+    let microcode: MicroCode
+    var cycle: Int = 0
+  }
+  /** The machine instruction represents the CPU's understanding of its current instruction. */
+  var machineInstruction = MachineInstruction()
+
   /** Initializes the state with boot values. */
   public init() {}
 

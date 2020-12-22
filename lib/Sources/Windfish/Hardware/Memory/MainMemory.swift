@@ -12,7 +12,13 @@ extension Gameboy {
       mapRegion(to: hram)
     }
 
+    public var tracers: [AddressableMemory] = []
+
     public func read(from address: LR35902.Address) -> UInt8 {
+      for tracer in tracers {
+        _ = tracer.read(from: address)
+      }
+
       if let memory = mappedRegions.first(where: { range, _ in range.contains(address) })?.value {
         return memory.read(from: address)
       }
@@ -20,6 +26,10 @@ extension Gameboy {
     }
 
     public mutating func write(_ byte: UInt8, to address: LR35902.Address) {
+      for index in tracers.indices {
+        tracers[index].write(byte, to: address)
+      }
+
       if var mappedRegion = mappedRegions.first(where: { range, _ in range.contains(address) }) {
         mappedRegion.value.write(byte, to: address)
         mappedRegions[mappedRegion.key] = mappedRegion.value
@@ -34,7 +44,7 @@ extension Gameboy {
     private var mappedBytes = IndexSet()
     private var hram = GenericRAM(addressableRanges: [0xFF80...0xFFFE])
 
-    private mutating func mapRegion(to memory: AddressableMemory) {
+    mutating func mapRegion(to memory: AddressableMemory) {
       for range in memory.addressableRanges {
         let intRange = Int(range.lowerBound)...Int(range.upperBound)
         precondition(!mappedBytes.contains(integersIn: intRange), "Memory is already mapped to this region.")
