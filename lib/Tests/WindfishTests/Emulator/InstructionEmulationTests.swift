@@ -40,10 +40,12 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
 
   func test_01_ld_bc_imm16() {
-    var cpu = LR35902.zeroed()
+    let initialCpu = LR35902.zeroed()
+    var cpu = initialCpu
     var memory: AddressableMemory = TestMemory()
     let mutatedCpu = cpu.emulate(instruction: .init(spec: LR35902.InstructionSet.table[0x01], immediate: .imm16(0xabcd)), memory: &memory, followControlFlow: true)
 
@@ -55,6 +57,9 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [
+      .bc: .init(sourceLocation: Gameboy.Cartridge.location(for: initialCpu.pc, in: initialCpu.bank)!)
+    ])
   }
 
   func test_02_ld_bcaddr_a() {
@@ -68,6 +73,7 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [.init(byte: 0x12, address: 0xabcd)])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
 
   func test_03_inc_bc() {
@@ -82,6 +88,7 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
 
   func test_03_inc_bc_overflow() {
@@ -96,6 +103,7 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
 
   func test_04_inc_b() {
@@ -110,6 +118,7 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
 
   func test_04_inc_b_overflow() {
@@ -124,6 +133,7 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
 
   func test_05_dec_b() {
@@ -138,6 +148,7 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
 
   func test_05_dec_b_underflow() {
@@ -152,10 +163,12 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
 
   func test_06_ld_b_imm8() {
-    var cpu = LR35902()
+    let initialCpu = LR35902()
+    var cpu = initialCpu
     var memory: AddressableMemory = TestMemory()
     let mutatedCpu = cpu.emulate(instruction: .init(spec: LR35902.InstructionSet.table[0x06], immediate: .imm8(0xab)), memory: &memory, followControlFlow: true)
 
@@ -166,6 +179,9 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [
+      .b: .init(sourceLocation: Gameboy.Cartridge.location(for: initialCpu.pc, in: initialCpu.bank)!)
+    ])
   }
 
   func test_07_rlca_0000_0000() {
@@ -181,6 +197,7 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
 
   func test_07_rlca_0000_0011() {
@@ -196,6 +213,7 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
 
   func test_07_rlca_1000_0000() {
@@ -211,6 +229,7 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
 
   func test_08_ld_imm16addr_sp() {
@@ -227,6 +246,7 @@ class InstructionEmulationTests: XCTestCase {
       .init(byte: 0xcd, address: 0x1234),
       .init(byte: 0xab, address: 0x1235)
     ])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
 
   func test_09_add_hl_bc() {
@@ -246,6 +266,7 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
 
   func test_09_add_hl_bc_low_to_high_overflow() {
@@ -265,6 +286,7 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
 
   func test_09_add_hl_bc_overflow() {
@@ -284,6 +306,7 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
 
   func test_09_add_hl_bc_low_to_high_halfcarry() {
@@ -303,10 +326,12 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
 
   func test_0A_ld_a_bcaddr() {
-    var cpu = LR35902(b: 0x12, c: 0x34)
+    let initialCpu = LR35902(b: 0x12, c: 0x34)
+    var cpu = initialCpu
     var memory: AddressableMemory = TestMemory(defaultReadValue: 0xab)
     let mutatedCpu = cpu.emulate(instruction: .init(spec: LR35902.InstructionSet.table[0x0A]), memory: &memory, followControlFlow: true)
 
@@ -317,6 +342,9 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [0x1234])
     XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [
+      .a: .init(sourceLocation: Gameboy.Cartridge.location(for: initialCpu.pc, in: initialCpu.bank)!, loadAddress: 0x1234)
+    ])
   }
 
   func test_0B_dec_bc() {
@@ -332,6 +360,7 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
 
   func test_0B_dec_bc_underflow() {
@@ -347,6 +376,7 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
 
   func test_C3_jp_imm16() {
@@ -360,6 +390,7 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
     XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
 
   func test_CD_call_imm16() {
@@ -377,10 +408,28 @@ class InstructionEmulationTests: XCTestCase {
       .init(byte: 0x01, address: 0xFFFC),
       .init(byte: 0x00, address: 0xFFFB)
     ])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
+  }
+
+  func test_E0_ld_ffimm8addr_a() {
+    var cpu = LR35902(a: 0x12)
+    var memory: AddressableMemory = TestMemory()
+    let mutatedCpu = cpu.emulate(instruction: .init(spec: LR35902.InstructionSet.table[0xE0], immediate: .imm8(0xab)), memory: &memory, followControlFlow: true)
+
+    // Expected mutations
+    cpu.pc += 2
+
+    assertEqual(cpu, mutatedCpu)
+    XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [])
+    XCTAssertEqual((memory as! TestMemory).writes, [
+      .init(byte: 0x12, address: 0xffab)
+    ])
+    XCTAssertEqual(mutatedCpu.registerTraces, [:])
   }
 
   func test_F0_ld_a_ffimm8addr() {
-    var cpu = LR35902()
+    let initialCpu = LR35902()
+    var cpu = initialCpu
     var memory: AddressableMemory = TestMemory(defaultReadValue: 0x12)
     let mutatedCpu = cpu.emulate(instruction: .init(spec: LR35902.InstructionSet.table[0xF0], immediate: .imm8(0xab)), memory: &memory, followControlFlow: true)
 
@@ -391,5 +440,8 @@ class InstructionEmulationTests: XCTestCase {
     assertEqual(cpu, mutatedCpu)
     XCTAssertEqual((memory as! TestMemory).readMonitor.reads, [0xffab])
     XCTAssertEqual((memory as! TestMemory).writes, [])
+    XCTAssertEqual(mutatedCpu.registerTraces, [
+      .a: .init(sourceLocation: Gameboy.Cartridge.location(for: initialCpu.pc, in: initialCpu.bank)!, loadAddress: 0xffab)
+    ])
   }
 }
