@@ -15,6 +15,9 @@ class TestMemory: AddressableMemory {
   }
 
   func write(_ byte: UInt8, to address: LR35902.Address) {
+    guard !ignoreWrites else {
+      return
+    }
     writes.append(WriteOp(byte: byte, address: address))
   }
 
@@ -25,4 +28,5 @@ class TestMemory: AddressableMemory {
     let address: LR35902.Address
   }
   var writes: [WriteOp] = []
+  var ignoreWrites = false
 }

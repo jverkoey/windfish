@@ -29,17 +29,28 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
-    // ld r, (HL)
-    case .ld(let dst, .hladdr) where registers8.contains(dst):
+    // ld r, (rr)
+    case .ld(let dst, let src) where registers8.contains(dst) && registersAddr.contains(src):
       var value: UInt8 = 0
 
       return { (cpu, memory, cycle) in
         if cycle == 1 {
-          value = UInt8(memory.read(from: cpu.hl))
-          cpu.registerTraces[dst] = .init(sourceLocation: cpu.machineInstruction.sourceLocation, loadAddress: cpu.hl)
+          let address = cpu[src] as UInt16
+          value = UInt8(memory.read(from: address))
+          cpu.registerTraces[dst] = .init(sourceLocation: cpu.machineInstruction.sourceLocation, loadAddress: address)
           return .continueExecution
         }
         cpu[dst] = value
+        return .fetchNext
+      }
+
+    // ld (rr), r
+    case .ld(let dst, let src) where registersAddr.contains(dst) && registers8.contains(src):
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          memory.write(cpu[src], to: cpu[dst])
+          return .continueExecution
+        }
         return .fetchNext
       }
 
@@ -62,15 +73,6 @@ extension LR35902.InstructionSet {
           sourceLocation: cpu.machineInstruction.sourceLocation,
           loadAddress: immediate
         )
-        return .fetchNext
-      }
-
-    case .ld(let dst, let src) where registersAddr.contains(dst) && registers8.contains(src):
-      return { (cpu, memory, cycle) in
-        if cycle == 1 {
-          memory.write(cpu[src], to: cpu[dst])
-          return .continueExecution
-        }
         return .fetchNext
       }
 

@@ -201,8 +201,8 @@ extension LR35902 {
   public func get(numeric16: LR35902.Instruction.Numeric) -> UInt16 {
     switch numeric16 {
     case .bc, .bcaddr: return bc
-    case .de: return de
-    case .hl: return hl
+    case .de, .deaddr: return de
+    case .hl, .hladdr: return hl
     case .sp: return sp
     default:
       preconditionFailure()
@@ -210,9 +210,9 @@ extension LR35902 {
   }
   public mutating func set(numeric16: LR35902.Instruction.Numeric, to newValue: UInt16) {
     switch numeric16 {
-    case .bc: bc = newValue
-    case .de: de = newValue
-    case .hl: hl = newValue
+    case .bc, .bcaddr: bc = newValue
+    case .de, .deaddr: de = newValue
+    case .hl, .hladdr: hl = newValue
     case .sp: sp = newValue
     default:
       preconditionFailure()
