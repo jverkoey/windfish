@@ -7,10 +7,25 @@ extension LR35902.InstructionSet {
     let registersAddr = LR35902.Instruction.Numeric.registersAddr
 
     switch spec {
+    // ld r, r'
     case .ld(let dst, let src) where registers8.contains(dst) && registers8.contains(src):
       return { (cpu, memory, cycle) in
         cpu[dst] = cpu[src] as UInt8
         cpu.registerTraces[dst] = cpu.registerTraces[src]
+        return .fetchNext
+      }
+
+    // ld r, n
+    case .ld(let dst, .imm8) where registers8.contains(dst):
+      var immediate: UInt8 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          immediate = UInt8(memory.read(from: cpu.pc))
+          cpu.pc += 1
+          return .continueExecution
+        }
+        cpu[dst] = immediate
+        cpu.registerTraces[dst] = .init(sourceLocation: cpu.machineInstruction.sourceLocation)
         return .fetchNext
       }
 
