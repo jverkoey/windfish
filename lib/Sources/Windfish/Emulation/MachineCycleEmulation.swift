@@ -4,30 +4,43 @@ extension LR35902.InstructionSet {
   static func microcode(for spec: LR35902.Instruction.Spec) -> LR35902.MachineInstruction.MicroCode {
     let registers8 = LR35902.Instruction.Numeric.registers8
     let registers16 = LR35902.Instruction.Numeric.registers16
+    let registersAddr = LR35902.Instruction.Numeric.registersAddr
 
     switch spec {
     case .ld(let dst, .imm16) where registers16.contains(dst):
       var immediate: UInt16 = 0
-      return [
-        { (cpu, memory) in
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
           immediate = UInt16(memory.read(from: cpu.pc))
           cpu.pc += 1
-        },
-        { (cpu, memory) in
+          return .continueExecution
+        }
+        if cycle == 2 {
           immediate |= UInt16(memory.read(from: cpu.pc)) << 8
           cpu.pc += 1
-        },
-        { (cpu, memory) in
-          cpu[dst] = immediate
+          return .continueExecution
+        }
 
-          // TODO: Move the trace registration out of the microcode.
-          cpu.registerTraces[dst] = .init(sourceLocation: Gameboy.Cartridge.location(for: cpu.pc - 3, in: cpu.bank)!,
-                                          loadAddress: immediate)
-        },
-      ]
+        cpu[dst] = immediate
+        cpu.registerTraces[dst] = .init(
+          sourceLocation: cpu.machineInstruction.sourceLocation,
+          loadAddress: immediate
+        )
+        return .fetchNext
+      }
+
+    case .ld(let dst, let src) where registersAddr.contains(dst) && registers8.contains(src):
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          memory.write(cpu[src], to: cpu[dst])
+          return .continueExecution
+        }
+        return .fetchNext
+      }
 
     case .nop:
-      return []
+      return { _, _, _ in .fetchNext }
+
     default:
       preconditionFailure("Unhandled specification: \(spec)")
     }
@@ -40,14 +53,18 @@ extension LR35902 {
     // https://gekkio.fi/files/gb-docs/gbctr.pdf
     var mutation = self
 
-    if machineInstruction.cycle < machineInstruction.microcode.count {
-      machineInstruction.microcode[machineInstruction.cycle](&mutation, &memory)
+    let nextAction: MachineInstruction.MicroCodeResult
+    if let microcode = machineInstruction.microcode {
       mutation.machineInstruction.cycle += 1
+      nextAction = microcode(&mutation, &memory, mutation.machineInstruction.cycle)
+    } else {
+      nextAction = .fetchNext
     }
 
     // The LR35902's fetch/execute overlap behavior means we load the next opcode on the same machine cycle as the
     // last instruction's microcode execution.
-    if machineInstruction.cycle == machineInstruction.microcode.count {
+    if nextAction == .fetchNext {
+      let sourceLocation = Gameboy.Cartridge.location(for: pc, in: bank)!
       let tableIndex = Int(memory.read(from: pc))
       mutation.pc += 1
       let loadedSpec: Instruction.Spec
@@ -57,7 +74,7 @@ extension LR35902 {
       } else {
         loadedSpec = InstructionSet.table[tableIndex]
       }
-      mutation.machineInstruction = .init(spec: loadedSpec, microcode: InstructionSet.microcode(for: loadedSpec))
+      mutation.machineInstruction = .init(spec: loadedSpec, sourceLocation: sourceLocation)
     }
 
     return mutation

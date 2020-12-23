@@ -103,14 +103,27 @@ public struct LR35902 {
   public var registerTraces: [LR35902.Instruction.Numeric: RegisterTrace] = [:]
 
   struct MachineInstruction {
-    typealias MicroCode = [(inout LR35902, inout AddressableMemory) -> Void]
-    internal init(spec: LR35902.Instruction.Spec? = nil, microcode: MicroCode = []) {
+    enum MicroCodeResult {
+      case continueExecution
+      case fetchNext
+    }
+    typealias MicroCode = (inout LR35902, inout AddressableMemory, Int) -> MicroCodeResult
+
+    internal init() {
+      self.spec = nil
+      self.microcode = nil
+      self.sourceLocation = 0
+    }
+
+    internal init(spec: LR35902.Instruction.Spec, sourceLocation: Gameboy.Cartridge.Location) {
       self.spec = spec
-      self.microcode = microcode
+      self.microcode = InstructionSet.microcode(for: spec)
+      self.sourceLocation = sourceLocation
     }
 
     let spec: Instruction.Spec?
-    let microcode: MicroCode
+    let microcode: MicroCode?
+    let sourceLocation: Gameboy.Cartridge.Location
     var cycle: Int = 0
   }
   /** The machine instruction represents the CPU's understanding of its current instruction. */
@@ -187,7 +200,7 @@ extension LR35902 {
 
   public func get(numeric16: LR35902.Instruction.Numeric) -> UInt16 {
     switch numeric16 {
-    case .bc: return bc
+    case .bc, .bcaddr: return bc
     case .de: return de
     case .hl: return hl
     case .sp: return sp

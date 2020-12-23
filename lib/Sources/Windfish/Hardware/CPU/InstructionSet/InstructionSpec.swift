@@ -97,6 +97,12 @@ extension LR35902.Instruction {
       .sp,
     ])
 
+    public static let registersAddr: Set<LR35902.Instruction.Numeric> = Set([
+      .bcaddr,
+      .deaddr,
+      .hladdr,
+    ])
+
     public var width: Int {
       switch self {
       case .sp_plus_simm8, .imm8, .simm8, .ffimm8addr, .zeroimm8: return 1
