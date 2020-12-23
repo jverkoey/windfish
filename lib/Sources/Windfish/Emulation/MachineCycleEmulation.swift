@@ -29,6 +29,20 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // ld r, (HL)
+    case .ld(let dst, .hladdr) where registers8.contains(dst):
+      var value: UInt8 = 0
+
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          value = UInt8(memory.read(from: cpu.hl))
+          cpu.registerTraces[dst] = .init(sourceLocation: cpu.machineInstruction.sourceLocation, loadAddress: cpu.hl)
+          return .continueExecution
+        }
+        cpu[dst] = value
+        return .fetchNext
+      }
+
     case .ld(let dst, .imm16) where registers16.contains(dst):
       var immediate: UInt16 = 0
       return { (cpu, memory, cycle) in
