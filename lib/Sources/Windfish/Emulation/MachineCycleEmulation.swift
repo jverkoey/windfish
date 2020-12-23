@@ -54,6 +54,22 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // ld (rr), n
+    case .ld(let dst, .imm8) where registersAddr.contains(dst):
+      var immediate: UInt8 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          immediate = UInt8(memory.read(from: cpu.pc))
+          cpu.pc += 1
+          return .continueExecution
+        }
+        if cycle == 2 {
+          memory.write(immediate, to: cpu[dst])
+          return .continueExecution
+        }
+        return .fetchNext
+      }
+
     case .ld(let dst, .imm16) where registers16.contains(dst):
       var immediate: UInt16 = 0
       return { (cpu, memory, cycle) in
