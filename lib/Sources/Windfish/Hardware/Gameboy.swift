@@ -25,7 +25,9 @@ public struct Gameboy {
 
   public func advanceInstruction() -> Gameboy {
     var mutated = self
-    mutated.cpu = mutated.cpu.advance(memory: &mutated.memory)
+    if mutated.cpu.machineInstruction.spec == nil {
+      mutated.cpu = mutated.cpu.advance(memory: &mutated.memory)
+    }
     let sourceLocation = mutated.cpu.machineInstruction.sourceLocation
     while sourceLocation == mutated.cpu.machineInstruction.sourceLocation {
       mutated.cpu = mutated.cpu.advance(memory: &mutated.memory)

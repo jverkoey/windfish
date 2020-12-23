@@ -11,6 +11,13 @@ class MicrocodeEmulationTests: XCTestCase {
     return Gameboy(cartridge: .init(data: data))
   }
 
+  static var testedSpecs = Set<LR35902.Instruction.Spec>()
+
+  static override func tearDown() {
+    let remainingSpecs = LR35902.InstructionSet.allSpecs().filter { !testedSpecs.contains($0) }
+    print("\(remainingSpecs.count) specs remaining to test")
+  }
+
   func test_00_nop() {
     // Given
     var gameboy = createGameboy(loadedWith: """
@@ -31,6 +38,58 @@ nop
     XCTAssertEqual(testMemory.reads, [0x0000, 0x0001])
     XCTAssertEqual(testMemory.writes, [])
     XCTAssertEqual(mutated.cpu.registerTraces, [:])
+  }
+
+  func test_8bit_loads() {
+    // Given
+    let registers8 = LR35902.Instruction.Numeric.registers8
+    let specs = LR35902.InstructionSet.table.filter { spec in
+      switch spec {
+      case .ld(let dst, let src) where registers8.contains(dst) && registers8.contains(src):
+        return true
+      default:
+        return false
+      }
+    }
+    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    let instructions = specs.map { LR35902.Instruction(spec: $0) }
+    let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
+    var gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let testMemory = TestMemory()
+    gameboy.addMemoryTracer(testMemory)
+
+    // When
+    for (index, instruction) in instructions.enumerated() {
+      switch instruction.spec {
+      case .ld(let dst, let src) where registers8.contains(dst) && registers8.contains(src):
+        // Set dst first in case dst == src
+        gameboy.cpu[dst] = UInt8(0x00)
+        gameboy.cpu[src] = UInt8(0xab)
+      default:
+        fatalError()
+      }
+      let mutated = gameboy.advanceInstruction()
+
+      // Expected mutations
+      if index == 0 {
+        gameboy.cpu.pc += 1
+      }
+      gameboy.cpu.pc += 1
+
+      switch instruction.spec {
+      case .ld(let dst, let src) where registers8.contains(dst) && registers8.contains(src):
+        gameboy.cpu[dst] = UInt8(0xab)
+      default:
+        fatalError()
+      }
+
+      assertEqual(gameboy.cpu, mutated.cpu, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
+
+      gameboy = mutated
+    }
+
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(gameboy.cartridge.size)).map { $0 })
+    XCTAssertEqual(testMemory.writes, [])
   }
 
   func test_01_ld_bc_imm16() {
