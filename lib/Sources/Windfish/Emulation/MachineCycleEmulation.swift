@@ -70,6 +70,30 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // ld a, (nn)
+    case .ld(.a, .imm16addr):
+      var immediate: UInt16 = 0
+      var value: UInt8 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          immediate = UInt16(memory.read(from: cpu.pc))
+          cpu.pc += 1
+          return .continueExecution
+        }
+        if cycle == 2 {
+          immediate |= UInt16(memory.read(from: cpu.pc)) << 8
+          cpu.pc += 1
+          return .continueExecution
+        }
+        if cycle == 3 {
+          value = memory.read(from: immediate)
+          return .continueExecution
+        }
+        cpu.a = value
+        cpu.registerTraces[.a] = .init(sourceLocation: cpu.machineInstruction.sourceLocation, loadAddress: immediate)
+        return .fetchNext
+      }
+
     case .ld(let dst, .imm16) where registers16.contains(dst):
       var immediate: UInt16 = 0
       return { (cpu, memory, cycle) in
