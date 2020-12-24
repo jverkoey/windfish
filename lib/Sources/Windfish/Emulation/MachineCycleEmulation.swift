@@ -94,6 +94,27 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // ld (nn), a
+    case .ld(.imm16addr, .a):
+      var immediate: UInt16 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          immediate = UInt16(memory.read(from: cpu.pc))
+          cpu.pc += 1
+          return .continueExecution
+        }
+        if cycle == 2 {
+          immediate |= UInt16(memory.read(from: cpu.pc)) << 8
+          cpu.pc += 1
+          return .continueExecution
+        }
+        if cycle == 3 {
+          memory.write(cpu.a, to: immediate)
+          return .continueExecution
+        }
+        return .fetchNext
+      }
+
     case .ld(let dst, .imm16) where registers16.contains(dst):
       var immediate: UInt16 = 0
       return { (cpu, memory, cycle) in

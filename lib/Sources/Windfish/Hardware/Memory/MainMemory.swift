@@ -10,6 +10,7 @@ extension Gameboy {
       mapRegion(to: IORegisterMemory())
       mapRegion(to: LCDController())
       mapRegion(to: hram)
+      mapRegion(to: ram)
     }
 
     public var tracers: [AddressableMemory] = []
@@ -43,6 +44,7 @@ extension Gameboy {
     private var mappedRegions: [ClosedRange<LR35902.Address>: AddressableMemory] = [:]
     private var mappedBytes = IndexSet()
     private var hram = GenericRAM(addressableRanges: [0xFF80...0xFFFE])
+    private var ram = GenericRAM(addressableRanges: [0xC000...0xDFFF])
 
     mutating func mapRegion(to memory: AddressableMemory) {
       for range in memory.addressableRanges {
