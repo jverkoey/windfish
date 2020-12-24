@@ -8,14 +8,14 @@ import XCTest
 class MicrocodeEmulationTests: XCTestCase {
   private func createGameboy(loadedWith assembly: String) -> Gameboy {
     let (instructions, errors) = RGBDSAssembler.assemble(assembly: assembly)
-    XCTAssertEqual(errors, [])
+    precondition(errors.isEmpty, "Errors: \(errors)")
     let data = instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     return Gameboy(cartridge: .init(data: data))
   }
 
   static var testedSpecs = Set<LR35902.Instruction.Spec>()
 
-  // 407 specs to go.
+  // 402 specs to go.
   static override func tearDown() {
     let remainingSpecs = LR35902.InstructionSet.allSpecs().filter { !testedSpecs.contains($0) }
     print("\(remainingSpecs.count) specs remaining to test")
@@ -1184,6 +1184,131 @@ nop
     }
 
     XCTAssertEqual(testMemory.reads, [0, 2])
+    XCTAssertEqual(testMemory.writes, [])
+  }
+
+  func test_jr_n_all_true() {
+    // Given
+    let specs = LR35902.InstructionSet.table.filter { spec in
+      switch spec {
+      case .jr(_, .simm8):
+        return true
+      default:
+        return false
+      }
+    }
+    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(UInt8(bitPattern: 1))) }
+    let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
+    var gameboy = createGameboy(loadedWith: assembly + "\n nop\n nop")
+
+    let testMemory = TestMemory()
+    gameboy.addMemoryTracer(testMemory)
+
+    // When
+    for instruction in instructions {
+      let stashedpc = gameboy.cpu.pc
+      switch instruction.spec {
+      case .jr(let cnd, .simm8):
+        switch cnd {
+        case .none:
+          break
+        case .some(.c):
+          gameboy.cpu.fcarry = true
+          break
+        case .some(.nz):
+          gameboy.cpu.fzero = false
+          break
+        case .some(.z):
+          gameboy.cpu.fzero = true
+          break
+        case .some(.nc):
+          gameboy.cpu.fcarry = false
+          break
+        }
+        break
+      default:
+        fatalError()
+      }
+
+      let mutated = gameboy.advanceInstruction()
+
+      // Expected mutations
+      gameboy.cpu.pc += 2 + 1 + 1  // 2 for instruction, 1 for relative jump, 1 for next opcode read
+
+      assertEqual(gameboy.cpu, mutated.cpu, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
+
+      gameboy = mutated
+      gameboy.cpu.pc = stashedpc + 2
+      gameboy.cpu.machineInstruction = .init() // Reset the cpu's machine instruction cache to force a re-load
+    }
+
+    XCTAssertEqual(testMemory.reads, [
+      0, 1, 3,
+      2, 3, 5,
+      4, 5, 7,
+      6, 7, 9,
+      8, 9, 11
+    ])
+    XCTAssertEqual(testMemory.writes, [])
+  }
+
+  func test_jr_n_all_false() {
+    // Given
+    let specs = LR35902.InstructionSet.table.filter { spec in
+      switch spec {
+      case .jr(let cnd, .simm8) where cnd != nil:
+        return true
+      default:
+        return false
+      }
+    }
+    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(UInt8(bitPattern: 1))) }
+    let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
+    var gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let testMemory = TestMemory()
+    gameboy.addMemoryTracer(testMemory)
+
+    // When
+    for (index, instruction) in instructions.enumerated() {
+      switch instruction.spec {
+      case .jr(let cnd, .simm8) where cnd != nil:
+        switch cnd {
+        case .some(.c):
+          gameboy.cpu.fcarry = false
+          break
+        case .some(.nz):
+          gameboy.cpu.fzero = true
+          break
+        case .some(.z):
+          gameboy.cpu.fzero = false
+          break
+        case .some(.nc):
+          gameboy.cpu.fcarry = true
+          break
+        default:
+          fatalError()
+        }
+        break
+      default:
+        fatalError()
+      }
+
+      let mutated = gameboy.advanceInstruction()
+
+      // Expected mutations
+      if index == 0 {
+        gameboy.cpu.pc += 1
+      }
+      gameboy.cpu.pc += 2
+
+      assertEqual(gameboy.cpu, mutated.cpu, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
+
+      gameboy = mutated
+    }
+
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(gameboy.cartridge.size)).map { $0 })
     XCTAssertEqual(testMemory.writes, [])
   }
 

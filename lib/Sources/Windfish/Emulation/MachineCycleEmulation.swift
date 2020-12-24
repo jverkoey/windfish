@@ -380,6 +380,50 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // jr cc, e
+    case .jr(let cnd, .simm8):
+      var immediate: Int8 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          immediate = Int8(bitPattern: memory.read(from: cpu.pc))
+          cpu.pc += 1
+          return .continueExecution
+        }
+        if cycle == 2 {
+          switch cnd {
+          case .none:
+            return .continueExecution
+          case .some(.c):
+            if cpu.fcarry {
+              return .continueExecution
+            } else {
+              return .fetchNext
+            }
+          case .some(.nc):
+            if !cpu.fcarry {
+              return .continueExecution
+            } else {
+              return .fetchNext
+            }
+          case .some(.z):
+            if cpu.fzero {
+              return .continueExecution
+            } else {
+              return .fetchNext
+            }
+          case .some(.nz):
+            if !cpu.fzero {
+              return .continueExecution
+            } else {
+              return .fetchNext
+            }
+          }
+        }
+        cpu.pc = cpu.pc.advanced(by: Int(immediate))
+        return .fetchNext
+      }
+
+
     case .nop:
       return { _, _, _ in .fetchNext }
 

@@ -277,7 +277,7 @@ jr 5
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .jr(nil, .simm8), immediate: .imm8(3)),
+      0x0000: LR35902.Instruction(spec: .jr(nil, .simm8), immediate: .imm8(5)),
     ])
   }
 
@@ -395,7 +395,7 @@ set 6, [hl]
 
   func test_jr_cond() throws {
     let results = RGBDSAssembler.assemble(assembly: """
-jr nz, 5
+jr nz, 3
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)

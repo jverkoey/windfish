@@ -174,6 +174,7 @@ extension RGBDSDisassembler {
       }
 
       let byte = immediate
+      // Is the byte negative?
       if (byte & UInt8(0x80)) != 0 {
         return "@-" + RGBDS.asHexString(0xff - byte + 1 - 2)
       }

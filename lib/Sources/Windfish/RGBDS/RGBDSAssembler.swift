@@ -119,10 +119,22 @@ final class RGBDSAssembler {
         instruction = .init(spec: spec, immediate: .imm16(numericValue))
 
       case LR35902.Instruction.Numeric.imm8, LR35902.Instruction.Numeric.simm8:
-        guard var numericValue: UInt8 = RGBDS.integer(from: value) else {
+        let strippedValue: String
+        let isRelativeToPc: Bool
+        if value.hasPrefix("@+") {
+          strippedValue = String(value.dropFirst(2))
+          isRelativeToPc = true
+        } else if value.hasPrefix("@") {
+          strippedValue = String(value.dropFirst())
+          isRelativeToPc = true
+        } else {
+          strippedValue = value
+          isRelativeToPc = false
+        }
+        guard var numericValue: UInt8 = RGBDS.integer(from: strippedValue) else {
           throw StringError(message: "Unable to represent \(value) as a \(UInt8.self)")
         }
-        if case .jr = spec {
+        if isRelativeToPc {
           // Relative jumps in assembly are written from the point of view of the instruction's beginning.
           numericValue = numericValue.subtractingReportingOverflow(UInt8(LR35902.InstructionSet.widths[spec]!.total)).partialValue
         }

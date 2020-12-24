@@ -66,7 +66,7 @@ SECTION "ROM Bank 00", ROM0[$00]
     let results = RGBDSAssembler.assemble(assembly: """
 ld   a, [$abcd]
 and  a
-jr   z, -$03
+jr   z, @-$03
 """)
     XCTAssertEqual(results.errors, [])
 
@@ -254,7 +254,7 @@ SECTION "ROM Bank 00", ROM0[$00]
   func test_jr_simm8() {
     let results = RGBDSAssembler.assemble(assembly: """
 nop
-jr -$01
+jr @-$01
 """)
     XCTAssertEqual(results.errors, [])
 

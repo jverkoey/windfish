@@ -24,6 +24,21 @@ public enum InstructionOperandToken: Equatable {
 
   /** Creates a token from the given string. */
   public init(string: String) {
+    if string.lowercased().hasPrefix("sp+") {
+      self = .stackPointerOffset
+      return
+    }
+
+    if string == "[$ff00+c]" {
+      self = .specific(string)
+      return
+    }
+
+    if (string.hasPrefix("@+") || string.hasPrefix("@-")) && isNumber(String(string.dropFirst(2))) {
+      self = .numeric
+      return
+    }
+
     if isNumber(string) {
       self = .numeric
       return
@@ -35,11 +50,6 @@ public enum InstructionOperandToken: Equatable {
         self = .address
         return
       }
-    }
-
-    if string.lowercased().hasPrefix("sp+") {
-      self = .stackPointerOffset
-      return
     }
 
     self = .specific(string)
@@ -67,7 +77,7 @@ public protocol InstructionOperandTokenizable {
 }
 
 private func isNumber(_ string: String) -> Bool {
-  let looksLikeANumber =
+  return
     string.hasPrefix(NumericPrefix.hexadecimal.rawValue)
     || string.hasPrefix(NumericPrefix.octal.rawValue)
     || string.hasPrefix(NumericPrefix.binary.rawValue)
@@ -76,8 +86,6 @@ private func isNumber(_ string: String) -> Bool {
     || (string.hasPrefix("-") && isNumber(String(string.dropFirst())))
     || Int(string) != nil
     || (string.contains(".") && Float(string) != nil)
-  let looksLikeSpecialInstruction = string.contains("+")  // E.g. sp+# or [$ff00+c]
-  return looksLikeANumber && !looksLikeSpecialInstruction
 }
 
 // MARK: - RGBDS string -> number conversions
