@@ -301,6 +301,29 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // pop rr
+    case .pop(let dst) where registers16.contains(dst):
+      var value: UInt16 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          cpu.registerTraces[dst] = .init(
+            sourceLocation: cpu.machineInstruction.sourceLocation,
+            loadAddress: cpu.sp
+          )
+
+          value = UInt16(memory.read(from: cpu.sp))
+          cpu.sp += 1
+          return .continueExecution
+        }
+        if cycle == 2 {
+          value |= UInt16(memory.read(from: cpu.sp)) << 8
+          cpu.sp += 1
+          return .continueExecution
+        }
+        cpu[dst] = value
+        return .fetchNext
+      }
+
     case .nop:
       return { _, _, _ in .fetchNext }
 

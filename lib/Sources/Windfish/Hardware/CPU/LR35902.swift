@@ -68,6 +68,13 @@ public struct LR35902 {
   // MARK: 16-bit registers
   // Note that, though these registers are ultimately backed by the underlying 8 bit registers, each 16-bit register
   // also stores the state value that was directly assigned to it.
+  public var af: UInt16 {
+    get { return UInt16(a) << 8 | UInt16(f) }
+    set {
+      a = UInt8(newValue >> 8)
+      f = UInt8(newValue & 0x00FF)
+    }
+  }
   public var bc: UInt16 {
     get { return UInt16(b) << 8 | UInt16(c) }
     set {
@@ -200,6 +207,7 @@ extension LR35902 {
 
   public func get(numeric16: LR35902.Instruction.Numeric) -> UInt16 {
     switch numeric16 {
+    case .af: return af
     case .bc, .bcaddr: return bc
     case .de, .deaddr: return de
     case .hl, .hladdr: return hl
@@ -210,6 +218,7 @@ extension LR35902 {
   }
   public mutating func set(numeric16: LR35902.Instruction.Numeric, to newValue: UInt16) {
     switch numeric16 {
+    case .af: af = newValue
     case .bc, .bcaddr: bc = newValue
     case .de, .deaddr: de = newValue
     case .hl, .hladdr: hl = newValue

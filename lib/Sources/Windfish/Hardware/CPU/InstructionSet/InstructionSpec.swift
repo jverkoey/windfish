@@ -91,6 +91,7 @@ extension LR35902.Instruction {
     ])
 
     public static let registers16: Set<LR35902.Instruction.Numeric> = Set([
+      .af,
       .bc,
       .de,
       .hl,
