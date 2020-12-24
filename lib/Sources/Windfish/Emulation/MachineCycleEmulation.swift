@@ -282,6 +282,25 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // push rr
+    case .push(let src) where registers16.contains(src):
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          cpu.sp -= 1
+          return .continueExecution
+        }
+        if cycle == 2 {
+          memory.write(UInt8(((cpu[src] as UInt16) & 0xFF00) >> 8), to: cpu.sp)
+          cpu.sp -= 1
+          return .continueExecution
+        }
+        if cycle == 3 {
+          memory.write(UInt8((cpu[src] as UInt16) & 0x00FF), to: cpu.sp)
+          return .continueExecution
+        }
+        return .fetchNext
+      }
+
     case .nop:
       return { _, _, _ in .fetchNext }
 

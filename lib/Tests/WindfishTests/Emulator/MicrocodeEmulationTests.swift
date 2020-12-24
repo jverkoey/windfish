@@ -15,7 +15,7 @@ class MicrocodeEmulationTests: XCTestCase {
 
   static var testedSpecs = Set<LR35902.Instruction.Spec>()
 
-  // 421 specs to go.
+  // 418 specs to go.
   static override func tearDown() {
     let remainingSpecs = LR35902.InstructionSet.allSpecs().filter { !testedSpecs.contains($0) }
     print("\(remainingSpecs.count) specs remaining to test")
@@ -899,6 +899,58 @@ nop
 
     XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(gameboy.cartridge.size)).map { $0 })
     XCTAssertEqual(testMemory.writes, [])
+  }
+
+  func test_push_rr() {
+    // Given
+    let registers16 = LR35902.Instruction.Numeric.registers16
+    let specs = LR35902.InstructionSet.table.filter { spec in
+      switch spec {
+      case .push(let src) where registers16.contains(src):
+        return true
+      default:
+        return false
+      }
+    }
+    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    let instructions = specs.map { LR35902.Instruction(spec: $0) }
+    let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
+    var gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    gameboy.cpu.sp = 0xFFFD
+    let testMemory = TestMemory()
+    gameboy.addMemoryTracer(testMemory)
+
+    // When
+    for (index, instruction) in instructions.enumerated() {
+      switch instruction.spec {
+      case .push(let src) where registers16.contains(src):
+        gameboy.cpu[src] = UInt16(0x1234)
+      default:
+        fatalError()
+      }
+      let mutated = gameboy.advanceInstruction()
+
+      // Expected mutations
+      if index == 0 {
+        gameboy.cpu.pc += 1
+      }
+      gameboy.cpu.pc += 1
+      gameboy.cpu.sp -= 2
+
+      assertEqual(gameboy.cpu, mutated.cpu, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
+
+      gameboy = mutated
+    }
+
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(gameboy.cartridge.size)).map { $0 })
+    var sp = UInt16(0xFFFD)
+    XCTAssertEqual(testMemory.writes, specs.reduce(into: [], { accumulator, _ in
+      accumulator.append(contentsOf: [
+        .init(byte: 0x12, address: sp - 1),
+        .init(byte: 0x34, address: sp - 2),
+      ])
+      sp -= 2
+    }))
   }
 
 }
