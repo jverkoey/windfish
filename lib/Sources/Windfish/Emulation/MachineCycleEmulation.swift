@@ -189,6 +189,17 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // ld (hl-), a
+    case .ldd(.hladdr, .a):
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          memory.write(cpu.a, to: cpu.hl)
+          return .continueExecution
+        }
+        cpu.hl -= 1
+        return .fetchNext
+      }
+
     case .ld(let dst, .imm16) where registers16.contains(dst):
       var immediate: UInt16 = 0
       return { (cpu, memory, cycle) in
