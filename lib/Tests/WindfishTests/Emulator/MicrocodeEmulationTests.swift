@@ -15,7 +15,7 @@ class MicrocodeEmulationTests: XCTestCase {
 
   static var testedSpecs = Set<LR35902.Instruction.Spec>()
 
-  // 408 specs to go.
+  // 407 specs to go.
   static override func tearDown() {
     let remainingSpecs = LR35902.InstructionSet.allSpecs().filter { !testedSpecs.contains($0) }
     print("\(remainingSpecs.count) specs remaining to test")
@@ -1036,7 +1036,9 @@ nop
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm16(0x0000)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    var gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    var gameboy = createGameboy(loadedWith: "nop\n" + assembly + "\n nop")
+    gameboy.cpu.pc = 1  // Skip the nop
+
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
 
@@ -1079,11 +1081,11 @@ nop
     }
 
     XCTAssertEqual(testMemory.reads, [
-      0, 1, 2, 3,
-      3, 4, 5, 6,
-      6, 7, 8, 9,
-      9, 10, 11, 12,
-      12, 13, 14, 15,
+      1, 2, 3, 0,
+      4, 5, 6, 0,
+      7, 8, 9, 0,
+      10, 11, 12, 0,
+      13, 14, 15, 0,
     ])
     XCTAssertEqual(testMemory.writes, [])
   }
@@ -1144,6 +1146,44 @@ nop
     }
 
     XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(gameboy.cartridge.size)).map { $0 })
+    XCTAssertEqual(testMemory.writes, [])
+  }
+
+  func test_jp_hl() {
+    // Given
+    let specs = LR35902.InstructionSet.table.filter { spec in
+      switch spec {
+      case .jp(nil, .hl):
+        return true
+      default:
+        return false
+      }
+    }
+    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    let instructions = specs.map { LR35902.Instruction(spec: $0) }
+    let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
+    var gameboy = createGameboy(loadedWith: assembly + "\n nop\n nop")
+    gameboy.cpu.hl = 0x0002
+    let testMemory = TestMemory()
+    gameboy.addMemoryTracer(testMemory)
+
+    // When
+    for instruction in instructions {
+      let stashedpc = gameboy.cpu.pc
+
+      let mutated = gameboy.advanceInstruction()
+
+      // Expected mutations
+      gameboy.cpu.pc = 0x0003
+
+      assertEqual(gameboy.cpu, mutated.cpu, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
+
+      gameboy = mutated
+      gameboy.cpu.pc = stashedpc + 1
+      gameboy.cpu.machineInstruction = .init() // Reset the cpu's machine instruction cache to force a re-load
+    }
+
+    XCTAssertEqual(testMemory.reads, [0, 2])
     XCTAssertEqual(testMemory.writes, [])
   }
 
