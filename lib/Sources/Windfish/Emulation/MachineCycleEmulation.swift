@@ -223,6 +223,7 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // ld rr, nn
     case .ld(let dst, .imm16) where registers16.contains(dst):
       var immediate: UInt16 = 0
       return { (cpu, memory, cycle) in
