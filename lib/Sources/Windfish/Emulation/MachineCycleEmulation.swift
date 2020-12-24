@@ -246,6 +246,31 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // ld (nn), sp
+    case .ld(.imm16addr, .sp):
+      var immediate: UInt16 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          immediate = UInt16(memory.read(from: cpu.pc))
+          cpu.pc += 1
+          return .continueExecution
+        }
+        if cycle == 2 {
+          immediate |= UInt16(memory.read(from: cpu.pc)) << 8
+          cpu.pc += 1
+          return .continueExecution
+        }
+        if cycle == 3 {
+          memory.write(UInt8(cpu.sp & 0x00FF), to: immediate)
+          return .continueExecution
+        }
+        if cycle == 4 {
+          memory.write(UInt8((cpu.sp & 0xFF00) >> 8), to: immediate + 1)
+          return .continueExecution
+        }
+        return .fetchNext
+      }
+
     case .nop:
       return { _, _, _ in .fetchNext }
 
