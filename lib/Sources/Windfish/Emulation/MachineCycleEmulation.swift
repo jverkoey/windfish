@@ -271,6 +271,17 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // ld sp, hl
+    case .ld(.sp, .hl):
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          cpu.sp = cpu.hl
+          cpu.registerTraces[.sp] = cpu.registerTraces[.hl]
+          return .continueExecution
+        }
+        return .fetchNext
+      }
+
     case .nop:
       return { _, _, _ in .fetchNext }
 
