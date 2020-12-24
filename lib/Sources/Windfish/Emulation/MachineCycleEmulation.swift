@@ -115,6 +115,20 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // ldh a, (c)
+    case .ld(.a, .ffccaddr):
+      var value: UInt8 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          let address = UInt16(0xFF00) | UInt16(cpu.c)
+          value = memory.read(from: address)
+          cpu.registerTraces[.a] = .init(sourceLocation: cpu.machineInstruction.sourceLocation, loadAddress: address)
+          return .continueExecution
+        }
+        cpu.a = value
+        return .fetchNext
+      }
+
     case .ld(let dst, .imm16) where registers16.contains(dst):
       var immediate: UInt16 = 0
       return { (cpu, memory, cycle) in

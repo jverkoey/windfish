@@ -13,6 +13,8 @@ extension LR35902.Instruction.Numeric: RGBDS.InstructionOperandTokenizable {
       return .specific("[de]")
     case .hladdr:
       return .specific("[hl]")
+    case .ffccaddr:
+      return .specific("[$ff00+c]")
     case .imm16addr, .ffimm8addr:
       return .address
     case .sp_plus_simm8:
