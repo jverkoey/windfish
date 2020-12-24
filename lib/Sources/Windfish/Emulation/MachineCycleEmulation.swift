@@ -324,6 +324,55 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // jp nn
+    // jp cc, nn
+    case .jp(let cnd, .imm16):
+      var immediate: UInt16 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          immediate = UInt16(memory.read(from: cpu.pc))
+          cpu.pc += 1
+          return .continueExecution
+        }
+        if cycle == 2 {
+          immediate |= UInt16(memory.read(from: cpu.pc)) << 8
+          cpu.pc += 1
+          return .continueExecution
+        }
+        if cycle == 3 {
+          switch cnd {
+          case .none:
+            return .continueExecution
+          case .some(.c):
+            if cpu.fcarry {
+              return .continueExecution
+            } else {
+              return .fetchNext
+            }
+          case .some(.nc):
+            if !cpu.fcarry {
+              return .continueExecution
+            } else {
+              return .fetchNext
+            }
+          case .some(.z):
+            if cpu.fzero {
+              return .continueExecution
+            } else {
+              return .fetchNext
+            }
+          case .some(.nz):
+            if !cpu.fzero {
+              return .continueExecution
+            } else {
+              return .fetchNext
+            }
+          }
+        }
+        cpu.pc = immediate
+        return .fetchNext
+      }
+
     case .nop:
       return { _, _, _ in .fetchNext }
 
