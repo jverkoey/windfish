@@ -479,6 +479,9 @@ extension LR35902.InstructionSet {
     case .nop:
       return { _, _, _ in .fetchNext }
 
+    case .prefix:
+      return { _, _, _ in .fetchNext }
+
     default:
       preconditionFailure("Unhandled specification: \(spec)")
     }
