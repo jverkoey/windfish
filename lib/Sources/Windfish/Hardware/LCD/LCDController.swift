@@ -97,6 +97,32 @@ public struct LCDController {
   // MARK: LYC
 
   var lyc: UInt8 = 0
+
+  /** How many cycles have been advanced for the current lcdMode. */
+  private var lcdModeCycle: Int = 0
+}
+
+extension LCDController {
+  /** Executes a single machine cycle and returns the mutation. */
+  public func advance() -> LCDController {
+    var mutation = self
+
+    mutation.lcdModeCycle += 1
+
+    // TODO: Implement state machine below.
+    switch lcdMode {
+    case .hblank:
+      break
+    case .vblank:
+      break
+    case .transferringToLCDDriver:
+      break
+    case .searchingOAM:
+      break
+    }
+
+    return mutation
+  }
 }
 
 extension LCDController: AddressableMemory {

@@ -51,7 +51,8 @@ extension Gameboy {
     mutating func mapRegion(to memory: AddressableMemory) {
       for range in memory.addressableRanges {
         let intRange = Int(range.lowerBound)...Int(range.upperBound)
-        precondition(!mappedBytes.contains(integersIn: intRange), "Memory is already mapped to this region.")
+        precondition(mappedRegions[range] != nil || !mappedBytes.contains(integersIn: intRange),
+                     "This map will partially overlap another region.")
         mappedBytes.insert(integersIn: intRange)
 
         mappedRegions[range] = memory
