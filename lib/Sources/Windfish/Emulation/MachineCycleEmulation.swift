@@ -476,6 +476,12 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    case .cb(.res(let bit, let register)) where registers8.contains(register):
+      return { (cpu, memory, cycle) in
+        cpu[register] = cpu[register] & ~(UInt8(1) << bit.rawValue)
+        return .fetchNext
+      }
+
     case .nop:
       return { _, _, _ in .fetchNext }
 
@@ -505,12 +511,13 @@ extension LR35902 {
     // The LR35902's fetch/execute overlap behavior means we load the next opcode on the same machine cycle as the
     // last instruction's microcode execution.
     if nextAction == .fetchNext {
-      let sourceLocation = Gameboy.Cartridge.location(for: mutation.pc, in: mutation.bank)!
+      var sourceLocation = Gameboy.Cartridge.location(for: mutation.pc, in: mutation.bank)!
       let tableIndex = Int(memory.read(from: mutation.pc))
       mutation.pc += 1
       let loadedSpec: Instruction.Spec
-      if let spec = mutation.machineInstruction.loaded?.spec,
-          let prefixTable = InstructionSet.prefixTables[spec] {
+      if let loaded = mutation.machineInstruction.loaded,
+         let prefixTable = InstructionSet.prefixTables[loaded.spec] {
+        sourceLocation = loaded.sourceLocation
         loadedSpec = prefixTable[tableIndex]
       } else {
         loadedSpec = InstructionSet.table[tableIndex]
