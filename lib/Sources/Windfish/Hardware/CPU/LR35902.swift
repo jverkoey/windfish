@@ -65,6 +65,14 @@ public struct LR35902 {
     }
   }
 
+  /**
+   The interrupt master enable flag (IME).
+
+   When false, all interrupts are disabled.
+   When true, interrupts are enabled conditionally on the IE register.
+   */
+  public var ime: Bool = false
+
   // MARK: 16-bit registers
   // Note that, though these registers are ultimately backed by the underlying 8 bit registers, each 16-bit register
   // also stores the state value that was directly assigned to it.

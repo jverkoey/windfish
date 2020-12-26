@@ -26,6 +26,7 @@ func assertEqual(_ state1: LR35902, _ state2: LR35902, message: String = "", fil
   XCTAssertEqual(state1.sp.hexString, state2.sp.hexString,      "sp mismatch \(message)", file: file, line: line)
   XCTAssertEqual(state1.pc.hexString, state2.pc.hexString,      "pc mismatch \(message)", file: file, line: line)
   XCTAssertEqual(state1.bank.hexString, state2.bank.hexString,  "bank mismatch \(message)", file: file, line: line)
+  XCTAssertEqual(state1.ime, state2.ime,                        "ime mismatch \(message)", file: file, line: line)
 }
 
 class EmulatorTests: XCTestCase {

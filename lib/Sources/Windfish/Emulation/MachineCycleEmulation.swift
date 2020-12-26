@@ -454,6 +454,28 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // reti
+    case .reti:
+      var pc: UInt16 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          pc = UInt16(memory.read(from: cpu.sp))
+          cpu.sp += 1
+          return .continueExecution
+        }
+        if cycle == 2 {
+          pc |= UInt16(memory.read(from: cpu.sp)) << 8
+          cpu.sp += 1
+          return .continueExecution
+        }
+        if cycle == 3 {
+          cpu.ime = true
+          return .continueExecution
+        }
+        cpu.pc = pc
+        return .fetchNext
+      }
+
     case .nop:
       return { _, _, _ in .fetchNext }
 
