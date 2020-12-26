@@ -476,9 +476,29 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // res b, r
     case .cb(.res(let bit, let register)) where registers8.contains(register):
       return { (cpu, memory, cycle) in
         cpu[register] = cpu[register] & ~(UInt8(1) << bit.rawValue)
+        return .fetchNext
+      }
+
+    // cp n
+    case .cp(.imm8):
+      var immediate: UInt8 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          immediate = memory.read(from: cpu.pc)
+          cpu.pc += 1
+          return .continueExecution
+        }
+
+        cpu.fsubtract = true
+        let result = cpu.a.subtractingReportingOverflow(immediate)
+        cpu.fzero = result.partialValue == 0
+        cpu.fcarry = result.overflow
+        cpu.fhalfcarry = (cpu.a & 0x0f) < (immediate & 0x0f)
+
         return .fetchNext
       }
 
