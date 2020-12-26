@@ -6,6 +6,37 @@ extension LR35902.InstructionSet {
     let registers16 = LR35902.Instruction.Numeric.registers16
     let registersAddr = LR35902.Instruction.Numeric.registersAddr
 
+    let evaluateConditional: (LR35902.Instruction.Condition?, LR35902) -> LR35902.MachineInstruction.MicroCodeResult = { cnd, cpu in
+      switch cnd {
+      case .none:
+        return .continueExecution
+      case .some(.c):
+        if cpu.fcarry {
+          return .continueExecution
+        } else {
+          return .fetchNext
+        }
+      case .some(.nc):
+        if !cpu.fcarry {
+          return .continueExecution
+        } else {
+          return .fetchNext
+        }
+      case .some(.z):
+        if cpu.fzero {
+          return .continueExecution
+        } else {
+          return .fetchNext
+        }
+      case .some(.nz):
+        if !cpu.fzero {
+          return .continueExecution
+        } else {
+          return .fetchNext
+        }
+      }
+    }
+
     switch spec {
     // ld r, r'
     case .ld(let dst, let src) where registers8.contains(dst) && registers8.contains(src):
@@ -340,34 +371,7 @@ extension LR35902.InstructionSet {
           return .continueExecution
         }
         if cycle == 3 {
-          switch cnd {
-          case .none:
-            return .continueExecution
-          case .some(.c):
-            if cpu.fcarry {
-              return .continueExecution
-            } else {
-              return .fetchNext
-            }
-          case .some(.nc):
-            if !cpu.fcarry {
-              return .continueExecution
-            } else {
-              return .fetchNext
-            }
-          case .some(.z):
-            if cpu.fzero {
-              return .continueExecution
-            } else {
-              return .fetchNext
-            }
-          case .some(.nz):
-            if !cpu.fzero {
-              return .continueExecution
-            } else {
-              return .fetchNext
-            }
-          }
+          return evaluateConditional(cnd, cpu)
         }
         cpu.pc = immediate
         return .fetchNext
@@ -390,34 +394,7 @@ extension LR35902.InstructionSet {
           return .continueExecution
         }
         if cycle == 2 {
-          switch cnd {
-          case .none:
-            return .continueExecution
-          case .some(.c):
-            if cpu.fcarry {
-              return .continueExecution
-            } else {
-              return .fetchNext
-            }
-          case .some(.nc):
-            if !cpu.fcarry {
-              return .continueExecution
-            } else {
-              return .fetchNext
-            }
-          case .some(.z):
-            if cpu.fzero {
-              return .continueExecution
-            } else {
-              return .fetchNext
-            }
-          case .some(.nz):
-            if !cpu.fzero {
-              return .continueExecution
-            } else {
-              return .fetchNext
-            }
-          }
+          return evaluateConditional(cnd, cpu)
         }
         cpu.pc = cpu.pc.advanced(by: Int(immediate))
         return .fetchNext
@@ -439,34 +416,7 @@ extension LR35902.InstructionSet {
           return .continueExecution
         }
         if cycle == 3 {
-          switch cnd {
-          case .none:
-            return .continueExecution
-          case .some(.c):
-            if cpu.fcarry {
-              return .continueExecution
-            } else {
-              return .fetchNext
-            }
-          case .some(.nc):
-            if !cpu.fcarry {
-              return .continueExecution
-            } else {
-              return .fetchNext
-            }
-          case .some(.z):
-            if cpu.fzero {
-              return .continueExecution
-            } else {
-              return .fetchNext
-            }
-          case .some(.nz):
-            if !cpu.fzero {
-              return .continueExecution
-            } else {
-              return .fetchNext
-            }
-          }
+          return evaluateConditional(cnd, cpu)
         }
         if cycle == 4 {
           cpu.sp -= 1
@@ -479,6 +429,28 @@ extension LR35902.InstructionSet {
           return .continueExecution
         }
         cpu.pc = immediate
+        return .fetchNext
+      }
+
+    // ret
+    // ret cc
+    case .ret(let cnd):
+      var pc: UInt16 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          return evaluateConditional(cnd, cpu)
+        }
+        if cycle == 2 {
+          pc = UInt16(memory.read(from: cpu.sp))
+          cpu.sp += 1
+          return .continueExecution
+        }
+        if cycle == 3 {
+          pc |= UInt16(memory.read(from: cpu.sp)) << 8
+          cpu.sp += 1
+          return .continueExecution
+        }
+        cpu.pc = pc
         return .fetchNext
       }
 
