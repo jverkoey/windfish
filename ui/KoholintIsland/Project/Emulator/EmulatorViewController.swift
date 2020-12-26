@@ -121,6 +121,41 @@ private final class RAMValue: NSObject {
   @objc dynamic var variableAddress: LR35902.Address
 }
 
+private final class FlagsView: NSView {
+  let label = CreateLabel()
+  override init(frame frameRect: NSRect) {
+    super.init(frame: frameRect)
+
+    label.frame = bounds
+    label.autoresizingMask = [.width, .height]
+
+    addSubview(label)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  func updateLabel(from cpu: LR35902) {
+    let text = NSMutableAttributedString(string: "Flags: ")
+    let enabledAttributes: [NSAttributedString.Key: Any] = [
+      .foregroundColor: NSColor.textColor,
+    ]
+    let disabledAttributes: [NSAttributedString.Key: Any] = [
+      .foregroundColor: NSColor.disabledControlTextColor,
+    ]
+    text.append(NSAttributedString(string: "zero ", attributes: cpu.fzero ? enabledAttributes : disabledAttributes))
+    text.append(NSAttributedString(string: "subtract ", attributes: cpu.fsubtract ? enabledAttributes : disabledAttributes))
+    text.append(NSAttributedString(string: "carry ", attributes: cpu.fcarry ? enabledAttributes : disabledAttributes))
+    text.append(NSAttributedString(string: "halfcarry ", attributes: cpu.fhalfcarry ? enabledAttributes : disabledAttributes))
+    label.attributedStringValue = text
+  }
+
+  override var intrinsicContentSize: NSSize {
+    return label.intrinsicContentSize
+  }
+}
+
 final class EmulatorViewController: NSViewController, TabSelectable {
   let deselectedTabImage = NSImage(systemSymbolName: "cpu", accessibilityDescription: nil)!
   let selectedTabImage = NSImage(systemSymbolName: "cpu", accessibilityDescription: nil)!
@@ -134,6 +169,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   let programCounterTextField = NSTextField()
   let instructionAssemblyLabel = CreateLabel()
   let instructionBytesLabel = CreateLabel()
+  private let flagsView = FlagsView()
 
   init(document: ProjectDocument) {
     self.document = document
@@ -154,6 +190,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   private var programCounterObserver: NSKeyValueObservation?
   private var registerObservers: [NSKeyValueObservation] = []
   private var disassembledSubscriber: AnyCancellable?
+  private var didChangeFlagsSubscriber: AnyCancellable?
 
   override func loadView() {
     view = NSView()
@@ -241,6 +278,9 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     containerView.documentView = tableView
     view.addSubview(containerView)
     self.tableView = tableView
+
+    flagsView.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(flagsView)
 
     let ramTableView = EditorTableView(elementsController: ramController)
     ramTableView.translatesAutoresizingMaskIntoConstraints = false
@@ -378,9 +418,13 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       containerView.topAnchor.constraint(equalToSystemSpacingBelow: instructionBytesLabel.bottomAnchor, multiplier: 1),
       containerView.heightAnchor.constraint(equalToConstant: 220),
 
+      flagsView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
+      flagsView.widthAnchor.constraint(lessThanOrEqualToConstant: 400),
+      flagsView.topAnchor.constraint(equalToSystemSpacingBelow: containerView.bottomAnchor, multiplier: 1),
+
       ramTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
       ramTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-      ramTableView.topAnchor.constraint(equalToSystemSpacingBelow: containerView.bottomAnchor, multiplier: 1),
+      ramTableView.topAnchor.constraint(equalToSystemSpacingBelow: flagsView.bottomAnchor, multiplier: 1),
       ramTableView.heightAnchor.constraint(equalToConstant: 220),
     ])
 
@@ -399,11 +443,18 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     updateInstructionAssembly()
     updateRegisters()
     updateRAM()
+    flagsView.updateLabel(from: document.gameboy.cpu)
 
     disassembledSubscriber = NotificationCenter.default.publisher(for: .disassembled, object: document)
       .receive(on: RunLoop.main)
       .sink(receiveValue: { notification in
         self.updateInstructionAssembly()
+      })
+
+    didChangeFlagsSubscriber = NotificationCenter.default.publisher(for: .didChangeFlags, object: document)
+      .receive(on: RunLoop.main)
+      .sink(receiveValue: { notification in
+        self.flagsView.updateLabel(from: self.document.gameboy.cpu)
       })
   }
 

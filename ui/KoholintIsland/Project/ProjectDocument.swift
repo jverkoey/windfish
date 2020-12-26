@@ -211,6 +211,9 @@ class ProjectDocument: NSDocument {
       if oldValue.cpu.pc != gameboy.cpu.pc || oldValue.cpu.bank != gameboy.cpu.bank {
         NotificationCenter.default.post(name: .didChangeEmulationLocation, object: self)
       }
+      if oldValue.cpu.f != gameboy.cpu.f {
+        NotificationCenter.default.post(name: .didChangeFlags, object: self)
+      }
     }
   }
 
