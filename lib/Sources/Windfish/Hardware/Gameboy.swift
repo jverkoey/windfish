@@ -31,12 +31,13 @@ public struct Gameboy {
 
   public func advanceInstruction() -> Gameboy {
     var mutated = self
-    if mutated.cpu.machineInstruction.spec == nil {
+    if mutated.cpu.machineInstruction.loaded == nil {
       mutated.cpu = mutated.cpu.advance(memory: &mutated.memory)
     }
-    let sourceLocation = mutated.cpu.machineInstruction.sourceLocation
-    while sourceLocation == mutated.cpu.machineInstruction.sourceLocation {
-      mutated.cpu = mutated.cpu.advance(memory: &mutated.memory)
+    if let sourceLocation = mutated.cpu.machineInstruction.loaded?.sourceLocation {
+      while sourceLocation == mutated.cpu.machineInstruction.loaded?.sourceLocation {
+        mutated.cpu = mutated.cpu.advance(memory: &mutated.memory)
+      }
     }
     return mutated
   }

@@ -117,32 +117,39 @@ public struct LR35902 {
   /** Trace information for a given register. */
   public var registerTraces: [LR35902.Instruction.Numeric: RegisterTrace] = [:]
 
-  struct MachineInstruction {
+  public struct MachineInstruction {
     enum MicroCodeResult {
       case continueExecution
       case fetchNext
     }
     typealias MicroCode = (inout LR35902, inout AddressableMemory, Int) -> MicroCodeResult
 
-    internal init() {
-      self.spec = nil
-      self.microcode = nil
-      self.sourceLocation = 0
+    struct LoadedInstruction {
+      let spec: Instruction.Spec
+      let microcode: MicroCode
+      let sourceLocation: Gameboy.Cartridge.Location
     }
+
+    internal init() {}
 
     internal init(spec: LR35902.Instruction.Spec, sourceLocation: Gameboy.Cartridge.Location) {
-      self.spec = spec
-      self.microcode = InstructionSet.microcode(for: spec)
-      self.sourceLocation = sourceLocation
+      self.loaded = LoadedInstruction(spec: spec,
+                                      microcode: InstructionSet.microcode(for: spec, sourceLocation: sourceLocation),
+                                      sourceLocation: sourceLocation)
     }
 
-    let spec: Instruction.Spec?
-    let microcode: MicroCode?
-    let sourceLocation: Gameboy.Cartridge.Location
+    var loaded: LoadedInstruction? = nil
     var cycle: Int = 0
+
+    public func sourceAddressAndBank() -> (address: LR35902.Address, bank: LR35902.Bank)? {
+      guard let sourceLocation = loaded?.sourceLocation else {
+        return nil
+      }
+      return Gameboy.Cartridge.addressAndBank(from: sourceLocation)
+    }
   }
   /** The machine instruction represents the CPU's understanding of its current instruction. */
-  var machineInstruction = MachineInstruction()
+  public var machineInstruction = MachineInstruction()
 
   /** Initializes the state with boot values. */
   public init() {}

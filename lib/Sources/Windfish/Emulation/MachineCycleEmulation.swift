@@ -1,7 +1,7 @@
 import Foundation
 
 extension LR35902.InstructionSet {
-  static func microcode(for spec: LR35902.Instruction.Spec) -> LR35902.MachineInstruction.MicroCode {
+  static func microcode(for spec: LR35902.Instruction.Spec, sourceLocation: Gameboy.Cartridge.Location) -> LR35902.MachineInstruction.MicroCode {
     let registers8 = LR35902.Instruction.Numeric.registers8
     let registers16 = LR35902.Instruction.Numeric.registers16
     let registersAddr = LR35902.Instruction.Numeric.registersAddr
@@ -56,7 +56,7 @@ extension LR35902.InstructionSet {
           return .continueExecution
         }
         cpu[dst] = immediate
-        cpu.registerTraces[dst] = .init(sourceLocation: cpu.machineInstruction.sourceLocation)
+        cpu.registerTraces[dst] = .init(sourceLocation: sourceLocation)
         return .fetchNext
       }
 
@@ -68,7 +68,7 @@ extension LR35902.InstructionSet {
         if cycle == 1 {
           let address = cpu[src] as UInt16
           value = UInt8(memory.read(from: address))
-          cpu.registerTraces[dst] = .init(sourceLocation: cpu.machineInstruction.sourceLocation, loadAddress: address)
+          cpu.registerTraces[dst] = .init(sourceLocation: sourceLocation, loadAddress: address)
           return .continueExecution
         }
         cpu[dst] = value
@@ -121,7 +121,7 @@ extension LR35902.InstructionSet {
           return .continueExecution
         }
         cpu.a = value
-        cpu.registerTraces[.a] = .init(sourceLocation: cpu.machineInstruction.sourceLocation, loadAddress: immediate)
+        cpu.registerTraces[.a] = .init(sourceLocation: sourceLocation, loadAddress: immediate)
         return .fetchNext
       }
 
@@ -153,7 +153,7 @@ extension LR35902.InstructionSet {
         if cycle == 1 {
           let address = UInt16(0xFF00) | UInt16(cpu.c)
           value = memory.read(from: address)
-          cpu.registerTraces[.a] = .init(sourceLocation: cpu.machineInstruction.sourceLocation, loadAddress: address)
+          cpu.registerTraces[.a] = .init(sourceLocation: sourceLocation, loadAddress: address)
           return .continueExecution
         }
         cpu.a = value
@@ -184,7 +184,7 @@ extension LR35902.InstructionSet {
         if cycle == 2 {
           let address = UInt16(0xFF00) | UInt16(immediate)
           value = memory.read(from: address)
-          cpu.registerTraces[.a] = .init(sourceLocation: cpu.machineInstruction.sourceLocation, loadAddress: address)
+          cpu.registerTraces[.a] = .init(sourceLocation: sourceLocation, loadAddress: address)
           return .continueExecution
         }
         cpu.a = value
@@ -213,7 +213,7 @@ extension LR35902.InstructionSet {
       return { (cpu, memory, cycle) in
         if cycle == 1 {
           cpu.a = memory.read(from: cpu.hl)
-          cpu.registerTraces[.a] = .init(sourceLocation: cpu.machineInstruction.sourceLocation, loadAddress: cpu.hl)
+          cpu.registerTraces[.a] = .init(sourceLocation: sourceLocation, loadAddress: cpu.hl)
           return .continueExecution
         }
         cpu.hl -= 1
@@ -236,7 +236,7 @@ extension LR35902.InstructionSet {
       return { (cpu, memory, cycle) in
         if cycle == 1 {
           cpu.a = memory.read(from: cpu.hl)
-          cpu.registerTraces[.a] = .init(sourceLocation: cpu.machineInstruction.sourceLocation, loadAddress: cpu.hl)
+          cpu.registerTraces[.a] = .init(sourceLocation: sourceLocation, loadAddress: cpu.hl)
           return .continueExecution
         }
         cpu.hl += 1
@@ -271,7 +271,7 @@ extension LR35902.InstructionSet {
 
         cpu[dst] = immediate
         cpu.registerTraces[dst] = .init(
-          sourceLocation: cpu.machineInstruction.sourceLocation,
+          sourceLocation: sourceLocation,
           loadAddress: immediate
         )
         return .fetchNext
@@ -338,7 +338,7 @@ extension LR35902.InstructionSet {
       return { (cpu, memory, cycle) in
         if cycle == 1 {
           cpu.registerTraces[dst] = .init(
-            sourceLocation: cpu.machineInstruction.sourceLocation,
+            sourceLocation: sourceLocation,
             loadAddress: cpu.sp
           )
 
@@ -492,7 +492,7 @@ extension LR35902 {
     var mutation = self
 
     let nextAction: MachineInstruction.MicroCodeResult
-    if let microcode = machineInstruction.microcode {
+    if let microcode = machineInstruction.loaded?.microcode {
       mutation.machineInstruction.cycle += 1
       nextAction = microcode(&mutation, &memory, mutation.machineInstruction.cycle)
     } else {
@@ -506,7 +506,7 @@ extension LR35902 {
       let tableIndex = Int(memory.read(from: mutation.pc))
       mutation.pc += 1
       let loadedSpec: Instruction.Spec
-      if let spec = mutation.machineInstruction.spec,
+      if let spec = mutation.machineInstruction.loaded?.spec,
           let prefixTable = InstructionSet.prefixTables[spec] {
         loadedSpec = prefixTable[tableIndex]
       } else {
