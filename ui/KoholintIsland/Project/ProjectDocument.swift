@@ -193,18 +193,22 @@ class ProjectDocument: NSDocument {
   weak var contentViewController: ProjectViewController?
 
   var isDisassembling = false
-  var romData: Data?
+  var romData: Data? {
+    didSet {
+      if let romData = romData {
+        gameboy.load(cartridge: .init(data: romData))
+        gameboy.cpu.pc = 0x100  // Assume the boot sequence has concluded.
+      } else {
+        preconditionFailure()
+      }
+    }
+  }
   @objc dynamic var disassemblyResults: DisassemblyResults?
   var metadata: ProjectMetadata?
   var configuration = ProjectConfiguration()
-  var memory = Gameboy.Memory()
-  var cpuState: LR35902 = {
-    var state = LR35902(a: 0x01, b: 0x00, c: 0x13, d: 0x00, e: 0xD8, h: 0x01, l: 0x4D, sp: 0xFFFE, pc: 0x100, bank: 0x00)
-    state.f = 0xB0
-    return state
-  }() {
+  var gameboy = Gameboy() {
     didSet {
-      if oldValue.pc != cpuState.pc || oldValue.bank != cpuState.bank {
+      if oldValue.cpu.pc != gameboy.cpu.pc || oldValue.cpu.bank != gameboy.cpu.bank {
         NotificationCenter.default.post(name: .didChangeEmulationLocation, object: self)
       }
     }

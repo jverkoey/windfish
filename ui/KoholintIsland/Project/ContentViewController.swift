@@ -164,7 +164,7 @@ final class ContentViewController: NSViewController {
       .sink(receiveValue: { notification in
         self.refreshBank()
         self.refreshFileContents()
-        textView.emulationLine = self.document.disassemblyResults?.lineFor(address: self.document.cpuState.pc, bank: self.document.cpuState.bank)
+        textView.emulationLine = self.document.disassemblyResults?.lineFor(address: self.document.gameboy.cpu.pc, bank: self.document.gameboy.cpu.bank)
       })
 
     didProcessEditingSubscriber = NotificationCenter.default.publisher(for: NSTextStorage.didProcessEditingNotification)

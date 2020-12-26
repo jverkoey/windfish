@@ -43,7 +43,7 @@ nop
     XCTAssertEqual(mutated.cpu.registerTraces, [:])
   }
 
-  func test_ld_r_r() {
+  func test_ld_r_r() throws {
     // Given
     let registers8 = LR35902.Instruction.Numeric.registers8
     let specs = LR35902.InstructionSet.table.filter { spec in
@@ -91,11 +91,12 @@ nop
       gameboy = mutated
     }
 
-    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(gameboy.cartridge.size)).map { $0 })
+    let cartridge = try XCTUnwrap(gameboy.cartridge)
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(cartridge.size)).map { $0 })
     XCTAssertEqual(testMemory.writes, [])
   }
 
-  func test_ld_r_n() {
+  func test_ld_r_n() throws {
     // Given
     let registers8 = LR35902.Instruction.Numeric.registers8
     let specs = LR35902.InstructionSet.table.filter { spec in
@@ -141,11 +142,12 @@ nop
       gameboy = mutated
     }
 
-    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(gameboy.cartridge.size)).map { $0 })
+    let cartridge = try XCTUnwrap(gameboy.cartridge)
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(cartridge.size)).map { $0 })
     XCTAssertEqual(testMemory.writes, [])
   }
 
-  func test_ld_r_rraddr() {
+  func test_ld_r_rraddr() throws {
     // Given
     let registers8 = LR35902.Instruction.Numeric.registers8
     let registersAddr = LR35902.Instruction.Numeric.registersAddr
@@ -195,7 +197,8 @@ nop
       gameboy = mutated
     }
 
-    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(gameboy.cartridge.size)).reduce(into: [], { acc, addr in
+    let cartridge = try XCTUnwrap(gameboy.cartridge)
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(cartridge.size)).reduce(into: [], { acc, addr in
       acc.append(addr)
       if addr < specs.count {
         acc.append(0xFF80)
@@ -204,7 +207,7 @@ nop
     XCTAssertEqual(testMemory.writes, [])
   }
 
-  func test_ld_rraddr_r() {
+  func test_ld_rraddr_r() throws {
     // Given
     let registers8 = LR35902.Instruction.Numeric.registers8
     let registersAddr = LR35902.Instruction.Numeric.registersAddr
@@ -255,7 +258,8 @@ nop
       gameboy = mutated
     }
 
-    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(gameboy.cartridge.size)).map { $0 })
+    let cartridge = try XCTUnwrap(gameboy.cartridge)
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(cartridge.size)).map { $0 })
     XCTAssertEqual(testMemory.writes, specs.map {
       switch $0 {
       case .ld(let dst, let src) where registersAddr.contains(dst) && registers8.contains(src):
@@ -272,7 +276,7 @@ nop
     })
   }
 
-  func test_ld_rraddr_n() {
+  func test_ld_rraddr_n() throws {
     // Given
     let registersAddr = LR35902.Instruction.Numeric.registersAddr
     let specs = LR35902.InstructionSet.table.filter { spec in
@@ -321,7 +325,8 @@ nop
       gameboy = mutated
     }
 
-    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(gameboy.cartridge.size)).map { $0 })
+    let cartridge = try XCTUnwrap(gameboy.cartridge)
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(cartridge.size)).map { $0 })
     XCTAssertEqual(testMemory.writes, specs.map { _ in
       return .init(byte: 0x12, address: 0xFF80)
     })
@@ -772,7 +777,7 @@ nop
     XCTAssertEqual(testMemory.writes, [.init(byte: 0x12, address: 0xFF80)])
   }
 
-  func test_ld_rr_nn() {
+  func test_ld_rr_nn() throws {
     // Given
     let registers16 = LR35902.Instruction.Numeric.registers16
     let specs = LR35902.InstructionSet.table.filter { spec in
@@ -818,11 +823,12 @@ nop
       gameboy = mutated
     }
 
-    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(gameboy.cartridge.size)).map { $0 })
+    let cartridge = try XCTUnwrap(gameboy.cartridge)
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(cartridge.size)).map { $0 })
     XCTAssertEqual(testMemory.writes, [])
   }
 
-  func test_ld_imm16add_sp() {
+  func test_ld_imm16add_sp() throws {
     // Given
     let specs = LR35902.InstructionSet.table.filter { spec in
       switch spec {
@@ -855,14 +861,15 @@ nop
       gameboy = mutated
     }
 
-    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(gameboy.cartridge.size)).map { $0 })
+    let cartridge = try XCTUnwrap(gameboy.cartridge)
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(cartridge.size)).map { $0 })
     XCTAssertEqual(testMemory.writes, [
       .init(byte: 0x34, address: 0xFF80),
       .init(byte: 0x12, address: 0xFF81),
     ])
   }
 
-  func test_ld_sp_hl() {
+  func test_ld_sp_hl() throws {
     // Given
     let specs = LR35902.InstructionSet.table.filter { spec in
       switch spec {
@@ -897,11 +904,12 @@ nop
       gameboy = mutated
     }
 
-    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(gameboy.cartridge.size)).map { $0 })
+    let cartridge = try XCTUnwrap(gameboy.cartridge)
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(cartridge.size)).map { $0 })
     XCTAssertEqual(testMemory.writes, [])
   }
 
-  func test_push_rr() {
+  func test_push_rr() throws {
     // Given
     let registers16 = LR35902.Instruction.Numeric.registers16
     let specs = LR35902.InstructionSet.table.filter { spec in
@@ -942,7 +950,8 @@ nop
       gameboy = mutated
     }
 
-    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(gameboy.cartridge.size)).map { $0 })
+    let cartridge = try XCTUnwrap(gameboy.cartridge)
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(cartridge.size)).map { $0 })
     var sp = UInt16(0xFFFD)
     XCTAssertEqual(testMemory.writes, specs.reduce(into: [], { accumulator, spec in
       if case .push(.af) = spec {
@@ -1090,7 +1099,7 @@ nop
     XCTAssertEqual(testMemory.writes, [])
   }
 
-  func test_jp_nn_all_false() {
+  func test_jp_nn_all_false() throws {
     // Given
     let specs = LR35902.InstructionSet.table.filter { spec in
       switch spec {
@@ -1145,7 +1154,8 @@ nop
       gameboy = mutated
     }
 
-    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(gameboy.cartridge.size)).map { $0 })
+    let cartridge = try XCTUnwrap(gameboy.cartridge)
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(cartridge.size)).map { $0 })
     XCTAssertEqual(testMemory.writes, [])
   }
 
@@ -1253,7 +1263,7 @@ nop
     XCTAssertEqual(testMemory.writes, [])
   }
 
-  func test_jr_n_all_false() {
+  func test_jr_n_all_false() throws {
     // Given
     let specs = LR35902.InstructionSet.table.filter { spec in
       switch spec {
@@ -1308,7 +1318,8 @@ nop
       gameboy = mutated
     }
 
-    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(gameboy.cartridge.size)).map { $0 })
+    let cartridge = try XCTUnwrap(gameboy.cartridge)
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(cartridge.size)).map { $0 })
     XCTAssertEqual(testMemory.writes, [])
   }
 
@@ -1392,7 +1403,7 @@ nop
     ])
   }
 
-  func test_call_nn_all_false() {
+  func test_call_nn_all_false() throws {
     // Given
     let specs = LR35902.InstructionSet.table.filter { spec in
       switch spec {
@@ -1448,7 +1459,8 @@ nop
       gameboy = mutated
     }
 
-    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(gameboy.cartridge.size)).map { $0 })
+    let cartridge = try XCTUnwrap(gameboy.cartridge)
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(cartridge.size)).map { $0 })
     XCTAssertEqual(testMemory.writes, [])
   }
 
@@ -1527,7 +1539,7 @@ nop
     XCTAssertEqual(testMemory.writes, [])
   }
 
-  func test_ret_all_false() {
+  func test_ret_all_false() throws {
     // Given
     let specs = LR35902.InstructionSet.table.filter { spec in
       switch spec {
@@ -1583,7 +1595,8 @@ nop
       gameboy = mutated
     }
 
-    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(gameboy.cartridge.size)).map { $0 })
+    let cartridge = try XCTUnwrap(gameboy.cartridge)
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(cartridge.size)).map { $0 })
     XCTAssertEqual(testMemory.writes, [])
   }
 

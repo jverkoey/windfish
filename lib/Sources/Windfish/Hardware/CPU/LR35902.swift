@@ -109,7 +109,7 @@ public struct LR35902 {
   public var sp: UInt16 = 0xFFFE
 
   /** Program counter. */
-  public var pc: Address = 0x100
+  public var pc: Address = 0x0000
 
   /** Selected bank. */
   public var bank: Bank = 0x00

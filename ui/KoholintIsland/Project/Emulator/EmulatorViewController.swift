@@ -186,7 +186,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
     programCounterTextField.translatesAutoresizingMaskIntoConstraints = false
     programCounterTextField.formatter = LR35902AddressFormatter()
-    programCounterTextField.stringValue = programCounterTextField.formatter!.string(for: document.cpuState.pc)!
+    programCounterTextField.stringValue = programCounterTextField.formatter!.string(for: document.gameboy.cpu.pc)!
     programCounterTextField.identifier = .programCounter
     programCounterTextField.delegate = self
     view.addSubview(programCounterTextField)
@@ -200,7 +200,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     let bankTextField = NSTextField()
     bankTextField.translatesAutoresizingMaskIntoConstraints = false
     bankTextField.formatter = UInt8HexFormatter()
-    bankTextField.stringValue = programCounterTextField.formatter!.string(for: document.cpuState.bank)!
+    bankTextField.stringValue = programCounterTextField.formatter!.string(for: document.gameboy.cpu.bank)!
     bankTextField.identifier = .bank
     bankTextField.delegate = self
     view.addSubview(bankTextField)
@@ -305,7 +305,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
         } else {
           registerValue = 0
         }
-        self.document.cpuState[register.register] = registerValue
+        self.document.gameboy.cpu[register.register] = registerValue
 
       } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
         let registerValue: UInt16
@@ -315,7 +315,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
         } else {
           registerValue = 0
         }
-        self.document.cpuState[register.register] = registerValue
+        self.document.gameboy.cpu[register.register] = registerValue
       }
     }
     for register in registers {
@@ -415,11 +415,11 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
       // TODO: Step into and through any control flow.
 
-      var memory: AddressableMemory = document.memory
-      document.cpuState = document.cpuState.emulate(instruction: instruction, memory: &memory, followControlFlow: true)
-      document.memory = memory as! Gameboy.Memory
+      var memory: AddressableMemory = document.gameboy.memory
+      document.gameboy.cpu = document.gameboy.cpu.emulate(instruction: instruction, memory: &memory, followControlFlow: true)
+      document.gameboy.memory = memory as! Gameboy.Memory
 
-      programCounterTextField.objectValue = document.cpuState.pc
+      programCounterTextField.objectValue = document.gameboy.cpu.pc
       updateInstructionAssembly()
       updateRegisters()
       updateRAM()
@@ -427,7 +427,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       // TODO: Only allow this if the instruction causes a transfer of control flow.
 
     } else if sender.selectedSegment == 2 {  // Clear
-      var state = document.cpuState
+      var state = document.gameboy.cpu
       for register in LR35902.Instruction.Numeric.registers8 {
         state.clear(register)
       }
@@ -435,7 +435,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
         state.clear(register)
       }
       // TODO: Reset RAM.
-      document.cpuState = state
+      document.gameboy.cpu = state
 
       updateRegisters()
       updateRAM()
@@ -451,9 +451,9 @@ extension EmulatorViewController: NSTextFieldDelegate {
     }
     switch identifier {
     case .bank:
-      document.cpuState.bank = textField.objectValue as! LR35902.Bank
+      document.gameboy.cpu.bank = textField.objectValue as! LR35902.Bank
     case .programCounter:
-      document.cpuState.pc = textField.objectValue as! LR35902.Address
+      document.gameboy.cpu.pc = textField.objectValue as! LR35902.Address
     default:
       preconditionFailure()
     }
@@ -462,7 +462,7 @@ extension EmulatorViewController: NSTextFieldDelegate {
   }
 
   private func currentInstruction() -> LR35902.Instruction? {
-    return document.disassemblyResults?.disassembly?.instruction(at: document.cpuState.pc, in: document.cpuState.bank)
+    return document.disassemblyResults?.disassembly?.instruction(at: document.gameboy.cpu.pc, in: document.gameboy.cpu.bank)
   }
 
   private func updateInstructionAssembly() {
@@ -476,8 +476,8 @@ extension EmulatorViewController: NSTextFieldDelegate {
     }
 
     let context = RGBDSDisassembler.Context(
-      address: document.cpuState.pc,
-      bank: document.cpuState.bank,
+      address: document.gameboy.cpu.pc,
+      bank: document.gameboy.cpu.bank,
       disassembly: disassembly,
       argumentString: nil
     )
@@ -495,10 +495,10 @@ extension EmulatorViewController: NSTextFieldDelegate {
 
     for register in cpuController.arrangedObjects as! [CPURegister] {
       if LR35902.Instruction.Numeric.registers8.contains(register.register) {
-        let value = self.document.cpuState[register.register] as UInt8
+        let value = self.document.gameboy.cpu[register.register] as UInt8
         register.value = value.stringWithRepresentation(register.valueRepresentation)
 
-        let trace = self.document.cpuState.registerTraces[register.register]
+        let trace = self.document.gameboy.cpu.registerTraces[register.register]
         register.sourceLocation = trace?.sourceLocation?.stringWithAddressAndBank()
         register.variableAddress = trace?.loadAddress ?? 0
         if let loadAddress = trace?.loadAddress {
@@ -508,10 +508,10 @@ extension EmulatorViewController: NSTextFieldDelegate {
         }
 
       } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
-        let value = self.document.cpuState[register.register] as UInt16
+        let value = self.document.gameboy.cpu[register.register] as UInt16
         register.value = value.stringWithRepresentation(register.valueRepresentation)
 
-        let trace = self.document.cpuState.registerTraces[register.register]
+        let trace = self.document.gameboy.cpu.registerTraces[register.register]
         register.sourceLocation = trace?.sourceLocation?.stringWithAddressAndBank()
         register.variableAddress = trace?.loadAddress ?? 0
         if let loadAddress = trace?.loadAddress {

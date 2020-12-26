@@ -168,9 +168,9 @@ final class ProjectViewController: NSViewController {
     didChangeEmulationLocationSubscriber = NotificationCenter.default.publisher(for: .didChangeEmulationLocation, object: document)
       .receive(on: RunLoop.main)
       .sink(receiveValue: { notification in
-        self.contentViewController.textView?.emulationLine = self.document.disassemblyResults?.lineFor(address: self.document.cpuState.pc, bank: self.document.cpuState.bank)
+        self.contentViewController.textView?.emulationLine = self.document.disassemblyResults?.lineFor(address: self.document.gameboy.cpu.pc, bank: self.document.gameboy.cpu.bank)
 
-        self.jumpTo(address: self.document.cpuState.pc, bank: self.document.cpuState.bank)
+        self.jumpTo(address: self.document.gameboy.cpu.pc, bank: self.document.gameboy.cpu.bank)
       })
 
     if document.isDisassembling {
