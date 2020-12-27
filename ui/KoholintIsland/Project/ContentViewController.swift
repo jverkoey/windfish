@@ -164,7 +164,9 @@ final class ContentViewController: NSViewController {
       .sink(receiveValue: { notification in
         self.refreshBank()
         self.refreshFileContents()
-        textView.emulationLine = self.document.disassemblyResults?.lineFor(address: self.document.gameboy.cpu.pc, bank: self.document.gameboy.cpu.bank)
+        if let cartridge = self.document.gameboy.cartridge {
+          textView.emulationLine = self.document.disassemblyResults?.lineFor(address: self.document.gameboy.cpu.pc, bank: cartridge.selectedBank)
+        }
       })
 
     didProcessEditingSubscriber = NotificationCenter.default.publisher(for: NSTextStorage.didProcessEditingNotification)

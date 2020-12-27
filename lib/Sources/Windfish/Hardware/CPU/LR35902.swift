@@ -117,9 +117,6 @@ public struct LR35902 {
   /** Program counter. */
   public var pc: Address = 0x0000
 
-  /** Selected bank. */
-  public var bank: Bank = 0x00
-
   /** Trace information for a given register. */
   public var registerTraces: [LR35902.Instruction.Numeric: RegisterTrace] = [:]
 
@@ -161,7 +158,7 @@ public struct LR35902 {
   public init() {}
 
   /** Initializes the state with specific values. */
-  public init(a: UInt8 = 0, b: UInt8 = 0, c: UInt8 = 0, d: UInt8 = 0, e: UInt8 = 0, h: UInt8 = 0, l: UInt8 = 0, fzero: Bool = false, fsubtract: Bool = false, fhalfcarry: Bool = false, fcarry: Bool = false, sp: UInt16 = 0, pc: LR35902.Address = 0, bank: LR35902.Bank = 0, registerTraces: [LR35902.Instruction.Numeric : LR35902.RegisterTrace] = [:]) {
+  public init(a: UInt8 = 0, b: UInt8 = 0, c: UInt8 = 0, d: UInt8 = 0, e: UInt8 = 0, h: UInt8 = 0, l: UInt8 = 0, fzero: Bool = false, fsubtract: Bool = false, fhalfcarry: Bool = false, fcarry: Bool = false, sp: UInt16 = 0, pc: LR35902.Address = 0, registerTraces: [LR35902.Instruction.Numeric : LR35902.RegisterTrace] = [:]) {
     self.a = a
     self.b = b
     self.c = c
@@ -175,12 +172,11 @@ public struct LR35902 {
     self.fcarry = fcarry
     self.sp = sp
     self.pc = pc
-    self.bank = bank
     self.registerTraces = registerTraces
   }
 
   public static func zeroed() -> LR35902 {
-    return LR35902(a: 0, b: 0, c: 0, d: 0, e: 0, h: 0, l: 0, fzero: false, fsubtract: false, fhalfcarry: false, fcarry: false, sp: 0, pc: 0, bank: 0, registerTraces: [:])
+    return LR35902(a: 0, b: 0, c: 0, d: 0, e: 0, h: 0, l: 0, fzero: false, fsubtract: false, fhalfcarry: false, fcarry: false, sp: 0, pc: 0, registerTraces: [:])
   }
 }
 

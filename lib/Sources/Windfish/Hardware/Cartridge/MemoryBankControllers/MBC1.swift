@@ -2,7 +2,7 @@ import Foundation
 
 extension Gameboy.Cartridge {
   /** Implementation of the MBC1 memory bank controller. */
-  struct MBC1: AddressableMemory {
+  struct MBC1: MemoryBankController {
     public var addressableRanges: [ClosedRange<LR35902.Address>] = [
       0x0000...0x7FFF
     ]
@@ -56,7 +56,11 @@ extension Gameboy.Cartridge {
       fatalError("Invalid write address provided to the cartridge: \(address).")
     }
 
-    private var selectedBank: LR35902.Bank = 0
+    public func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
+      return .cartridge(Gameboy.Cartridge.location(for: address, in: (selectedBank == 0) ? 1 : selectedBank)!)
+    }
+
+    public private(set) var selectedBank: LR35902.Bank = 0
     private let data: Data
   }
 }

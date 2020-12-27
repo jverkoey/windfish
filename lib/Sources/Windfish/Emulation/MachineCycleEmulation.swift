@@ -646,7 +646,7 @@ extension LR35902 {
     // The LR35902's fetch/execute overlap behavior means we load the next opcode on the same machine cycle as the
     // last instruction's microcode execution.
     if nextAction == .fetchNext {
-      var sourceLocation = Disassembler.sourceLocation(for: mutation.pc, in: mutation.bank)
+      var sourceLocation = memory.sourceLocation(from: mutation.pc)
       let tableIndex = Int(memory.read(from: mutation.pc))
       mutation.pc += 1
       let loadedSpec: Instruction.Spec

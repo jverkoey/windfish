@@ -11,6 +11,10 @@ public struct TracerMemory: AddressableMemory {
 
   public mutating func write(_ byte: UInt8, to address: LR35902.Address) {
   }
+
+  public func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
+    return .memory(address)
+  }
 }
 
 extension Disassembler {
@@ -38,20 +42,22 @@ extension Disassembler {
   -> [Gameboy.Cartridge.Location: LR35902] {
     var state = initialState
 
-    (state.pc, state.bank) = Gameboy.Cartridge.addressAndBank(from: range.lowerBound)
+    let addressAndBank = Gameboy.Cartridge.addressAndBank(from: range.lowerBound)
+    state.pc = addressAndBank.address
+    let bank = addressAndBank.bank
     let upperBoundPc = Gameboy.Cartridge.addressAndBank(from: range.upperBound).address
 
     // TODO: Store this globally.
     var states: [Gameboy.Cartridge.Location: LR35902] = [:]
 
     while state.pc < upperBoundPc {
-      guard let instruction = self.instruction(at: state.pc, in: state.bank) else {
+      guard let instruction = self.instruction(at: state.pc, in: bank) else {
         state.pc += 1
         continue
       }
 
       var memory: AddressableMemory = TracerMemory()
-      let location = Gameboy.Cartridge.location(for: state.pc, in: state.bank)!
+      let location = Gameboy.Cartridge.location(for: state.pc, in: bank)!
       let postState = state.emulate(instruction: instruction, memory: &memory)
       step?(instruction, location, postState)
       states[location] = postState

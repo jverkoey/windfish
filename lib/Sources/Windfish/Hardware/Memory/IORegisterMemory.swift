@@ -84,4 +84,8 @@ public struct IORegisterMemory: AddressableMemory {
     precondition(values[ioAddress] != nil, "Writing to invalid register.")
     values[ioAddress] = byte
   }
+
+  public func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
+    return .memory(address)
+  }
 }

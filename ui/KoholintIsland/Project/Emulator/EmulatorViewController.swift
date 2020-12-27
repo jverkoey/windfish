@@ -247,7 +247,10 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     let bankTextField = NSTextField()
     bankTextField.translatesAutoresizingMaskIntoConstraints = false
     bankTextField.formatter = UInt8HexFormatter()
-    bankTextField.stringValue = programCounterTextField.formatter!.string(for: document.gameboy.cpu.bank)!
+    if let cartridge = self.document.gameboy.cartridge {
+      bankTextField.stringValue = programCounterTextField.formatter!.string(for: cartridge.selectedBank)!
+    }
+    bankTextField.isEditable = false
     bankTextField.identifier = .bank
     bankTextField.font = monospacedFont
     bankTextField.delegate = self
@@ -509,8 +512,6 @@ extension EmulatorViewController: NSTextFieldDelegate {
       preconditionFailure()
     }
     switch identifier {
-    case .bank:
-      document.gameboy.cpu.bank = textField.objectValue as! LR35902.Bank
     case .programCounter:
       document.gameboy.cpu.pc = textField.objectValue as! LR35902.Address
     default:
@@ -526,7 +527,10 @@ extension EmulatorViewController: NSTextFieldDelegate {
       // pc + bank as the CPU may have already incremented the pc as a result of reading the instruction's opcode.
       return document.disassemblyResults?.disassembly?.instruction(at: addressAndBank.address, in: addressAndBank.bank)
     }
-    return document.disassemblyResults?.disassembly?.instruction(at: document.gameboy.cpu.pc, in: document.gameboy.cpu.bank)
+    if let cartridge = document.gameboy.cartridge {
+      return document.disassemblyResults?.disassembly?.instruction(at: document.gameboy.cpu.pc, in: cartridge.selectedBank)
+    }
+    return nil
   }
 
   private func updateInstructionAssembly() {
@@ -539,17 +543,19 @@ extension EmulatorViewController: NSTextFieldDelegate {
       return
     }
 
-    let context = RGBDSDisassembler.Context(
-      address: document.gameboy.cpu.pc,
-      bank: document.gameboy.cpu.bank,
-      disassembly: disassembly,
-      argumentString: nil
-    )
-    let statement = RGBDSDisassembler.statement(for: instruction, with: context)
-    instructionAssemblyLabel.stringValue = statement.formattedString
+    if let cartridge = document.gameboy.cartridge {
+      let context = RGBDSDisassembler.Context(
+        address: document.gameboy.cpu.pc,
+        bank: cartridge.selectedBank,
+        disassembly: disassembly,
+        argumentString: nil
+      )
+      let statement = RGBDSDisassembler.statement(for: instruction, with: context)
+      instructionAssemblyLabel.stringValue = statement.formattedString
 
-    let bytes = LR35902.InstructionSet.opcodeBytes[instruction.spec]! + [UInt8](instruction.immediate?.asData() ?? Data())
-    instructionBytesLabel.stringValue = bytes.map { "0x" + $0.hexString }.joined(separator: " ")
+      let bytes = LR35902.InstructionSet.opcodeBytes[instruction.spec]! + [UInt8](instruction.immediate?.asData() ?? Data())
+      instructionBytesLabel.stringValue = bytes.map { "0x" + $0.hexString }.joined(separator: " ")
+    }
   }
 
   func updateRegisters() {

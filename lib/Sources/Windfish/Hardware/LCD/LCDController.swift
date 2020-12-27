@@ -237,4 +237,8 @@ extension LCDController: AddressableMemory {
       values[lcdAddress] = byte
     }
   }
+
+  public func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
+    return .memory(address)
+  }
 }

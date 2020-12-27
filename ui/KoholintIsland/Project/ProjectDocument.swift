@@ -208,7 +208,7 @@ class ProjectDocument: NSDocument {
   var configuration = ProjectConfiguration()
   var gameboy = Gameboy() {
     didSet {
-      if oldValue.cpu.pc != gameboy.cpu.pc || oldValue.cpu.bank != gameboy.cpu.bank {
+      if oldValue.cpu.pc != gameboy.cpu.pc || oldValue.cartridge?.selectedBank != gameboy.cartridge?.selectedBank {
         NotificationCenter.default.post(name: .didChangeEmulationLocation, object: self)
       }
       if oldValue.cpu.f != gameboy.cpu.f {

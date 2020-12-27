@@ -15,4 +15,8 @@ public struct GenericRAM: AddressableMemory {
   public mutating func write(_ byte: UInt8, to address: LR35902.Address) {
     data[address] = byte
   }
+
+  public func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
+    return .memory(address)
+  }
 }

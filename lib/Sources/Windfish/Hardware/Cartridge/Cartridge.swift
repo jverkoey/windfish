@@ -1,5 +1,9 @@
 import Foundation
 
+protocol MemoryBankController: AddressableMemory {
+  var selectedBank: LR35902.Bank { get }
+}
+
 extension Gameboy {
   /** A representation of a Gameboy cartridge as addressable memory at a given moment. */
   public struct Cartridge: AddressableMemory {
@@ -26,6 +30,9 @@ extension Gameboy {
     /** The total number of banks in this cartridge. */
     public let numberOfBanks: LR35902.Bank
     public let size: Length
+    public var selectedBank: LR35902.Bank {
+      return memoryBankController.selectedBank
+    }
 
     // MARK: - AddressableMemory
 
@@ -37,7 +44,11 @@ extension Gameboy {
       memoryBankController.write(byte, to: address)
     }
 
-    private var memoryBankController: AddressableMemory
+    public func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
+      return memoryBankController.sourceLocation(from: address)
+    }
+
+    private var memoryBankController: MemoryBankController
   }
 }
 

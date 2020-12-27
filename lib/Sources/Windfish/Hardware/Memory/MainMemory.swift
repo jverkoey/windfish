@@ -40,6 +40,13 @@ extension Gameboy {
       fatalError("No region mapped to this address.")
     }
 
+    public func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
+      if let memory = mappedRegions.first(where: { range, _ in range.contains(address) })?.value {
+        return memory.sourceLocation(from: address)
+      }
+      fatalError("No region mapped to this address.")
+    }
+
     // MARK: - Mapping regions of memory
 
     private var mappedRegions: [ClosedRange<LR35902.Address>: AddressableMemory] = [:]

@@ -173,10 +173,11 @@ final class ProjectViewController: NSViewController {
                                                                                                          bank: addressAndBank.bank)
 
           self.jumpTo(address: addressAndBank.address, bank: addressAndBank.bank)
-        } else {
-          self.contentViewController.textView?.emulationLine = self.document.disassemblyResults?.lineFor(address: self.document.gameboy.cpu.pc, bank: self.document.gameboy.cpu.bank)
+        } else if let cartridge = self.document.gameboy.cartridge {
+          self.contentViewController.textView?.emulationLine = self.document.disassemblyResults?.lineFor(address: self.document.gameboy.cpu.pc,
+                                                                                                         bank: cartridge.selectedBank)
 
-          self.jumpTo(address: self.document.gameboy.cpu.pc, bank: self.document.gameboy.cpu.bank)
+          self.jumpTo(address: self.document.gameboy.cpu.pc, bank: cartridge.selectedBank)
         }
       })
 

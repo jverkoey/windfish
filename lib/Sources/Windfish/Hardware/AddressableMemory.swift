@@ -10,4 +10,7 @@ public protocol AddressableMemory {
 
   /** Write a byte to the given address. */
   mutating func write(_ byte: UInt8, to address: LR35902.Address)
+
+  /** Returns a source code location for the given address based on the current memory configuration. */
+  func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation
 }

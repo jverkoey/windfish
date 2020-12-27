@@ -43,4 +43,8 @@ public struct OAM: AddressableMemory {
     }
     oams[oamIndex] = oam
   }
+
+  public func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
+    return .memory(address)
+  }
 }
