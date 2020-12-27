@@ -13,32 +13,11 @@ extension LR35902.InstructionSet {
 
     let evaluateConditional: (LR35902.Instruction.Condition?, LR35902) -> LR35902.MachineInstruction.MicroCodeResult = { cnd, cpu in
       switch cnd {
-      case .none:
-        return .continueExecution
-      case .some(.c):
-        if cpu.fcarry {
-          return .continueExecution
-        } else {
-          return .fetchNext
-        }
-      case .some(.nc):
-        if !cpu.fcarry {
-          return .continueExecution
-        } else {
-          return .fetchNext
-        }
-      case .some(.z):
-        if cpu.fzero {
-          return .continueExecution
-        } else {
-          return .fetchNext
-        }
-      case .some(.nz):
-        if !cpu.fzero {
-          return .continueExecution
-        } else {
-          return .fetchNext
-        }
+      case .none:      return .continueExecution
+      case .some(.c):  return  cpu.fcarry ? .continueExecution : .fetchNext
+      case .some(.nc): return !cpu.fcarry ? .continueExecution : .fetchNext
+      case .some(.z):  return  cpu.fzero ? .continueExecution : .fetchNext
+      case .some(.nz): return !cpu.fzero ? .continueExecution : .fetchNext
       }
     }
 
