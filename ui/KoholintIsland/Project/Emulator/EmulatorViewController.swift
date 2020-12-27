@@ -339,15 +339,19 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     } else if sender.selectedSegment == 1 {  // Step into
       running = !running
       if running {
+        instructionAssemblyLabel.stringValue = "Running..."
+        instructionBytesLabel.stringValue = "Running..."
         DispatchQueue.global(qos: .userInteractive).async {
           while self.running {
             self.document.gameboy = self.document.gameboy.advanceInstruction()
 
             DispatchQueue.main.sync {
-              self.updateInstructionAssembly()
               self.updateRegisters()
               self.updateRAM()
             }
+          }
+          DispatchQueue.main.sync {
+            self.updateInstructionAssembly()
           }
         }
       }
