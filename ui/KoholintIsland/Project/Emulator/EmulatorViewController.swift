@@ -126,9 +126,15 @@ private final class RAMValue: NSObject {
   @objc dynamic var variableAddress: LR35902.Address
 }
 
+protocol EmulatorViewControllerDelegate: NSObject {
+  func emulatorViewControllerDidStepIn(_ emulatorViewController: EmulatorViewController)
+}
+
 final class EmulatorViewController: NSViewController, TabSelectable {
   let deselectedTabImage = NSImage(systemSymbolName: "cpu", accessibilityDescription: nil)!
   let selectedTabImage = NSImage(systemSymbolName: "cpu", accessibilityDescription: nil)!
+
+  weak var delegate: EmulatorViewControllerDelegate?
 
   let document: ProjectDocument
   let ramController = NSArrayController()
@@ -327,6 +333,9 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       updateInstructionAssembly()
       updateRegisters()
       updateRAM()
+
+      delegate?.emulatorViewControllerDidStepIn(self)
+
     } else if sender.selectedSegment == 1 {  // Step into
       running = !running
       if running {

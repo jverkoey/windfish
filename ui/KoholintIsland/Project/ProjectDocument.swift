@@ -206,13 +206,7 @@ class ProjectDocument: NSDocument {
   @objc dynamic var disassemblyResults: DisassemblyResults?
   var metadata: ProjectMetadata?
   var configuration = ProjectConfiguration()
-  var gameboy = Gameboy() {
-    didSet {
-      if oldValue.cpu.pc != gameboy.cpu.pc || oldValue.cartridge?.selectedBank != gameboy.cartridge?.selectedBank {
-        NotificationCenter.default.post(name: .didChangeEmulationLocation, object: self)
-      }
-    }
-  }
+  var gameboy = Gameboy()
 
   override init() {
     super.init()

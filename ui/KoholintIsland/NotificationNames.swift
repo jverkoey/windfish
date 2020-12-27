@@ -11,5 +11,4 @@ extension Notification.Name {
   static let selectedFileDidChange = Notification.Name("selectedFileDidChange")
   static let selectedRegionDidChange = Notification.Name("selectedRegionDidChange")
   static let didCreateRegion = Notification.Name("didCreateRegion")
-  static let didChangeEmulationLocation = Notification.Name("didChangeEmulationLocation")
 }

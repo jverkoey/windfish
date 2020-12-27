@@ -9,7 +9,7 @@ import Combine
 
 import Windfish
 
-final class ProjectViewController: NSViewController {
+final class ProjectViewController: NSViewController, EmulatorViewControllerDelegate {
 
   let document: ProjectDocument
   let containerView = NSView()
@@ -26,7 +26,6 @@ final class ProjectViewController: NSViewController {
   private var selectedRegionDidChangeSubscriber: AnyCancellable?
   private var didCreateRegionSubscriber: AnyCancellable?
   private var disassembledSubscriber: AnyCancellable?
-  private var didChangeEmulationLocationSubscriber: AnyCancellable?
 
   init(document: ProjectDocument) {
     self.document = document
@@ -48,6 +47,8 @@ final class ProjectViewController: NSViewController {
     splitViewController.addSplitViewItem(trailingSidebarItem)
 
     super.init(nibName: nil, bundle: nil)
+
+    inspectorViewController.emulatorViewController.delegate = self
 
     self.addChild(self.splitViewController)
   }
@@ -165,24 +166,22 @@ final class ProjectViewController: NSViewController {
         self.statisticsView.statistics = self.document.disassemblyResults?.statistics
       })
 
-    didChangeEmulationLocationSubscriber = NotificationCenter.default.publisher(for: .didChangeEmulationLocation, object: document)
-      .receive(on: RunLoop.main)
-      .sink(receiveValue: { notification in
-        if let addressAndBank = self.document.gameboy.cpu.machineInstruction.sourceAddressAndBank() {
-          self.contentViewController.textView?.emulationLine = self.document.disassemblyResults?.lineFor(address: addressAndBank.address,
-                                                                                                         bank: addressAndBank.bank)
-
-          self.jumpTo(address: addressAndBank.address, bank: addressAndBank.bank)
-        } else if let cartridge = self.document.gameboy.cartridge {
-          self.contentViewController.textView?.emulationLine = self.document.disassemblyResults?.lineFor(address: self.document.gameboy.cpu.pc,
-                                                                                                         bank: cartridge.selectedBank)
-
-          self.jumpTo(address: self.document.gameboy.cpu.pc, bank: cartridge.selectedBank)
-        }
-      })
-
     if document.isDisassembling {
       startProgressIndicator()
+    }
+  }
+
+  func emulatorViewControllerDidStepIn(_ emulatorViewController: EmulatorViewController) {
+    if let addressAndBank = self.document.gameboy.cpu.machineInstruction.sourceAddressAndBank() {
+      self.contentViewController.textView?.emulationLine = self.document.disassemblyResults?.lineFor(address: addressAndBank.address,
+                                                                                                     bank: addressAndBank.bank)
+
+      self.jumpTo(address: addressAndBank.address, bank: addressAndBank.bank)
+    } else if let cartridge = self.document.gameboy.cartridge {
+      self.contentViewController.textView?.emulationLine = self.document.disassemblyResults?.lineFor(address: self.document.gameboy.cpu.pc,
+                                                                                                     bank: cartridge.selectedBank)
+
+      self.jumpTo(address: self.document.gameboy.cpu.pc, bank: cartridge.selectedBank)
     }
   }
 
