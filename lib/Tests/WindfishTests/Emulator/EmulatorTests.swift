@@ -25,7 +25,6 @@ func assertEqual(_ state1: LR35902, _ state2: LR35902, message: String = "", fil
   XCTAssertEqual(state1.fcarry, state2.fcarry,                  "fcarry mismatch \(message)", file: file, line: line)
   XCTAssertEqual(state1.sp.hexString, state2.sp.hexString,      "sp mismatch \(message)", file: file, line: line)
   XCTAssertEqual(state1.pc.hexString, state2.pc.hexString,      "pc mismatch \(message)", file: file, line: line)
-  XCTAssertEqual(state1.bank.hexString, state2.bank.hexString,  "bank mismatch \(message)", file: file, line: line)
   XCTAssertEqual(state1.ime, state2.ime,                        "ime mismatch \(message)", file: file, line: line)
 }
 
@@ -50,7 +49,6 @@ ld   e, a
     XCTAssertEqual(lastState.value.h, 0)
     XCTAssertEqual(lastState.value.l, 0)
     XCTAssertEqual(lastState.value.pc, 0x0004)
-    XCTAssertEqual(lastState.value.bank, 0x00)
   }
 
   func test_ld_a_imm8__xor_imm8__ld_e_a() {
@@ -70,7 +68,6 @@ ld   e, a
     XCTAssertEqual(trace[0].value.h, 0)
     XCTAssertEqual(trace[0].value.l, 0)
     XCTAssertEqual(trace[0].value.pc, 0x0002)
-    XCTAssertEqual(trace[0].value.bank, 0x00)
 
     XCTAssertEqual(trace[1].value.a, 0xE1)
     XCTAssertEqual(trace[1].value.b, 0)
@@ -80,7 +77,6 @@ ld   e, a
     XCTAssertEqual(trace[1].value.h, 0)
     XCTAssertEqual(trace[1].value.l, 0)
     XCTAssertEqual(trace[1].value.pc, 0x0004)
-    XCTAssertEqual(trace[1].value.bank, 0x00)
 
     XCTAssertEqual(trace[2].value.a, 0xE1)
     XCTAssertEqual(trace[2].value.b, 0)
@@ -90,7 +86,6 @@ ld   e, a
     XCTAssertEqual(trace[2].value.h, 0)
     XCTAssertEqual(trace[2].value.l, 0)
     XCTAssertEqual(trace[2].value.pc, 0x0005)
-    XCTAssertEqual(trace[2].value.bank, 0x00)
   }
 
   func test_ld_a_addr__and_imm8__ld_e_a() {
@@ -110,7 +105,6 @@ ld   e, a
     XCTAssertEqual(trace[0].value.h, 0)
     XCTAssertEqual(trace[0].value.l, 0)
     XCTAssertEqual(trace[0].value.pc, 0x0003)
-    XCTAssertEqual(trace[0].value.bank, 0x00)
 
     // TODO: a should capture the and operation that affected it here somehow.
     XCTAssertEqual(trace[1].value.a, 0)
@@ -121,7 +115,6 @@ ld   e, a
     XCTAssertEqual(trace[1].value.h, 0)
     XCTAssertEqual(trace[1].value.l, 0)
     XCTAssertEqual(trace[1].value.pc, 0x0005)
-    XCTAssertEqual(trace[1].value.bank, 0x00)
 
     XCTAssertEqual(trace[2].value.a, 0)
     XCTAssertEqual(trace[2].value.b, 0)
@@ -131,7 +124,6 @@ ld   e, a
     XCTAssertEqual(trace[2].value.h, 0)
     XCTAssertEqual(trace[2].value.l, 0)
     XCTAssertEqual(trace[2].value.pc, 0x0006)
-    XCTAssertEqual(trace[2].value.bank, 0x00)
   }
 
   func testComplexInstruction() {
@@ -156,6 +148,5 @@ ld   [$ffcb], a
     XCTAssertEqual(lastState.value.a, 0b0000_1111)
     XCTAssertEqual(lastState.value.c, 0b0000_1111)
     XCTAssertEqual(lastState.value.pc, 0x000A)
-    XCTAssertEqual(lastState.value.bank, 0x00)
   }
 }

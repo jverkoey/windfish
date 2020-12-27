@@ -13,7 +13,7 @@ public struct TracerMemory: AddressableMemory {
   }
 
   public func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
-    return .memory(address)
+    return Disassembler.sourceLocation(for: address, in: 0)
   }
 }
 

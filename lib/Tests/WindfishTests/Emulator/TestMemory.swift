@@ -21,6 +21,10 @@ class TestMemory: AddressableMemory {
     writes.append(WriteOp(byte: byte, address: address))
   }
 
+  func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
+    return Disassembler.sourceLocation(for: address, in: 0)
+  }
+
   var defaultReadValue: UInt8 = 0x00
   var reads: [LR35902.Address] = []
   struct WriteOp: Equatable {
