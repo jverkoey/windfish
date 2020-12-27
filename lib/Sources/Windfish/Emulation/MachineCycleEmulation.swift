@@ -1,5 +1,9 @@
 import Foundation
 
+// References:
+// - https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
+// - https://gekkio.fi/files/gb-docs/gbctr.pdf
+
 extension LR35902.InstructionSet {
   static func microcode(for spec: LR35902.Instruction.Spec, sourceLocation: Gameboy.Cartridge.Location) -> LR35902.MachineInstruction.MicroCode {
     let registers8 = LR35902.Instruction.Numeric.registers8
@@ -499,6 +503,18 @@ extension LR35902.InstructionSet {
         cpu.fcarry = result.overflow
         cpu.fhalfcarry = (cpu.a & 0x0f) < (immediate & 0x0f)
 
+        return .fetchNext
+      }
+
+    // inc r
+    case .inc(let register) where registers8.contains(register):
+      return { (cpu, memory, cycle) in
+        let originalValue = cpu[register] as UInt8
+        let result = originalValue.addingReportingOverflow(1)
+        cpu.fzero = result.partialValue == 0
+        cpu.fhalfcarry = (((originalValue & 0x0f) + 1) & 0x10) > 0
+        cpu.fsubtract = false
+        cpu[register] = result.partialValue
         return .fetchNext
       }
 
