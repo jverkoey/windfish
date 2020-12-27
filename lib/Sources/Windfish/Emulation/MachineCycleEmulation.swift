@@ -567,6 +567,23 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // and n
+    case .and(.imm8):
+      var immediate: UInt8 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          immediate = UInt8(memory.read(from: cpu.pc))
+          cpu.pc += 1
+          return .continueExecution
+        }
+        cpu.a &= immediate
+        cpu.fzero = cpu.a == 0
+        cpu.fsubtract = false
+        cpu.fcarry = false
+        cpu.fhalfcarry = true
+        return .fetchNext
+      }
+
     case .nop:
       return { _, _, _ in .fetchNext }
 
