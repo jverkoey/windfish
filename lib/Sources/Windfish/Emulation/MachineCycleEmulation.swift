@@ -530,6 +530,16 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // inc rr
+    case .inc(let register) where registers16.contains(register):
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          return .continueExecution
+        }
+        cpu[register] = (cpu[register] as UInt16).addingReportingOverflow(1).partialValue
+        return .fetchNext
+      }
+
     // di
     case .di:
       return { (cpu, memory, cycle) in
