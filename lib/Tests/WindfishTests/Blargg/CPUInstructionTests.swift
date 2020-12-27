@@ -1,6 +1,17 @@
 import XCTest
 @testable import Windfish
 
+extension Disassembler.SourceLocation {
+  func address() -> LR35902.Address {
+    switch self {
+    case .cartridge(let location):
+      return Gameboy.Cartridge.addressAndBank(from: location).address
+    case .memory(let address):
+      return address
+    }
+  }
+}
+
 class CPUInstructionTests: XCTestCase {
 
   func testAll() throws {
@@ -10,9 +21,9 @@ class CPUInstructionTests: XCTestCase {
 
     gameboy = gameboy.advanceInstruction()
     while let loaded = gameboy.cpu.machineInstruction.loaded {
-      var pc = Gameboy.Cartridge.addressAndBank(from: loaded.sourceLocation).address
-      let instruction = Disassembler.fetchInstruction(pc: &pc, memory: gameboy.memory)
-      print("\(loaded.sourceLocation.hexString) \(RGBDSDisassembler.statement(for: instruction).formattedString)")
+      var address = loaded.sourceLocation.address()
+      let instruction = Disassembler.fetchInstruction(at: &address, memory: gameboy.memory)
+      print("\(loaded.sourceLocation.address().hexString) \(RGBDSDisassembler.statement(for: instruction).formattedString)")
       gameboy = gameboy.advanceInstruction()
     }
   }

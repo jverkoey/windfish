@@ -11,7 +11,7 @@ extension LR35902 {
     let registers8 = LR35902.Instruction.Numeric.registers8
     let registers16 = LR35902.Instruction.Numeric.registers16
 
-    let location = Gameboy.Cartridge.location(for: pc, in: bank)!
+    let location = Disassembler.sourceLocation(for: pc, in: bank)
     let width = LR35902.InstructionSet.widths[instruction.spec]!.total
 
     var state = self

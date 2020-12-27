@@ -57,6 +57,30 @@ public class Disassembler {
     setData(at: 0x014E..<0x0150, in: 0x00)
   }
 
+  // MARK: - Representing source locations
+
+  /** A representation of the location from which an instruction was disassembled. */
+  public enum SourceLocation: Equatable {
+    /** The instruction was disassembled from a location in the cartridge data. */
+    case cartridge(Gameboy.Cartridge.Location)
+
+    /** The instruction was disassembled from the gameboy's memory. */
+    case memory(LR35902.Address)
+  }
+
+  /**
+   Returns a source location for the given program counter and bank.
+
+   - Parameter address: An address in the gameboy's memory.
+   - Parameter bank: The selected bank.
+   */
+  public static func sourceLocation(for address: LR35902.Address, in bank: LR35902.Bank) -> SourceLocation {
+    if let cartridgeLocation = Gameboy.Cartridge.location(for: address, in: bank) {
+      return .cartridge(cartridgeLocation)
+    }
+    return .memory(address)
+  }
+
   // MARK: - Transfers of control
 
   func transfersOfControl(at pc: LR35902.Address, in bank: LR35902.Bank) -> Set<TransferOfControl>? {
@@ -618,8 +642,8 @@ public class Disassembler {
     return spec
   }
 
-  public static func fetchInstruction(pc: inout LR35902.Address, memory: AddressableMemory) -> LR35902.Instruction {
-    let spec = fetchInstructionSpec(pc: &pc, memory: memory)
+  public static func fetchInstruction(at address: inout LR35902.Address, memory: AddressableMemory) -> LR35902.Instruction {
+    let spec = fetchInstructionSpec(pc: &address, memory: memory)
 
     guard let instructionWidth = LR35902.InstructionSet.widths[spec] else {
       preconditionFailure("\(spec) is missing its width, implying a misconfiguration of the instruction set."
@@ -630,8 +654,8 @@ public class Disassembler {
     if instructionWidth.operand > 0 {
       var operandBytes: [UInt8] = []
       for _ in 0..<Int(instructionWidth.operand) {
-        let byte = memory.read(from: pc)
-        pc += 1
+        let byte = memory.read(from: address)
+        address += 1
         operandBytes.append(byte)
       }
       return LR35902.Instruction(spec: spec, immediate: LR35902.Instruction.ImmediateValue(data: Data(operandBytes)))
@@ -699,7 +723,7 @@ public class Disassembler {
 
         // Don't commit the fetch to the context pc yet in case the instruction was invalid.
         var instructionPc = runContext.pc
-        let instruction = Disassembler.fetchInstruction(pc: &instructionPc, memory: cartridge)
+        let instruction = Disassembler.fetchInstruction(at: &instructionPc, memory: cartridge)
 
         // STOP must be followed by 0
         if case .stop = instruction.spec, case let .imm8(immediate) = instruction.immediate, immediate != 0 {

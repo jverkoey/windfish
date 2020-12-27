@@ -31,7 +31,7 @@ extension Disassembler {
             }
             if let global = self.globals[immediate],
               let dataType = global.dataType,
-              let sourceLocation = state.registerTraces[.a]?.sourceLocation {
+              case let .cartridge(sourceLocation) = state.registerTraces[.a]?.sourceLocation {
               self.typeAtLocation[sourceLocation] = dataType
             }
 
@@ -42,7 +42,7 @@ extension Disassembler {
             let address = 0xFF00 | LR35902.Address(immediate)
             if let global = self.globals[address],
               let dataType = global.dataType,
-              let sourceLocation = state.registerTraces[.a]?.sourceLocation {
+              case let .cartridge(sourceLocation) = state.registerTraces[.a]?.sourceLocation {
               self.typeAtLocation[sourceLocation] = dataType
             }
 
@@ -60,7 +60,7 @@ extension Disassembler {
             let address = 0xFF00 | LR35902.Address(immediate)
             if let global = self.globals[address],
               let dataType = global.dataType,
-              let sourceLocation = state.registerTraces[src]?.sourceLocation {
+              case let .cartridge(sourceLocation) = state.registerTraces[src]?.sourceLocation {
               self.typeAtLocation[sourceLocation] = dataType
             }
 

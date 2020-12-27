@@ -78,11 +78,16 @@ extension FixedWidthInteger {
   }
 }
 
-extension Gameboy.Cartridge.Location {
+extension Disassembler.SourceLocation {
   /** Returns a string representation of the integer in the given representation format. */
   fileprivate func stringWithAddressAndBank() -> String {
-    let (address, bank) = Gameboy.Cartridge.addressAndBank(from: self)
-    return  bank.hexString + "." + address.stringWithRepresentation(.hex)
+    switch self {
+    case .cartridge(let location):
+      let (address, bank) = Gameboy.Cartridge.addressAndBank(from: location)
+      return  bank.hexString + "." + address.stringWithRepresentation(.hex)
+    case .memory(let address):
+      return  address.hexString
+    }
   }
 }
 

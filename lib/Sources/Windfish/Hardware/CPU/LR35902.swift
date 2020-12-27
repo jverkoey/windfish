@@ -127,12 +127,12 @@ public struct LR35902 {
     struct LoadedInstruction {
       let spec: Instruction.Spec
       let microcode: MicroCode
-      let sourceLocation: Gameboy.Cartridge.Location
+      let sourceLocation: Disassembler.SourceLocation
     }
 
     internal init() {}
 
-    internal init(spec: LR35902.Instruction.Spec, sourceLocation: Gameboy.Cartridge.Location) {
+    internal init(spec: LR35902.Instruction.Spec, sourceLocation: Disassembler.SourceLocation) {
       self.loaded = LoadedInstruction(spec: spec,
                                       microcode: InstructionSet.microcode(for: spec, sourceLocation: sourceLocation),
                                       sourceLocation: sourceLocation)
@@ -142,7 +142,7 @@ public struct LR35902 {
     var cycle: Int = 0
 
     public func sourceAddressAndBank() -> (address: LR35902.Address, bank: LR35902.Bank)? {
-      guard let sourceLocation = loaded?.sourceLocation else {
+      guard case let .cartridge(sourceLocation) = loaded?.sourceLocation else {
         return nil
       }
       return Gameboy.Cartridge.addressAndBank(from: sourceLocation)
@@ -267,7 +267,7 @@ extension LR35902 {
 extension LR35902 {
   /** Trace information for a specific register. */
   public struct RegisterTrace: Equatable {
-    public init(sourceLocation: Gameboy.Cartridge.Location) {
+    public init(sourceLocation: Disassembler.SourceLocation) {
       self.sourceLocation = sourceLocation
       self.loadAddress = nil
     }
@@ -275,7 +275,7 @@ extension LR35902 {
       self.sourceLocation = nil
       self.loadAddress = loadAddress
     }
-    public init(sourceLocation: Gameboy.Cartridge.Location, loadAddress: LR35902.Address) {
+    public init(sourceLocation: Disassembler.SourceLocation, loadAddress: LR35902.Address) {
       self.sourceLocation = sourceLocation
       self.loadAddress = loadAddress
     }
@@ -283,7 +283,7 @@ extension LR35902 {
     /** The address from which the value was loaded, if known. */
     public let loadAddress: LR35902.Address?
 
-    /** The cartridge location at which this register's value was loaded, if known. */
-    public let sourceLocation: Gameboy.Cartridge.Location?
+    /** The source location from which this register's value was loaded, if known. */
+    public let sourceLocation: Disassembler.SourceLocation?
   }
 }

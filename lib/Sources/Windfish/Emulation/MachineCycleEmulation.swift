@@ -5,7 +5,7 @@ import Foundation
 // - https://gekkio.fi/files/gb-docs/gbctr.pdf
 
 extension LR35902.InstructionSet {
-  static func microcode(for spec: LR35902.Instruction.Spec, sourceLocation: Gameboy.Cartridge.Location) -> LR35902.MachineInstruction.MicroCode {
+  static func microcode(for spec: LR35902.Instruction.Spec, sourceLocation: Disassembler.SourceLocation) -> LR35902.MachineInstruction.MicroCode {
     let registers8 = LR35902.Instruction.Numeric.registers8
     let registers16 = LR35902.Instruction.Numeric.registers16
     let registersAddr = LR35902.Instruction.Numeric.registersAddr
@@ -559,7 +559,7 @@ extension LR35902 {
     // The LR35902's fetch/execute overlap behavior means we load the next opcode on the same machine cycle as the
     // last instruction's microcode execution.
     if nextAction == .fetchNext {
-      var sourceLocation = Gameboy.Cartridge.location(for: mutation.pc, in: mutation.bank)!
+      var sourceLocation = Disassembler.sourceLocation(for: mutation.pc, in: mutation.bank)
       let tableIndex = Int(memory.read(from: mutation.pc))
       mutation.pc += 1
       let loadedSpec: Instruction.Spec
