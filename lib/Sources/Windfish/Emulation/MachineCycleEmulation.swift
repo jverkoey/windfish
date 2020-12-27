@@ -530,6 +530,14 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // di
+    case .di:
+      return { (cpu, memory, cycle) in
+        cpu.ime = false
+        cpu.imeScheduled = false
+        return .fetchNext
+      }
+
     case .nop:
       return { _, _, _ in .fetchNext }
 

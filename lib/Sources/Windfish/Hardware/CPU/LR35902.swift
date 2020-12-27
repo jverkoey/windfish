@@ -73,6 +73,9 @@ public struct LR35902 {
    */
   public var ime: Bool = false
 
+  /** Whether an ei instruction has requested ime to be enabled on the next machine cycle. */
+  var imeScheduled: Bool = false
+
   // MARK: 16-bit registers
   // Note that, though these registers are ultimately backed by the underlying 8 bit registers, each 16-bit register
   // also stores the state value that was directly assigned to it.
