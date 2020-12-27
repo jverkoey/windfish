@@ -314,6 +314,8 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       })
   }
 
+  var running = false
+
   @objc func performControlAction(_ sender: NSSegmentedControl) {
     if sender.selectedSegment == 0 {  // Step forward
       precondition(currentInstruction() != nil)
@@ -326,6 +328,20 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       updateRegisters()
       updateRAM()
     } else if sender.selectedSegment == 1 {  // Step into
+      running = !running
+      if running {
+        DispatchQueue.global(qos: .userInteractive).async {
+          while self.running {
+            self.document.gameboy = self.document.gameboy.advanceInstruction()
+
+            DispatchQueue.main.sync {
+              self.updateInstructionAssembly()
+              self.updateRegisters()
+              self.updateRAM()
+            }
+          }
+        }
+      }
       // TODO: Only allow this if the instruction causes a transfer of control flow.
 
     } else if sender.selectedSegment == 2 {  // Clear
