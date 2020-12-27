@@ -8,7 +8,6 @@ import Foundation
  */
 public struct LR35902 {
   public typealias Address = UInt16
-  public typealias Bank = UInt8
 
   // MARK: 8-bit registers
   public var a: UInt8 = 0x01
@@ -144,7 +143,7 @@ public struct LR35902 {
     var loaded: LoadedInstruction? = nil
     var cycle: Int = 0
 
-    public func sourceAddressAndBank() -> (address: LR35902.Address, bank: LR35902.Bank)? {
+    public func sourceAddressAndBank() -> (address: LR35902.Address, bank: Gameboy.Cartridge.Bank)? {
       guard case let .cartridge(sourceLocation) = loaded?.sourceLocation else {
         return nil
       }

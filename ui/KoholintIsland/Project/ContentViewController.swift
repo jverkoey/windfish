@@ -43,7 +43,7 @@ final class ContentViewController: NSViewController {
 
   var filename: String?
 
-  var bank: LR35902.Bank? {
+  var bank: Gameboy.Cartridge.Bank? {
     didSet {
       refreshFileContents()
       refreshBank()

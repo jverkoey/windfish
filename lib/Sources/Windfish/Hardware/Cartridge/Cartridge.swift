@@ -1,16 +1,13 @@
 import Foundation
 
 protocol MemoryBankController: AddressableMemory {
-  var selectedBank: LR35902.Bank { get }
+  var selectedBank: Gameboy.Cartridge.Bank { get }
 }
 
 extension Gameboy {
   /** A representation of a Gameboy cartridge as addressable memory at a given moment. */
   public struct Cartridge: AddressableMemory {
-    public var addressableRanges: [ClosedRange<LR35902.Address>] = [
-      0x0000...0x7FFF
-    ]
-
+    public typealias Bank = UInt8
     public typealias Location = UInt32
     public typealias Length = UInt32
 
@@ -24,17 +21,21 @@ extension Gameboy {
       self.memoryBankController = MBC1(data: data)
 
       self.size = Length(data.count)
-      self.numberOfBanks = LR35902.Bank((self.size + Gameboy.Cartridge.bankSize - 1) / Gameboy.Cartridge.bankSize)
+      self.numberOfBanks = Gameboy.Cartridge.Bank((self.size + Gameboy.Cartridge.bankSize - 1) / Gameboy.Cartridge.bankSize)
     }
 
     /** The total number of banks in this cartridge. */
-    public let numberOfBanks: LR35902.Bank
+    public let numberOfBanks: Gameboy.Cartridge.Bank
     public let size: Length
-    public var selectedBank: LR35902.Bank {
+    public var selectedBank: Gameboy.Cartridge.Bank {
       return memoryBankController.selectedBank
     }
 
     // MARK: - AddressableMemory
+
+    public var addressableRanges: [ClosedRange<LR35902.Address>] = [
+      0x0000...0x7FFF
+    ]
 
     public func read(from address: LR35902.Address) -> UInt8 {
       return memoryBankController.read(from: address)
@@ -67,7 +68,7 @@ extension Gameboy.Cartridge {
    - Parameter pc: The program counter's location.
    - Parameter bank: The current bank.
    */
-  public static func location(for pc: LR35902.Address, in bank: LR35902.Bank) -> Location? {
+  public static func location(for pc: LR35902.Address, in bank: Gameboy.Cartridge.Bank) -> Location? {
     // Bank 0 is permanently addressable from 0x0000...0x3FFF.
     // All other banks map from 0x4000...0x7FFF
     guard (bank == 0 && pc < 0x4000) || (bank > 0 && pc < 0x8000) else {
@@ -89,7 +90,7 @@ extension Gameboy.Cartridge {
    - Parameter pc: The program counter's location.
    - Parameter bank: The current bank.
    */
-  public static func location(for pc: LR35902.Address, inHumanProvided bank: LR35902.Bank) -> Location? {
+  public static func location(for pc: LR35902.Address, inHumanProvided bank: Gameboy.Cartridge.Bank) -> Location? {
     return location(for: pc, in: (bank == 0) ? 1 : bank)
   }
 
@@ -98,8 +99,8 @@ extension Gameboy.Cartridge {
    - Parameter pc: The program counter's location.
    - Parameter bank: The current bank.
    */
-  public static func addressAndBank(from cartridgeLocation: Location) -> (address: LR35902.Address, bank: LR35902.Bank) {
-    let bank = LR35902.Bank(cartridgeLocation / Gameboy.Cartridge.bankSize)
+  public static func addressAndBank(from cartridgeLocation: Location) -> (address: LR35902.Address, bank: Gameboy.Cartridge.Bank) {
+    let bank = Gameboy.Cartridge.Bank(cartridgeLocation / Gameboy.Cartridge.bankSize)
     let address = LR35902.Address(cartridgeLocation % Gameboy.Cartridge.bankSize + Location((bank > 0) ? 0x4000 : 0x0000))
     return (address: address, bank: bank)
   }

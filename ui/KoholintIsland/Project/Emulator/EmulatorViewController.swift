@@ -58,7 +58,7 @@ extension String {
     }
 
     let parts = self.split(separator: ".", maxSplits: 1)
-    guard let bank = LR35902.Bank(parts[0], radix: 16),
+    guard let bank = Gameboy.Cartridge.Bank(parts[0], radix: 16),
           let address = LR35902.Address(parts[1].dropFirst(2), radix: 16) else {
       return nil
     }

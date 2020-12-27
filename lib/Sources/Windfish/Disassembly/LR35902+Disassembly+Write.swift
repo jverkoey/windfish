@@ -87,7 +87,7 @@ extension Disassembler {
       case macroComment(comment: String)
       case preComment(comment: String)
       case label(labelName: String)
-      case section(LR35902.Bank)
+      case section(Gameboy.Cartridge.Bank)
       case transferOfControl(Set<TransferOfControl>, String)
       case instruction(LR35902.Instruction, RGBDS.Statement)
       case macroInstruction(LR35902.Instruction, RGBDS.Statement)
@@ -104,7 +104,7 @@ extension Disassembler {
       case global(RGBDS.Statement, dataTypeName: String, dataType: Datatype)
     }
 
-    init(semantic: Semantic, address: LR35902.Address? = nil, bank: LR35902.Bank? = nil, scope: String? = nil, data: Data? = nil) {
+    init(semantic: Semantic, address: LR35902.Address? = nil, bank: Gameboy.Cartridge.Bank? = nil, scope: String? = nil, data: Data? = nil) {
       self.semantic = semantic
       self.address = address
       self.bank = bank
@@ -122,7 +122,7 @@ extension Disassembler {
 
     public let semantic: Semantic
     public let address: LR35902.Address?
-    public let bank: LR35902.Bank?
+    public let bank: Gameboy.Cartridge.Bank?
     public let scope: String?
     public let data: Data?
 
@@ -260,7 +260,7 @@ extension Disassembler {
       case macros(content: String)
       case makefile(content: String)
       case variables(content: String)
-      case bank(number: LR35902.Bank, content: String, lines: [Line])
+      case bank(number: Gameboy.Cartridge.Bank, content: String, lines: [Line])
     }
     public let sources: [String: FileDescription]
   }
@@ -582,7 +582,7 @@ clean:
 
             let firstInstruction = lineBuffer.firstIndex { line in if case .instruction = line.semantic { return true } else { return false} }!
             let lastInstruction = lineBuffer.lastIndex { line in if case .instruction = line.semantic { return true } else { return false} }!
-            let bank: LR35902.Bank
+            let bank: Gameboy.Cartridge.Bank
             if case .instruction = lineBuffer[lastInstruction].semantic {
               bank = lineBuffer[lastInstruction].bank!
             } else {
@@ -748,7 +748,7 @@ clean:
             for (index, pair) in accumulator.chunked(into: 2).enumerated() {
               let address = (LR35902.Address(pair[1]) << 8) | LR35902.Address(pair[0])
               let jumpLocation: String
-              let effectiveBank: LR35902.Bank
+              let effectiveBank: Gameboy.Cartridge.Bank
               if let changedBank = bankChange(at: chunkPc, in: bankToWrite) {
                 effectiveBank = changedBank
               } else {
@@ -820,7 +820,7 @@ clean:
     sources["game.asm"] = .game(content: gameAsm)
 
     let disassembledLocations = knownLocations()
-    let bankPercents: [LR35902.Bank: Double] = (0..<cartridge.numberOfBanks).reduce(into: [:]) { accumulator, bank in
+    let bankPercents: [Gameboy.Cartridge.Bank: Double] = (0..<cartridge.numberOfBanks).reduce(into: [:]) { accumulator, bank in
       let disassembledBankLocations = disassembledLocations.intersection(
         IndexSet(integersIn: (Int(bank) * Int(Gameboy.Cartridge.bankSize))..<(Int(bank + 1) * Int(Gameboy.Cartridge.bankSize)))
       )
@@ -838,6 +838,6 @@ clean:
   public struct Statistics: Equatable {
     public let instructionsDecoded: Int
     public let percent: Double
-    public let bankPercents: [LR35902.Bank: Double]
+    public let bankPercents: [Gameboy.Cartridge.Bank: Double]
   }
 }

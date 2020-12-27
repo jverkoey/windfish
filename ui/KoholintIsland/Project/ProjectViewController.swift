@@ -186,7 +186,7 @@ final class ProjectViewController: NSViewController {
     }
   }
 
-  func jumpTo(address: LR35902.Address, bank: LR35902.Bank, highlight: Bool = false) {
+  func jumpTo(address: LR35902.Address, bank: Gameboy.Cartridge.Bank, highlight: Bool = false) {
     guard let metadata = self.document.metadata else {
       return
     }

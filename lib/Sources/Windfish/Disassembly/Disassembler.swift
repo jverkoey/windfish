@@ -23,7 +23,7 @@ public class Disassembler {
   }
 
   /** Returns true if the program counter is pointing to addressable memory. */
-  func pcIsValid(pc: LR35902.Address, bank: LR35902.Bank) -> Bool {
+  func pcIsValid(pc: LR35902.Address, bank: Gameboy.Cartridge.Bank) -> Bool {
     return
       ((bank == 0 && pc < 0x4000)
         || (bank != 0 && pc < 0x8000))
@@ -74,7 +74,7 @@ public class Disassembler {
    - Parameter address: An address in the gameboy's memory.
    - Parameter bank: The selected bank.
    */
-  public static func sourceLocation(for address: LR35902.Address, in bank: LR35902.Bank) -> SourceLocation {
+  public static func sourceLocation(for address: LR35902.Address, in bank: Gameboy.Cartridge.Bank) -> SourceLocation {
     if let cartridgeLocation = Gameboy.Cartridge.location(for: address, in: bank) {
       return .cartridge(cartridgeLocation)
     }
@@ -83,13 +83,13 @@ public class Disassembler {
 
   // MARK: - Transfers of control
 
-  func transfersOfControl(at pc: LR35902.Address, in bank: LR35902.Bank) -> Set<TransferOfControl>? {
+  func transfersOfControl(at pc: LR35902.Address, in bank: Gameboy.Cartridge.Bank) -> Set<TransferOfControl>? {
     guard let cartridgeLocation = Gameboy.Cartridge.location(for: pc, in: bank) else {
       return nil
     }
     return transfers[cartridgeLocation]
   }
-  public func registerTransferOfControl(to pc: LR35902.Address, in bank: LR35902.Bank, from fromPc: LR35902.Address, in fromBank: LR35902.Bank, spec: LR35902.Instruction.Spec) {
+  public func registerTransferOfControl(to pc: LR35902.Address, in bank: Gameboy.Cartridge.Bank, from fromPc: LR35902.Address, in fromBank: Gameboy.Cartridge.Bank, spec: LR35902.Instruction.Spec) {
     let index = Gameboy.Cartridge.location(for: pc, in: bank)!
     let fromLocation = Gameboy.Cartridge.location(for: fromPc, in: fromBank)!
     let transfer = TransferOfControl(sourceLocation: fromLocation, sourceInstructionSpec: spec)
@@ -110,7 +110,7 @@ public class Disassembler {
 
   // MARK: - Instructions
 
-  public func instruction(at pc: LR35902.Address, in bank: LR35902.Bank) -> LR35902.Instruction? {
+  public func instruction(at pc: LR35902.Address, in bank: Gameboy.Cartridge.Bank) -> LR35902.Instruction? {
     let location = Gameboy.Cartridge.location(for: pc, in: bank)!
     guard code.contains(Int(location)) else {
       return nil
@@ -118,7 +118,7 @@ public class Disassembler {
     return instructionMap[location]
   }
 
-  func register(instruction: LR35902.Instruction, at pc: LR35902.Address, in bank: LR35902.Bank) {
+  func register(instruction: LR35902.Instruction, at pc: LR35902.Address, in bank: Gameboy.Cartridge.Bank) {
     let address = Gameboy.Cartridge.location(for: pc, in: bank)!
 
     // Avoid overlapping instructions.
@@ -148,10 +148,10 @@ public class Disassembler {
     case image2bpp
   }
 
-  public func setData(at address: LR35902.Address, in bank: LR35902.Bank) {
+  public func setData(at address: LR35902.Address, in bank: Gameboy.Cartridge.Bank) {
     setData(at: address..<(address+1), in: bank)
   }
-  public func setData(at range: Range<LR35902.Address>, in bank: LR35902.Bank, format: DataFormat = .bytes) {
+  public func setData(at range: Range<LR35902.Address>, in bank: Gameboy.Cartridge.Bank, format: DataFormat = .bytes) {
     let lowerBound = Gameboy.Cartridge.location(for: range.lowerBound, in: bank)!
     let upperBound = Gameboy.Cartridge.location(for: range.upperBound, in: bank)!
     let cartRange = lowerBound..<upperBound
@@ -185,7 +185,7 @@ public class Disassembler {
       labelTypes[location] = nil
     }
   }
-  func formatOfData(at address: LR35902.Address, in bank: LR35902.Bank) -> DataFormat? {
+  func formatOfData(at address: LR35902.Address, in bank: Gameboy.Cartridge.Bank) -> DataFormat? {
     let location = Gameboy.Cartridge.location(for: address, in: bank)!
     return dataFormats.first { pair in
       pair.0.contains(location)
@@ -194,7 +194,7 @@ public class Disassembler {
   private var dataBlocks = IndexSet()
   private var dataFormats: [Range<Gameboy.Cartridge.Location>: DataFormat] = [:]
 
-  public func setJumpTable(at range: Range<LR35902.Address>, in bank: LR35902.Bank) {
+  public func setJumpTable(at range: Range<LR35902.Address>, in bank: Gameboy.Cartridge.Bank) {
     let lowerBound = Gameboy.Cartridge.location(for: range.lowerBound, in: bank)!
     let upperBound = Gameboy.Cartridge.location(for: range.upperBound, in: bank)!
     jumpTables.insert(integersIn: Int(lowerBound)..<Int(upperBound))
@@ -205,7 +205,7 @@ public class Disassembler {
 
   // MARK: - Text segments
 
-  public func setText(at range: Range<LR35902.Address>, in bank: LR35902.Bank, lineLength: Int? = nil) {
+  public func setText(at range: Range<LR35902.Address>, in bank: Gameboy.Cartridge.Bank, lineLength: Int? = nil) {
     let lowerBound = Gameboy.Cartridge.location(for: range.lowerBound, in: bank)!
     let upperBound = Gameboy.Cartridge.location(for: range.upperBound, in: bank)!
     text.insert(integersIn: Int(lowerBound)..<Int(upperBound))
@@ -213,7 +213,7 @@ public class Disassembler {
       textLengths[lowerBound..<upperBound] = lineLength
     }
   }
-  func lineLengthOfText(at address: LR35902.Address, in bank: LR35902.Bank) -> Int? {
+  func lineLengthOfText(at address: LR35902.Address, in bank: Gameboy.Cartridge.Bank) -> Int? {
     let location = Gameboy.Cartridge.location(for: address, in: bank)!
     return textLengths.first { pair in
       pair.0.contains(location)
@@ -228,14 +228,14 @@ public class Disassembler {
 
   // MARK: - Bank changes
 
-  func bankChange(at pc: LR35902.Address, in bank: LR35902.Bank) -> LR35902.Bank? {
+  func bankChange(at pc: LR35902.Address, in bank: Gameboy.Cartridge.Bank) -> Gameboy.Cartridge.Bank? {
     return bankChanges[Gameboy.Cartridge.location(for: pc, in: bank)!]
   }
 
-  public func register(bankChange: LR35902.Bank, at pc: LR35902.Address, in bank: LR35902.Bank) {
+  public func register(bankChange: Gameboy.Cartridge.Bank, at pc: LR35902.Address, in bank: Gameboy.Cartridge.Bank) {
     bankChanges[Gameboy.Cartridge.location(for: pc, in: bank)!] = bankChange
   }
-  private var bankChanges: [Gameboy.Cartridge.Location: LR35902.Bank] = [:]
+  private var bankChanges: [Gameboy.Cartridge.Location: Gameboy.Cartridge.Bank] = [:]
 
   // MARK: - Regions
 
@@ -249,7 +249,7 @@ public class Disassembler {
     case image2bpp
     case ram
   }
-  public func type(of address: LR35902.Address, in bank: LR35902.Bank) -> ByteType {
+  public func type(of address: LR35902.Address, in bank: Gameboy.Cartridge.Bank) -> ByteType {
     guard let cartridgeLocation = Gameboy.Cartridge.location(for: address, in: bank) else {
       return .ram
     }
@@ -283,25 +283,25 @@ public class Disassembler {
     return code.union(data).union(text)
   }
 
-  public func setSoftTerminator(at pc: LR35902.Address, in bank: LR35902.Bank) {
+  public func setSoftTerminator(at pc: LR35902.Address, in bank: Gameboy.Cartridge.Bank) {
     softTerminators[Gameboy.Cartridge.location(for: pc, in: bank)!] = true
   }
   var softTerminators: [Gameboy.Cartridge.Location: Bool] = [:]
 
-  private func effectiveBank(at pc: LR35902.Address, in bank: LR35902.Bank) -> LR35902.Bank {
+  private func effectiveBank(at pc: LR35902.Address, in bank: Gameboy.Cartridge.Bank) -> Gameboy.Cartridge.Bank {
     if pc < 0x4000 {
       return 0
     }
     return bank
   }
 
-  public func contiguousScopes(at pc: LR35902.Address, in bank: LR35902.Bank) -> Set<Range<Gameboy.Cartridge.Location>> {
+  public func contiguousScopes(at pc: LR35902.Address, in bank: Gameboy.Cartridge.Bank) -> Set<Range<Gameboy.Cartridge.Location>> {
     guard let cartridgeLocation = Gameboy.Cartridge.location(for: pc, in: bank) else {
       return Set()
     }
     return contiguousScopes[effectiveBank(at: pc, in: bank), default: Set()].filter { scope in scope.contains(cartridgeLocation) }
   }
-  public func labeledContiguousScopes(at pc: LR35902.Address, in bank: LR35902.Bank) -> [(label: String, scope: Range<Gameboy.Cartridge.Location>)] {
+  public func labeledContiguousScopes(at pc: LR35902.Address, in bank: Gameboy.Cartridge.Bank) -> [(label: String, scope: Range<Gameboy.Cartridge.Location>)] {
     return contiguousScopes(at: pc, in: bank).compactMap {
       let addressAndBank = Gameboy.Cartridge.addressAndBank(from: $0.lowerBound)
       guard let label = label(at: addressAndBank.address, in: addressAndBank.bank) else {
@@ -316,9 +316,9 @@ public class Disassembler {
     precondition(bankAndAddress.bank == bankAndAddress2.bank, "Scopes can't cross banks")
     contiguousScopes[effectiveBank(at: bankAndAddress.address, in: bankAndAddress.bank), default: Set()].insert(range)
   }
-  var contiguousScopes: [LR35902.Bank: Set<Range<Gameboy.Cartridge.Location>>] = [:]
+  var contiguousScopes: [Gameboy.Cartridge.Bank: Set<Range<Gameboy.Cartridge.Location>>] = [:]
 
-  public func defineFunction(startingAt pc: LR35902.Address, in bank: LR35902.Bank, named name: String) {
+  public func defineFunction(startingAt pc: LR35902.Address, in bank: Gameboy.Cartridge.Bank, named name: String) {
     setLabel(at: pc, in: bank, named: name)
     let upperBound: LR35902.Address = (pc < 0x4000) ? 0x4000 : 0x8000
     disassemble(range: pc..<upperBound, inBank: bank)
@@ -326,7 +326,7 @@ public class Disassembler {
 
   // MARK: - Labels
 
-  public func label(at pc: LR35902.Address, in bank: LR35902.Bank) -> String? {
+  public func label(at pc: LR35902.Address, in bank: Gameboy.Cartridge.Bank) -> String? {
     guard let index = Gameboy.Cartridge.location(for: pc, in: bank) else {
       return nil
     }
@@ -343,7 +343,7 @@ public class Disassembler {
     if let explicitName = labels[index] {
       name = explicitName
     } else if let labelType = labelTypes[index] {
-      let bank: LR35902.Bank = (pc < 0x4000) ? 0 : bank
+      let bank: Gameboy.Cartridge.Bank = (pc < 0x4000) ? 0 : bank
       switch labelType {
       case .transferOfControlType: name = "toc_\(bank.hexString)_\(pc.hexString)"
       case .elseType:              name = "else_\(bank.hexString)_\(pc.hexString)"
@@ -375,7 +375,7 @@ public class Disassembler {
     }
   }
 
-  public func setLabel(at pc: LR35902.Address, in bank: LR35902.Bank, named name: String) {
+  public func setLabel(at pc: LR35902.Address, in bank: Gameboy.Cartridge.Bank, named name: String) {
     precondition(!name.contains("."), "Labels cannot contain dots.")
     guard let cartridgeLocation = Gameboy.Cartridge.location(for: pc, inHumanProvided: bank) else {
       preconditionFailure("Attempting to set label in non-cart addressable location.")
@@ -460,7 +460,7 @@ public class Disassembler {
   }
   var dataTypes: [String: Datatype] = [:]
 
-  public func setType(at address: LR35902.Address, in bank: LR35902.Bank, to type: String) {
+  public func setType(at address: LR35902.Address, in bank: Gameboy.Cartridge.Bank, to type: String) {
     precondition(!type.isEmpty, "Invalid type provided.")
     precondition(dataTypes[type] != nil, "\(type) is not a known type.")
     typeAtLocation[Gameboy.Cartridge.location(for: address, in: bank)!] = type
@@ -469,13 +469,13 @@ public class Disassembler {
 
   // MARK: - Comments
 
-  public func preComment(at address: LR35902.Address, in bank: LR35902.Bank) -> String? {
+  public func preComment(at address: LR35902.Address, in bank: Gameboy.Cartridge.Bank) -> String? {
     guard let cartridgeLocation = Gameboy.Cartridge.location(for: address, in: bank) else {
       return nil
     }
     return preComments[cartridgeLocation]
   }
-  public func setPreComment(at address: LR35902.Address, in bank: LR35902.Bank, text: String) {
+  public func setPreComment(at address: LR35902.Address, in bank: Gameboy.Cartridge.Bank, text: String) {
     guard let cartridgeLocation = Gameboy.Cartridge.location(for: address, in: bank) else {
       preconditionFailure("Attempting to set pre-comment in non-cart addressable location.")
     }
@@ -527,7 +527,7 @@ public class Disassembler {
   public func defineMacro(named name: String,
                           instructions: [MacroLine],
                           validArgumentValues: [Int: IndexSet]? = nil,
-                          action: (([Int: String], LR35902.Address, LR35902.Bank) -> Void)? = nil) {
+                          action: (([Int: String], LR35902.Address, Gameboy.Cartridge.Bank) -> Void)? = nil) {
     precondition(!macroNames.contains(name))
     macroNames.insert(name)
 
@@ -599,9 +599,9 @@ public class Disassembler {
     let name: String
     let macroLines: [MacroLine]
     let validArgumentValues: [Int: IndexSet]?
-    let action: (([Int: String], LR35902.Address, LR35902.Bank) -> Void)?
+    let action: (([Int: String], LR35902.Address, Gameboy.Cartridge.Bank) -> Void)?
 
-    init(name: String, macroLines: [MacroLine], validArgumentValues: [Int: IndexSet]?, action: (([Int: String], LR35902.Address, LR35902.Bank) -> Void)?) {
+    init(name: String, macroLines: [MacroLine], validArgumentValues: [Int: IndexSet]?, action: (([Int: String], LR35902.Address, Gameboy.Cartridge.Bank) -> Void)?) {
       self.name = name
       self.macroLines = macroLines
       self.validArgumentValues = validArgumentValues
@@ -620,7 +620,7 @@ public class Disassembler {
   let macroTree = MacroNode()
 
   private struct DisassemblyIntent: Hashable {
-    let bank: LR35902.Bank
+    let bank: Gameboy.Cartridge.Bank
     let address: LR35902.Address
   }
 
@@ -664,14 +664,14 @@ public class Disassembler {
     return LR35902.Instruction(spec: spec, immediate: nil)
   }
 
-  public func disassemble(range: Range<LR35902.Address>, inBank bankInitial: LR35902.Bank) {
+  public func disassemble(range: Range<LR35902.Address>, inBank bankInitial: Gameboy.Cartridge.Bank) {
     var visitedAddresses = IndexSet()
 
     var runQueue = Queue<Disassembler.Run>()
     let firstRun = Run(from: range.lowerBound, initialBank: bankInitial, upTo: range.upperBound)
     runQueue.add(firstRun)
 
-    let queueRun: (Run, LR35902.Address, LR35902.Address, LR35902.Bank, LR35902.Instruction) -> Void = { fromRun, fromAddress, toAddress, bank, instruction in
+    let queueRun: (Run, LR35902.Address, LR35902.Address, Gameboy.Cartridge.Bank, LR35902.Instruction) -> Void = { fromRun, fromAddress, toAddress, bank, instruction in
       if toAddress > 0x8000 {
         return // We can't disassemble in-memory regions.
       }

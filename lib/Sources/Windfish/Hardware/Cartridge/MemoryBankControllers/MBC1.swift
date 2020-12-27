@@ -60,7 +60,7 @@ extension Gameboy.Cartridge {
       return .cartridge(Gameboy.Cartridge.location(for: address, in: (selectedBank == 0) ? 1 : selectedBank)!)
     }
 
-    public private(set) var selectedBank: LR35902.Bank = 0
+    public private(set) var selectedBank: Gameboy.Cartridge.Bank = 0
     private let data: Data
   }
 }

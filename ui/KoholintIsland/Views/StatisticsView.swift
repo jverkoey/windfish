@@ -56,7 +56,7 @@ final class StatisticsView: NSView {
     if let statistics = statistics {
       instructionsDecodedLabel.stringValue = "\(statistics.instructionsDecoded) instructions decoded"
       percentDecodedLabel.stringValue = String(format: "%.2f", statistics.percent) + "% decoded"
-      percentDecodedLabel.toolTip = statistics.bankPercents.map { (key: LR35902.Bank, value: Double) in
+      percentDecodedLabel.toolTip = statistics.bankPercents.map { (key: Gameboy.Cartridge.Bank, value: Double) in
         return "Bank \(key.hexString): \(String(format: "%.2f", value))%"
       }.sorted().joined(separator: "\n")
     } else {

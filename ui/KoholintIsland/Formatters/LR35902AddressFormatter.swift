@@ -9,7 +9,7 @@ import Windfish
 
 final class UInt8HexFormatter: Formatter {
   override func string(for obj: Any?) -> String? {
-    guard let address = obj as? LR35902.Bank else {
+    guard let address = obj as? Gameboy.Cartridge.Bank else {
       return nil
     }
     return "0x\(address.hexString)"
@@ -24,7 +24,7 @@ final class UInt8HexFormatter: Formatter {
     } else {
       numericalValue = string
     }
-    guard let bank = LR35902.Bank(numericalValue, radix: 16) else {
+    guard let bank = Gameboy.Cartridge.Bank(numericalValue, radix: 16) else {
       return false
     }
     obj?.pointee = bank as AnyObject
@@ -34,7 +34,7 @@ final class UInt8HexFormatter: Formatter {
 
 final class UInt8BinaryFormatter: Formatter {
   override func string(for obj: Any?) -> String? {
-    guard let address = obj as? LR35902.Bank else {
+    guard let address = obj as? Gameboy.Cartridge.Bank else {
       return nil
     }
     return "0b\(address.binaryString)"
@@ -49,7 +49,7 @@ final class UInt8BinaryFormatter: Formatter {
     } else {
       numericalValue = string
     }
-    guard let bank = LR35902.Bank(numericalValue, radix: 2) else {
+    guard let bank = Gameboy.Cartridge.Bank(numericalValue, radix: 2) else {
       return false
     }
     obj?.pointee = bank as AnyObject

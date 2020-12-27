@@ -6,10 +6,10 @@ extension Disassembler {
 
     let startAddress: Gameboy.Cartridge.Location
     let endAddress: Gameboy.Cartridge.Location?
-    let initialBank: LR35902.Bank
+    let initialBank: Gameboy.Cartridge.Bank
 
     // TODO: Accept a Gameboy.Cartridge.Location here instead.
-    init(from startAddress: LR35902.Address, initialBank: LR35902.Bank, upTo endAddress: LR35902.Address? = nil) {
+    init(from startAddress: LR35902.Address, initialBank: Gameboy.Cartridge.Bank, upTo endAddress: LR35902.Address? = nil) {
       self.startAddress = Gameboy.Cartridge.location(for: startAddress, inHumanProvided: initialBank)!
       if let endAddress = endAddress, endAddress > 0 {
         self.endAddress = Gameboy.Cartridge.location(for: endAddress - 1, inHumanProvided: initialBank)!

@@ -27,11 +27,11 @@ final class Region: NSObject, Codable {
     }
   }
   @objc dynamic var name: String
-  @objc dynamic var bank: LR35902.Bank
+  @objc dynamic var bank: Gameboy.Cartridge.Bank
   @objc dynamic var address: LR35902.Address
   @objc dynamic var length: LR35902.Address
 
-  init(regionType: String, name: String, bank: LR35902.Bank, address: LR35902.Address, length: LR35902.Address) {
+  init(regionType: String, name: String, bank: Gameboy.Cartridge.Bank, address: LR35902.Address, length: LR35902.Address) {
     self.regionType = regionType
     self.name = name
     self.bank = bank
@@ -119,8 +119,8 @@ class ProjectConfiguration: NSObject, Codable {
 final class DisassemblyResults: NSObject {
   internal init(
     files: [String : Data],
-    bankLines: [LR35902.Bank : [Disassembler.Line]]? = nil,
-    bankTextStorage: [LR35902.Bank: NSAttributedString]? = nil,
+    bankLines: [Gameboy.Cartridge.Bank : [Disassembler.Line]]? = nil,
+    bankTextStorage: [Gameboy.Cartridge.Bank: NSAttributedString]? = nil,
     regions: [Region]? = nil,
     regionLookup: [String: Region]? = nil,
     statistics: Disassembler.Statistics? = nil,
@@ -135,7 +135,7 @@ final class DisassemblyResults: NSObject {
     self.disassembly = disassembly
   }
 
-  func lineFor(address: LR35902.Address, bank: LR35902.Bank) -> Int? {
+  func lineFor(address: LR35902.Address, bank: Gameboy.Cartridge.Bank) -> Int? {
     guard let bankLines = bankLines?[bank] else {
       return nil
     }
@@ -167,8 +167,8 @@ final class DisassemblyResults: NSObject {
   }
 
   var files: [String: Data]
-  var bankLines: [LR35902.Bank: [Disassembler.Line]]?
-  var bankTextStorage: [LR35902.Bank: NSAttributedString]?
+  var bankLines: [Gameboy.Cartridge.Bank: [Disassembler.Line]]?
+  var bankTextStorage: [Gameboy.Cartridge.Bank: NSAttributedString]?
   @objc dynamic var regions: [Region]?
   var regionLookup: [String: Region]?
   var statistics: Disassembler.Statistics?
@@ -177,8 +177,8 @@ final class DisassemblyResults: NSObject {
 
 struct ProjectMetadata: Codable {
   var romUrl: URL
-  var numberOfBanks: LR35902.Bank
-  var bankMap: [String: LR35902.Bank]
+  var numberOfBanks: Gameboy.Cartridge.Bank
+  var bankMap: [String: Gameboy.Cartridge.Bank]
 }
 
 private struct Filenames {
@@ -678,12 +678,12 @@ extension ProjectDocument {
       //            disassembly.disassembleAsGameboyCartridge()
       let (disassembledSource, statistics) = try! disassembly.generateSource()
 
-      let bankMap: [String: LR35902.Bank] = disassembledSource.sources.reduce(into: [:], { accumulator, element in
+      let bankMap: [String: Gameboy.Cartridge.Bank] = disassembledSource.sources.reduce(into: [:], { accumulator, element in
         if case .bank(let number, _, _) = element.value {
           accumulator[element.key] = number
         }
       })
-      let bankLines: [LR35902.Bank: [Disassembler.Line]] = disassembledSource.sources.compactMapValues {
+      let bankLines: [Gameboy.Cartridge.Bank: [Disassembler.Line]] = disassembledSource.sources.compactMapValues {
         switch $0 {
         case .bank(_, _, let lines):
           return lines
@@ -733,7 +733,7 @@ extension ProjectDocument {
       ]
       let operandAttributes: [NSAttributedString.Key : Any] = baseAttributes
 
-      let bankTextStorage: [LR35902.Bank: NSAttributedString] = disassembledSource.sources.compactMapValues {
+      let bankTextStorage: [Gameboy.Cartridge.Bank: NSAttributedString] = disassembledSource.sources.compactMapValues {
         switch $0 {
         case .bank(_, _, let lines):
           return lines.reduce(into: NSMutableAttributedString()) { accumulator, line in

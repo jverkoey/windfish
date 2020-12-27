@@ -4,7 +4,7 @@ import XCTest
 class AddressConversionTests: XCTestCase {
 
   func testZero() throws {
-    let bank: LR35902.Bank = 0
+    let bank: Gameboy.Cartridge.Bank = 0
     let address: LR35902.Address = 0
     let cartridgeLocation = Gameboy.Cartridge.location(for: address, in: bank)!
     let addressAndBank = Gameboy.Cartridge.addressAndBank(from: cartridgeLocation)
@@ -13,7 +13,7 @@ class AddressConversionTests: XCTestCase {
   }
 
   func testMiddleOfBank0() throws {
-    let bank: LR35902.Bank = 0
+    let bank: Gameboy.Cartridge.Bank = 0
     let address: LR35902.Address = 0x2000
     let cartridgeLocation = Gameboy.Cartridge.location(for: address, in: bank)!
     let addressAndBank = Gameboy.Cartridge.addressAndBank(from: cartridgeLocation)
@@ -22,7 +22,7 @@ class AddressConversionTests: XCTestCase {
   }
 
   func testEndOfBank0() throws {
-    let bank: LR35902.Bank = 0
+    let bank: Gameboy.Cartridge.Bank = 0
     let address: LR35902.Address = 0x3FFF
     let cartridgeLocation = Gameboy.Cartridge.location(for: address, in: bank)!
     let addressAndBank = Gameboy.Cartridge.addressAndBank(from: cartridgeLocation)
@@ -37,7 +37,7 @@ class AddressConversionTests: XCTestCase {
   }
 
   func testBeginningOfBank1() throws {
-    let bank: LR35902.Bank = 1
+    let bank: Gameboy.Cartridge.Bank = 1
     let address: LR35902.Address = 0x4000
     let cartridgeLocation = Gameboy.Cartridge.location(for: address, in: bank)!
     let addressAndBank = Gameboy.Cartridge.addressAndBank(from: cartridgeLocation)
@@ -47,7 +47,7 @@ class AddressConversionTests: XCTestCase {
   }
 
   func testBeginningOfBank2() throws {
-    let bank: LR35902.Bank = 2
+    let bank: Gameboy.Cartridge.Bank = 2
     let address: LR35902.Address = 0x4000
     let cartridgeLocation = Gameboy.Cartridge.location(for: address, in: bank)!
     let addressAndBank = Gameboy.Cartridge.addressAndBank(from: cartridgeLocation)
@@ -57,7 +57,7 @@ class AddressConversionTests: XCTestCase {
   }
 
   func testBank0WithBank1Selected() throws {
-    let bank: LR35902.Bank = 1
+    let bank: Gameboy.Cartridge.Bank = 1
     let address: LR35902.Address = 0x2000
     let cartridgeLocation = Gameboy.Cartridge.location(for: address, in: bank)!
     let addressAndBank = Gameboy.Cartridge.addressAndBank(from: cartridgeLocation)

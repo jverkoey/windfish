@@ -34,15 +34,15 @@ func extractText(from range: Range<Gameboy.Cartridge.Location>) {
 
 var jumpTableIndex = 0
 
-func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902.Bank,
-                          selectedBank: LR35902.Bank? = nil,
-                          bankTable: [UInt8: LR35902.Bank]? = nil,
+func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: Gameboy.Cartridge.Bank,
+                          selectedBank: Gameboy.Cartridge.Bank? = nil,
+                          bankTable: [UInt8: Gameboy.Cartridge.Bank]? = nil,
                           functionNames: [UInt8: String]? = nil) {
   //  assert((range.upperBound - range.lowerBound) <= 256)
   jumpTableIndex += 1
   disassembly.setJumpTable(at: range, in: bank)
 
-  let bankSelector: (UInt8) -> LR35902.Bank?
+  let bankSelector: (UInt8) -> Gameboy.Cartridge.Bank?
   if let selectedBank = selectedBank {
     disassembly.register(bankChange: selectedBank, at: range.lowerBound - 1, in: bank)
     bankSelector = { _ in
@@ -62,7 +62,7 @@ func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: LR35902
     let address: LR35902.Address = (LR35902.Address(highByte) << 8) | LR35902.Address(lowByte)
     if address < 0x8000 {
       let index = UInt8((location - cartRange.lowerBound) / 2)
-      let effectiveBank: LR35902.Bank
+      let effectiveBank: Gameboy.Cartridge.Bank
       let addressAndBank = Gameboy.Cartridge.addressAndBank(from: location)
       if address < 0x4000 {
         effectiveBank = 0
@@ -398,7 +398,7 @@ disassembleJumpTable(within: 0x76A8..<0x76AA, in: 0x19, selectedBank: 0x19)
 
 // MARK: - Entity table.
 
-var entityJumpTableBanks: [UInt8: LR35902.Bank] = [:]
+var entityJumpTableBanks: [UInt8: Gameboy.Cartridge.Bank] = [:]
 for (value, name) in disassembly.valuesForDatatype(named: "ENTITY")! {
   let address = 0x4000 + LR35902.Address(value)
   disassembly.setLabel(at: address, in: 0x03, named: "\(name)_bank")
