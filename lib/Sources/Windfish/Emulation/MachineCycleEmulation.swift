@@ -567,6 +567,17 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // xor r
+    case .xor(let register) where registers8.contains(register):
+      return { (cpu, memory, cycle) in
+        cpu.a ^= cpu[register]
+        cpu.fzero = cpu.a == 0
+        cpu.fsubtract = false
+        cpu.fcarry = false
+        cpu.fhalfcarry = false
+        return .fetchNext
+      }
+
     // and n
     case .and(.imm8):
       var immediate: UInt8 = 0
