@@ -202,6 +202,8 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
     // MARK: Views
 
+    let monospacedFont = NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
+
     let controls = NSSegmentedControl()
     controls.translatesAutoresizingMaskIntoConstraints = false
     controls.trackingMode = .momentary
@@ -222,7 +224,8 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
     let programCounterLabel = CreateLabel()
     programCounterLabel.translatesAutoresizingMaskIntoConstraints = false
-    programCounterLabel.stringValue = "Program counter:"
+    programCounterLabel.stringValue = "pc:"
+    programCounterLabel.font = monospacedFont
     programCounterLabel.alignment = .right
     view.addSubview(programCounterLabel)
 
@@ -230,12 +233,14 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     programCounterTextField.formatter = LR35902AddressFormatter()
     programCounterTextField.stringValue = programCounterTextField.formatter!.string(for: document.gameboy.cpu.pc)!
     programCounterTextField.identifier = .programCounter
+    programCounterTextField.font = monospacedFont
     programCounterTextField.delegate = self
     view.addSubview(programCounterTextField)
 
     let bankLabel = CreateLabel()
     bankLabel.translatesAutoresizingMaskIntoConstraints = false
-    bankLabel.stringValue = "Bank:"
+    bankLabel.stringValue = "bank:"
+    bankLabel.font = monospacedFont
     bankLabel.alignment = .right
     view.addSubview(bankLabel)
 
@@ -244,6 +249,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     bankTextField.formatter = UInt8HexFormatter()
     bankTextField.stringValue = programCounterTextField.formatter!.string(for: document.gameboy.cpu.bank)!
     bankTextField.identifier = .bank
+    bankTextField.font = monospacedFont
     bankTextField.delegate = self
     view.addSubview(bankTextField)
 
@@ -254,7 +260,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
     instructionAssemblyLabel.translatesAutoresizingMaskIntoConstraints = false
     instructionAssemblyLabel.stringValue = "Waiting for disassembly results..."
-    instructionAssemblyLabel.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
+    instructionAssemblyLabel.font = monospacedFont
     instructionAssemblyLabel.maximumNumberOfLines = 5
     instructionAssemblyLabel.lineBreakStrategy = .standard
     view.addSubview(instructionAssemblyLabel)
@@ -266,7 +272,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
     instructionBytesLabel.translatesAutoresizingMaskIntoConstraints = false
     instructionBytesLabel.stringValue = "Waiting for disassembly results..."
-    instructionBytesLabel.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
+    instructionBytesLabel.font = monospacedFont
     instructionBytesLabel.maximumNumberOfLines = 5
     instructionBytesLabel.lineBreakStrategy = .standard
     view.addSubview(instructionBytesLabel)
@@ -383,23 +389,22 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       controls.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
 
       programCounterLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
-      programCounterLabel.topAnchor.constraint(equalToSystemSpacingBelow: controls.bottomAnchor, multiplier: 1),
+      programCounterLabel.firstBaselineAnchor.constraint(equalTo: programCounterTextField.firstBaselineAnchor),
 
       bankLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
-      bankLabel.topAnchor.constraint(equalTo: programCounterLabel.bottomAnchor),
+      bankLabel.firstBaselineAnchor.constraint(equalTo: bankTextField.firstBaselineAnchor),
 
       textFieldAlignmentGuide.leadingAnchor.constraint(equalTo: programCounterLabel.trailingAnchor),
       textFieldAlignmentGuide.leadingAnchor.constraint(equalTo: bankLabel.trailingAnchor),
       textFieldAlignmentGuide.widthAnchor.constraint(equalToConstant: 8),
 
       programCounterTextField.leadingAnchor.constraint(equalTo: textFieldAlignmentGuide.trailingAnchor),
-      programCounterTextField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-      programCounterTextField.topAnchor.constraint(equalTo: programCounterLabel.topAnchor),
-      bankLabel.topAnchor.constraint(equalTo: programCounterTextField.bottomAnchor),
+      programCounterTextField.widthAnchor.constraint(equalToConstant: 50),
+      programCounterTextField.topAnchor.constraint(equalToSystemSpacingBelow: controls.bottomAnchor, multiplier: 1),
 
       bankTextField.leadingAnchor.constraint(equalTo: textFieldAlignmentGuide.trailingAnchor),
-      bankTextField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-      bankTextField.topAnchor.constraint(equalTo: bankLabel.topAnchor),
+      bankTextField.widthAnchor.constraint(equalToConstant: 50),
+      bankTextField.topAnchor.constraint(equalTo: programCounterTextField.bottomAnchor),
 
       instructionLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
       instructionLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -4),
