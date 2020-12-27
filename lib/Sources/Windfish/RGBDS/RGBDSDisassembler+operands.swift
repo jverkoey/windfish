@@ -257,7 +257,7 @@ extension RGBDSDisassembler {
       var parts = bitmaskValues.sorted()
 
       // If there are any remaining bits in the mask, binary or those as well.
-      if namedValues != imm8 {
+      if namedValues != imm8 || parts.isEmpty {
         let remainingBits = imm8 & ~(namedValues)
         parts.append(literal(for: remainingBits, using: dataType.representation))
       }
