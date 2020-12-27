@@ -44,7 +44,7 @@ final class ProjectViewController: NSViewController {
 
     let trailingSidebarItem = NSSplitViewItem(sidebarWithViewController: inspectorViewController)
     trailingSidebarItem.canCollapse = false
-    trailingSidebarItem.minimumThickness = 400
+    trailingSidebarItem.minimumThickness = 300
     splitViewController.addSplitViewItem(trailingSidebarItem)
 
     super.init(nibName: nil, bundle: nil)

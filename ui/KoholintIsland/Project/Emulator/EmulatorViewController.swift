@@ -137,7 +137,6 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   let instructionAssemblyLabel = CreateLabel()
   let instructionBytesLabel = CreateLabel()
   private let cpuView = LR35902View()
-  private let flagsView = FlagsView()
 
   init(document: ProjectDocument) {
     self.document = document
@@ -157,7 +156,6 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
   private var programCounterObserver: NSKeyValueObservation?
   private var disassembledSubscriber: AnyCancellable?
-  private var didChangeFlagsSubscriber: AnyCancellable?
 
   override func loadView() {
     view = NSView()
@@ -230,9 +228,6 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     instructionBytesLabel.lineBreakStrategy = .standard
     view.addSubview(instructionBytesLabel)
 
-    flagsView.translatesAutoresizingMaskIntoConstraints = false
-    view.addSubview(flagsView)
-
     let ramTableView = EditorTableView(elementsController: ramController)
     ramTableView.translatesAutoresizingMaskIntoConstraints = false
     ramTableView.tableView?.delegate = self
@@ -283,7 +278,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       instructionLabel.topAnchor.constraint(equalTo: bankTextField.bottomAnchor),
 
       instructionAssemblyLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
-      instructionAssemblyLabel.widthAnchor.constraint(lessThanOrEqualToConstant: 400),
+      instructionAssemblyLabel.widthAnchor.constraint(lessThanOrEqualToConstant: 300),
       instructionAssemblyLabel.topAnchor.constraint(equalTo: instructionLabel.bottomAnchor),
 
       instructionBytesLabelHeader.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
@@ -291,16 +286,12 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       instructionBytesLabelHeader.topAnchor.constraint(equalTo: instructionAssemblyLabel.bottomAnchor),
 
       instructionBytesLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
-      instructionBytesLabel.widthAnchor.constraint(lessThanOrEqualToConstant: 400),
+      instructionBytesLabel.widthAnchor.constraint(lessThanOrEqualToConstant: 300),
       instructionBytesLabel.topAnchor.constraint(equalTo: instructionBytesLabelHeader.bottomAnchor),
-
-      flagsView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
-      flagsView.widthAnchor.constraint(lessThanOrEqualToConstant: 400),
-      flagsView.topAnchor.constraint(equalToSystemSpacingBelow: instructionBytesLabel.bottomAnchor, multiplier: 1),
 
       ramTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
       ramTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-      ramTableView.topAnchor.constraint(equalToSystemSpacingBelow: flagsView.bottomAnchor, multiplier: 1),
+      ramTableView.topAnchor.constraint(equalToSystemSpacingBelow: instructionBytesLabel.bottomAnchor, multiplier: 1),
       ramTableView.heightAnchor.constraint(equalToConstant: 220),
     ])
 
@@ -315,18 +306,11 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     updateInstructionAssembly()
     updateRegisters()
     updateRAM()
-    flagsView.updateLabel(from: document.gameboy.cpu)
 
     disassembledSubscriber = NotificationCenter.default.publisher(for: .disassembled, object: document)
       .receive(on: RunLoop.main)
       .sink(receiveValue: { notification in
         self.updateInstructionAssembly()
-      })
-
-    didChangeFlagsSubscriber = NotificationCenter.default.publisher(for: .didChangeFlags, object: document)
-      .receive(on: RunLoop.main)
-      .sink(receiveValue: { notification in
-        self.flagsView.updateLabel(from: self.document.gameboy.cpu)
       })
   }
 

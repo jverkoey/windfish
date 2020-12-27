@@ -142,6 +142,7 @@ final class LR35902View: NSView {
   let eView = RegisterView()
   let hView = RegisterView()
   let lView = RegisterView()
+  let flagsView = FlagsView()
   override init(frame frameRect: NSRect) {
     super.init(frame: frameRect)
 
@@ -181,6 +182,9 @@ final class LR35902View: NSView {
     lView.translatesAutoresizingMaskIntoConstraints = false
     addSubview(lView)
 
+    flagsView.translatesAutoresizingMaskIntoConstraints = false
+    addSubview(flagsView)
+
     NSLayoutConstraint.activate([
       pcView.leadingAnchor.constraint(equalTo: leadingAnchor),
       pcView.topAnchor.constraint(equalTo: topAnchor),
@@ -190,28 +194,28 @@ final class LR35902View: NSView {
 
       aView.leadingAnchor.constraint(equalToSystemSpacingAfter: pcView.trailingAnchor, multiplier: 1),
       fView.leadingAnchor.constraint(equalTo: aView.trailingAnchor, constant: 4),
-      fView.trailingAnchor.constraint(equalTo: trailingAnchor),
+
+      flagsView.leadingAnchor.constraint(equalTo: fView.trailingAnchor, constant: 4),
+      flagsView.centerYAnchor.constraint(equalTo: fView.centerYAnchor),
+      flagsView.trailingAnchor.constraint(equalTo: trailingAnchor),
 
       aView.topAnchor.constraint(equalTo: topAnchor),
       fView.topAnchor.constraint(equalTo: aView.topAnchor),
 
       bView.leadingAnchor.constraint(equalTo: aView.leadingAnchor),
       cView.leadingAnchor.constraint(equalTo: bView.trailingAnchor, constant: 4),
-      cView.trailingAnchor.constraint(equalTo: trailingAnchor),
 
       bView.topAnchor.constraint(equalTo: aView.bottomAnchor),
       cView.topAnchor.constraint(equalTo: bView.topAnchor),
 
       dView.leadingAnchor.constraint(equalTo: aView.leadingAnchor),
       eView.leadingAnchor.constraint(equalTo: dView.trailingAnchor, constant: 4),
-      eView.trailingAnchor.constraint(equalTo: trailingAnchor),
 
       dView.topAnchor.constraint(equalTo: bView.bottomAnchor),
       eView.topAnchor.constraint(equalTo: dView.topAnchor),
 
       hView.leadingAnchor.constraint(equalTo: aView.leadingAnchor),
       lView.leadingAnchor.constraint(equalTo: hView.trailingAnchor, constant: 4),
-      lView.trailingAnchor.constraint(equalTo: trailingAnchor),
 
       hView.topAnchor.constraint(equalTo: dView.bottomAnchor),
       lView.topAnchor.constraint(equalTo: hView.topAnchor),
@@ -235,5 +239,6 @@ final class LR35902View: NSView {
     eView.value = cpu.e
     hView.value = cpu.h
     lView.value = cpu.l
+    flagsView.update(with: cpu)
   }
 }
