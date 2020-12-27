@@ -87,7 +87,7 @@ public struct LCDController {
   var coincidence: Bool {                 // bit 2
     return ly == lyc
   }
-  var lcdMode = LCDCMode.hblank           // bits 1 and 0
+  var lcdMode = LCDCMode.searchingOAM     // bits 1 and 0
 
   // MARK: LY
 
@@ -102,6 +102,8 @@ public struct LCDController {
   private var lcdModeCycle: Int = 0
 }
 
+// MARK: - Emulation
+
 extension LCDController {
   /** Executes a single machine cycle and returns the mutation. */
   public func advance() -> LCDController {
@@ -111,19 +113,49 @@ extension LCDController {
 
     // TODO: Implement state machine below.
     switch lcdMode {
-    case .hblank:
-      break
-    case .vblank:
+    case .searchingOAM:
+      if mutation.lcdModeCycle >= 20 {
+        mutation.lcdMode = .transferringToLCDDriver
+        mutation.lcdModeCycle = 0
+      }
       break
     case .transferringToLCDDriver:
+      if mutation.lcdModeCycle >= 43 {
+        mutation.lcdMode = .hblank
+        mutation.lcdModeCycle = 0
+      }
       break
-    case .searchingOAM:
+    case .hblank:
+      if mutation.lcdModeCycle >= 51 {
+        mutation.lcdModeCycle = 0
+        mutation.ly += 1
+        if mutation.ly >= 144 {
+          mutation.lcdMode = .vblank
+        } else {
+          // TODO: Dump the current scanline to the screen buffer.
+
+          mutation.lcdMode = .searchingOAM
+        }
+      }
+      break
+    case .vblank:
+      if mutation.lcdModeCycle >= 114 {
+        mutation.lcdModeCycle = 0
+        mutation.ly += 1
+
+        if mutation.ly >= 154 {
+          mutation.ly = 0
+          mutation.lcdMode = .searchingOAM
+        }
+      }
       break
     }
 
     return mutation
   }
 }
+
+// MARK: - AddressableMemory
 
 extension LCDController: AddressableMemory {
   public func read(from address: LR35902.Address) -> UInt8 {
