@@ -9,7 +9,11 @@ extension LR35902.InstructionSet {
     let registers8 = LR35902.Instruction.Numeric.registers8
     let registers16 = LR35902.Instruction.Numeric.registers16
     let registersAddr = LR35902.Instruction.Numeric.registersAddr
+
+    // Swift isn't able to resolve case statements when enums have an ambiguous number of associated values, so we need
+    // to explicitly declare the specs here.
     let addimm8 = LR35902.Instruction.Spec.add(.imm8)
+    let subimm8 = LR35902.Instruction.Spec.sub(.imm8)
 
     let evaluateConditional: (LR35902.Instruction.Condition?, LR35902) -> LR35902.MachineInstruction.MicroCodeResult = { cnd, cpu in
       switch cnd {
@@ -504,9 +508,28 @@ extension LR35902.InstructionSet {
         let originalValue = cpu[register] as UInt8
         let result = originalValue.subtractingReportingOverflow(1)
         cpu.fzero = result.partialValue == 0
-        cpu.fhalfcarry = (originalValue & 0x0f) == 0
         cpu.fsubtract = true
+        cpu.fhalfcarry = (originalValue & 0x0f) < (1 & 0x0f)
         cpu[register] = result.partialValue
+        return .fetchNext
+      }
+
+    // sub n
+    case subimm8:
+      var immediate: UInt8 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          immediate = UInt8(memory.read(from: cpu.pc))
+          cpu.pc += 1
+          return .continueExecution
+        }
+        let originalValue = cpu.a
+        let result = originalValue.subtractingReportingOverflow(immediate)
+        cpu.fzero = result.partialValue == 0
+        cpu.fsubtract = true
+        cpu.fcarry = result.overflow
+        cpu.fhalfcarry = (cpu.a & 0x0f) < (immediate & 0x0f)
+        cpu.a = result.partialValue
         return .fetchNext
       }
 
