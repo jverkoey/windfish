@@ -131,14 +131,12 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   let selectedTabImage = NSImage(systemSymbolName: "cpu", accessibilityDescription: nil)!
 
   let document: ProjectDocument
-  let cpuController = NSArrayController()
   let ramController = NSArrayController()
   let registerStateController = NSArrayController()
-  var tableView: NSTableView?
   var ramTableView: EditorTableView?
-  let programCounterTextField = NSTextField()
   let instructionAssemblyLabel = CreateLabel()
   let instructionBytesLabel = CreateLabel()
+  private let cpuView = LR35902View()
   private let flagsView = FlagsView()
 
   init(document: ProjectDocument) {
@@ -158,7 +156,6 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   }
 
   private var programCounterObserver: NSKeyValueObservation?
-  private var registerObservers: [NSKeyValueObservation] = []
   private var disassembledSubscriber: AnyCancellable?
   private var didChangeFlagsSubscriber: AnyCancellable?
 
@@ -187,20 +184,8 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     controls.action = #selector(performControlAction(_:))
     view.addSubview(controls)
 
-    let programCounterLabel = CreateLabel()
-    programCounterLabel.translatesAutoresizingMaskIntoConstraints = false
-    programCounterLabel.stringValue = "pc:"
-    programCounterLabel.font = monospacedFont
-    programCounterLabel.alignment = .right
-    view.addSubview(programCounterLabel)
-
-    programCounterTextField.translatesAutoresizingMaskIntoConstraints = false
-    programCounterTextField.formatter = LR35902AddressFormatter()
-    programCounterTextField.stringValue = programCounterTextField.formatter!.string(for: document.gameboy.cpu.pc)!
-    programCounterTextField.identifier = .programCounter
-    programCounterTextField.font = monospacedFont
-    programCounterTextField.delegate = self
-    view.addSubview(programCounterTextField)
+    cpuView.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(cpuView)
 
     let bankLabel = CreateLabel()
     bankLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -213,7 +198,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     bankTextField.translatesAutoresizingMaskIntoConstraints = false
     bankTextField.formatter = UInt8HexFormatter()
     if let cartridge = self.document.gameboy.cartridge {
-      bankTextField.stringValue = programCounterTextField.formatter!.string(for: cartridge.selectedBank)!
+      bankTextField.stringValue = bankTextField.formatter!.string(for: cartridge.selectedBank)!
     }
     bankTextField.isEditable = false
     bankTextField.identifier = .bank
@@ -245,19 +230,6 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     instructionBytesLabel.lineBreakStrategy = .standard
     view.addSubview(instructionBytesLabel)
 
-    let containerView = NSScrollView()
-    containerView.translatesAutoresizingMaskIntoConstraints = false
-    containerView.hasVerticalScroller = true
-
-    let tableView = NSTableView()
-    tableView.translatesAutoresizingMaskIntoConstraints = false
-    tableView.style = .fullWidth
-    tableView.selectionHighlightStyle = .regular
-    tableView.delegate = self
-    containerView.documentView = tableView
-    view.addSubview(containerView)
-    self.tableView = tableView
-
     flagsView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(flagsView)
 
@@ -267,25 +239,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     view.addSubview(ramTableView)
     self.ramTableView = ramTableView
 
-    let textFieldAlignmentGuide = NSLayoutGuide()
-    view.addLayoutGuide(textFieldAlignmentGuide)
-
     // MARK: Model
-
-    let columns = [
-      Column(name: "Register", identifier: .register, width: 50),
-      Column(name: "Value", identifier: .registerValue, width: 50),
-      Column(name: "Source", identifier: .registerSourceLocation, width: 65),
-      Column(name: "Variable", identifier: .registerVariableAddress, width: 50),
-      Column(name: "Name", identifier: .variableName, width: 50),
-    ]
-    for columnInfo in columns {
-      let column = NSTableColumn(identifier: columnInfo.identifier)
-      column.isEditable = false
-      column.headerCell.stringValue = columnInfo.name
-      column.width = columnInfo.width
-      tableView.addTableColumn(column)
-    }
 
     let ramColumns = [
       Column(name: "Address", identifier: .address, width: 50),
@@ -302,49 +256,6 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       ramTableView.tableView?.addTableColumn(column)
     }
 
-    let registers = [
-      CPURegister(name: "a", register: .a, value: nil, sourceLocation: nil, variableAddress: 0),
-      CPURegister(name: "b", register: .b, value: nil, sourceLocation: nil, variableAddress: 0),
-      CPURegister(name: "c", register: .c, value: nil, sourceLocation: nil, variableAddress: 0),
-      CPURegister(name: "d", register: .d, value: nil, sourceLocation: nil, variableAddress: 0),
-      CPURegister(name: "e", register: .e, value: nil, sourceLocation: nil, variableAddress: 0),
-      CPURegister(name: "h", register: .h, value: nil, sourceLocation: nil, variableAddress: 0),
-      CPURegister(name: "l", register: .l, value: nil, sourceLocation: nil, variableAddress: 0),
-      CPURegister(name: "sp", register: .sp, value: nil, sourceLocation: nil, variableAddress: 0),
-    ]
-    let didChangeRegister: (CPURegister) -> Void = { [weak self] register in
-      guard let self = self else {
-        return
-      }
-      if LR35902.Instruction.Numeric.registers8.contains(register.register) {
-        let registerValue: UInt8
-        if let result = register.value?.numberRepresentation(UInt8.self) {
-          register.valueRepresentation = result.0
-          registerValue = result.1
-        } else {
-          registerValue = 0
-        }
-        self.document.gameboy.cpu[register.register] = registerValue
-
-      } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
-        let registerValue: UInt16
-        if let result = register.value?.numberRepresentation(UInt16.self) {
-          register.valueRepresentation = result.0
-          registerValue = result.1
-        } else {
-          registerValue = 0
-        }
-        self.document.gameboy.cpu[register.register] = registerValue
-      }
-    }
-    for register in registers {
-      registerObservers.append(contentsOf: [
-        register.observe(\.value) { register, _ in didChangeRegister(register) },
-      ])
-    }
-    cpuController.add(contentsOf: registers)
-    cpuController.setSelectionIndexes(IndexSet())
-
     registerStateController.addObject("Unknown")
     registerStateController.addObject("Literal")
     registerStateController.addObject("Address")
@@ -356,23 +267,15 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       controls.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
       controls.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
 
-      programCounterLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
-      programCounterLabel.firstBaselineAnchor.constraint(equalTo: programCounterTextField.firstBaselineAnchor),
+      cpuView.topAnchor.constraint(equalToSystemSpacingBelow: controls.bottomAnchor, multiplier: 1),
+      cpuView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
 
       bankLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
       bankLabel.firstBaselineAnchor.constraint(equalTo: bankTextField.firstBaselineAnchor),
 
-      textFieldAlignmentGuide.leadingAnchor.constraint(equalTo: programCounterLabel.trailingAnchor),
-      textFieldAlignmentGuide.leadingAnchor.constraint(equalTo: bankLabel.trailingAnchor),
-      textFieldAlignmentGuide.widthAnchor.constraint(equalToConstant: 8),
-
-      programCounterTextField.leadingAnchor.constraint(equalTo: textFieldAlignmentGuide.trailingAnchor),
-      programCounterTextField.widthAnchor.constraint(equalToConstant: 50),
-      programCounterTextField.topAnchor.constraint(equalToSystemSpacingBelow: controls.bottomAnchor, multiplier: 1),
-
-      bankTextField.leadingAnchor.constraint(equalTo: textFieldAlignmentGuide.trailingAnchor),
+      bankTextField.leadingAnchor.constraint(equalTo: bankLabel.trailingAnchor),
       bankTextField.widthAnchor.constraint(equalToConstant: 50),
-      bankTextField.topAnchor.constraint(equalTo: programCounterTextField.bottomAnchor),
+      bankTextField.topAnchor.constraint(equalTo: cpuView.bottomAnchor),
 
       instructionLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
       instructionLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -4),
@@ -391,14 +294,9 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       instructionBytesLabel.widthAnchor.constraint(lessThanOrEqualToConstant: 400),
       instructionBytesLabel.topAnchor.constraint(equalTo: instructionBytesLabelHeader.bottomAnchor),
 
-      containerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-      containerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-      containerView.topAnchor.constraint(equalToSystemSpacingBelow: instructionBytesLabel.bottomAnchor, multiplier: 1),
-      containerView.heightAnchor.constraint(equalToConstant: 220),
-
       flagsView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
       flagsView.widthAnchor.constraint(lessThanOrEqualToConstant: 400),
-      flagsView.topAnchor.constraint(equalToSystemSpacingBelow: containerView.bottomAnchor, multiplier: 1),
+      flagsView.topAnchor.constraint(equalToSystemSpacingBelow: instructionBytesLabel.bottomAnchor, multiplier: 1),
 
       ramTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
       ramTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
@@ -409,10 +307,6 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     ramController.sortDescriptors = [
       NSSortDescriptor(key: NSUserInterfaceItemIdentifier.address.rawValue, ascending: true),
     ]
-
-    tableView.bind(.content, to: cpuController, withKeyPath: "arrangedObjects", options: nil)
-    tableView.bind(.selectionIndexes, to: cpuController, withKeyPath:"selectionIndexes", options: nil)
-    tableView.bind(.sortDescriptors, to: cpuController, withKeyPath: "sortDescriptors", options: nil)
 
     ramTableView.tableView?.bind(.content, to: ramController, withKeyPath: "arrangedObjects", options: nil)
     ramTableView.tableView?.bind(.selectionIndexes, to: ramController, withKeyPath:"selectionIndexes", options: nil)
@@ -444,9 +338,6 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
       document.gameboy = document.gameboy.advanceInstruction()
 
-      if let addressAndBank = document.gameboy.cpu.machineInstruction.sourceAddressAndBank() {
-        programCounterTextField.objectValue = addressAndBank.address
-      }
       updateInstructionAssembly()
       updateRegisters()
       updateRAM()
@@ -524,38 +415,7 @@ extension EmulatorViewController: NSTextFieldDelegate {
   }
 
   func updateRegisters() {
-    let globalMap = document.configuration.globals.reduce(into: [:]) { accumulator, global in
-      accumulator[global.address] = global
-    }
-
-    for register in cpuController.arrangedObjects as! [CPURegister] {
-      if LR35902.Instruction.Numeric.registers8.contains(register.register) {
-        let value = self.document.gameboy.cpu[register.register] as UInt8
-        register.value = value.stringWithRepresentation(register.valueRepresentation)
-
-        let trace = self.document.gameboy.cpu.registerTraces[register.register]
-        register.sourceLocation = trace?.sourceLocation?.stringWithAddressAndBank()
-        register.variableAddress = trace?.loadAddress ?? 0
-        if let loadAddress = trace?.loadAddress {
-          register.variableName = globalMap[loadAddress]?.name
-        } else {
-          register.variableName = nil
-        }
-
-      } else if LR35902.Instruction.Numeric.registers16.contains(register.register) {
-        let value = self.document.gameboy.cpu[register.register] as UInt16
-        register.value = value.stringWithRepresentation(register.valueRepresentation)
-
-        let trace = self.document.gameboy.cpu.registerTraces[register.register]
-        register.sourceLocation = trace?.sourceLocation?.stringWithAddressAndBank()
-        register.variableAddress = trace?.loadAddress ?? 0
-        if let loadAddress = trace?.loadAddress {
-          register.variableName = globalMap[loadAddress]?.name
-        } else {
-          register.variableName = nil
-        }
-      }
-    }
+    cpuView.update(with: document.gameboy.cpu)
   }
 
   func updateRAM() {
