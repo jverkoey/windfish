@@ -2359,4 +2359,36 @@ nop
     XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(cartridge.size)).map { $0 })
     XCTAssertEqual(testMemory.writes, [])
   }
+
+  func test_ei_di() throws {
+    // Given
+    var gameboy = createGameboy(loadedWith: "ei\n di\n nop")
+
+    let testMemory = TestMemory()
+    gameboy.addMemoryTracer(testMemory)
+
+    // When
+    gameboy.cpu.ime = false
+    gameboy.cpu.imeScheduledCyclesRemaining = 0
+
+    var mutated = gameboy.advanceInstruction()
+
+    // Expected mutations
+    gameboy.cpu.pc += 2
+    gameboy.cpu.ime = false  // Not enabled immediately.
+    gameboy.cpu.imeScheduledCyclesRemaining = 1
+
+    assertEqual(gameboy.cpu, mutated.cpu)
+
+    gameboy = mutated
+
+    mutated = gameboy.advance()
+
+    // Expected mutations
+    gameboy.cpu.pc += 1
+    gameboy.cpu.ime = false
+    gameboy.cpu.imeScheduledCyclesRemaining = 0
+
+    assertEqual(gameboy.cpu, mutated.cpu)
+  }
 }

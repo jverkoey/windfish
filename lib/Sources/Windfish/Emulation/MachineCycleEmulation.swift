@@ -594,6 +594,7 @@ extension LR35902 {
 }
 
 extension Gameboy {
+  /** Advances the emulation by one machine cycle. */
   public func advance() -> Gameboy {
     var mutated = self
     mutated.cpu = cpu.advance(memory: &mutated.memory)
@@ -610,6 +611,7 @@ extension Gameboy {
     return mutated
   }
 
+  /** Advances the emulation by one instruction. */
   public func advanceInstruction() -> Gameboy {
     var mutated = self
     if mutated.cpu.machineInstruction.loaded == nil {

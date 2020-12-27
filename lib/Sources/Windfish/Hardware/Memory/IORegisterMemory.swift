@@ -1,5 +1,8 @@
 import Foundation
 
+// References:
+// - https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
+
 public struct IORegisterMemory: AddressableMemory {
   public let addressableRanges: [ClosedRange<LR35902.Address>] = [
     0xFF05...0xFF26,
@@ -11,6 +14,7 @@ public struct IORegisterMemory: AddressableMemory {
     case TIMA = 0xFF05
     case TMA  = 0xFF06
     case TAC  = 0xFF07
+    case IF   = 0xFF0F
     case NR10 = 0xFF10
     case NR11 = 0xFF11
     case NR12 = 0xFF12
@@ -40,6 +44,7 @@ public struct IORegisterMemory: AddressableMemory {
     .TIMA: 0x00,
     .TMA:  0x00,
     .TAC:  0x00,
+    .IF:   0x00,
     .NR10: 0x80,
     .NR11: 0xBF,
     .NR12: 0xF3,
