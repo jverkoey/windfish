@@ -1,18 +1,22 @@
 import Foundation
 
 // References:
-// https://www.youtube.com/watch?v=HyzD8pNlpwI&t=29m19s
-// https://gbdev.gg8.se/wiki/articles/Video_Display#FF41_-_STAT_-_LCDC_Status_.28R.2FW.29
-// https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
+// - https://www.youtube.com/watch?v=HyzD8pNlpwI&t=29m19s
+// - https://gbdev.gg8.se/wiki/articles/Video_Display#FF41_-_STAT_-_LCDC_Status_.28R.2FW.29
+// - https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
+// - http://gameboy.mongenel.com/dmg/asmmemmap.html
 
 public struct LCDController {
   static let tileMapRegion: ClosedRange<LR35902.Address> = 0x9800...0x9FFF
+  static let tileDataRegion: ClosedRange<LR35902.Address> = 0x8000...0x97FF
   public let addressableRanges: [ClosedRange<LR35902.Address>] = [
     0xFF40...0xFF45,
     LCDController.tileMapRegion,
+    LCDController.tileDataRegion,
   ]
 
   var tileMap: [LR35902.Address: UInt8] = [:]
+  var tileData: [LR35902.Address: UInt8] = [:]
 
   enum Addresses: LR35902.Address {
     case LCDC = 0xFF40
@@ -200,6 +204,10 @@ extension LCDController: AddressableMemory {
   public mutating func write(_ byte: UInt8, to address: LR35902.Address) {
     if LCDController.tileMapRegion.contains(address) {
       tileMap[address] = byte
+      return
+    }
+    if LCDController.tileDataRegion.contains(address) {
+      tileData[address] = byte
       return
     }
     guard let lcdAddress = Addresses(rawValue: address) else {
