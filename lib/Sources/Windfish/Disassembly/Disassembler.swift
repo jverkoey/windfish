@@ -600,16 +600,16 @@ public class Disassembler {
     let address: LR35902.Address
   }
 
-  private func fetchInstructionSpec(pc: inout LR35902.Address) -> LR35902.Instruction.Spec {
+  public static func fetchInstructionSpec(pc: inout LR35902.Address, memory: AddressableMemory) -> LR35902.Instruction.Spec {
     // Fetch
-    let instructionByte = cartridge.read(from: pc)
+    let instructionByte = memory.read(from: pc)
     pc += 1
 
     // Decode
     let spec = LR35902.InstructionSet.table[Int(instructionByte)]
     if let prefixTable = LR35902.InstructionSet.prefixTables[spec] {
       // Fetch
-      let cbInstructionByte = cartridge.read(from: pc)
+      let cbInstructionByte = memory.read(from: pc)
       pc += 1
 
       // Decode
@@ -618,8 +618,8 @@ public class Disassembler {
     return spec
   }
 
-  private func fetchInstruction(pc: inout LR35902.Address) -> LR35902.Instruction {
-    let spec = fetchInstructionSpec(pc: &pc)
+  public static func fetchInstruction(pc: inout LR35902.Address, memory: AddressableMemory) -> LR35902.Instruction {
+    let spec = fetchInstructionSpec(pc: &pc, memory: memory)
 
     guard let instructionWidth = LR35902.InstructionSet.widths[spec] else {
       preconditionFailure("\(spec) is missing its width, implying a misconfiguration of the instruction set."
@@ -630,7 +630,7 @@ public class Disassembler {
     if instructionWidth.operand > 0 {
       var operandBytes: [UInt8] = []
       for _ in 0..<Int(instructionWidth.operand) {
-        let byte = cartridge.read(from: pc)
+        let byte = memory.read(from: pc)
         pc += 1
         operandBytes.append(byte)
       }
@@ -699,7 +699,7 @@ public class Disassembler {
 
         // Don't commit the fetch to the context pc yet in case the instruction was invalid.
         var instructionPc = runContext.pc
-        let instruction = fetchInstruction(pc: &instructionPc)
+        let instruction = Disassembler.fetchInstruction(pc: &instructionPc, memory: cartridge)
 
         // STOP must be followed by 0
         if case .stop = instruction.spec, case let .imm8(immediate) = instruction.immediate, immediate != 0 {
