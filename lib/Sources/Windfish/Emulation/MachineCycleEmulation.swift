@@ -534,7 +534,15 @@ extension LR35902.InstructionSet {
     case .di:
       return { (cpu, memory, cycle) in
         cpu.ime = false
-        cpu.imeScheduled = false
+        cpu.imeScheduledCyclesRemaining = 0
+        return .fetchNext
+      }
+
+    // ei
+    case .ei:
+      return { (cpu, memory, cycle) in
+        // IME will be enabled after the next machine cycle, so we set up a counter to track that delay.
+        cpu.imeScheduledCyclesRemaining = 2
         return .fetchNext
       }
 
@@ -582,5 +590,36 @@ extension LR35902 {
     }
 
     return mutation
+  }
+}
+
+extension Gameboy {
+  public func advance() -> Gameboy {
+    var mutated = self
+    mutated.cpu = cpu.advance(memory: &mutated.memory)
+    mutated.lcdController = lcdController.advance()
+
+    // TODO: Verify this timing as I'm not confident it's being evaluated at the correct location.
+    if mutated.cpu.imeScheduledCyclesRemaining > 0 {
+      mutated.cpu.imeScheduledCyclesRemaining -= 1
+      if mutated.cpu.imeScheduledCyclesRemaining <= 0 {
+        mutated.cpu.ime = true
+        mutated.cpu.imeScheduledCyclesRemaining = 0
+      }
+    }
+    return mutated
+  }
+
+  public func advanceInstruction() -> Gameboy {
+    var mutated = self
+    if mutated.cpu.machineInstruction.loaded == nil {
+      mutated = mutated.advance()
+    }
+    if let sourceLocation = mutated.cpu.machineInstruction.loaded?.sourceLocation {
+      while sourceLocation == mutated.cpu.machineInstruction.loaded?.sourceLocation {
+        mutated = mutated.advance()
+      }
+    }
+    return mutated
   }
 }

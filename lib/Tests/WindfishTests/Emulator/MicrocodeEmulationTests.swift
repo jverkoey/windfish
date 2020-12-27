@@ -15,7 +15,7 @@ class MicrocodeEmulationTests: XCTestCase {
 
   static var testedSpecs = Set<LR35902.Instruction.Spec>()
 
-  // 319 specs to go.
+  // 318 specs to go.
   static override func tearDown() {
     let remainingSpecs = LR35902.InstructionSet.allSpecs().filter { !testedSpecs.contains($0) }
     print("\(remainingSpecs.count) specs remaining to test")
@@ -2287,7 +2287,7 @@ nop
     // When
     for (index, instruction) in instructions.enumerated() {
       gameboy.cpu.ime = true
-      gameboy.cpu.imeScheduled = true
+      gameboy.cpu.imeScheduledCyclesRemaining = 2
 
       let mutated = gameboy.advanceInstruction()
 
@@ -2297,11 +2297,62 @@ nop
       }
       gameboy.cpu.pc += 1
       gameboy.cpu.ime = false
-      gameboy.cpu.imeScheduled = false
+      gameboy.cpu.imeScheduledCyclesRemaining = 0
 
       assertEqual(gameboy.cpu, mutated.cpu, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
 
       gameboy = mutated
+    }
+
+    let cartridge = try XCTUnwrap(gameboy.cartridge)
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(cartridge.size)).map { $0 })
+    XCTAssertEqual(testMemory.writes, [])
+  }
+
+  func test_ei() throws {
+    // Given
+    let specs = LR35902.InstructionSet.allSpecs().filter { spec in
+      switch spec {
+      case .ei:
+        return true
+      default:
+        return false
+      }
+    }
+    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    let instructions = specs.map { LR35902.Instruction(spec: $0) }
+    let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
+    var gameboy = createGameboy(loadedWith: assembly + "\n nop\n nop")
+
+    let testMemory = TestMemory()
+    gameboy.addMemoryTracer(testMemory)
+
+    // When
+    for (index, instruction) in instructions.enumerated() {
+      gameboy.cpu.ime = false
+      gameboy.cpu.imeScheduledCyclesRemaining = 0
+
+      var mutated = gameboy.advanceInstruction()
+
+      // Expected mutations
+      if index == 0 {
+        gameboy.cpu.pc += 1
+      }
+      gameboy.cpu.pc += 1
+      gameboy.cpu.ime = false  // Not enabled immediately.
+      gameboy.cpu.imeScheduledCyclesRemaining = 1
+
+      assertEqual(gameboy.cpu, mutated.cpu, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
+
+      gameboy = mutated
+
+      mutated = gameboy.advance()
+
+      // Expected mutations
+      gameboy.cpu.pc += 1
+      gameboy.cpu.ime = true
+
+      assertEqual(gameboy.cpu, mutated.cpu, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
     }
 
     let cartridge = try XCTUnwrap(gameboy.cartridge)

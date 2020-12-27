@@ -18,7 +18,7 @@ public struct Gameboy {
     set { _memory = newValue as! Memory }
   }
   public var cpu = LR35902()
-  public private(set) var lcdController = LCDController() {
+  public internal(set) var lcdController = LCDController() {
     didSet {
       _memory.mapRegion(to: lcdController)
     }
@@ -26,26 +26,6 @@ public struct Gameboy {
 
   public mutating func addMemoryTracer(_ tracer: AddressableMemory) {
     _memory.tracers.append(tracer)
-  }
-
-  public func advance() -> Gameboy {
-    var mutated = self
-    mutated.cpu = cpu.advance(memory: &mutated.memory)
-    mutated.lcdController = lcdController.advance()
-    return mutated
-  }
-
-  public func advanceInstruction() -> Gameboy {
-    var mutated = self
-    if mutated.cpu.machineInstruction.loaded == nil {
-      mutated = mutated.advance()
-    }
-    if let sourceLocation = mutated.cpu.machineInstruction.loaded?.sourceLocation {
-      while sourceLocation == mutated.cpu.machineInstruction.loaded?.sourceLocation {
-        mutated = mutated.advance()
-      }
-    }
-    return mutated
   }
 
   private var _memory = Memory()
