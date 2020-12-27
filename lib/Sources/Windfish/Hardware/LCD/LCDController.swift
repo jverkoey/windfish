@@ -6,9 +6,13 @@ import Foundation
 // https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
 
 public struct LCDController {
+  static let tileMapRegion: ClosedRange<LR35902.Address> = 0x9800...0x9FFF
   public let addressableRanges: [ClosedRange<LR35902.Address>] = [
-    0xFF40...0xFF45
+    0xFF40...0xFF45,
+    LCDController.tileMapRegion,
   ]
+
+  var tileMap: [LR35902.Address: UInt8] = [:]
 
   enum Addresses: LR35902.Address {
     case LCDC = 0xFF40
@@ -194,6 +198,10 @@ extension LCDController: AddressableMemory {
   }
 
   public mutating func write(_ byte: UInt8, to address: LR35902.Address) {
+    if LCDController.tileMapRegion.contains(address) {
+      tileMap[address] = byte
+      return
+    }
     guard let lcdAddress = Addresses(rawValue: address) else {
       preconditionFailure("Invalid address")
     }
