@@ -556,6 +556,17 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // or r
+    case .or(let register) where registers8.contains(register):
+      return { (cpu, memory, cycle) in
+        cpu.a |= cpu[register]
+        cpu.fzero = cpu.a == 0
+        cpu.fsubtract = false
+        cpu.fcarry = false
+        cpu.fhalfcarry = false
+        return .fetchNext
+      }
+
     case .nop:
       return { _, _, _ in .fetchNext }
 
