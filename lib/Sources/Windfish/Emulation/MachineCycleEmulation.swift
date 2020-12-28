@@ -620,6 +620,17 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // and r
+    case .and(let register) where registers8.contains(register):
+      return { (cpu, memory, cycle) in
+        cpu.state.a &= cpu.state[register]
+        cpu.state.fzero = cpu.state.a == 0
+        cpu.state.fsubtract = false
+        cpu.state.fcarry = false
+        cpu.state.fhalfcarry = true
+        return .fetchNext
+      }
+
     // add n
     case addimm8:
       var immediate: UInt8 = 0

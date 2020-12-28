@@ -18,7 +18,7 @@ class MicrocodeEmulationTests: XCTestCase {
 
   static var testedSpecs = Set<LR35902.Instruction.Spec>()
 
-  // 289 specs to go.
+  // 275 specs to go.
   static override func tearDown() {
     let remainingSpecs = LR35902.InstructionSet.allSpecs().filter { !testedSpecs.contains($0) }
     print("\(remainingSpecs.count) specs remaining to test")
@@ -2778,27 +2778,23 @@ nop
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      gameboy.cpu.state.a = 0x0F
-      gameboy.cpu.state.fsubtract = true
-      gameboy.cpu.state.fcarry = true
-      gameboy.cpu.state.fhalfcarry = false
-      gameboy.cpu.state.fzero = true
-
-      var state = gameboy.cpu.state
-      gameboy.advanceInstruction()
-
-      // Expected mutations
-      if index == 0 {
-        state.pc += 1
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        gameboy.cpu.state.a = 0x0F
+        gameboy.cpu.state.fsubtract = true
+        gameboy.cpu.state.fcarry = true
+        gameboy.cpu.state.fhalfcarry = false
+        gameboy.cpu.state.fzero = true
+      } expectedMutations: { state in
+        if index == 0 {
+          state.pc += 1
+        }
+        state.pc += 2
+        state.fsubtract = false
+        state.fcarry = false
+        state.fhalfcarry = true
+        state.fzero = false
+        state.a = 0x0f
       }
-      state.pc += 2
-      state.fsubtract = false
-      state.fcarry = false
-      state.fhalfcarry = true
-      state.fzero = false
-      state.a = 0x0f
-
-      assertEqual(gameboy.cpu.state, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
     }
 
     let cartridge = try XCTUnwrap(gameboy.cartridge)
@@ -2825,27 +2821,130 @@ nop
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      gameboy.cpu.state.a = 0x0F
-      gameboy.cpu.state.fsubtract = true
-      gameboy.cpu.state.fcarry = true
-      gameboy.cpu.state.fhalfcarry = false
-      gameboy.cpu.state.fzero = false
-
-      var state = gameboy.cpu.state
-      gameboy.advanceInstruction()
-
-      // Expected mutations
-      if index == 0 {
-        state.pc += 1
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        gameboy.cpu.state.a = 0x0F
+        gameboy.cpu.state.fsubtract = true
+        gameboy.cpu.state.fcarry = true
+        gameboy.cpu.state.fhalfcarry = false
+        gameboy.cpu.state.fzero = false
+      } expectedMutations: { state in
+        if index == 0 {
+          state.pc += 1
+        }
+        state.pc += 2
+        state.fsubtract = false
+        state.fcarry = false
+        state.fhalfcarry = true
+        state.fzero = true
+        state.a = 0x00
       }
-      state.pc += 2
-      state.fsubtract = false
-      state.fcarry = false
-      state.fhalfcarry = true
-      state.fzero = true
-      state.a = 0x00
+    }
 
-      assertEqual(gameboy.cpu.state, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
+    let cartridge = try XCTUnwrap(gameboy.cartridge)
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(cartridge.size)).map { $0 })
+    XCTAssertEqual(testMemory.writes, [])
+  }
+
+  func test_and_r() throws {
+    // Given
+    let registers8 = LR35902.Instruction.Numeric.registers8
+    let specs = LR35902.InstructionSet.allSpecs().filter { spec in
+      switch spec {
+      case .and(let register) where registers8.contains(register): return true
+      default: return false
+      }
+    }
+    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    let instructions = specs.map { LR35902.Instruction(spec: $0) }
+    let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
+    let gameboy = createGameboy(loadedWith: assembly)
+
+    let testMemory = TestMemory()
+    gameboy.addMemoryTracer(testMemory)
+
+    // When
+    for (index, instruction) in instructions.enumerated() {
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        gameboy.cpu.state.a = 0x0F
+        switch instruction.spec {
+        case .and(let register) where registers8.contains(register):
+          gameboy.cpu.state[register] = UInt8(0xFF)
+        default: fatalError()
+        }
+        gameboy.cpu.state.fsubtract = true
+        gameboy.cpu.state.fcarry = true
+        gameboy.cpu.state.fhalfcarry = false
+        gameboy.cpu.state.fzero = true
+      } expectedMutations: { state in
+        if index == 0 {
+          state.pc += 1
+        }
+        state.pc += 1
+        state.fsubtract = false
+        state.fcarry = false
+        state.fhalfcarry = true
+        state.fzero = false
+        switch instruction.spec {
+        case .and(.a):
+          state.a = 0xff
+        default:
+          state.a = 0x0f
+        }
+      }
+    }
+
+    let cartridge = try XCTUnwrap(gameboy.cartridge)
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(cartridge.size)).map { $0 })
+    XCTAssertEqual(testMemory.writes, [])
+  }
+
+  func test_and_r_zero() throws {
+    // Given
+    let registers8 = LR35902.Instruction.Numeric.registers8
+    let specs = LR35902.InstructionSet.allSpecs().filter { spec in
+      switch spec {
+      case .and(let register) where registers8.contains(register): return true
+      default: return false
+      }
+    }
+    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    let instructions = specs.map { LR35902.Instruction(spec: $0) }
+    let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
+    let gameboy = createGameboy(loadedWith: assembly)
+
+    let testMemory = TestMemory()
+    gameboy.addMemoryTracer(testMemory)
+
+    // When
+    for (index, instruction) in instructions.enumerated() {
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        gameboy.cpu.state.a = 0x0F
+        switch instruction.spec {
+        case .and(let register) where registers8.contains(register):
+          gameboy.cpu.state[register] = UInt8(0xF0)
+        default: fatalError()
+        }
+        gameboy.cpu.state.fsubtract = true
+        gameboy.cpu.state.fcarry = true
+        gameboy.cpu.state.fhalfcarry = false
+        gameboy.cpu.state.fzero = false
+      } expectedMutations: { state in
+        if index == 0 {
+          state.pc += 1
+        }
+        state.pc += 1
+        state.fsubtract = false
+        state.fcarry = false
+        state.fhalfcarry = true
+        switch instruction.spec {
+        case .and(.a):
+          state.a = 0xf0
+          state.fzero = false
+        default:
+          state.a = 0x00
+          state.fzero = true
+        }
+      }
     }
 
     let cartridge = try XCTUnwrap(gameboy.cartridge)
