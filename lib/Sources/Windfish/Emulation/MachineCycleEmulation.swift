@@ -486,7 +486,18 @@ extension LR35902.InstructionSet {
         cpu.state.fzero = result.partialValue == 0
         cpu.state.fcarry = result.overflow
         cpu.state.fhalfcarry = (cpu.state.a & 0x0f) < (immediate & 0x0f)
+        return .fetchNext
+      }
 
+    // cp r
+    case .cp(let register) where registers8.contains(register):
+      return { (cpu, memory, cycle) in
+        cpu.state.fsubtract = true
+        let registerValue: UInt8 = cpu.state[register]
+        let result = cpu.state.a.subtractingReportingOverflow(registerValue)
+        cpu.state.fzero = result.partialValue == 0
+        cpu.state.fcarry = result.overflow
+        cpu.state.fhalfcarry = (cpu.state.a & 0x0f) < (registerValue & 0x0f)
         return .fetchNext
       }
 
