@@ -343,17 +343,19 @@ final class EmulatorViewController: NSViewController, TabSelectable {
         instructionBytesLabel.stringValue = "Running..."
         DispatchQueue.global(qos: .userInteractive).async {
           let start = DispatchTime.now()
-          var instructionsDispatched: UInt64 = 0
+          var machineCycles: UInt64 = 0
           while self.running {
-             self.document.gameboy.advanceInstruction()
+             self.document.gameboy.advance()
 
-            instructionsDispatched += 1
+            if !self.document.gameboy.cpu.state.halted {
+              machineCycles += 1
+            }
 
             // Only show every 100 instructions (this actually results in a 100x speed improvement).
-            if instructionsDispatched % 100 == 0 {
+            if machineCycles % 400 == 0 {
               DispatchQueue.main.sync {
                 let deltaSeconds = Double((DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds)) / 1_000_000_000
-                let instructionsPerSecond = Double(instructionsDispatched) / deltaSeconds
+                let instructionsPerSecond = Double(machineCycles) / deltaSeconds
                 print(instructionsPerSecond)
 
                 self.updateRegisters()
@@ -361,6 +363,10 @@ final class EmulatorViewController: NSViewController, TabSelectable {
               }
             }
           }
+
+          // Advance to the next full instruction.
+          self.document.gameboy.advanceInstruction()
+
           DispatchQueue.main.sync {
             self.updateInstructionAssembly()
           }

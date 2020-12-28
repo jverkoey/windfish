@@ -2,14 +2,16 @@ import Foundation
 
 extension Gameboy {
   public final class Memory {
-    public init(lcdController: LCDController) {
+    public init(cpu: LR35902, lcdController: LCDController) {
+      self.cpu = cpu
       self.lcdController = lcdController
     }
 
     public var tracers: [AddressableMemory] = []
 
     public var cartridge: Cartridge?
-    public var lcdController: LCDController
+    public let cpu: LR35902
+    public let lcdController: LCDController
 
     // MARK: - Memory mapping
 
@@ -18,13 +20,15 @@ extension Gameboy {
         switch address {
         case Gameboy.Cartridge.romBankRegion, Gameboy.Cartridge.ramBankRegion:
           return cartridge!
+        case LR35902.interruptEnableAddress, LR35902.interruptFlagAddress:
+          return cpu
         case OAM.addressableRange:
           return oam
         case ramAddressableRange:
           return ram
         case hramAddressableRange:
           return hram
-        case 0xFF05...0xFF26, 0xFF47...0xFF4B, 0xFFFF...0xFFFF:
+        case 0xFF05...0xFF07, 0xFF10...0xFF26, 0xFF47...0xFF4B:
           return ioRegisters
         case LCDController.tileMapRegion, LCDController.tileDataRegion, 0xFF40...0xFF46:
           return lcdController

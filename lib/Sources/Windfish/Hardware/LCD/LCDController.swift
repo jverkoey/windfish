@@ -111,7 +111,7 @@ public final class LCDController {
 
 extension LCDController {
   /** Executes a single machine cycle and returns the  */
-  public func advance() {
+  public func advance(memory: AddressableMemory) {
     lcdModeCycle += 1
 
     // TODO: Implement state machine below.
@@ -134,6 +134,11 @@ extension LCDController {
         ly += 1
         if ly >= 144 {
           lcdMode = .vblank
+
+          var interruptFlag = LR35902.Instruction.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
+          interruptFlag.insert(.vBlank)
+          memory.write(interruptFlag.rawValue, to: LR35902.interruptFlagAddress)
+
         } else {
           // TODO: Dump the current scanline to the screen buffer.
 
@@ -160,6 +165,13 @@ extension LCDController {
 
 extension LCDController: AddressableMemory {
   public func read(from address: LR35902.Address) -> UInt8 {
+    if LCDController.tileMapRegion.contains(address) {
+      return tileMap[address]!
+    }
+    if LCDController.tileDataRegion.contains(address) {
+      return tileData[address]!
+    }
+
     guard let lcdAddress = Addresses(rawValue: address) else {
       preconditionFailure("Invalid address")
     }

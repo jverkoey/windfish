@@ -13,6 +13,7 @@ public final class LR35902 {
     enum MicroCodeResult {
       case continueExecution
       case fetchNext
+      case fetchPrefix
     }
     typealias MicroCode = (LR35902, AddressableMemory, Int) -> MicroCodeResult
 
@@ -106,12 +107,23 @@ public final class LR35902 {
      */
     public var ime: Bool = false
 
+    /** Enabled bits represent a requested interrupt. */
+    var interruptEnable: LR35902.Instruction.Interrupt = []
+
+    /** Enabled bits represent a requested interrupt. */
+    var interruptFlag: LR35902.Instruction.Interrupt = []
+
     /**
      The halt status.
 
      When true, the CPU will stop executing instructions until the next interrupt occurs.
      */
     public var halted: Bool = false
+
+    /** Indicates whether the CPU is fetching and executing instructions. */
+    public func isRunning() -> Bool {
+      return !halted
+    }
 
     /**
      If greater than zero, then this value will be decremented on each machine cycle until it is less then or equal to 0,
@@ -286,5 +298,30 @@ extension LR35902 {
 
     /** The source location from which this register's value was loaded, if known. */
     public let sourceLocation: Disassembler.SourceLocation?
+  }
+}
+
+extension LR35902: AddressableMemory {
+  static let interruptEnableAddress: LR35902.Address = 0xFFFF
+  static let interruptFlagAddress: LR35902.Address = 0xFF0F
+
+  public func read(from address: Address) -> UInt8 {
+    switch address {
+    case LR35902.interruptEnableAddress: return state.interruptEnable.rawValue
+    case LR35902.interruptFlagAddress:   return state.interruptFlag.rawValue
+    default: fatalError()
+    }
+  }
+
+  public func write(_ byte: UInt8, to address: Address) {
+    switch address {
+    case LR35902.interruptEnableAddress: state.interruptEnable = LR35902.Instruction.Interrupt(rawValue: byte)
+    case LR35902.interruptFlagAddress:   state.interruptFlag = LR35902.Instruction.Interrupt(rawValue: byte)
+    default: fatalError()
+    }
+  }
+
+  public func sourceLocation(from address: Address) -> Disassembler.SourceLocation {
+    return .memory(address)
   }
 }

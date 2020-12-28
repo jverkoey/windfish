@@ -2,7 +2,7 @@ import Foundation
 
 public final class Gameboy {
   public init() {
-    self.memory = Memory(lcdController: lcdController)
+    self.memory = Memory(cpu: cpu, lcdController: lcdController)
   }
 
   // MARK: - Hardware

@@ -61,6 +61,24 @@ extension LR35902.Instruction {
 
     // Invalid opcode
     case invalid
+
+    // Internal use only representation of an interrupt
+    case interrupt(Interrupt)
+  }
+
+  /** A representation of a Gameboy interrupt. */
+  public struct Interrupt: OptionSet, Hashable {
+    public init(rawValue: UInt8) {
+      self.rawValue = rawValue
+    }
+
+    public let rawValue: UInt8
+
+    static let vBlank       = Interrupt(rawValue: 0b0000_0001)
+    static let lcdStat      = Interrupt(rawValue: 0b0000_0010)
+    static let timer        = Interrupt(rawValue: 0b0000_0100)
+    static let serial       = Interrupt(rawValue: 0b0000_1000)
+    static let joypad       = Interrupt(rawValue: 0b0001_0000)
   }
 
   public enum PrefixTable: Hashable {

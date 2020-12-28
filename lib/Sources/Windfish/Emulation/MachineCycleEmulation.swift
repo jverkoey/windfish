@@ -684,7 +684,40 @@ extension LR35902.InstructionSet {
 
     case .halt:
       return { (cpu, memory, cycle) in
+        // TODO: Implement HALT bug behavior outlined in https://github.com/AntonioND/giibiiadvance/tree/master/docs
         cpu.state.halted = true
+        return .fetchNext
+      }
+
+    case .interrupt(var interrupt):
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          cpu.state.sp -= 1
+          memory.write(UInt8(cpu.state.pc & 0xFF), to: cpu.state.sp)
+          return .continueExecution
+        }
+        if cycle == 2 {
+          cpu.state.sp -= 1
+          memory.write(UInt8(cpu.state.pc >> 8), to: cpu.state.sp)
+          return .continueExecution
+        }
+        if interrupt.contains(.vBlank) {
+          interrupt.remove(.vBlank)
+          cpu.state.pc = 0x0040
+        } else if interrupt.contains(.lcdStat) {
+          interrupt.remove(.lcdStat)
+          cpu.state.pc = 0x0048
+        } else if interrupt.contains(.timer) {
+          interrupt.remove(.timer)
+          cpu.state.pc = 0x0050
+        } else if interrupt.contains(.serial) {
+          interrupt.remove(.serial)
+          cpu.state.pc = 0x0058
+        } else if interrupt.contains(.joypad) {
+          interrupt.remove(.joypad)
+          cpu.state.pc = 0x0060
+        }
+        memory.write(interrupt.rawValue, to: LR35902.interruptFlagAddress)
         return .fetchNext
       }
 
@@ -692,7 +725,7 @@ extension LR35902.InstructionSet {
       return { _, _, _ in .fetchNext }
 
     case .prefix:
-      return { _, _, _ in .fetchNext }
+      return { _, _, _ in .fetchPrefix }
 
     default:
       preconditionFailure("Unhandled specification: \(spec)")
@@ -704,7 +737,7 @@ extension LR35902 {
   /** Advances the CPU by one machine cycle. */
   public func advance(memory: AddressableMemory) {
     // https://gekkio.fi/files/gb-docs/gbctr.pdf
-    if !state.halted {
+    if state.isRunning() {
       // Execution phase
       if nextAction == .continueExecution, let microcode = state.machineInstruction.loaded?.microcode {
         state.machineInstruction.cycle += 1
@@ -715,31 +748,42 @@ extension LR35902 {
       }
     }
 
-    // TODO: Check interrupts somewhere around here.
+    // The LR35902's fetch/execute overlap behavior means we load the next opcode on the same machine cycle as the
+    // last instruction's microcode execution.
+    if nextAction == .fetchNext || nextAction == .fetchPrefix {
+      let interrupts = state.interruptFlag.intersection(state.interruptEnable)
+      if nextAction == .fetchNext && !interrupts.isEmpty {
+        // Interrupt phase
+        state.halted = false
 
-    if !state.halted {
-      // The LR35902's fetch/execute overlap behavior means we load the next opcode on the same machine cycle as the
-      // last instruction's microcode execution.
-      if nextAction == .fetchNext {
+        let sourceLocation = memory.sourceLocation(from: state.pc)
+        nextAction = .continueExecution
+        state.machineInstruction = .init(spec: .interrupt(interrupts), sourceLocation: sourceLocation)
+
+      } else if state.isRunning() {
         // Fetch phase
         var sourceLocation = memory.sourceLocation(from: state.pc)
         let tableIndex = Int(memory.read(from: state.pc))
         state.pc += 1
         let loadedSpec: Instruction.Spec
-        if let loaded = state.machineInstruction.loaded,
-           let prefixTable = InstructionSet.prefixTables[loaded.spec] {
+        if let loaded = state.machineInstruction.loaded, let prefixTable = InstructionSet.prefixTables[loaded.spec] {
+          // Finish loading the prefix instruction.
           sourceLocation = loaded.sourceLocation
           loadedSpec = prefixTable[tableIndex]
-          nextAction = .continueExecution
         } else {
           loadedSpec = InstructionSet.table[tableIndex]
-          if InstructionSet.prefixTables[loadedSpec] != nil {
-            nextAction = .fetchNext  // Need to fetch one more opcode before we execute.
-          } else {
-            nextAction = .continueExecution
-          }
         }
+        nextAction = .continueExecution
         state.machineInstruction = .init(spec: loadedSpec, sourceLocation: sourceLocation)
+      }
+    }
+
+    // TODO: Verify this timing as I'm not confident it's being evaluated at the correct location.
+    if state.imeScheduledCyclesRemaining > 0 {
+      state.imeScheduledCyclesRemaining -= 1
+      if state.imeScheduledCyclesRemaining <= 0 {
+        state.ime = true
+        state.imeScheduledCyclesRemaining = 0
       }
     }
   }
@@ -749,16 +793,7 @@ extension Gameboy {
   /** Advances the emulation by one machine cycle. */
   public func advance() {
     cpu.advance(memory: memory)
-    lcdController.advance()
-
-    // TODO: Verify this timing as I'm not confident it's being evaluated at the correct location.
-    if cpu.state.imeScheduledCyclesRemaining > 0 {
-      cpu.state.imeScheduledCyclesRemaining -= 1
-      if cpu.state.imeScheduledCyclesRemaining <= 0 {
-        cpu.state.ime = true
-        cpu.state.imeScheduledCyclesRemaining = 0
-      }
-    }
+    lcdController.advance(memory: memory)
   }
 
   /** Advances the emulation by one instruction. */
@@ -767,7 +802,7 @@ extension Gameboy {
       advance()
     }
     if let sourceLocation = cpu.state.machineInstruction.loaded?.sourceLocation {
-      while sourceLocation == cpu.state.machineInstruction.loaded?.sourceLocation {
+      while sourceLocation == cpu.state.machineInstruction.loaded?.sourceLocation, !cpu.state.halted {
         advance()
       }
     }
