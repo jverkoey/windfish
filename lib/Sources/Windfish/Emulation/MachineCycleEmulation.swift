@@ -624,6 +624,22 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // add hl, rr
+    case .add(.hl, let src) where registers16.contains(src):
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          return .continueExecution
+        }
+        let originalValue = cpu.state.hl
+        let sourceValue: UInt16 = cpu.state[src]
+        let result = originalValue.addingReportingOverflow(sourceValue)
+        cpu.state.fsubtract = false
+        cpu.state.fcarry = result.overflow
+        cpu.state.fhalfcarry = (((originalValue & 0x0fff) + (sourceValue & 0x0fff)) & 0x1000) > 0
+        cpu.state.hl = result.partialValue
+        return .fetchNext
+      }
+
     case .nop:
       return { _, _, _ in .fetchNext }
 

@@ -18,7 +18,7 @@ class MicrocodeEmulationTests: XCTestCase {
 
   static var testedSpecs = Set<LR35902.Instruction.Spec>()
 
-  // 293 specs to go.
+  // 289 specs to go.
   static override func tearDown() {
     let remainingSpecs = LR35902.InstructionSet.allSpecs().filter { !testedSpecs.contains($0) }
     print("\(remainingSpecs.count) specs remaining to test")
@@ -3127,4 +3127,161 @@ nop
     XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(cartridge.size)).map { $0 })
     XCTAssertEqual(testMemory.writes, [])
   }
+
+  func test_add_hl_rr() throws {
+    // Given
+    let registers16 = LR35902.Instruction.Numeric.registers16
+    let specs = LR35902.InstructionSet.allSpecs().filter { spec in
+      switch spec {
+      case .add(.hl, let src) where registers16.contains(src): return true
+      default:      return false
+      }
+    }
+    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(1)) }
+    let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
+    let gameboy = createGameboy(loadedWith: assembly)
+
+    let testMemory = TestMemory()
+    gameboy.addMemoryTracer(testMemory)
+
+    // When
+    for (index, instruction) in instructions.enumerated() {
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        gameboy.cpu.state.hl = 3
+        switch instruction.spec {
+        case .add(.hl, let src) where registers16.contains(src):
+          gameboy.cpu.state[src] = UInt16(2)
+        default:
+          fatalError()
+        }
+        gameboy.cpu.state.fsubtract = true
+        gameboy.cpu.state.fcarry = true
+        gameboy.cpu.state.fhalfcarry = true
+      } expectedMutations: { state in
+        if index == 0 {
+          state.pc += 1
+        }
+        state.pc += 1
+        state.fsubtract = false
+        state.fcarry = false
+        state.fhalfcarry = false
+        switch instruction.spec {
+        case .add(.hl, .hl):
+          state.hl = 4
+        default:
+          state.hl = 5
+        }
+      }
+    }
+
+    let cartridge = try XCTUnwrap(gameboy.cartridge)
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(cartridge.size)).map { $0 })
+    XCTAssertEqual(testMemory.writes, [])
+  }
+
+  func test_add_hl_rr_overflow() throws {
+    // Given
+    let registers16 = LR35902.Instruction.Numeric.registers16
+    let specs = LR35902.InstructionSet.allSpecs().filter { spec in
+      switch spec {
+      case .add(.hl, let src) where registers16.contains(src): return true
+      default:      return false
+      }
+    }
+    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(1)) }
+    let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
+    let gameboy = createGameboy(loadedWith: assembly)
+
+    let testMemory = TestMemory()
+    gameboy.addMemoryTracer(testMemory)
+
+    // When
+    for (index, instruction) in instructions.enumerated() {
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        gameboy.cpu.state.hl = 1
+        switch instruction.spec {
+        case .add(.hl, let src) where registers16.contains(src):
+          gameboy.cpu.state[src] = UInt16(0xffff)
+        default:
+          fatalError()
+        }
+        gameboy.cpu.state.fsubtract = true
+        gameboy.cpu.state.fcarry = false
+        gameboy.cpu.state.fhalfcarry = false
+      } expectedMutations: { state in
+        if index == 0 {
+          state.pc += 1
+        }
+        state.pc += 1
+        state.fsubtract = false
+        state.fcarry = true
+        state.fhalfcarry = true
+        switch instruction.spec {
+        case .add(.hl, .hl):
+          state.hl = 0xfffe
+        default:
+          state.hl = 0
+        }
+      }
+    }
+
+    let cartridge = try XCTUnwrap(gameboy.cartridge)
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(cartridge.size)).map { $0 })
+    XCTAssertEqual(testMemory.writes, [])
+  }
+
+  func test_add_hl_rr_halfcarry() throws {
+    // Given
+    let registers16 = LR35902.Instruction.Numeric.registers16
+    let specs = LR35902.InstructionSet.allSpecs().filter { spec in
+      switch spec {
+      case .add(.hl, let src) where registers16.contains(src): return true
+      default:      return false
+      }
+    }
+    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(1)) }
+    let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
+    let gameboy = createGameboy(loadedWith: assembly)
+
+    let testMemory = TestMemory()
+    gameboy.addMemoryTracer(testMemory)
+
+    // When
+    for (index, instruction) in instructions.enumerated() {
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        gameboy.cpu.state.hl = 1
+        switch instruction.spec {
+        case .add(.hl, let src) where registers16.contains(src):
+          gameboy.cpu.state[src] = UInt16(0x0fff)
+        default:
+          fatalError()
+        }
+        gameboy.cpu.state.fsubtract = true
+        gameboy.cpu.state.fcarry = true
+        gameboy.cpu.state.fhalfcarry = false
+      } expectedMutations: { state in
+        if index == 0 {
+          state.pc += 1
+        }
+        state.pc += 1
+        state.fsubtract = false
+        state.fcarry = false
+        state.fhalfcarry = true
+        switch instruction.spec {
+        case .add(.hl, .hl):
+          state.hl = 0x1ffe
+        default:
+          state.hl = 0x1000
+        }
+      }
+    }
+
+    let cartridge = try XCTUnwrap(gameboy.cartridge)
+    XCTAssertEqual(testMemory.reads, (LR35902.Address(0)..<LR35902.Address(cartridge.size)).map { $0 })
+    XCTAssertEqual(testMemory.writes, [])
+  }
+
 }
