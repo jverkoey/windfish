@@ -117,6 +117,20 @@ extension Gameboy.Cartridge {
         return
       }
 
+      // Random-access memory (RAM) bank 00-03
+      if address >= 0xA000 && address <= 0xBFFF {
+        precondition(ramEnabled, "RAM is not enabled.")
+        switch ramSize {
+        case .none:
+          preconditionFailure("Cartridge has no RAM.")
+        case .one2kb, .one8kb:
+          ram![Int(address) - 0xA000] = byte
+        case .four32kb, .sixteen128kb:
+          preconditionFailure("Bankable RAM not implemented.")
+        }
+        return
+      }
+
       fatalError("Invalid write address provided to the cartridge: \(address).")
     }
 
