@@ -6,7 +6,7 @@ protocol MemoryBankController: AddressableMemory {
 
 extension Gameboy {
   /** A representation of a Gameboy cartridge as addressable memory at a given moment. */
-  public struct Cartridge: AddressableMemory {
+  public class Cartridge: AddressableMemory {
     public typealias Bank = UInt8
     public typealias Location = UInt32
     public typealias Length = UInt32
@@ -41,7 +41,7 @@ extension Gameboy {
       return memoryBankController.read(from: address)
     }
 
-    public mutating func write(_ byte: UInt8, to address: LR35902.Address) {
+    public func write(_ byte: UInt8, to address: LR35902.Address) {
       memoryBankController.write(byte, to: address)
     }
 

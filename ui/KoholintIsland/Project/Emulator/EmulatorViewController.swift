@@ -328,7 +328,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
       // TODO: Step into and through any control flow.
 
-      document.gameboy = document.gameboy.advanceInstruction()
+      document.gameboy.advanceInstruction()
 
       updateInstructionAssembly()
       updateRegisters()
@@ -343,7 +343,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
         instructionBytesLabel.stringValue = "Running..."
         DispatchQueue.global(qos: .userInteractive).async {
           while self.running {
-            self.document.gameboy = self.document.gameboy.advanceInstruction()
+             self.document.gameboy.advanceInstruction()
 
             DispatchQueue.main.sync {
               self.updateRegisters()
@@ -358,15 +358,13 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       // TODO: Only allow this if the instruction causes a transfer of control flow.
 
     } else if sender.selectedSegment == 2 {  // Clear
-      var state = document.gameboy.cpu
       for register in LR35902.Instruction.Numeric.registers8 {
-        state.clear(register)
+        document.gameboy.cpu.state.clear(register)
       }
       for register in LR35902.Instruction.Numeric.registers16 {
-        state.clear(register)
+        document.gameboy.cpu.state.clear(register)
       }
       // TODO: Reset RAM.
-      document.gameboy.cpu = state
 
       updateRegisters()
       updateRAM()
@@ -382,7 +380,7 @@ extension EmulatorViewController: NSTextFieldDelegate {
     }
     switch identifier {
     case .programCounter:
-      document.gameboy.cpu.pc = textField.objectValue as! LR35902.Address
+      document.gameboy.cpu.state.pc = textField.objectValue as! LR35902.Address
     default:
       preconditionFailure()
     }
@@ -391,13 +389,13 @@ extension EmulatorViewController: NSTextFieldDelegate {
   }
 
   private func currentInstruction() -> LR35902.Instruction? {
-    if let addressAndBank = document.gameboy.cpu.machineInstruction.sourceAddressAndBank() {
+    if let addressAndBank = document.gameboy.cpu.state.machineInstruction.sourceAddressAndBank() {
       // When a machine instruction has been loaded we need to look at it source location rather than the cpu's current
       // pc + bank as the CPU may have already incremented the pc as a result of reading the instruction's opcode.
       return document.disassemblyResults?.disassembly?.instruction(at: addressAndBank.address, in: addressAndBank.bank)
     }
     if let cartridge = document.gameboy.cartridge {
-      return document.disassemblyResults?.disassembly?.instruction(at: document.gameboy.cpu.pc, in: cartridge.selectedBank)
+      return document.disassemblyResults?.disassembly?.instruction(at: document.gameboy.cpu.state.pc, in: cartridge.selectedBank)
     }
     return nil
   }
@@ -414,7 +412,7 @@ extension EmulatorViewController: NSTextFieldDelegate {
 
     if let cartridge = document.gameboy.cartridge {
       let context = RGBDSDisassembler.Context(
-        address: document.gameboy.cpu.pc,
+        address: document.gameboy.cpu.state.pc,
         bank: cartridge.selectedBank,
         disassembly: disassembly,
         argumentString: nil
@@ -428,7 +426,7 @@ extension EmulatorViewController: NSTextFieldDelegate {
   }
 
   func updateRegisters() {
-    cpuView.update(with: document.gameboy.cpu)
+    cpuView.update(with: document.gameboy.cpu.state)
   }
 
   func updateRAM() {

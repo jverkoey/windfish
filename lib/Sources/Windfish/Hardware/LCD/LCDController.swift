@@ -6,14 +6,10 @@ import Foundation
 // - https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
 // - http://gameboy.mongenel.com/dmg/asmmemmap.html
 
-public struct LCDController {
+public final class LCDController {
   static let tileMapRegion: ClosedRange<LR35902.Address> = 0x9800...0x9FFF
   static let tileDataRegion: ClosedRange<LR35902.Address> = 0x8000...0x97FF
-  public let addressableRanges: [ClosedRange<LR35902.Address>] = [
-    0xFF40...0xFF45,
-    LCDController.tileMapRegion,
-    LCDController.tileDataRegion,
-  ]
+  // 0xFF40...0xFF45
 
   var tileMap: [LR35902.Address: UInt8] = [:]
   var tileData: [LR35902.Address: UInt8] = [:]
@@ -113,53 +109,49 @@ public struct LCDController {
 // MARK: - Emulation
 
 extension LCDController {
-  /** Executes a single machine cycle and returns the mutation. */
-  public func advance() -> LCDController {
-    var mutation = self
-
-    mutation.lcdModeCycle += 1
+  /** Executes a single machine cycle and returns the  */
+  public func advance() {
+    lcdModeCycle += 1
 
     // TODO: Implement state machine below.
     switch lcdMode {
     case .searchingOAM:
-      if mutation.lcdModeCycle >= 20 {
-        mutation.lcdMode = .transferringToLCDDriver
-        mutation.lcdModeCycle = 0
+      if lcdModeCycle >= 20 {
+        lcdMode = .transferringToLCDDriver
+        lcdModeCycle = 0
       }
       break
     case .transferringToLCDDriver:
-      if mutation.lcdModeCycle >= 43 {
-        mutation.lcdMode = .hblank
-        mutation.lcdModeCycle = 0
+      if lcdModeCycle >= 43 {
+        lcdMode = .hblank
+        lcdModeCycle = 0
       }
       break
     case .hblank:
-      if mutation.lcdModeCycle >= 51 {
-        mutation.lcdModeCycle = 0
-        mutation.ly += 1
-        if mutation.ly >= 144 {
-          mutation.lcdMode = .vblank
+      if lcdModeCycle >= 51 {
+        lcdModeCycle = 0
+        ly += 1
+        if ly >= 144 {
+          lcdMode = .vblank
         } else {
           // TODO: Dump the current scanline to the screen buffer.
 
-          mutation.lcdMode = .searchingOAM
+          lcdMode = .searchingOAM
         }
       }
       break
     case .vblank:
-      if mutation.lcdModeCycle >= 114 {
-        mutation.lcdModeCycle = 0
-        mutation.ly += 1
+      if lcdModeCycle >= 114 {
+        lcdModeCycle = 0
+        ly += 1
 
-        if mutation.ly >= 154 {
-          mutation.ly = 0
-          mutation.lcdMode = .searchingOAM
+        if ly >= 154 {
+          ly = 0
+          lcdMode = .searchingOAM
         }
       }
       break
     }
-
-    return mutation
   }
 }
 
@@ -201,7 +193,7 @@ extension LCDController: AddressableMemory {
     }
   }
 
-  public mutating func write(_ byte: UInt8, to address: LR35902.Address) {
+  public func write(_ byte: UInt8, to address: LR35902.Address) {
     if LCDController.tileMapRegion.contains(address) {
       tileMap[address] = byte
       return

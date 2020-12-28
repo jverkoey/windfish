@@ -1,69 +1,69 @@
 import Foundation
 
 extension Gameboy {
-  public struct Memory: AddressableMemory {
-    public let addressableRanges: [ClosedRange<LR35902.Address>] = [
-      0x0000...0xFFFF
-    ]
-
-    public init() {
-      mapRegion(to: IORegisterMemory())
-      mapRegion(to: LCDController())
-      mapRegion(to: hram)
-      mapRegion(to: ram)
-      mapRegion(to: oam)
+  public final class Memory {
+    public init(lcdController: LCDController) {
+      self.lcdController = lcdController
     }
 
     public var tracers: [AddressableMemory] = []
 
-    public func read(from address: LR35902.Address) -> UInt8 {
-      for tracer in tracers {
-        _ = tracer.read(from: address)
-      }
+    public var cartridge: Cartridge?
+    public var lcdController: LCDController
 
-      if let memory = mappedRegions.first(where: { range, _ in range.contains(address) })?.value {
-        return memory.read(from: address)
-      }
-      fatalError("No region mapped to this address.")
-    }
+    // MARK: - Memory mapping
 
-    public mutating func write(_ byte: UInt8, to address: LR35902.Address) {
-      for index in tracers.indices {
-        tracers[index].write(byte, to: address)
+    private subscript(address: LR35902.Address) -> AddressableMemory {
+      get {
+        switch address {
+        case 0x0000...0x7FFF:
+          return cartridge!
+        case OAM.addressableRange:
+          return oam
+        case ramAddressableRange:
+          return ram
+        case hramAddressableRange:
+          return hram
+        case 0xFF05...0xFF26, 0xFF47...0xFF4B, 0xFFFF...0xFFFF:
+          return ioRegisters
+        case LCDController.tileMapRegion, LCDController.tileDataRegion, 0xFF40...0xFF45:
+          return lcdController
+        default:
+          fatalError("No region mapped to this address.")
+        }
       }
-
-      if var mappedRegion = mappedRegions.first(where: { range, _ in range.contains(address) }) {
-        mappedRegion.value.write(byte, to: address)
-        mappedRegions[mappedRegion.key] = mappedRegion.value
-        return
-      }
-      fatalError("No region mapped to this address.")
-    }
-
-    public func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
-      if let memory = mappedRegions.first(where: { range, _ in range.contains(address) })?.value {
-        return memory.sourceLocation(from: address)
-      }
-      fatalError("No region mapped to this address.")
     }
 
     // MARK: - Mapping regions of memory
 
-    private var mappedRegions: [ClosedRange<LR35902.Address>: AddressableMemory] = [:]
-    private var mappedBytes = IndexSet()
-    private var hram = GenericRAM(addressableRanges: [0xFF80...0xFFFE])
-    private var ram = GenericRAM(addressableRanges: [0xC000...0xDFFF])
+    private var hram = GenericRAM()
+    private var ram = GenericRAM()
+    private var ioRegisters = IORegisterMemory()
     private var oam = OAM()
 
-    mutating func mapRegion(to memory: AddressableMemory) {
-      for range in memory.addressableRanges {
-        let intRange = Int(range.lowerBound)...Int(range.upperBound)
-        precondition(mappedRegions[range] != nil || !mappedBytes.contains(integersIn: intRange),
-                     "This map will partially overlap another region.")
-        mappedBytes.insert(integersIn: intRange)
+    private let hramAddressableRange: ClosedRange<LR35902.Address> = 0xFF80...0xFFFE
+    private let ramAddressableRange: ClosedRange<LR35902.Address> = 0xC000...0xDFFF
+  }
+}
 
-        mappedRegions[range] = memory
-      }
+extension Gameboy.Memory: AddressableMemory {
+  public func read(from address: LR35902.Address) -> UInt8 {
+    for tracer in tracers {
+      _ = tracer.read(from: address)
     }
+
+    return self[address].read(from: address)
+  }
+
+  public func write(_ byte: UInt8, to address: LR35902.Address) {
+    for index in tracers.indices {
+      tracers[index].write(byte, to: address)
+    }
+
+    self[address].write(byte, to: address)
+  }
+
+  public func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
+    return self[address].sourceLocation(from: address)
   }
 }

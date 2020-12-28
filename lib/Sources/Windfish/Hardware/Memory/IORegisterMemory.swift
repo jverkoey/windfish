@@ -3,12 +3,10 @@ import Foundation
 // References:
 // - https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
 
-public struct IORegisterMemory: AddressableMemory {
-  public let addressableRanges: [ClosedRange<LR35902.Address>] = [
-    0xFF05...0xFF26,
-    0xFF47...0xFF4B,
-    0xFFFF...0xFFFF
-  ]
+final class IORegisterMemory: AddressableMemory {
+//  0xFF05...0xFF26,
+//  0xFF47...0xFF4B,
+//  0xFFFF...0xFFFF
 
   enum IOAddresses: LR35902.Address {
     case TIMA = 0xFF05
@@ -70,14 +68,14 @@ public struct IORegisterMemory: AddressableMemory {
     .WX:   0x00,
     .IE:   0x00,
   ]
-  public func read(from address: LR35902.Address) -> UInt8 {
+  func read(from address: LR35902.Address) -> UInt8 {
     guard let ioAddress = IOAddresses(rawValue: address) else {
       preconditionFailure("Invalid address")
     }
     return values[ioAddress]!
   }
 
-  public mutating func write(_ byte: UInt8, to address: LR35902.Address) {
+  func write(_ byte: UInt8, to address: LR35902.Address) {
     guard let ioAddress = IOAddresses(rawValue: address) else {
       preconditionFailure("Invalid address")
     }
@@ -85,7 +83,7 @@ public struct IORegisterMemory: AddressableMemory {
     values[ioAddress] = byte
   }
 
-  public func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
+  func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
     return .memory(address)
   }
 }

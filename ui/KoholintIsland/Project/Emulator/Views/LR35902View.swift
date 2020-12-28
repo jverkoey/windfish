@@ -59,12 +59,14 @@ final class RegisterView: NSView {
 
   var value: UInt8 {
     set {
-      textField.objectValue = newValue
+      if newValue != _value {
+        textField.objectValue = newValue
+        _value = newValue
+      }
     }
-    get {
-      return textField.objectValue as! UInt8
-    }
+    get { return _value }
   }
+  var _value: UInt8 = 0
 }
 
 final class AddressView: NSView {
@@ -123,12 +125,14 @@ final class AddressView: NSView {
 
   var value: UInt16 {
     set {
-      textField.objectValue = newValue
+      if newValue != _value {
+        textField.objectValue = newValue
+        _value = newValue
+      }
     }
-    get {
-      return textField.objectValue as! UInt16
-    }
+    get { return _value }
   }
+  var _value: UInt16 = 0
 }
 
 final class LR35902View: NSView {
@@ -228,7 +232,7 @@ final class LR35902View: NSView {
     fatalError("init(coder:) has not been implemented")
   }
 
-  func update(with cpu: LR35902) {
+  func update(with cpu: LR35902.State) {
     pcView.value = cpu.machineInstruction.sourceAddressAndBank()?.address ?? 0x100
     spView.value = cpu.sp
     aView.value = cpu.a

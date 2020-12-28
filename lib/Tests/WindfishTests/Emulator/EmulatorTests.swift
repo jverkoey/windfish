@@ -11,7 +11,7 @@ func disassemblyInitialized(with assembly: String) -> Disassembler {
 }
 
 /** Asserts that two CPU states are equal. */
-func assertEqual(_ state1: LR35902, _ state2: LR35902, message: String = "", file: StaticString = #file, line: UInt = #line) {
+func assertEqual(_ state1: LR35902.State, _ state2: LR35902.State, message: String = "", file: StaticString = #file, line: UInt = #line) {
   XCTAssertEqual(state1.a.hexString, state2.a.hexString,        "a mismatch \(message)", file: file, line: line)
   XCTAssertEqual(state1.b.hexString, state2.b.hexString,        "b mismatch \(message)", file: file, line: line)
   XCTAssertEqual(state1.c.hexString, state2.c.hexString,        "c mismatch \(message)", file: file, line: line)
@@ -27,6 +27,9 @@ func assertEqual(_ state1: LR35902, _ state2: LR35902, message: String = "", fil
   XCTAssertEqual(state1.pc.hexString, state2.pc.hexString,      "pc mismatch \(message)", file: file, line: line)
   XCTAssertEqual(state1.ime, state2.ime,                        "ime mismatch \(message)", file: file, line: line)
 }
+func assertEqual(_ state1: LR35902, _ state2: LR35902, message: String = "", file: StaticString = #file, line: UInt = #line) {
+  assertEqual(state1.state, state2.state)
+}
 
 class EmulatorTests: XCTestCase {
   // MARK: - To be categorized
@@ -38,17 +41,18 @@ xor  $E0
 ld   e, a
 """)
 
-    let states = disassembly.trace(range: 0..<disassembly.cartridge.size).sorted(by: { $0.key < $1.key })
-    let lastState = states[states.count - 1]
+    let cpu = LR35902.zeroed()
+    disassembly.trace(range: 0..<disassembly.cartridge.size, cpu: cpu)
+    let lastState = cpu.state
 
-    XCTAssertEqual(lastState.value.a, 0xE0)
-    XCTAssertEqual(lastState.value.b, 0)
-    XCTAssertEqual(lastState.value.c, 0)
-    XCTAssertEqual(lastState.value.d, 0)
-    XCTAssertEqual(lastState.value.e, 0xE0)
-    XCTAssertEqual(lastState.value.h, 0)
-    XCTAssertEqual(lastState.value.l, 0)
-    XCTAssertEqual(lastState.value.pc, 0x0004)
+    XCTAssertEqual(lastState.a, 0xE0)
+    XCTAssertEqual(lastState.b, 0)
+    XCTAssertEqual(lastState.c, 0)
+    XCTAssertEqual(lastState.d, 0)
+    XCTAssertEqual(lastState.e, 0xE0)
+    XCTAssertEqual(lastState.h, 0)
+    XCTAssertEqual(lastState.l, 0)
+    XCTAssertEqual(lastState.pc, 0x0004)
   }
 
   func test_ld_a_imm8__xor_imm8__ld_e_a() {
@@ -58,34 +62,17 @@ xor  $E0
 ld   e, a
 """)
 
-    let trace = disassembly.trace(range: 0..<disassembly.cartridge.size).sorted(by: { $0.key < $1.key })
+    let cpu = LR35902.zeroed()
+    disassembly.trace(range: 0..<disassembly.cartridge.size, cpu: cpu)
 
-    XCTAssertEqual(trace[0].value.a, 0x01)
-    XCTAssertEqual(trace[0].value.b, 0)
-    XCTAssertEqual(trace[0].value.c, 0)
-    XCTAssertEqual(trace[0].value.d, 0)
-    XCTAssertEqual(trace[0].value.e, 0)
-    XCTAssertEqual(trace[0].value.h, 0)
-    XCTAssertEqual(trace[0].value.l, 0)
-    XCTAssertEqual(trace[0].value.pc, 0x0002)
-
-    XCTAssertEqual(trace[1].value.a, 0xE1)
-    XCTAssertEqual(trace[1].value.b, 0)
-    XCTAssertEqual(trace[1].value.c, 0)
-    XCTAssertEqual(trace[1].value.d, 0)
-    XCTAssertEqual(trace[0].value.e, 0)
-    XCTAssertEqual(trace[1].value.h, 0)
-    XCTAssertEqual(trace[1].value.l, 0)
-    XCTAssertEqual(trace[1].value.pc, 0x0004)
-
-    XCTAssertEqual(trace[2].value.a, 0xE1)
-    XCTAssertEqual(trace[2].value.b, 0)
-    XCTAssertEqual(trace[2].value.c, 0)
-    XCTAssertEqual(trace[2].value.d, 0)
-    XCTAssertEqual(trace[2].value.e, 0xE1)
-    XCTAssertEqual(trace[2].value.h, 0)
-    XCTAssertEqual(trace[2].value.l, 0)
-    XCTAssertEqual(trace[2].value.pc, 0x0005)
+    XCTAssertEqual(cpu.state.a, 0xE1)
+    XCTAssertEqual(cpu.state.b, 0)
+    XCTAssertEqual(cpu.state.c, 0)
+    XCTAssertEqual(cpu.state.d, 0)
+    XCTAssertEqual(cpu.state.e, 0xE1)
+    XCTAssertEqual(cpu.state.h, 0)
+    XCTAssertEqual(cpu.state.l, 0)
+    XCTAssertEqual(cpu.state.pc, 0x0005)
   }
 
   func test_ld_a_addr__and_imm8__ld_e_a() {
@@ -95,35 +82,17 @@ and  %01111111
 ld   e, a
 """)
 
-    let trace = disassembly.trace(range: 0..<disassembly.cartridge.size).sorted(by: { $0.key < $1.key })
+    let cpu = LR35902.zeroed()
+    disassembly.trace(range: 0..<disassembly.cartridge.size, cpu: cpu)
 
-    XCTAssertEqual(trace[0].value.a, 0)
-    XCTAssertEqual(trace[0].value.b, 0)
-    XCTAssertEqual(trace[0].value.c, 0)
-    XCTAssertEqual(trace[0].value.d, 0)
-    XCTAssertEqual(trace[0].value.e, 0)
-    XCTAssertEqual(trace[0].value.h, 0)
-    XCTAssertEqual(trace[0].value.l, 0)
-    XCTAssertEqual(trace[0].value.pc, 0x0003)
-
-    // TODO: a should capture the and operation that affected it here somehow.
-    XCTAssertEqual(trace[1].value.a, 0)
-    XCTAssertEqual(trace[1].value.b, 0)
-    XCTAssertEqual(trace[1].value.c, 0)
-    XCTAssertEqual(trace[1].value.d, 0)
-    XCTAssertEqual(trace[0].value.e, 0)
-    XCTAssertEqual(trace[1].value.h, 0)
-    XCTAssertEqual(trace[1].value.l, 0)
-    XCTAssertEqual(trace[1].value.pc, 0x0005)
-
-    XCTAssertEqual(trace[2].value.a, 0)
-    XCTAssertEqual(trace[2].value.b, 0)
-    XCTAssertEqual(trace[2].value.c, 0)
-    XCTAssertEqual(trace[2].value.d, 0)
-    XCTAssertEqual(trace[2].value.e, 0)
-    XCTAssertEqual(trace[2].value.h, 0)
-    XCTAssertEqual(trace[2].value.l, 0)
-    XCTAssertEqual(trace[2].value.pc, 0x0006)
+    XCTAssertEqual(cpu.state.a, 0)
+    XCTAssertEqual(cpu.state.b, 0)
+    XCTAssertEqual(cpu.state.c, 0)
+    XCTAssertEqual(cpu.state.d, 0)
+    XCTAssertEqual(cpu.state.e, 0)
+    XCTAssertEqual(cpu.state.h, 0)
+    XCTAssertEqual(cpu.state.l, 0)
+    XCTAssertEqual(cpu.state.pc, 0x0006)
   }
 
   func testComplexInstruction() {
@@ -137,16 +106,13 @@ ld   a, c
 ld   [$ffcb], a
 """)
 
-    var initialState = LR35902()
+    let cpu = LR35902()
+    cpu.state.a = 0b0000_1111
 
-    initialState.a = 0b0000_1111
+    disassembly.trace(range: 0..<disassembly.cartridge.size, cpu: cpu)
 
-    let states = disassembly.trace(range: 0..<disassembly.cartridge.size,
-                                   initialState: initialState).sorted(by: { $0.key < $1.key })
-    let lastState = states[states.count - 1]
-
-    XCTAssertEqual(lastState.value.a, 0b0000_1111)
-    XCTAssertEqual(lastState.value.c, 0b0000_1111)
-    XCTAssertEqual(lastState.value.pc, 0x000A)
+    XCTAssertEqual(cpu.state.a, 0b0000_1111)
+    XCTAssertEqual(cpu.state.c, 0b0000_1111)
+    XCTAssertEqual(cpu.state.pc, 0x000A)
   }
 }

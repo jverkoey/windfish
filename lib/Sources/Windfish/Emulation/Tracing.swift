@@ -1,15 +1,11 @@
 import Foundation
 
-public struct TracerMemory: AddressableMemory {
-  public var addressableRanges: [ClosedRange<LR35902.Address>] = [
-    0x0000...0xFFFF
-  ]
-
+public final class TracerMemory: AddressableMemory {
   public func read(from address: LR35902.Address) -> UInt8 {
     return 0x00
   }
 
-  public mutating func write(_ byte: UInt8, to address: LR35902.Address) {
+  public func write(_ byte: UInt8, to address: LR35902.Address) {
   }
 
   public func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
@@ -35,36 +31,25 @@ extension Disassembler {
    The returned dictionary is a mapping of cartridge locations to the post-execution CPU state for the instruction at
    that location.
    */
-  @discardableResult
   func trace(range: Range<Gameboy.Cartridge.Location>,
-             initialState: LR35902 = LR35902.zeroed(),
-             step: ((LR35902.Instruction, Gameboy.Cartridge.Location, LR35902) -> Void)? = nil)
-  -> [Gameboy.Cartridge.Location: LR35902] {
-    var state = initialState
-
+             cpu: LR35902 = LR35902.zeroed(),
+             step: ((LR35902.Instruction, Gameboy.Cartridge.Location, LR35902) -> Void)? = nil) {
     let addressAndBank = Gameboy.Cartridge.addressAndBank(from: range.lowerBound)
-    state.pc = addressAndBank.address
+    cpu.state.pc = addressAndBank.address
     let bank = addressAndBank.bank
     let upperBoundPc = Gameboy.Cartridge.addressAndBank(from: range.upperBound).address
 
-    // TODO: Store this globally.
-    var states: [Gameboy.Cartridge.Location: LR35902] = [:]
-
-    while state.pc < upperBoundPc {
-      guard let instruction = self.instruction(at: state.pc, in: bank) else {
-        state.pc += 1
+    while cpu.state.pc < upperBoundPc {
+      guard let instruction = self.instruction(at: cpu.state.pc, in: bank) else {
+        cpu.state.pc += 1
         continue
       }
 
-      var memory: AddressableMemory = TracerMemory()
-      let location = Gameboy.Cartridge.location(for: state.pc, in: bank)!
-      let postState = state.emulate(instruction: instruction, memory: &memory)
-      step?(instruction, location, postState)
-      states[location] = postState
-      state = postState
+      let memory: AddressableMemory = TracerMemory()
+      let location = Gameboy.Cartridge.location(for: cpu.state.pc, in: bank)!
+      cpu.emulate(instruction: instruction, memory: memory)
+      step?(instruction, location, cpu)
     }
-
-    return states
   }
 }
 

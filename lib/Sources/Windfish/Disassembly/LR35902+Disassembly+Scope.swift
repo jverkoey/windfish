@@ -13,7 +13,7 @@ extension Disassembler {
           continue
         }
 
-        trace(range: visitedRange) { instruction, location, state in
+        trace(range: visitedRange) { instruction, location, cpu in
           switch instruction.spec {
             // TODO: This only works if we're simulating the run as part of the linear sweep.
             // TODO: Fold the simulation logic into the linear sweep somehow.
@@ -31,7 +31,7 @@ extension Disassembler {
             }
             if let global = self.globals[immediate],
               let dataType = global.dataType,
-              case let .cartridge(sourceLocation) = state.registerTraces[.a]?.sourceLocation {
+              case let .cartridge(sourceLocation) = cpu.state.registerTraces[.a]?.sourceLocation {
               self.typeAtLocation[sourceLocation] = dataType
             }
 
@@ -42,12 +42,12 @@ extension Disassembler {
             let address = 0xFF00 | LR35902.Address(immediate)
             if let global = self.globals[address],
               let dataType = global.dataType,
-              case let .cartridge(sourceLocation) = state.registerTraces[.a]?.sourceLocation {
+              case let .cartridge(sourceLocation) = cpu.state.registerTraces[.a]?.sourceLocation {
               self.typeAtLocation[sourceLocation] = dataType
             }
 
           case .cp(_):
-            if let address = state.registerTraces[.a]?.loadAddress,
+            if let address = cpu.state.registerTraces[.a]?.loadAddress,
               let global = self.globals[address],
               let dataType = global.dataType {
               self.typeAtLocation[location] = dataType
@@ -60,12 +60,12 @@ extension Disassembler {
             let address = 0xFF00 | LR35902.Address(immediate)
             if let global = self.globals[address],
               let dataType = global.dataType,
-              case let .cartridge(sourceLocation) = state.registerTraces[src]?.sourceLocation {
+              case let .cartridge(sourceLocation) = cpu.state.registerTraces[src]?.sourceLocation {
               self.typeAtLocation[sourceLocation] = dataType
             }
 
           case .and(.imm8):
-            if let address = state.registerTraces[.a]?.loadAddress,
+            if let address = cpu.state.registerTraces[.a]?.loadAddress,
               let global = self.globals[address],
               let dataType = global.dataType,
               let type = self.dataTypes[dataType],

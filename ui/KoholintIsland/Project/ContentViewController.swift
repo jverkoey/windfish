@@ -165,7 +165,7 @@ final class ContentViewController: NSViewController {
         self.refreshBank()
         self.refreshFileContents()
         if let cartridge = self.document.gameboy.cartridge {
-          textView.emulationLine = self.document.disassemblyResults?.lineFor(address: self.document.gameboy.cpu.pc, bank: cartridge.selectedBank)
+          textView.emulationLine = self.document.disassemblyResults?.lineFor(address: self.document.gameboy.cpu.state.pc, bank: cartridge.selectedBank)
         }
       })
 

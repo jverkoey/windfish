@@ -7,14 +7,12 @@ extension LR35902 {
    - Parameter followControlFlow: If enabled, emulation will follow any transfers of control flow. Otherwise, control
    flow changes will be ignored and the instruction will be immediately stepped over.
    */
-  public func emulate(instruction: LR35902.Instruction, memory: inout AddressableMemory, followControlFlow: Bool = false) -> LR35902 {
+  public func emulate(instruction: LR35902.Instruction, memory: AddressableMemory, followControlFlow: Bool = false) {
     let registers8 = LR35902.Instruction.Numeric.registers8
     let registers16 = LR35902.Instruction.Numeric.registers16
 
-    let location = memory.sourceLocation(from: pc)
+    let location = memory.sourceLocation(from: state.pc)
     let width = LR35902.InstructionSet.widths[instruction.spec]!.total
-
-    var state = self
 
     switch instruction.spec {
     case .ld(let numeric, .imm8) where registers8.contains(numeric):
@@ -215,7 +213,5 @@ extension LR35902 {
       }
       state.pc += width
     }
-
-    return state
   }
 }
