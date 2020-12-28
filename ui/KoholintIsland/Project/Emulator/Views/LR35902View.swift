@@ -18,6 +18,7 @@ final class RegisterView: NSView {
     textField.font = monospacedFont
     textField.formatter = UInt8HexFormatter()
     textField.isEditable = false // TODO: Allow editing.
+    textField.objectValue = 0
 
     label.translatesAutoresizingMaskIntoConstraints = false
     textField.translatesAutoresizingMaskIntoConstraints = false

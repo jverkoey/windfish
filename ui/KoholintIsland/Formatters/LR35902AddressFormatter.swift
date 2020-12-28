@@ -9,7 +9,7 @@ import Windfish
 
 final class UInt8HexFormatter: Formatter {
   override func string(for obj: Any?) -> String? {
-    guard let address = obj as? Gameboy.Cartridge.Bank else {
+    guard let address = obj as? UInt8 else {
       return nil
     }
     return "0x\(address.hexString)"
