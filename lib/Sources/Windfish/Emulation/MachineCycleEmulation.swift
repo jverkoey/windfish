@@ -424,6 +424,26 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // rst n
+    case .rst(let address):
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          return .continueExecution
+        }
+        if cycle == 2 {
+          cpu.state.sp -= 1
+          memory.write(UInt8((cpu.state.pc & 0xFF00) >> 8), to: cpu.state.sp)
+          return .continueExecution
+        }
+        if cycle == 3 {
+          cpu.state.sp -= 1
+          memory.write(UInt8(cpu.state.pc & 0x00FF), to: cpu.state.sp)
+          return .continueExecution
+        }
+        cpu.state.pc = LR35902.Address(address.rawValue)
+        return .fetchNext
+      }
+
     // ret
     // ret cc
     case .ret(let cnd):

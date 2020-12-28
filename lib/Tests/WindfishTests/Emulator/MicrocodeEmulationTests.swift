@@ -18,7 +18,7 @@ class MicrocodeEmulationTests: XCTestCase {
 
   static var testedSpecs = Set<LR35902.Instruction.Spec>()
 
-  // 274 specs to go.
+  // 265 specs to go.
   static override func tearDown() {
     let remainingSpecs = LR35902.InstructionSet.allSpecs().filter { !testedSpecs.contains($0) }
     print("\(remainingSpecs.count) specs remaining to test")
@@ -3637,6 +3637,65 @@ nop
 
     XCTAssertEqual(testMemory.reads, [0])
     XCTAssertEqual(testMemory.writes, [])
+  }
+
+  func test_rst_n() throws {
+    // Given
+    let specs = LR35902.InstructionSet.table.filter { spec in
+      switch spec {
+      case .rst: return true
+      default: return false
+      }
+    }
+    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    let instructions = specs.map { LR35902.Instruction(spec: $0) }
+    let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
+    let gameboy = createGameboy(loadedWith: (0..<100).map { _ in "nop" }.joined(separator: "\n") + "\n" + assembly )
+    gameboy.cpu.state.pc = 100
+    gameboy.cpu.state.sp = 0xFFFD
+    let testMemory = TestMemory()
+    gameboy.addMemoryTracer(testMemory)
+
+    // When
+    for instruction in instructions {
+      let stashedpc = gameboy.cpu.state.pc
+
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        // No setup.
+      } expectedMutations: { state in
+        state.sp -= 2
+
+        switch instruction.spec {
+        case .rst(let address):
+          state.pc = UInt16(address.rawValue) + 1
+        default: fatalError()
+        }
+      }
+
+      gameboy.cpu.state.pc = stashedpc + 1
+      gameboy.cpu.state.machineInstruction = .init() // Reset the cpu's machine instruction cache to force a re-load
+    }
+
+    XCTAssertEqual(testMemory.reads, [
+      100, 0,
+      101, 8,
+      102, 16,
+      103, 24,
+      104, 32,
+      105, 40,
+      106, 48,
+      107, 56
+    ])
+    var pc = UInt8(101)
+    var sp = UInt16(0xFFFD)
+    XCTAssertEqual(testMemory.writes, specs.reduce(into: [], { accumulator, spec in
+      accumulator.append(contentsOf: [
+        .init(byte: 00, address: sp - 1),
+        .init(byte: pc, address: sp - 2),
+      ])
+      pc += 1
+      sp -= 2
+    }))
   }
 
 }
