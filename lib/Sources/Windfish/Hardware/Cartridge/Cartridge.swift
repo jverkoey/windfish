@@ -7,6 +7,9 @@ protocol MemoryBankController: AddressableMemory {
 extension Gameboy {
   /** A representation of a Gameboy cartridge as addressable memory at a given moment. */
   public class Cartridge: AddressableMemory {
+    static let romBankRegion: ClosedRange<LR35902.Address> = 0x0000...0x7FFF
+    static let ramBankRegion: ClosedRange<LR35902.Address> = 0xA000...0xBFFF
+
     public typealias Bank = UInt8
     public typealias Location = UInt32
     public typealias Length = UInt32
@@ -32,10 +35,6 @@ extension Gameboy {
     }
 
     // MARK: - AddressableMemory
-
-    public var addressableRanges: [ClosedRange<LR35902.Address>] = [
-      0x0000...0x7FFF
-    ]
 
     public func read(from address: LR35902.Address) -> UInt8 {
       return memoryBankController.read(from: address)

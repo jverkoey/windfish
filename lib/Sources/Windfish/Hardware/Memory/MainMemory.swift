@@ -16,7 +16,7 @@ extension Gameboy {
     private subscript(address: LR35902.Address) -> AddressableMemory {
       get {
         switch address {
-        case 0x0000...0x7FFF:
+        case Gameboy.Cartridge.romBankRegion, Gameboy.Cartridge.ramBankRegion:
           return cartridge!
         case OAM.addressableRange:
           return oam
