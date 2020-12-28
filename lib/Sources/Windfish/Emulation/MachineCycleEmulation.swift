@@ -514,6 +514,13 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // dec rr
+    case .dec(let register) where registers16.contains(register):
+      return { (cpu, memory, cycle) in
+        cpu.state[register] = (cpu.state[register] as UInt16).subtractingReportingOverflow(1).partialValue
+        return .fetchNext
+      }
+
     // sub n
     case subimm8:
       var immediate: UInt8 = 0
