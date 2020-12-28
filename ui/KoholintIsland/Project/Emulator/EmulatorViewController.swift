@@ -349,13 +349,16 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
             instructionsDispatched += 1
 
-            DispatchQueue.main.sync {
-              let deltaSeconds = Double((DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds)) / 1_000_000_000
-              let instructionsPerSecond = Double(instructionsDispatched) / deltaSeconds
-              print(instructionsPerSecond)
+            // Only show every 100 instructions (this actually results in a 100x speed improvement).
+            if instructionsDispatched % 100 == 0 {
+              DispatchQueue.main.sync {
+                let deltaSeconds = Double((DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds)) / 1_000_000_000
+                let instructionsPerSecond = Double(instructionsDispatched) / deltaSeconds
+                print(instructionsPerSecond)
 
-              self.updateRegisters()
-              self.updateRAM()
+                self.updateRegisters()
+                self.updateRAM()
+              }
             }
           }
           DispatchQueue.main.sync {
