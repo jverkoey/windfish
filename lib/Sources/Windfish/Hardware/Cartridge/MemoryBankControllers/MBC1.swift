@@ -37,6 +37,7 @@ extension Gameboy.Cartridge {
         // 0 is always translated to bank 1.
         let adjustedByte = maskedByte != 0 ? maskedByte : 1
         selectedBank = (selectedBank & ~mask) | adjustedByte
+        return
       }
 
       // Random-access memory (RAM) bank number / upper bits of read-only memory (ROM) bank number

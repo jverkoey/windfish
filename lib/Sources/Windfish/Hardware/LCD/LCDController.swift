@@ -21,6 +21,7 @@ public final class LCDController {
     case SCX  = 0xFF43
     case LY   = 0xFF44
     case LYC  = 0xFF45
+    case DMA  = 0xFF46
   }
   var values: [Addresses: UInt8] = [
     .SCY:  0x00,

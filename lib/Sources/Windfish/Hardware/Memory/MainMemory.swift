@@ -26,7 +26,7 @@ extension Gameboy {
           return hram
         case 0xFF05...0xFF26, 0xFF47...0xFF4B, 0xFFFF...0xFFFF:
           return ioRegisters
-        case LCDController.tileMapRegion, LCDController.tileDataRegion, 0xFF40...0xFF45:
+        case LCDController.tileMapRegion, LCDController.tileDataRegion, 0xFF40...0xFF46:
           return lcdController
         default:
           fatalError("No region mapped to this address.")
