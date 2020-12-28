@@ -16,9 +16,11 @@ final class IORegisterMemory: AddressableMemory {
     case NR10 = 0xFF10
     case NR11 = 0xFF11
     case NR12 = 0xFF12
+    case NR13 = 0xFF13
     case NR14 = 0xFF14
     case NR21 = 0xFF16
     case NR22 = 0xFF17
+    case NR23 = 0xFF18
     case NR24 = 0xFF19
     case NR30 = 0xFF1A
     case NR31 = 0xFF1B
@@ -50,9 +52,11 @@ final class IORegisterMemory: AddressableMemory {
     .NR10: 0x80,
     .NR11: 0xBF,
     .NR12: 0xF3,
+    .NR13: 0x00,
     .NR14: 0xBF,
     .NR21: 0x3F,
     .NR22: 0x00,
+    .NR23: 0x00,
     .NR24: 0xBF,
     .NR30: 0x7F,
     .NR31: 0xFF,

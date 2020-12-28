@@ -490,6 +490,15 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // bit b, r
+    case .cb(.bit(let bit, let register)) where registers8.contains(register):  // TODO: Test me
+      return { (cpu, memory, cycle) in
+        cpu.state.fzero = (cpu.state[register] & (UInt8(1) << bit.rawValue)) == 0
+        cpu.state.fsubtract = false
+        cpu.state.fhalfcarry = true
+        return .fetchNext
+      }
+
     // swap r
     case .cb(.swap(let register)) where registers8.contains(register):  // TODO: Test me
       return { (cpu, memory, cycle) in
@@ -521,11 +530,30 @@ extension LR35902.InstructionSet {
       return { (cpu, memory, cycle) in
         let partialResult = (cpu.state[register] as UInt8).multipliedReportingOverflow(by: 2)
         let result = partialResult.partialValue | (partialResult.overflow ? 0x01 : 0)
-        cpu.state[register] = result
+
         cpu.state.fzero = result == 0
         cpu.state.fsubtract = false
         cpu.state.fcarry = partialResult.overflow
         cpu.state.fhalfcarry = false
+
+        cpu.state[register] = result
+
+        return .fetchNext
+      }
+
+    // srl r
+    case .cb(.srl(let register)) where registers8.contains(register):  // TODO: Test me
+      return { (cpu, memory, cycle) in
+        let partialResult = (cpu.state[register] as UInt8).dividedReportingOverflow(by: 2)
+        let result = partialResult.partialValue
+
+        cpu.state.fzero = result == 0
+        cpu.state.fsubtract = false
+        cpu.state.fcarry = partialResult.overflow
+        cpu.state.fhalfcarry = false
+
+        cpu.state[register] = result
+
         return .fetchNext
       }
 
@@ -619,9 +647,34 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // dec [hl]
+    case .dec(.hladdr):  // TODO: Test me
+      var value: UInt8 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          value = memory.read(from: cpu.state.hl)
+          return .continueExecution
+        }
+        if cycle == 2 {
+          let result = value.subtractingReportingOverflow(1)
+          cpu.state.fzero = result.partialValue == 0
+          cpu.state.fsubtract = true
+          cpu.state.fhalfcarry = (value & 0x0f) < (1 & 0x0f)
+
+          value = result.partialValue
+
+          return .continueExecution
+        }
+        memory.write(value, to: cpu.state.hl)
+        return .fetchNext
+      }
+
     // dec rr
     case .dec(let register) where registers16.contains(register):
       return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          return .continueExecution
+        }
         cpu.state[register] = (cpu.state[register] as UInt16).subtractingReportingOverflow(1).partialValue
         return .fetchNext
       }
@@ -682,6 +735,23 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // or n
+    case .or(.imm8):  // TODO: Test me
+      var immediate: UInt8 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          immediate = UInt8(memory.read(from: cpu.state.pc))
+          cpu.state.pc += 1
+          return .continueExecution
+        }
+        cpu.state.a |= immediate
+        cpu.state.fzero = cpu.state.a == 0
+        cpu.state.fsubtract = false
+        cpu.state.fcarry = false
+        cpu.state.fhalfcarry = false
+        return .fetchNext
+      }
+
     // or [hl]
     case .or(.hladdr):
       var value: UInt8 = 0
@@ -734,6 +804,23 @@ extension LR35902.InstructionSet {
         cpu.state.fsubtract = false
         cpu.state.fcarry = false
         cpu.state.fhalfcarry = true
+        return .fetchNext
+      }
+
+    // add r
+    case .add(.a, let register) where registers8.contains(register):  // TODO: Test me
+      return { (cpu, memory, cycle) in
+        let originalValue = cpu.state.a
+        let registerValue = cpu.state[register] as UInt8
+        let result = originalValue.addingReportingOverflow(registerValue)
+
+        cpu.state.fzero = result.partialValue == 0
+        cpu.state.fsubtract = false
+        cpu.state.fcarry = result.overflow
+        cpu.state.fhalfcarry = (((originalValue & 0x0f) + (registerValue & 0x0f)) & 0x10) > 0
+
+        cpu.state.a = result.partialValue
+
         return .fetchNext
       }
 
