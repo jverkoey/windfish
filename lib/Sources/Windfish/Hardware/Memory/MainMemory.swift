@@ -28,7 +28,7 @@ extension Gameboy {
           return ram
         case hramAddressableRange:
           return hram
-        case 0xFF05...0xFF07, 0xFF10...0xFF26, 0xFF47...0xFF4B:
+        case 0xFF00...0xFF07, 0xFF10...0xFF26, 0xFF47...0xFF4B:
           return ioRegisters
         case LCDController.tileMapRegion, LCDController.tileDataRegion, 0xFF40...0xFF46:
           return lcdController

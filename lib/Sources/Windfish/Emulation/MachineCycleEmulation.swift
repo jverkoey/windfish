@@ -17,6 +17,7 @@ extension LR35902.InstructionSet {
     // Swift isn't able to resolve case statements when enums have an ambiguous number of associated values, so we need
     // to explicitly declare the specs here.
     let addimm8 = LR35902.Instruction.Spec.add(.imm8)
+    let addhladdr = LR35902.Instruction.Spec.add(.hladdr)
     let subimm8 = LR35902.Instruction.Spec.sub(.imm8)
 
     let evaluateConditional: (LR35902.Instruction.Condition?, LR35902) -> LR35902.MachineInstruction.MicroCodeResult = { cnd, cpu in
@@ -495,6 +496,58 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // swap r
+    case .cb(.swap(let register)) where registers8.contains(register):  // TODO: Test me
+      return { (cpu, memory, cycle) in
+        let upperNibble: UInt8 = cpu.state[register] & 0xF0
+        let lowerNibble: UInt8 = cpu.state[register] & 0x0F
+        let result = (upperNibble >> 8) | (lowerNibble << 8)
+        cpu.state[register] = result
+        cpu.state.fzero = result == 0
+        cpu.state.fsubtract = false
+        cpu.state.fcarry = false
+        cpu.state.fhalfcarry = false
+        return .fetchNext
+      }
+
+    // sla r
+    case .cb(.sla(let register)) where registers8.contains(register):  // TODO: Test me
+      return { (cpu, memory, cycle) in
+        let result = (cpu.state[register] as UInt8).multipliedReportingOverflow(by: 2)
+        cpu.state[register] = result.partialValue
+        cpu.state.fzero = result.partialValue == 0
+        cpu.state.fsubtract = false
+        cpu.state.fcarry = result.overflow
+        cpu.state.fhalfcarry = false
+        return .fetchNext
+      }
+
+    // rl r
+    case .cb(.rl(let register)) where registers8.contains(register):  // TODO: Test me
+      return { (cpu, memory, cycle) in
+        let partialResult = (cpu.state[register] as UInt8).multipliedReportingOverflow(by: 2)
+        let result = partialResult.partialValue | (partialResult.overflow ? 0x01 : 0)
+        cpu.state[register] = result
+        cpu.state.fzero = result == 0
+        cpu.state.fsubtract = false
+        cpu.state.fcarry = partialResult.overflow
+        cpu.state.fhalfcarry = false
+        return .fetchNext
+      }
+
+    // rra
+    case .rra:  // TODO: Test me
+      return { (cpu, memory, cycle) in
+        let partialResult = cpu.state.a.dividedReportingOverflow(by: 2)
+        let result = partialResult.partialValue | (partialResult.overflow ? 0b1000_0000 : 0)
+        cpu.state.a = result
+        cpu.state.fzero = result == 0
+        cpu.state.fsubtract = false
+        cpu.state.fcarry = partialResult.overflow
+        cpu.state.fhalfcarry = false
+        return .fetchNext
+      }
+
     // cp n
     case .cp(.imm8):
       var immediate: UInt8 = 0
@@ -534,6 +587,29 @@ extension LR35902.InstructionSet {
         cpu.state.fhalfcarry = (((originalValue & 0x0f) + 1) & 0x10) > 0
         cpu.state.fsubtract = false
         cpu.state[register] = result.partialValue
+        return .fetchNext
+      }
+
+    // inc [hl]
+    case .inc(.hladdr):
+      var value: UInt8 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          value = memory.read(from: cpu.state.hl)
+          return .continueExecution
+        }
+        if cycle == 2 {
+          let result = value.addingReportingOverflow(1)
+          cpu.state.fzero = result.partialValue == 0
+          cpu.state.fhalfcarry = (((value & 0x0f) + 1) & 0x10) > 0
+          cpu.state.fsubtract = false
+          value = result.partialValue
+          return .continueExecution
+        }
+        if cycle == 3 {
+          memory.write(value, to: cpu.state.hl)
+          return .continueExecution
+        }
         return .fetchNext
       }
 
@@ -686,6 +762,24 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // add [hl]
+    case addhladdr:  // TODO: Test me.
+      var value: UInt8 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          value = memory.read(from: cpu.state.hl)
+          return .continueExecution
+        }
+        let originalValue = cpu.state.a
+        let result = originalValue.addingReportingOverflow(value)
+        cpu.state.fzero = result.partialValue == 0
+        cpu.state.fsubtract = false
+        cpu.state.fcarry = result.overflow
+        cpu.state.fhalfcarry = (((originalValue & 0x0f) + (value & 0x0f)) & 0x10) > 0
+        cpu.state.a = result.partialValue
+        return .fetchNext
+      }
+
     // add hl, rr
     case .add(.hl, let src) where registers16.contains(src):
       return { (cpu, memory, cycle) in
@@ -699,6 +793,15 @@ extension LR35902.InstructionSet {
         cpu.state.fcarry = result.overflow
         cpu.state.fhalfcarry = (((originalValue & 0x0fff) + (sourceValue & 0x0fff)) & 0x1000) > 0
         cpu.state.hl = result.partialValue
+        return .fetchNext
+      }
+
+    // cpl
+    case .cpl:  // TODO: Test me
+      return { (cpu, memory, cycle) in
+        cpu.state.a = ~cpu.state.a
+        cpu.state.fsubtract = true
+        cpu.state.fcarry = true
         return .fetchNext
       }
 
