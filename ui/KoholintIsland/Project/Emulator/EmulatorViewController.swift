@@ -342,10 +342,18 @@ final class EmulatorViewController: NSViewController, TabSelectable {
         instructionAssemblyLabel.stringValue = "Running..."
         instructionBytesLabel.stringValue = "Running..."
         DispatchQueue.global(qos: .userInteractive).async {
+          let start = DispatchTime.now()
+          var instructionsDispatched: UInt64 = 0
           while self.running {
              self.document.gameboy.advanceInstruction()
 
+            instructionsDispatched += 1
+
             DispatchQueue.main.sync {
+              let deltaSeconds = Double((DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds)) / 1_000_000_000
+              let instructionsPerSecond = Double(instructionsDispatched) / deltaSeconds
+              print(instructionsPerSecond)
+
               self.updateRegisters()
               self.updateRAM()
             }

@@ -3,9 +3,17 @@ import Cocoa
 
 import Windfish
 
+final class FixedTextView: NSTextField {
+  override func invalidateIntrinsicContentSize() {
+    // Every time objectValue is set, NSControl invokes invalidateIntrinsicContentSize which is a fairly expensive
+    // operation. We know our register fields will never change their intrinsic content size, so we short-circuit this
+    // logic to improve rendering performance during emulation (13k instructions/s -> 16k instructions/s).
+  }
+}
+
 final class RegisterView: NSView {
   let label = CreateLabel()
-  let textField = NSTextField()
+  let textField = FixedTextView()
   let columnLayoutGuide = NSLayoutGuide()
 
   override init(frame frameRect: NSRect) {
@@ -72,7 +80,7 @@ final class RegisterView: NSView {
 
 final class AddressView: NSView {
   let label = CreateLabel()
-  let textField = NSTextField()
+  let textField = FixedTextView()
   let columnLayoutGuide = NSLayoutGuide()
 
   override init(frame frameRect: NSRect) {
