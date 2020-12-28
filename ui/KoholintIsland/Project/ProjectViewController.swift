@@ -216,10 +216,12 @@ final class ProjectViewController: NSViewController, EmulatorViewControllerDeleg
       self.contentViewController.textView?.highlightedLine = lineIndex
     }
 
-    let lineRange = analysis.lineRanges[lineIndex]
-    let glyphGraph = layoutManager.glyphRange(forCharacterRange: lineRange, actualCharacterRange: nil)
-    let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphGraph, in: textContainer)
-    self.contentViewController.textView?.scroll(boundingRect.offsetBy(dx: 0, dy: -containerView.bounds.height / 2).origin)
+    if analysis.lineRanges.count > lineIndex {
+      let lineRange = analysis.lineRanges[lineIndex]
+      let glyphGraph = layoutManager.glyphRange(forCharacterRange: lineRange, actualCharacterRange: nil)
+      let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphGraph, in: textContainer)
+      self.contentViewController.textView?.scroll(boundingRect.offsetBy(dx: 0, dy: -containerView.bounds.height / 2).origin)
+    }
   }
 
   func showRegion(_ region: Region) {

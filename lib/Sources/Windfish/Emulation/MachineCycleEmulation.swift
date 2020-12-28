@@ -713,12 +713,12 @@ extension LR35902.InstructionSet {
       return { (cpu, memory, cycle) in
         if cycle == 1 {
           cpu.state.sp -= 1
-          memory.write(UInt8(cpu.state.pc & 0xFF), to: cpu.state.sp)
+          memory.write(UInt8((cpu.state.pc & 0xFF00) >> 8), to: cpu.state.sp)
           return .continueExecution
         }
         if cycle == 2 {
           cpu.state.sp -= 1
-          memory.write(UInt8(cpu.state.pc >> 8), to: cpu.state.sp)
+          memory.write(UInt8(cpu.state.pc & 0x00FF), to: cpu.state.sp)
           return .continueExecution
         }
         if interrupt.contains(.vBlank) {
@@ -738,6 +738,7 @@ extension LR35902.InstructionSet {
           cpu.state.pc = 0x0060
         }
         memory.write(interrupt.rawValue, to: LR35902.interruptFlagAddress)
+        cpu.state.ime = false
         return .fetchNext
       }
 
