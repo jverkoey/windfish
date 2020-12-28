@@ -107,6 +107,13 @@ public final class LR35902 {
     public var ime: Bool = false
 
     /**
+     The halt status.
+
+     When true, the CPU will stop executing instructions until the next interrupt occurs.
+     */
+    public var halted: Bool = false
+
+    /**
      If greater than zero, then this value will be decremented on each machine cycle until it is less then or equal to 0,
      at which point ime will be enabled.
      */
@@ -156,6 +163,8 @@ public final class LR35902 {
     /** Trace information for a given register. */
     public var registerTraces: [LR35902.Instruction.Numeric: RegisterTrace] = [:]
   }
+
+  var nextAction: MachineInstruction.MicroCodeResult = .fetchNext
 
   /** Initializes the state with boot values. */
   public init() {}

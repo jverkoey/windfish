@@ -682,6 +682,12 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    case .halt:
+      return { (cpu, memory, cycle) in
+        cpu.state.halted = true
+        return .fetchNext
+      }
+
     case .nop:
       return { _, _, _ in .fetchNext }
 
@@ -698,29 +704,43 @@ extension LR35902 {
   /** Advances the CPU by one machine cycle. */
   public func advance(memory: AddressableMemory) {
     // https://gekkio.fi/files/gb-docs/gbctr.pdf
-    let nextAction: MachineInstruction.MicroCodeResult
-    if let microcode = state.machineInstruction.loaded?.microcode {
-      state.machineInstruction.cycle += 1
-      nextAction = microcode(self, memory, state.machineInstruction.cycle)
-    } else {
-      nextAction = .fetchNext
+    if !state.halted {
+      // Execution phase
+      if nextAction == .continueExecution, let microcode = state.machineInstruction.loaded?.microcode {
+        state.machineInstruction.cycle += 1
+        nextAction = microcode(self, memory, state.machineInstruction.cycle)
+      } else {
+        // No instruction was actually loaded into the CPU; let's switch to fetching one.
+        nextAction = .fetchNext
+      }
     }
 
-    // The LR35902's fetch/execute overlap behavior means we load the next opcode on the same machine cycle as the
-    // last instruction's microcode execution.
-    if nextAction == .fetchNext {
-      var sourceLocation = memory.sourceLocation(from: state.pc)
-      let tableIndex = Int(memory.read(from: state.pc))
-      state.pc += 1
-      let loadedSpec: Instruction.Spec
-      if let loaded = state.machineInstruction.loaded,
-         let prefixTable = InstructionSet.prefixTables[loaded.spec] {
-        sourceLocation = loaded.sourceLocation
-        loadedSpec = prefixTable[tableIndex]
-      } else {
-        loadedSpec = InstructionSet.table[tableIndex]
+    // TODO: Check interrupts somewhere around here.
+
+    if !state.halted {
+      // The LR35902's fetch/execute overlap behavior means we load the next opcode on the same machine cycle as the
+      // last instruction's microcode execution.
+      if nextAction == .fetchNext {
+        // Fetch phase
+        var sourceLocation = memory.sourceLocation(from: state.pc)
+        let tableIndex = Int(memory.read(from: state.pc))
+        state.pc += 1
+        let loadedSpec: Instruction.Spec
+        if let loaded = state.machineInstruction.loaded,
+           let prefixTable = InstructionSet.prefixTables[loaded.spec] {
+          sourceLocation = loaded.sourceLocation
+          loadedSpec = prefixTable[tableIndex]
+          nextAction = .continueExecution
+        } else {
+          loadedSpec = InstructionSet.table[tableIndex]
+          if InstructionSet.prefixTables[loadedSpec] != nil {
+            nextAction = .fetchNext  // Need to fetch one more opcode before we execute.
+          } else {
+            nextAction = .continueExecution
+          }
+        }
+        state.machineInstruction = .init(spec: loadedSpec, sourceLocation: sourceLocation)
       }
-      state.machineInstruction = .init(spec: loadedSpec, sourceLocation: sourceLocation)
     }
   }
 }

@@ -3614,4 +3614,29 @@ nop
     XCTAssertEqual(testMemory.writes, [])
   }
 
+  func test_halt() throws {
+    // Given
+    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union([.halt])
+    let instructions = [.halt].map { LR35902.Instruction(spec: $0) }
+    let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
+    let gameboy = createGameboy(loadedWith: assembly)
+
+    let testMemory = TestMemory()
+    gameboy.addMemoryTracer(testMemory)
+
+    // When
+    var state = gameboy.cpu.state
+    gameboy.advance()  // Load opcode
+    gameboy.advance()  // Execute halt instruction
+    gameboy.advance()  // Does nothing, verified by lack of read of next opcode.
+
+    // Then
+    state.pc += 1
+    state.halted = true
+    assertEqual(gameboy.cpu.state, state, message: "Spec: \(RGBDSDisassembler.statement(for: instructions[0]).formattedString)")
+
+    XCTAssertEqual(testMemory.reads, [0])
+    XCTAssertEqual(testMemory.writes, [])
+  }
+
 }

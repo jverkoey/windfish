@@ -26,6 +26,7 @@ func assertEqual(_ state1: LR35902.State, _ state2: LR35902.State, message: Stri
   XCTAssertEqual(state1.sp.hexString, state2.sp.hexString,      "sp mismatch \(message)", file: file, line: line)
   XCTAssertEqual(state1.pc.hexString, state2.pc.hexString,      "pc mismatch \(message)", file: file, line: line)
   XCTAssertEqual(state1.ime, state2.ime,                        "ime mismatch \(message)", file: file, line: line)
+  XCTAssertEqual(state1.halted, state2.halted,                  "halted mismatch \(message)", file: file, line: line)
 }
 func assertEqual(_ state1: LR35902, _ state2: LR35902, message: String = "", file: StaticString = #file, line: UInt = #line) {
   assertEqual(state1.state, state2.state)
