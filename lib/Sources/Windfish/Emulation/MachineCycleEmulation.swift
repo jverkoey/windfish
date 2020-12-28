@@ -14,12 +14,6 @@ extension LR35902.InstructionSet {
     let registers16 = LR35902.Instruction.Numeric.registers16
     let registersAddr = LR35902.Instruction.Numeric.registersAddr
 
-    // Swift isn't able to resolve case statements when enums have an ambiguous number of associated values, so we need
-    // to explicitly declare the specs here.
-    let addimm8 = LR35902.Instruction.Spec.add(.imm8)
-    let addhladdr = LR35902.Instruction.Spec.add(.hladdr)
-    let subimm8 = LR35902.Instruction.Spec.sub(.imm8)
-
     let evaluateConditional: (LR35902.Instruction.Condition?, LR35902) -> LR35902.MachineInstruction.MicroCodeResult = { cnd, cpu in
       switch cnd {
       case .none:      return .continueExecution
@@ -633,7 +627,7 @@ extension LR35902.InstructionSet {
       }
 
     // sub n
-    case subimm8:
+    case .sub(.a, .imm8):
       var immediate: UInt8 = 0
       return { (cpu, memory, cycle) in
         if cycle == 1 {
@@ -744,7 +738,7 @@ extension LR35902.InstructionSet {
       }
 
     // add n
-    case addimm8:
+    case .add(.a, .imm8):
       var immediate: UInt8 = 0
       return { (cpu, memory, cycle) in
         if cycle == 1 {
@@ -762,8 +756,8 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
-    // add [hl]
-    case addhladdr:  // TODO: Test me.
+    // add a, [hl]
+    case .add(.a, .hladdr):  // TODO: Test me.
       var value: UInt8 = 0
       return { (cpu, memory, cycle) in
         if cycle == 1 {

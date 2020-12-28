@@ -13,8 +13,8 @@ extension LR35902.Instruction {
     case push(Numeric), pop(Numeric)
 
     // 8- and 16-bit arithmetic
-    case add(Numeric), add(Numeric, Numeric), adc(Numeric)
-    case sub(Numeric), sub(Numeric, Numeric), sbc(Numeric)
+    case add(Numeric, Numeric), adc(Numeric)
+    case sub(Numeric, Numeric), sbc(Numeric)
     case and(Numeric), or(Numeric), xor(Numeric)
     case cp(Numeric)
     case inc(Numeric), dec(Numeric)
