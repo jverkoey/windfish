@@ -592,6 +592,22 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // or [hl]
+    case .or(.hladdr):
+      var value: UInt8 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          value = memory.read(from: cpu.state.hl)
+          return .continueExecution
+        }
+        cpu.state.a |= value
+        cpu.state.fzero = cpu.state.a == 0
+        cpu.state.fsubtract = false
+        cpu.state.fcarry = false
+        cpu.state.fhalfcarry = false
+        return .fetchNext
+      }
+
     // xor r
     case .xor(let register) where registers8.contains(register):
       return { (cpu, memory, cycle) in
