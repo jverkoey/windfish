@@ -5,6 +5,10 @@ import Foundation
 // - https://gekkio.fi/files/gb-docs/gbctr.pdf
 
 extension LR35902.InstructionSet {
+
+  // TODO: Cache the results of this method per spec because it's currently the performance bottleneck. Should be a
+  // simple matter of building a lookup table of microcode blocks that can accept sourceLocation as a parameter for
+  // tracing. Tracing arguably could even be moved elsewhere to remove one layer of indirection.
   static func microcode(for spec: LR35902.Instruction.Spec, sourceLocation: Disassembler.SourceLocation) -> LR35902.MachineInstruction.MicroCode {
     let registers8 = LR35902.Instruction.Numeric.registers8
     let registers16 = LR35902.Instruction.Numeric.registers16
