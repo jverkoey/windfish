@@ -7,7 +7,8 @@ import XCTest
  */
 class MicrocodeEmulationTests: XCTestCase {
   private func createGameboy(loadedWith assembly: String) -> Gameboy {
-    let (instructions, errors) = RGBDSAssembler.assemble(assembly: assembly)
+    // Pad every test with a nop at the end so that the post-execution opcode fetch has something to fetch.
+    let (instructions, errors) = RGBDSAssembler.assemble(assembly: assembly + "\n nop")
     precondition(errors.isEmpty, "Errors: \(errors)")
     let data = instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let gameboy = Gameboy()
@@ -23,23 +24,37 @@ class MicrocodeEmulationTests: XCTestCase {
     print("\(remainingSpecs.count) specs remaining to test")
   }
 
+  private func assertAdvance(gameboy: Gameboy, instruction: LR35902.Instruction,
+                             setup: () -> Void,
+                             expectedMutations: (inout LR35902.State) -> Void,
+                             file: StaticString = #file, line: UInt = #line) {
+    setup()
+
+    var state = gameboy.cpu.state
+    gameboy.advanceInstruction()
+
+    expectedMutations(&state)
+
+    assertEqual(gameboy.cpu.state, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)",
+                file: file, line: line)
+  }
+
   func test_00_nop() {
     // Given
     let gameboy = createGameboy(loadedWith: """
 nop
 nop
 """)
-    var state = gameboy.cpu.state
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
 
     // When
-    gameboy.advanceInstruction()
+    assertAdvance(gameboy: gameboy, instruction: .init(spec: .nop)) {
+      // No setup.
+    } expectedMutations: { state in
+      state.pc += 2
+    }
 
-    // Expected mutations
-    state.pc += 2
-
-    assertEqual(gameboy.cpu.state, state)
     XCTAssertEqual(gameboy.cpu.state.machineInstruction.cycle, 0)
     XCTAssertEqual(testMemory.reads, [0x0000, 0x0001])
     XCTAssertEqual(testMemory.writes, [])
@@ -53,44 +68,39 @@ nop
       switch spec {
       case .ld(let dst, let src) where registers8.contains(dst) && registers8.contains(src):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      switch instruction.spec {
-      case .ld(let dst, let src) where registers8.contains(dst) && registers8.contains(src):
-        // Set dst first in case dst == src
-        gameboy.cpu.state[dst] = UInt8(0x00)
-        gameboy.cpu.state[src] = UInt8(0xab)
-      default:
-        fatalError()
-      }
-      var state = gameboy.cpu.state
-      gameboy.advanceInstruction()
-
-      // Expected mutations
-      if index == 0 {
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        switch instruction.spec {
+        case .ld(let dst, let src) where registers8.contains(dst) && registers8.contains(src):
+          // Set dst first in case dst == src
+          gameboy.cpu.state[dst] = UInt8(0x00)
+          gameboy.cpu.state[src] = UInt8(0xab)
+        default:
+          fatalError()
+        }
+      } expectedMutations: { state in
+        if index == 0 {
+          state.pc += 1
+        }
         state.pc += 1
+        switch instruction.spec {
+        case .ld(let dst, let src) where registers8.contains(dst) && registers8.contains(src):
+          state[dst] = UInt8(0xab)
+        default:
+          fatalError()
+        }
       }
-      state.pc += 1
-
-      switch instruction.spec {
-      case .ld(let dst, let src) where registers8.contains(dst) && registers8.contains(src):
-        state[dst] = UInt8(0xab)
-      default:
-        fatalError()
-      }
-
-      assertEqual(gameboy.cpu.state, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
     }
 
     let cartridge = try XCTUnwrap(gameboy.cartridge)
@@ -105,43 +115,38 @@ nop
       switch spec {
       case .ld(let dst, .imm8) where registers8.contains(dst):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(0x12)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      switch instruction.spec {
-      case .ld(let dst, .imm8) where registers8.contains(dst):
-        gameboy.cpu.state[dst] = UInt8(0x00)
-      default:
-        fatalError()
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        switch instruction.spec {
+        case .ld(let dst, .imm8) where registers8.contains(dst):
+          gameboy.cpu.state[dst] = UInt8(0x00)
+        default:
+          fatalError()
+        }
+      } expectedMutations: { state in
+        if index == 0 {
+          state.pc += 1
+        }
+        state.pc += 2
+
+        switch instruction.spec {
+        case .ld(let dst, .imm8) where registers8.contains(dst):
+          state[dst] = UInt8(0x12)
+        default:
+          fatalError()
+        }
       }
-
-      var state = gameboy.cpu.state
-      gameboy.advanceInstruction()
-
-      // Expected mutations
-      if index == 0 {
-        state.pc += 1
-      }
-      state.pc += 2
-
-      switch instruction.spec {
-      case .ld(let dst, .imm8) where registers8.contains(dst):
-        state[dst] = UInt8(0x12)
-      default:
-        fatalError()
-      }
-
-      assertEqual(gameboy.cpu.state, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
     }
 
     let cartridge = try XCTUnwrap(gameboy.cartridge)
@@ -157,14 +162,13 @@ nop
       switch spec {
       case .ld(let dst, let src) where registers8.contains(dst) && registersAddr.contains(src):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     gameboy.cpu.state.hl = 0xFF80
     gameboy.memory.write(0x12, to: gameboy.cpu.state.hl)
     let testMemory = TestMemory()
@@ -172,31 +176,27 @@ nop
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      switch instruction.spec {
-      case .ld(let dst, let src) where registers8.contains(dst) && registersAddr.contains(src):
-        gameboy.cpu.state[dst] = UInt8(0x00)
-        gameboy.cpu.state[src] = UInt16(0xFF80) // Always reset hl in case we're writing to h or l.
-      default:
-        fatalError()
-      }
-
-      var state = gameboy.cpu.state
-      gameboy.advanceInstruction()
-
-      // Expected mutations
-      if index == 0 {
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        switch instruction.spec {
+        case .ld(let dst, let src) where registers8.contains(dst) && registersAddr.contains(src):
+          gameboy.cpu.state[dst] = UInt8(0x00)
+          gameboy.cpu.state[src] = UInt16(0xFF80) // Always reset hl in case we're writing to h or l.
+        default:
+          fatalError()
+        }
+      } expectedMutations: { state in
+        if index == 0 {
+          state.pc += 1
+        }
         state.pc += 1
-      }
-      state.pc += 1
 
-      switch instruction.spec {
-      case .ld(let dst, let src) where registers8.contains(dst) && registersAddr.contains(src):
-        state[dst] = UInt8(0x12)
-      default:
-        fatalError()
+        switch instruction.spec {
+        case .ld(let dst, let src) where registers8.contains(dst) && registersAddr.contains(src):
+          state[dst] = UInt8(0x12)
+        default:
+          fatalError()
+        }
       }
-
-      assertEqual(gameboy.cpu.state, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
     }
 
     let cartridge = try XCTUnwrap(gameboy.cartridge)
@@ -217,46 +217,41 @@ nop
       switch spec {
       case .ld(let dst, let src) where registersAddr.contains(dst) && registers8.contains(src):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     gameboy.cpu.state.hl = 0xFF80
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      switch instruction.spec {
-      case .ld(let dst, let src) where registersAddr.contains(dst) && registers8.contains(src):
-        gameboy.cpu.state[src] = UInt8(0x12)
-        gameboy.cpu.state[dst] = UInt16(0xFF80) // Always reset hl in case we're writing to h or l.
-      default:
-        fatalError()
-      }
-
-      var state = gameboy.cpu.state
-      gameboy.advanceInstruction()
-
-      // Expected mutations
-      if index == 0 {
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        switch instruction.spec {
+        case .ld(let dst, let src) where registersAddr.contains(dst) && registers8.contains(src):
+          gameboy.cpu.state[src] = UInt8(0x12)
+          gameboy.cpu.state[dst] = UInt16(0xFF80) // Always reset hl in case we're writing to h or l.
+        default:
+          fatalError()
+        }
+      } expectedMutations: { state in
+        if index == 0 {
+          state.pc += 1
+        }
         state.pc += 1
+        switch instruction.spec {
+        case .ld(let dst, let src) where registersAddr.contains(dst) && registers8.contains(src):
+          testMemory.ignoreWrites = true
+          gameboy.memory.write(state[src], to: state[dst])
+          testMemory.ignoreWrites = false
+        default:
+          fatalError()
+        }
       }
-      state.pc += 1
-      switch instruction.spec {
-      case .ld(let dst, let src) where registersAddr.contains(dst) && registers8.contains(src):
-        testMemory.ignoreWrites = true
-        gameboy.memory.write(state[src], to: state[dst])
-        testMemory.ignoreWrites = false
-      default:
-        fatalError()
-      }
-
-      assertEqual(gameboy.cpu.state, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
     }
 
     let cartridge = try XCTUnwrap(gameboy.cartridge)
@@ -284,46 +279,41 @@ nop
       switch spec {
       case .ld(let dst, .imm8) where registersAddr.contains(dst):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(0x12)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     gameboy.cpu.state.hl = 0xFF80
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      switch instruction.spec {
-      case .ld(let dst, .imm8) where registersAddr.contains(dst):
-        gameboy.cpu.state[dst] = UInt16(0xFF80) // Always reset hl in case we're writing to h or l.
-      default:
-        fatalError()
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        switch instruction.spec {
+        case .ld(let dst, .imm8) where registersAddr.contains(dst):
+          gameboy.cpu.state[dst] = UInt16(0xFF80) // Always reset hl in case we're writing to h or l.
+        default:
+          fatalError()
+        }
+      } expectedMutations: { state in
+        if index == 0 {
+          state.pc += 1
+        }
+        state.pc += 2
+
+        switch instruction.spec {
+        case .ld(let dst, .imm8) where registersAddr.contains(dst):
+          testMemory.ignoreWrites = true
+          gameboy.memory.write(0x12, to: gameboy.cpu.state[dst])
+          testMemory.ignoreWrites = false
+        default:
+          fatalError()
+        }
       }
-
-      var state = gameboy.cpu.state
-      gameboy.advanceInstruction()
-
-      // Expected mutations
-      if index == 0 {
-        state.pc += 1
-      }
-      state.pc += 2
-
-      switch instruction.spec {
-      case .ld(let dst, .imm8) where registersAddr.contains(dst):
-        testMemory.ignoreWrites = true
-        gameboy.memory.write(0x12, to: gameboy.cpu.state[dst])
-        testMemory.ignoreWrites = false
-      default:
-        fatalError()
-      }
-
-      assertEqual(gameboy.cpu.state, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
     }
 
     let cartridge = try XCTUnwrap(gameboy.cartridge)
@@ -339,43 +329,38 @@ nop
       switch spec {
       case .ld(.a, .imm16addr):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm16(0x0000)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      switch instruction.spec {
-      case .ld(.a, .imm16addr):
-        gameboy.cpu.state.a = UInt8(0x00)
-      default:
-        fatalError()
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        switch instruction.spec {
+        case .ld(.a, .imm16addr):
+          gameboy.cpu.state.a = UInt8(0x00)
+        default:
+          fatalError()
+        }
+      } expectedMutations: { state in
+        if index == 0 {
+          state.pc += 1
+        }
+        state.pc += 3
+
+        switch instruction.spec {
+        case .ld(.a, .imm16addr):
+          state.a = UInt8(0xFA)  // opcode for this instruction
+        default:
+          fatalError()
+        }
       }
-
-      var state = gameboy.cpu.state
-      gameboy.advanceInstruction()
-
-      // Expected mutations
-      if index == 0 {
-        state.pc += 1
-      }
-      state.pc += 3
-
-      switch instruction.spec {
-      case .ld(.a, .imm16addr):
-        state.a = UInt8(0xFA)  // opcode for this instruction
-      default:
-        fatalError()
-      }
-
-      assertEqual(gameboy.cpu.state, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
     }
 
     XCTAssertEqual(testMemory.reads, [0, 1, 2, 0, 3])
@@ -388,14 +373,13 @@ nop
       switch spec {
       case .ld(.imm16addr, .a):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm16(0xC000)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
 
@@ -430,14 +414,13 @@ nop
       switch spec {
       case .ld(.a, .ffccaddr):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     gameboy.cpu.state.c = UInt8(0xab)
     gameboy.memory.write(0x12, to: 0xFFAB)
     let testMemory = TestMemory()
@@ -480,14 +463,13 @@ nop
       switch spec {
       case .ld(.ffccaddr, .a):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     gameboy.cpu.state.c = UInt8(0xab)
     gameboy.cpu.state.a = 0x12
     let testMemory = TestMemory()
@@ -517,14 +499,13 @@ nop
       switch spec {
       case .ld(.a, .ffimm8addr):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(0xab)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     gameboy.memory.write(0x12, to: 0xFFAB)
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -565,14 +546,13 @@ nop
       switch spec {
       case .ld(.ffimm8addr, .a):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(0xab)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     gameboy.cpu.state.a = 0x12
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -601,14 +581,13 @@ nop
       switch spec {
       case .ldd(.a, .hladdr):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     gameboy.cpu.state.hl = 0xFF80
     gameboy.memory.write(0x12, to: 0xFF80)
     let testMemory = TestMemory()
@@ -652,14 +631,13 @@ nop
       switch spec {
       case .ldd(.hladdr, .a):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     gameboy.cpu.state.hl = 0xFF80
     gameboy.cpu.state.a = 0x12
     let testMemory = TestMemory()
@@ -690,14 +668,13 @@ nop
       switch spec {
       case .ldi(.a, .hladdr):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     gameboy.cpu.state.hl = 0xFF80
     gameboy.memory.write(0x12, to: 0xFF80)
     let testMemory = TestMemory()
@@ -741,14 +718,13 @@ nop
       switch spec {
       case .ldi(.hladdr, .a):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     gameboy.cpu.state.hl = 0xFF80
     gameboy.cpu.state.a = 0x12
     let testMemory = TestMemory()
@@ -780,14 +756,13 @@ nop
       switch spec {
       case .ld(let dst, .imm16) where registers16.contains(dst):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm16(0x1234)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
 
@@ -830,14 +805,13 @@ nop
       switch spec {
       case .ld(.imm16addr, .sp):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm16(0xFF80)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     gameboy.cpu.state.sp = 0x1234
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -870,14 +844,13 @@ nop
       switch spec {
       case .ld(.sp, .hl):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     gameboy.cpu.state.hl = 0x1234
     gameboy.cpu.state.sp = 0
     let testMemory = TestMemory()
@@ -910,14 +883,13 @@ nop
       switch spec {
       case .push(let src) where registers16.contains(src):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     gameboy.cpu.state.sp = 0xFFFD
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -970,14 +942,13 @@ nop
       switch spec {
       case .pop(let dst) where registers16.contains(dst):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     gameboy.cpu.state.sp = 0xFFE0
     var sp = gameboy.cpu.state.sp
     specs.forEach { _ in
@@ -1032,14 +1003,13 @@ nop
       switch spec {
       case .jp(_, .imm16):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm16(0x0000)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: "nop\n" + assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: "nop\n" + assembly)
     gameboy.cpu.state.pc = 1  // Skip the nop
 
     let testMemory = TestMemory()
@@ -1098,14 +1068,13 @@ nop
       switch spec {
       case .jp(let cnd, .imm16) where cnd != nil:
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm16(0x0000)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
 
@@ -1157,8 +1126,7 @@ nop
       switch spec {
       case .jp(nil, .hl):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
@@ -1194,8 +1162,7 @@ nop
       switch spec {
       case .jr(_, .simm8):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
@@ -1259,14 +1226,13 @@ nop
       switch spec {
       case .jr(let cnd, .simm8) where cnd != nil:
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(UInt8(bitPattern: 1))) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
 
@@ -1318,14 +1284,13 @@ nop
       switch spec {
       case .call(_, .imm16):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm16(0x0000)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: "nop\n" + assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: "nop\n" + assembly)
     gameboy.cpu.state.sp = 0xFFFD
     gameboy.cpu.state.pc = 1  // Skip the nop
 
@@ -1397,14 +1362,13 @@ nop
       switch spec {
       case .call(let cnd, .imm16) where cnd != nil:
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm16(0x0000)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -1457,14 +1421,13 @@ nop
       switch spec {
       case .ret(_):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: "nop\n nop\n" + assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: "nop\n nop\n" + assembly)
     gameboy.cpu.state.sp = 0xFFE0
     var sp = gameboy.cpu.state.sp
     specs.forEach { _ in
@@ -1531,14 +1494,13 @@ nop
       switch spec {
       case .ret(let cnd) where cnd != nil:
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -1591,14 +1553,13 @@ nop
       switch spec {
       case .reti:
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: "nop\n nop\n" + assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: "nop\n nop\n" + assembly)
     gameboy.cpu.state.sp = 0xFFE0
     var sp = gameboy.cpu.state.sp
     specs.forEach { _ in
@@ -1641,14 +1602,13 @@ nop
       switch spec {
       case .cb(.res(_, let register)) where registers8.contains(register):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -1666,30 +1626,26 @@ nop
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      switch instruction.spec {
-      case .cb(.res(_, let register)) where registers8.contains(register):
-        gameboy.cpu.state[register] = UInt8(0xFF)
-      default:
-        fatalError()
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        switch instruction.spec {
+        case .cb(.res(_, let register)) where registers8.contains(register):
+          gameboy.cpu.state[register] = UInt8(0xFF)
+        default:
+          fatalError()
+        }
+      } expectedMutations: { (state: inout LR35902.State) in
+        if index == 0 {
+          state.pc += 1
+        }
+        state.pc += 2
+
+        switch instruction.spec {
+        case .cb(.res(let bit, let register)) where registers8.contains(register):
+          state[register] = expectedResults[bit]!
+        default:
+          fatalError()
+        }
       }
-
-      var state = gameboy.cpu.state
-      gameboy.advanceInstruction()
-
-      // Expected mutations
-      if index == 0 {
-        state.pc += 1
-      }
-      state.pc += 2
-
-      switch instruction.spec {
-      case .cb(.res(let bit, let register)) where registers8.contains(register):
-        state[register] = expectedResults[bit]!
-      default:
-        fatalError()
-      }
-
-      assertEqual(gameboy.cpu.state, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
     }
 
     let cartridge = try XCTUnwrap(gameboy.cartridge)
@@ -1703,14 +1659,13 @@ nop
       switch spec {
       case .cp(.imm8):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(16)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -1750,14 +1705,13 @@ nop
       switch spec {
       case .cp(.imm8):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(16)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -1797,14 +1751,13 @@ nop
       switch spec {
       case .cp(.imm8):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(16)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -1844,14 +1797,13 @@ nop
       switch spec {
       case .cp(.imm8):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(0b0000_0010)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -1892,14 +1844,13 @@ nop
       switch spec {
       case .inc(let register) where registers8.contains(register):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -1951,14 +1902,13 @@ nop
       switch spec {
       case .inc(let register) where registers8.contains(register):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -2010,14 +1960,13 @@ nop
       switch spec {
       case .inc(let register) where registers8.contains(register):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -2069,14 +2018,13 @@ nop
       switch spec {
       case .dec(let register) where registers8.contains(register):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -2128,14 +2076,13 @@ nop
       switch spec {
       case .dec(let register) where registers8.contains(register):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -2187,14 +2134,13 @@ nop
       switch spec {
       case .dec(let register) where registers8.contains(register):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -2245,14 +2191,13 @@ nop
       switch spec {
       case .di:
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -2287,14 +2232,13 @@ nop
       switch spec {
       case .ei:
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop\n nop")
+    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -2371,14 +2315,13 @@ nop
       switch spec {
       case .inc(let register) where registers16.contains(register):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -2426,14 +2369,13 @@ nop
       switch spec {
       case .inc(let register) where registers16.contains(register):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -2481,14 +2423,13 @@ nop
       switch spec {
       case .or(let register) where registers8.contains(register):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -2541,14 +2482,13 @@ nop
       switch spec {
       case .or(let register) where registers8.contains(register):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -2594,14 +2534,13 @@ nop
       switch spec {
       case .and(.imm8):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(0xFF)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -2642,14 +2581,13 @@ nop
       switch spec {
       case .and(.imm8):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(0xF0)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -2691,14 +2629,13 @@ nop
       switch spec {
       case .xor(let register) where registers8.contains(register):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
@@ -2752,47 +2689,42 @@ nop
       switch spec {
       case .xor(let register) where registers8.contains(register):
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      gameboy.cpu.state.a = 0x0f
-      switch instruction.spec {
-      case .xor(let register) where registers8.contains(register):
-        gameboy.cpu.state[register] = UInt8(0x0f)
-      default:
-        fatalError()
-      }
-      gameboy.cpu.state.fsubtract = true
-      gameboy.cpu.state.fcarry = true
-      gameboy.cpu.state.fhalfcarry = true
-      gameboy.cpu.state.fzero = true
-
-      var state = gameboy.cpu.state
-      gameboy.advanceInstruction()
-
-      // Expected mutations
-      if index == 0 {
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        gameboy.cpu.state.a = 0x0f
+        switch instruction.spec {
+        case .xor(let register) where registers8.contains(register):
+          gameboy.cpu.state[register] = UInt8(0x0f)
+        default:
+          fatalError()
+        }
+        gameboy.cpu.state.fsubtract = true
+        gameboy.cpu.state.fcarry = true
+        gameboy.cpu.state.fhalfcarry = true
+        gameboy.cpu.state.fzero = true
+      } expectedMutations: { state in
+        if index == 0 {
+          state.pc += 1
+        }
         state.pc += 1
+        state.fsubtract = false
+        state.fcarry = false
+        state.fhalfcarry = false
+        state.fzero = true
+        state.a = 0
       }
-      state.pc += 1
-      state.fsubtract = false
-      state.fcarry = false
-      state.fhalfcarry = false
-      state.fzero = true
-      state.a = 0
-
-      assertEqual(gameboy.cpu.state, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
     }
 
     let cartridge = try XCTUnwrap(gameboy.cartridge)
@@ -2807,41 +2739,36 @@ nop
       switch spec {
       case addimm8:
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(1)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      gameboy.cpu.state.a = 0
-      gameboy.cpu.state.fsubtract = true
-      gameboy.cpu.state.fcarry = true
-      gameboy.cpu.state.fhalfcarry = true
-      gameboy.cpu.state.fzero = true
-
-      var state = gameboy.cpu.state
-      gameboy.advanceInstruction()
-
-      // Expected mutations
-      if index == 0 {
-        state.pc += 1
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        gameboy.cpu.state.a = 0
+        gameboy.cpu.state.fsubtract = true
+        gameboy.cpu.state.fcarry = true
+        gameboy.cpu.state.fhalfcarry = true
+        gameboy.cpu.state.fzero = true
+      } expectedMutations: { state in
+        if index == 0 {
+          state.pc += 1
+        }
+        state.pc += 2
+        state.fsubtract = false
+        state.fcarry = false
+        state.fhalfcarry = false
+        state.fzero = false
+        state.a = 1
       }
-      state.pc += 2
-      state.fsubtract = false
-      state.fcarry = false
-      state.fhalfcarry = false
-      state.fzero = false
-      state.a = 1
-
-      assertEqual(gameboy.cpu.state, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
     }
 
     let cartridge = try XCTUnwrap(gameboy.cartridge)
@@ -2856,41 +2783,36 @@ nop
       switch spec {
       case addimm8:
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(1)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      gameboy.cpu.state.a = 255
-      gameboy.cpu.state.fsubtract = true
-      gameboy.cpu.state.fcarry = false
-      gameboy.cpu.state.fhalfcarry = false
-      gameboy.cpu.state.fzero = false
-
-      var state = gameboy.cpu.state
-      gameboy.advanceInstruction()
-
-      // Expected mutations
-      if index == 0 {
-        state.pc += 1
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        gameboy.cpu.state.a = 255
+        gameboy.cpu.state.fsubtract = true
+        gameboy.cpu.state.fcarry = false
+        gameboy.cpu.state.fhalfcarry = false
+        gameboy.cpu.state.fzero = false
+      } expectedMutations: { state in
+        if index == 0 {
+          state.pc += 1
+        }
+        state.pc += 2
+        state.fsubtract = false
+        state.fcarry = true
+        state.fhalfcarry = true
+        state.fzero = true
+        state.a = 0
       }
-      state.pc += 2
-      state.fsubtract = false
-      state.fcarry = true
-      state.fhalfcarry = true
-      state.fzero = true
-      state.a = 0
-
-      assertEqual(gameboy.cpu.state, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
     }
 
     let cartridge = try XCTUnwrap(gameboy.cartridge)
@@ -2905,41 +2827,36 @@ nop
       switch spec {
       case addimm8:
         return true
-      default:
-        return false
+      default: return false
       }
     }
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(1)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      gameboy.cpu.state.a = 0x0f
-      gameboy.cpu.state.fsubtract = true
-      gameboy.cpu.state.fcarry = true
-      gameboy.cpu.state.fhalfcarry = false
-      gameboy.cpu.state.fzero = true
-
-      var state = gameboy.cpu.state
-      gameboy.advanceInstruction()
-
-      // Expected mutations
-      if index == 0 {
-        state.pc += 1
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        gameboy.cpu.state.a = 0x0f
+        gameboy.cpu.state.fsubtract = true
+        gameboy.cpu.state.fcarry = true
+        gameboy.cpu.state.fhalfcarry = false
+        gameboy.cpu.state.fzero = true
+      } expectedMutations: { state in
+        if index == 0 {
+          state.pc += 1
+        }
+        state.pc += 2
+        state.fsubtract = false
+        state.fcarry = false
+        state.fhalfcarry = true
+        state.fzero = false
+        state.a = 0x10
       }
-      state.pc += 2
-      state.fsubtract = false
-      state.fcarry = false
-      state.fhalfcarry = true
-      state.fzero = false
-      state.a = 0x10
-
-      assertEqual(gameboy.cpu.state, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
     }
 
     let cartridge = try XCTUnwrap(gameboy.cartridge)
@@ -2959,34 +2876,30 @@ nop
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(1)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      gameboy.cpu.state.a = 2
-      gameboy.cpu.state.fsubtract = false
-      gameboy.cpu.state.fcarry = true
-      gameboy.cpu.state.fhalfcarry = true
-      gameboy.cpu.state.fzero = true
-
-      var state = gameboy.cpu.state
-      gameboy.advanceInstruction()
-
-      // Expected mutations
-      if index == 0 {
-        state.pc += 1
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        gameboy.cpu.state.a = 2
+        gameboy.cpu.state.fsubtract = false
+        gameboy.cpu.state.fcarry = true
+        gameboy.cpu.state.fhalfcarry = true
+        gameboy.cpu.state.fzero = true
+      } expectedMutations: { state in
+        if index == 0 {
+          state.pc += 1
+        }
+        state.pc += 2
+        state.fsubtract = true
+        state.fcarry = false
+        state.fhalfcarry = false
+        state.fzero = false
+        state.a = 1
       }
-      state.pc += 2
-      state.fsubtract = true
-      state.fcarry = false
-      state.fhalfcarry = false
-      state.fzero = false
-      state.a = 1
-
-      assertEqual(gameboy.cpu.state, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
     }
 
     let cartridge = try XCTUnwrap(gameboy.cartridge)
@@ -3006,34 +2919,30 @@ nop
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(1)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      gameboy.cpu.state.a = 0
-      gameboy.cpu.state.fsubtract = false
-      gameboy.cpu.state.fcarry = false
-      gameboy.cpu.state.fhalfcarry = false
-      gameboy.cpu.state.fzero = true
-
-      var state = gameboy.cpu.state
-      gameboy.advanceInstruction()
-
-      // Expected mutations
-      if index == 0 {
-        state.pc += 1
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        gameboy.cpu.state.a = 0
+        gameboy.cpu.state.fsubtract = false
+        gameboy.cpu.state.fcarry = false
+        gameboy.cpu.state.fhalfcarry = false
+        gameboy.cpu.state.fzero = true
+      } expectedMutations: { state in
+        if index == 0 {
+          state.pc += 1
+        }
+        state.pc += 2
+        state.fsubtract = true
+        state.fcarry = true
+        state.fhalfcarry = true
+        state.fzero = false
+        state.a = 255
       }
-      state.pc += 2
-      state.fsubtract = true
-      state.fcarry = true
-      state.fhalfcarry = true
-      state.fzero = false
-      state.a = 255
-
-      assertEqual(gameboy.cpu.state, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
     }
 
     let cartridge = try XCTUnwrap(gameboy.cartridge)
@@ -3053,34 +2962,30 @@ nop
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(1)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      gameboy.cpu.state.a = 1
-      gameboy.cpu.state.fsubtract = false
-      gameboy.cpu.state.fcarry = true
-      gameboy.cpu.state.fhalfcarry = true
-      gameboy.cpu.state.fzero = false
-
-      var state = gameboy.cpu.state
-      gameboy.advanceInstruction()
-
-      // Expected mutations
-      if index == 0 {
-        state.pc += 1
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        gameboy.cpu.state.a = 1
+        gameboy.cpu.state.fsubtract = false
+        gameboy.cpu.state.fcarry = true
+        gameboy.cpu.state.fhalfcarry = true
+        gameboy.cpu.state.fzero = false
+      } expectedMutations: { state in
+        if index == 0 {
+          state.pc += 1
+        }
+        state.pc += 2
+        state.fsubtract = true
+        state.fcarry = false
+        state.fhalfcarry = false
+        state.fzero = true
+        state.a = 0
       }
-      state.pc += 2
-      state.fsubtract = true
-      state.fcarry = false
-      state.fhalfcarry = false
-      state.fzero = true
-      state.a = 0
-
-      assertEqual(gameboy.cpu.state, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
     }
 
     let cartridge = try XCTUnwrap(gameboy.cartridge)
@@ -3100,34 +3005,30 @@ nop
     MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(1)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
-    let gameboy = createGameboy(loadedWith: assembly + "\n nop")
+    let gameboy = createGameboy(loadedWith: assembly)
 
     let testMemory = TestMemory()
     gameboy.addMemoryTracer(testMemory)
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      gameboy.cpu.state.a = 0b1111_0000
-      gameboy.cpu.state.fsubtract = false
-      gameboy.cpu.state.fcarry = true
-      gameboy.cpu.state.fhalfcarry = false
-      gameboy.cpu.state.fzero = true
-
-      var state = gameboy.cpu.state
-      gameboy.advanceInstruction()
-
-      // Expected mutations
-      if index == 0 {
-        state.pc += 1
+      assertAdvance(gameboy: gameboy, instruction: instruction) {
+        gameboy.cpu.state.a = 0b1111_0000
+        gameboy.cpu.state.fsubtract = false
+        gameboy.cpu.state.fcarry = true
+        gameboy.cpu.state.fhalfcarry = false
+        gameboy.cpu.state.fzero = true
+      } expectedMutations: { state in
+        if index == 0 {
+          state.pc += 1
+        }
+        state.pc += 2
+        state.fsubtract = true
+        state.fcarry = false
+        state.fhalfcarry = true
+        state.fzero = false
+        state.a = 0b1110_1111
       }
-      state.pc += 2
-      state.fsubtract = true
-      state.fcarry = false
-      state.fhalfcarry = true
-      state.fzero = false
-      state.a = 0b1110_1111
-
-      assertEqual(gameboy.cpu.state, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
     }
 
     let cartridge = try XCTUnwrap(gameboy.cartridge)
