@@ -55,6 +55,12 @@ public final class LCDController {
           || !lcdDisplayEnable && newValue            // Can always enable.
       )
     }
+    didSet {
+      if !lcdDisplayEnable {
+        ly = 0
+        lcdMode = .searchingOAM
+      }
+    }
   }
   var windowTileMapAddress = TileMapAddress.x9800      // bit 6
   var windowEnable = false                             // bit 5
@@ -85,14 +91,19 @@ public final class LCDController {
       }
     }
   }
-  var enableCoincidenceInterrupt = false  // bit 6
-  var enableOAMInterrupt = false          // bit 5
-  var enableVBlankInterrupt = false       // bit 4
-  var enableHBlankInterrupt = false       // bit 3
-  var coincidence: Bool {                 // bit 2
+  var enableCoincidenceInterrupt = false          // bit 6
+  var enableOAMInterrupt = false                  // bit 5
+  var enableVBlankInterrupt = false               // bit 4
+  var enableHBlankInterrupt = false               // bit 3
+  var coincidence: Bool {                         // bit 2
     return ly == lyc
   }
-  var lcdMode = LCDCMode.searchingOAM     // bits 1 and 0
+  private var lcdMode = LCDCMode.searchingOAM {   // bits 1 and 0
+    didSet {
+      // Always reset the cycle count when changing modes.
+      lcdModeCycle = 0
+    }
+  }
 
   // MARK: LY
 
@@ -112,6 +123,10 @@ public final class LCDController {
 extension LCDController {
   /** Executes a single machine cycle and returns the  */
   public func advance(memory: AddressableMemory) {
+    guard lcdDisplayEnable else {
+      return
+    }
+
     lcdModeCycle += 1
 
     // TODO: Implement state machine below.
@@ -119,18 +134,15 @@ extension LCDController {
     case .searchingOAM:
       if lcdModeCycle >= 20 {
         lcdMode = .transferringToLCDDriver
-        lcdModeCycle = 0
       }
       break
     case .transferringToLCDDriver:
       if lcdModeCycle >= 43 {
         lcdMode = .hblank
-        lcdModeCycle = 0
       }
       break
     case .hblank:
       if lcdModeCycle >= 51 {
-        lcdModeCycle = 0
         ly += 1
         if ly >= 144 {
           lcdMode = .vblank
@@ -147,8 +159,7 @@ extension LCDController {
       }
       break
     case .vblank:
-      if lcdModeCycle >= 114 {
-        lcdModeCycle = 0
+      if lcdModeCycle % 114 == 0 {
         ly += 1
 
         if ly >= 154 {
