@@ -16,9 +16,6 @@ final class IORegisterMemory: AddressableMemory {
     case BGP  = 0xFF47
     case OBP0 = 0xFF48
     case OBP1 = 0xFF49
-    case WY   = 0xFF4A
-    case WX   = 0xFF4B
-    case IE   = 0xFFFF
   }
   var values: [IOAddresses: UInt8] = [
     .P1:   0x00,
@@ -31,8 +28,6 @@ final class IORegisterMemory: AddressableMemory {
     .BGP:  0xFC,
     .OBP0: 0xFF,
     .OBP1: 0xFF,
-    .WY:   0x00,
-    .WX:   0x00,
   ]
   func read(from address: LR35902.Address) -> UInt8 {
     guard let ioAddress = IOAddresses(rawValue: address) else {

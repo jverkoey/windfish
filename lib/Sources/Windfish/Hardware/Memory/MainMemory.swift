@@ -27,11 +27,12 @@ extension Gameboy {
           return cpu
         case Memory.ramAddressableRange:  return ram
         case Memory.hramAddressableRange: return hram
-        case 0xFF00...0xFF07, 0xFF47...0xFF4B:
+        case 0xFF00...0xFF07, 0xFF47...0xFF49:
           return ioRegisters
         case DMAController.registerAddress:
           return dmaController
-        case LCDController.tileMapRegion, LCDController.tileDataRegion, OAM.addressableRange, 0xFF40...0xFF45:
+        case LCDController.tileMapRegion, LCDController.tileDataRegion, LCDController.registerRegion1, LCDController.registerRegion2,
+             OAM.addressableRange:
           return lcdController
         case SoundController.wavePatternRegion, SoundController.soundRegistersRegion:
           return soundController

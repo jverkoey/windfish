@@ -10,7 +10,8 @@ import Foundation
 public final class LCDController {
   static let tileMapRegion: ClosedRange<LR35902.Address> = 0x9800...0x9FFF
   static let tileDataRegion: ClosedRange<LR35902.Address> = 0x8000...0x97FF
-  // 0xFF40...0xFF45
+  static let registerRegion1: ClosedRange<LR35902.Address> = 0xFF40...0xFF45
+  static let registerRegion2: ClosedRange<LR35902.Address> = 0xFF47...0xFF4B
 
   init(oam: OAM) {
     self.oam = oam
@@ -44,6 +45,8 @@ public final class LCDController {
     case LY   = 0xFF44
     case LYC  = 0xFF45
     case DMA  = 0xFF46
+    case WY   = 0xFF4A
+    case WX   = 0xFF4B
   }
   var values: [Addresses: UInt8] = [
     .SCY:  0x00,
@@ -145,23 +148,46 @@ public final class LCDController {
 
   var lyc: UInt8 = 0
 
+  // MARK: WY and WX
+
+  var wy: UInt8 = 0
+  var wx: UInt8 = 0
+
+  // MARK: .searchingOAM state
+
   /** How many cycles have been advanced for the current lcdMode. */
   private var lcdModeCycle: Int = 0
   private var intersectedOAMs: [OAM.Sprite] = []
   private var oamIndex = 0
+
+  // MARK: .transferringToLCDDriver state
+  private struct Pixel {
+    let color: UInt8
+    let palette: UInt8
+    let spritePriority: UInt8
+    let bgPriority: UInt8
+  }
+  private var bgfifo: [Pixel] = []
+  private var spritefifo: [Pixel] = []
+  private var transferringToLCDDriverCycle: Int = 0
+  private var scanlineX: Int = 0
 }
 
 // MARK: - Emulation
 
 extension LCDController {
+  static let searchingOAMLength = 20
   static let scanlineCycleLength = 114
 
   private func plot(x: Int, y: Int, byte: UInt8) {
     screenData[LCDController.screenSize.width * y + x] = byte
   }
 
-  private func plot() {
-    var pixelIndex = (lcdModeCycle - 20) * 4
+  /** Takes 2 machine cycles to conclude. */
+  private func getTile() {
+    if windowEnable && wx <= scanlineX && wy <= ly {
+      // TODO: Implement pixel fifo.
+    }
   }
 
   /** Executes a single machine cycle.  */
@@ -178,13 +204,19 @@ extension LCDController {
       searchNextOAM()
       searchNextOAM()
 
-      if lcdModeCycle >= 20 {
+      if lcdModeCycle >= LCDController.searchingOAMLength {
         precondition(intersectedOAMs.count == 0, "Sprites not handled yet.")
         lcdMode = .transferringToLCDDriver
+        transferringToLCDDriverCycle = 0
+        scanlineX = 0
+        bgfifo.removeAll()
+        spritefifo.removeAll()
       }
       break
     case .transferringToLCDDriver:
-      plot()
+      transferringToLCDDriverCycle += 1
+
+      getTile()
 
       if lcdModeCycle >= 63 {
         lcdMode = .hblank
@@ -270,6 +302,9 @@ extension LCDController: AddressableMemory {
     case .LY:   return ly
     case .LYC:  return lyc
 
+    case .WY:   return wy
+    case .WX:   return wx
+
     case .STAT:
       return (
         (enableCoincidenceInterrupt   ? 0b0100_0000 : 0)
@@ -319,6 +354,9 @@ extension LCDController: AddressableMemory {
 
     case .LY:  ly = 0
     case .LYC: lyc = 0
+
+    case .WY:   wy = byte
+    case .WX:   wx = byte
 
     case .STAT:
       enableCoincidenceInterrupt  = (byte & 0b0100_0000) > 0
