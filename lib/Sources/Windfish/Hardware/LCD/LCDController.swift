@@ -133,8 +133,6 @@ public final class LCDController {
   }
   private var lcdMode = LCDCMode.searchingOAM {   // bits 1 and 0
     didSet {
-      // Always reset the cycle count when changing modes.
-      lcdModeCycle = 0
       if lcdMode == .searchingOAM {
         intersectedOAMs = []
         oamIndex = 0
@@ -160,6 +158,8 @@ public final class LCDController {
 // MARK: - Emulation
 
 extension LCDController {
+  static let scanlineCycleLength = 114
+
   /** Executes a single machine cycle.  */
   public func advance(memory: AddressableMemory) {
     guard lcdDisplayEnable else {
@@ -180,29 +180,29 @@ extension LCDController {
       }
       break
     case .transferringToLCDDriver:
-      if lcdModeCycle >= 43 {
+      // TODO: This isn't always 43.
+      if lcdModeCycle >= 63 {
         lcdMode = .hblank
+        // Don't reset lcdModeCycle yet, as this mode can actually end early.
       }
       break
     case .hblank:
-      if lcdModeCycle >= 51 {
+      if lcdModeCycle >= LCDController.scanlineCycleLength {
         ly += 1
-        if ly >= 144 {
+        if ly < 144 {
+          lcdMode = .searchingOAM
+        } else {
+          // No more lines to draw.
           lcdMode = .vblank
 
           var interruptFlag = LR35902.Instruction.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
           interruptFlag.insert(.vBlank)
           memory.write(interruptFlag.rawValue, to: LR35902.interruptFlagAddress)
-
-        } else {
-          // TODO: Dump the current scanline to the screen buffer.
-
-          lcdMode = .searchingOAM
         }
       }
       break
     case .vblank:
-      if lcdModeCycle % 114 == 0 {
+      if lcdModeCycle % LCDController.scanlineCycleLength == 0 {
         ly += 1
 
         if ly >= 154 {
