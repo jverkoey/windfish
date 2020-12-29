@@ -2,9 +2,10 @@ import Foundation
 
 extension Gameboy {
   public final class Memory {
-    public init(cpu: LR35902, lcdController: LCDController) {
+    public init(cpu: LR35902, lcdController: LCDController, dmaController: DMAController) {
       self.cpu = cpu
       self.lcdController = lcdController
+      self.dmaController = dmaController
     }
 
     public var tracers: [AddressableMemory] = []
@@ -22,15 +23,14 @@ extension Gameboy {
           return cartridge!
         case LR35902.interruptEnableAddress, LR35902.interruptFlagAddress:
           return cpu
-        case OAM.addressableRange:
-          return oam
-        case ramAddressableRange:
-          return ram
-        case hramAddressableRange:
-          return hram
+        case OAM.addressableRange: return oam
+        case Memory.ramAddressableRange:  return ram
+        case Memory.hramAddressableRange: return hram
         case 0xFF00...0xFF07, 0xFF10...0xFF26, 0xFF47...0xFF4B:
           return ioRegisters
-        case LCDController.tileMapRegion, LCDController.tileDataRegion, 0xFF40...0xFF46:
+        case DMAController.registerAddress:
+          return dmaController
+        case LCDController.tileMapRegion, LCDController.tileDataRegion, 0xFF40...0xFF45:
           return lcdController
         default:
           fatalError("No region mapped to this address.")
@@ -40,13 +40,14 @@ extension Gameboy {
 
     // MARK: - Mapping regions of memory
 
-    private var hram = GenericRAM()
-    private var ram = GenericRAM()
-    private var ioRegisters = IORegisterMemory()
-    private var oam = OAM()
+    private let hram = GenericRAM()
+    private let ram = GenericRAM()
+    private let ioRegisters = IORegisterMemory()
+    private let dmaController: DMAController
+    private let oam = OAM()
 
-    private let hramAddressableRange: ClosedRange<LR35902.Address> = 0xFF80...0xFFFE
-    private let ramAddressableRange: ClosedRange<LR35902.Address> = 0xC000...0xDFFF
+    static let hramAddressableRange: ClosedRange<LR35902.Address> = 0xFF80...0xFFFE
+    static let ramAddressableRange: ClosedRange<LR35902.Address> = 0xC000...0xDFFF
   }
 }
 

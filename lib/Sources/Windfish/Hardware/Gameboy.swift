@@ -2,7 +2,7 @@ import Foundation
 
 public final class Gameboy {
   public init() {
-    self.memory = Memory(cpu: cpu, lcdController: lcdController)
+    self.memory = Memory(cpu: cpu, lcdController: lcdController, dmaController: dmaController)
   }
 
   // MARK: - Hardware
@@ -23,24 +23,13 @@ public final class Gameboy {
   /** The Gameboy's liquid crystal display (LCD) controller. */
   let lcdController = LCDController()
 
+  /** The Gameboy's OAM DMA controller. */
+  let dmaController = DMAController()
+
   // MARK: - Debugging
 
   /** Registers a memory tracer with the gameboy that can observe memory operations. */
   public func addMemoryTracer(_ tracer: AddressableMemory) {
     memory.tracers.append(tracer)
-  }
-}
-
-extension Gameboy: AddressableMemory {
-  public func read(from address: LR35902.Address) -> UInt8 {
-    return memory.read(from: address)
-  }
-
-  public func write(_ byte: UInt8, to address: LR35902.Address) {
-    memory.write(byte, to: address)
-  }
-
-  public func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
-    return memory.sourceLocation(from: address)
   }
 }

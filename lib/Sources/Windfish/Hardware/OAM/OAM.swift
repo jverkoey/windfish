@@ -2,8 +2,8 @@ import Foundation
 
 /** Object Attribute Map addressable memory. */
 extension Gameboy {
-  final class OAM {
-    static let addressableRange: ClosedRange<LR35902.Address> = 0xFE00...0xFE9C
+  public final class OAM {
+    static let addressableRange: ClosedRange<LR35902.Address> = 0xFE00...0xFE9F
 
     private struct ObjectAttribute {
       var x: UInt8
@@ -18,7 +18,7 @@ extension Gameboy {
 }
 
 extension Gameboy.OAM: AddressableMemory {
-  func read(from address: LR35902.Address) -> UInt8 {
+  public func read(from address: LR35902.Address) -> UInt8 {
     let relativeOffset = (address - Gameboy.OAM.addressableRange.lowerBound)
     let oamIndex = relativeOffset / 4
     let oam = oams[Int(oamIndex)]
@@ -31,7 +31,7 @@ extension Gameboy.OAM: AddressableMemory {
     }
   }
 
-  func write(_ byte: UInt8, to address: LR35902.Address) {
+  public func write(_ byte: UInt8, to address: LR35902.Address) {
     let relativeOffset = (address - Gameboy.OAM.addressableRange.lowerBound)
     let oamIndex = Int(relativeOffset / 4)
     var oam = oams[oamIndex]
@@ -45,7 +45,7 @@ extension Gameboy.OAM: AddressableMemory {
     oams[oamIndex] = oam
   }
 
-  func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
+  public func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
     return .memory(address)
   }
 }

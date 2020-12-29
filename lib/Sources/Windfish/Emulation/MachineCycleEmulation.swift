@@ -994,11 +994,46 @@ extension LR35902 {
   }
 }
 
+private final class DMAProxy: AddressableMemory {
+  init(memory: AddressableMemory) {
+    self.memory = memory
+  }
+  let memory: AddressableMemory
+
+  func read(from address: LR35902.Address) -> UInt8 {
+    switch address {
+    // Addresses that are still accessible during DMA transfer
+    case Gameboy.Memory.hramAddressableRange, DMAController.registerAddress:
+      return memory.read(from: address)
+    default:
+      return 0xFF
+    }
+  }
+
+  func write(_ byte: UInt8, to address: LR35902.Address) {
+    switch address {
+    // Addresses that are still accessible during DMA transfer
+    case Gameboy.Memory.hramAddressableRange, DMAController.registerAddress:
+      memory.write(byte, to: address)
+    default:
+      break  // Do nothing.
+    }
+  }
+
+  func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
+    return .memory(address)
+  }
+}
+
 extension Gameboy {
   /** Advances the emulation by one machine cycle. */
   public func advance() {
-    cpu.advance(memory: memory)
-    lcdController.advance(memory: memory)
+    // DMA controller is always able to access memory directly.
+    dmaController.advance(memory: memory)
+
+    let proxyMemory: AddressableMemory = dmaController.oamLocked ? DMAProxy(memory: memory) : memory
+    cpu.advance(memory: proxyMemory)
+    lcdController.advance(memory: proxyMemory)
   }
 
   /** Advances the emulation by one instruction. */
