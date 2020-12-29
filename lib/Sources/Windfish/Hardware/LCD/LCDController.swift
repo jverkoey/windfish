@@ -5,14 +5,40 @@ import Foundation
 // - https://gbdev.gg8.se/wiki/articles/Video_Display#FF41_-_STAT_-_LCDC_Status_.28R.2FW.29
 // - https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
 // - http://gameboy.mongenel.com/dmg/asmmemmap.html
+// - https://hacktix.github.io/GBEDG/ppu/#the-concept-of-scanlines
 
 public final class LCDController {
+  static let oamRegion: ClosedRange<LR35902.Address> = 0xFE00...0xFE9F
   static let tileMapRegion: ClosedRange<LR35902.Address> = 0x9800...0x9FFF
   static let tileDataRegion: ClosedRange<LR35902.Address> = 0x8000...0x97FF
   // 0xFF40...0xFF45
 
   var tileMap: [LR35902.Address: UInt8] = [:]
   var tileData: [LR35902.Address: UInt8] = [:]
+
+  private struct Sprite {
+    var x: UInt8
+    var y: UInt8
+    var tile: UInt8
+    var flags: UInt8
+  }
+  private var oams: [Sprite] = (0..<40).map { _ -> Sprite in
+    Sprite(x: 0, y: 0, tile: 0, flags: 0)
+  }
+
+  var bufferToggle = false
+  private var screenData: Data {
+    get { bufferToggle ? screenData1 : screenData0 }
+    set {
+      if bufferToggle {
+        screenData1 = newValue
+      } else {
+        screenData0 = newValue
+      }
+    }
+  }
+  private var screenData0 = Data(count: 160 * 144)
+  private var screenData1 = Data(count: 160 * 144)
 
   enum Addresses: LR35902.Address {
     case LCDC = 0xFF40
@@ -41,6 +67,13 @@ public final class LCDController {
   enum SpriteSize {
     case x8x8  // 0
     case x8x16 // 1
+
+    func height() -> UInt8 {
+      switch self {
+      case .x8x8:  return 8
+      case .x8x16: return 16
+      }
+    }
   }
   /**
    Whether the display is turned on or not.
@@ -102,6 +135,10 @@ public final class LCDController {
     didSet {
       // Always reset the cycle count when changing modes.
       lcdModeCycle = 0
+      if lcdMode == .searchingOAM {
+        intersectedOAMs = []
+        oamIndex = 0
+      }
     }
   }
 
@@ -116,12 +153,14 @@ public final class LCDController {
 
   /** How many cycles have been advanced for the current lcdMode. */
   private var lcdModeCycle: Int = 0
+  private var intersectedOAMs: [Sprite] = []
+  private var oamIndex = 0
 }
 
 // MARK: - Emulation
 
 extension LCDController {
-  /** Executes a single machine cycle and returns the  */
+  /** Executes a single machine cycle.  */
   public func advance(memory: AddressableMemory) {
     guard lcdDisplayEnable else {
       return
@@ -129,10 +168,14 @@ extension LCDController {
 
     lcdModeCycle += 1
 
-    // TODO: Implement state machine below.
     switch lcdMode {
     case .searchingOAM:
+      // One OAM search takes two T-cycles, so we can perform two per machine cycle.
+      searchNextOAM()
+      searchNextOAM()
+
       if lcdModeCycle >= 20 {
+        precondition(intersectedOAMs.count == 0, "Sprites not handled yet.")
         lcdMode = .transferringToLCDDriver
       }
       break
@@ -170,6 +213,20 @@ extension LCDController {
       break
     }
   }
+
+  // MARK: OAM search
+
+  private func searchNextOAM() {
+    if intersectedOAMs.count < 10 {
+      let oam = oams[oamIndex]
+      oamIndex += 1
+      if oam.x > 0
+          && ly + 16 >= oam.y
+          && ly + 16 < oam.y + spriteSize.height() {
+        intersectedOAMs.append(oam)
+      }
+    }
+  }
 }
 
 // MARK: - AddressableMemory
@@ -181,6 +238,18 @@ extension LCDController: AddressableMemory {
     }
     if LCDController.tileDataRegion.contains(address) {
       return tileData[address]!
+    }
+    if LCDController.oamRegion.contains(address) {
+      let relativeOffset = (address - LCDController.oamRegion.lowerBound)
+      let oamIndex = relativeOffset / 4
+      let oam = oams[Int(oamIndex)]
+      switch relativeOffset % 4 {
+      case 0: return oam.x
+      case 1: return oam.y
+      case 2: return oam.tile
+      case 3: return oam.flags
+      default: fatalError()
+      }
     }
 
     guard let lcdAddress = Addresses(rawValue: address) else {
@@ -224,6 +293,20 @@ extension LCDController: AddressableMemory {
     }
     if LCDController.tileDataRegion.contains(address) {
       tileData[address] = byte
+      return
+    }
+    if LCDController.oamRegion.contains(address) {
+      let relativeOffset = (address - LCDController.oamRegion.lowerBound)
+      let oamIndex = Int(relativeOffset / 4)
+      var oam = oams[oamIndex]
+      switch relativeOffset % 4 {
+      case 0: oam.x = byte
+      case 1: oam.y = byte
+      case 2: oam.tile = byte
+      case 3: oam.flags = byte
+      default: fatalError()
+      }
+      oams[oamIndex] = oam
       return
     }
     guard let lcdAddress = Addresses(rawValue: address) else {

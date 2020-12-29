@@ -23,14 +23,13 @@ extension Gameboy {
           return cartridge!
         case LR35902.interruptEnableAddress, LR35902.interruptFlagAddress:
           return cpu
-        case OAM.addressableRange: return oam
         case Memory.ramAddressableRange:  return ram
         case Memory.hramAddressableRange: return hram
         case 0xFF00...0xFF07, 0xFF10...0xFF26, 0xFF47...0xFF4B:
           return ioRegisters
         case DMAController.registerAddress:
           return dmaController
-        case LCDController.tileMapRegion, LCDController.tileDataRegion, 0xFF40...0xFF45:
+        case LCDController.tileMapRegion, LCDController.tileDataRegion, LCDController.oamRegion, 0xFF40...0xFF45:
           return lcdController
         default:
           fatalError("No region mapped to this address.")
@@ -44,7 +43,6 @@ extension Gameboy {
     private let ram = GenericRAM()
     private let ioRegisters = IORegisterMemory()
     private let dmaController: DMAController
-    private let oam = OAM()
 
     static let hramAddressableRange: ClosedRange<LR35902.Address> = 0xFF80...0xFFFE
     static let ramAddressableRange: ClosedRange<LR35902.Address> = 0xC000...0xDFFF
