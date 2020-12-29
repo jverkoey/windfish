@@ -2,7 +2,9 @@ import Foundation
 
 public final class Gameboy {
   public init() {
-    self.memory = Memory(cpu: cpu, lcdController: lcdController, dmaController: dmaController)
+    self.lcdController = LCDController(oam: oam)
+    self.dmaController = DMAController(oam: oam)
+    self.memory = Memory(cpu: cpu, lcdController: lcdController, dmaController: dmaController, oam: oam, soundController: soundController)
   }
 
   // MARK: - Hardware
@@ -21,10 +23,16 @@ public final class Gameboy {
   public let memory: Memory
 
   /** The Gameboy's liquid crystal display (LCD) controller. */
-  let lcdController = LCDController()
+  let lcdController: LCDController
 
   /** The Gameboy's OAM DMA controller. */
-  let dmaController = DMAController()
+  let dmaController: DMAController
+
+  /** The Gameboy's sound controller. */
+  let soundController = SoundController()
+
+  /** The Gameboy's OAM. */
+  let oam = OAM()
 
   // MARK: - Debugging
 

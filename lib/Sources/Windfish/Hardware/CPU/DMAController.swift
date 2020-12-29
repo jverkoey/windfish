@@ -9,6 +9,11 @@ import Foundation
 public final class DMAController {
   static let registerAddress: LR35902.Address = 0xFF46
 
+  init(oam: OAM) {
+    self.oam = oam
+  }
+  let oam: OAM
+
   var oamLocked = false
   private var running = false
 
@@ -37,7 +42,8 @@ extension DMAController {
     oamLocked = true
 
     let byte = memory.read(from: LR35902.Address(register) << 8 | LR35902.Address(currentAddressLSB))
-    memory.write(byte, to: 0xFE00 | LR35902.Address(currentAddressLSB))
+    // Ignore any memory locks the LCD controller might have in place at this time and write directly to the OAM.
+    oam.write(byte, to: 0xFE00 | LR35902.Address(currentAddressLSB))
 
     currentAddressLSB += 1
     if currentAddressLSB > 0x9F {

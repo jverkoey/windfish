@@ -2,10 +2,12 @@ import Foundation
 
 extension Gameboy {
   public final class Memory {
-    public init(cpu: LR35902, lcdController: LCDController, dmaController: DMAController) {
+    public init(cpu: LR35902, lcdController: LCDController, dmaController: DMAController, oam: OAM, soundController: SoundController) {
       self.cpu = cpu
       self.lcdController = lcdController
       self.dmaController = dmaController
+      self.oam = oam
+      self.soundController = soundController
     }
 
     public var tracers: [AddressableMemory] = []
@@ -25,12 +27,14 @@ extension Gameboy {
           return cpu
         case Memory.ramAddressableRange:  return ram
         case Memory.hramAddressableRange: return hram
-        case 0xFF00...0xFF07, 0xFF10...0xFF26, 0xFF47...0xFF4B:
+        case 0xFF00...0xFF07, 0xFF47...0xFF4B:
           return ioRegisters
         case DMAController.registerAddress:
           return dmaController
-        case LCDController.tileMapRegion, LCDController.tileDataRegion, LCDController.oamRegion, 0xFF40...0xFF45:
+        case LCDController.tileMapRegion, LCDController.tileDataRegion, OAM.addressableRange, 0xFF40...0xFF45:
           return lcdController
+        case SoundController.wavePatternRegion, SoundController.soundRegistersRegion:
+          return soundController
         default:
           fatalError("No region mapped to this address.")
         }
@@ -43,6 +47,8 @@ extension Gameboy {
     private let ram = GenericRAM()
     private let ioRegisters = IORegisterMemory()
     private let dmaController: DMAController
+    private let oam: OAM
+    private let soundController: SoundController
 
     static let hramAddressableRange: ClosedRange<LR35902.Address> = 0xFF80...0xFFFE
     static let ramAddressableRange: ClosedRange<LR35902.Address> = 0xC000...0xDFFF

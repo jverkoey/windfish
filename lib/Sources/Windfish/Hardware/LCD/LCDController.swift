@@ -8,23 +8,18 @@ import Foundation
 // - https://hacktix.github.io/GBEDG/ppu/#the-concept-of-scanlines
 
 public final class LCDController {
-  static let oamRegion: ClosedRange<LR35902.Address> = 0xFE00...0xFE9F
   static let tileMapRegion: ClosedRange<LR35902.Address> = 0x9800...0x9FFF
   static let tileDataRegion: ClosedRange<LR35902.Address> = 0x8000...0x97FF
   // 0xFF40...0xFF45
 
+  init(oam: OAM) {
+    self.oam = oam
+  }
+
+  let oam: OAM
+
   var tileMap: [LR35902.Address: UInt8] = [:]
   var tileData: [LR35902.Address: UInt8] = [:]
-
-  private struct Sprite {
-    var x: UInt8
-    var y: UInt8
-    var tile: UInt8
-    var flags: UInt8
-  }
-  private var oams: [Sprite] = (0..<40).map { _ -> Sprite in
-    Sprite(x: 0, y: 0, tile: 0, flags: 0)
-  }
 
   var bufferToggle = false
   private var screenData: Data {
@@ -37,8 +32,9 @@ public final class LCDController {
       }
     }
   }
-  private var screenData0 = Data(count: 160 * 144)
-  private var screenData1 = Data(count: 160 * 144)
+  static let screenSize = (width: 160, height: 144)
+  private var screenData0 = Data(count: LCDController.screenSize.width * LCDController.screenSize.height)
+  private var screenData1 = Data(count: LCDController.screenSize.width * LCDController.screenSize.height)
 
   enum Addresses: LR35902.Address {
     case LCDC = 0xFF40
@@ -151,7 +147,7 @@ public final class LCDController {
 
   /** How many cycles have been advanced for the current lcdMode. */
   private var lcdModeCycle: Int = 0
-  private var intersectedOAMs: [Sprite] = []
+  private var intersectedOAMs: [OAM.Sprite] = []
   private var oamIndex = 0
 }
 
@@ -159,6 +155,14 @@ public final class LCDController {
 
 extension LCDController {
   static let scanlineCycleLength = 114
+
+  private func plot(x: Int, y: Int, byte: UInt8) {
+    screenData[LCDController.screenSize.width * y + x] = byte
+  }
+
+  private func plot() {
+    var pixelIndex = (lcdModeCycle - 20) * 4
+  }
 
   /** Executes a single machine cycle.  */
   public func advance(memory: AddressableMemory) {
@@ -180,7 +184,8 @@ extension LCDController {
       }
       break
     case .transferringToLCDDriver:
-      // TODO: This isn't always 43.
+      plot()
+
       if lcdModeCycle >= 63 {
         lcdMode = .hblank
         // Don't reset lcdModeCycle yet, as this mode can actually end early.
@@ -218,12 +223,12 @@ extension LCDController {
 
   private func searchNextOAM() {
     if intersectedOAMs.count < 10 {
-      let oam = oams[oamIndex]
+      let sprite = oam.sprites[oamIndex]
       oamIndex += 1
-      if oam.x > 0
-          && ly + 16 >= oam.y
-          && ly + 16 < oam.y + spriteSize.height() {
-        intersectedOAMs.append(oam)
+      if sprite.x > 0
+          && ly + 16 >= sprite.y
+          && ly + 16 < sprite.y + spriteSize.height() {
+        intersectedOAMs.append(sprite)
       }
     }
   }
@@ -239,17 +244,11 @@ extension LCDController: AddressableMemory {
     if LCDController.tileDataRegion.contains(address) {
       return tileData[address]!
     }
-    if LCDController.oamRegion.contains(address) {
-      let relativeOffset = (address - LCDController.oamRegion.lowerBound)
-      let oamIndex = relativeOffset / 4
-      let oam = oams[Int(oamIndex)]
-      switch relativeOffset % 4 {
-      case 0: return oam.x
-      case 1: return oam.y
-      case 2: return oam.tile
-      case 3: return oam.flags
-      default: fatalError()
+    if OAM.addressableRange.contains(address) {
+      guard lcdMode == .hblank || lcdMode == .vblank else {
+        return 0xFF  // OAM are only accessible during hblank and vblank
       }
+      return oam.read(from: address)
     }
 
     guard let lcdAddress = Addresses(rawValue: address) else {
@@ -295,18 +294,13 @@ extension LCDController: AddressableMemory {
       tileData[address] = byte
       return
     }
-    if LCDController.oamRegion.contains(address) {
-      let relativeOffset = (address - LCDController.oamRegion.lowerBound)
-      let oamIndex = Int(relativeOffset / 4)
-      var oam = oams[oamIndex]
-      switch relativeOffset % 4 {
-      case 0: oam.x = byte
-      case 1: oam.y = byte
-      case 2: oam.tile = byte
-      case 3: oam.flags = byte
-      default: fatalError()
+    if OAM.addressableRange.contains(address) {
+      guard lcdMode == .hblank || lcdMode == .vblank else {
+        // OAM are only accessible during hblank and vblank.
+        // Note that DMAController has direct write access and circumvents this check when running.
+        return
       }
-      oams[oamIndex] = oam
+      oam.write(byte, to: address)
       return
     }
     guard let lcdAddress = Addresses(rawValue: address) else {
