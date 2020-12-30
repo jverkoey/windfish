@@ -23,19 +23,8 @@ public final class LCDController {
   var tileData = Data(count: tileDataRegion.count)
 
   var bufferToggle = false
-  private var screenData: Data {
-    get { bufferToggle ? screenData1 : screenData0 }
-    set {
-      if bufferToggle {
-        screenData1 = newValue
-      } else {
-        screenData0 = newValue
-      }
-    }
-  }
   static let screenSize = (width: 160, height: 144)
-  private var screenData0 = Data(count: LCDController.screenSize.width * LCDController.screenSize.height)
-  private var screenData1 = Data(count: LCDController.screenSize.width * LCDController.screenSize.height)
+  private var screenData = Data(count: LCDController.screenSize.width * LCDController.screenSize.height)
 
   enum Addresses: LR35902.Address {
     case LCDC = 0xFF40
@@ -45,6 +34,9 @@ public final class LCDController {
     case LY   = 0xFF44
     case LYC  = 0xFF45
     case DMA  = 0xFF46
+    case BGP  = 0xFF47
+    case OBP0 = 0xFF48
+    case OBP1 = 0xFF49
     case WY   = 0xFF4A
     case WX   = 0xFF4B
   }
@@ -53,7 +45,7 @@ public final class LCDController {
     .SCX:  0x00,
   ]
 
-  // MARK: LCDC bits
+  // MARK: LCDC bits (0xFF40)
 
   enum TileMapAddress {
     case x9800 // 0
@@ -102,7 +94,7 @@ public final class LCDController {
   var objEnable = false                                // bit 1
   var backgroundEnable = true                          // bit 0
 
-  // MARK: STAT bits
+  // MARK: STAT bits (0xFF41)
 
   enum LCDCMode {
     case hblank
@@ -139,16 +131,62 @@ public final class LCDController {
     }
   }
 
-  // MARK: LY
+  // MARK: LY (0xFF44)
 
   /** The vertical line to which data is transferred to the display. */
   var ly: UInt8 = 0
 
-  // MARK: LYC
+  // MARK: LYC (0xFF45)
 
   var lyc: UInt8 = 0
 
-  // MARK: WY and WX
+  // MARK: BGP (0xFF47)
+
+  typealias Palette = [UInt8: UInt8]
+
+  private func bitsForPalette(_ palette: Palette) -> UInt8 {
+    return (palette[0]! & UInt8(0b0000_0011))
+        | ((palette[1]! & UInt8(0b0000_0011)) << 2)
+        | ((palette[2]! & UInt8(0b0000_0011)) << 4)
+        | ((palette[3]! & UInt8(0b0000_0011)) << 6)
+  }
+
+  private func paletteFromBits(_ bits: UInt8) -> Palette {
+    return [
+      0: bits & 0b0000_0011,
+      1: (bits >> 2) & 0b0000_0011,
+      2: (bits >> 4) & 0b0000_0011,
+      3: (bits >> 6) & 0b0000_0011,
+    ]
+  }
+
+  /** Shade values for background and window tiles. */
+  var backgroundPalette: Palette = [
+    0: 0,
+    1: 1,
+    2: 2,
+    3: 3,
+  ]
+
+  // MARK: OBP0 and OBP1 (0xFF48 and 0xFF49)
+
+  /** Shade values for background and window tiles. */
+  var objectPallete0: Palette = [
+    0: 0,
+    1: 1,
+    2: 2,
+    3: 3,
+  ]
+
+  /** Shade values for background and window tiles. */
+  var objectPallete1: Palette = [
+    0: 0,
+    1: 1,
+    2: 2,
+    3: 3,
+  ]
+
+  // MARK: WY and WX (0xFF4A and 0xFF4B)
 
   var wy: UInt8 = 0
   var wx: UInt8 = 0
@@ -305,6 +343,10 @@ extension LCDController: AddressableMemory {
     case .WY:   return wy
     case .WX:   return wx
 
+    case .BGP:  return bitsForPalette(backgroundPalette)
+    case .OBP0: return bitsForPalette(objectPallete0)
+    case .OBP1: return bitsForPalette(objectPallete1)
+
     case .STAT:
       return (
         (enableCoincidenceInterrupt   ? 0b0100_0000 : 0)
@@ -357,6 +399,10 @@ extension LCDController: AddressableMemory {
 
     case .WY:   wy = byte
     case .WX:   wx = byte
+
+    case .BGP:  backgroundPalette = paletteFromBits(byte)
+    case .OBP0: objectPallete0 = paletteFromBits(byte)
+    case .OBP1: objectPallete1 = paletteFromBits(byte)
 
     case .STAT:
       enableCoincidenceInterrupt  = (byte & 0b0100_0000) > 0
