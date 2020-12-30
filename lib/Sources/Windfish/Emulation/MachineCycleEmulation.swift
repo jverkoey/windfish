@@ -6,12 +6,8 @@ import Foundation
 
 extension LR35902.InstructionSet {
 
-  static let microcodes: [SpecType: LR35902.MachineInstruction.MicroCode] = {
-    var microcodes: [SpecType: LR35902.MachineInstruction.MicroCode] = [:]
-    allSpecs().forEach { spec in
-      microcodes[spec] = microcode(for: spec)
-    }
-    return microcodes
+  static let microcodes: [LR35902.MachineInstruction.MicroCode?] = {
+    return allSpecs().map { spec in microcode(for: spec) }
   }()
 
   // TODO: Cache the results of this method per spec because it's currently the performance bottleneck. Should be a
@@ -102,12 +98,12 @@ extension LR35902.InstructionSet {
       var value: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt16(memory.read(from: cpu.pc))
+          immediate = UInt16(truncatingIfNeeded: memory.read(from: cpu.pc))
           cpu.pc += 1
           return .continueExecution
         }
         if cycle == 2 {
-          immediate |= UInt16(memory.read(from: cpu.pc)) << 8
+          immediate |= UInt16(truncatingIfNeeded: memory.read(from: cpu.pc)) << 8
           cpu.pc += 1
           return .continueExecution
         }
@@ -125,12 +121,12 @@ extension LR35902.InstructionSet {
       var immediate: UInt16 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt16(memory.read(from: cpu.pc))
+          immediate = UInt16(truncatingIfNeeded: memory.read(from: cpu.pc))
           cpu.pc += 1
           return .continueExecution
         }
         if cycle == 2 {
-          immediate |= UInt16(memory.read(from: cpu.pc)) << 8
+          immediate |= UInt16(truncatingIfNeeded: memory.read(from: cpu.pc)) << 8
           cpu.pc += 1
           return .continueExecution
         }
@@ -146,7 +142,7 @@ extension LR35902.InstructionSet {
       var value: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          let address = UInt16(0xFF00) | UInt16(cpu.c)
+          let address = UInt16(0xFF00) | UInt16(truncatingIfNeeded: cpu.c)
           value = memory.read(from: address)
           cpu.registerTraces[.a] = .init(sourceLocation: sourceLocation, loadAddress: address)
           return .continueExecution
@@ -159,7 +155,7 @@ extension LR35902.InstructionSet {
     case .ld(.ffccaddr, .a):
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          let address = UInt16(0xFF00) | UInt16(cpu.c)
+          let address = UInt16(0xFF00) | UInt16(truncatingIfNeeded: cpu.c)
           memory.write(cpu.a, to: address)
           return .continueExecution
         }
@@ -172,12 +168,12 @@ extension LR35902.InstructionSet {
       var value: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt16(memory.read(from: cpu.pc))
+          immediate = UInt16(truncatingIfNeeded: memory.read(from: cpu.pc))
           cpu.pc += 1
           return .continueExecution
         }
         if cycle == 2 {
-          let address = UInt16(0xFF00) | UInt16(immediate)
+          let address = UInt16(0xFF00) | immediate
           value = memory.read(from: address)
           cpu.registerTraces[.a] = .init(sourceLocation: sourceLocation, loadAddress: address)
           return .continueExecution
@@ -191,12 +187,12 @@ extension LR35902.InstructionSet {
       var immediate: UInt16 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt16(memory.read(from: cpu.pc))
+          immediate = UInt16(truncatingIfNeeded: memory.read(from: cpu.pc))
           cpu.pc += 1
           return .continueExecution
         }
         if cycle == 2 {
-          let address = UInt16(0xFF00) | UInt16(immediate)
+          let address = UInt16(0xFF00) | immediate
           memory.write(cpu.a, to: address)
           return .continueExecution
         }
@@ -254,12 +250,12 @@ extension LR35902.InstructionSet {
       var immediate: UInt16 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt16(memory.read(from: cpu.pc))
+          immediate = UInt16(truncatingIfNeeded: memory.read(from: cpu.pc))
           cpu.pc += 1
           return .continueExecution
         }
         if cycle == 2 {
-          immediate |= UInt16(memory.read(from: cpu.pc)) << 8
+          immediate |= UInt16(truncatingIfNeeded: memory.read(from: cpu.pc)) << 8
           cpu.pc += 1
           return .continueExecution
         }
@@ -277,12 +273,12 @@ extension LR35902.InstructionSet {
       var immediate: UInt16 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt16(memory.read(from: cpu.pc))
+          immediate = UInt16(truncatingIfNeeded: memory.read(from: cpu.pc))
           cpu.pc += 1
           return .continueExecution
         }
         if cycle == 2 {
-          immediate |= UInt16(memory.read(from: cpu.pc)) << 8
+          immediate |= UInt16(truncatingIfNeeded: memory.read(from: cpu.pc)) << 8
           cpu.pc += 1
           return .continueExecution
         }
@@ -337,12 +333,12 @@ extension LR35902.InstructionSet {
             loadAddress: cpu.sp
           )
 
-          value = UInt16(memory.read(from: cpu.sp))
+          value = UInt16(truncatingIfNeeded: memory.read(from: cpu.sp))
           cpu.sp += 1
           return .continueExecution
         }
         if cycle == 2 {
-          value |= UInt16(memory.read(from: cpu.sp)) << 8
+          value |= UInt16(truncatingIfNeeded: memory.read(from: cpu.sp)) << 8
           cpu.sp += 1
           return .continueExecution
         }
@@ -356,12 +352,12 @@ extension LR35902.InstructionSet {
       var immediate: UInt16 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt16(memory.read(from: cpu.pc))
+          immediate = UInt16(truncatingIfNeeded: memory.read(from: cpu.pc))
           cpu.pc += 1
           return .continueExecution
         }
         if cycle == 2 {
-          immediate |= UInt16(memory.read(from: cpu.pc)) << 8
+          immediate |= UInt16(truncatingIfNeeded: memory.read(from: cpu.pc)) << 8
           cpu.pc += 1
           return .continueExecution
         }
@@ -391,7 +387,7 @@ extension LR35902.InstructionSet {
         if cycle == 2 {
           return evaluateConditional(cnd, cpu)
         }
-        cpu.pc = cpu.pc.advanced(by: Int(immediate))
+        cpu.pc = cpu.pc.advanced(by: Int(truncatingIfNeeded: immediate))
         return .fetchNext
       }
 
@@ -401,12 +397,12 @@ extension LR35902.InstructionSet {
       var immediate: UInt16 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt16(memory.read(from: cpu.pc))
+          immediate = UInt16(truncatingIfNeeded: memory.read(from: cpu.pc))
           cpu.pc += 1
           return .continueExecution
         }
         if cycle == 2 {
-          immediate |= UInt16(memory.read(from: cpu.pc)) << 8
+          immediate |= UInt16(truncatingIfNeeded: memory.read(from: cpu.pc)) << 8
           cpu.pc += 1
           return .continueExecution
         }
@@ -456,12 +452,12 @@ extension LR35902.InstructionSet {
           return evaluateConditional(cnd, cpu)
         }
         if cycle == 2 {
-          pc = UInt16(memory.read(from: cpu.sp))
+          pc = UInt16(truncatingIfNeeded: memory.read(from: cpu.sp))
           cpu.sp += 1
           return .continueExecution
         }
         if cycle == 3 {
-          pc |= UInt16(memory.read(from: cpu.sp)) << 8
+          pc |= UInt16(truncatingIfNeeded: memory.read(from: cpu.sp)) << 8
           cpu.sp += 1
           return .continueExecution
         }
@@ -474,12 +470,12 @@ extension LR35902.InstructionSet {
       var pc: UInt16 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          pc = UInt16(memory.read(from: cpu.sp))
+          pc = UInt16(truncatingIfNeeded: memory.read(from: cpu.sp))
           cpu.sp += 1
           return .continueExecution
         }
         if cycle == 2 {
-          pc |= UInt16(memory.read(from: cpu.sp)) << 8
+          pc |= UInt16(truncatingIfNeeded: memory.read(from: cpu.sp)) << 8
           cpu.sp += 1
           return .continueExecution
         }
@@ -1102,9 +1098,9 @@ extension LR35902 {
     if isRunning {
       let machineInstruction = self.machineInstruction
       // Execution phase
-      if nextAction == .continueExecution, let loaded = machineInstruction.loaded {
+      if nextAction == .continueExecution, let microcode = machineInstruction.microcode {
         machineInstruction.cycle += 1
-        nextAction = loaded.microcode(self, memory, machineInstruction.cycle, loaded.sourceLocation)
+        nextAction = microcode(self, memory, machineInstruction.cycle, machineInstruction.sourceLocation!)
       } else {
         // No instruction was actually loaded into the CPU; let's switch to fetching one.
         nextAction = .fetchNext
@@ -1114,14 +1110,46 @@ extension LR35902 {
     // The LR35902's fetch/execute overlap behavior means we load the next opcode on the same machine cycle as the
     // last instruction's microcode execution.
     if nextAction == .fetchNext || nextAction == .fetchPrefix {
-      let interrupts = interruptFlag.intersection(interruptEnable)
+      var interrupts = interruptFlag.intersection(interruptEnable)
       if nextAction == .fetchNext && !interrupts.isEmpty {
         // Interrupt phase
         halted = false
 
         let sourceLocation = memory.sourceLocation(from: pc)
         nextAction = .continueExecution
-        machineInstruction = .init(spec: .interrupt(interrupts), sourceLocation: sourceLocation)
+        machineInstruction.microcode = { (cpu, memory, cycle, sourceLocation) in
+          if cycle == 1 {
+            cpu.sp -= 1
+            memory.write(UInt8((cpu.pc & 0xFF00) >> 8), to: cpu.sp)
+            return .continueExecution
+          }
+          if cycle == 2 {
+            cpu.sp -= 1
+            memory.write(UInt8(cpu.pc & 0x00FF), to: cpu.sp)
+            return .continueExecution
+          }
+          if interrupts.contains(.vBlank) {
+            interrupts.remove(.vBlank)
+            cpu.pc = 0x0040
+          } else if interrupts.contains(.lcdStat) {
+            interrupts.remove(.lcdStat)
+            cpu.pc = 0x0048
+          } else if interrupts.contains(.timer) {
+            interrupts.remove(.timer)
+            cpu.pc = 0x0050
+          } else if interrupts.contains(.serial) {
+            interrupts.remove(.serial)
+            cpu.pc = 0x0058
+          } else if interrupts.contains(.joypad) {
+            interrupts.remove(.joypad)
+            cpu.pc = 0x0060
+          }
+          memory.write(interrupts.rawValue, to: LR35902.interruptFlagAddress)
+          cpu.ime = false
+          return .fetchNext
+        }
+        machineInstruction.spec = .interrupt(interrupts)
+        machineInstruction.sourceLocation = sourceLocation
 
       } else if isRunning {
         // Fetch phase
@@ -1129,15 +1157,20 @@ extension LR35902 {
         let tableIndex = Int(truncatingIfNeeded: memory.read(from: pc))
         pc += 1
         let loadedSpec: Instruction.Spec
-        if let loaded = machineInstruction.loaded, let prefixTable = InstructionSet.prefixTables[loaded.spec] {
+        if let spec = machineInstruction.spec, let prefixTable = InstructionSet.prefixTables[spec] {
           // Finish loading the prefix instruction.
-          sourceLocation = loaded.sourceLocation
+          sourceLocation = machineInstruction.sourceLocation!
           loadedSpec = prefixTable[tableIndex]
+          specIndex = 256 + tableIndex
         } else {
           loadedSpec = InstructionSet.table[tableIndex]
+          specIndex = tableIndex
         }
         nextAction = .continueExecution
-        machineInstruction = .init(spec: loadedSpec, sourceLocation: sourceLocation)
+
+        machineInstruction.spec = loadedSpec
+        machineInstruction.sourceLocation = sourceLocation
+        machineInstruction.microcode = LR35902.InstructionSet.microcodes[specIndex]
       }
     }
 
@@ -1165,11 +1198,11 @@ extension Gameboy {
 
   /** Advances the emulation by one instruction. */
   public func advanceInstruction() {
-    if cpu.machineInstruction.loaded == nil {
+    if cpu.machineInstruction.spec == nil {
       advance()
     }
-    if let sourceLocation = cpu.machineInstruction.loaded?.sourceLocation {
-      while sourceLocation == cpu.machineInstruction.loaded?.sourceLocation, !cpu.halted {
+    if let sourceLocation = cpu.machineInstruction.sourceLocation {
+      while sourceLocation == cpu.machineInstruction.sourceLocation, !cpu.halted {
         advance()
       }
     }

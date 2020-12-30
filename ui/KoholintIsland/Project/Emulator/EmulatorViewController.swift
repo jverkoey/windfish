@@ -377,9 +377,10 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     var tileRow = 0
     var pixelRow = 0
     var imageData = Data(count: ncolumns * 8 * nrows * 8)
-    for bytePairs in [UInt8](data).chunked(into: 2) {
-      let lowByte = bytePairs.first!
-      let highByte = bytePairs.last!
+    var iterator = data.makeIterator()
+
+    while let lowByte = iterator.next() {
+      let highByte = iterator.next()!
 
       for i in 0..<8 {
         let color = colorForBytePair(highByte, lowByte, UInt8(7 - i))

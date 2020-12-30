@@ -17,69 +17,19 @@ public final class LR35902 {
     }
     typealias MicroCode = (LR35902, AddressableMemory, Int, Disassembler.SourceLocation) -> MicroCodeResult
 
-    final class LoadedInstruction {
-      internal init(spec: LR35902.Instruction.Spec, microcode: @escaping LR35902.MachineInstruction.MicroCode, sourceLocation: Disassembler.SourceLocation) {
-        self.spec = spec
-        self.microcode = microcode
-        self.sourceLocation = sourceLocation
-      }
-
-      let spec: Instruction.Spec
-      let microcode: MicroCode
-      let sourceLocation: Disassembler.SourceLocation
-    }
-
     internal init() {}
 
-    internal init(spec: LR35902.Instruction.Spec, sourceLocation: Disassembler.SourceLocation) {
-      if case var .interrupt(interrupt) = spec {
-        self.loaded = LoadedInstruction(
-          spec: spec,
-          microcode: { (cpu, memory, cycle, sourceLocation) in
-            if cycle == 1 {
-              cpu.sp -= 1
-              memory.write(UInt8((cpu.pc & 0xFF00) >> 8), to: cpu.sp)
-              return .continueExecution
-            }
-            if cycle == 2 {
-              cpu.sp -= 1
-              memory.write(UInt8(cpu.pc & 0x00FF), to: cpu.sp)
-              return .continueExecution
-            }
-            if interrupt.contains(.vBlank) {
-              interrupt.remove(.vBlank)
-              cpu.pc = 0x0040
-            } else if interrupt.contains(.lcdStat) {
-              interrupt.remove(.lcdStat)
-              cpu.pc = 0x0048
-            } else if interrupt.contains(.timer) {
-              interrupt.remove(.timer)
-              cpu.pc = 0x0050
-            } else if interrupt.contains(.serial) {
-              interrupt.remove(.serial)
-              cpu.pc = 0x0058
-            } else if interrupt.contains(.joypad) {
-              interrupt.remove(.joypad)
-              cpu.pc = 0x0060
-            }
-            memory.write(interrupt.rawValue, to: LR35902.interruptFlagAddress)
-            cpu.ime = false
-            return .fetchNext
-          },
-          sourceLocation: sourceLocation
-        )
-      } else {
-        self.loaded = LoadedInstruction(spec: spec,
-                                        microcode: InstructionSet.microcodes[spec]!,
-                                        sourceLocation: sourceLocation)
+    var spec: Instruction.Spec?
+    var microcode: MicroCode? {
+      didSet {
+        cycle = 0
       }
     }
-
-    var loaded: LoadedInstruction? = nil
+    var sourceLocation: Disassembler.SourceLocation?
     var cycle: Int = 0
 
     public func sourceAddressAndBank() -> (address: LR35902.Address, bank: Gameboy.Cartridge.Bank)? {
-      guard case let .cartridge(sourceLocation) = loaded?.sourceLocation else {
+      guard case let .cartridge(sourceLocation) = sourceLocation else {
         return nil
       }
       return Gameboy.Cartridge.addressAndBank(from: sourceLocation)
@@ -218,6 +168,7 @@ public final class LR35902 {
   public var registerTraces: [LR35902.Instruction.Numeric: RegisterTrace] = [:]
 
   var nextAction: MachineInstruction.MicroCodeResult = .fetchNext
+  var specIndex: Int = 0
 
   /** Initializes the state with boot values. */
   public init() {}
