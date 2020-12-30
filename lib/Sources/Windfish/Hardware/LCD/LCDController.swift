@@ -205,7 +205,7 @@ extension LCDController {
       searchNextOAM()
 
       if lcdModeCycle >= LCDController.searchingOAMLength {
-        precondition(intersectedOAMs.count == 0, "Sprites not handled yet.")
+//        precondition(intersectedOAMs.count == 0, "Sprites not handled yet.")
         lcdMode = .transferringToLCDDriver
         transferringToLCDDriverCycle = 0
         scanlineX = 0
