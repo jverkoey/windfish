@@ -155,48 +155,48 @@ public final class LCDController {
 
   // MARK: BGP (0xFF47)
 
-  typealias Palette = [UInt8: UInt8]
+  typealias Palette = [UInt8]
 
   private func bitsForPalette(_ palette: Palette) -> UInt8 {
-    return (palette[0]! & UInt8(0b0000_0011))
-        | ((palette[1]! & UInt8(0b0000_0011)) << 2)
-        | ((palette[2]! & UInt8(0b0000_0011)) << 4)
-        | ((palette[3]! & UInt8(0b0000_0011)) << 6)
+    return (palette[0] & UInt8(0b0000_0011))
+        | ((palette[1] & UInt8(0b0000_0011)) << 2)
+        | ((palette[2] & UInt8(0b0000_0011)) << 4)
+        | ((palette[3] & UInt8(0b0000_0011)) << 6)
   }
 
   private func paletteFromBits(_ bits: UInt8) -> Palette {
     return [
-      0: bits & 0b0000_0011,
-      1: (bits >> 2) & 0b0000_0011,
-      2: (bits >> 4) & 0b0000_0011,
-      3: (bits >> 6) & 0b0000_0011,
+      bits & 0b0000_0011,
+      (bits >> 2) & 0b0000_0011,
+      (bits >> 4) & 0b0000_0011,
+      (bits >> 6) & 0b0000_0011,
     ]
   }
 
   /** Shade values for background and window tiles. */
   var backgroundPalette: Palette = [
-    0: 0,
-    1: 1,
-    2: 2,
-    3: 3,
+    0,
+    1,
+    2,
+    3,
   ]
 
   // MARK: OBP0 and OBP1 (0xFF48 and 0xFF49)
 
   /** Shade values for background and window tiles. */
   var objectPallete0: Palette = [
-    0: 0,
-    1: 1,
-    2: 2,
-    3: 3,
+    0,
+    1,
+    2,
+    3,
   ]
 
   /** Shade values for background and window tiles. */
   var objectPallete1: Palette = [
-    0: 0,
-    1: 1,
-    2: 2,
-    3: 3,
+    0,
+    1,
+    2,
+    3,
   ]
 
   // MARK: WY and WX (0xFF4A and 0xFF4B)
@@ -241,7 +241,7 @@ extension LCDController {
   static let scanlineCycleLength = 114
 
   private func plot(x: UInt8, y: UInt8, byte: UInt8, palette: Palette) {
-    let color = palette[byte]!
+    let color = palette[Int(byte)]
     screenDataBuffer[LCDController.screenSize.width * Int(y) + Int(x)] = color
   }
 

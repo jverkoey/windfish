@@ -9,6 +9,39 @@ class EndToEndTests: XCTestCase {
     XCTAssertNotNil(path)
   }
 
+  func testWallTimePerformance() throws {
+    let byteValue = UInt8(0xFA)
+    // ~0.687
+    measure {
+      for _ in 0..<1_000_000 {
+        let intValue = Int(byteValue)
+      }
+    }
+  }
+
+  func testWallTimePerformanceTruncatingIfNeeded() throws {
+    let byteValue = UInt8(0xFA)
+    // ~0.664
+    measure {
+      for _ in 0..<1_000_000 {
+        let intValue = Int(truncatingIfNeeded: byteValue)
+      }
+    }
+  }
+
+  func testWallTimePerformanceUnsafebound() throws {
+    let byteValue = UInt8(0xFA)
+    // ~0.621
+    measure {
+      for _ in 0..<1_000_000 {
+        var intValue: Int = 0
+        withUnsafeMutableBytes(of: &intValue) { (pointer: UnsafeMutableRawBufferPointer) in
+          pointer[0] = byteValue
+        }
+      }
+    }
+  }
+
   func disable_testWallTimePerformance() throws {
     let path = try XCTUnwrap(Bundle.module.path(forResource: "Resources/2048", ofType: "gb"))
     let rom = try Data(contentsOf: URL(fileURLWithPath: path))

@@ -15,7 +15,7 @@ public final class LR35902 {
       case fetchNext
       case fetchPrefix
     }
-    typealias MicroCode = (LR35902, AddressableMemory, Int) -> MicroCodeResult
+    typealias MicroCode = (LR35902, AddressableMemory, Int, Disassembler.SourceLocation) -> MicroCodeResult
 
     struct LoadedInstruction {
       let spec: Instruction.Spec
@@ -26,9 +26,47 @@ public final class LR35902 {
     internal init() {}
 
     internal init(spec: LR35902.Instruction.Spec, sourceLocation: Disassembler.SourceLocation) {
-      self.loaded = LoadedInstruction(spec: spec,
-                                      microcode: InstructionSet.microcode(for: spec, sourceLocation: sourceLocation),
-                                      sourceLocation: sourceLocation)
+      if case var .interrupt(interrupt) = spec {
+        self.loaded = LoadedInstruction(
+          spec: spec,
+          microcode: { (cpu, memory, cycle, sourceLocation) in
+            if cycle == 1 {
+              cpu.state.sp -= 1
+              memory.write(UInt8((cpu.state.pc & 0xFF00) >> 8), to: cpu.state.sp)
+              return .continueExecution
+            }
+            if cycle == 2 {
+              cpu.state.sp -= 1
+              memory.write(UInt8(cpu.state.pc & 0x00FF), to: cpu.state.sp)
+              return .continueExecution
+            }
+            if interrupt.contains(.vBlank) {
+              interrupt.remove(.vBlank)
+              cpu.state.pc = 0x0040
+            } else if interrupt.contains(.lcdStat) {
+              interrupt.remove(.lcdStat)
+              cpu.state.pc = 0x0048
+            } else if interrupt.contains(.timer) {
+              interrupt.remove(.timer)
+              cpu.state.pc = 0x0050
+            } else if interrupt.contains(.serial) {
+              interrupt.remove(.serial)
+              cpu.state.pc = 0x0058
+            } else if interrupt.contains(.joypad) {
+              interrupt.remove(.joypad)
+              cpu.state.pc = 0x0060
+            }
+            memory.write(interrupt.rawValue, to: LR35902.interruptFlagAddress)
+            cpu.state.ime = false
+            return .fetchNext
+          },
+          sourceLocation: sourceLocation
+        )
+      } else {
+        self.loaded = LoadedInstruction(spec: spec,
+                                        microcode: InstructionSet.microcodes[spec]!,
+                                        sourceLocation: sourceLocation)
+      }
     }
 
     var loaded: LoadedInstruction? = nil
