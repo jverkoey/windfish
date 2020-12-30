@@ -442,68 +442,74 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       if running {
         instructionAssemblyLabel.stringValue = "Running..."
         instructionBytesLabel.stringValue = "Running..."
-        DispatchQueue.global(qos: .userInteractive).async {
-          let start = DispatchTime.now()
-          var machineCycles: UInt64 = 0
-          while self.running {
-             self.document.gameboy.advance()
 
-            if !self.document.gameboy.cpu.state.halted {
+        let gameboy = self.document.gameboy
+        DispatchQueue.global(qos: .userInteractive).async {
+          var start = DispatchTime.now()
+          var machineCycles: UInt64 = 0
+          var frames: UInt64 = 0
+          var startCounting = false
+          while self.running {
+            gameboy.advance()
+
+            if !startCounting && (DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds) >= 1_000_000_000 {
+              startCounting = true
+              start = DispatchTime.now()
+            }
+
+            if !gameboy.cpu.state.halted && startCounting {
               machineCycles += 1
             }
 
-            if self.lastVblankCounter != self.document.gameboy.lcdController.vblankCounter {
-              self.lastVblankCounter = self.document.gameboy.lcdController.vblankCounter
+            if self.lastVblankCounter != gameboy.lcdController.vblankCounter {
+              self.lastVblankCounter = gameboy.lcdController.vblankCounter
 
-              let tileData = self.document.gameboy.tileData
-              let screenData = self.document.gameboy.screenData
+              let tileData = gameboy.tileData
+              let screenData = gameboy.screenData
 
               let tileDataDidChange = self.lastRenderedTileData != tileData
               if tileDataDidChange {
                 self.renderTileDataImage(with: tileData)
               }
 
-              let screenDataDidChange = self.lastRenderedScreenData != screenData
-              if screenDataDidChange {
-                let colors: [UInt8: UInt8] = [
-                  0: 0x00,
-                  1: UInt8(NSColor.darkGray.whiteComponent * 255),
-                  2: UInt8(NSColor.lightGray.whiteComponent * 255),
-                  3: 0xFF,
-                ]
-                var pixels = screenData.map { colors[$0]! }
-                let providerRef = CGDataProvider(data: NSData(bytes: &pixels, length: pixels.count))!
-                let cgImage = CGImage(
-                  width: LCDController.screenSize.width,
-                  height: LCDController.screenSize.height,
-                  bitsPerComponent: 8,
-                  bitsPerPixel: 8,
-                  bytesPerRow: LCDController.screenSize.width,
-                  space: CGColorSpaceCreateDeviceGray(),
-                  bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.none.rawValue),
-                  provider: providerRef,
-                  decode: nil,
-                  shouldInterpolate: false,
-                  intent: .defaultIntent
-                )!
+              let colors = ContiguousArray<UInt8>([
+                0x00,
+                UInt8(NSColor.darkGray.whiteComponent * 255),
+                UInt8(NSColor.lightGray.whiteComponent * 255),
+                0xFF,
+              ])
+              var pixels = screenData.map { colors[Int(truncatingIfNeeded: $0)] }
+              let providerRef = CGDataProvider(data: NSData(bytes: &pixels, length: pixels.count))!
+              let cgImage = CGImage(
+                width: LCDController.screenSize.width,
+                height: LCDController.screenSize.height,
+                bitsPerComponent: 8,
+                bitsPerPixel: 8,
+                bytesPerRow: LCDController.screenSize.width,
+                space: CGColorSpaceCreateDeviceGray(),
+                bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.none.rawValue),
+                provider: providerRef,
+                decode: nil,
+                shouldInterpolate: false,
+                intent: .defaultIntent
+              )!
 
-                let imageSize = NSSize(width: CGFloat(LCDController.screenSize.width),
-                                       height: CGFloat(LCDController.screenSize.height))
-                let image = NSImage(cgImage: cgImage, size: imageSize)
-                self.screenImage = image
-              }
+              let imageSize = NSSize(width: CGFloat(LCDController.screenSize.width),
+                                     height: CGFloat(LCDController.screenSize.height))
+              let image = NSImage(cgImage: cgImage, size: imageSize)
+              self.screenImage = image
 
               DispatchQueue.main.sync {
+                frames += 1
                 let deltaSeconds = Double((DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds)) / 1_000_000_000
                 let instructionsPerSecond = Double(machineCycles) / deltaSeconds
-                print(instructionsPerSecond)
+                let framesPerSecond = Double(frames) / deltaSeconds
+                print("\(instructionsPerSecond) - \(framesPerSecond)")
 
                 if tileDataDidChange {
                   self.tileDataImageView.image = self.tileDataImage
                 }
-                if screenDataDidChange {
-                  self.screenImageView.image = self.screenImage
-                }
+                self.screenImageView.image = self.screenImage
 
                 self.updateRegisters()
                 self.updateRAM()
@@ -512,7 +518,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
           }
 
           // Advance to the next full instruction.
-          self.document.gameboy.advanceInstruction()
+          gameboy.advanceInstruction()
 
           DispatchQueue.main.sync {
             self.updateInstructionAssembly()

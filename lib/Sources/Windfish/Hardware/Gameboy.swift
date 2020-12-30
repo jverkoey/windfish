@@ -5,6 +5,7 @@ public final class Gameboy {
     self.lcdController = LCDController(oam: oam)
     self.dmaController = DMAController(oam: oam)
     self.memory = Memory(cpu: cpu, lcdController: lcdController, dmaController: dmaController, oam: oam, soundController: soundController)
+    self.dmaProxy = DMAProxy(memory: memory)
   }
 
   // MARK: - Hardware
@@ -34,6 +35,8 @@ public final class Gameboy {
   /** The Gameboy's OAM. */
   let oam = OAM()
 
+  let dmaProxy: DMAProxy
+
   // MARK: - Debugging
 
   /** Registers a memory tracer with the gameboy that can observe memory operations. */
@@ -41,7 +44,7 @@ public final class Gameboy {
     memory.tracers.append(tracer)
   }
 
-  public var screenData: Data {
+  public var screenData: UnsafeMutableRawBufferPointer {
     return lcdController.screenData
   }
 
@@ -51,5 +54,36 @@ public final class Gameboy {
 
   public static var tileDataRegionSize: Int {
     return LCDController.tileDataRegion.count
+  }
+}
+
+final class DMAProxy: AddressableMemory {
+  init(memory: AddressableMemory) {
+    self.memory = memory
+  }
+  let memory: AddressableMemory
+
+  func read(from address: LR35902.Address) -> UInt8 {
+    switch address {
+    // Addresses that are still accessible during DMA transfer
+    case Gameboy.Memory.hramAddressableRange, DMAController.registerAddress:
+      return memory.read(from: address)
+    default:
+      return 0xFF
+    }
+  }
+
+  func write(_ byte: UInt8, to address: LR35902.Address) {
+    switch address {
+    // Addresses that are still accessible during DMA transfer
+    case Gameboy.Memory.hramAddressableRange, DMAController.registerAddress:
+      memory.write(byte, to: address)
+    default:
+      break  // Do nothing.
+    }
+  }
+
+  func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
+    return .memory(address)
   }
 }

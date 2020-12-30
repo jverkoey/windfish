@@ -16,7 +16,7 @@ public final class LCDController {
   deinit {
     tileMap.deallocate()
     tileData.deallocate()
-    screenDataBuffer.deallocate()
+    screenData.deallocate()
   }
 
   init(oam: OAM) {
@@ -30,8 +30,7 @@ public final class LCDController {
 
   var bufferToggle = false
   public static let screenSize = (width: 160, height: 144)
-  var screenData = Data(count: LCDController.screenSize.width * LCDController.screenSize.height)
-  var screenDataBuffer = UnsafeMutableRawBufferPointer.allocate(byteCount: LCDController.screenSize.width * LCDController.screenSize.height, alignment: 1)
+  var screenData = UnsafeMutableRawBufferPointer.allocate(byteCount: LCDController.screenSize.width * LCDController.screenSize.height, alignment: 1)
 
   enum Addresses: LR35902.Address {
     case LCDC = 0xFF40
@@ -242,7 +241,7 @@ extension LCDController {
 
   private func plot(x: UInt8, y: UInt8, byte: UInt8, palette: Palette) {
     let color = palette[Int(byte)]
-    screenDataBuffer[LCDController.screenSize.width * Int(y) + Int(x)] = color
+    screenData[LCDController.screenSize.width * Int(y) + Int(x)] = color
   }
 
   private func backgroundPixel(x: UInt8, y: UInt8, window: Bool) -> UInt8 {
@@ -342,10 +341,6 @@ extension LCDController {
         } else {
           // No more lines to draw.
           lcdMode = .vblank
-
-          screenData.withUnsafeMutableBytes { (buffer: UnsafeMutableRawBufferPointer) in
-            buffer.copyBytes(from: screenDataBuffer)
-          }
 
           vblankCounter += 1
 
