@@ -111,7 +111,7 @@ public final class LR35902 {
     var interruptEnable: LR35902.Instruction.Interrupt = []
 
     /** Enabled bits represent a requested interrupt. */
-    var interruptFlag: LR35902.Instruction.Interrupt = []
+    public var interruptFlag: LR35902.Instruction.Interrupt = []
 
     /**
      The halt status.

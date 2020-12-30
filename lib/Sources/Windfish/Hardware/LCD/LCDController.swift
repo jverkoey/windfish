@@ -19,12 +19,12 @@ public final class LCDController {
 
   let oam: OAM
 
-  var tileMap: [LR35902.Address: UInt8] = [:]
+  var tileMap = Data(count: tileMapRegion.count)
   var tileData = Data(count: tileDataRegion.count)
 
   var bufferToggle = false
-  static let screenSize = (width: 160, height: 144)
-  private var screenData = Data(count: LCDController.screenSize.width * LCDController.screenSize.height)
+  public static let screenSize = (width: 160, height: 144)
+  var screenData = Data(count: LCDController.screenSize.width * LCDController.screenSize.height)
 
   enum Addresses: LR35902.Address {
     case LCDC = 0xFF40
@@ -40,10 +40,6 @@ public final class LCDController {
     case WY   = 0xFF4A
     case WX   = 0xFF4B
   }
-  var values: [Addresses: UInt8] = [
-    .SCY:  0x00,
-    .SCX:  0x00,
-  ]
 
   // MARK: LCDC bits (0xFF40)
 
@@ -74,14 +70,14 @@ public final class LCDController {
   var lcdDisplayEnable = true {                       // bit 7
     willSet {
       precondition(
-        (lcdDisplayEnable && !newValue) && ly >= 144  // Can only change during v-blank
+        (lcdDisplayEnable && !newValue) && scanlineY >= 144  // Can only change during v-blank
           || lcdDisplayEnable == newValue             // No change
           || !lcdDisplayEnable && newValue            // Can always enable.
       )
     }
     didSet {
       if !lcdDisplayEnable {
-        ly = 0
+        scanlineY = 0
         lcdMode = .searchingOAM
       }
     }
@@ -120,21 +116,31 @@ public final class LCDController {
   var enableVBlankInterrupt = false               // bit 4
   var enableHBlankInterrupt = false               // bit 3
   var coincidence: Bool {                         // bit 2
-    return ly == lyc
+    return scanlineY == lyc
   }
   private var lcdMode = LCDCMode.searchingOAM {   // bits 1 and 0
     didSet {
       if lcdMode == .searchingOAM {
         intersectedOAMs = []
         oamIndex = 0
+      } else if lcdMode == .transferringToLCDDriver {
+        windowYPlot = scanlineY &- windowY
+        bgYPlot = scanlineY &+ scrollY
+        transferringToLCDDriverCycle = 0
+        scanlineX = 0
       }
     }
   }
 
+  // MARK: SY and XX (0xFF42 and 0xFF43)
+
+  var scrollY: UInt8 = 0
+  var scrollX: UInt8 = 0
+
   // MARK: LY (0xFF44)
 
   /** The vertical line to which data is transferred to the display. */
-  var ly: UInt8 = 0
+  var scanlineY: UInt8 = 0
 
   // MARK: LYC (0xFF45)
 
@@ -188,8 +194,8 @@ public final class LCDController {
 
   // MARK: WY and WX (0xFF4A and 0xFF4B)
 
-  var wy: UInt8 = 0
-  var wx: UInt8 = 0
+  var windowY: UInt8 = 0
+  var windowX: UInt8 = 0
 
   // MARK: .searchingOAM state
 
@@ -208,7 +214,17 @@ public final class LCDController {
   private var bgfifo: [Pixel] = []
   private var spritefifo: [Pixel] = []
   private var transferringToLCDDriverCycle: Int = 0
-  private var scanlineX: Int = 0
+  private var scanlineX: UInt8 = 0
+  private var windowYPlot: UInt8 = 0
+  private var bgYPlot: UInt8 = 0
+  private var lastBackgroundPixel: UInt8 = 0
+
+  /**
+   Incremented every time a new vblank occurs.
+
+   Primarily used by the emulator to observe whether a new vblank has occurred and to extract the vram data if so.
+   */
+  public private(set) var vblankCounter: Int = 0
 }
 
 // MARK: - Emulation
@@ -217,14 +233,56 @@ extension LCDController {
   static let searchingOAMLength = 20
   static let scanlineCycleLength = 114
 
-  private func plot(x: Int, y: Int, byte: UInt8) {
-    screenData[LCDController.screenSize.width * y + x] = byte
+  private func plot(x: UInt8, y: UInt8, byte: UInt8, palette: Palette) {
+    let color = palette[byte]!
+    screenData[LCDController.screenSize.width * Int(y) + Int(x)] = color
   }
 
-  /** Takes 2 machine cycles to conclude. */
-  private func getTile() {
-    if windowEnable && wx <= scanlineX && wy <= ly {
-      // TODO: Implement pixel fifo.
+  private func backgroundPixel(x: UInt8, y: UInt8, window: Bool) -> UInt8 {
+    let tileX = x >> 3
+    let tileY = y >> 3
+    let tileOffsetX = x % 8
+    let tileOffsetY = y % 8
+
+    let tileIndex: UInt8
+    let tileMapIndex = tileX + tileY << 5
+    switch window ? windowTileMapAddress : backgroundTileMapAddress {
+    case .x9800:
+      tileIndex = tileMap[Int(tileMapIndex)]
+    case .x9C00:
+      tileIndex = tileMap[(0x9C00 - 0x9800) + Int(tileMapIndex)]
+    }
+
+    let tileDataIndex = (tileIndex << 4) + tileOffsetY * 2
+    let tileData0: UInt8
+    let tileData1: UInt8
+    switch tileDataAddress {
+    case .x8000:
+      tileData0 = tileData[Int(tileDataIndex)]
+      tileData1 = tileData[Int(tileDataIndex + 1)]
+    case .x8800:
+      tileData0 = tileData[(0x8800 - 0x8000) + Int(tileDataIndex)]
+      tileData1 = tileData[(0x8800 - 0x8000) + Int(tileDataIndex + 1)]
+    }
+
+    let lsbSet = (tileData0 & (0x80 >> tileOffsetX)) > 0
+    let msbSet = (tileData1 & (0x80 >> tileOffsetX)) > 0
+
+    lastBackgroundPixel = (msbSet ? 0x2 : 0) | (lsbSet ? 0x1 : 0)
+    return lastBackgroundPixel
+  }
+
+  private func plot() {
+    if windowEnable && windowX <= scanlineX && windowY <= scanlineY {
+      plot(x: scanlineX, y: scanlineY,
+           byte: backgroundPixel(x: scanlineX &- windowX, y: windowYPlot, window: true),
+           palette: backgroundPalette)
+    } else if backgroundEnable {
+      plot(x: scanlineX, y: scanlineY,
+           byte: backgroundPixel(x: scanlineX &- scrollX, y: bgYPlot, window: false),
+           palette: backgroundPalette)
+    } else {
+      lastBackgroundPixel = 0
     }
   }
 
@@ -245,8 +303,6 @@ extension LCDController {
       if lcdModeCycle >= LCDController.searchingOAMLength {
 //        precondition(intersectedOAMs.count == 0, "Sprites not handled yet.")
         lcdMode = .transferringToLCDDriver
-        transferringToLCDDriverCycle = 0
-        scanlineX = 0
         bgfifo.removeAll()
         spritefifo.removeAll()
       }
@@ -254,7 +310,16 @@ extension LCDController {
     case .transferringToLCDDriver:
       transferringToLCDDriverCycle += 1
 
-      getTile()
+      if transferringToLCDDriverCycle > 1 && scanlineX < 160 {
+        plot()
+        scanlineX += 1
+        plot()
+        scanlineX += 1
+        plot()
+        scanlineX += 1
+        plot()
+        scanlineX += 1
+      }
 
       if lcdModeCycle >= 63 {
         lcdMode = .hblank
@@ -263,12 +328,15 @@ extension LCDController {
       break
     case .hblank:
       if lcdModeCycle >= LCDController.scanlineCycleLength {
-        ly += 1
-        if ly < 144 {
+        scanlineY += 1
+        if scanlineY < 144 {
           lcdMode = .searchingOAM
+          lcdModeCycle = 0
         } else {
           // No more lines to draw.
           lcdMode = .vblank
+
+          vblankCounter += 1
 
           var interruptFlag = LR35902.Instruction.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
           interruptFlag.insert(.vBlank)
@@ -278,10 +346,10 @@ extension LCDController {
       break
     case .vblank:
       if lcdModeCycle % LCDController.scanlineCycleLength == 0 {
-        ly += 1
+        scanlineY += 1
 
-        if ly >= 154 {
-          ly = 0
+        if scanlineY >= 154 {
+          scanlineY = 0
           lcdMode = .searchingOAM
         }
       }
@@ -296,8 +364,8 @@ extension LCDController {
       let sprite = oam.sprites[oamIndex]
       oamIndex += 1
       if sprite.x > 0
-          && ly + 16 >= sprite.y
-          && ly + 16 < sprite.y + spriteSize.height() {
+          && scanlineY + 16 >= sprite.y
+          && scanlineY + 16 < sprite.y + spriteSize.height() {
         intersectedOAMs.append(sprite)
       }
     }
@@ -309,7 +377,7 @@ extension LCDController {
 extension LCDController: AddressableMemory {
   public func read(from address: LR35902.Address) -> UInt8 {
     if LCDController.tileMapRegion.contains(address) {
-      return tileMap[address]!
+      return tileMap[Int(address - LCDController.tileMapRegion.lowerBound)]
     }
     if LCDController.tileDataRegion.contains(address) {
       return tileData[Int(address - LCDController.tileDataRegion.lowerBound)]
@@ -337,11 +405,14 @@ extension LCDController: AddressableMemory {
           | (backgroundEnable                   ? 0b0000_0001 : 0)
       )
 
-    case .LY:   return ly
+    case .LY:   return scanlineY
     case .LYC:  return lyc
 
-    case .WY:   return wy
-    case .WX:   return wx
+    case .SCY:  return scrollY
+    case .SCX:  return scrollX
+
+    case .WY:   return windowY
+    case .WX:   return windowX
 
     case .BGP:  return bitsForPalette(backgroundPalette)
     case .OBP0: return bitsForPalette(objectPallete0)
@@ -358,13 +429,13 @@ extension LCDController: AddressableMemory {
       )
 
     default:
-      return values[lcdAddress]!
+      fatalError()
     }
   }
 
   public func write(_ byte: UInt8, to address: LR35902.Address) {
     if LCDController.tileMapRegion.contains(address) {
-      tileMap[address] = byte
+      tileMap[Int(address - LCDController.tileMapRegion.lowerBound)] = byte
       return
     }
     if LCDController.tileDataRegion.contains(address) {
@@ -394,11 +465,14 @@ extension LCDController: AddressableMemory {
       objEnable                 = (byte & 0b0000_0010) > 0
       backgroundEnable          = (byte & 0b0000_0001) > 0
 
-    case .LY:  ly = 0
+    case .LY:  scanlineY = 0
     case .LYC: lyc = 0
 
-    case .WY:   wy = byte
-    case .WX:   wx = byte
+    case .SCY:  scrollY = byte
+    case .SCX:  scrollX = byte
+
+    case .WY:   windowY = byte
+    case .WX:   windowX = byte
 
     case .BGP:  backgroundPalette = paletteFromBits(byte)
     case .OBP0: objectPallete0 = paletteFromBits(byte)
@@ -411,7 +485,7 @@ extension LCDController: AddressableMemory {
       enableHBlankInterrupt       = (byte & 0b0000_1000) > 0
 
     default:
-      values[lcdAddress] = byte
+      fatalError()
     }
   }
 

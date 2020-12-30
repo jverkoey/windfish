@@ -143,6 +143,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   let instructionAssemblyLabel = CreateLabel()
   let instructionBytesLabel = CreateLabel()
   let tileDataImageView = NSImageView()
+  let screenImageView = NSImageView()
   private let cpuView = LR35902View()
 
   init(document: ProjectDocument) {
@@ -188,6 +189,9 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     controls.target = self
     controls.action = #selector(performControlAction(_:))
     view.addSubview(controls)
+
+    screenImageView.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(screenImageView)
 
     cpuView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(cpuView)
@@ -272,7 +276,12 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       controls.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
       controls.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
 
-      cpuView.topAnchor.constraint(equalToSystemSpacingBelow: controls.bottomAnchor, multiplier: 1),
+      screenImageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
+      screenImageView.widthAnchor.constraint(equalToConstant: CGFloat(LCDController.screenSize.width)),
+      screenImageView.heightAnchor.constraint(equalToConstant: CGFloat(LCDController.screenSize.height)),
+      screenImageView.topAnchor.constraint(equalToSystemSpacingBelow: controls.bottomAnchor, multiplier: 1),
+
+      cpuView.topAnchor.constraint(equalToSystemSpacingBelow: screenImageView.bottomAnchor, multiplier: 1),
       cpuView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
 
       bankLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
@@ -335,7 +344,10 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
   var running = false
   var lastRenderedTileData: Data?
+  var lastRenderedScreenData: Data?
   var tileDataImage: NSImage?
+  var screenImage: NSImage?
+  var lastVblankCounter = 0
 
   func renderTileDataImage(with data: Data) {
     self.lastRenderedTileData = data
@@ -432,13 +444,50 @@ final class EmulatorViewController: NSViewController, TabSelectable {
               machineCycles += 1
             }
 
-            // Only show every n instructions (this actually results in a 100x speed improvement).
-            if machineCycles % 40000 == 0 {
+            if self.lastVblankCounter != self.document.gameboy.lcdController.vblankCounter {
+              self.lastVblankCounter = self.document.gameboy.lcdController.vblankCounter
+
               let tileData = self.document.gameboy.tileData
+              let screenData = self.document.gameboy.screenData
 
               let tileDataDidChange = self.lastRenderedTileData != tileData
               if tileDataDidChange {
                 self.renderTileDataImage(with: tileData)
+              }
+
+              let screenDataDidChange = self.lastRenderedScreenData != screenData
+              if screenDataDidChange {
+                let imageSize = NSSize(width: CGFloat(LCDController.screenSize.width),
+                                       height: CGFloat(LCDController.screenSize.height))
+                let image = NSImage(size: imageSize)
+                image.lockFocusFlipped(true)
+
+                NSColor.white.setFill()
+                NSRect(origin: .zero, size: imageSize).fill()
+
+                let colors: [NSColor] = [
+                  .black,
+                  .darkGray,
+                  .lightGray,
+                  .white,
+                ]
+
+                var x = 0
+                var y = 0
+                let pixel = NSRect(x: 0, y: 0, width: 1, height: 1)
+                for color in [UInt8](screenData) {
+                  colors[Int(color)].set()
+                  pixel.offsetBy(dx: CGFloat(x), dy: CGFloat(y)).fill()
+                  x += 1
+                  if x >= LCDController.screenSize.width {
+                    x = 0
+                    y += 1
+                  }
+                }
+
+                image.unlockFocus()
+
+                self.screenImage = image
               }
 
               DispatchQueue.main.sync {
@@ -448,6 +497,9 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
                 if tileDataDidChange {
                   self.tileDataImageView.image = self.tileDataImage
+                }
+                if screenDataDidChange {
+                  self.screenImageView.image = self.screenImage
                 }
 
                 self.updateRegisters()

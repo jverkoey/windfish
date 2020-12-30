@@ -23,7 +23,7 @@ public final class Gameboy {
   public let memory: Memory
 
   /** The Gameboy's liquid crystal display (LCD) controller. */
-  let lcdController: LCDController
+  public let lcdController: LCDController
 
   /** The Gameboy's OAM DMA controller. */
   let dmaController: DMAController
@@ -41,8 +41,8 @@ public final class Gameboy {
     memory.tracers.append(tracer)
   }
 
-  public func tileMap() -> [LR35902.Address: UInt8] {
-    return lcdController.tileMap
+  public var screenData: Data {
+    return lcdController.screenData
   }
 
   public var tileData: Data {
