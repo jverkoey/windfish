@@ -368,7 +368,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       return (((highByte & mask) >> bit) << 1) | ((lowByte & mask) >> bit)
     }
 
-    NSColor.white.setFill()
+    NSColor.black.setFill()
     NSRect(origin: .zero, size: imageSize).fill()
 
     let colors: [NSColor] = [
@@ -382,12 +382,20 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     var tileRow = 0
     var pixelRow = 0
     let pixel = NSRect(x: 0, y: 0, width: 1, height: 1)
+    var lastColor: UInt8 = 0
     for bytePairs in [UInt8](data).chunked(into: 2) {
       let lowByte = bytePairs.first!
       let highByte = bytePairs.last!
 
       for i: UInt8 in 0..<8 {
-        colors[Int(colorForBytePair(highByte, lowByte, 7 - i))].set()
+        let color = colorForBytePair(highByte, lowByte, 7 - i)
+        if color == 0 {
+          continue  // No need to draw the background color
+        }
+        if color != lastColor {
+          lastColor = color
+          colors[Int(lastColor)].set()
+        }
         pixel.offsetBy(dx: CGFloat(tileColumn) * 8 + CGFloat(i),
                        dy: CGFloat(tileRow) * 8 + CGFloat(pixelRow)).fill()
       }
@@ -457,36 +465,31 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
               let screenDataDidChange = self.lastRenderedScreenData != screenData
               if screenDataDidChange {
+                let colors: [UInt8: UInt8] = [
+                  0: 0x00,
+                  1: UInt8(NSColor.darkGray.whiteComponent * 255),
+                  2: UInt8(NSColor.lightGray.whiteComponent * 255),
+                  3: 0xFF,
+                ]
+                var pixels = screenData.map { colors[$0]! }
+                let providerRef = CGDataProvider(data: NSData(bytes: &pixels, length: pixels.count))!
+                let cgImage = CGImage(
+                  width: LCDController.screenSize.width,
+                  height: LCDController.screenSize.height,
+                  bitsPerComponent: 8,
+                  bitsPerPixel: 8,
+                  bytesPerRow: LCDController.screenSize.width,
+                  space: CGColorSpaceCreateDeviceGray(),
+                  bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.none.rawValue),
+                  provider: providerRef,
+                  decode: nil,
+                  shouldInterpolate: false,
+                  intent: .defaultIntent
+                )!
+
                 let imageSize = NSSize(width: CGFloat(LCDController.screenSize.width),
                                        height: CGFloat(LCDController.screenSize.height))
-                let image = NSImage(size: imageSize)
-                image.lockFocusFlipped(true)
-
-                NSColor.white.setFill()
-                NSRect(origin: .zero, size: imageSize).fill()
-
-                let colors: [NSColor] = [
-                  .black,
-                  .darkGray,
-                  .lightGray,
-                  .white,
-                ]
-
-                var x = 0
-                var y = 0
-                let pixel = NSRect(x: 0, y: 0, width: 1, height: 1)
-                for color in [UInt8](screenData) {
-                  colors[Int(color)].set()
-                  pixel.offsetBy(dx: CGFloat(x), dy: CGFloat(y)).fill()
-                  x += 1
-                  if x >= LCDController.screenSize.width {
-                    x = 0
-                    y += 1
-                  }
-                }
-
-                image.unlockFocus()
-
+                let image = NSImage(cgImage: cgImage, size: imageSize)
                 self.screenImage = image
               }
 
