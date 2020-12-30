@@ -13,18 +13,25 @@ public final class LCDController {
   static let registerRegion1: ClosedRange<LR35902.Address> = 0xFF40...0xFF45
   static let registerRegion2: ClosedRange<LR35902.Address> = 0xFF47...0xFF4B
 
+  deinit {
+    tileMap.deallocate()
+    tileData.deallocate()
+    screenDataBuffer.deallocate()
+  }
+
   init(oam: OAM) {
     self.oam = oam
   }
 
   let oam: OAM
 
-  var tileMap = Data(count: tileMapRegion.count)
-  var tileData = Data(count: tileDataRegion.count)
+  var tileMap = UnsafeMutableRawBufferPointer.allocate(byteCount: tileMapRegion.count, alignment: 1)
+  var tileData = UnsafeMutableRawBufferPointer.allocate(byteCount:  tileDataRegion.count, alignment: 1)
 
   var bufferToggle = false
   public static let screenSize = (width: 160, height: 144)
   var screenData = Data(count: LCDController.screenSize.width * LCDController.screenSize.height)
+  var screenDataBuffer = UnsafeMutableRawBufferPointer.allocate(byteCount: LCDController.screenSize.width * LCDController.screenSize.height, alignment: 1)
 
   enum Addresses: LR35902.Address {
     case LCDC = 0xFF40
@@ -235,7 +242,7 @@ extension LCDController {
 
   private func plot(x: UInt8, y: UInt8, byte: UInt8, palette: Palette) {
     let color = palette[byte]!
-    screenData[LCDController.screenSize.width * Int(y) + Int(x)] = color
+    screenDataBuffer[LCDController.screenSize.width * Int(y) + Int(x)] = color
   }
 
   private func backgroundPixel(x: UInt8, y: UInt8, window: Bool) -> UInt8 {
@@ -335,6 +342,10 @@ extension LCDController {
         } else {
           // No more lines to draw.
           lcdMode = .vblank
+
+          screenData.withUnsafeMutableBytes { (buffer: UnsafeMutableRawBufferPointer) in
+            buffer.copyBytes(from: screenDataBuffer)
+          }
 
           vblankCounter += 1
 

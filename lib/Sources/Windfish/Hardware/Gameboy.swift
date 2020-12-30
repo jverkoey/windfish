@@ -46,7 +46,7 @@ public final class Gameboy {
   }
 
   public var tileData: Data {
-    return lcdController.tileData
+    return Data(lcdController.tileData)
   }
 
   public static var tileDataRegionSize: Int {
