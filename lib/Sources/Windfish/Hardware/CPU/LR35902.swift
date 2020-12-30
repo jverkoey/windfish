@@ -159,7 +159,7 @@ public final class LR35902 {
     public var halted: Bool = false
 
     /** Indicates whether the CPU is fetching and executing instructions. */
-    public func isRunning() -> Bool {
+    public var isRunning: Bool {
       return !halted
     }
 

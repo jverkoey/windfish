@@ -144,6 +144,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   let instructionBytesLabel = CreateLabel()
   let tileDataImageView = NSImageView()
   let screenImageView = NSImageView()
+  let fpsLabel = CreateLabel()
   private let cpuView = LR35902View()
 
   init(document: ProjectDocument) {
@@ -189,6 +190,9 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     controls.target = self
     controls.action = #selector(performControlAction(_:))
     view.addSubview(controls)
+
+    fpsLabel.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(fpsLabel)
 
     screenImageView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(screenImageView)
@@ -276,10 +280,13 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       controls.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
       controls.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
 
+      fpsLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
+      fpsLabel.topAnchor.constraint(equalToSystemSpacingBelow: controls.bottomAnchor, multiplier: 1),
+
       screenImageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
       screenImageView.widthAnchor.constraint(equalToConstant: CGFloat(LCDController.screenSize.width)),
       screenImageView.heightAnchor.constraint(equalToConstant: CGFloat(LCDController.screenSize.height)),
-      screenImageView.topAnchor.constraint(equalToSystemSpacingBelow: controls.bottomAnchor, multiplier: 1),
+      screenImageView.topAnchor.constraint(equalToSystemSpacingBelow: fpsLabel.bottomAnchor, multiplier: 1),
 
       cpuView.topAnchor.constraint(equalToSystemSpacingBelow: screenImageView.bottomAnchor, multiplier: 1),
       cpuView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
@@ -504,13 +511,13 @@ final class EmulatorViewController: NSViewController, TabSelectable {
                 let deltaSeconds = Double((DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds)) / 1_000_000_000
                 let instructionsPerSecond = Double(machineCycles) / deltaSeconds
                 let framesPerSecond = Double(frames) / deltaSeconds
-                print("\(instructionsPerSecond) - \(framesPerSecond)")
 
                 if tileDataDidChange {
                   self.tileDataImageView.image = self.tileDataImage
                 }
                 self.screenImageView.image = self.screenImage
 
+                self.fpsLabel.stringValue = String(format: "fps: %.2f ips: %.2f", framesPerSecond, instructionsPerSecond)
                 self.updateRegisters()
                 self.updateRAM()
               }

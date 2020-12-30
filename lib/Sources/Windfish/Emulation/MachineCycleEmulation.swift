@@ -1099,7 +1099,7 @@ extension LR35902 {
   /** Advances the CPU by one machine cycle. */
   public func advance(memory: AddressableMemory) {
     // https://gekkio.fi/files/gb-docs/gbctr.pdf
-    if state.isRunning() {
+    if state.isRunning {
       // Execution phase
       if nextAction == .continueExecution, let loaded = state.machineInstruction.loaded {
         state.machineInstruction.cycle += 1
@@ -1122,7 +1122,7 @@ extension LR35902 {
         nextAction = .continueExecution
         state.machineInstruction = .init(spec: .interrupt(interrupts), sourceLocation: sourceLocation)
 
-      } else if state.isRunning() {
+      } else if state.isRunning {
         // Fetch phase
         var sourceLocation = memory.sourceLocation(from: state.pc)
         let tableIndex = Int(truncatingIfNeeded: memory.read(from: state.pc))
