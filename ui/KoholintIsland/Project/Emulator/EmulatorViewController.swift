@@ -142,6 +142,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   var ramTableView: EditorTableView?
   let instructionAssemblyLabel = CreateLabel()
   let instructionBytesLabel = CreateLabel()
+  let tileDataImageView = NSImageView()
   private let cpuView = LR35902View()
 
   init(document: ProjectDocument) {
@@ -234,6 +235,9 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     instructionBytesLabel.lineBreakStrategy = .standard
     view.addSubview(instructionBytesLabel)
 
+    tileDataImageView.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(tileDataImageView)
+
     let ramTableView = EditorTableView(elementsController: ramController)
     ramTableView.translatesAutoresizingMaskIntoConstraints = false
     ramTableView.tableView?.delegate = self
@@ -295,9 +299,14 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       instructionBytesLabel.widthAnchor.constraint(lessThanOrEqualToConstant: 300),
       instructionBytesLabel.topAnchor.constraint(equalTo: instructionBytesLabelHeader.bottomAnchor),
 
+      tileDataImageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
+      tileDataImageView.widthAnchor.constraint(equalToConstant: 128),
+      tileDataImageView.heightAnchor.constraint(equalToConstant: 192),
+      tileDataImageView.topAnchor.constraint(equalToSystemSpacingBelow: instructionBytesLabel.bottomAnchor, multiplier: 1),
+
       ramTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
       ramTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-      ramTableView.topAnchor.constraint(equalToSystemSpacingBelow: instructionBytesLabel.bottomAnchor, multiplier: 1),
+      ramTableView.topAnchor.constraint(equalToSystemSpacingBelow: tileDataImageView.bottomAnchor, multiplier: 1),
       ramTableView.heightAnchor.constraint(equalToConstant: 220),
     ])
 
@@ -308,6 +317,10 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     ramTableView.tableView?.bind(.content, to: ramController, withKeyPath: "arrangedObjects", options: nil)
     ramTableView.tableView?.bind(.selectionIndexes, to: ramController, withKeyPath:"selectionIndexes", options: nil)
     ramTableView.tableView?.bind(.sortDescriptors, to: ramController, withKeyPath: "sortDescriptors", options: nil)
+
+    let tileData = self.document.gameboy.tileData
+    renderTileDataImage(with: tileData)
+    tileDataImageView.image = tileDataImage
 
     updateInstructionAssembly()
     updateRegisters()
@@ -321,6 +334,67 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   }
 
   var running = false
+  var lastRenderedTileData: Data?
+  var tileDataImage: NSImage?
+
+  func renderTileDataImage(with data: Data) {
+    self.lastRenderedTileData = data
+
+    // TODO: Also render the tile data regions, possibly as lines extending outward from the right-hand side of the
+    // image so as not to clutter the tiles themselves.
+
+    let ntiles = Gameboy.tileDataRegionSize / 16
+    let ncolumns = 16
+    let nrows = ntiles / ncolumns
+    let pixelsPerTile = 8
+    let imageSize = NSSize(width: CGFloat(ncolumns * pixelsPerTile), height: CGFloat(nrows * pixelsPerTile))
+    let image = NSImage(size: imageSize)
+    image.lockFocusFlipped(true)
+
+    let colorForBytePair: (UInt8, UInt8, UInt8) -> UInt8 = { highByte, lowByte, bit in
+      let mask = UInt8(0x01) << bit
+      return (((highByte & mask) >> bit) << 1) | ((lowByte & mask) >> bit)
+    }
+
+    NSColor.white.setFill()
+    NSRect(origin: .zero, size: imageSize).fill()
+
+    let colors: [NSColor] = [
+      .black,
+      .darkGray,
+      .lightGray,
+      .white,
+    ]
+
+    var tileColumn = 0
+    var tileRow = 0
+    var pixelRow = 0
+    let pixel = NSRect(x: 0, y: 0, width: 1, height: 1)
+    for bytePairs in [UInt8](data).chunked(into: 2) {
+      let lowByte = bytePairs.first!
+      let highByte = bytePairs.last!
+
+      for i: UInt8 in 0..<8 {
+        colors[Int(colorForBytePair(highByte, lowByte, 7 - i))].set()
+        pixel.offsetBy(dx: CGFloat(tileColumn) * 8 + CGFloat(i),
+                       dy: CGFloat(tileRow) * 8 + CGFloat(pixelRow)).fill()
+      }
+      pixelRow += 1
+      if pixelRow >= 16 {
+        tileColumn += 1
+        pixelRow = 0
+
+        if tileColumn >= ncolumns {
+          tileColumn = 0
+          tileRow += 2
+        }
+      }
+    }
+
+    image.unlockFocus()
+
+    self.tileDataImage = image
+  }
 
   @objc func performControlAction(_ sender: NSSegmentedControl) {
     if sender.selectedSegment == 0 {  // Step forward
@@ -329,6 +403,13 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       // TODO: Step into and through any control flow.
 
       document.gameboy.advanceInstruction()
+
+      let tileData = self.document.gameboy.tileData
+      let tileDataDidChange = self.lastRenderedTileData != tileData
+      if tileDataDidChange {
+        renderTileDataImage(with: tileData)
+        tileDataImageView.image = tileDataImage
+      }
 
       updateInstructionAssembly()
       updateRegisters()
@@ -351,12 +432,23 @@ final class EmulatorViewController: NSViewController, TabSelectable {
               machineCycles += 1
             }
 
-            // Only show every 100 instructions (this actually results in a 100x speed improvement).
-            if machineCycles % 400 == 0 {
+            // Only show every n instructions (this actually results in a 100x speed improvement).
+            if machineCycles % 40000 == 0 {
+              let tileData = self.document.gameboy.tileData
+
+              let tileDataDidChange = self.lastRenderedTileData != tileData
+              if tileDataDidChange {
+                self.renderTileDataImage(with: tileData)
+              }
+
               DispatchQueue.main.sync {
                 let deltaSeconds = Double((DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds)) / 1_000_000_000
                 let instructionsPerSecond = Double(machineCycles) / deltaSeconds
                 print(instructionsPerSecond)
+
+                if tileDataDidChange {
+                  self.tileDataImageView.image = self.tileDataImage
+                }
 
                 self.updateRegisters()
                 self.updateRAM()

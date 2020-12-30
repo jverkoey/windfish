@@ -20,7 +20,7 @@ public final class LCDController {
   let oam: OAM
 
   var tileMap: [LR35902.Address: UInt8] = [:]
-  var tileData: [LR35902.Address: UInt8] = [:]
+  var tileData = Data(count: tileDataRegion.count)
 
   var bufferToggle = false
   private var screenData: Data {
@@ -274,7 +274,7 @@ extension LCDController: AddressableMemory {
       return tileMap[address]!
     }
     if LCDController.tileDataRegion.contains(address) {
-      return tileData[address]!
+      return tileData[Int(address - LCDController.tileDataRegion.lowerBound)]
     }
     if OAM.addressableRange.contains(address) {
       guard lcdMode == .hblank || lcdMode == .vblank else {
@@ -326,7 +326,7 @@ extension LCDController: AddressableMemory {
       return
     }
     if LCDController.tileDataRegion.contains(address) {
-      tileData[address] = byte
+      tileData[Int(address - LCDController.tileDataRegion.lowerBound)] = byte
       return
     }
     if OAM.addressableRange.contains(address) {

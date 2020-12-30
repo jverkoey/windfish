@@ -40,4 +40,16 @@ public final class Gameboy {
   public func addMemoryTracer(_ tracer: AddressableMemory) {
     memory.tracers.append(tracer)
   }
+
+  public func tileMap() -> [LR35902.Address: UInt8] {
+    return lcdController.tileMap
+  }
+
+  public var tileData: Data {
+    return lcdController.tileData
+  }
+
+  public static var tileDataRegionSize: Int {
+    return LCDController.tileDataRegion.count
+  }
 }
