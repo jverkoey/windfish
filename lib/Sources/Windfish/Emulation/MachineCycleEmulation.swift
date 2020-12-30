@@ -499,6 +499,27 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // bit b, [hl]
+    case .cb(.bit(let bit, .hladdr)):  // TODO: Test me
+      var value: UInt8 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          value = memory.read(from: cpu.state.hl)
+          return .continueExecution
+        }
+        if cycle == 2 {
+          cpu.state.fzero = (value & (UInt8(1) << bit.rawValue)) == 0
+          cpu.state.fsubtract = false
+          cpu.state.fhalfcarry = true
+          return .continueExecution
+        }
+        if cycle == 3 {
+          memory.write(value, to: cpu.state.hl)
+          return .continueExecution
+        }
+        return .fetchNext
+      }
+
     // swap r
     case .cb(.swap(let register)) where registers8.contains(register):  // TODO: Test me
       return { (cpu, memory, cycle) in
@@ -557,8 +578,37 @@ extension LR35902.InstructionSet {
         return .fetchNext
       }
 
+    // rlca
+    case .rlca:  // TODO: Test me
+      return { (cpu, memory, cycle) in
+        let partialResult = cpu.state.a.multipliedReportingOverflow(by: 2)
+        let result = partialResult.partialValue | (partialResult.overflow ? 0x01 : 0)
+
+        cpu.state.fzero = result == 0
+        cpu.state.fsubtract = false
+        cpu.state.fcarry = partialResult.overflow
+        cpu.state.fhalfcarry = false
+
+        cpu.state.a = result
+
+        return .fetchNext
+      }
+
     // rra
     case .rra:  // TODO: Test me
+      return { (cpu, memory, cycle) in
+        let partialResult = cpu.state.a.dividedReportingOverflow(by: 2)
+        let result = partialResult.partialValue | (cpu.state.fcarry ? 0b1000_0000 : 0)
+        cpu.state.a = result
+        cpu.state.fzero = result == 0
+        cpu.state.fsubtract = false
+        cpu.state.fcarry = partialResult.overflow
+        cpu.state.fhalfcarry = false
+        return .fetchNext
+      }
+
+    // rrca
+    case .rrca:  // TODO: Test me
       return { (cpu, memory, cycle) in
         let partialResult = cpu.state.a.dividedReportingOverflow(by: 2)
         let result = partialResult.partialValue | (partialResult.overflow ? 0b1000_0000 : 0)
@@ -597,6 +647,22 @@ extension LR35902.InstructionSet {
         cpu.state.fzero = result.partialValue == 0
         cpu.state.fcarry = result.overflow
         cpu.state.fhalfcarry = (cpu.state.a & 0x0f) < (registerValue & 0x0f)
+        return .fetchNext
+      }
+
+    // cp [hl]
+    case .cp(.hladdr):  // TODO: Test me
+      var value: UInt8 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          value = memory.read(from: cpu.state.hl)
+          return .continueExecution
+        }
+        cpu.state.fsubtract = true
+        let result = cpu.state.a.subtractingReportingOverflow(value)
+        cpu.state.fzero = result.partialValue == 0
+        cpu.state.fcarry = result.overflow
+        cpu.state.fhalfcarry = (cpu.state.a & 0x0f) < (value & 0x0f)
         return .fetchNext
       }
 
@@ -694,6 +760,46 @@ extension LR35902.InstructionSet {
         cpu.state.fsubtract = true
         cpu.state.fcarry = result.overflow
         cpu.state.fhalfcarry = (cpu.state.a & 0x0f) < (immediate & 0x0f)
+        cpu.state.a = result.partialValue
+        return .fetchNext
+      }
+
+    // sub n
+    case .sbc(.imm8):  // TODO: Test me
+      var immediate: UInt8 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          immediate = UInt8(memory.read(from: cpu.state.pc))
+          cpu.state.pc += 1
+          return .continueExecution
+        }
+
+        immediate += cpu.state.fcarry ? 1 : 0
+
+        let originalValue = cpu.state.a
+        let result = originalValue.subtractingReportingOverflow(immediate)
+        cpu.state.fzero = result.partialValue == 0
+        cpu.state.fsubtract = true
+        cpu.state.fcarry = result.overflow
+        cpu.state.fhalfcarry = (cpu.state.a & 0x0f) < (immediate & 0x0f)
+        cpu.state.a = result.partialValue
+        return .fetchNext
+      }
+
+    // sub [hl]
+    case .sub(.a, .hladdr):  // TODO: Test me
+      var value: UInt8 = 0
+      return { (cpu, memory, cycle) in
+        if cycle == 1 {
+          value = memory.read(from: cpu.state.hl)
+          return .continueExecution
+        }
+        let originalValue = cpu.state.a
+        let result = originalValue.subtractingReportingOverflow(value)
+        cpu.state.fzero = result.partialValue == 0
+        cpu.state.fsubtract = true
+        cpu.state.fcarry = result.overflow
+        cpu.state.fhalfcarry = (cpu.state.a & 0x0f) < (value & 0x0f)
         cpu.state.a = result.partialValue
         return .fetchNext
       }
