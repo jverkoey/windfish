@@ -3156,7 +3156,7 @@ nop
 
   func test_add_n() throws {
     // Given
-    let addimm8 = LR35902.Instruction.Spec.add(.imm8)
+    let addimm8 = LR35902.Instruction.Spec.add(.a, .imm8)
     let specs = LR35902.InstructionSet.allSpecs().filter { spec in
       switch spec {
       case addimm8:
@@ -3200,7 +3200,7 @@ nop
 
   func test_add_n_overflow() throws {
     // Given
-    let addimm8 = LR35902.Instruction.Spec.add(.imm8)
+    let addimm8 = LR35902.Instruction.Spec.add(.a, .imm8)
     let specs = LR35902.InstructionSet.allSpecs().filter { spec in
       switch spec {
       case addimm8:
@@ -3244,7 +3244,7 @@ nop
 
   func test_add_n_halfcarry() throws {
     // Given
-    let addimm8 = LR35902.Instruction.Spec.add(.imm8)
+    let addimm8 = LR35902.Instruction.Spec.add(.a, .imm8)
     let specs = LR35902.InstructionSet.allSpecs().filter { spec in
       switch spec {
       case addimm8:
@@ -3288,7 +3288,7 @@ nop
 
   func test_sub_n() throws {
     // Given
-    let subimm8 = LR35902.Instruction.Spec.sub(.imm8)
+    let subimm8 = LR35902.Instruction.Spec.sub(.a, .imm8)
     let specs = LR35902.InstructionSet.allSpecs().filter { spec in
       switch spec {
       case subimm8: return true
@@ -3331,7 +3331,7 @@ nop
 
   func test_sub_n_underflow() throws {
     // Given
-    let subimm8 = LR35902.Instruction.Spec.sub(.imm8)
+    let subimm8 = LR35902.Instruction.Spec.sub(.a, .imm8)
     let specs = LR35902.InstructionSet.allSpecs().filter { spec in
       switch spec {
       case subimm8: return true
@@ -3374,7 +3374,7 @@ nop
 
   func test_sub_n_zero() throws {
     // Given
-    let subimm8 = LR35902.Instruction.Spec.sub(.imm8)
+    let subimm8 = LR35902.Instruction.Spec.sub(.a, .imm8)
     let specs = LR35902.InstructionSet.allSpecs().filter { spec in
       switch spec {
       case subimm8: return true
@@ -3417,7 +3417,7 @@ nop
 
   func test_sub_n_halfcarry() throws {
     // Given
-    let subimm8 = LR35902.Instruction.Spec.sub(.imm8)
+    let subimm8 = LR35902.Instruction.Spec.sub(.a, .imm8)
     let specs = LR35902.InstructionSet.allSpecs().filter { spec in
       switch spec {
       case subimm8: return true

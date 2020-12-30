@@ -212,7 +212,7 @@ func populateRequestWithHardwareMacros(_ request: DisassemblyRequest<LR35902.Add
 
   request.createMacro(named: "plusEqualH", pattern: [
     .any(.ld(.a, .ffimm8addr), argument: 1),
-    .any(.add(.imm8), argument: 2),
+    .any(.add(.a, .imm8), argument: 2),
     .any(.ld(.ffimm8addr, .a), argument: 1),
   ])
 

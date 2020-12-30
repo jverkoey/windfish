@@ -325,7 +325,7 @@ ret z
 
   func test_sub_imm8() throws {
     let results = RGBDSAssembler.assemble(assembly: """
-sub 5
+sub a, 5
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
@@ -333,7 +333,7 @@ sub 5
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .sub(.imm8), immediate: .imm8(5)),
+      0x0000: LR35902.Instruction(spec: .sub(.a, .imm8), immediate: .imm8(5)),
     ])
   }
 

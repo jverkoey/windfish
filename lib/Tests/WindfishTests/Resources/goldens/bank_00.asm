@@ -608,7 +608,7 @@ toc_00_037C:
     cp   c
     ret  c
 
-    sub  c
+    sub  a, c
     jr   toc_00_037C
 
 toc_00_0381:
@@ -617,7 +617,7 @@ toc_00_0381:
     ld   [hl], e
     ld   c, a
     ld   a, e
-    add  $08
+    add  a, $08
     ld   e, a
     ld   a, c
     inc  hl
@@ -948,7 +948,7 @@ toc_00_06B1:
     pop  de
     ld   hl, $FFB2
     ld   a, [hl]
-    add  e
+    add  a, e
     daa
     ldd  [hl], a
     ld   a, [hl]
@@ -1020,11 +1020,11 @@ toc_00_0735:
     ld   a, [de]
     swap a
     and  $0F
-    add  $E8
+    add  a, $E8
     ldi  [hl], a
     ld   a, [de]
     and  $0F
-    add  $E8
+    add  a, $E8
     ldi  [hl], a
     inc  de
     ret
@@ -1123,7 +1123,7 @@ toc_00_076F:
 
 toc_00_0928:
     ld   a, [$FFA9]
-    add  a
+    add  a, a
     ld   hl, $0920
     ld   d, $00
     ld   e, a
@@ -1421,7 +1421,7 @@ toc_00_0ADE:
     add  hl, de
     ld   a, [hl]
     ld   hl, $C800
-    add  l
+    add  a, l
     ld   l, a
     ld   c, $01
     ld   e, $00
@@ -1432,7 +1432,7 @@ toc_00_0AF1:
 
     ld   b, a
     ld   a, [$FFA1]
-    add  l
+    add  a, l
     ld   l, a
     ld   a, [hl]
     and  a
@@ -1445,7 +1445,7 @@ toc_00_0B01:
     ld   a, [$FFA1]
     ld   d, a
     ld   a, l
-    sub  d
+    sub  a, d
     ld   l, a
 toc_00_0B07:
     inc  c
@@ -1456,7 +1456,7 @@ toc_00_0B07:
     ld   a, [$FFA1]
     ld   d, a
     ld   a, l
-    sub  d
+    sub  a, d
     ld   l, a
     jr   toc_00_0AF1
 
@@ -1469,11 +1469,11 @@ toc_00_0B15:
     ld   a, [$FFA1]
     ld   d, a
     ld   a, l
-    add  d
-    add  d
+    add  a, d
+    add  a, d
     ld   l, a
     ld   a, [$FFA2]
-    add  l
+    add  a, l
     ld   l, a
     jr   toc_00_0AF1
 
@@ -1482,7 +1482,7 @@ toc_00_0B28:
     ld   a, [$FFA1]
     ld   d, a
     ld   a, l
-    sub  d
+    sub  a, d
     ld   l, a
     xor  a
     ld   [hl], a
@@ -1503,7 +1503,7 @@ toc_00_0B3B:
     ld   a, [$FFA1]
     ld   d, a
     ld   a, l
-    sub  d
+    sub  a, d
     ld   l, a
     xor  a
     ld   [hl], a
@@ -1552,7 +1552,7 @@ toc_00_0B8A:
     add  hl, de
     ld   a, [hl]
     ld   hl, $C800
-    add  l
+    add  a, l
     ld   l, a
     ld   c, $01
 toc_00_0B8A.toc_00_0BA0:
@@ -1562,7 +1562,7 @@ toc_00_0B8A.toc_00_0BA0:
 
     ld   b, a
     ld   a, [$FFA1]
-    add  l
+    add  a, l
     ld   l, a
     ld   a, [hl]
     and  a
@@ -1574,7 +1574,7 @@ toc_00_0B8A.toc_00_0BA0:
     ld   a, [$FFA1]
     ld   d, a
     ld   a, l
-    sub  d
+    sub  a, d
     ld   l, a
 toc_00_0B8A.else_00_0BB6:
     inc  c
@@ -1585,7 +1585,7 @@ toc_00_0B8A.else_00_0BB6:
     ld   a, [$FFA1]
     ld   d, a
     ld   a, l
-    sub  d
+    sub  a, d
     ld   l, a
     jr   .toc_00_0BA0
 
@@ -1598,11 +1598,11 @@ toc_00_0B8A.else_00_0BC4:
     ld   a, [$FFA1]
     ld   d, a
     ld   a, l
-    add  d
-    add  d
+    add  a, d
+    add  a, d
     ld   l, a
     ld   a, [$FFA2]
-    add  l
+    add  a, l
     ld   l, a
     jr   .toc_00_0BA0
 
