@@ -360,44 +360,23 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     let nrows = ntiles / ncolumns
     let pixelsPerTile = 8
     let imageSize = NSSize(width: CGFloat(ncolumns * pixelsPerTile), height: CGFloat(nrows * pixelsPerTile))
-    let image = NSImage(size: imageSize)
-    image.lockFocusFlipped(true)
 
     let colorForBytePair: (UInt8, UInt8, UInt8) -> UInt8 = { highByte, lowByte, bit in
       let mask = UInt8(0x01) << bit
       return (((highByte & mask) >> bit) << 1) | ((lowByte & mask) >> bit)
     }
 
-    NSColor.black.setFill()
-    NSRect(origin: .zero, size: imageSize).fill()
-
-    let colors: [NSColor] = [
-      .black,
-      .darkGray,
-      .lightGray,
-      .white,
-    ]
-
     var tileColumn = 0
     var tileRow = 0
     var pixelRow = 0
-    let pixel = NSRect(x: 0, y: 0, width: 1, height: 1)
-    var lastColor: UInt8 = 0
+    var imageData = Data(count: ncolumns * 8 * nrows * 8)
     for bytePairs in [UInt8](data).chunked(into: 2) {
       let lowByte = bytePairs.first!
       let highByte = bytePairs.last!
 
-      for i: UInt8 in 0..<8 {
-        let color = colorForBytePair(highByte, lowByte, 7 - i)
-        if color == 0 {
-          continue  // No need to draw the background color
-        }
-        if color != lastColor {
-          lastColor = color
-          colors[Int(lastColor)].set()
-        }
-        pixel.offsetBy(dx: CGFloat(tileColumn) * 8 + CGFloat(i),
-                       dy: CGFloat(tileRow) * 8 + CGFloat(pixelRow)).fill()
+      for i in 0..<8 {
+        let color = colorForBytePair(highByte, lowByte, UInt8(7 - i))
+        imageData[Int(tileColumn * 8 + i) + Int((tileRow * 8 + pixelRow) * (ncolumns * 8))] = color
       }
       pixelRow += 1
       if pixelRow >= 16 {
@@ -411,7 +390,28 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       }
     }
 
-    image.unlockFocus()
+    let colors: [UInt8: UInt8] = [
+      0: 0x00,
+      1: UInt8(NSColor.darkGray.whiteComponent * 255),
+      2: UInt8(NSColor.lightGray.whiteComponent * 255),
+      3: 0xFF,
+    ]
+    var pixels = imageData.map { colors[$0]! }
+    let providerRef = CGDataProvider(data: NSData(bytes: &pixels, length: pixels.count))!
+    let cgImage = CGImage(
+      width: ncolumns * 8,
+      height: nrows * 8,
+      bitsPerComponent: 8,
+      bitsPerPixel: 8,
+      bytesPerRow: ncolumns * 8,
+      space: CGColorSpaceCreateDeviceGray(),
+      bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.none.rawValue),
+      provider: providerRef,
+      decode: nil,
+      shouldInterpolate: false,
+      intent: .defaultIntent
+    )!
+    let image = NSImage(cgImage: cgImage, size: imageSize)
 
     self.tileDataImage = image
   }
