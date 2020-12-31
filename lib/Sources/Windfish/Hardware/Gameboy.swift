@@ -87,3 +87,27 @@ final class DMAProxy: AddressableMemory {
     return .memory(address)
   }
 }
+
+extension Gameboy {
+  /** Advances the emulation by one machine cycle. */
+  public func advance() {
+    // DMA controller is always able to access memory directly.
+    dmaController.advance(memory: memory)
+
+    let proxyMemory: AddressableMemory = dmaController.oamLocked ? dmaProxy : memory
+    cpu.advance(memory: proxyMemory)
+    lcdController.advance(memory: proxyMemory)
+  }
+
+  /** Advances the emulation by one instruction. */
+  public func advanceInstruction() {
+    if cpu.machineInstruction.spec == nil {
+      advance()
+    }
+    if let sourceLocation = cpu.machineInstruction.sourceLocation {
+      while sourceLocation == cpu.machineInstruction.sourceLocation, !cpu.halted {
+        advance()
+      }
+    }
+  }
+}

@@ -56,6 +56,7 @@ extension LR35902.Emulation {
     rl_r.self,
     rlca.self,
     rra.self,
+    rrc_r.self,
     rrca.self,
     res_b_r.self,
     set_b_r.self,
