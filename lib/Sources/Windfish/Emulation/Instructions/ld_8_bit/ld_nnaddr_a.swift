@@ -1,14 +1,14 @@
 import Foundation
 
 extension LR35902.Emulation {
-  final class ld_nnadr_a: InstructionEmulator {
+  final class ld_nnadr_a: InstructionEmulator, InstructionEmulatorInitializable {
     init?(spec: LR35902.Instruction.Spec) {
       guard case .ld(.imm16addr, .a) = spec else {
         return nil
       }
     }
 
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.MachineInstruction.MicroCodeResult {
+    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.Emulation.EmulationResult {
       if cycle == 1 {
         immediate = UInt16(truncatingIfNeeded: memory.read(from: cpu.pc))
         cpu.pc += 1

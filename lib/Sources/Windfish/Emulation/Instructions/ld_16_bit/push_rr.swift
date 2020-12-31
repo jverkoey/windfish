@@ -1,7 +1,7 @@
 import Foundation
 
 extension LR35902.Emulation {
-  final class push_rr: InstructionEmulator {
+  final class push_rr: InstructionEmulator, InstructionEmulatorInitializable {
     init?(spec: LR35902.Instruction.Spec) {
       let registers16 = LR35902.Instruction.Numeric.registers16
       guard case .push(let src) = spec, registers16.contains(src) else {
@@ -10,7 +10,7 @@ extension LR35902.Emulation {
       self.src = src
     }
 
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.MachineInstruction.MicroCodeResult {
+    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.Emulation.EmulationResult {
       if cycle == 1 {
         cpu.sp -= 1
         return .continueExecution

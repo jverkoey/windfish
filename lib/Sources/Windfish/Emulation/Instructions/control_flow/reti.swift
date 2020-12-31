@@ -1,14 +1,14 @@
 import Foundation
 
 extension LR35902.Emulation {
-  final class reti: InstructionEmulator {
+  final class reti: InstructionEmulator, InstructionEmulatorInitializable {
     init?(spec: LR35902.Instruction.Spec) {
       guard case .reti = spec else {
         return nil
       }
     }
 
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.MachineInstruction.MicroCodeResult {
+    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.Emulation.EmulationResult {
       if cycle == 1 {
         pc = UInt16(truncatingIfNeeded: memory.read(from: cpu.sp))
         cpu.sp += 1

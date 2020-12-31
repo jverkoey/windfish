@@ -2,10 +2,10 @@ import XCTest
 @testable import Windfish
 
 /**
- Note that each test includes state.a single nop instruction for padding at the end of the ROM due to how instructions are
+ Note that each test includes a single nop instruction for padding at the end of the ROM due to how instructions are
  simultaneously executed and loaded in state.a single machine cycle.
  */
-class MicrocodeEmulationTests: XCTestCase {
+class EmulationTests: XCTestCase {
   private func createGameboy(loadedWith assembly: String) -> Gameboy {
     // Pad every test with state.a nop at the end so that the post-execution opcode fetch has something to fetch.
     let (instructions, errors) = RGBDSAssembler.assemble(assembly: assembly + "\n nop")
@@ -71,7 +71,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -118,7 +118,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(0x12)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -165,7 +165,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -220,7 +220,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -282,7 +282,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(0x12)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -332,7 +332,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm16(0x0000)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -376,7 +376,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm16(0xC000)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -417,7 +417,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -466,7 +466,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -502,7 +502,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(0xab)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -549,7 +549,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(0xab)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -584,7 +584,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -634,7 +634,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -671,7 +671,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -721,7 +721,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -759,7 +759,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm16(0x1234)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -808,7 +808,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm16(0xFF80)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -847,7 +847,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -886,7 +886,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -945,7 +945,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -1006,7 +1006,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm16(0x0000)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: "nop\n" + assembly)
@@ -1071,7 +1071,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm16(0x0000)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -1129,7 +1129,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly + "\n nop\n nop")
@@ -1165,7 +1165,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(UInt8(bitPattern: 1))) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly + "\n nop\n nop")
@@ -1229,7 +1229,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(UInt8(bitPattern: 1))) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -1287,7 +1287,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm16(0x0000)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: "nop\n" + assembly)
@@ -1365,7 +1365,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm16(0x0000)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -1424,7 +1424,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: "nop\n nop\n" + assembly)
@@ -1497,7 +1497,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -1556,7 +1556,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: "nop\n nop\n" + assembly)
@@ -1605,7 +1605,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -1662,7 +1662,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(16)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -1704,7 +1704,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(16)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -1746,7 +1746,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(16)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -1788,7 +1788,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(0b0000_0010)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -1830,7 +1830,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -1877,7 +1877,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -1931,7 +1931,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -1986,7 +1986,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -2044,7 +2044,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -2102,7 +2102,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -2160,7 +2160,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -2218,7 +2218,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -2276,7 +2276,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -2334,7 +2334,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -2380,7 +2380,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -2425,7 +2425,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -2466,7 +2466,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly + "\n nop")
@@ -2549,7 +2549,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -2603,7 +2603,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -2657,7 +2657,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -2716,7 +2716,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -2767,7 +2767,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -2813,7 +2813,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -2860,7 +2860,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(0xFF)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -2903,7 +2903,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(0xF0)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -2946,7 +2946,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -2999,7 +2999,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -3054,7 +3054,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -3114,7 +3114,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -3164,7 +3164,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(1)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -3208,7 +3208,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(1)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -3252,7 +3252,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(1)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -3295,7 +3295,7 @@ nop
       default:      return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(1)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -3338,7 +3338,7 @@ nop
       default:      return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(1)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -3381,7 +3381,7 @@ nop
       default:      return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(1)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -3424,7 +3424,7 @@ nop
       default:      return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(1)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -3467,7 +3467,7 @@ nop
       default:      return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(1)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -3519,7 +3519,7 @@ nop
       default:      return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(1)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -3571,7 +3571,7 @@ nop
       default:      return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0, immediate: .imm8(1)) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -3616,7 +3616,7 @@ nop
 
   func test_halt() throws {
     // Given
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union([.halt])
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union([.halt])
     let instructions = [.halt].map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: assembly)
@@ -3647,7 +3647,7 @@ nop
       default: return false
       }
     }
-    MicrocodeEmulationTests.testedSpecs = MicrocodeEmulationTests.testedSpecs.union(specs)
+    EmulationTests.testedSpecs = EmulationTests.testedSpecs.union(specs)
     let instructions = specs.map { LR35902.Instruction(spec: $0) }
     let assembly = instructions.map { RGBDSDisassembler.statement(for: $0).formattedString }.joined(separator: "\n")
     let gameboy = createGameboy(loadedWith: (0..<100).map { _ in "nop" }.joined(separator: "\n") + "\n" + assembly )

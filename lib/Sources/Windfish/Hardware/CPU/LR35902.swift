@@ -10,21 +10,9 @@ public final class LR35902 {
   public typealias Address = UInt16
 
   public final class MachineInstruction {
-    enum MicroCodeResult {
-      case continueExecution
-      case fetchNext
-      case fetchPrefix
-    }
-    typealias MicroCode = (LR35902, AddressableMemory, Int, Disassembler.SourceLocation) -> MicroCodeResult
-
     internal init() {}
 
     var spec: Instruction.Spec?
-    var microcode: MicroCode? {
-      didSet {
-        cycle = 0
-      }
-    }
     var instructionEmulator: InstructionEmulator? {
       didSet {
         cycle = 0
@@ -172,13 +160,13 @@ public final class LR35902 {
   /** Trace information for a given register. */
   public var registerTraces: [LR35902.Instruction.Numeric: RegisterTrace] = [:]
 
-  var nextAction: MachineInstruction.MicroCodeResult = .fetchNext
+  var nextAction: LR35902.Emulation.EmulationResult = .fetchNext
   var specIndex: Int = 0
 
   /** Initializes the state with boot values. */
   public init() {}
 
-  internal init(a: UInt8 = 0, b: UInt8 = 0, c: UInt8 = 0, d: UInt8 = 0, e: UInt8 = 0, h: UInt8 = 0, l: UInt8 = 0, fzero: Bool = false, fsubtract: Bool = false, fhalfcarry: Bool = false, fcarry: Bool = false, ime: Bool = false, interruptEnable: LR35902.Instruction.Interrupt = [], interruptFlag: LR35902.Instruction.Interrupt = [], halted: Bool = false, imeScheduledCyclesRemaining: Int = 0, sp: UInt16 = 0, pc: LR35902.Address = 0, machineInstruction: LR35902.MachineInstruction = MachineInstruction(), registerTraces: [LR35902.Instruction.Numeric : LR35902.RegisterTrace] = [:], nextAction: LR35902.MachineInstruction.MicroCodeResult = .fetchNext) {
+  internal init(a: UInt8 = 0, b: UInt8 = 0, c: UInt8 = 0, d: UInt8 = 0, e: UInt8 = 0, h: UInt8 = 0, l: UInt8 = 0, fzero: Bool = false, fsubtract: Bool = false, fhalfcarry: Bool = false, fcarry: Bool = false, ime: Bool = false, interruptEnable: LR35902.Instruction.Interrupt = [], interruptFlag: LR35902.Instruction.Interrupt = [], halted: Bool = false, imeScheduledCyclesRemaining: Int = 0, sp: UInt16 = 0, pc: LR35902.Address = 0, machineInstruction: LR35902.MachineInstruction = MachineInstruction(), registerTraces: [LR35902.Instruction.Numeric : LR35902.RegisterTrace] = [:], nextAction: LR35902.Emulation.EmulationResult = .fetchNext) {
     self.a = a
     self.b = b
     self.c = c

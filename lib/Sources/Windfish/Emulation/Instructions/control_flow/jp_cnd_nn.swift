@@ -1,7 +1,7 @@
 import Foundation
 
 extension LR35902.Emulation {
-  final class jp_cnd_nn: InstructionEmulator {
+  final class jp_cnd_nn: InstructionEmulator, InstructionEmulatorInitializable {
     init?(spec: LR35902.Instruction.Spec) {
       guard case .jp(let cnd, .imm16) = spec else {
         return nil
@@ -9,7 +9,7 @@ extension LR35902.Emulation {
       self.cnd = cnd
     }
 
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.MachineInstruction.MicroCodeResult {
+    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.Emulation.EmulationResult {
       if cycle == 1 {
         immediate = UInt16(truncatingIfNeeded: memory.read(from: cpu.pc))
         cpu.pc += 1
