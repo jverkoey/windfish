@@ -245,43 +245,46 @@ extension LCDController {
   }
 
   private func backgroundPixel(x: UInt8, y: UInt8, window: Bool) -> UInt8 {
-    let tileX = x >> 3
-    let tileY = y >> 3
-    let tileOffsetX = x % 8
-    let tileOffsetY = y % 8
+    let wideX = UInt16(truncatingIfNeeded: x)
+    let wideY = UInt16(truncatingIfNeeded: y)
+    let tileX = Int16(bitPattern: wideX / 8)
+    let tileY = Int16(bitPattern: wideY / 8)
+    let tileOffsetX = Int16(bitPattern: wideX % 8)
+    let tileOffsetY = Int16(bitPattern: wideY % 8)
 
     let tileIndex: UInt8
-    let tileMapIndex = tileX + tileY << 5
+    let tileMapIndex = Int(tileX + tileY &* 32)
     switch window ? windowTileMapAddress : backgroundTileMapAddress {
     case .x9800:
-      tileIndex = tileMap[Int(tileMapIndex)]
+      tileIndex = tileMap[tileMapIndex]
     case .x9C00:
-      tileIndex = tileMap[(0x9C00 - 0x9800) + Int(tileMapIndex)]
+      tileIndex = tileMap[0x400 + tileMapIndex]
     }
 
-    let tileDataIndex = (tileIndex << 4) + tileOffsetY * 2
     let tileData0: UInt8
     let tileData1: UInt8
     switch tileDataAddress {
     case .x8000:
-      tileData0 = tileData[Int(tileDataIndex)]
-      tileData1 = tileData[Int(tileDataIndex + 1)]
+      let tileDataIndex = Int(truncatingIfNeeded: Int16(bitPattern: UInt16(truncatingIfNeeded: (tileIndex &* 16))) &+ tileOffsetY &* 2)
+      tileData0 = tileData[tileDataIndex]
+      tileData1 = tileData[tileDataIndex + 1]
     case .x8800:
-      tileData0 = tileData[(0x8800 - 0x8000) + Int(tileDataIndex)]
-      tileData1 = tileData[(0x8800 - 0x8000) + Int(tileDataIndex + 1)]
+      let tileDataIndex = Int(truncatingIfNeeded: 0x1000 + Int16(truncatingIfNeeded: Int8(bitPattern: tileIndex)) &* 16 &+ tileOffsetY &* 2)
+      tileData0 = tileData[tileDataIndex]
+      tileData1 = tileData[tileDataIndex + 1]
     }
 
-    let lsbSet = (tileData0 & (0x80 >> tileOffsetX)) > 0
-    let msbSet = (tileData1 & (0x80 >> tileOffsetX)) > 0
+    let lsb: UInt8 = (tileData0 & (0x80 >> tileOffsetX)) > 0 ? 0b01 : 0
+    let msb: UInt8 = (tileData1 & (0x80 >> tileOffsetX)) > 0 ? 0b10 : 0
 
-    lastBackgroundPixel = (msbSet ? 0x2 : 0) | (lsbSet ? 0x1 : 0)
+    lastBackgroundPixel = msb | lsb
     return lastBackgroundPixel
   }
 
   private func plot() {
-    if windowEnable && windowX <= scanlineX && windowY <= scanlineY {
+    if windowEnable && (windowX &- 7) <= scanlineX && windowY <= scanlineY {
       plot(x: scanlineX, y: scanlineY,
-           byte: backgroundPixel(x: scanlineX &- windowX, y: windowYPlot, window: true),
+           byte: backgroundPixel(x: scanlineX &- (windowX &- 7), y: windowYPlot, window: true),
            palette: backgroundPalette)
     } else if backgroundEnable {
       plot(x: scanlineX, y: scanlineY,
