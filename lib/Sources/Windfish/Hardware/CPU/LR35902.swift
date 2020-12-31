@@ -25,6 +25,11 @@ public final class LR35902 {
         cycle = 0
       }
     }
+    var instructionEmulator: InstructionEmulator? {
+      didSet {
+        cycle = 0
+      }
+    }
     var sourceLocation: Disassembler.SourceLocation?
     var cycle: Int = 0
 
