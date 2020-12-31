@@ -6,6 +6,7 @@ import Foundation
 // - https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
 // - http://gameboy.mongenel.com/dmg/asmmemmap.html
 // - https://hacktix.github.io/GBEDG/ppu/#the-concept-of-scanlines
+// - https://blog.tigris.fr/2019/09/15/writing-an-emulator-the-first-pixel/
 
 public final class LCDController {
   static let tileMapRegion: ClosedRange<LR35902.Address> = 0x9800...0x9FFF

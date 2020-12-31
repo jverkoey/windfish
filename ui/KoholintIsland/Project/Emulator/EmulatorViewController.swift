@@ -130,6 +130,20 @@ protocol EmulatorViewControllerDelegate: NSObject {
   func emulatorViewControllerDidStepIn(_ emulatorViewController: EmulatorViewController)
 }
 
+final class PixelImageView: NSImageView {
+  override init(frame frameRect: NSRect) {
+    super.init(frame: frameRect)
+
+    wantsLayer = true
+    layer?.shouldRasterize = true
+    layer?.magnificationFilter = .nearest
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+}
+
 final class EmulatorViewController: NSViewController, TabSelectable {
   let deselectedTabImage = NSImage(systemSymbolName: "cpu", accessibilityDescription: nil)!
   let selectedTabImage = NSImage(systemSymbolName: "cpu", accessibilityDescription: nil)!
@@ -142,8 +156,8 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   var ramTableView: EditorTableView?
   let instructionAssemblyLabel = CreateLabel()
   let instructionBytesLabel = CreateLabel()
-  let tileDataImageView = NSImageView()
-  let screenImageView = NSImageView()
+  let tileDataImageView = PixelImageView()
+  let screenImageView = PixelImageView()
   let fpsLabel = CreateLabel()
   private let cpuView = LR35902View()
 
