@@ -7,8 +7,13 @@ import Foundation
 extension Gameboy.Cartridge {
   /** Implementation of the MBC1 memory bank controller. */
   final class MBC1: MemoryBankController {
+    deinit {
+      data.deallocate()
+    }
+
     init(data: Data) {
-      self.data = data
+      self.data = UnsafeMutableRawBufferPointer.allocate(byteCount: data.count, alignment: 1)
+      self.data.copyBytes(from: data)
 
       if data.count > 0x149,
          let ramSize = RAMSize(rawValue: data[0x149]){
@@ -18,14 +23,17 @@ extension Gameboy.Cartridge {
       }
 
       // TODO: Allow this to be saved to and loaded from disk.
-      ram = Data(count: ramCapacity())
+      ram = UnsafeMutableRawBufferPointer.allocate(byteCount: self.ramSize.capacity, alignment: 1)
     }
+
+    private(set) var selectedBank: Gameboy.Cartridge.Bank = 0
+    private let data: UnsafeMutableRawBufferPointer
 
     /** Whether or not RAM is enabled. */
     var ramEnabled = false
 
     /** The cartridge's internal RAM. */
-    var ram: Data?
+    var ram: UnsafeMutableRawBufferPointer
 
     private enum RAMSize: UInt8 {
       case none = 0
@@ -33,17 +41,18 @@ extension Gameboy.Cartridge {
       case one8kb = 2
       case four32kb = 3
       case sixteen128kb = 4
-    }
-    private let ramSize: RAMSize
-    private func ramCapacity() -> Int {
-      switch ramSize {
-      case .none:         return 0
-      case .one2kb:       return 2 * 1024
-      case .one8kb:       return 8 * 1024
-      case .four32kb:     return 32 * 1024
-      case .sixteen128kb: return 128 * 1024
+
+      fileprivate var capacity: Int {
+        switch self {
+        case .none:         return 0
+        case .one2kb:       return 2 * 1024
+        case .one8kb:       return 8 * 1024
+        case .four32kb:     return 32 * 1024
+        case .sixteen128kb: return 128 * 1024
+        }
       }
     }
+    private let ramSize: RAMSize
 
     /** Possible ROM/RAM modes. */
     enum Mode {
@@ -75,7 +84,7 @@ extension Gameboy.Cartridge {
         case .none:
           preconditionFailure("Cartridge has no RAM.")
         case .one2kb, .one8kb:
-          return ram![Int(address) - 0xA000]
+          return ram[Int(address) - 0xA000]
         case .four32kb, .sixteen128kb:
           preconditionFailure("Bankable RAM not implemented.")
         }
@@ -124,7 +133,7 @@ extension Gameboy.Cartridge {
         case .none:
           preconditionFailure("Cartridge has no RAM.")
         case .one2kb, .one8kb:
-          ram![Int(address) - 0xA000] = byte
+          ram[Int(address) - 0xA000] = byte
         case .four32kb, .sixteen128kb:
           preconditionFailure("Bankable RAM not implemented.")
         }
@@ -137,8 +146,5 @@ extension Gameboy.Cartridge {
     func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
       return .cartridge(Gameboy.Cartridge.location(for: address, in: (selectedBank == 0) ? 1 : selectedBank)!)
     }
-
-    private(set) var selectedBank: Gameboy.Cartridge.Bank = 0
-    private let data: Data
   }
 }
