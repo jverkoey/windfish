@@ -1100,6 +1100,7 @@ extension LR35902 {
   public func advance(memory: AddressableMemory) {
     // https://gekkio.fi/files/gb-docs/gbctr.pdf
     if isRunning {
+      let machineInstruction = self.machineInstruction
       // Execution phase
       if nextAction == .continueExecution, let loaded = machineInstruction.loaded {
         machineInstruction.cycle += 1

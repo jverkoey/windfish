@@ -10,7 +10,7 @@ extension Gameboy {
       self.soundController = soundController
     }
 
-    public var tracers: [AddressableMemory] = []
+    public var tracers = ContiguousArray<AddressableMemory>()
 
     public var cartridge: Cartridge?
     public let cpu: LR35902
