@@ -10,6 +10,7 @@ class EndToEndTests: XCTestCase {
   }
 
   func testWallTimePerformance() throws {
+    try XCTSkipIf(true)
     let byteValue = UInt8(0xFA)
     // ~0.687
     measure {
@@ -20,6 +21,7 @@ class EndToEndTests: XCTestCase {
   }
 
   func testWallTimePerformanceTruncatingIfNeeded() throws {
+    try XCTSkipIf(true)
     let byteValue = UInt8(0xFA)
     // ~0.664
     measure {
@@ -30,6 +32,7 @@ class EndToEndTests: XCTestCase {
   }
 
   func testWallTimePerformanceUnsafebound() throws {
+    try XCTSkipIf(true)
     let byteValue = UInt8(0xFA)
     // ~0.621
     measure {

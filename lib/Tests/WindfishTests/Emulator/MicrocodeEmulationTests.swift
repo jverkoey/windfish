@@ -2,12 +2,12 @@ import XCTest
 @testable import Windfish
 
 /**
- Note that each test includes a single nop instruction for padding at the end of the ROM due to how instructions are
- simultaneously executed and loaded in a single machine cycle.
+ Note that each test includes state.a single nop instruction for padding at the end of the ROM due to how instructions are
+ simultaneously executed and loaded in state.a single machine cycle.
  */
 class MicrocodeEmulationTests: XCTestCase {
   private func createGameboy(loadedWith assembly: String) -> Gameboy {
-    // Pad every test with a nop at the end so that the post-execution opcode fetch has something to fetch.
+    // Pad every test with state.a nop at the end so that the post-execution opcode fetch has something to fetch.
     let (instructions, errors) = RGBDSAssembler.assemble(assembly: assembly + "\n nop")
     precondition(errors.isEmpty, "Errors: \(errors)")
     let data = instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
@@ -96,7 +96,7 @@ nop
         state.pc += 1
         switch instruction.spec {
         case .ld(let dst, let src) where registers8.contains(dst) && registers8.contains(src):
-          self[dst] = UInt8(0xab)
+          state[dst] = UInt8(0xab)
         default:
           fatalError()
         }
@@ -142,7 +142,7 @@ nop
 
         switch instruction.spec {
         case .ld(let dst, .imm8) where registers8.contains(dst):
-          self[dst] = UInt8(0x12)
+          state[dst] = UInt8(0x12)
         default:
           fatalError()
         }
@@ -192,7 +192,7 @@ nop
 
         switch instruction.spec {
         case .ld(let dst, let src) where registers8.contains(dst) && registersAddr.contains(src):
-          self[dst] = UInt8(0x12)
+          state[dst] = UInt8(0x12)
         default:
           fatalError()
         }
@@ -246,7 +246,7 @@ nop
         switch instruction.spec {
         case .ld(let dst, let src) where registersAddr.contains(dst) && registers8.contains(src):
           testMemory.ignoreWrites = true
-          gameboy.memory.write(self[src], to: self[dst])
+          gameboy.memory.write(state[src], to: state[dst])
           testMemory.ignoreWrites = false
         default:
           fatalError()
@@ -356,7 +356,7 @@ nop
 
         switch instruction.spec {
         case .ld(.a, .imm16addr):
-          a = UInt8(0xFA)  // opcode for this instruction
+          state.a = UInt8(0xFA)  // opcode for this instruction
         default:
           fatalError()
         }
@@ -392,7 +392,7 @@ nop
         fatalError()
       }
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -435,7 +435,7 @@ nop
         fatalError()
       }
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -445,7 +445,7 @@ nop
       state.pc += 1
       switch instruction.spec {
       case .ld(.a, .ffccaddr):
-        a = UInt8(0x12)
+        state.a = UInt8(0x12)
       default:
         fatalError()
       }
@@ -477,7 +477,7 @@ nop
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -518,7 +518,7 @@ nop
       default:
         fatalError()
       }
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -528,7 +528,7 @@ nop
       state.pc += 2
       switch instruction.spec {
       case .ld(.a, .ffimm8addr):
-        a = UInt8(0x12)
+        state.a = UInt8(0x12)
       default:
         fatalError()
       }
@@ -559,7 +559,7 @@ nop
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -602,7 +602,7 @@ nop
         fatalError()
       }
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -612,7 +612,7 @@ nop
       state.pc += 1
       switch instruction.spec {
       case .ldd(.a, .hladdr):
-        a = UInt8(0x12)
+        state.a = UInt8(0x12)
         state.hl -= 1
       default:
         fatalError()
@@ -645,7 +645,7 @@ nop
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -689,7 +689,7 @@ nop
         fatalError()
       }
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -699,7 +699,7 @@ nop
       state.pc += 1
       switch instruction.spec {
       case .ldi(.a, .hladdr):
-        a = UInt8(0x12)
+        state.a = UInt8(0x12)
         state.hl += 1
       default:
         fatalError()
@@ -732,7 +732,7 @@ nop
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -775,7 +775,7 @@ nop
         fatalError()
       }
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -786,7 +786,7 @@ nop
 
       switch instruction.spec {
       case .ld(let dst, .imm16) where registers16.contains(dst):
-        self[dst] = UInt16(0x1234)
+        state[dst] = UInt16(0x1234)
       default:
         fatalError()
       }
@@ -818,7 +818,7 @@ nop
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -858,7 +858,7 @@ nop
 
     // When
     for (index, instruction) in instructions.enumerated() {
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -903,7 +903,7 @@ nop
         fatalError()
       }
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -968,7 +968,7 @@ nop
         fatalError()
       }
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -979,7 +979,7 @@ nop
       state.sp += 2
       switch instruction.spec {
       case .pop(let dst) where registers16.contains(dst):
-        self[dst] = UInt16(0x1234)
+        state[dst] = UInt16(0x1234)
       default:
         fatalError()
       }
@@ -1041,7 +1041,7 @@ nop
         fatalError()
       }
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -1049,7 +1049,7 @@ nop
 
       assertEqual(gameboy.cpu, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
       gameboy.cpu.pc = stashedpc + 3
-      gameboy.cpu.machineInstruction = .init() // Reset the cpu's machine instruction cache to force a re-load
+      gameboy.cpu.machineInstruction = .init() // Reset the cpu's machine instruction cache to force state.a re-load
     }
 
     XCTAssertEqual(testMemory.reads, [
@@ -1103,7 +1103,7 @@ nop
         fatalError()
       }
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -1141,7 +1141,7 @@ nop
     for instruction in instructions {
       let stashedpc = gameboy.cpu.pc
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -1149,7 +1149,7 @@ nop
 
       assertEqual(gameboy.cpu, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
       gameboy.cpu.pc = stashedpc + 1
-      gameboy.cpu.machineInstruction = .init() // Reset the cpu's machine instruction cache to force a re-load
+      gameboy.cpu.machineInstruction = .init() // Reset the cpu's machine instruction cache to force state.a re-load
     }
 
     XCTAssertEqual(testMemory.reads, [0, 2])
@@ -1199,7 +1199,7 @@ nop
         fatalError()
       }
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -1207,7 +1207,7 @@ nop
 
       assertEqual(gameboy.cpu, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
       gameboy.cpu.pc = stashedpc + 2
-      gameboy.cpu.machineInstruction = .init() // Reset the cpu's machine instruction cache to force a re-load
+      gameboy.cpu.machineInstruction = .init() // Reset the cpu's machine instruction cache to force state.a re-load
     }
 
     XCTAssertEqual(testMemory.reads, [
@@ -1261,7 +1261,7 @@ nop
         fatalError()
       }
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -1323,7 +1323,7 @@ nop
         fatalError()
       }
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -1332,7 +1332,7 @@ nop
 
       assertEqual(gameboy.cpu, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
       gameboy.cpu.pc = stashedpc + 3
-      gameboy.cpu.machineInstruction = .init() // Reset the cpu's machine instruction cache to force a re-load
+      gameboy.cpu.machineInstruction = .init() // Reset the cpu's machine instruction cache to force state.a re-load
     }
 
     XCTAssertEqual(testMemory.reads, [
@@ -1398,7 +1398,7 @@ nop
         fatalError()
       }
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -1466,7 +1466,7 @@ nop
         fatalError()
       }
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -1475,7 +1475,7 @@ nop
 
       assertEqual(gameboy.cpu, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
       gameboy.cpu.pc = stashedpc + 1
-      gameboy.cpu.machineInstruction = .init() // Reset the cpu's machine instruction cache to force a re-load
+      gameboy.cpu.machineInstruction = .init() // Reset the cpu's machine instruction cache to force state.a re-load
     }
 
     XCTAssertEqual(testMemory.reads, [
@@ -1530,7 +1530,7 @@ nop
         fatalError()
       }
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -1576,7 +1576,7 @@ nop
     for instruction in instructions {
       let stashedpc = gameboy.cpu.pc
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -1586,7 +1586,7 @@ nop
 
       assertEqual(gameboy.cpu, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
       gameboy.cpu.pc = stashedpc + 1
-      gameboy.cpu.machineInstruction = .init() // Reset the cpu's machine instruction cache to force a re-load
+      gameboy.cpu.machineInstruction = .init() // Reset the cpu's machine instruction cache to force state.a re-load
     }
 
     XCTAssertEqual(testMemory.reads, [
@@ -1633,7 +1633,7 @@ nop
         default:
           fatalError()
         }
-      } expectedMutations: { (state: inout LR35902.State) in
+      } expectedMutations: { state in
         if index == 0 {
           state.pc += 1
         }
@@ -1641,7 +1641,7 @@ nop
 
         switch instruction.spec {
         case .cb(.res(let bit, let register)) where registers8.contains(register):
-          self[register] = expectedResults[bit]!
+          state[register] = expectedResults[bit]!
         default:
           fatalError()
         }
@@ -1683,9 +1683,9 @@ nop
           state.pc += 1
         }
         state.pc += 2
-        fsubtract = true
-        fcarry = false
-        fhalfcarry = false
+        state.fsubtract = true
+        state.fcarry = false
+        state.fhalfcarry = false
         state.fzero = true
       }
     }
@@ -1725,9 +1725,9 @@ nop
           state.pc += 1
         }
         state.pc += 2
-        fsubtract = true
-        fcarry = true
-        fhalfcarry = false
+        state.fsubtract = true
+        state.fcarry = true
+        state.fhalfcarry = false
         state.fzero = false
       }
     }
@@ -1767,9 +1767,9 @@ nop
           state.pc += 1
         }
         state.pc += 2
-        fsubtract = true
-        fcarry = false
-        fhalfcarry = false
+        state.fsubtract = true
+        state.fcarry = false
+        state.fhalfcarry = false
         state.fzero = false
       }
     }
@@ -1809,9 +1809,9 @@ nop
           state.pc += 1
         }
         state.pc += 2
-        fsubtract = true
-        fcarry = true
-        fhalfcarry = true
+        state.fsubtract = true
+        state.fcarry = true
+        state.fhalfcarry = true
         state.fzero = false
       }
     }
@@ -1856,9 +1856,9 @@ nop
           state.pc += 1
         }
         state.pc += 1
-        fsubtract = true
-        fcarry = false
-        fhalfcarry = false
+        state.fsubtract = true
+        state.fcarry = false
+        state.fhalfcarry = false
         state.fzero = true
       }
     }
@@ -1903,15 +1903,15 @@ nop
           state.pc += 1
         }
         state.pc += 1
-        fsubtract = true
-        fhalfcarry = false
+        state.fsubtract = true
+        state.fhalfcarry = false
 
         switch instruction.spec {
         case .cp(.a):
-          fcarry = false
+          state.fcarry = false
           state.fzero = true
         default:
-          fcarry = true
+          state.fcarry = true
           state.fzero = false
         }
       }
@@ -1957,15 +1957,15 @@ nop
           state.pc += 1
         }
         state.pc += 1
-        fsubtract = true
-        fhalfcarry = false
+        state.fsubtract = true
+        state.fhalfcarry = false
 
         switch instruction.spec {
         case .cp(.a):
-          fcarry = false
+          state.fcarry = false
           state.fzero = true
         default:
-          fcarry = false
+          state.fcarry = false
           state.fzero = false
         }
       }
@@ -2007,7 +2007,7 @@ nop
       gameboy.cpu.fhalfcarry = true
       gameboy.cpu.fzero = true
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -2015,13 +2015,13 @@ nop
         state.pc += 1
       }
       state.pc += 1
-      fsubtract = false
-      fcarry = false
-      fhalfcarry = false
+      state.fsubtract = false
+      state.fcarry = false
+      state.fhalfcarry = false
       state.fzero = false
       switch instruction.spec {
       case .inc(let register) where registers8.contains(register):
-        self[register] = UInt8(2)
+        state[register] = UInt8(2)
       default:
         fatalError()
       }
@@ -2065,7 +2065,7 @@ nop
       gameboy.cpu.fhalfcarry = false
       gameboy.cpu.fzero = false
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -2073,13 +2073,13 @@ nop
         state.pc += 1
       }
       state.pc += 1
-      fsubtract = false
-      fcarry = false
-      fhalfcarry = true
+      state.fsubtract = false
+      state.fcarry = false
+      state.fhalfcarry = true
       state.fzero = true
       switch instruction.spec {
       case .inc(let register) where registers8.contains(register):
-        self[register] = UInt8(0)
+        state[register] = UInt8(0)
       default:
         fatalError()
       }
@@ -2123,7 +2123,7 @@ nop
       gameboy.cpu.fhalfcarry = false
       gameboy.cpu.fzero = true
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -2131,13 +2131,13 @@ nop
         state.pc += 1
       }
       state.pc += 1
-      fsubtract = false
-      fcarry = false
-      fhalfcarry = true
+      state.fsubtract = false
+      state.fcarry = false
+      state.fhalfcarry = true
       state.fzero = false
       switch instruction.spec {
       case .inc(let register) where registers8.contains(register):
-        self[register] = UInt8(0x10)
+        state[register] = UInt8(0x10)
       default:
         fatalError()
       }
@@ -2181,7 +2181,7 @@ nop
       gameboy.cpu.fhalfcarry = true
       gameboy.cpu.fzero = true
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -2189,13 +2189,13 @@ nop
         state.pc += 1
       }
       state.pc += 1
-      fsubtract = true
-      fcarry = false
-      fhalfcarry = false
+      state.fsubtract = true
+      state.fcarry = false
+      state.fhalfcarry = false
       state.fzero = false
       switch instruction.spec {
       case .dec(let register) where registers8.contains(register):
-        self[register] = UInt8(254)
+        state[register] = UInt8(254)
       default:
         fatalError()
       }
@@ -2239,7 +2239,7 @@ nop
       gameboy.cpu.fhalfcarry = true
       gameboy.cpu.fzero = false
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -2247,13 +2247,13 @@ nop
         state.pc += 1
       }
       state.pc += 1
-      fsubtract = true
-      fcarry = false
-      fhalfcarry = false
+      state.fsubtract = true
+      state.fcarry = false
+      state.fhalfcarry = false
       state.fzero = true
       switch instruction.spec {
       case .dec(let register) where registers8.contains(register):
-        self[register] = UInt8(0)
+        state[register] = UInt8(0)
       default:
         fatalError()
       }
@@ -2297,7 +2297,7 @@ nop
       gameboy.cpu.fhalfcarry = false
       gameboy.cpu.fzero = true
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -2305,13 +2305,13 @@ nop
         state.pc += 1
       }
       state.pc += 1
-      fsubtract = true
-      fcarry = false
-      fhalfcarry = true
+      state.fsubtract = true
+      state.fcarry = false
+      state.fhalfcarry = true
       state.fzero = false
       switch instruction.spec {
       case .dec(let register) where registers8.contains(register):
-        self[register] = UInt8(255)
+        state[register] = UInt8(255)
       default:
         fatalError()
       }
@@ -2358,7 +2358,7 @@ nop
         state.pc += 1
         switch instruction.spec {
         case .dec(let register) where registers16.contains(register):
-          self[register] = UInt16(254)
+          state[register] = UInt16(254)
         default:
           fatalError()
         }
@@ -2404,7 +2404,7 @@ nop
         state.pc += 1
         switch instruction.spec {
         case .dec(let register) where registers16.contains(register):
-          self[register] = UInt16(0xffff)
+          state[register] = UInt16(0xffff)
         default:
           fatalError()
         }
@@ -2438,7 +2438,7 @@ nop
       gameboy.cpu.ime = true
       gameboy.cpu.imeScheduledCyclesRemaining = 2
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -2479,7 +2479,7 @@ nop
       gameboy.cpu.ime = false
       gameboy.cpu.imeScheduledCyclesRemaining = 0
 
-      var state = gameboy.cpu
+      var state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -2492,7 +2492,7 @@ nop
 
       assertEqual(gameboy.cpu, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
 
-      state = gameboy.cpu
+      state = gameboy.cpu.copy()
       gameboy.advance()
 
       // Expected mutations
@@ -2518,7 +2518,7 @@ nop
     gameboy.cpu.ime = false
     gameboy.cpu.imeScheduledCyclesRemaining = 0
 
-    var state = gameboy.cpu
+    var state = gameboy.cpu.copy()
     gameboy.advanceInstruction()
 
     // Expected mutations
@@ -2528,7 +2528,7 @@ nop
 
     assertEqual(gameboy.cpu, state)
 
-    state = gameboy.cpu
+    state = gameboy.cpu.copy()
     gameboy.advance()
 
     // Expected mutations
@@ -2570,7 +2570,7 @@ nop
       gameboy.cpu.fhalfcarry = true
       gameboy.cpu.fzero = true
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -2580,7 +2580,7 @@ nop
       state.pc += 1
       switch instruction.spec {
       case .inc(let register) where registers16.contains(register):
-        self[register] = UInt16(2)
+        state[register] = UInt16(2)
       default:
         fatalError()
       }
@@ -2624,7 +2624,7 @@ nop
       gameboy.cpu.fhalfcarry = true
       gameboy.cpu.fzero = true
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -2634,7 +2634,7 @@ nop
       state.pc += 1
       switch instruction.spec {
       case .inc(let register) where registers16.contains(register):
-        self[register] = UInt16(0)
+        state[register] = UInt16(0)
       default:
         fatalError()
       }
@@ -2679,7 +2679,7 @@ nop
       gameboy.cpu.fhalfcarry = true
       gameboy.cpu.fzero = true
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -2687,15 +2687,15 @@ nop
         state.pc += 1
       }
       state.pc += 1
-      fsubtract = false
-      fcarry = false
-      fhalfcarry = false
+      state.fsubtract = false
+      state.fcarry = false
+      state.fhalfcarry = false
       state.fzero = false
       switch instruction.spec {
       case .or(.a):
         break  // Nothing changed.
       default:
-        a = 0b0000_0011
+        state.a = 0b0000_0011
       }
 
       assertEqual(gameboy.cpu, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
@@ -2738,7 +2738,7 @@ nop
       gameboy.cpu.fhalfcarry = true
       gameboy.cpu.fzero = true
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -2746,9 +2746,9 @@ nop
         state.pc += 1
       }
       state.pc += 1
-      fsubtract = false
-      fcarry = false
-      fhalfcarry = false
+      state.fsubtract = false
+      state.fcarry = false
+      state.fhalfcarry = false
       state.fzero = true
 
       assertEqual(gameboy.cpu, state, message: "Spec: \(RGBDSDisassembler.statement(for: instruction).formattedString)")
@@ -2790,11 +2790,11 @@ nop
           state.pc += 1
         }
         state.pc += 1
-        fsubtract = false
-        fcarry = false
-        fhalfcarry = false
+        state.fsubtract = false
+        state.fcarry = false
+        state.fhalfcarry = false
         state.fzero = true
-        a = 0
+        state.a = 0
       }
     }
 
@@ -2836,11 +2836,11 @@ nop
           state.pc += 1
         }
         state.pc += 1
-        fsubtract = false
-        fcarry = false
-        fhalfcarry = false
+        state.fsubtract = false
+        state.fcarry = false
+        state.fhalfcarry = false
         state.fzero = false
-        a = 0b0000_0011
+        state.a = 0b0000_0011
       }
     }
 
@@ -2881,11 +2881,11 @@ nop
           state.pc += 1
         }
         state.pc += 2
-        fsubtract = false
-        fcarry = false
-        fhalfcarry = true
+        state.fsubtract = false
+        state.fcarry = false
+        state.fhalfcarry = true
         state.fzero = false
-        a = 0x0f
+        state.a = 0x0f
       }
     }
 
@@ -2924,11 +2924,11 @@ nop
           state.pc += 1
         }
         state.pc += 2
-        fsubtract = false
-        fcarry = false
-        fhalfcarry = true
+        state.fsubtract = false
+        state.fcarry = false
+        state.fhalfcarry = true
         state.fzero = true
-        a = 0x00
+        state.a = 0x00
       }
     }
 
@@ -2972,15 +2972,15 @@ nop
           state.pc += 1
         }
         state.pc += 1
-        fsubtract = false
-        fcarry = false
-        fhalfcarry = true
+        state.fsubtract = false
+        state.fcarry = false
+        state.fhalfcarry = true
         state.fzero = false
         switch instruction.spec {
         case .and(.a):
-          a = 0xff
+          state.a = 0xff
         default:
-          a = 0x0f
+          state.a = 0x0f
         }
       }
     }
@@ -3025,15 +3025,15 @@ nop
           state.pc += 1
         }
         state.pc += 1
-        fsubtract = false
-        fcarry = false
-        fhalfcarry = true
+        state.fsubtract = false
+        state.fcarry = false
+        state.fhalfcarry = true
         switch instruction.spec {
         case .and(.a):
-          a = 0xf0
+          state.a = 0xf0
           state.fzero = false
         default:
-          a = 0x00
+          state.a = 0x00
           state.fzero = true
         }
       }
@@ -3076,7 +3076,7 @@ nop
       gameboy.cpu.fhalfcarry = true
       gameboy.cpu.fzero = true
 
-      var state = gameboy.cpu
+      let state = gameboy.cpu.copy()
       gameboy.advanceInstruction()
 
       // Expected mutations
@@ -3084,15 +3084,15 @@ nop
         state.pc += 1
       }
       state.pc += 1
-      fsubtract = false
-      fcarry = false
-      fhalfcarry = false
+      state.fsubtract = false
+      state.fcarry = false
+      state.fhalfcarry = false
       switch instruction.spec {
       case .xor(.a):
-        a = 0b0000_0000
+        state.a = 0b0000_0000
         state.fzero = true
       default:
-        a = 0b0000_0011
+        state.a = 0b0000_0011
         state.fzero = false
       }
 
@@ -3141,11 +3141,11 @@ nop
           state.pc += 1
         }
         state.pc += 1
-        fsubtract = false
-        fcarry = false
-        fhalfcarry = false
+        state.fsubtract = false
+        state.fcarry = false
+        state.fhalfcarry = false
         state.fzero = true
-        a = 0
+        state.a = 0
       }
     }
 
@@ -3185,11 +3185,11 @@ nop
           state.pc += 1
         }
         state.pc += 2
-        fsubtract = false
-        fcarry = false
-        fhalfcarry = false
+        state.fsubtract = false
+        state.fcarry = false
+        state.fhalfcarry = false
         state.fzero = false
-        a = 1
+        state.a = 1
       }
     }
 
@@ -3229,11 +3229,11 @@ nop
           state.pc += 1
         }
         state.pc += 2
-        fsubtract = false
-        fcarry = true
-        fhalfcarry = true
+        state.fsubtract = false
+        state.fcarry = true
+        state.fhalfcarry = true
         state.fzero = true
-        a = 0
+        state.a = 0
       }
     }
 
@@ -3273,11 +3273,11 @@ nop
           state.pc += 1
         }
         state.pc += 2
-        fsubtract = false
-        fcarry = false
-        fhalfcarry = true
+        state.fsubtract = false
+        state.fcarry = false
+        state.fhalfcarry = true
         state.fzero = false
-        a = 0x10
+        state.a = 0x10
       }
     }
 
@@ -3316,11 +3316,11 @@ nop
           state.pc += 1
         }
         state.pc += 2
-        fsubtract = true
-        fcarry = false
-        fhalfcarry = false
+        state.fsubtract = true
+        state.fcarry = false
+        state.fhalfcarry = false
         state.fzero = false
-        a = 1
+        state.a = 1
       }
     }
 
@@ -3359,11 +3359,11 @@ nop
           state.pc += 1
         }
         state.pc += 2
-        fsubtract = true
-        fcarry = true
-        fhalfcarry = true
+        state.fsubtract = true
+        state.fcarry = true
+        state.fhalfcarry = true
         state.fzero = false
-        a = 255
+        state.a = 255
       }
     }
 
@@ -3402,11 +3402,11 @@ nop
           state.pc += 1
         }
         state.pc += 2
-        fsubtract = true
-        fcarry = false
-        fhalfcarry = false
+        state.fsubtract = true
+        state.fcarry = false
+        state.fhalfcarry = false
         state.fzero = true
-        a = 0
+        state.a = 0
       }
     }
 
@@ -3445,11 +3445,11 @@ nop
           state.pc += 1
         }
         state.pc += 2
-        fsubtract = true
-        fcarry = false
-        fhalfcarry = true
+        state.fsubtract = true
+        state.fcarry = false
+        state.fhalfcarry = true
         state.fzero = false
-        a = 0b1110_1111
+        state.a = 0b1110_1111
       }
     }
 
@@ -3493,9 +3493,9 @@ nop
           state.pc += 1
         }
         state.pc += 1
-        fsubtract = false
-        fcarry = false
-        fhalfcarry = false
+        state.fsubtract = false
+        state.fcarry = false
+        state.fhalfcarry = false
         switch instruction.spec {
         case .add(.hl, .hl):
           state.hl = 4
@@ -3545,9 +3545,9 @@ nop
           state.pc += 1
         }
         state.pc += 1
-        fsubtract = false
-        fcarry = true
-        fhalfcarry = true
+        state.fsubtract = false
+        state.fcarry = true
+        state.fhalfcarry = true
         switch instruction.spec {
         case .add(.hl, .hl):
           state.hl = 0xfffe
@@ -3597,9 +3597,9 @@ nop
           state.pc += 1
         }
         state.pc += 1
-        fsubtract = false
-        fcarry = false
-        fhalfcarry = true
+        state.fsubtract = false
+        state.fcarry = false
+        state.fhalfcarry = true
         switch instruction.spec {
         case .add(.hl, .hl):
           state.hl = 0x1ffe
@@ -3625,7 +3625,7 @@ nop
     gameboy.addMemoryTracer(testMemory)
 
     // When
-    var state = gameboy.cpu
+    let state = gameboy.cpu.copy()
     gameboy.advance()  // Load opcode
     gameboy.advance()  // Execute halt instruction
     gameboy.advance()  // Does nothing, verified by lack of read of next opcode.
@@ -3673,7 +3673,7 @@ nop
       }
 
       gameboy.cpu.pc = stashedpc + 1
-      gameboy.cpu.machineInstruction = .init() // Reset the cpu's machine instruction cache to force a re-load
+      gameboy.cpu.machineInstruction = .init() // Reset the cpu's machine instruction cache to force state.a re-load
     }
 
     XCTAssertEqual(testMemory.reads, [
@@ -3693,7 +3693,7 @@ nop
         .init(byte: 00, address: sp - 1),
         .init(byte: pc, address: sp - 2),
       ])
-      state.pc += 1
+      pc += 1
       sp -= 2
     }))
   }

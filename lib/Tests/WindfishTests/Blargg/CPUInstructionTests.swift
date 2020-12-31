@@ -25,10 +25,10 @@ class CPUInstructionTests: XCTestCase {
     gameboy.cartridge = .init(data: data)
 
     gameboy.advanceInstruction()
-    while let loaded = gameboy.cpu.machineInstruction.loaded {
-      var address = loaded.sourceLocation.address()
+    while let sourceLocation = gameboy.cpu.machineInstruction.sourceLocation {
+      var address = sourceLocation.address()
       let instruction = Disassembler.fetchInstruction(at: &address, memory: gameboy.memory)
-      print("\(loaded.sourceLocation.address().hexString) \(RGBDSDisassembler.statement(for: instruction).formattedString)")
+      print("\(sourceLocation.address().hexString) \(RGBDSDisassembler.statement(for: instruction).formattedString)")
       gameboy.advanceInstruction()
     }
   }
