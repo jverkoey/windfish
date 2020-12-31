@@ -25,10 +25,10 @@ extension LR35902.InstructionSet {
     let evaluateConditional: (LR35902.Instruction.Condition?, LR35902) -> LR35902.MachineInstruction.MicroCodeResult = { cnd, cpu in
       switch cnd {
       case .none:      return .continueExecution
-      case .some(.c):  return  cpu.state.fcarry ? .continueExecution : .fetchNext
-      case .some(.nc): return !cpu.state.fcarry ? .continueExecution : .fetchNext
-      case .some(.z):  return  cpu.state.fzero ? .continueExecution : .fetchNext
-      case .some(.nz): return !cpu.state.fzero ? .continueExecution : .fetchNext
+      case .some(.c):  return  cpu.fcarry ? .continueExecution : .fetchNext
+      case .some(.nc): return !cpu.fcarry ? .continueExecution : .fetchNext
+      case .some(.z):  return  cpu.fzero ? .continueExecution : .fetchNext
+      case .some(.nz): return !cpu.fzero ? .continueExecution : .fetchNext
       }
     }
 
@@ -36,8 +36,8 @@ extension LR35902.InstructionSet {
     // ld r, r'
     case .ld(let dst, let src) where registers8.contains(dst) && registers8.contains(src):
       return { (cpu, memory, cycle, sourceLocation) in
-        cpu.state[dst] = cpu.state[src] as UInt8
-        cpu.state.registerTraces[dst] = cpu.state.registerTraces[src]
+        cpu[dst] = cpu[src] as UInt8
+        cpu.registerTraces[dst] = cpu.registerTraces[src]
         return .fetchNext
       }
 
@@ -46,12 +46,12 @@ extension LR35902.InstructionSet {
       var immediate: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt8(memory.read(from: cpu.state.pc))
-          cpu.state.pc += 1
+          immediate = UInt8(memory.read(from: cpu.pc))
+          cpu.pc += 1
           return .continueExecution
         }
-        cpu.state[dst] = immediate
-        cpu.state.registerTraces[dst] = .init(sourceLocation: sourceLocation)
+        cpu[dst] = immediate
+        cpu.registerTraces[dst] = .init(sourceLocation: sourceLocation)
         return .fetchNext
       }
 
@@ -61,12 +61,12 @@ extension LR35902.InstructionSet {
 
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          let address = cpu.state[src] as UInt16
+          let address = cpu[src] as UInt16
           value = UInt8(memory.read(from: address))
-          cpu.state.registerTraces[dst] = .init(sourceLocation: sourceLocation, loadAddress: address)
+          cpu.registerTraces[dst] = .init(sourceLocation: sourceLocation, loadAddress: address)
           return .continueExecution
         }
-        cpu.state[dst] = value
+        cpu[dst] = value
         return .fetchNext
       }
 
@@ -74,7 +74,7 @@ extension LR35902.InstructionSet {
     case .ld(let dst, let src) where registersAddr.contains(dst) && registers8.contains(src):
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          memory.write(cpu.state[src], to: cpu.state[dst])
+          memory.write(cpu[src], to: cpu[dst])
           return .continueExecution
         }
         return .fetchNext
@@ -85,12 +85,12 @@ extension LR35902.InstructionSet {
       var immediate: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt8(memory.read(from: cpu.state.pc))
-          cpu.state.pc += 1
+          immediate = UInt8(memory.read(from: cpu.pc))
+          cpu.pc += 1
           return .continueExecution
         }
         if cycle == 2 {
-          memory.write(immediate, to: cpu.state[dst])
+          memory.write(immediate, to: cpu[dst])
           return .continueExecution
         }
         return .fetchNext
@@ -102,21 +102,21 @@ extension LR35902.InstructionSet {
       var value: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt16(memory.read(from: cpu.state.pc))
-          cpu.state.pc += 1
+          immediate = UInt16(memory.read(from: cpu.pc))
+          cpu.pc += 1
           return .continueExecution
         }
         if cycle == 2 {
-          immediate |= UInt16(memory.read(from: cpu.state.pc)) << 8
-          cpu.state.pc += 1
+          immediate |= UInt16(memory.read(from: cpu.pc)) << 8
+          cpu.pc += 1
           return .continueExecution
         }
         if cycle == 3 {
           value = memory.read(from: immediate)
           return .continueExecution
         }
-        cpu.state.a = value
-        cpu.state.registerTraces[.a] = .init(sourceLocation: sourceLocation, loadAddress: immediate)
+        cpu.a = value
+        cpu.registerTraces[.a] = .init(sourceLocation: sourceLocation, loadAddress: immediate)
         return .fetchNext
       }
 
@@ -125,17 +125,17 @@ extension LR35902.InstructionSet {
       var immediate: UInt16 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt16(memory.read(from: cpu.state.pc))
-          cpu.state.pc += 1
+          immediate = UInt16(memory.read(from: cpu.pc))
+          cpu.pc += 1
           return .continueExecution
         }
         if cycle == 2 {
-          immediate |= UInt16(memory.read(from: cpu.state.pc)) << 8
-          cpu.state.pc += 1
+          immediate |= UInt16(memory.read(from: cpu.pc)) << 8
+          cpu.pc += 1
           return .continueExecution
         }
         if cycle == 3 {
-          memory.write(cpu.state.a, to: immediate)
+          memory.write(cpu.a, to: immediate)
           return .continueExecution
         }
         return .fetchNext
@@ -146,12 +146,12 @@ extension LR35902.InstructionSet {
       var value: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          let address = UInt16(0xFF00) | UInt16(cpu.state.c)
+          let address = UInt16(0xFF00) | UInt16(cpu.c)
           value = memory.read(from: address)
-          cpu.state.registerTraces[.a] = .init(sourceLocation: sourceLocation, loadAddress: address)
+          cpu.registerTraces[.a] = .init(sourceLocation: sourceLocation, loadAddress: address)
           return .continueExecution
         }
-        cpu.state.a = value
+        cpu.a = value
         return .fetchNext
       }
 
@@ -159,8 +159,8 @@ extension LR35902.InstructionSet {
     case .ld(.ffccaddr, .a):
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          let address = UInt16(0xFF00) | UInt16(cpu.state.c)
-          memory.write(cpu.state.a, to: address)
+          let address = UInt16(0xFF00) | UInt16(cpu.c)
+          memory.write(cpu.a, to: address)
           return .continueExecution
         }
         return .fetchNext
@@ -172,17 +172,17 @@ extension LR35902.InstructionSet {
       var value: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt16(memory.read(from: cpu.state.pc))
-          cpu.state.pc += 1
+          immediate = UInt16(memory.read(from: cpu.pc))
+          cpu.pc += 1
           return .continueExecution
         }
         if cycle == 2 {
           let address = UInt16(0xFF00) | UInt16(immediate)
           value = memory.read(from: address)
-          cpu.state.registerTraces[.a] = .init(sourceLocation: sourceLocation, loadAddress: address)
+          cpu.registerTraces[.a] = .init(sourceLocation: sourceLocation, loadAddress: address)
           return .continueExecution
         }
-        cpu.state.a = value
+        cpu.a = value
         return .fetchNext
       }
 
@@ -191,13 +191,13 @@ extension LR35902.InstructionSet {
       var immediate: UInt16 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt16(memory.read(from: cpu.state.pc))
-          cpu.state.pc += 1
+          immediate = UInt16(memory.read(from: cpu.pc))
+          cpu.pc += 1
           return .continueExecution
         }
         if cycle == 2 {
           let address = UInt16(0xFF00) | UInt16(immediate)
-          memory.write(cpu.state.a, to: address)
+          memory.write(cpu.a, to: address)
           return .continueExecution
         }
         return .fetchNext
@@ -207,11 +207,11 @@ extension LR35902.InstructionSet {
     case .ldd(.a, .hladdr):
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          cpu.state.a = memory.read(from: cpu.state.hl)
-          cpu.state.registerTraces[.a] = .init(sourceLocation: sourceLocation, loadAddress: cpu.state.hl)
+          cpu.a = memory.read(from: cpu.hl)
+          cpu.registerTraces[.a] = .init(sourceLocation: sourceLocation, loadAddress: cpu.hl)
           return .continueExecution
         }
-        cpu.state.hl -= 1
+        cpu.hl -= 1
         return .fetchNext
       }
 
@@ -219,10 +219,10 @@ extension LR35902.InstructionSet {
     case .ldd(.hladdr, .a):
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          memory.write(cpu.state.a, to: cpu.state.hl)
+          memory.write(cpu.a, to: cpu.hl)
           return .continueExecution
         }
-        cpu.state.hl -= 1
+        cpu.hl -= 1
         return .fetchNext
       }
 
@@ -230,11 +230,11 @@ extension LR35902.InstructionSet {
     case .ldi(.a, .hladdr):
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          cpu.state.a = memory.read(from: cpu.state.hl)
-          cpu.state.registerTraces[.a] = .init(sourceLocation: sourceLocation, loadAddress: cpu.state.hl)
+          cpu.a = memory.read(from: cpu.hl)
+          cpu.registerTraces[.a] = .init(sourceLocation: sourceLocation, loadAddress: cpu.hl)
           return .continueExecution
         }
-        cpu.state.hl += 1
+        cpu.hl += 1
         return .fetchNext
       }
 
@@ -242,10 +242,10 @@ extension LR35902.InstructionSet {
     case .ldi(.hladdr, .a):
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          memory.write(cpu.state.a, to: cpu.state.hl)
+          memory.write(cpu.a, to: cpu.hl)
           return .continueExecution
         }
-        cpu.state.hl += 1
+        cpu.hl += 1
         return .fetchNext
       }
 
@@ -254,18 +254,18 @@ extension LR35902.InstructionSet {
       var immediate: UInt16 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt16(memory.read(from: cpu.state.pc))
-          cpu.state.pc += 1
+          immediate = UInt16(memory.read(from: cpu.pc))
+          cpu.pc += 1
           return .continueExecution
         }
         if cycle == 2 {
-          immediate |= UInt16(memory.read(from: cpu.state.pc)) << 8
-          cpu.state.pc += 1
+          immediate |= UInt16(memory.read(from: cpu.pc)) << 8
+          cpu.pc += 1
           return .continueExecution
         }
 
-        cpu.state[dst] = immediate
-        cpu.state.registerTraces[dst] = .init(
+        cpu[dst] = immediate
+        cpu.registerTraces[dst] = .init(
           sourceLocation: sourceLocation,
           loadAddress: immediate
         )
@@ -277,21 +277,21 @@ extension LR35902.InstructionSet {
       var immediate: UInt16 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt16(memory.read(from: cpu.state.pc))
-          cpu.state.pc += 1
+          immediate = UInt16(memory.read(from: cpu.pc))
+          cpu.pc += 1
           return .continueExecution
         }
         if cycle == 2 {
-          immediate |= UInt16(memory.read(from: cpu.state.pc)) << 8
-          cpu.state.pc += 1
+          immediate |= UInt16(memory.read(from: cpu.pc)) << 8
+          cpu.pc += 1
           return .continueExecution
         }
         if cycle == 3 {
-          memory.write(UInt8(cpu.state.sp & 0x00FF), to: immediate)
+          memory.write(UInt8(cpu.sp & 0x00FF), to: immediate)
           return .continueExecution
         }
         if cycle == 4 {
-          memory.write(UInt8((cpu.state.sp & 0xFF00) >> 8), to: immediate + 1)
+          memory.write(UInt8((cpu.sp & 0xFF00) >> 8), to: immediate + 1)
           return .continueExecution
         }
         return .fetchNext
@@ -301,8 +301,8 @@ extension LR35902.InstructionSet {
     case .ld(.sp, .hl):
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          cpu.state.sp = cpu.state.hl
-          cpu.state.registerTraces[.sp] = cpu.state.registerTraces[.hl]
+          cpu.sp = cpu.hl
+          cpu.registerTraces[.sp] = cpu.registerTraces[.hl]
           return .continueExecution
         }
         return .fetchNext
@@ -312,16 +312,16 @@ extension LR35902.InstructionSet {
     case .push(let src) where registers16.contains(src):
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          cpu.state.sp -= 1
+          cpu.sp -= 1
           return .continueExecution
         }
         if cycle == 2 {
-          memory.write(UInt8(((cpu.state[src] as UInt16) & 0xFF00) >> 8), to: cpu.state.sp)
-          cpu.state.sp -= 1
+          memory.write(UInt8(((cpu[src] as UInt16) & 0xFF00) >> 8), to: cpu.sp)
+          cpu.sp -= 1
           return .continueExecution
         }
         if cycle == 3 {
-          memory.write(UInt8((cpu.state[src] as UInt16) & 0x00FF), to: cpu.state.sp)
+          memory.write(UInt8((cpu[src] as UInt16) & 0x00FF), to: cpu.sp)
           return .continueExecution
         }
         return .fetchNext
@@ -332,21 +332,21 @@ extension LR35902.InstructionSet {
       var value: UInt16 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          cpu.state.registerTraces[dst] = .init(
+          cpu.registerTraces[dst] = .init(
             sourceLocation: sourceLocation,
-            loadAddress: cpu.state.sp
+            loadAddress: cpu.sp
           )
 
-          value = UInt16(memory.read(from: cpu.state.sp))
-          cpu.state.sp += 1
+          value = UInt16(memory.read(from: cpu.sp))
+          cpu.sp += 1
           return .continueExecution
         }
         if cycle == 2 {
-          value |= UInt16(memory.read(from: cpu.state.sp)) << 8
-          cpu.state.sp += 1
+          value |= UInt16(memory.read(from: cpu.sp)) << 8
+          cpu.sp += 1
           return .continueExecution
         }
-        cpu.state[dst] = value
+        cpu[dst] = value
         return .fetchNext
       }
 
@@ -356,26 +356,26 @@ extension LR35902.InstructionSet {
       var immediate: UInt16 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt16(memory.read(from: cpu.state.pc))
-          cpu.state.pc += 1
+          immediate = UInt16(memory.read(from: cpu.pc))
+          cpu.pc += 1
           return .continueExecution
         }
         if cycle == 2 {
-          immediate |= UInt16(memory.read(from: cpu.state.pc)) << 8
-          cpu.state.pc += 1
+          immediate |= UInt16(memory.read(from: cpu.pc)) << 8
+          cpu.pc += 1
           return .continueExecution
         }
         if cycle == 3 {
           return evaluateConditional(cnd, cpu)
         }
-        cpu.state.pc = immediate
+        cpu.pc = immediate
         return .fetchNext
       }
 
     // jp hl
     case .jp(nil, .hl):
       return { (cpu, memory, cycle, sourceLocation) in
-        cpu.state.pc = cpu.state.hl
+        cpu.pc = cpu.hl
         return .fetchNext
       }
 
@@ -384,14 +384,14 @@ extension LR35902.InstructionSet {
       var immediate: Int8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = Int8(bitPattern: memory.read(from: cpu.state.pc))
-          cpu.state.pc += 1
+          immediate = Int8(bitPattern: memory.read(from: cpu.pc))
+          cpu.pc += 1
           return .continueExecution
         }
         if cycle == 2 {
           return evaluateConditional(cnd, cpu)
         }
-        cpu.state.pc = cpu.state.pc.advanced(by: Int(immediate))
+        cpu.pc = cpu.pc.advanced(by: Int(immediate))
         return .fetchNext
       }
 
@@ -401,29 +401,29 @@ extension LR35902.InstructionSet {
       var immediate: UInt16 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt16(memory.read(from: cpu.state.pc))
-          cpu.state.pc += 1
+          immediate = UInt16(memory.read(from: cpu.pc))
+          cpu.pc += 1
           return .continueExecution
         }
         if cycle == 2 {
-          immediate |= UInt16(memory.read(from: cpu.state.pc)) << 8
-          cpu.state.pc += 1
+          immediate |= UInt16(memory.read(from: cpu.pc)) << 8
+          cpu.pc += 1
           return .continueExecution
         }
         if cycle == 3 {
           return evaluateConditional(cnd, cpu)
         }
         if cycle == 4 {
-          cpu.state.sp -= 1
-          memory.write(UInt8((cpu.state.pc & 0xFF00) >> 8), to: cpu.state.sp)
+          cpu.sp -= 1
+          memory.write(UInt8((cpu.pc & 0xFF00) >> 8), to: cpu.sp)
           return .continueExecution
         }
         if cycle == 5 {
-          cpu.state.sp -= 1
-          memory.write(UInt8(cpu.state.pc & 0x00FF), to: cpu.state.sp)
+          cpu.sp -= 1
+          memory.write(UInt8(cpu.pc & 0x00FF), to: cpu.sp)
           return .continueExecution
         }
-        cpu.state.pc = immediate
+        cpu.pc = immediate
         return .fetchNext
       }
 
@@ -434,16 +434,16 @@ extension LR35902.InstructionSet {
           return .continueExecution
         }
         if cycle == 2 {
-          cpu.state.sp -= 1
-          memory.write(UInt8((cpu.state.pc & 0xFF00) >> 8), to: cpu.state.sp)
+          cpu.sp -= 1
+          memory.write(UInt8((cpu.pc & 0xFF00) >> 8), to: cpu.sp)
           return .continueExecution
         }
         if cycle == 3 {
-          cpu.state.sp -= 1
-          memory.write(UInt8(cpu.state.pc & 0x00FF), to: cpu.state.sp)
+          cpu.sp -= 1
+          memory.write(UInt8(cpu.pc & 0x00FF), to: cpu.sp)
           return .continueExecution
         }
-        cpu.state.pc = LR35902.Address(address.rawValue)
+        cpu.pc = LR35902.Address(address.rawValue)
         return .fetchNext
       }
 
@@ -456,16 +456,16 @@ extension LR35902.InstructionSet {
           return evaluateConditional(cnd, cpu)
         }
         if cycle == 2 {
-          pc = UInt16(memory.read(from: cpu.state.sp))
-          cpu.state.sp += 1
+          pc = UInt16(memory.read(from: cpu.sp))
+          cpu.sp += 1
           return .continueExecution
         }
         if cycle == 3 {
-          pc |= UInt16(memory.read(from: cpu.state.sp)) << 8
-          cpu.state.sp += 1
+          pc |= UInt16(memory.read(from: cpu.sp)) << 8
+          cpu.sp += 1
           return .continueExecution
         }
-        cpu.state.pc = pc
+        cpu.pc = pc
         return .fetchNext
       }
 
@@ -474,43 +474,43 @@ extension LR35902.InstructionSet {
       var pc: UInt16 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          pc = UInt16(memory.read(from: cpu.state.sp))
-          cpu.state.sp += 1
+          pc = UInt16(memory.read(from: cpu.sp))
+          cpu.sp += 1
           return .continueExecution
         }
         if cycle == 2 {
-          pc |= UInt16(memory.read(from: cpu.state.sp)) << 8
-          cpu.state.sp += 1
+          pc |= UInt16(memory.read(from: cpu.sp)) << 8
+          cpu.sp += 1
           return .continueExecution
         }
         if cycle == 3 {
-          cpu.state.ime = true
+          cpu.ime = true
           return .continueExecution
         }
-        cpu.state.pc = pc
+        cpu.pc = pc
         return .fetchNext
       }
 
     // set b, r
     case .cb(.set(let bit, let register)) where registers8.contains(register):  // TODO: Test me
       return { (cpu, memory, cycle, sourceLocation) in
-        cpu.state[register] = cpu.state[register] | (UInt8(1) << bit.rawValue)
+        cpu[register] = cpu[register] | (UInt8(1) << bit.rawValue)
         return .fetchNext
       }
 
     // res b, r
     case .cb(.res(let bit, let register)) where registers8.contains(register):
       return { (cpu, memory, cycle, sourceLocation) in
-        cpu.state[register] = cpu.state[register] & ~(UInt8(1) << bit.rawValue)
+        cpu[register] = cpu[register] & ~(UInt8(1) << bit.rawValue)
         return .fetchNext
       }
 
     // bit b, r
     case .cb(.bit(let bit, let register)) where registers8.contains(register):  // TODO: Test me
       return { (cpu, memory, cycle, sourceLocation) in
-        cpu.state.fzero = (cpu.state[register] & (UInt8(1) << bit.rawValue)) == 0
-        cpu.state.fsubtract = false
-        cpu.state.fhalfcarry = true
+        cpu.fzero = (cpu[register] & (UInt8(1) << bit.rawValue)) == 0
+        cpu.fsubtract = false
+        cpu.fhalfcarry = true
         return .fetchNext
       }
 
@@ -519,17 +519,17 @@ extension LR35902.InstructionSet {
       var value: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          value = memory.read(from: cpu.state.hl)
+          value = memory.read(from: cpu.hl)
           return .continueExecution
         }
         if cycle == 2 {
-          cpu.state.fzero = (value & (UInt8(1) << bit.rawValue)) == 0
-          cpu.state.fsubtract = false
-          cpu.state.fhalfcarry = true
+          cpu.fzero = (value & (UInt8(1) << bit.rawValue)) == 0
+          cpu.fsubtract = false
+          cpu.fhalfcarry = true
           return .continueExecution
         }
         if cycle == 3 {
-          memory.write(value, to: cpu.state.hl)
+          memory.write(value, to: cpu.hl)
           return .continueExecution
         }
         return .fetchNext
@@ -538,41 +538,41 @@ extension LR35902.InstructionSet {
     // swap r
     case .cb(.swap(let register)) where registers8.contains(register):  // TODO: Test me
       return { (cpu, memory, cycle, sourceLocation) in
-        let upperNibble: UInt8 = cpu.state[register] & 0xF0
-        let lowerNibble: UInt8 = cpu.state[register] & 0x0F
+        let upperNibble: UInt8 = cpu[register] & 0xF0
+        let lowerNibble: UInt8 = cpu[register] & 0x0F
         let result = (upperNibble >> 8) | (lowerNibble << 8)
-        cpu.state[register] = result
-        cpu.state.fzero = result == 0
-        cpu.state.fsubtract = false
-        cpu.state.fcarry = false
-        cpu.state.fhalfcarry = false
+        cpu[register] = result
+        cpu.fzero = result == 0
+        cpu.fsubtract = false
+        cpu.fcarry = false
+        cpu.fhalfcarry = false
         return .fetchNext
       }
 
     // sla r
     case .cb(.sla(let register)) where registers8.contains(register):  // TODO: Test me
       return { (cpu, memory, cycle, sourceLocation) in
-        let result = (cpu.state[register] as UInt8).multipliedReportingOverflow(by: 2)
-        cpu.state[register] = result.partialValue
-        cpu.state.fzero = result.partialValue == 0
-        cpu.state.fsubtract = false
-        cpu.state.fcarry = result.overflow
-        cpu.state.fhalfcarry = false
+        let result = (cpu[register] as UInt8).multipliedReportingOverflow(by: 2)
+        cpu[register] = result.partialValue
+        cpu.fzero = result.partialValue == 0
+        cpu.fsubtract = false
+        cpu.fcarry = result.overflow
+        cpu.fhalfcarry = false
         return .fetchNext
       }
 
     // rl r
     case .cb(.rl(let register)) where registers8.contains(register):  // TODO: Test me
       return { (cpu, memory, cycle, sourceLocation) in
-        let partialResult = (cpu.state[register] as UInt8).multipliedReportingOverflow(by: 2)
+        let partialResult = (cpu[register] as UInt8).multipliedReportingOverflow(by: 2)
         let result = partialResult.partialValue | (partialResult.overflow ? 0x01 : 0)
 
-        cpu.state.fzero = result == 0
-        cpu.state.fsubtract = false
-        cpu.state.fcarry = partialResult.overflow
-        cpu.state.fhalfcarry = false
+        cpu.fzero = result == 0
+        cpu.fsubtract = false
+        cpu.fcarry = partialResult.overflow
+        cpu.fhalfcarry = false
 
-        cpu.state[register] = result
+        cpu[register] = result
 
         return .fetchNext
       }
@@ -580,15 +580,15 @@ extension LR35902.InstructionSet {
     // srl r
     case .cb(.srl(let register)) where registers8.contains(register):  // TODO: Test me
       return { (cpu, memory, cycle, sourceLocation) in
-        let partialResult = (cpu.state[register] as UInt8).dividedReportingOverflow(by: 2)
+        let partialResult = (cpu[register] as UInt8).dividedReportingOverflow(by: 2)
         let result = partialResult.partialValue
 
-        cpu.state.fzero = result == 0
-        cpu.state.fsubtract = false
-        cpu.state.fcarry = partialResult.overflow
-        cpu.state.fhalfcarry = false
+        cpu.fzero = result == 0
+        cpu.fsubtract = false
+        cpu.fcarry = partialResult.overflow
+        cpu.fhalfcarry = false
 
-        cpu.state[register] = result
+        cpu[register] = result
 
         return .fetchNext
       }
@@ -596,15 +596,15 @@ extension LR35902.InstructionSet {
     // rlca
     case .rlca:  // TODO: Test me
       return { (cpu, memory, cycle, sourceLocation) in
-        let partialResult = cpu.state.a.multipliedReportingOverflow(by: 2)
+        let partialResult = cpu.a.multipliedReportingOverflow(by: 2)
         let result = partialResult.partialValue | (partialResult.overflow ? 0x01 : 0)
 
-        cpu.state.fzero = result == 0
-        cpu.state.fsubtract = false
-        cpu.state.fcarry = partialResult.overflow
-        cpu.state.fhalfcarry = false
+        cpu.fzero = result == 0
+        cpu.fsubtract = false
+        cpu.fcarry = partialResult.overflow
+        cpu.fhalfcarry = false
 
-        cpu.state.a = result
+        cpu.a = result
 
         return .fetchNext
       }
@@ -612,26 +612,26 @@ extension LR35902.InstructionSet {
     // rra
     case .rra:  // TODO: Test me
       return { (cpu, memory, cycle, sourceLocation) in
-        let partialResult = cpu.state.a.dividedReportingOverflow(by: 2)
-        let result = partialResult.partialValue | (cpu.state.fcarry ? 0b1000_0000 : 0)
-        cpu.state.a = result
-        cpu.state.fzero = result == 0
-        cpu.state.fsubtract = false
-        cpu.state.fcarry = partialResult.overflow
-        cpu.state.fhalfcarry = false
+        let partialResult = cpu.a.dividedReportingOverflow(by: 2)
+        let result = partialResult.partialValue | (cpu.fcarry ? 0b1000_0000 : 0)
+        cpu.a = result
+        cpu.fzero = result == 0
+        cpu.fsubtract = false
+        cpu.fcarry = partialResult.overflow
+        cpu.fhalfcarry = false
         return .fetchNext
       }
 
     // rrca
     case .rrca:  // TODO: Test me
       return { (cpu, memory, cycle, sourceLocation) in
-        let partialResult = cpu.state.a.dividedReportingOverflow(by: 2)
+        let partialResult = cpu.a.dividedReportingOverflow(by: 2)
         let result = partialResult.partialValue | (partialResult.overflow ? 0b1000_0000 : 0)
-        cpu.state.a = result
-        cpu.state.fzero = result == 0
-        cpu.state.fsubtract = false
-        cpu.state.fcarry = partialResult.overflow
-        cpu.state.fhalfcarry = false
+        cpu.a = result
+        cpu.fzero = result == 0
+        cpu.fsubtract = false
+        cpu.fcarry = partialResult.overflow
+        cpu.fhalfcarry = false
         return .fetchNext
       }
 
@@ -640,28 +640,28 @@ extension LR35902.InstructionSet {
       var immediate: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = memory.read(from: cpu.state.pc)
-          cpu.state.pc += 1
+          immediate = memory.read(from: cpu.pc)
+          cpu.pc += 1
           return .continueExecution
         }
 
-        cpu.state.fsubtract = true
-        let result = cpu.state.a.subtractingReportingOverflow(immediate)
-        cpu.state.fzero = result.partialValue == 0
-        cpu.state.fcarry = result.overflow
-        cpu.state.fhalfcarry = (cpu.state.a & 0x0f) < (immediate & 0x0f)
+        cpu.fsubtract = true
+        let result = cpu.a.subtractingReportingOverflow(immediate)
+        cpu.fzero = result.partialValue == 0
+        cpu.fcarry = result.overflow
+        cpu.fhalfcarry = (cpu.a & 0x0f) < (immediate & 0x0f)
         return .fetchNext
       }
 
     // cp r
     case .cp(let register) where registers8.contains(register):
       return { (cpu, memory, cycle, sourceLocation) in
-        cpu.state.fsubtract = true
-        let registerValue: UInt8 = cpu.state[register]
-        let result = cpu.state.a.subtractingReportingOverflow(registerValue)
-        cpu.state.fzero = result.partialValue == 0
-        cpu.state.fcarry = result.overflow
-        cpu.state.fhalfcarry = (cpu.state.a & 0x0f) < (registerValue & 0x0f)
+        cpu.fsubtract = true
+        let registerValue: UInt8 = cpu[register]
+        let result = cpu.a.subtractingReportingOverflow(registerValue)
+        cpu.fzero = result.partialValue == 0
+        cpu.fcarry = result.overflow
+        cpu.fhalfcarry = (cpu.a & 0x0f) < (registerValue & 0x0f)
         return .fetchNext
       }
 
@@ -670,26 +670,26 @@ extension LR35902.InstructionSet {
       var value: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          value = memory.read(from: cpu.state.hl)
+          value = memory.read(from: cpu.hl)
           return .continueExecution
         }
-        cpu.state.fsubtract = true
-        let result = cpu.state.a.subtractingReportingOverflow(value)
-        cpu.state.fzero = result.partialValue == 0
-        cpu.state.fcarry = result.overflow
-        cpu.state.fhalfcarry = (cpu.state.a & 0x0f) < (value & 0x0f)
+        cpu.fsubtract = true
+        let result = cpu.a.subtractingReportingOverflow(value)
+        cpu.fzero = result.partialValue == 0
+        cpu.fcarry = result.overflow
+        cpu.fhalfcarry = (cpu.a & 0x0f) < (value & 0x0f)
         return .fetchNext
       }
 
     // inc r
     case .inc(let register) where registers8.contains(register):
       return { (cpu, memory, cycle, sourceLocation) in
-        let originalValue = cpu.state[register] as UInt8
+        let originalValue = cpu[register] as UInt8
         let result = originalValue.addingReportingOverflow(1)
-        cpu.state.fzero = result.partialValue == 0
-        cpu.state.fhalfcarry = (((originalValue & 0x0f) + 1) & 0x10) > 0
-        cpu.state.fsubtract = false
-        cpu.state[register] = result.partialValue
+        cpu.fzero = result.partialValue == 0
+        cpu.fhalfcarry = (((originalValue & 0x0f) + 1) & 0x10) > 0
+        cpu.fsubtract = false
+        cpu[register] = result.partialValue
         return .fetchNext
       }
 
@@ -698,19 +698,19 @@ extension LR35902.InstructionSet {
       var value: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          value = memory.read(from: cpu.state.hl)
+          value = memory.read(from: cpu.hl)
           return .continueExecution
         }
         if cycle == 2 {
           let result = value.addingReportingOverflow(1)
-          cpu.state.fzero = result.partialValue == 0
-          cpu.state.fhalfcarry = (((value & 0x0f) + 1) & 0x10) > 0
-          cpu.state.fsubtract = false
+          cpu.fzero = result.partialValue == 0
+          cpu.fhalfcarry = (((value & 0x0f) + 1) & 0x10) > 0
+          cpu.fsubtract = false
           value = result.partialValue
           return .continueExecution
         }
         if cycle == 3 {
-          memory.write(value, to: cpu.state.hl)
+          memory.write(value, to: cpu.hl)
           return .continueExecution
         }
         return .fetchNext
@@ -719,12 +719,12 @@ extension LR35902.InstructionSet {
     // dec r
     case .dec(let register) where registers8.contains(register):
       return { (cpu, memory, cycle, sourceLocation) in
-        let originalValue = cpu.state[register] as UInt8
+        let originalValue = cpu[register] as UInt8
         let result = originalValue.subtractingReportingOverflow(1)
-        cpu.state.fzero = result.partialValue == 0
-        cpu.state.fsubtract = true
-        cpu.state.fhalfcarry = (originalValue & 0x0f) < (1 & 0x0f)
-        cpu.state[register] = result.partialValue
+        cpu.fzero = result.partialValue == 0
+        cpu.fsubtract = true
+        cpu.fhalfcarry = (originalValue & 0x0f) < (1 & 0x0f)
+        cpu[register] = result.partialValue
         return .fetchNext
       }
 
@@ -733,20 +733,20 @@ extension LR35902.InstructionSet {
       var value: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          value = memory.read(from: cpu.state.hl)
+          value = memory.read(from: cpu.hl)
           return .continueExecution
         }
         if cycle == 2 {
           let result = value.subtractingReportingOverflow(1)
-          cpu.state.fzero = result.partialValue == 0
-          cpu.state.fsubtract = true
-          cpu.state.fhalfcarry = (value & 0x0f) < (1 & 0x0f)
+          cpu.fzero = result.partialValue == 0
+          cpu.fsubtract = true
+          cpu.fhalfcarry = (value & 0x0f) < (1 & 0x0f)
 
           value = result.partialValue
 
           return .continueExecution
         }
-        memory.write(value, to: cpu.state.hl)
+        memory.write(value, to: cpu.hl)
         return .fetchNext
       }
 
@@ -756,21 +756,21 @@ extension LR35902.InstructionSet {
         if cycle == 1 {
           return .continueExecution
         }
-        cpu.state[register] = (cpu.state[register] as UInt16).subtractingReportingOverflow(1).partialValue
+        cpu[register] = (cpu[register] as UInt16).subtractingReportingOverflow(1).partialValue
         return .fetchNext
       }
 
     // sub r
     case .sub(.a, let register) where registers8.contains(register):  // TODO: Test me
       return { (cpu, memory, cycle, sourceLocation) in
-        let originalValue = cpu.state.a
-        let value = cpu.state[register] as UInt8
+        let originalValue = cpu.a
+        let value = cpu[register] as UInt8
         let result = originalValue.subtractingReportingOverflow(value)
-        cpu.state.fzero = result.partialValue == 0
-        cpu.state.fsubtract = true
-        cpu.state.fcarry = result.overflow
-        cpu.state.fhalfcarry = (cpu.state.a & 0x0f) < (value & 0x0f)
-        cpu.state.a = result.partialValue
+        cpu.fzero = result.partialValue == 0
+        cpu.fsubtract = true
+        cpu.fcarry = result.overflow
+        cpu.fhalfcarry = (cpu.a & 0x0f) < (value & 0x0f)
+        cpu.a = result.partialValue
         return .fetchNext
       }
 
@@ -779,17 +779,17 @@ extension LR35902.InstructionSet {
       var immediate: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt8(memory.read(from: cpu.state.pc))
-          cpu.state.pc += 1
+          immediate = UInt8(memory.read(from: cpu.pc))
+          cpu.pc += 1
           return .continueExecution
         }
-        let originalValue = cpu.state.a
+        let originalValue = cpu.a
         let result = originalValue.subtractingReportingOverflow(immediate)
-        cpu.state.fzero = result.partialValue == 0
-        cpu.state.fsubtract = true
-        cpu.state.fcarry = result.overflow
-        cpu.state.fhalfcarry = (cpu.state.a & 0x0f) < (immediate & 0x0f)
-        cpu.state.a = result.partialValue
+        cpu.fzero = result.partialValue == 0
+        cpu.fsubtract = true
+        cpu.fcarry = result.overflow
+        cpu.fhalfcarry = (cpu.a & 0x0f) < (immediate & 0x0f)
+        cpu.a = result.partialValue
         return .fetchNext
       }
 
@@ -798,20 +798,20 @@ extension LR35902.InstructionSet {
       var immediate: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt8(memory.read(from: cpu.state.pc))
-          cpu.state.pc += 1
+          immediate = UInt8(memory.read(from: cpu.pc))
+          cpu.pc += 1
           return .continueExecution
         }
 
-        immediate += cpu.state.fcarry ? 1 : 0
+        immediate += cpu.fcarry ? 1 : 0
 
-        let originalValue = cpu.state.a
+        let originalValue = cpu.a
         let result = originalValue.subtractingReportingOverflow(immediate)
-        cpu.state.fzero = result.partialValue == 0
-        cpu.state.fsubtract = true
-        cpu.state.fcarry = result.overflow
-        cpu.state.fhalfcarry = (cpu.state.a & 0x0f) < (immediate & 0x0f)
-        cpu.state.a = result.partialValue
+        cpu.fzero = result.partialValue == 0
+        cpu.fsubtract = true
+        cpu.fcarry = result.overflow
+        cpu.fhalfcarry = (cpu.a & 0x0f) < (immediate & 0x0f)
+        cpu.a = result.partialValue
         return .fetchNext
       }
 
@@ -820,16 +820,16 @@ extension LR35902.InstructionSet {
       var value: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          value = memory.read(from: cpu.state.hl)
+          value = memory.read(from: cpu.hl)
           return .continueExecution
         }
-        let originalValue = cpu.state.a
+        let originalValue = cpu.a
         let result = originalValue.subtractingReportingOverflow(value)
-        cpu.state.fzero = result.partialValue == 0
-        cpu.state.fsubtract = true
-        cpu.state.fcarry = result.overflow
-        cpu.state.fhalfcarry = (cpu.state.a & 0x0f) < (value & 0x0f)
-        cpu.state.a = result.partialValue
+        cpu.fzero = result.partialValue == 0
+        cpu.fsubtract = true
+        cpu.fcarry = result.overflow
+        cpu.fhalfcarry = (cpu.a & 0x0f) < (value & 0x0f)
+        cpu.a = result.partialValue
         return .fetchNext
       }
 
@@ -839,15 +839,15 @@ extension LR35902.InstructionSet {
         if cycle == 1 {
           return .continueExecution
         }
-        cpu.state[register] = (cpu.state[register] as UInt16).addingReportingOverflow(1).partialValue
+        cpu[register] = (cpu[register] as UInt16).addingReportingOverflow(1).partialValue
         return .fetchNext
       }
 
     // di
     case .di:
       return { (cpu, memory, cycle, sourceLocation) in
-        cpu.state.ime = false
-        cpu.state.imeScheduledCyclesRemaining = 0
+        cpu.ime = false
+        cpu.imeScheduledCyclesRemaining = 0
         return .fetchNext
       }
 
@@ -855,18 +855,18 @@ extension LR35902.InstructionSet {
     case .ei:
       return { (cpu, memory, cycle, sourceLocation) in
         // IME will be enabled after the next machine cycle, so we set up a counter to track that delay.
-        cpu.state.imeScheduledCyclesRemaining = 2
+        cpu.imeScheduledCyclesRemaining = 2
         return .fetchNext
       }
 
     // or r
     case .or(let register) where registers8.contains(register):
       return { (cpu, memory, cycle, sourceLocation) in
-        cpu.state.a |= cpu.state[register]
-        cpu.state.fzero = cpu.state.a == 0
-        cpu.state.fsubtract = false
-        cpu.state.fcarry = false
-        cpu.state.fhalfcarry = false
+        cpu.a |= cpu[register]
+        cpu.fzero = cpu.a == 0
+        cpu.fsubtract = false
+        cpu.fcarry = false
+        cpu.fhalfcarry = false
         return .fetchNext
       }
 
@@ -875,15 +875,15 @@ extension LR35902.InstructionSet {
       var immediate: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt8(memory.read(from: cpu.state.pc))
-          cpu.state.pc += 1
+          immediate = UInt8(memory.read(from: cpu.pc))
+          cpu.pc += 1
           return .continueExecution
         }
-        cpu.state.a |= immediate
-        cpu.state.fzero = cpu.state.a == 0
-        cpu.state.fsubtract = false
-        cpu.state.fcarry = false
-        cpu.state.fhalfcarry = false
+        cpu.a |= immediate
+        cpu.fzero = cpu.a == 0
+        cpu.fsubtract = false
+        cpu.fcarry = false
+        cpu.fhalfcarry = false
         return .fetchNext
       }
 
@@ -892,25 +892,25 @@ extension LR35902.InstructionSet {
       var value: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          value = memory.read(from: cpu.state.hl)
+          value = memory.read(from: cpu.hl)
           return .continueExecution
         }
-        cpu.state.a |= value
-        cpu.state.fzero = cpu.state.a == 0
-        cpu.state.fsubtract = false
-        cpu.state.fcarry = false
-        cpu.state.fhalfcarry = false
+        cpu.a |= value
+        cpu.fzero = cpu.a == 0
+        cpu.fsubtract = false
+        cpu.fcarry = false
+        cpu.fhalfcarry = false
         return .fetchNext
       }
 
     // xor r
     case .xor(let register) where registers8.contains(register):
       return { (cpu, memory, cycle, sourceLocation) in
-        cpu.state.a ^= cpu.state[register]
-        cpu.state.fzero = cpu.state.a == 0
-        cpu.state.fsubtract = false
-        cpu.state.fcarry = false
-        cpu.state.fhalfcarry = false
+        cpu.a ^= cpu[register]
+        cpu.fzero = cpu.a == 0
+        cpu.fsubtract = false
+        cpu.fcarry = false
+        cpu.fhalfcarry = false
         return .fetchNext
       }
 
@@ -919,14 +919,14 @@ extension LR35902.InstructionSet {
       var value: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          value = memory.read(from: cpu.state.hl)
+          value = memory.read(from: cpu.hl)
           return .continueExecution
         }
-        cpu.state.a ^= value
-        cpu.state.fzero = cpu.state.a == 0
-        cpu.state.fsubtract = false
-        cpu.state.fcarry = false
-        cpu.state.fhalfcarry = false
+        cpu.a ^= value
+        cpu.fzero = cpu.a == 0
+        cpu.fsubtract = false
+        cpu.fcarry = false
+        cpu.fhalfcarry = false
         return .fetchNext
       }
 
@@ -935,15 +935,15 @@ extension LR35902.InstructionSet {
       var immediate: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt8(memory.read(from: cpu.state.pc))
-          cpu.state.pc += 1
+          immediate = UInt8(memory.read(from: cpu.pc))
+          cpu.pc += 1
           return .continueExecution
         }
-        cpu.state.a ^= immediate
-        cpu.state.fzero = cpu.state.a == 0
-        cpu.state.fsubtract = false
-        cpu.state.fcarry = false
-        cpu.state.fhalfcarry = false
+        cpu.a ^= immediate
+        cpu.fzero = cpu.a == 0
+        cpu.fsubtract = false
+        cpu.fcarry = false
+        cpu.fhalfcarry = false
         return .fetchNext
       }
 
@@ -952,42 +952,42 @@ extension LR35902.InstructionSet {
       var immediate: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt8(memory.read(from: cpu.state.pc))
-          cpu.state.pc += 1
+          immediate = UInt8(memory.read(from: cpu.pc))
+          cpu.pc += 1
           return .continueExecution
         }
-        cpu.state.a &= immediate
-        cpu.state.fzero = cpu.state.a == 0
-        cpu.state.fsubtract = false
-        cpu.state.fcarry = false
-        cpu.state.fhalfcarry = true
+        cpu.a &= immediate
+        cpu.fzero = cpu.a == 0
+        cpu.fsubtract = false
+        cpu.fcarry = false
+        cpu.fhalfcarry = true
         return .fetchNext
       }
 
     // and r
     case .and(let register) where registers8.contains(register):
       return { (cpu, memory, cycle, sourceLocation) in
-        cpu.state.a &= cpu.state[register]
-        cpu.state.fzero = cpu.state.a == 0
-        cpu.state.fsubtract = false
-        cpu.state.fcarry = false
-        cpu.state.fhalfcarry = true
+        cpu.a &= cpu[register]
+        cpu.fzero = cpu.a == 0
+        cpu.fsubtract = false
+        cpu.fcarry = false
+        cpu.fhalfcarry = true
         return .fetchNext
       }
 
     // add r
     case .add(.a, let register) where registers8.contains(register):  // TODO: Test me
       return { (cpu, memory, cycle, sourceLocation) in
-        let originalValue = cpu.state.a
-        let registerValue = cpu.state[register] as UInt8
+        let originalValue = cpu.a
+        let registerValue = cpu[register] as UInt8
         let result = originalValue.addingReportingOverflow(registerValue)
 
-        cpu.state.fzero = result.partialValue == 0
-        cpu.state.fsubtract = false
-        cpu.state.fcarry = result.overflow
-        cpu.state.fhalfcarry = (((originalValue & 0x0f) + (registerValue & 0x0f)) & 0x10) > 0
+        cpu.fzero = result.partialValue == 0
+        cpu.fsubtract = false
+        cpu.fcarry = result.overflow
+        cpu.fhalfcarry = (((originalValue & 0x0f) + (registerValue & 0x0f)) & 0x10) > 0
 
-        cpu.state.a = result.partialValue
+        cpu.a = result.partialValue
 
         return .fetchNext
       }
@@ -997,17 +997,17 @@ extension LR35902.InstructionSet {
       var immediate: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt8(memory.read(from: cpu.state.pc))
-          cpu.state.pc += 1
+          immediate = UInt8(memory.read(from: cpu.pc))
+          cpu.pc += 1
           return .continueExecution
         }
-        let originalValue = cpu.state.a
+        let originalValue = cpu.a
         let result = originalValue.addingReportingOverflow(immediate)
-        cpu.state.fzero = result.partialValue == 0
-        cpu.state.fsubtract = false
-        cpu.state.fcarry = result.overflow
-        cpu.state.fhalfcarry = (((originalValue & 0x0f) + (immediate & 0x0f)) & 0x10) > 0
-        cpu.state.a = result.partialValue
+        cpu.fzero = result.partialValue == 0
+        cpu.fsubtract = false
+        cpu.fcarry = result.overflow
+        cpu.fhalfcarry = (((originalValue & 0x0f) + (immediate & 0x0f)) & 0x10) > 0
+        cpu.a = result.partialValue
         return .fetchNext
       }
 
@@ -1016,16 +1016,16 @@ extension LR35902.InstructionSet {
       var value: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          value = memory.read(from: cpu.state.hl)
+          value = memory.read(from: cpu.hl)
           return .continueExecution
         }
-        let originalValue = cpu.state.a
+        let originalValue = cpu.a
         let result = originalValue.addingReportingOverflow(value)
-        cpu.state.fzero = result.partialValue == 0
-        cpu.state.fsubtract = false
-        cpu.state.fcarry = result.overflow
-        cpu.state.fhalfcarry = (((originalValue & 0x0f) + (value & 0x0f)) & 0x10) > 0
-        cpu.state.a = result.partialValue
+        cpu.fzero = result.partialValue == 0
+        cpu.fsubtract = false
+        cpu.fcarry = result.overflow
+        cpu.fhalfcarry = (((originalValue & 0x0f) + (value & 0x0f)) & 0x10) > 0
+        cpu.a = result.partialValue
         return .fetchNext
       }
 
@@ -1035,13 +1035,13 @@ extension LR35902.InstructionSet {
         if cycle == 1 {
           return .continueExecution
         }
-        let originalValue = cpu.state.hl
-        let sourceValue: UInt16 = cpu.state[src]
+        let originalValue = cpu.hl
+        let sourceValue: UInt16 = cpu[src]
         let result = originalValue.addingReportingOverflow(sourceValue)
-        cpu.state.fsubtract = false
-        cpu.state.fcarry = result.overflow
-        cpu.state.fhalfcarry = (((originalValue & 0x0fff) + (sourceValue & 0x0fff)) & 0x1000) > 0
-        cpu.state.hl = result.partialValue
+        cpu.fsubtract = false
+        cpu.fcarry = result.overflow
+        cpu.fhalfcarry = (((originalValue & 0x0fff) + (sourceValue & 0x0fff)) & 0x1000) > 0
+        cpu.hl = result.partialValue
         return .fetchNext
       }
 
@@ -1050,36 +1050,36 @@ extension LR35902.InstructionSet {
       var immediate: UInt8 = 0
       return { (cpu, memory, cycle, sourceLocation) in
         if cycle == 1 {
-          immediate = UInt8(memory.read(from: cpu.state.pc))
-          cpu.state.pc += 1
+          immediate = UInt8(memory.read(from: cpu.pc))
+          cpu.pc += 1
           return .continueExecution
         }
 
-        immediate += cpu.state.fcarry ? 1 : 0
+        immediate += cpu.fcarry ? 1 : 0
 
-        let originalValue = cpu.state.a
+        let originalValue = cpu.a
         let result = originalValue.subtractingReportingOverflow(immediate)
-        cpu.state.fzero = result.partialValue == 0
-        cpu.state.fsubtract = true
-        cpu.state.fcarry = result.overflow
-        cpu.state.fhalfcarry = (cpu.state.a & 0x0f) < (immediate & 0x0f)
-        cpu.state.a = result.partialValue
+        cpu.fzero = result.partialValue == 0
+        cpu.fsubtract = true
+        cpu.fcarry = result.overflow
+        cpu.fhalfcarry = (cpu.a & 0x0f) < (immediate & 0x0f)
+        cpu.a = result.partialValue
         return .fetchNext
       }
 
     // cpl
     case .cpl:  // TODO: Test me
       return { (cpu, memory, cycle, sourceLocation) in
-        cpu.state.a = ~cpu.state.a
-        cpu.state.fsubtract = true
-        cpu.state.fcarry = true
+        cpu.a = ~cpu.a
+        cpu.fsubtract = true
+        cpu.fcarry = true
         return .fetchNext
       }
 
     case .halt:
       return { (cpu, memory, cycle, sourceLocation) in
         // TODO: Implement HALT bug behavior outlined in https://github.com/AntonioND/giibiiadvance/tree/master/docs
-        cpu.state.halted = true
+        cpu.halted = true
         return .fetchNext
       }
 
@@ -1099,11 +1099,11 @@ extension LR35902 {
   /** Advances the CPU by one machine cycle. */
   public func advance(memory: AddressableMemory) {
     // https://gekkio.fi/files/gb-docs/gbctr.pdf
-    if state.isRunning {
+    if isRunning {
       // Execution phase
-      if nextAction == .continueExecution, let loaded = state.machineInstruction.loaded {
-        state.machineInstruction.cycle += 1
-        nextAction = loaded.microcode(self, memory, state.machineInstruction.cycle, loaded.sourceLocation)
+      if nextAction == .continueExecution, let loaded = machineInstruction.loaded {
+        machineInstruction.cycle += 1
+        nextAction = loaded.microcode(self, memory, machineInstruction.cycle, loaded.sourceLocation)
       } else {
         // No instruction was actually loaded into the CPU; let's switch to fetching one.
         nextAction = .fetchNext
@@ -1113,22 +1113,22 @@ extension LR35902 {
     // The LR35902's fetch/execute overlap behavior means we load the next opcode on the same machine cycle as the
     // last instruction's microcode execution.
     if nextAction == .fetchNext || nextAction == .fetchPrefix {
-      let interrupts = state.interruptFlag.intersection(state.interruptEnable)
+      let interrupts = interruptFlag.intersection(interruptEnable)
       if nextAction == .fetchNext && !interrupts.isEmpty {
         // Interrupt phase
-        state.halted = false
+        halted = false
 
-        let sourceLocation = memory.sourceLocation(from: state.pc)
+        let sourceLocation = memory.sourceLocation(from: pc)
         nextAction = .continueExecution
-        state.machineInstruction = .init(spec: .interrupt(interrupts), sourceLocation: sourceLocation)
+        machineInstruction = .init(spec: .interrupt(interrupts), sourceLocation: sourceLocation)
 
-      } else if state.isRunning {
+      } else if isRunning {
         // Fetch phase
-        var sourceLocation = memory.sourceLocation(from: state.pc)
-        let tableIndex = Int(truncatingIfNeeded: memory.read(from: state.pc))
-        state.pc += 1
+        var sourceLocation = memory.sourceLocation(from: pc)
+        let tableIndex = Int(truncatingIfNeeded: memory.read(from: pc))
+        pc += 1
         let loadedSpec: Instruction.Spec
-        if let loaded = state.machineInstruction.loaded, let prefixTable = InstructionSet.prefixTables[loaded.spec] {
+        if let loaded = machineInstruction.loaded, let prefixTable = InstructionSet.prefixTables[loaded.spec] {
           // Finish loading the prefix instruction.
           sourceLocation = loaded.sourceLocation
           loadedSpec = prefixTable[tableIndex]
@@ -1136,16 +1136,16 @@ extension LR35902 {
           loadedSpec = InstructionSet.table[tableIndex]
         }
         nextAction = .continueExecution
-        state.machineInstruction = .init(spec: loadedSpec, sourceLocation: sourceLocation)
+        machineInstruction = .init(spec: loadedSpec, sourceLocation: sourceLocation)
       }
     }
 
     // TODO: Verify this timing as I'm not confident it's being evaluated at the correct location.
-    if state.imeScheduledCyclesRemaining > 0 {
-      state.imeScheduledCyclesRemaining -= 1
-      if state.imeScheduledCyclesRemaining <= 0 {
-        state.ime = true
-        state.imeScheduledCyclesRemaining = 0
+    if imeScheduledCyclesRemaining > 0 {
+      imeScheduledCyclesRemaining -= 1
+      if imeScheduledCyclesRemaining <= 0 {
+        ime = true
+        imeScheduledCyclesRemaining = 0
       }
     }
   }
@@ -1164,11 +1164,11 @@ extension Gameboy {
 
   /** Advances the emulation by one instruction. */
   public func advanceInstruction() {
-    if cpu.state.machineInstruction.loaded == nil {
+    if cpu.machineInstruction.loaded == nil {
       advance()
     }
-    if let sourceLocation = cpu.state.machineInstruction.loaded?.sourceLocation {
-      while sourceLocation == cpu.state.machineInstruction.loaded?.sourceLocation, !cpu.state.halted {
+    if let sourceLocation = cpu.machineInstruction.loaded?.sourceLocation {
+      while sourceLocation == cpu.machineInstruction.loaded?.sourceLocation, !cpu.halted {
         advance()
       }
     }

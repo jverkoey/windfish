@@ -46,7 +46,7 @@ final class FlagsView: NSView {
     fatalError("init(coder:) has not been implemented")
   }
 
-  func update(with cpu: LR35902.State) {
+  func update(with cpu: LR35902) {
     zeroLabel.textColor = cpu.fzero ? .textColor : .disabledControlTextColor
     subtractLabel.textColor = cpu.fsubtract ? .textColor : .disabledControlTextColor
     carryLabel.textColor = cpu.fcarry ? .textColor : .disabledControlTextColor

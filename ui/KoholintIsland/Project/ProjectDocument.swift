@@ -197,7 +197,7 @@ class ProjectDocument: NSDocument {
     didSet {
       if let romData = romData {
         gameboy.cartridge = .init(data: romData)
-        gameboy.cpu.state.pc = 0x100  // Assume the boot sequence has concluded.
+        gameboy.cpu.pc = 0x100  // Assume the boot sequence has concluded.
       } else {
         preconditionFailure()
       }

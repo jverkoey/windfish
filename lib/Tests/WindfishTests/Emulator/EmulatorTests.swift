@@ -11,7 +11,7 @@ func disassemblyInitialized(with assembly: String) -> Disassembler {
 }
 
 /** Asserts that two CPU states are equal. */
-func assertEqual(_ state1: LR35902.State, _ state2: LR35902.State, message: String = "", file: StaticString = #file, line: UInt = #line) {
+func assertEqual(_ state1: LR35902, _ state2: LR35902, message: String = "", file: StaticString = #file, line: UInt = #line) {
   XCTAssertEqual(state1.a.hexString, state2.a.hexString,        "a mismatch \(message)", file: file, line: line)
   XCTAssertEqual(state1.b.hexString, state2.b.hexString,        "b mismatch \(message)", file: file, line: line)
   XCTAssertEqual(state1.c.hexString, state2.c.hexString,        "c mismatch \(message)", file: file, line: line)
@@ -28,9 +28,6 @@ func assertEqual(_ state1: LR35902.State, _ state2: LR35902.State, message: Stri
   XCTAssertEqual(state1.ime, state2.ime,                        "ime mismatch \(message)", file: file, line: line)
   XCTAssertEqual(state1.halted, state2.halted,                  "halted mismatch \(message)", file: file, line: line)
 }
-func assertEqual(_ state1: LR35902, _ state2: LR35902, message: String = "", file: StaticString = #file, line: UInt = #line) {
-  assertEqual(state1.state, state2.state)
-}
 
 class EmulatorTests: XCTestCase {
   // MARK: - To be categorized
@@ -44,7 +41,7 @@ ld   e, a
 
     let cpu = LR35902.zeroed()
     disassembly.trace(range: 0..<disassembly.cartridge.size, cpu: cpu)
-    let lastState = cpu.state
+    let lastState = cpu
 
     XCTAssertEqual(lastState.a, 0xE0)
     XCTAssertEqual(lastState.b, 0)
@@ -66,14 +63,14 @@ ld   e, a
     let cpu = LR35902.zeroed()
     disassembly.trace(range: 0..<disassembly.cartridge.size, cpu: cpu)
 
-    XCTAssertEqual(cpu.state.a, 0xE1)
-    XCTAssertEqual(cpu.state.b, 0)
-    XCTAssertEqual(cpu.state.c, 0)
-    XCTAssertEqual(cpu.state.d, 0)
-    XCTAssertEqual(cpu.state.e, 0xE1)
-    XCTAssertEqual(cpu.state.h, 0)
-    XCTAssertEqual(cpu.state.l, 0)
-    XCTAssertEqual(cpu.state.pc, 0x0005)
+    XCTAssertEqual(cpu.a, 0xE1)
+    XCTAssertEqual(cpu.b, 0)
+    XCTAssertEqual(cpu.c, 0)
+    XCTAssertEqual(cpu.d, 0)
+    XCTAssertEqual(cpu.e, 0xE1)
+    XCTAssertEqual(cpu.h, 0)
+    XCTAssertEqual(cpu.l, 0)
+    XCTAssertEqual(cpu.pc, 0x0005)
   }
 
   func test_ld_a_addr__and_imm8__ld_e_a() {
@@ -86,14 +83,14 @@ ld   e, a
     let cpu = LR35902.zeroed()
     disassembly.trace(range: 0..<disassembly.cartridge.size, cpu: cpu)
 
-    XCTAssertEqual(cpu.state.a, 0)
-    XCTAssertEqual(cpu.state.b, 0)
-    XCTAssertEqual(cpu.state.c, 0)
-    XCTAssertEqual(cpu.state.d, 0)
-    XCTAssertEqual(cpu.state.e, 0)
-    XCTAssertEqual(cpu.state.h, 0)
-    XCTAssertEqual(cpu.state.l, 0)
-    XCTAssertEqual(cpu.state.pc, 0x0006)
+    XCTAssertEqual(cpu.a, 0)
+    XCTAssertEqual(cpu.b, 0)
+    XCTAssertEqual(cpu.c, 0)
+    XCTAssertEqual(cpu.d, 0)
+    XCTAssertEqual(cpu.e, 0)
+    XCTAssertEqual(cpu.h, 0)
+    XCTAssertEqual(cpu.l, 0)
+    XCTAssertEqual(cpu.pc, 0x0006)
   }
 
   func testComplexInstruction() {
@@ -108,12 +105,12 @@ ld   [$ffcb], a
 """)
 
     let cpu = LR35902()
-    cpu.state.a = 0b0000_1111
+    cpu.a = 0b0000_1111
 
     disassembly.trace(range: 0..<disassembly.cartridge.size, cpu: cpu)
 
-    XCTAssertEqual(cpu.state.a, 0b0000_1111)
-    XCTAssertEqual(cpu.state.c, 0b0000_1111)
-    XCTAssertEqual(cpu.state.pc, 0x000A)
+    XCTAssertEqual(cpu.a, 0b0000_1111)
+    XCTAssertEqual(cpu.c, 0b0000_1111)
+    XCTAssertEqual(cpu.pc, 0x000A)
   }
 }

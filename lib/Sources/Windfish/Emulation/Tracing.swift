@@ -35,18 +35,18 @@ extension Disassembler {
              cpu: LR35902 = LR35902.zeroed(),
              step: ((LR35902.Instruction, Gameboy.Cartridge.Location, LR35902) -> Void)? = nil) {
     let addressAndBank = Gameboy.Cartridge.addressAndBank(from: range.lowerBound)
-    cpu.state.pc = addressAndBank.address
+    cpu.pc = addressAndBank.address
     let bank = addressAndBank.bank
     let upperBoundPc = Gameboy.Cartridge.addressAndBank(from: range.upperBound).address
 
-    while cpu.state.pc < upperBoundPc {
-      guard let instruction = self.instruction(at: cpu.state.pc, in: bank) else {
-        cpu.state.pc += 1
+    while cpu.pc < upperBoundPc {
+      guard let instruction = self.instruction(at: cpu.pc, in: bank) else {
+        cpu.pc += 1
         continue
       }
 
       let memory: AddressableMemory = TracerMemory()
-      let location = Gameboy.Cartridge.location(for: cpu.state.pc, in: bank)!
+      let location = Gameboy.Cartridge.location(for: cpu.pc, in: bank)!
       cpu.emulate(instruction: instruction, memory: memory)
       step?(instruction, location, cpu)
     }
