@@ -265,7 +265,7 @@ extension LCDController {
     let tileData1: UInt8
     switch tileDataAddress {
     case .x8000:
-      let tileDataIndex = Int(truncatingIfNeeded: Int16(bitPattern: UInt16(truncatingIfNeeded: (tileIndex &* 16))) &+ tileOffsetY &* 2)
+      let tileDataIndex = Int(truncatingIfNeeded: Int16(bitPattern: UInt16(truncatingIfNeeded: tileIndex) &* 16) &+ tileOffsetY &* 2)
       tileData0 = tileData[tileDataIndex]
       tileData1 = tileData[tileDataIndex + 1]
     case .x8800:
@@ -292,6 +292,70 @@ extension LCDController {
            palette: backgroundPalette)
     } else {
       lastBackgroundPixel = 0
+    }
+
+    if intersectedOAMs.isEmpty {
+      return
+    }
+
+    for sprite in intersectedOAMs {
+      guard sprite.x > scanlineX && sprite.x <= scanlineX + 8 else {
+        continue
+      }
+      let tileIndex: Int16
+      var tileOffsetX = Int16(truncatingIfNeeded: scanlineX) + 8 - Int16(bitPattern: UInt16(truncatingIfNeeded: sprite.x))
+      var tileOffsetY = Int16(truncatingIfNeeded: scanlineY) + 16 - Int16(bitPattern: UInt16(truncatingIfNeeded: sprite.y))
+
+      switch spriteSize {
+      case .x8x16:
+        let flipY = sprite.flags & 0b0100_0000 > 0
+        let wideTile = Int16(bitPattern: UInt16(truncatingIfNeeded: sprite.tile))
+        if tileOffsetY > 7 && !flipY {
+          tileOffsetY -= 8;
+          tileIndex = wideTile | 0x01
+        } else if tileOffsetY <= 7 && !flipY  {
+          tileIndex = wideTile & 0xFE
+        } else if tileOffsetY > 7 && flipY {
+          tileOffsetY = 15 - tileOffsetY
+          tileIndex = wideTile & 0xFE
+        } else if tileOffsetY <= 7 && flipY {
+          tileIndex = wideTile | 0x01
+          tileOffsetY = 7 - tileOffsetY
+        } else {
+          tileIndex = 0
+        }
+      case .x8x8:
+        tileIndex = Int16(bitPattern: UInt16(truncatingIfNeeded: sprite.tile))
+        if sprite.flags & 0b0100_0000 > 0 {
+          tileOffsetY = 7 - tileOffsetY
+        }
+      }
+      if sprite.flags & 0b0010_0000 > 0 {
+        tileOffsetX = 7 - tileOffsetX
+      }
+
+      let tileData0: UInt8
+      let tileData1: UInt8
+      let tileDataIndex = Int(truncatingIfNeeded: Int16(bitPattern: UInt16(truncatingIfNeeded: tileIndex) &* 16) &+ tileOffsetY &* 2)
+      tileData0 = tileData[tileDataIndex]
+      tileData1 = tileData[tileDataIndex + 1]
+
+      let lsb: UInt8 = (tileData0 & (0x80 >> tileOffsetX)) > 0 ? 0b01 : 0
+      let msb: UInt8 = (tileData1 & (0x80 >> tileOffsetX)) > 0 ? 0b10 : 0
+      let pixel = msb | lsb
+      if pixel > 0 {
+        let pixelBehindBg = sprite.flags & 0b1000_0000 > 0 && lastBackgroundPixel > 0
+        if !pixelBehindBg {
+          let palette: Palette
+          if sprite.flags & 0b0001_0000 > 0 {
+            palette = objectPallete0
+          } else {
+            palette = objectPallete1
+          }
+          plot(x: scanlineX, y: scanlineY, byte: pixel, palette: palette)
+        }
+        break
+      }
     }
   }
 
@@ -369,14 +433,15 @@ extension LCDController {
   // MARK: OAM search
 
   private func searchNextOAM() {
-    if intersectedOAMs.count < 10 {
-      let sprite = oam.sprites[oamIndex]
-      oamIndex += 1
-      if sprite.x > 0
-          && scanlineY + 16 >= sprite.y
-          && scanlineY + 16 < sprite.y + spriteSize.height() {
-        intersectedOAMs.append(sprite)
-      }
+    guard intersectedOAMs.count < 10 else {
+      return
+    }
+    let sprite = oam.sprites[oamIndex]
+    oamIndex += 1
+    if sprite.x > 0
+        && scanlineY + 16 >= sprite.y
+        && scanlineY + 16 < sprite.y + spriteSize.height() {
+      intersectedOAMs.append(sprite)
     }
   }
 }
