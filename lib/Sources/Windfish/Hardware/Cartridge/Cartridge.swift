@@ -67,7 +67,8 @@ extension Gameboy.Cartridge {
    - Parameter pc: The program counter's location.
    - Parameter bank: The current bank.
    */
-  public static func location(for pc: LR35902.Address, in bank: Gameboy.Cartridge.Bank) -> Location? {
+  public static func location(for pc: LR35902.Address, in _bank: Gameboy.Cartridge.Bank) -> Location? {
+    let bank = _bank == 0 ? 1 : _bank
     // Bank 0 is permanently addressable from 0x0000...0x3FFF.
     // All other banks map from 0x4000...0x7FFF
     guard (bank == 0 && pc < 0x4000) || (bank > 0 && pc < 0x8000) else {
