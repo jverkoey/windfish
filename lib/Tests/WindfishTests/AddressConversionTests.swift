@@ -30,9 +30,9 @@ class AddressConversionTests: XCTestCase {
     XCTAssertEqual(addressAndBank.bank, bank)
   }
 
-  func testUnselectedBankGivesNilCartAddressAbove0x3FFF() throws {
-    XCTAssertNil(Gameboy.Cartridge.location(for: 0x4000, in: 0))
-    XCTAssertNil(Gameboy.Cartridge.location(for: 0x6000, in: 0))
+  func testUnselectedBankGivesNilCartAddressAbove0x8FFF() throws {
+    XCTAssertEqual(Gameboy.Cartridge.location(for: 0x4000, in: 0), 0x4000)
+    XCTAssertEqual(Gameboy.Cartridge.location(for: 0x6000, in: 0), 0x6000)
     XCTAssertNil(Gameboy.Cartridge.location(for: 0x9000, in: 0))
   }
 
