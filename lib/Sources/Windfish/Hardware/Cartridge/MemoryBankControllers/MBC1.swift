@@ -128,7 +128,9 @@ extension Gameboy.Cartridge {
 
       // Random-access memory (RAM) bank 00-03
       if address >= 0xA000 && address <= 0xBFFF {
-        precondition(ramEnabled, "RAM is not enabled.")
+        guard ramEnabled else {
+          return
+        }
         switch ramSize {
         case .none:
           preconditionFailure("Cartridge has no RAM.")

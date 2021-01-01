@@ -1,8 +1,8 @@
 import XCTest
 @testable import Windfish
 
-class ld_r_rTests: XCTestCase {
-  func testTimingsAndCorrectness() {
+class ld_r_r: XCTestCase {
+  func test() {
     let memory = TestMemory()
 
     for spec in LR35902.InstructionSet.allSpecs() {

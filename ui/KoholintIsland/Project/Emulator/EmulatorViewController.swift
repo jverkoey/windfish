@@ -440,8 +440,6 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
   @objc func performControlAction(_ sender: NSSegmentedControl) {
     if sender.selectedSegment == 0 {  // Step forward
-      precondition(currentInstruction() != nil)
-
       // TODO: Step into and through any control flow.
 
       document.gameboy.advanceInstruction()
@@ -581,6 +579,23 @@ extension EmulatorViewController: NSTextFieldDelegate {
   }
 
   private func currentInstruction() -> LR35902.Instruction? {
+    if let spec = document.gameboy.cpu.machineInstruction.spec {
+      if let operandWidth = LR35902.InstructionSet.widths[spec]?.operand,
+         let sourceAddress = document.gameboy.cpu.machineInstruction.sourceAddress(),
+         operandWidth > 0 {
+        switch operandWidth {
+        case 1:
+          return LR35902.Instruction(spec: spec, immediate: .imm8(document.gameboy.memory.read(from: sourceAddress + 1)))
+        case 2:
+          let lsb = UInt16(truncatingIfNeeded: document.gameboy.memory.read(from: sourceAddress + 1))
+          let msb = UInt16(truncatingIfNeeded: document.gameboy.memory.read(from: sourceAddress + 1)) << 8
+          return LR35902.Instruction(spec: spec, immediate: .imm16(lsb | msb))
+        default:
+          break
+        }
+      }
+      return LR35902.Instruction(spec: spec)
+    }
     if let addressAndBank = document.gameboy.cpu.machineInstruction.sourceAddressAndBank() {
       // When a machine instruction has been loaded we need to look at it source location rather than the cpu's current
       // pc + bank as the CPU may have already incremented the pc as a result of reading the instruction's opcode.

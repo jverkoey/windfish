@@ -15,7 +15,7 @@ extension LR35902.Emulation {
         return .continueExecution
       }
 
-      immediate += cpu.fcarry ? 1 : 0
+      immediate &+= cpu.fcarry ? 1 : 0
 
       let originalValue = cpu.a
       let result = originalValue.subtractingReportingOverflow(immediate)

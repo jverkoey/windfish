@@ -12,15 +12,25 @@ public final class LR35902 {
   public final class MachineInstruction {
     internal init() {}
 
-    var spec: Instruction.Spec?
+    public internal(set) var spec: Instruction.Spec?
     var instructionEmulator: InstructionEmulator? {
       didSet {
         cycle = 0
       }
     }
-    var sourceLocation: Disassembler.SourceLocation?
+    public internal(set) var sourceLocation: Disassembler.SourceLocation?
     var cycle: Int = 0
 
+    public func sourceAddress() -> LR35902.Address? {
+      switch sourceLocation {
+      case .cartridge(let location):
+        return Gameboy.Cartridge.addressAndBank(from: location).address
+      case .memory(let address):
+        return address
+      default:
+        return nil
+      }
+    }
     public func sourceAddressAndBank() -> (address: LR35902.Address, bank: Gameboy.Cartridge.Bank)? {
       guard case let .cartridge(sourceLocation) = sourceLocation else {
         return nil

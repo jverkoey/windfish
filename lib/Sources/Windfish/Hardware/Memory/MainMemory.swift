@@ -25,7 +25,7 @@ extension Gameboy {
           return cartridge!
         case LR35902.interruptEnableAddress, LR35902.interruptFlagAddress:
           return cpu
-        case Memory.ramAddressableRange:  return ram
+        case Memory.ramAddressableRange, Memory.echoRamAddressableRange:  return ram
         case Memory.hramAddressableRange: return hram
         case 0xFF00...0xFF07, 0xFF47...0xFF49:
           return ioRegisters
@@ -45,7 +45,7 @@ extension Gameboy {
     // MARK: - Mapping regions of memory
 
     private let hram = GenericRAM()
-    private let ram = GenericRAM()
+    private let ram = InternalRAM()
     private let ioRegisters = IORegisterMemory()
     private let dmaController: DMAController
     private let oam: OAM
@@ -53,6 +53,37 @@ extension Gameboy {
 
     static let hramAddressableRange: ClosedRange<LR35902.Address> = 0xFF80...0xFFFE
     static let ramAddressableRange: ClosedRange<LR35902.Address> = 0xC000...0xDFFF
+    static let echoRamAddressableRange: ClosedRange<LR35902.Address> = 0xE000...0xFDFF
+  }
+}
+
+private final class InternalRAM: AddressableMemory {
+  public var data: [LR35902.Address: UInt8] = [:]
+
+  func read(from address: LR35902.Address) -> UInt8 {
+    switch address {
+    case Gameboy.Memory.ramAddressableRange:
+      return data[address] ?? 0xff
+    case Gameboy.Memory.echoRamAddressableRange:
+      return data[address - (Gameboy.Memory.echoRamAddressableRange.lowerBound - Gameboy.Memory.ramAddressableRange.lowerBound)] ?? 0xff
+    default:
+      fatalError()
+    }
+  }
+
+  func write(_ byte: UInt8, to address: LR35902.Address) {
+    switch address {
+    case Gameboy.Memory.ramAddressableRange:
+      data[address] = byte
+    case Gameboy.Memory.echoRamAddressableRange:
+      data[address - (Gameboy.Memory.echoRamAddressableRange.lowerBound - Gameboy.Memory.ramAddressableRange.lowerBound)] = byte
+    default:
+      fatalError()
+    }
+  }
+
+  func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
+    return .memory(address)
   }
 }
 

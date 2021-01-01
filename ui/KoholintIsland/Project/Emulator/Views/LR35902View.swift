@@ -242,7 +242,7 @@ final class LR35902View: NSView {
   }
 
   func update(with cpu: LR35902) {
-    pcView.value = cpu.machineInstruction.sourceAddressAndBank()?.address ?? 0x100
+    pcView.value = cpu.machineInstruction.sourceAddress() ?? 0x100
     spView.value = cpu.sp
     aView.value = cpu.a
     fView.value = cpu.f

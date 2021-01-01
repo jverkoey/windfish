@@ -111,7 +111,9 @@ public class Disassembler {
   // MARK: - Instructions
 
   public func instruction(at pc: LR35902.Address, in bank: Gameboy.Cartridge.Bank) -> LR35902.Instruction? {
-    let location = Gameboy.Cartridge.location(for: pc, in: bank)!
+    guard let location = Gameboy.Cartridge.location(for: pc, in: bank) else {
+      return nil
+    }
     guard code.contains(Int(location)) else {
       return nil
     }
