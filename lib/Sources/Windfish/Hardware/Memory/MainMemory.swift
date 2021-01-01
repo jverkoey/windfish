@@ -37,7 +37,8 @@ extension Gameboy {
         case SoundController.wavePatternRegion, SoundController.soundRegistersRegion:
           return soundController
         default:
-          fatalError("No region mapped to this address.")
+          print("Unhandled address \(address.hexString)")
+          return fallthroughRAM
         }
       }
     }
@@ -50,6 +51,8 @@ extension Gameboy {
     private let dmaController: DMAController
     private let oam: OAM
     private let soundController: SoundController
+
+    private let fallthroughRAM = GenericRAM()
 
     static let hramAddressableRange: ClosedRange<LR35902.Address> = 0xFF80...0xFFFE
     static let ramAddressableRange: ClosedRange<LR35902.Address> = 0xC000...0xDFFF

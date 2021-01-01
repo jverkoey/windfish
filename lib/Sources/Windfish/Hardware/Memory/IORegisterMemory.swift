@@ -40,7 +40,7 @@ final class IORegisterMemory: AddressableMemory {
     guard let ioAddress = IOAddresses(rawValue: address) else {
       preconditionFailure("Invalid address")
     }
-    if ioAddress == .SC && byte == 0x81 {
+    if ioAddress == .SC && (byte & 0b1000_0000) > 0 {
       print(String(format: "%c", values[.SB]!), terminator: "")
     }
     precondition(values[ioAddress] != nil, "Writing to invalid register.")
