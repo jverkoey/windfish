@@ -14,13 +14,7 @@ extension LR35902.Emulation {
         cpu.pc += 1
         return .continueExecution
       }
-      let originalValue = cpu.a
-      let result = originalValue.subtractingReportingOverflow(immediate)
-      cpu.fzero = result.partialValue == 0
-      cpu.fsubtract = true
-      cpu.fcarry = result.overflow
-      cpu.fhalfcarry = (cpu.a & 0x0f) < (immediate & 0x0f)
-      cpu.a = result.partialValue
+      sub(cpu: cpu, value: immediate)
       return .fetchNext
     }
 
