@@ -1,8 +1,8 @@
 import XCTest
 @testable import Windfish
 
-class call_nn: XCTestCase {
-  func test() {
+extension InstructionEmulatorTests {
+  func test_call_nn() {
     let memory = TestMemory(defaultReadValue: 0x12)
 
     for spec in LR35902.InstructionSet.allSpecs() {

@@ -14,13 +14,7 @@ extension LR35902.Emulation {
       if cycle == 1 {
         return .continueExecution
       }
-      let originalValue = cpu.hl
-      let sourceValue: UInt16 = cpu[src]
-      let result = originalValue.addingReportingOverflow(sourceValue)
-      cpu.fsubtract = false
-      cpu.fcarry = result.overflow
-      cpu.fhalfcarry = (((originalValue & 0x0fff) + (sourceValue & 0x0fff)) & 0x1000) > 0
-      cpu.hl = result.partialValue
+      add(cpu: cpu, value: cpu[src] as UInt16)
       return .fetchNext
     }
 

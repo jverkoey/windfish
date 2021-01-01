@@ -22,6 +22,55 @@ extension InstructionEmulator {
     case .some(.nz): return !cpu.fzero ? .continueExecution : .fetchNext
     }
   }
+
+  /** Adds 8-bit value to cpu.a. */
+  func add(cpu: LR35902, value: UInt8) {
+    cpu.fsubtract = false
+
+    let wideA = UInt16(truncatingIfNeeded: cpu.a)
+    let wideVal = UInt16(truncatingIfNeeded: value)
+
+    let halfResult: UInt16 = (wideA & 0xf) + (wideVal & 0xf)
+    let fullResult: UInt16 = wideA + wideVal
+
+    cpu.a = UInt8(truncatingIfNeeded: fullResult)
+    cpu.fzero = cpu.a == 0
+    cpu.fcarry = fullResult > 0xff
+    cpu.fhalfcarry = halfResult > 0xf
+  }
+
+  /** Adds 8-bit value and a carry to cpu.a. */
+  func addWithCarry(cpu: LR35902, value: UInt8) {
+    cpu.fsubtract = false
+
+    let wideA = UInt16(truncatingIfNeeded: cpu.a)
+    let wideVal = UInt16(truncatingIfNeeded: value)
+
+    let halfResult: UInt16 = (wideA & 0xf) + (wideVal & 0xf) + 1
+    let fullResult: UInt16 = wideA + wideVal + 1
+
+    cpu.a = UInt8(truncatingIfNeeded: fullResult)
+    cpu.fzero = cpu.a == 0
+    cpu.fcarry = fullResult > 0xff
+    cpu.fhalfcarry = halfResult > 0xf
+  }
+
+  /** Adds 16-bit value to cpu.hl. */
+  func add(cpu: LR35902, value: UInt16) {
+    cpu.fsubtract = false
+    // Intentionally no modification of cpu.fzero
+
+    let wideHL = UInt32(truncatingIfNeeded: cpu.hl)
+    let wideVal = UInt32(truncatingIfNeeded: value)
+
+    let halfResult: UInt32 = (wideHL & 0xfff) + (wideVal & 0xfff)
+    let fullResult: UInt32 = wideHL + wideVal
+
+    cpu.hl = UInt16(truncatingIfNeeded: fullResult)
+    cpu.fcarry = fullResult > 0xffff
+    cpu.fhalfcarry = halfResult > 0xfff
+  }
+
 }
 
 extension LR35902.Emulation {

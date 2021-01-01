@@ -1,8 +1,8 @@
 import XCTest
 @testable import Windfish
 
-class add_sp_n: XCTestCase {
-  struct TestCase {
+extension InstructionEmulatorTests {
+  private struct TestCase {
     let sp: UInt16
     let imm8: Int8
     struct Result {
@@ -12,7 +12,7 @@ class add_sp_n: XCTestCase {
     }
     let result: Result
   }
-  func test() {
+  func test_add_sp_n() {
     let testCases: [String: TestCase] = [
       "zero":      .init(sp: 0,      imm8: 0,  result: .init(fc: false, fh: false, sp: 0)),
       "positive":  .init(sp: 0,      imm8: 1,  result: .init(fc: false, fh: false, sp: 1)),

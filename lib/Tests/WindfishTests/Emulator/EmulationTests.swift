@@ -1,6 +1,8 @@
 import XCTest
 @testable import Windfish
 
+class InstructionEmulatorTests: XCTestCase {}
+
 /**
  Note that each test includes a single nop instruction for padding at the end of the ROM due to how instructions are
  simultaneously executed and loaded in state.a single machine cycle.

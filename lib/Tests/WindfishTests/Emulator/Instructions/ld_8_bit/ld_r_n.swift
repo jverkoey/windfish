@@ -1,8 +1,8 @@
 import XCTest
 @testable import Windfish
 
-class ld_r_n: XCTestCase {
-  func test() {
+extension InstructionEmulatorTests {
+  func test_ld_r_n() {
     let defaultMemoryValue: UInt8 = 0x12
     let memory = TestMemory(defaultReadValue: defaultMemoryValue)
 
