@@ -14,13 +14,11 @@ extension LR35902.Emulation {
         return .continueExecution
       }
       if cycle == 2 {
-        let result = value.subtractingReportingOverflow(1)
-        cpu.fzero = result.partialValue == 0
         cpu.fsubtract = true
-        cpu.fhalfcarry = (value & 0x0f) < (1 & 0x0f)
-
-        value = result.partialValue
-
+        // fcarry not affected
+        value &-= 1
+        cpu.fzero = value == 0
+        cpu.fhalfcarry = (value & 0xf) == 0xf
         return .continueExecution
       }
       memory.write(value, to: cpu.hl)

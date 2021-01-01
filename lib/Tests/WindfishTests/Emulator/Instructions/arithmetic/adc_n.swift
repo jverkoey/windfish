@@ -32,9 +32,9 @@ extension InstructionEmulatorTests {
     ]
 
     for (name, testCase) in testCases {
-      let memory = TestMemory(defaultReadValue: testCase.imm8)
       for spec in LR35902.InstructionSet.allSpecs() {
         guard let emulator = LR35902.Emulation.adc_n(spec: spec) else { continue }
+        let memory = TestMemory(defaultReadValue: testCase.imm8)
         let cpu = LR35902.zeroed()
         cpu.a = testCase.a
         cpu.fcarry = testCase.fc

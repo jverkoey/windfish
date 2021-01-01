@@ -25,12 +25,10 @@ extension InstructionEmulatorTests {
       "nohalfcarry10":   .init(a: 0x10, reg: 0, result: .init(fz: false, fc: false, fh: false, a: 0x20)),
     ]
     for (name, testCase) in testCases {
-      let memory = TestMemory()
       for spec in LR35902.InstructionSet.allSpecs() {
-        guard case .add(.a, .a) = spec else {
-          continue
-        }
-        guard let emulator = LR35902.Emulation.add_a_r(spec: spec) else { continue }
+        guard case .add(.a, .a) = spec,
+              let emulator = LR35902.Emulation.add_a_r(spec: spec) else { continue }
+        let memory = TestMemory()
         let cpu = LR35902.zeroed()
         cpu.a = testCase.a
         let mutations = cpu.copy()
@@ -61,12 +59,10 @@ extension InstructionEmulatorTests {
       "nohalfcarry10":   .init(a: 0x10, reg: 0xf, result: .init(fz: false, fc: false, fh: false, a: 0x1f)),
     ]
     for (name, testCase) in testCases {
-      let memory = TestMemory()
       for spec in LR35902.InstructionSet.allSpecs() {
-        guard case .add(.a, let register) = spec, register != .a else {
-          continue
-        }
-        guard let emulator = LR35902.Emulation.add_a_r(spec: spec) else { continue }
+        guard case .add(.a, let register) = spec, register != .a,
+              let emulator = LR35902.Emulation.add_a_r(spec: spec) else { continue }
+        let memory = TestMemory()
         let cpu = LR35902.zeroed()
         cpu.a = testCase.a
         cpu[register] = testCase.reg

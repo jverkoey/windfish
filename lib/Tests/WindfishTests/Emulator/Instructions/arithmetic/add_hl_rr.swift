@@ -24,12 +24,10 @@ extension InstructionEmulatorTests {
       "nohalfcarry10":   .init(hl: 0x1000, reg: 0, result: .init(fc: false, fh: false, hl: 0x2000)),
     ]
     for (name, testCase) in testCases {
-      let memory = TestMemory()
       for spec in LR35902.InstructionSet.allSpecs() {
-        guard case .add(.hl, .hl) = spec else {
-          continue
-        }
-        guard let emulator = LR35902.Emulation.add_hl_rr(spec: spec) else { continue }
+        guard case .add(.hl, .hl) = spec,
+              let emulator = LR35902.Emulation.add_hl_rr(spec: spec) else { continue }
+        let memory = TestMemory()
         let cpu = LR35902.zeroed()
         cpu.hl = testCase.hl
         cpu.fzero = true
@@ -60,12 +58,10 @@ extension InstructionEmulatorTests {
       "nohalfcarry10":   .init(hl: 0x1000, reg: 0xfff, result: .init(fc: false, fh: false, hl: 0x1fff)),
     ]
     for (name, testCase) in testCases {
-      let memory = TestMemory()
       for spec in LR35902.InstructionSet.allSpecs() {
-        guard case .add(.hl, let register) = spec, register != .hl else {
-          continue
-        }
-        guard let emulator = LR35902.Emulation.add_hl_rr(spec: spec) else { continue }
+        guard case .add(.hl, let register) = spec, register != .hl,
+              let emulator = LR35902.Emulation.add_hl_rr(spec: spec) else { continue }
+        let memory = TestMemory()
         let cpu = LR35902.zeroed()
         cpu.hl = testCase.hl
         cpu.fzero = true

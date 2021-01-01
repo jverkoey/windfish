@@ -26,9 +26,9 @@ extension InstructionEmulatorTests {
 
   func test_add_a_hladdr() {
     for (name, testCase) in TestCase.testCases {
-      let memory = TestMemory(defaultReadValue: testCase.mem)
       for spec in LR35902.InstructionSet.allSpecs() {
         guard let emulator = LR35902.Emulation.add_a_hladdr(spec: spec) else { continue }
+        let memory = TestMemory(defaultReadValue: testCase.mem)
         let cpu = LR35902.zeroed()
         cpu.a = testCase.a
         let mutations = cpu.copy()
@@ -50,9 +50,9 @@ extension InstructionEmulatorTests {
 
   func test_add_a_n() {
     for (name, testCase) in TestCase.testCases {
-      let memory = TestMemory(defaultReadValue: testCase.mem)
       for spec in LR35902.InstructionSet.allSpecs() {
         guard let emulator = LR35902.Emulation.add_a_n(spec: spec) else { continue }
+        let memory = TestMemory(defaultReadValue: testCase.mem)
         let cpu = LR35902.zeroed()
         cpu.a = testCase.a
         let mutations = cpu.copy()

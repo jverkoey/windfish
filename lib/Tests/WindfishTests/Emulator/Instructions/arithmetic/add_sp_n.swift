@@ -14,17 +14,20 @@ extension InstructionEmulatorTests {
   }
   func test_add_sp_n() {
     let testCases: [String: TestCase] = [
-      "zero":      .init(sp: 0,      imm8: 0,  result: .init(fc: false, fh: false, sp: 0)),
-      "positive":  .init(sp: 0,      imm8: 1,  result: .init(fc: false, fh: false, sp: 1)),
-      "negative":  .init(sp: 2,      imm8: -1, result: .init(fc: false, fh: false, sp: 1)),
-      "underflow": .init(sp: 0,      imm8: -1, result: .init(fc: true,  fh: true,  sp: 0xffff)),
-      "overflow":  .init(sp: 0xffff, imm8: 1,  result: .init(fc: true,  fh: true,  sp: 0)),
+      "zero":       .init(sp: 0,      imm8: 0,    result: .init(fc: false, fh: false, sp: 0)),
+      "positive":   .init(sp: 0,      imm8: 1,    result: .init(fc: false, fh: false, sp: 1)),
+      // The c and h flags look inverted here, but remember that subtractions are just really large additions.
+      "carry":      .init(sp: 2,      imm8: -1,   result: .init(fc: true,  fh: true,  sp: 1)),
+      "nocarry":    .init(sp: 0,      imm8: -1,   result: .init(fc: false, fh: false, sp: 0xffff)),
+      "overflow":   .init(sp: 0xffff, imm8: 1,    result: .init(fc: true,  fh: true,  sp: 0)),
+      "halfcarry":  .init(sp: 0xf,    imm8: 1,    result: .init(fc: false, fh: true,  sp: 0x10)),
+      "halfcarry2": .init(sp: 0xf,    imm8: 0x11, result: .init(fc: false, fh: true,  sp: 0x20)),
     ]
 
     for (name, testCase) in testCases {
-      let memory = TestMemory(defaultReadValue: UInt8(bitPattern: testCase.imm8))
       for spec in LR35902.InstructionSet.allSpecs() {
         guard let emulator = LR35902.Emulation.add_sp_n(spec: spec) else { continue }
+        let memory = TestMemory(defaultReadValue: UInt8(bitPattern: testCase.imm8))
         let cpu = LR35902.zeroed()
         cpu.sp = testCase.sp
         let mutations = cpu.copy()

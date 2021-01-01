@@ -3,15 +3,10 @@ import XCTest
 
 extension InstructionEmulatorTests {
   func test_call_nn() {
-    let memory = TestMemory(defaultReadValue: 0x12)
-
     for spec in LR35902.InstructionSet.allSpecs() {
-      guard case .call(let cnd, .imm16) = spec, cnd == nil else {
-        continue
-      }
-      guard let emulator = LR35902.Emulation.call_cnd_nn(spec: spec) else {
-        continue
-      }
+      guard case .call(let cnd, .imm16) = spec, cnd == nil,
+            let emulator = LR35902.Emulation.call_cnd_nn(spec: spec) else { continue }
+      let memory = TestMemory(defaultReadValue: 0x12)
 
       let cpu = LR35902.zeroed()
       cpu.sp = 0x100

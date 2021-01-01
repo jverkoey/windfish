@@ -14,7 +14,7 @@ extension LR35902.Emulation {
       if cycle == 1 {
         return .continueExecution
       }
-      cpu[register] = (cpu[register] as UInt16).subtractingReportingOverflow(1).partialValue
+      cpu[register] = (cpu[register] as UInt16) &- 1
       return .fetchNext
     }
 

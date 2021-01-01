@@ -1,5 +1,8 @@
 import Foundation
 
+// References:
+// - https://stackoverflow.com/questions/57958631/game-boy-half-carry-flag-and-16-bit-instructions-especially-opcode-0xe8
+
 extension LR35902.Emulation {
   final class add_sp_n: InstructionEmulator, InstructionEmulatorInitializable {
     init?(spec: LR35902.Instruction.Spec) {
@@ -15,28 +18,22 @@ extension LR35902.Emulation {
         return .continueExecution
       }
       if cycle == 2 {
-        if immediate > 0 {
-          let amount = UInt16(truncatingIfNeeded: UInt8(bitPattern: immediate))
-          let result = cpu.sp.addingReportingOverflow(amount)
-          cpu.fhalfcarry = (((cpu.sp & 0x0fff) + (amount & 0x0fff)) & 0x1000) > 0
-          cpu.sp = result.partialValue
-          cpu.fcarry = result.overflow
-        } else if immediate < 0 {
-          let amount = UInt16(truncatingIfNeeded: UInt8(bitPattern: -immediate))
-          let result = cpu.sp.subtractingReportingOverflow(amount)
-          cpu.fhalfcarry = (amount & 0x0fff) > (cpu.sp & 0x0fff)
-          cpu.sp = result.partialValue
-          cpu.fcarry = result.overflow
-        }
+        cpu.fzero = false
+        cpu.fsubtract = false
+        let wideImm = UInt16(bitPattern: Int16(truncatingIfNeeded: immediate))
+        cpu.fcarry = (cpu.sp & 0xff) &+ (wideImm & 0xff) > 0xff
+        cpu.fhalfcarry = (cpu.sp & 0xf) &+ (wideImm & 0xf) > 0xf
+        wz = cpu.sp &+ wideImm
         return .continueExecution
       }
       if cycle == 3 {
+        cpu.sp = wz
         return .continueExecution
       }
-      cpu.fsubtract = false
       return .fetchNext
     }
 
     private var immediate: Int8 = 0
+    private var wz: UInt16 = 0
   }
 }
