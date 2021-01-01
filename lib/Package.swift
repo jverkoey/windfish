@@ -46,6 +46,13 @@ let package = Package(
       ]
     ),
     .testTarget(
+      name: "MooneyeTests",
+      dependencies: ["Windfish"],
+      resources: [
+        .copy("Resources"),
+      ]
+    ),
+    .testTarget(
       name: "CPUTests",
       dependencies: ["CPU"]
     ),

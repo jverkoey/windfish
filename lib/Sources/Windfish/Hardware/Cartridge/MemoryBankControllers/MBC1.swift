@@ -27,6 +27,7 @@ extension Gameboy.Cartridge {
     }
 
     private(set) var selectedBank: Gameboy.Cartridge.Bank = 0
+    private(set) var selectedRAMBank: Gameboy.Cartridge.Bank = 0
     private let data: UnsafeMutableRawBufferPointer
 
     /** Whether or not RAM is enabled. */
@@ -110,7 +111,10 @@ extension Gameboy.Cartridge {
         case .rom:
           fatalError("Upper Bits of ROM Bank Number not implemented yet.")
         case .ram:
-          fatalError("RAM Bank Number not implemented yet.")
+          let mask: UInt8 = 0b0000_0011
+          let maskedByte = byte & mask
+          selectedRAMBank = (selectedBank & ~mask) | maskedByte
+          return
         }
       }
 
@@ -133,16 +137,16 @@ extension Gameboy.Cartridge {
         }
         switch ramSize {
         case .none:
-          preconditionFailure("Cartridge has no RAM.")
+          fatalError("Cartridge has no RAM.")
         case .one2kb, .one8kb:
           ram[Int(address) - 0xA000] = byte
         case .four32kb, .sixteen128kb:
-          preconditionFailure("Bankable RAM not implemented.")
+          fatalError("Bankable RAM not implemented: \(address.hexString).")
         }
         return
       }
 
-      fatalError("Invalid write address provided to the cartridge: \(address).")
+      fatalError("Invalid write address provided to the cartridge: \(address.hexString).")
     }
 
     func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {

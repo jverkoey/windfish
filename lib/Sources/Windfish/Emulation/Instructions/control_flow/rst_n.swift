@@ -14,12 +14,12 @@ extension LR35902.Emulation {
         return .continueExecution
       }
       if cycle == 2 {
-        cpu.sp -= 1
+        cpu.sp &-= 1
         memory.write(UInt8(truncatingIfNeeded: (cpu.pc & 0xFF00) >> 8), to: cpu.sp)
         return .continueExecution
       }
       if cycle == 3 {
-        cpu.sp -= 1
+        cpu.sp &-= 1
         memory.write(UInt8(truncatingIfNeeded: cpu.pc & 0x00FF), to: cpu.sp)
         return .continueExecution
       }

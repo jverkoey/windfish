@@ -1,0 +1,25 @@
+{
+  "configurations" : [
+    {
+      "id" : "1AA441D2-546C-45B5-A1AE-D0E839CFE989",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:..\/lib",
+        "identifier" : "MooneyeTests",
+        "name" : "MooneyeTests"
+      }
+    }
+  ],
+  "version" : 1
+}
