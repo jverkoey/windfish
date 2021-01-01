@@ -6,19 +6,19 @@ class add_sp_n: XCTestCase {
     let sp: UInt16
     let imm8: Int8
     struct Result {
-      let fcarry: Bool
-      let fhalfcarry: Bool
+      let fc: Bool
+      let fh: Bool
       let sp: UInt16
     }
     let result: Result
   }
   func test() {
     let testCases: [String: TestCase] = [
-      "zero":      .init(sp: 0,      imm8: 0,  result: .init(fcarry: false, fhalfcarry: false, sp: 0)),
-      "positive":  .init(sp: 0,      imm8: 1,  result: .init(fcarry: false, fhalfcarry: false, sp: 1)),
-      "negative":  .init(sp: 2,      imm8: -1, result: .init(fcarry: false, fhalfcarry: false, sp: 1)),
-      "underflow": .init(sp: 0,      imm8: -1, result: .init(fcarry: true,  fhalfcarry: true,  sp: 0xffff)),
-      "overflow":  .init(sp: 0xffff, imm8: 1,  result: .init(fcarry: true,  fhalfcarry: true,  sp: 0)),
+      "zero":      .init(sp: 0,      imm8: 0,  result: .init(fc: false, fh: false, sp: 0)),
+      "positive":  .init(sp: 0,      imm8: 1,  result: .init(fc: false, fh: false, sp: 1)),
+      "negative":  .init(sp: 2,      imm8: -1, result: .init(fc: false, fh: false, sp: 1)),
+      "underflow": .init(sp: 0,      imm8: -1, result: .init(fc: true,  fh: true,  sp: 0xffff)),
+      "overflow":  .init(sp: 0xffff, imm8: 1,  result: .init(fc: true,  fh: true,  sp: 0)),
     ]
 
     for (name, testCase) in testCases {
@@ -37,8 +37,8 @@ class add_sp_n: XCTestCase {
         XCTAssertEqual(cycle, 4, "Test case: \(name)")
         mutations.pc += 1
         mutations.sp = testCase.result.sp
-        mutations.fcarry = testCase.result.fcarry
-        mutations.fhalfcarry = testCase.result.fhalfcarry
+        mutations.fcarry = testCase.result.fc
+        mutations.fhalfcarry = testCase.result.fh
         assertEqual(cpu, mutations, message: "Test case: \(name)")
       }
     }
