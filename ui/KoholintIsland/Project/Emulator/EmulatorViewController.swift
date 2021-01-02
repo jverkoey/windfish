@@ -191,16 +191,19 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     controls.translatesAutoresizingMaskIntoConstraints = false
     controls.trackingMode = .momentary
     controls.segmentStyle = .smallSquare
-    controls.segmentCount = 3
+    controls.segmentCount = 4
     controls.setImage(NSImage(systemSymbolName: "arrowshape.bounce.forward.fill", accessibilityDescription: nil)!, forSegment: 0)
     controls.setImage(NSImage(systemSymbolName: "arrow.down.to.line.alt", accessibilityDescription: nil)!, forSegment: 1)
-    controls.setImage(NSImage(systemSymbolName: "clear", accessibilityDescription: nil)!, forSegment: 2)
+    controls.setImage(NSImage(systemSymbolName: "play", accessibilityDescription: nil)!, forSegment: 2)
+    controls.setImage(NSImage(systemSymbolName: "clear", accessibilityDescription: nil)!, forSegment: 3)
     controls.setWidth(40, forSegment: 0)
     controls.setWidth(40, forSegment: 1)
     controls.setWidth(40, forSegment: 2)
+    controls.setWidth(40, forSegment: 3)
     controls.setEnabled(true, forSegment: 0)
     controls.setEnabled(true, forSegment: 1)
     controls.setEnabled(true, forSegment: 2)
+    controls.setEnabled(true, forSegment: 3)
     controls.target = self
     controls.action = #selector(performControlAction(_:))
     view.addSubview(controls)
@@ -442,6 +445,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     if sender.selectedSegment == 0 {  // Step forward
       // TODO: Step into and through any control flow.
 
+    } else if sender.selectedSegment == 1 {  // Step into
       document.gameboy.advanceInstruction()
 
       let tileData = self.document.gameboy.tileData
@@ -457,7 +461,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
       delegate?.emulatorViewControllerDidStepIn(self)
 
-    } else if sender.selectedSegment == 1 {  // Step into
+    } else if sender.selectedSegment == 2 {  // Play
       running = !running
       if running {
         instructionAssemblyLabel.stringValue = "Running..."
@@ -547,7 +551,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       }
       // TODO: Only allow this if the instruction causes a transfer of control flow.
 
-    } else if sender.selectedSegment == 2 {  // Clear
+    } else if sender.selectedSegment == 3 {  // Clear
       for register in LR35902.Instruction.Numeric.registers8 {
         document.gameboy.cpu.clear(register)
       }
