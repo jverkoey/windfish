@@ -12,7 +12,7 @@ extension LR35902.Emulation {
     }
 
     func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.Emulation.EmulationResult {
-      cpu[register] = cpu[register] & ~(UInt8(1) << bit.rawValue)
+      cpu[register] &= ~(UInt8(1) << bit.rawValue)
       return .fetchNext
     }
 
