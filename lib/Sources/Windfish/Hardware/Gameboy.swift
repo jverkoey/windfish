@@ -26,6 +26,12 @@ public final class Gameboy {
   /** The Gameboy's liquid crystal display (LCD) controller. */
   public let lcdController: LCDController
 
+  public var serialDataReceived: [UInt8] {
+    get {
+      return memory.ioRegisters.serialDataReceived
+    }
+  }
+
   /** The Gameboy's OAM DMA controller. */
   let dmaController: DMAController
 
@@ -105,8 +111,10 @@ extension Gameboy {
       advance()
     }
     if let sourceLocation = cpu.machineInstruction.sourceLocation {
-      while sourceLocation == cpu.machineInstruction.sourceLocation, !cpu.halted {
+      var maxCycle = cpu.machineInstruction.cycle
+      while sourceLocation == cpu.machineInstruction.sourceLocation, !cpu.halted, maxCycle <= cpu.machineInstruction.cycle {
         advance()
+        maxCycle = max(maxCycle, cpu.machineInstruction.cycle)
       }
     }
   }

@@ -29,6 +29,9 @@ final class IORegisterMemory: AddressableMemory {
     .OBP0: 0xFF,
     .OBP1: 0xFF,
   ]
+
+  var serialDataReceived: [UInt8] = []
+
   func read(from address: LR35902.Address) -> UInt8 {
     guard let ioAddress = IOAddresses(rawValue: address) else {
       preconditionFailure("Invalid address")
@@ -41,7 +44,7 @@ final class IORegisterMemory: AddressableMemory {
       preconditionFailure("Invalid address")
     }
     if ioAddress == .SC && (byte & 0b1000_0000) > 0 {
-      print(String(format: "%c", values[.SB]!), terminator: "")
+      serialDataReceived.append(values[.SB]!)
     }
     precondition(values[ioAddress] != nil, "Writing to invalid register.")
     values[ioAddress] = byte

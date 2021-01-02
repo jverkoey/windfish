@@ -47,7 +47,7 @@ extension Gameboy {
 
     private let hram = GenericRAM()
     private let ram = InternalRAM()
-    private let ioRegisters = IORegisterMemory()
+    let ioRegisters = IORegisterMemory()
     private let dmaController: DMAController
     private let oam: OAM
     private let soundController: SoundController

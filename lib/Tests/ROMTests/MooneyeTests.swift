@@ -14,7 +14,6 @@ class MooneyeTests: XCTestCase {
     gameboy.cpu.pc = 0x100  // Assume the boot sequence has concluded.
 
     let maxInstructions = 2_000_000
-
     var instructions = 0
     repeat {
       gameboy.advanceInstruction()

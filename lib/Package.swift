@@ -46,7 +46,7 @@ let package = Package(
       ]
     ),
     .testTarget(
-      name: "MooneyeTests",
+      name: "ROMTests",
       dependencies: ["Windfish"],
       resources: [
         .copy("Resources"),
