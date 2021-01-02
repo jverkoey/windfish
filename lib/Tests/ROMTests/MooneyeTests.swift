@@ -7,14 +7,28 @@ import Windfish
 class MooneyeTests: XCTestCase {
   let updateGoldens = false
 
-  func test_acceptance_call_timing() throws {
-    try XCTSkipUnless(updateGoldens)  // sp appears to be getting corrupted
-    try run(testRom: "Resources/mooneye/acceptance/call_timing")
+  // MARK: - acceptance/
+
+  func test_acceptance_bits_mem_oam() throws {
+    try XCTSkipUnless(updateGoldens)  // ALL 0s
+    try run(testRom: "Resources/mooneye/acceptance/bits/mem_oam")
   }
 
   func test_acceptance_bits_reg_f() throws {
     try run(testRom: "Resources/mooneye/acceptance/bits/reg_f", expectedInstructions: 93_751)
   }
+
+  func test_acceptance_bits_unused_hwio_gs() throws {
+    try XCTSkipUnless(updateGoldens)
+    try run(testRom: "Resources/mooneye/acceptance/bits/unused_hwio-GS", expectedInstructions: 93_218)
+  }
+
+  func test_acceptance_call_timing() throws {
+    try XCTSkipUnless(updateGoldens)  // sp appears to be getting corrupted
+    try run(testRom: "Resources/mooneye/acceptance/call_timing")
+  }
+
+  // MARK: - emulator-only/
 
   func test_emulator_only_mbc1_bits_bank_1() throws {
     try run(testRom: "Resources/mooneye/emulator-only/mbc1/bits_bank1", expectedInstructions: 1_571_834)

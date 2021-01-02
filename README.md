@@ -52,8 +52,10 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 
 | Test name | Status | Screenshot |
 |:-----|:--------|:----|
-| `acceptance/call_timing` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mooneye/acceptance/call_timing.png) |
+| `acceptance/bits/mem_oam` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mooneye/acceptance/bits/mem_oam.png) |
 | `acceptance/bits/reg_f` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/mooneye/acceptance/bits/reg_f.png) |
+| `acceptance/bits/unused_hwio-GS` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mooneye/acceptance/bits/unused_hwio-GS.png) |
+| `acceptance/call_timing` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mooneye/acceptance/call_timing.png) |
 | `emulator-only/mbc1/bits_bank1` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/mooneye/emulator-only/mbc1/bits_bank1.png) |
 
 ## Learn more
