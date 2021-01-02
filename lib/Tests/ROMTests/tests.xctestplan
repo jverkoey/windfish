@@ -15,9 +15,9 @@
     {
       "parallelizable" : true,
       "target" : {
-        "containerPath" : "container:..\/lib",
-        "identifier" : "MooneyeTests",
-        "name" : "MooneyeTests"
+        "containerPath" : "container:",
+        "identifier" : "ROMTests",
+        "name" : "ROMTests"
       }
     }
   ],
