@@ -20,27 +20,12 @@ class MooneyeTests: XCTestCase {
       if case .ld(.b, .b) = gameboy.cpu.machineInstruction.spec {
         break
       }
-
-      if let spec = gameboy.cpu.machineInstruction.spec {
-        let instruction: LR35902.Instruction
-        if let operandWidth = LR35902.InstructionSet.widths[spec]?.operand,
-           let sourceAddress = gameboy.cpu.machineInstruction.sourceAddress(),
-           operandWidth > 0 {
-          switch operandWidth {
-          case 1:
-            instruction = .init(spec: spec, immediate: .imm8(gameboy.memory.read(from: sourceAddress + 1)))
-          case 2:
-            let lsb = UInt16(truncatingIfNeeded: gameboy.memory.read(from: sourceAddress + 1))
-            let msb = UInt16(truncatingIfNeeded: gameboy.memory.read(from: sourceAddress + 2)) << 8
-            instruction = .init(spec: spec, immediate: .imm16(lsb | msb))
-          default:
-            instruction = .init(spec: spec)
-          }
-        } else {
-          instruction = .init(spec: spec)
-        }
-        print("\(gameboy.cpu.machineInstruction.sourceAddress()!.hexString): \(RGBDSDisassembler.statement(for: instruction).formattedString)")
-      }
+//
+//      if let sourceLocation = gameboy.cpu.machineInstruction.sourceLocation {
+//        var address = sourceLocation.address()
+//        let instruction = Disassembler.fetchInstruction(at: &address, memory: gameboy.memory)
+//        print("\(sourceLocation.address().hexString) \(RGBDSDisassembler.statement(for: instruction).formattedString)")
+//      }
 
       instructions += 1
     } while instructions < maxInstructions
@@ -52,20 +37,20 @@ class MooneyeTests: XCTestCase {
 
   func test_acceptance_call_timing() throws {
     try XCTSkipIf(true)  // sp appears to be getting corrupted
-    try run(testRom: "Resources/acceptance/call_timing")
+    try run(testRom: "Resources/mooneye/acceptance/call_timing")
   }
 
   func test_emulator_only_mbc1_bits_bank_1() throws {
-    try run(testRom: "Resources/emulator-only/mbc1/bits_bank1")
+    try run(testRom: "Resources/mooneye/emulator-only/mbc1/bits_bank1")
   }
 
   func test_emulator_only_mbc1_bits_bank_2() throws {
     try XCTSkipIf(true)  // RAM banks not implemented yet.
-    try run(testRom: "Resources/emulator-only/mbc1/bits_bank2")
+    try run(testRom: "Resources/mooneye/emulator-only/mbc1/bits_bank2")
   }
 
   func test_emulator_only_mbc1_bits_mode() throws {
     try XCTSkipIf(true)  // Upper Bits of ROM Bank Number not implemented yet
-    try run(testRom: "Resources/emulator-only/mbc1/bits_mode")
+    try run(testRom: "Resources/mooneye/emulator-only/mbc1/bits_mode")
   }
 }
