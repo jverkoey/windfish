@@ -39,7 +39,7 @@ class BlarggTests: XCTestCase {
   }
 
   func test_02_interrupts() throws {
-    try XCTSkipIf(true)  // Gets stuck at 0xC7F4 running a jr   @-$00
+    try XCTSkipUnless(updateGoldens)  // Gets stuck at 0xC7F4 running a jr   @-$00
     try run(rom: "Resources/blargg/cpu_instrs/individual/02-interrupts", expectedInstructions: 1_092_295)
   }
 
