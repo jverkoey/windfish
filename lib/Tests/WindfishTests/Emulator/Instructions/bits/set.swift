@@ -5,23 +5,21 @@ extension InstructionEmulatorTests {
   private struct TestCase {
     let value: UInt8
     struct Result {
-      let fz: [LR35902.Instruction.Bit: Bool]
+      let value: [LR35902.Instruction.Bit: UInt8]
     }
     let result: Result
 
     static let testCases: [String: TestCase] = [
-      "zero": .init(value: 0,    result: .init(fz: [.b0: true,  .b1: true,  .b2: true,  .b3: true,  .b4: true,  .b5: true,  .b6: true,  .b7: true])),
-      "all":  .init(value: 0xff, result: .init(fz: [.b0: false, .b1: false, .b2: false, .b3: false, .b4: false, .b5: false, .b6: false, .b7: false])),
-      "low":  .init(value: 0xf,  result: .init(fz: [.b0: false, .b1: false, .b2: false, .b3: false, .b4: true,  .b5: true,  .b6: true,  .b7: true])),
-      "high": .init(value: 0xf0, result: .init(fz: [.b0: true,  .b1: true,  .b2: true,  .b3: true,  .b4: false, .b5: false, .b6: false, .b7: false])),
+      "zero": .init(value: 0,    result: .init(value: [.b0: 0x01, .b1: 0x02, .b2: 0x04, .b3: 0x08, .b4: 0x10, .b5: 0x20, .b6: 0x40, .b7: 0x80])),
+      "all":  .init(value: 0xff, result: .init(value: [.b0: 0xff, .b1: 0xff, .b2: 0xff, .b3: 0xff, .b4: 0xff, .b5: 0xff, .b6: 0xff, .b7: 0xff])),
     ]
   }
 
-  func test_bit_b_r() {
+  func test_set_b_r() {
     for (name, testCase) in TestCase.testCases {
       for spec in LR35902.InstructionSet.allSpecs() {
-        guard case .cb(.bit(let bit, let register)) = spec,
-              let emulator = LR35902.Emulation.bit_b_r(spec: spec) else { continue }
+        guard case .cb(.set(let bit, let register)) = spec,
+              let emulator = LR35902.Emulation.set_b_r(spec: spec) else { continue }
         InstructionEmulatorTests.testedSpecs.insert(spec)
         let memory = TestMemory()
         let cpu = LR35902.zeroed()
@@ -36,19 +34,17 @@ extension InstructionEmulatorTests {
         } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
         XCTAssertEqual(cycle, 1, "Test case: \(name) \(bit)")
-        mutations.fzero = testCase.result.fz[bit]!
-        mutations.fhalfcarry = true
-        mutations.fsubtract = false
+        mutations[register] = testCase.result.value[bit]!
         assertEqual(cpu, mutations, message: "Test case: \(name) \(bit)")
       }
     }
   }
 
-  func test_bit_b_hladdr() {
+  func test_set_b_hladdr() {
     for (name, testCase) in TestCase.testCases {
       for spec in LR35902.InstructionSet.allSpecs() {
-        guard case .cb(.bit(let bit, .hladdr)) = spec,
-              let emulator = LR35902.Emulation.bit_b_hladdr(spec: spec) else { continue }
+        guard case .cb(.set(let bit, .hladdr)) = spec,
+              let emulator = LR35902.Emulation.set_b_hladdr(spec: spec) else { continue }
         InstructionEmulatorTests.testedSpecs.insert(spec)
         let memory = TestMemory(defaultReadValue: testCase.value)
         let cpu = LR35902.zeroed()
@@ -62,9 +58,9 @@ extension InstructionEmulatorTests {
         } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
         XCTAssertEqual(cycle, 4, "Test case: \(name) \(bit)")
-        mutations.fzero = testCase.result.fz[bit]!
-        mutations.fhalfcarry = true
-        mutations.fsubtract = false
+        XCTAssertEqual(memory.writes, [
+          .init(byte: testCase.result.value[bit]!, address: 0)
+        ])
         assertEqual(cpu, mutations, message: "Test case: \(name) \(bit)")
       }
     }

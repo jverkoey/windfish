@@ -43,7 +43,7 @@ extension InstructionEmulatorTests {
   func test_res_b_hladdr() {
     for (name, testCase) in TestCase.testCases {
       for spec in LR35902.InstructionSet.allSpecs() {
-        guard case .cb(.res(let bit, _)) = spec,
+        guard case .cb(.res(let bit, .hladdr)) = spec,
               let emulator = LR35902.Emulation.res_b_hladdr(spec: spec) else { continue }
         InstructionEmulatorTests.testedSpecs.insert(spec)
         let memory = TestMemory(defaultReadValue: testCase.value)
