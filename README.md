@@ -34,8 +34,8 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 
 ### [blargg](https://gbdev.gg8.se/files/roms/blargg-gb-tests/)
 
-| Test name | Status |
-|:-----|:--------|
+| Test name | Status | Screenshot |
+|:-----|:--------|:---|
 | `01-special` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/01-special.png) |
 | `02-interrupts.gb` | ❌ |
 | `03-op sp,hl.gb` | ✅ |
