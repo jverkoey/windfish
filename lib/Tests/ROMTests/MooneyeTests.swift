@@ -33,7 +33,23 @@ class MooneyeTests: XCTestCase {
 
   func test_acceptance_interrupts_ie_push() throws {
     try XCTSkipUnless(updateGoldens)  // R1: not cancelled
-    try run(testRom: "Resources/mooneye/acceptance/interrupts/ie_push", expectedInstructions: 92597)
+    try run(testRom: "Resources/mooneye/acceptance/interrupts/ie_push", expectedInstructions: 92_597)
+  }
+
+  // MARK: - acceptance/oam_dma
+
+  func test_acceptance_oam_dma_basic() throws {
+    try XCTSkipUnless(updateGoldens)  // FAIL: $FE00
+    try run(testRom: "Resources/mooneye/acceptance/oam_dma/basic", expectedInstructions: 93_847)
+  }
+
+  func test_acceptance_oam_dma_reg_read() throws {
+    try run(testRom: "Resources/mooneye/acceptance/oam_dma/reg_read", expectedInstructions: 93_315)
+  }
+
+  func test_acceptance_oam_dma_sources_GS() throws {
+    try XCTSkipUnless(updateGoldens)  // FAIL: $0000
+    try run(testRom: "Resources/mooneye/acceptance/oam_dma/sources-GS", expectedInstructions: 208_553)
   }
 
   // MARK: - acceptance/
