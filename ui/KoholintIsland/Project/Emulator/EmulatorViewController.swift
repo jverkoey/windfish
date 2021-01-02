@@ -592,7 +592,7 @@ extension EmulatorViewController: NSTextFieldDelegate {
           return LR35902.Instruction(spec: spec, immediate: .imm8(document.gameboy.memory.read(from: sourceAddress + 1)))
         case 2:
           let lsb = UInt16(truncatingIfNeeded: document.gameboy.memory.read(from: sourceAddress + 1))
-          let msb = UInt16(truncatingIfNeeded: document.gameboy.memory.read(from: sourceAddress + 1)) << 8
+          let msb = UInt16(truncatingIfNeeded: document.gameboy.memory.read(from: sourceAddress + 2)) << 8
           return LR35902.Instruction(spec: spec, immediate: .imm16(lsb | msb))
         default:
           break

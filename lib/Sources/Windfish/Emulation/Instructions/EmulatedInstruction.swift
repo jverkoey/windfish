@@ -173,6 +173,7 @@ extension LR35902.Emulation {
     ld_a_ffnnaddr.self,
     ld_a_nnaddr.self,
     ld_ffnnaddr_a.self,
+    ld_hl_spsimm8.self,
     ld_nnaddr_sp.self,
     ld_nnaddr_a.self,
     ld_r_n.self,
