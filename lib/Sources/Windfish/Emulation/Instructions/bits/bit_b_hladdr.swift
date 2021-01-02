@@ -15,9 +15,9 @@ extension LR35902.Emulation {
         return .continueExecution
       }
       if cycle == 2 {
-        cpu.fzero = (value & (UInt8(1) << bit.rawValue)) == 0
         cpu.fsubtract = false
         cpu.fhalfcarry = true
+        cpu.fzero = (value & (UInt8(1) << bit.rawValue)) == 0
         return .continueExecution
       }
       if cycle == 3 {
