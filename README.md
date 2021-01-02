@@ -33,6 +33,7 @@ The Windfish disassembler is best invoked through the KoholintIsland front-end a
 The Windfish emulator is validated against test ROMs in order to ensure consistency + completeness of the implementation.
 
 | Test suite | Test name | Status |
+|:----------|:-----|:--------|
 | [blargg](https://gbdev.gg8.se/files/roms/blargg-gb-tests/) | `01-special` | ✅ |
 | [blargg](https://gbdev.gg8.se/files/roms/blargg-gb-tests/) | `02-interrupts.gb` | ❌ |
 | [blargg](https://gbdev.gg8.se/files/roms/blargg-gb-tests/) | `03-op sp,hl.gb` | ✅ |
