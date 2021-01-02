@@ -5,38 +5,10 @@ import Windfish
 // - https://gekkio.fi/files/mooneye-gb/latest/
 
 class MooneyeTests: XCTestCase {
-
-  func run(testRom: String, expectedInstructions: Int = 2_000_000) throws {
-    let path = try XCTUnwrap(Bundle.module.path(forResource: testRom, ofType: "gb"))
-    let data = try Data(contentsOf: URL(fileURLWithPath: path))
-    let gameboy = Gameboy()
-    gameboy.cartridge = .init(data: data)
-    gameboy.cpu.pc = 0x100  // Assume the boot sequence has concluded.
-
-    var instructions = 0
-    repeat {
-      gameboy.advanceInstruction()
-      if case .ld(.b, .b) = gameboy.cpu.machineInstruction.spec {
-        break
-      }
-
-//      if let sourceLocation = gameboy.cpu.machineInstruction.sourceLocation {
-//        var address = sourceLocation.address()
-//        let instruction = Disassembler.fetchInstruction(at: &address, memory: gameboy.memory)
-//        print("\(sourceLocation.address().hexString) \(RGBDSDisassembler.statement(for: instruction).formattedString)")
-//      }
-
-      instructions += 1
-    } while instructions <= expectedInstructions
-
-    XCTAssertEqual(instructions, expectedInstructions)
-    XCTAssertEqual(gameboy.cpu.a, 0, "Assertion failure: \(testRom)")
-    XCTAssert(gameboy.cpu.b == 3 && gameboy.cpu.c == 5 && gameboy.cpu.d == 8 && gameboy.cpu.e == 13 && gameboy.cpu.h == 21 && gameboy.cpu.l == 34,
-              "Hardware test failed: \(testRom)")
-  }
+  let updateGoldens = false
 
   func test_acceptance_call_timing() throws {
-    try XCTSkipIf(true)  // sp appears to be getting corrupted
+    try XCTSkipUnless(updateGoldens)  // sp appears to be getting corrupted
     try run(testRom: "Resources/mooneye/acceptance/call_timing")
   }
 
@@ -57,4 +29,46 @@ class MooneyeTests: XCTestCase {
     try XCTSkipIf(true)  // Upper Bits of ROM Bank Number not implemented yet
     try run(testRom: "Resources/mooneye/emulator-only/mbc1/bits_mode")
   }
+
+  func run(testRom: String, expectedInstructions: Int = 2_000_000) throws {
+    let path = try XCTUnwrap(Bundle.module.path(forResource: testRom, ofType: "gb"))
+    let data = try Data(contentsOf: URL(fileURLWithPath: path))
+    let gameboy = Gameboy()
+    gameboy.cartridge = .init(data: data)
+    gameboy.cpu.pc = 0x100  // Assume the boot sequence has concluded.
+
+    var instructions = 0
+    repeat {
+      gameboy.advanceInstruction()
+      if case .ld(.b, .b) = gameboy.cpu.machineInstruction.spec {
+        break
+      }
+
+      //      if let sourceLocation = gameboy.cpu.machineInstruction.sourceLocation {
+      //        var address = sourceLocation.address()
+      //        let instruction = Disassembler.fetchInstruction(at: &address, memory: gameboy.memory)
+      //        print("\(sourceLocation.address().hexString) \(RGBDSDisassembler.statement(for: instruction).formattedString)")
+      //      }
+
+      instructions += 1
+    } while instructions <= expectedInstructions
+
+    let screenshot: Data = gameboy.takeScreenshot().png!
+
+    if let screenshotPath = Bundle.module.path(forResource: testRom, ofType: "png") {
+      let existingScreenshot = try Data(contentsOf: URL(fileURLWithPath: screenshotPath))
+      XCTAssertEqual(screenshot.checksum, existingScreenshot.checksum, "Checksum failure for \(testRom)")
+    }
+
+    if updateGoldens {
+      let localFile = NSURL(fileURLWithPath: #file).deletingLastPathComponent!.appendingPathComponent(testRom).appendingPathExtension("png")
+      try screenshot.write(to: localFile)
+    }
+
+    XCTAssertEqual(instructions, expectedInstructions)
+    XCTAssertEqual(gameboy.cpu.a, 0, "Assertion failure: \(testRom)")
+    XCTAssert(gameboy.cpu.b == 3 && gameboy.cpu.c == 5 && gameboy.cpu.d == 8 && gameboy.cpu.e == 13 && gameboy.cpu.h == 21 && gameboy.cpu.l == 34,
+              "Hardware test failed: \(testRom)")
+  }
+
 }
