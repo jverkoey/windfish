@@ -37,8 +37,8 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 | Test name | Status | Screenshot |
 |:-----|:--------|:---|
 | `01-special` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/01-special.png) |
-| `02-interrupts.gb` | ❌ |
-| `03-op sp,hl.gb` | ✅ |
+| `02-interrupts.gb` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/02-interrupts.png) |
+| `03-op sp,hl.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/03-op sp,hl.png) |
 | `04-op r,imm.gb` | ✅ |
 | `05-op rp.gb` | ✅ |
 | `06-ld r,r.gb` | ✅ |
