@@ -103,6 +103,11 @@ extension InstructionEmulator {
     cpu.fhalfcarry = halfResult > 0xf
   }
 
+  func bit(cpu: LR35902, bit: LR35902.Instruction.Bit, value: UInt8) {
+    cpu.fsubtract = false
+    cpu.fhalfcarry = true
+    cpu.fzero = (value & (UInt8(1) << bit.rawValue)) == 0
+  }
 }
 
 extension LR35902.Emulation {
