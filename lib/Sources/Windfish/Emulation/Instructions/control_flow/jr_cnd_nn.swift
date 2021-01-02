@@ -18,7 +18,7 @@ extension LR35902.Emulation {
       if cycle == 2 {
         return checkConditional(cnd: cnd, cpu: cpu)
       }
-      cpu.pc = cpu.pc.advanced(by: Int(truncatingIfNeeded: immediate))
+      cpu.pc &+= UInt16(bitPattern: Int16(truncatingIfNeeded: immediate))
       return .fetchNext
     }
 

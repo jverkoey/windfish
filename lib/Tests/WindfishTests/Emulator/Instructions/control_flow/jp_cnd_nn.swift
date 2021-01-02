@@ -14,8 +14,8 @@ extension InstructionEmulatorTests {
     static let testCases: [String: TestCase] = [
       "nc_nz": .init(fc: false, fz: false, result: .init(cycles: [.nz: 4,      .z: 3, .nc: 4,      .c: 3],
                                                          pc:     [.nz: 0x1212, .z: 2, .nc: 0x1212, .c: 2])),
-      "c_z": .init(fc: true, fz: true, result: .init(cycles: [.nz: 3, .z: 4,      .nc: 3, .c: 4],
-                                                     pc:     [.nz: 2, .z: 0x1212, .nc: 2, .c: 0x1212])),
+      "c_z":   .init(fc: true,  fz: true,  result: .init(cycles: [.nz: 3, .z: 4,      .nc: 3, .c: 4],
+                                                         pc:     [.nz: 2, .z: 0x1212, .nc: 2, .c: 0x1212])),
     ]
   }
 
