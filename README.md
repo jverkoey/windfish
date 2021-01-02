@@ -39,14 +39,14 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 | `01-special` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/01-special.png) |
 | `02-interrupts.gb` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/02-interrupts.png) |
 | `03-op sp,hl.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/03-op%20sp,hl.png) |
-| `04-op r,imm.gb` | ✅ |
-| `05-op rp.gb` | ✅ |
-| `06-ld r,r.gb` | ✅ |
-| `07-jr,jp,call,ret,rst.gb` | ✅ |
-| `08-misc instrs.gb` | ✅ |
-| `09-op r,r.gb` | ❌ |
-| `10-bit ops.gb` | ✅ |
-| `11-op a,(hl).gb` | ❌ |
+| `04-op r,imm.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/04-op%20r,imm.png) |
+| `05-op rp.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/05-op%20rp.png) |
+| `06-ld r,r.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/06-ld%20r,r.png) |
+| `07-jr,jp,call,ret,rst.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/07-jr,jp,call,ret,rst.png) |
+| `08-misc instrs.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/08-misc%20instrs.png) |
+| `09-op r,r.gb` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/09-op%20r,r.png) |
+| `10-bit ops.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/10-bit%20ops.png) |
+| `11-op a,(hl).gb` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/11-op%20a,(hl).png) |
 
 ### [mooneye](https://github.com/Gekkio/mooneye-gb/)
 
