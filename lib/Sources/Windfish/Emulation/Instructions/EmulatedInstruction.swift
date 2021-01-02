@@ -209,6 +209,10 @@ extension LR35902.Emulation {
 
     // Internal
     prefix.self,
+
+    // Miscellaneous
+    ccf.self,
+    scf.self,
   ]
 
   static let instructionEmulators: [InstructionEmulator] = {
