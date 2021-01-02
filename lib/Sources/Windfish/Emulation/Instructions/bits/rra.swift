@@ -9,13 +9,13 @@ extension LR35902.Emulation {
     }
 
     func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.Emulation.EmulationResult {
-      let partialResult = cpu.a.dividedReportingOverflow(by: 2)
-      let result = partialResult.partialValue | (cpu.fcarry ? 0b1000_0000 : 0)
-      cpu.a = result
-      cpu.fzero = result == 0
+      cpu.fzero = false
       cpu.fsubtract = false
-      cpu.fcarry = partialResult.overflow
       cpu.fhalfcarry = false
+
+      let carry = (cpu.a & 0x01) != 0
+      cpu.a = (cpu.a &>> 1) | (cpu.fcarry ? 0b1000_0000 : 0)
+      cpu.fcarry = carry
       return .fetchNext
     }
   }

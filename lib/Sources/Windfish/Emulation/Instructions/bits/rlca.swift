@@ -13,9 +13,9 @@ extension LR35902.Emulation {
       cpu.fsubtract = false
       cpu.fhalfcarry = false
 
-      let partialResult = cpu.a.multipliedReportingOverflow(by: 2)
-      let result = partialResult.partialValue | (partialResult.overflow ? 0x01 : 0)
-      cpu.fcarry = partialResult.overflow
+      let carry = (cpu.a & 0b1000_0000) != 0
+      let result = (cpu.a &<< 1) | (carry ? 0x01 : 0)
+      cpu.fcarry = carry
       cpu.a = result
       return .fetchNext
     }
