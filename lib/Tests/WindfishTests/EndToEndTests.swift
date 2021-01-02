@@ -15,7 +15,7 @@ class EndToEndTests: XCTestCase {
     // ~0.687
     measure {
       for _ in 0..<1_000_000 {
-        let intValue = Int(byteValue)
+        _ = Int(byteValue)
       }
     }
   }
@@ -26,7 +26,7 @@ class EndToEndTests: XCTestCase {
     // ~0.664
     measure {
       for _ in 0..<1_000_000 {
-        let intValue = Int(truncatingIfNeeded: byteValue)
+        _ = Int(truncatingIfNeeded: byteValue)
       }
     }
   }

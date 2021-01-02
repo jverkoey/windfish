@@ -171,10 +171,10 @@ extension LR35902.Emulation {
 
     // 8-bit loads
     ld_a_ffnnaddr.self,
-    ld_a_nnadr.self,
+    ld_a_nnaddr.self,
     ld_ffnnaddr_a.self,
     ld_nnaddr_sp.self,
-    ld_nnadr_a.self,
+    ld_nnaddr_a.self,
     ld_r_n.self,
     ld_r_r.self,
     ld_r_rraddr.self,

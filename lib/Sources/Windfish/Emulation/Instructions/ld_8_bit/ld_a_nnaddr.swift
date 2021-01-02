@@ -1,7 +1,7 @@
 import Foundation
 
 extension LR35902.Emulation {
-  final class ld_a_nnadr: InstructionEmulator, InstructionEmulatorInitializable {
+  final class ld_a_nnaddr: InstructionEmulator, InstructionEmulatorInitializable {
     init?(spec: LR35902.Instruction.Spec) {
       guard case .ld(.a, .imm16addr) = spec else {
         return nil
