@@ -32,19 +32,21 @@ The Windfish disassembler is best invoked through the KoholintIsland front-end a
 
 The Windfish emulator is validated against test ROMs in order to ensure consistency + completeness of the implementation.
 
-| Test suite | Test name | Status |
-|:----------|:-----|:--------|
-| [blargg](https://gbdev.gg8.se/files/roms/blargg-gb-tests/) | `01-special` | ✅ |
-| [blargg](https://gbdev.gg8.se/files/roms/blargg-gb-tests/) | `02-interrupts.gb` | ❌ |
-| [blargg](https://gbdev.gg8.se/files/roms/blargg-gb-tests/) | `03-op sp,hl.gb` | ✅ |
-| [blargg](https://gbdev.gg8.se/files/roms/blargg-gb-tests/) | `04-op r,imm.gb` | ✅ |
-| [blargg](https://gbdev.gg8.se/files/roms/blargg-gb-tests/) | `05-op rp.gb` | ✅ |
-| [blargg](https://gbdev.gg8.se/files/roms/blargg-gb-tests/) | `06-ld r,r.gb` | ✅ |
-| [blargg](https://gbdev.gg8.se/files/roms/blargg-gb-tests/) | `07-jr,jp,call,ret,rst.gb` | ✅ |
-| [blargg](https://gbdev.gg8.se/files/roms/blargg-gb-tests/) | `08-misc instrs.gb` | ✅ |
-| [blargg](https://gbdev.gg8.se/files/roms/blargg-gb-tests/) | `09-op r,r.gb` | ❌ |
-| [blargg](https://gbdev.gg8.se/files/roms/blargg-gb-tests/) | `10-bit ops.gb` | ✅ |
-| [blargg](https://gbdev.gg8.se/files/roms/blargg-gb-tests/) | `11-op a,(hl).gb` | ❌ |
+### [blargg](https://gbdev.gg8.se/files/roms/blargg-gb-tests/)
+
+| Test name | Status |
+|:-----|:--------|
+| `01-special` | ✅ |
+| `02-interrupts.gb` | ❌ |
+| `03-op sp,hl.gb` | ✅ |
+| `04-op r,imm.gb` | ✅ |
+| `05-op rp.gb` | ✅ |
+| `06-ld r,r.gb` | ✅ |
+| `07-jr,jp,call,ret,rst.gb` | ✅ |
+| `08-misc instrs.gb` | ✅ |
+| `09-op r,r.gb` | ❌ |
+| `10-bit ops.gb` | ✅ |
+| `11-op a,(hl).gb` | ❌ |
 
 
 ## Learn more
