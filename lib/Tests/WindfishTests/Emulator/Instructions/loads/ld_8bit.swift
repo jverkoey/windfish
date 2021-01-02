@@ -48,7 +48,7 @@ extension InstructionEmulatorTests {
 
   func test_ld_a_ffnnaddr() {
     for spec in LR35902.InstructionSet.allSpecs() {
-      guard case .ld(.a, .ffimm8addr) = spec, let emulator = LR35902.Emulation.ld_a_ffnnaddr(spec: spec) else { continue }
+      guard let emulator = LR35902.Emulation.ld_a_ffnnaddr(spec: spec) else { continue }
       InstructionEmulatorTests.testedSpecs.insert(spec)
       let memory = TestMemory(defaultReadValue: 0x12)
 
@@ -71,7 +71,7 @@ extension InstructionEmulatorTests {
 
   func test_ld_ffnnaddr_a() {
     for spec in LR35902.InstructionSet.allSpecs() {
-      guard case .ld(.ffimm8addr, .a) = spec, let emulator = LR35902.Emulation.ld_ffnnaddr_a(spec: spec) else { continue }
+      guard let emulator = LR35902.Emulation.ld_ffnnaddr_a(spec: spec) else { continue }
       InstructionEmulatorTests.testedSpecs.insert(spec)
       let memory = TestMemory(defaultReadValue: 0x12)
 
@@ -96,7 +96,7 @@ extension InstructionEmulatorTests {
 
   func test_ld_a_nnaddr() {
     for spec in LR35902.InstructionSet.allSpecs() {
-      guard case .ld(.a, .imm16addr) = spec, let emulator = LR35902.Emulation.ld_a_nnaddr(spec: spec) else { continue }
+      guard let emulator = LR35902.Emulation.ld_a_nnaddr(spec: spec) else { continue }
       InstructionEmulatorTests.testedSpecs.insert(spec)
       let memory = TestMemory(defaultReadValue: 0x12)
 
@@ -119,7 +119,7 @@ extension InstructionEmulatorTests {
 
   func test_ld_nnaddr_a() {
     for spec in LR35902.InstructionSet.allSpecs() {
-      guard case .ld(.imm16addr, .a) = spec, let emulator = LR35902.Emulation.ld_nnaddr_a(spec: spec) else { continue }
+      guard let emulator = LR35902.Emulation.ld_nnaddr_a(spec: spec) else { continue }
       InstructionEmulatorTests.testedSpecs.insert(spec)
       let memory = TestMemory(defaultReadValue: 0x12)
 
@@ -139,6 +139,103 @@ extension InstructionEmulatorTests {
       XCTAssertEqual(memory.writes, [
         .init(byte: 0xab, address: 0x1212)
       ])
+    }
+  }
+
+  func test_ld_r_rraddr() {
+    for spec in LR35902.InstructionSet.allSpecs() {
+      guard case .ld(let dst, let src) = spec, let emulator = LR35902.Emulation.ld_r_rraddr(spec: spec) else { continue }
+      InstructionEmulatorTests.testedSpecs.insert(spec)
+      let memory = TestMemory(defaultReadValue: 0x12)
+
+      let cpu = LR35902.zeroed()
+      cpu[src] = 0xabcd as UInt16
+      let mutations = cpu.copy()
+
+      var cycle = 0
+      repeat {
+        cycle += 1
+      } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
+
+      XCTAssertEqual(cycle, 2)
+      mutations[dst] = 0x12 as UInt8
+      assertEqual(cpu, mutations)
+      XCTAssertEqual(memory.reads, [0xabcd])
+      XCTAssertEqual(memory.writes, [])
+    }
+  }
+
+  func test_ld_rraddr_r() {
+    for spec in LR35902.InstructionSet.allSpecs() {
+      guard case .ld(let dst, let src) = spec, !(dst == .hladdr && (src == .h || src == .l)),
+            let emulator = LR35902.Emulation.ld_rraddr_r(spec: spec) else { continue }
+      InstructionEmulatorTests.testedSpecs.insert(spec)
+      let memory = TestMemory(defaultReadValue: 0x12)
+
+      let cpu = LR35902.zeroed()
+      cpu[src] = 0xab as UInt8
+      cpu[dst] = 0x4567 as UInt16
+      let mutations = cpu.copy()
+
+      var cycle = 0
+      repeat {
+        cycle += 1
+      } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
+
+      XCTAssertEqual(cycle, 2, "\(spec)")
+      assertEqual(cpu, mutations, message: "\(spec)")
+      XCTAssertEqual(memory.reads, [], "\(spec)")
+      XCTAssertEqual(memory.writes, [
+        .init(byte: 0xab, address: 0x4567)
+      ], "\(spec)")
+    }
+  }
+
+  func test_ld_hladdr_h() {
+    for spec in LR35902.InstructionSet.allSpecs() {
+      guard case .ld(.hladdr, .h) = spec, let emulator = LR35902.Emulation.ld_rraddr_r(spec: spec) else { continue }
+      InstructionEmulatorTests.testedSpecs.insert(spec)
+      let memory = TestMemory(defaultReadValue: 0x12)
+
+      let cpu = LR35902.zeroed()
+      cpu.hl = 0x4567
+      let mutations = cpu.copy()
+
+      var cycle = 0
+      repeat {
+        cycle += 1
+      } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
+
+      XCTAssertEqual(cycle, 2, "\(spec)")
+      assertEqual(cpu, mutations, message: "\(spec)")
+      XCTAssertEqual(memory.reads, [], "\(spec)")
+      XCTAssertEqual(memory.writes, [
+        .init(byte: 0x45, address: 0x4567)
+      ], "\(spec)")
+    }
+  }
+
+  func test_ld_hladdr_l() {
+    for spec in LR35902.InstructionSet.allSpecs() {
+      guard case .ld(.hladdr, .l) = spec, let emulator = LR35902.Emulation.ld_rraddr_r(spec: spec) else { continue }
+      InstructionEmulatorTests.testedSpecs.insert(spec)
+      let memory = TestMemory(defaultReadValue: 0x12)
+
+      let cpu = LR35902.zeroed()
+      cpu.hl = 0x4567
+      let mutations = cpu.copy()
+
+      var cycle = 0
+      repeat {
+        cycle += 1
+      } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
+
+      XCTAssertEqual(cycle, 2, "\(spec)")
+      assertEqual(cpu, mutations, message: "\(spec)")
+      XCTAssertEqual(memory.reads, [], "\(spec)")
+      XCTAssertEqual(memory.writes, [
+        .init(byte: 0x67, address: 0x4567)
+      ], "\(spec)")
     }
   }
 }

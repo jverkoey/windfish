@@ -168,6 +168,7 @@ public final class LR35902 {
   public var machineInstruction = MachineInstruction()
 
   /** Trace information for a given register. */
+  // TODO: Allow the CPU to be wrapped in a tracing emulator that intercepts certain types of instructions to log tracer information.
   public var registerTraces: [LR35902.Instruction.Numeric: RegisterTrace] = [:]
 
   var nextAction: LR35902.Emulation.EmulationResult = .fetchNext
