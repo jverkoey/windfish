@@ -27,6 +27,7 @@ extension InstructionEmulatorTests {
     for (name, testCase) in testCases {
       for spec in LR35902.InstructionSet.allSpecs() {
         guard let emulator = LR35902.Emulation.add_sp_n(spec: spec) else { continue }
+        InstructionEmulatorTests.testedSpecs.insert(spec)
         let memory = TestMemory(defaultReadValue: UInt8(bitPattern: testCase.imm8))
         let cpu = LR35902.zeroed()
         cpu.sp = testCase.sp

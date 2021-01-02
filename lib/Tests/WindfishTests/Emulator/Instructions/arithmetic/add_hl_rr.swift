@@ -27,6 +27,7 @@ extension InstructionEmulatorTests {
       for spec in LR35902.InstructionSet.allSpecs() {
         guard case .add(.hl, .hl) = spec,
               let emulator = LR35902.Emulation.add_hl_rr(spec: spec) else { continue }
+        InstructionEmulatorTests.testedSpecs.insert(spec)
         let memory = TestMemory()
         let cpu = LR35902.zeroed()
         cpu.hl = testCase.hl
@@ -61,6 +62,7 @@ extension InstructionEmulatorTests {
       for spec in LR35902.InstructionSet.allSpecs() {
         guard case .add(.hl, let register) = spec, register != .hl,
               let emulator = LR35902.Emulation.add_hl_rr(spec: spec) else { continue }
+        InstructionEmulatorTests.testedSpecs.insert(spec)
         let memory = TestMemory()
         let cpu = LR35902.zeroed()
         cpu.hl = testCase.hl

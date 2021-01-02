@@ -6,6 +6,7 @@ extension InstructionEmulatorTests {
     for spec in LR35902.InstructionSet.allSpecs() {
       guard case .call(let cnd, .imm16) = spec, cnd == nil,
             let emulator = LR35902.Emulation.call_cnd_nn(spec: spec) else { continue }
+      InstructionEmulatorTests.testedSpecs.insert(spec)
       let memory = TestMemory(defaultReadValue: 0x12)
 
       let cpu = LR35902.zeroed()

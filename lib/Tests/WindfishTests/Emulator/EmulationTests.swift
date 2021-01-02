@@ -1,7 +1,15 @@
 import XCTest
 @testable import Windfish
 
-class InstructionEmulatorTests: XCTestCase {}
+class InstructionEmulatorTests: XCTestCase {
+  static var testedSpecs = Set<LR35902.Instruction.Spec>()
+
+  // 424 specs to go.
+  static override func tearDown() {
+    let remainingSpecs = LR35902.InstructionSet.allSpecs().filter { !testedSpecs.contains($0) }
+    print("\(remainingSpecs.count) specs remaining to test")
+  }
+}
 
 /**
  Note that each test includes a single nop instruction for padding at the end of the ROM due to how instructions are

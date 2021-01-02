@@ -5,6 +5,7 @@ extension InstructionEmulatorTests {
   func test_ld_r_n() {
     for spec in LR35902.InstructionSet.allSpecs() {
       guard let emulator = LR35902.Emulation.ld_r_n(spec: spec) else { continue }
+      InstructionEmulatorTests.testedSpecs.insert(spec)
       let memory = TestMemory(defaultReadValue: 0x12)
 
       let cpu = LR35902.zeroed()

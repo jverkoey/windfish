@@ -4,7 +4,7 @@ import XCTest
 class InstructionCBEmulationTests: XCTestCase {
   func test_87_res_b0_a_zero() {
     let cpu = LR35902(a: 0)
-    var state = cpu
+    let state = cpu
     let memory = TestMemory()
     cpu.emulate(instruction: .init(spec: LR35902.InstructionSet.prefixTables[LR35902.InstructionSet.table[0xCB]]![0x87]), memory: memory, followControlFlow: true)
 
@@ -20,7 +20,7 @@ class InstructionCBEmulationTests: XCTestCase {
 
   func test_87_res_b0_a_all() {
     let cpu = LR35902(a: 0xff)
-    var state = cpu
+    let state = cpu
     let memory = TestMemory()
     cpu.emulate(instruction: .init(spec: LR35902.InstructionSet.prefixTables[LR35902.InstructionSet.table[0xCB]]![0x87]), memory: memory, followControlFlow: true)
 
