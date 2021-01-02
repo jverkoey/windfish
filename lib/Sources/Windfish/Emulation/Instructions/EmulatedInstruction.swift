@@ -143,6 +143,7 @@ extension LR35902.Emulation {
     // Bit manipulation
     bit_b_hladdr.self,
     bit_b_r.self,
+    daa.self,
     cpl.self,
     res_b_hladdr.self,
     res_b_r.self,
