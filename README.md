@@ -48,6 +48,13 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 | `10-bit ops.gb` | ✅ |
 | `11-op a,(hl).gb` | ❌ |
 
+### [mooneye](https://github.com/Gekkio/mooneye-gb/)
+
+| Test name | Status |
+|:-----|:--------|
+| `acceptance/call_timing` | ❌ |
+| `acceptance/bits/reg_f` | ✅ |
+| `emulator-only/mbc1/bits_bank1` | ✅ |
 
 ## Learn more
 

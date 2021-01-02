@@ -6,21 +6,20 @@ import Windfish
 
 class MooneyeTests: XCTestCase {
 
-  func run(testRom: String) throws {
+  func run(testRom: String, expectedInstructions: Int = 2_000_000) throws {
     let path = try XCTUnwrap(Bundle.module.path(forResource: testRom, ofType: "gb"))
     let data = try Data(contentsOf: URL(fileURLWithPath: path))
     let gameboy = Gameboy()
     gameboy.cartridge = .init(data: data)
     gameboy.cpu.pc = 0x100  // Assume the boot sequence has concluded.
 
-    let maxInstructions = 2_000_000
     var instructions = 0
     repeat {
       gameboy.advanceInstruction()
       if case .ld(.b, .b) = gameboy.cpu.machineInstruction.spec {
         break
       }
-//
+
 //      if let sourceLocation = gameboy.cpu.machineInstruction.sourceLocation {
 //        var address = sourceLocation.address()
 //        let instruction = Disassembler.fetchInstruction(at: &address, memory: gameboy.memory)
@@ -28,8 +27,9 @@ class MooneyeTests: XCTestCase {
 //      }
 
       instructions += 1
-    } while instructions < maxInstructions
+    } while instructions <= expectedInstructions
 
+    XCTAssertEqual(instructions, expectedInstructions)
     XCTAssertEqual(gameboy.cpu.a, 0, "Assertion failure: \(testRom)")
     XCTAssert(gameboy.cpu.b == 3 && gameboy.cpu.c == 5 && gameboy.cpu.d == 8 && gameboy.cpu.e == 13 && gameboy.cpu.h == 21 && gameboy.cpu.l == 34,
               "Hardware test failed: \(testRom)")
@@ -40,8 +40,12 @@ class MooneyeTests: XCTestCase {
     try run(testRom: "Resources/mooneye/acceptance/call_timing")
   }
 
+  func test_acceptance_bits_reg_f() throws {
+    try run(testRom: "Resources/mooneye/acceptance/bits/reg_f", expectedInstructions: 93_751)
+  }
+
   func test_emulator_only_mbc1_bits_bank_1() throws {
-    try run(testRom: "Resources/mooneye/emulator-only/mbc1/bits_bank1")
+    try run(testRom: "Resources/mooneye/emulator-only/mbc1/bits_bank1", expectedInstructions: 1_571_834)
   }
 
   func test_emulator_only_mbc1_bits_bank_2() throws {
