@@ -7,7 +7,7 @@ import Windfish
 class MooneyeTests: XCTestCase {
   let updateGoldens = false
 
-  // MARK: - acceptance/
+  // MARK: - acceptance/bits
 
   func test_acceptance_bits_mem_oam() throws {
     try XCTSkipUnless(updateGoldens)  // ALL 0s
@@ -22,6 +22,21 @@ class MooneyeTests: XCTestCase {
     try XCTSkipUnless(updateGoldens)
     try run(testRom: "Resources/mooneye/acceptance/bits/unused_hwio-GS", expectedInstructions: 93_218)
   }
+
+  // MARK: - acceptance/instr
+
+  func test_acceptance_instr_daa() throws {
+    try run(testRom: "Resources/mooneye/acceptance/instr/daa", expectedInstructions: 188939)
+  }
+
+  // MARK: - acceptance/interrupts
+
+  func test_acceptance_interrupts_ie_push() throws {
+    try XCTSkipUnless(updateGoldens)  // R1: not cancelled
+    try run(testRom: "Resources/mooneye/acceptance/interrupts/ie_push", expectedInstructions: 92597)
+  }
+
+  // MARK: - acceptance/
 
   func test_acceptance_call_timing() throws {
     try XCTSkipUnless(updateGoldens)  // sp appears to be getting corrupted
@@ -71,6 +86,8 @@ class MooneyeTests: XCTestCase {
 
     if let screenshotPath = Bundle.module.path(forResource: testRom, ofType: "png") {
       let existingScreenshot = try Data(contentsOf: URL(fileURLWithPath: screenshotPath))
+      print([UInt8](existingScreenshot))
+      print([UInt8](screenshot))
       XCTAssertEqual(screenshot.checksum, existingScreenshot.checksum, "Checksum failure for \(testRom)")
     }
 
