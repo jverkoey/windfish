@@ -11,14 +11,16 @@ extension LR35902.Emulation {
     }
 
     func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.Emulation.EmulationResult {
-      let upperNibble: UInt8 = cpu[register] & 0xF0
-      let lowerNibble: UInt8 = cpu[register] & 0x0F
-      let result = (upperNibble >> 8) | (lowerNibble << 8)
-      cpu[register] = result
-      cpu.fzero = result == 0
       cpu.fsubtract = false
       cpu.fcarry = false
       cpu.fhalfcarry = false
+
+      let upperNibble: UInt8 = cpu[register] & 0xF0
+      let lowerNibble: UInt8 = cpu[register] & 0x0F
+
+      let result = (upperNibble >> 4) | (lowerNibble << 4)
+      cpu[register] = result
+      cpu.fzero = result == 0
       return .fetchNext
     }
 
