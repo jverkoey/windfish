@@ -12,7 +12,7 @@ extension LR35902.Emulation {
 
     func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.Emulation.EmulationResult {
       if cpu.fcarry {
-        addWithCarry(cpu: cpu, value: cpu[register])
+        carryadd(cpu: cpu, value: cpu[register])
       } else {
         add(cpu: cpu, value: cpu[register] as UInt8)
       }

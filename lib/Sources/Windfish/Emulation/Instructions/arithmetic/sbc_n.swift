@@ -15,7 +15,7 @@ extension LR35902.Emulation {
         return .continueExecution
       }
       if cpu.fcarry {
-        subWithCarry(cpu: cpu, value: immediate)
+        carrysub(cpu: cpu, value: immediate)
       } else {
         sub(cpu: cpu, value: immediate)
       }

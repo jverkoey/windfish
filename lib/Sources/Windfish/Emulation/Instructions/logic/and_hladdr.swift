@@ -1,27 +1,26 @@
 import Foundation
 
 extension LR35902.Emulation {
-  final class adc_n: InstructionEmulator, InstructionEmulatorInitializable {
+  final class and_hladd: InstructionEmulator, InstructionEmulatorInitializable {
     init?(spec: LR35902.Instruction.Spec) {
-      guard case .adc(.imm8) = spec else {
+      guard case .and(.hladdr) = spec else {
         return nil
       }
     }
 
     func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.Emulation.EmulationResult {
       if cycle == 1 {
-        immediate = memory.read(from: cpu.pc)
-        cpu.pc += 1
+        value = memory.read(from: cpu.hl)
         return .continueExecution
       }
-      if cpu.fcarry {
-        carryadd(cpu: cpu, value: immediate)
-      } else {
-        add(cpu: cpu, value: immediate)
-      }
+      cpu.a &= value
+      cpu.fzero = cpu.a == 0
+      cpu.fsubtract = false
+      cpu.fcarry = false
+      cpu.fhalfcarry = true
       return .fetchNext
     }
 
-    private var immediate: UInt8 = 0
+    private var value: UInt8 = 0
   }
 }
