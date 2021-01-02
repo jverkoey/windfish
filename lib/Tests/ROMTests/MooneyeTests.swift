@@ -52,7 +52,34 @@ class MooneyeTests: XCTestCase {
     try run(testRom: "Resources/mooneye/acceptance/oam_dma/sources-GS", expectedInstructions: 208_553)
   }
 
+  // MARK: - acceptance/ppu
+
+  func test_acceptance_ppu_hblank_ly_scx_timing_GS() throws {
+    try XCTSkipUnless(updateGoldens)  // Never completes
+    try run(testRom: "Resources/mooneye/acceptance/ppu/hblank_ly_scx_timing-GS")
+  }
+
+  func test_acceptance_ppu_intr_1_2_timing_GS() throws {
+    try XCTSkipUnless(updateGoldens)  // Never completes
+    try run(testRom: "Resources/mooneye/acceptance/ppu/intr_1_2_timing-GS")
+  }
+
+  func test_acceptance_ppu_intr_2_0_timing() throws {
+    try XCTSkipUnless(updateGoldens)  // Never completes
+    try run(testRom: "Resources/mooneye/acceptance/ppu/intr_2_0_timing")
+  }
+
   // MARK: - acceptance/
+
+  func test_acceptance_add_sp_e_timing() throws {
+    try XCTSkipUnless(updateGoldens)  // sp appears to be getting corrupted
+    try run(testRom: "Resources/mooneye/acceptance/add_sp_e_timing")
+  }
+
+  func test_acceptance_boot_regs_dmg0() throws {
+    try XCTSkipUnless(updateGoldens)  // Some registers aren't matching.
+    try run(testRom: "Resources/mooneye/acceptance/boot_regs-dmg0", expectedInstructions: 94007)
+  }
 
   func test_acceptance_call_timing() throws {
     try XCTSkipUnless(updateGoldens)  // sp appears to be getting corrupted
@@ -75,7 +102,7 @@ class MooneyeTests: XCTestCase {
     try run(testRom: "Resources/mooneye/emulator-only/mbc1/bits_mode")
   }
 
-  func run(testRom: String, expectedInstructions: Int = 2_000_000) throws {
+  func run(testRom: String, expectedInstructions: Int = 5_000_000) throws {
     let path = try XCTUnwrap(Bundle.module.path(forResource: testRom, ofType: "gb"))
     let data = try Data(contentsOf: URL(fileURLWithPath: path))
     let gameboy = Gameboy()
@@ -102,8 +129,8 @@ class MooneyeTests: XCTestCase {
 
     if let screenshotPath = Bundle.module.path(forResource: testRom, ofType: "png") {
       let existingScreenshot = try Data(contentsOf: URL(fileURLWithPath: screenshotPath))
-      print([UInt8](existingScreenshot))
-      print([UInt8](screenshot))
+//      print([UInt8](existingScreenshot))
+//      print([UInt8](screenshot))
       XCTAssertEqual(screenshot.checksum, existingScreenshot.checksum, "Checksum failure for \(testRom)")
     }
 
