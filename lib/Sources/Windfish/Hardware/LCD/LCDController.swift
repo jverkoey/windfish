@@ -289,7 +289,7 @@ extension LCDController {
            palette: backgroundPalette)
     } else if backgroundEnable {
       plot(x: scanlineX, y: scanlineY,
-           byte: backgroundPixel(x: scanlineX &- scrollX, y: bgYPlot, window: false),
+           byte: backgroundPixel(x: scanlineX &+ scrollX, y: bgYPlot, window: false),
            palette: backgroundPalette)
     } else {
       lastBackgroundPixel = 0
