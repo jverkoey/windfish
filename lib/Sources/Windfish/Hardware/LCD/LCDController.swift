@@ -303,13 +303,17 @@ extension LCDController {
       guard sprite.x > scanlineX && sprite.x <= scanlineX + 8 else {
         continue
       }
+      let wideScanlineX = Int16(truncatingIfNeeded: Int8(bitPattern: scanlineX))
+      let wideScanlineY = Int16(truncatingIfNeeded: Int8(bitPattern: scanlineY))
+      let wideSpriteX = Int16(truncatingIfNeeded: Int8(bitPattern: sprite.x))
+      let wideSpriteY = Int16(truncatingIfNeeded: Int8(bitPattern: sprite.y))
       let tileIndex: Int16
-      var tileOffsetX = Int16(truncatingIfNeeded: scanlineX) + 8 - Int16(bitPattern: UInt16(truncatingIfNeeded: sprite.x))
-      var tileOffsetY = Int16(truncatingIfNeeded: scanlineY) + 16 - Int16(bitPattern: UInt16(truncatingIfNeeded: sprite.y))
+      var tileOffsetX = wideScanlineX + 8 - wideSpriteX
+      var tileOffsetY = wideScanlineY + 16 - wideSpriteY
 
       switch spriteSize {
       case .x8x16:
-        let wideTile = Int16(bitPattern: UInt16(truncatingIfNeeded: sprite.tile))
+        let wideTile = Int16(truncatingIfNeeded: Int8(bitPattern: sprite.tile))
         if tileOffsetY > 7 && !sprite.yflip {
           tileOffsetY -= 8;
           tileIndex = wideTile | 0x01
@@ -325,7 +329,7 @@ extension LCDController {
           tileIndex = 0
         }
       case .x8x8:
-        tileIndex = Int16(bitPattern: UInt16(truncatingIfNeeded: sprite.tile))
+        tileIndex = Int16(truncatingIfNeeded: Int8(bitPattern: sprite.tile))
         if sprite.yflip {
           tileOffsetY = 7 - tileOffsetY
         }
@@ -336,7 +340,7 @@ extension LCDController {
 
       let tileData0: UInt8
       let tileData1: UInt8
-      let tileDataIndex = Int(truncatingIfNeeded: Int16(bitPattern: UInt16(truncatingIfNeeded: tileIndex) &* 16) &+ tileOffsetY &* 2)
+      let tileDataIndex = Int(truncatingIfNeeded: (tileIndex &* 16) &+ tileOffsetY &* 2)
       tileData0 = tileData[tileDataIndex]
       tileData1 = tileData[tileDataIndex + 1]
 
