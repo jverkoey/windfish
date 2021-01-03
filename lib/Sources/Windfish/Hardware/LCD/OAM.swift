@@ -8,10 +8,33 @@ public final class OAM {
     var x: UInt8
     var y: UInt8
     var tile: UInt8
-    var flags: UInt8
+    var flags: UInt8 {
+      get {
+        return
+          (priority              ? 0b1000_0000 : 0)
+          | (yflip               ? 0b0100_0000 : 0)
+          | (xflip               ? 0b0010_0000 : 0)
+          | (palette == .obj1pal ? 0b0001_0000 : 0)
+      }
+      set {
+        priority = (newValue & 0b1000_0000) != 0
+        yflip    = (newValue & 0b0100_0000) != 0
+        xflip    = (newValue & 0b0010_0000) != 0
+        palette  = ((newValue & 0b0001_0000) != 0) ? .obj1pal : .obj0pal
+      }
+    }
+
+    enum Palette {
+      case obj0pal
+      case obj1pal
+    }
+    var priority: Bool   // bit 7
+    var yflip: Bool      // bit 6
+    var xflip: Bool      // bit 5
+    var palette: Palette // bit 4
   }
   private(set) var sprites: [Sprite] = (0..<40).map { _ -> Sprite in
-    Sprite(x: 0, y: 0, tile: 0, flags: 0)
+    Sprite(x: 0, y: 0, tile: 0, priority: false, yflip: false, xflip: false, palette: .obj0pal)
   }
 }
 

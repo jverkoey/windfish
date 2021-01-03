@@ -309,17 +309,16 @@ extension LCDController {
 
       switch spriteSize {
       case .x8x16:
-        let flipY = sprite.flags & 0b0100_0000 > 0
         let wideTile = Int16(bitPattern: UInt16(truncatingIfNeeded: sprite.tile))
-        if tileOffsetY > 7 && !flipY {
+        if tileOffsetY > 7 && !sprite.yflip {
           tileOffsetY -= 8;
           tileIndex = wideTile | 0x01
-        } else if tileOffsetY <= 7 && !flipY  {
+        } else if tileOffsetY <= 7 && !sprite.yflip  {
           tileIndex = wideTile & 0xFE
-        } else if tileOffsetY > 7 && flipY {
+        } else if tileOffsetY > 7 && sprite.yflip {
           tileOffsetY = 15 - tileOffsetY
           tileIndex = wideTile & 0xFE
-        } else if tileOffsetY <= 7 && flipY {
+        } else if tileOffsetY <= 7 && sprite.yflip {
           tileIndex = wideTile | 0x01
           tileOffsetY = 7 - tileOffsetY
         } else {
@@ -327,11 +326,11 @@ extension LCDController {
         }
       case .x8x8:
         tileIndex = Int16(bitPattern: UInt16(truncatingIfNeeded: sprite.tile))
-        if sprite.flags & 0b0100_0000 > 0 {
+        if sprite.yflip {
           tileOffsetY = 7 - tileOffsetY
         }
       }
-      if sprite.flags & 0b0010_0000 > 0 {
+      if sprite.xflip {
         tileOffsetX = 7 - tileOffsetX
       }
 
@@ -345,12 +344,13 @@ extension LCDController {
       let msb: UInt8 = (tileData1 & (0x80 >> tileOffsetX)) > 0 ? 0b10 : 0
       let pixel = msb | lsb
       if pixel > 0 {
-        let pixelBehindBg = sprite.flags & 0b1000_0000 > 0 && lastBackgroundPixel > 0
+        let pixelBehindBg = sprite.priority && lastBackgroundPixel > 0
         if !pixelBehindBg {
           let palette: Palette
-          if sprite.flags & 0b0001_0000 > 0 {
+          switch sprite.palette {
+          case .obj0pal:
             palette = objectPallete0
-          } else {
+          case .obj1pal:
             palette = objectPallete1
           }
           plot(x: scanlineX, y: scanlineY, byte: pixel, palette: palette)
