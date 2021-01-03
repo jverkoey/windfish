@@ -592,10 +592,10 @@ extension EmulatorViewController: NSTextFieldDelegate {
     if let addressAndBank = document.gameboy.cpu.machineInstruction.sourceAddressAndBank() {
       // When a machine instruction has been loaded we need to look at it source location rather than the cpu's current
       // pc + bank as the CPU may have already incremented the pc as a result of reading the instruction's opcode.
-      return document.disassemblyResults?.disassembly?.instruction(at: addressAndBank.address, in: addressAndBank.bank)
+      return document.disassemblyResults?.disassembly?.instruction(at: addressAndBank.address, in: max(1, addressAndBank.bank))
     }
     if let cartridge = document.gameboy.cartridge {
-      return document.disassemblyResults?.disassembly?.instruction(at: document.gameboy.cpu.pc, in: cartridge.selectedBank)
+      return document.disassemblyResults?.disassembly?.instruction(at: document.gameboy.cpu.pc, in: max(1, cartridge.selectedBank))
     }
     return nil
   }
@@ -613,7 +613,7 @@ extension EmulatorViewController: NSTextFieldDelegate {
     if let cartridge = document.gameboy.cartridge {
       let context = RGBDSDisassembler.Context(
         address: document.gameboy.cpu.pc,
-        bank: cartridge.selectedBank,
+        bank: max(1, cartridge.selectedBank),
         disassembly: disassembly,
         argumentString: nil
       )

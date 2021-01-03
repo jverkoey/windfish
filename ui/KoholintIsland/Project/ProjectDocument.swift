@@ -135,7 +135,8 @@ final class DisassemblyResults: NSObject {
     self.disassembly = disassembly
   }
 
-  func lineFor(address: LR35902.Address, bank: Gameboy.Cartridge.Bank) -> Int? {
+  func lineFor(address: LR35902.Address, bank _bank: Gameboy.Cartridge.Bank) -> Int? {
+    let bank = (address < 0x4000) ? 0 : _bank
     guard let bankLines = bankLines?[bank] else {
       return nil
     }

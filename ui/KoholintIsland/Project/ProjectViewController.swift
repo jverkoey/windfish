@@ -185,7 +185,8 @@ final class ProjectViewController: NSViewController, EmulatorViewControllerDeleg
     }
   }
 
-  func jumpTo(address: LR35902.Address, bank: Gameboy.Cartridge.Bank, highlight: Bool = false) {
+  func jumpTo(address: LR35902.Address, bank _bank: Gameboy.Cartridge.Bank, highlight: Bool = false) {
+    let bank = (address < 0x4000) ? 0 : _bank
     guard let metadata = self.document.metadata else {
       return
     }

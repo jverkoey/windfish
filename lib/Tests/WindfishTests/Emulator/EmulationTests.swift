@@ -49,6 +49,47 @@ class EmulationTests: XCTestCase {
                 file: file, line: line)
   }
 
+  // Verify that push / pop of the af register doesn't lose state along the way.
+  func test_push_pop_af() throws {
+    let gameboy = createGameboy(loadedWith: """
+ld a, $ff
+push af
+pop af
+nop
+""")
+    let testMemory = TestMemory()
+    gameboy.addMemoryTracer(testMemory)
+
+    gameboy.cpu.fcarry = true
+    gameboy.cpu.fzero = true
+    gameboy.cpu.fsubtract = true
+    gameboy.cpu.fhalfcarry = true
+
+    XCTAssertEqual(gameboy.cpu.a, 1)
+    XCTAssertEqual(gameboy.cpu.sp, 0xFFFE)
+    gameboy.advanceInstruction()
+    XCTAssertEqual(gameboy.cpu.a, 255)
+    gameboy.advanceInstruction()
+    XCTAssertEqual(gameboy.cpu.sp, 0xFFFC)
+
+    // Forcefully clear the flags
+    gameboy.cpu.a = 0
+    gameboy.cpu.fcarry = false
+    gameboy.cpu.fzero = false
+    gameboy.cpu.fsubtract = false
+    gameboy.cpu.fhalfcarry = false
+
+    // Pop
+    gameboy.advanceInstruction()
+
+    XCTAssertEqual(gameboy.cpu.a, 255)
+    XCTAssertTrue(gameboy.cpu.fcarry)
+    XCTAssertTrue(gameboy.cpu.fzero)
+    XCTAssertTrue(gameboy.cpu.fsubtract)
+    XCTAssertTrue(gameboy.cpu.fhalfcarry)
+    XCTAssertEqual(gameboy.cpu.sp, 0xFFFE)
+  }
+
   func test_00_nop() {
     // Given
     let gameboy = createGameboy(loadedWith: """
