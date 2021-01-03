@@ -27,7 +27,7 @@ public final class LCDController {
   let oam: OAM
 
   var tileMap = UnsafeMutableRawBufferPointer.allocate(byteCount: tileMapRegion.count, alignment: 1)
-  var tileData = UnsafeMutableRawBufferPointer.allocate(byteCount:  tileDataRegion.count, alignment: 1)
+  var tileData = UnsafeMutableRawBufferPointer.allocate(byteCount: tileDataRegion.count, alignment: 1)
 
   var bufferToggle = false
   public static let screenSize = (width: 160, height: 144)

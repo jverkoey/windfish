@@ -175,13 +175,13 @@ public class Disassembler {
       }
     }
 
-    clearCode(in: range)
+    clearCode(in: cartRange)
     let range = Int(lowerBound)..<Int(upperBound)
     data.insert(integersIn: range)
     text.remove(integersIn: range)
   }
-  private func clearCode(in range: Range<LR35902.Address>) {
-    let range = Int(range.lowerBound)..<Int(range.upperBound)
+  private func clearCode(in _range: Range<Gameboy.Cartridge.Location>) {
+    let range = Int(_range.lowerBound)..<Int(_range.upperBound)
     code.remove(integersIn: range)
     for index in range.dropFirst() {
       let location = Gameboy.Cartridge.Location(index)
@@ -223,7 +223,7 @@ public class Disassembler {
     precondition(bank > 0)
     let lowerBound = Gameboy.Cartridge.location(for: range.lowerBound, in: bank)!
     let upperBound = Gameboy.Cartridge.location(for: range.upperBound, in: bank)!
-    clearCode(in: range)
+    clearCode(in: lowerBound..<upperBound)
     let range = Int(lowerBound)..<Int(upperBound)
     text.insert(integersIn: range)
     data.remove(integersIn: range)
@@ -830,7 +830,7 @@ public class Disassembler {
             runContext.bank = previousImmediate
           }
           let jumpTo = immediate
-          if jumpTo < 0x4000 || runContext.bank > 0 {
+          if jumpTo < 0x8000 {
             queueRun(run, instructionContext.pc, jumpTo, instructionContext.bank, instruction)
           }
 

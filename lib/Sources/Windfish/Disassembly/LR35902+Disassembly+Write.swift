@@ -338,7 +338,6 @@ clean:
       gameAsm += "INCLUDE \"charmap.asm\"\n"
     }
 
-    var instructionsToDecode = Int.max
     var instructionsDecoded = 0
 
     var macrosAsm: String? = nil
@@ -631,8 +630,7 @@ clean:
           isLabeled = true
         }
 
-        if instructionsToDecode > 0, let instruction = instruction(at: writeContext.pc, in: initialBank) {
-          instructionsToDecode -= 1
+        if let instruction = instruction(at: writeContext.pc, in: initialBank) {
           instructionsDecoded += 1
 
           if let bankChange = bankChange(at: writeContext.pc, in: writeContext.bank) {
@@ -720,7 +718,7 @@ clean:
             accumulator.append(cartridgeData[Int(Gameboy.Cartridge.location(for: writeContext.pc, in: initialBank)!)])
             writeContext.pc += 1
           } while writeContext.pc < end
-            && (instructionsToDecode == 0 || instruction(at: writeContext.pc, in: initialBank) == nil)
+            && instruction(at: writeContext.pc, in: initialBank) == nil
             && label(at: writeContext.pc, in: initialBank) == nil
             && type(of: writeContext.pc, in: initialBank) == initialType
             && global == nil
