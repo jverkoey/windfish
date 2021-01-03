@@ -1,43 +1,8 @@
 import Foundation
 
-/**
- A representation of the LR35902 CPU at a specific moment.
-
- All registers are optional, allowing for the representation of registers being in an unknown state in order to
- support emulation of a block of instructions that might be reached from unknown locations or a variety of states.
- */
+/** A representation of the LR35902 CPU. */
 public final class LR35902 {
   public typealias Address = UInt16
-
-  public final class MachineInstruction {
-    internal init() {}
-
-    public internal(set) var spec: Instruction.Spec?
-    var instructionEmulator: InstructionEmulator? {
-      didSet {
-        cycle = 0
-      }
-    }
-    public internal(set) var sourceLocation: Disassembler.SourceLocation?
-    var cycle: Int = 0
-
-    public func sourceAddress() -> LR35902.Address? {
-      switch sourceLocation {
-      case .cartridge(let location):
-        return Gameboy.Cartridge.addressAndBank(from: location).address
-      case .memory(let address):
-        return address
-      default:
-        return nil
-      }
-    }
-    public func sourceAddressAndBank() -> (address: LR35902.Address, bank: Gameboy.Cartridge.Bank)? {
-      guard case let .cartridge(sourceLocation) = sourceLocation else {
-        return nil
-      }
-      return Gameboy.Cartridge.addressAndBank(from: sourceLocation)
-    }
-  }
 
   // MARK: 8-bit registers
   public var a: UInt8 = 0x01
@@ -173,6 +138,36 @@ public final class LR35902 {
 
   var nextAction: LR35902.Emulation.EmulationResult = .fetchNext
   var specIndex: Int = 0
+
+  public final class MachineInstruction {
+    init() {}
+
+    public internal(set) var spec: Instruction.Spec?
+    var instructionEmulator: InstructionEmulator? {
+      didSet {
+        cycle = 0
+      }
+    }
+    public internal(set) var sourceLocation: Disassembler.SourceLocation?
+    var cycle: Int = 0
+
+    public func sourceAddress() -> LR35902.Address? {
+      switch sourceLocation {
+      case .cartridge(let location):
+        return Gameboy.Cartridge.addressAndBank(from: location).address
+      case .memory(let address):
+        return address
+      default:
+        return nil
+      }
+    }
+    public func sourceAddressAndBank() -> (address: LR35902.Address, bank: Gameboy.Cartridge.Bank)? {
+      guard case let .cartridge(sourceLocation) = sourceLocation else {
+        return nil
+      }
+      return Gameboy.Cartridge.addressAndBank(from: sourceLocation)
+    }
+  }
 
   /** Initializes the state with boot values. */
   public init() {}

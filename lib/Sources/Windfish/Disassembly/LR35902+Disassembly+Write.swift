@@ -365,8 +365,10 @@ clean:
       bankLines.append(Line(semantic: .section(bankToWrite)))
 
       var writeContext = (pc: LR35902.Address((bankToWrite == 0) ? 0x0000 : 0x4000),
-                          bank: bankToWrite)
-      let end: LR35902.Address = (writeContext.bank == 0) ? (cartridge.size < 0x4000 ? LR35902.Address(cartridge.size) : 0x4000) : 0x8000
+                          bank: max(1, bankToWrite))
+      let end: LR35902.Address = (bankToWrite == 0) ? (min(LR35902.Address(cartridge.size), 0x4000)) : 0x8000
+
+      let initialBank = max(1, bankToWrite)
 
       var lineBufferAddress: LR35902.Address = writeContext.pc
       var lineBuffer: [Line] = []
@@ -617,11 +619,11 @@ clean:
           lineGroup.append(Line(semantic: .empty))
           lineGroup.append(Line(semantic: .preComment(comment: preComment)))
         }
-        if let label = label(at: writeContext.pc, in: bankToWrite) {
-          if let transfersOfControl = transfersOfControl(at: writeContext.pc, in: bankToWrite) {
+        if let label = label(at: writeContext.pc, in: initialBank) {
+          if let transfersOfControl = transfersOfControl(at: writeContext.pc, in: initialBank) {
             lineGroup.append(Line(semantic: .transferOfControl(transfersOfControl, label), address: writeContext.pc, bank: writeContext.bank))
           } else {
-            let instructionScope = labeledContiguousScopes(at: writeContext.pc, in: bankToWrite).map { $0.label }
+            let instructionScope = labeledContiguousScopes(at: writeContext.pc, in: initialBank).map { $0.label }
             let scope = instructionScope.sorted().joined(separator: ", ")
             lineGroup.append(Line(semantic: .empty, address: writeContext.pc, bank: writeContext.bank, scope: scope))
             lineGroup.append(Line(semantic: .label(labelName: label), address: writeContext.pc, bank: writeContext.bank, scope: scope))
@@ -629,7 +631,7 @@ clean:
           isLabeled = true
         }
 
-        if instructionsToDecode > 0, let instruction = instruction(at: writeContext.pc, in: bankToWrite) {
+        if instructionsToDecode > 0, let instruction = instruction(at: writeContext.pc, in: initialBank) {
           instructionsToDecode -= 1
           instructionsDecoded += 1
 
@@ -638,10 +640,10 @@ clean:
           }
 
           // Write the instruction as assembly.
-          let index = Gameboy.Cartridge.location(for: writeContext.pc, in: bankToWrite)!
+          let index = Gameboy.Cartridge.location(for: writeContext.pc, in: initialBank)!
           let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!.total
           let bytes = cartridgeData[index..<(index + Gameboy.Cartridge.Location(instructionWidth))]
-          let instructionScope = labeledContiguousScopes(at: writeContext.pc, in: bankToWrite).map { $0.label }
+          let instructionScope = labeledContiguousScopes(at: writeContext.pc, in: initialBank).map { $0.label }
           let context = RGBDSDisassembler.Context(
             address: writeContext.pc,
             bank: writeContext.bank,
@@ -672,22 +674,22 @@ clean:
           // Handle context changes.
           switch instruction.spec {
           case .jp(let condition, _), .jr(let condition, _):
-            let instructionScope = labeledContiguousScopes(at: writeContext.pc, in: bankToWrite).map { $0.label }
+            let instructionScope = labeledContiguousScopes(at: writeContext.pc, in: initialBank).map { $0.label }
             let scope = instructionScope.sorted().joined(separator: ", ")
             lineGroup.append(Line(semantic: .empty, scope: scope))
             if condition == nil {
-              writeContext.bank = bankToWrite
+              writeContext.bank = initialBank
             }
           case .ret(let condition):
             lineGroup.append(Line(semantic: .newline))
             if condition == nil {
               lineGroup.append(Line(semantic: .empty))
-              writeContext.bank = bankToWrite
+              writeContext.bank = initialBank
             }
           case .reti:
             lineGroup.append(Line(semantic: .newline))
             lineGroup.append(Line(semantic: .empty))
-            writeContext.bank = bankToWrite
+            writeContext.bank = initialBank
           default:
             break
           }
@@ -709,18 +711,18 @@ clean:
           // Accumulate bytes until the next instruction or transfer of control.
           var accumulator: [UInt8] = []
           let initialPc = writeContext.pc
-          let initialType = type(of: writeContext.pc, in: bankToWrite)
+          let initialType = type(of: writeContext.pc, in: initialBank)
           var global: Global?
           repeat {
             if writeContext.pc < 0x4000 {
               global = globals[writeContext.pc]
             }
-            accumulator.append(cartridgeData[Int(Gameboy.Cartridge.location(for: writeContext.pc, in: bankToWrite)!)])
+            accumulator.append(cartridgeData[Int(Gameboy.Cartridge.location(for: writeContext.pc, in: initialBank)!)])
             writeContext.pc += 1
           } while writeContext.pc < end
-            && (instructionsToDecode == 0 || instruction(at: writeContext.pc, in: bankToWrite) == nil)
-            && label(at: writeContext.pc, in: bankToWrite) == nil
-            && type(of: writeContext.pc, in: bankToWrite) == initialType
+            && (instructionsToDecode == 0 || instruction(at: writeContext.pc, in: initialBank) == nil)
+            && label(at: writeContext.pc, in: initialBank) == nil
+            && type(of: writeContext.pc, in: initialBank) == initialType
             && global == nil
 
           let globalValue: String?
@@ -739,7 +741,7 @@ clean:
           var chunkPc = initialPc
           switch initialType {
           case .text:
-            let lineLength = lineLengthOfText(at: initialPc, in: bankToWrite) ?? 36
+            let lineLength = lineLengthOfText(at: initialPc, in: initialBank) ?? 36
             for chunk in accumulator.chunked(into: lineLength) {
               bankLines.append(textLine(for: chunk, characterMap: characterMap, address: chunkPc))
               chunkPc += LR35902.Address(chunk.count)
@@ -749,7 +751,7 @@ clean:
               let address = (LR35902.Address(pair[1]) << 8) | LR35902.Address(pair[0])
               let jumpLocation: String
               let effectiveBank: Gameboy.Cartridge.Bank
-              if let changedBank = bankChange(at: chunkPc, in: bankToWrite) {
+              if let changedBank = bankChange(at: chunkPc, in: initialBank) {
                 effectiveBank = changedBank
               } else {
                 effectiveBank = writeContext.bank
@@ -759,7 +761,7 @@ clean:
               } else {
                 jumpLocation = "$\(address.hexString)"
               }
-              let bytes = cartridgeData[Gameboy.Cartridge.location(for: chunkPc, in: bankToWrite)!..<(Gameboy.Cartridge.location(for: chunkPc, in: bankToWrite)! + 2)]
+              let bytes = cartridgeData[Gameboy.Cartridge.location(for: chunkPc, in: initialBank)!..<(Gameboy.Cartridge.location(for: chunkPc, in: initialBank)! + 2)]
               bankLines.append(Line(semantic: .jumpTable(jumpLocation, index), address: chunkPc, data: bytes))
               chunkPc += LR35902.Address(pair.count)
             }
@@ -801,7 +803,7 @@ clean:
 
           lineBuffer.append(Line(semantic: .empty))
           lineBufferAddress = writeContext.pc
-          writeContext.bank = bankToWrite
+          writeContext.bank = initialBank
         }
       }
 

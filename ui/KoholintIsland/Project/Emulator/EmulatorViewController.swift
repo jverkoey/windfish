@@ -18,6 +18,17 @@ private enum NumericalRepresentation {
   case decimal
 }
 
+extension Disassembler.SourceLocation {
+  func address() -> LR35902.Address {
+    switch self {
+    case .cartridge(let location):
+      return Gameboy.Cartridge.addressAndBank(from: location).address
+    case .memory(let address):
+      return address
+    }
+  }
+}
+
 extension String {
   /** Returns a numerical representation of the string and its detected representation format. */
   fileprivate func numberRepresentation<T: FixedWidthInteger>(_ type: T.Type) -> (NumericalRepresentation, T)? {
@@ -557,6 +568,10 @@ extension EmulatorViewController: NSTextFieldDelegate {
   }
 
   private func currentInstruction() -> LR35902.Instruction? {
+    if var address = document.gameboy.cpu.machineInstruction.sourceLocation?.address() {
+      return Disassembler.fetchInstruction(at: &address, memory: document.gameboy.memory)
+    }
+
     if let spec = document.gameboy.cpu.machineInstruction.spec {
       if let operandWidth = LR35902.InstructionSet.widths[spec]?.operand,
          let sourceAddress = document.gameboy.cpu.machineInstruction.sourceAddress(),

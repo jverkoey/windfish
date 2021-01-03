@@ -627,14 +627,15 @@ extension ProjectDocument {
 
       // Disassemble everything first
       for region in self.configuration.regions {
+        let bank = max(1, region.bank)
         switch region.regionType {
         case Region.Kind.region:
-          disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
+          disassembly.setLabel(at: region.address, in: bank, named: region.name)
           if region.length > 0 {
-            disassembly.disassemble(range: region.address..<(region.address + region.length), inBank: region.bank)
+            disassembly.disassemble(range: region.address..<(region.address + region.length), inBank: bank)
           }
         case Region.Kind.function:
-          disassembly.defineFunction(startingAt: region.address, in: region.bank, named: region.name)
+          disassembly.defineFunction(startingAt: region.address, in: bank, named: region.name)
         default:
           break
         }
@@ -642,21 +643,22 @@ extension ProjectDocument {
 
       // And then set any explicit regions
       for region in self.configuration.regions {
+        let bank = max(1, region.bank)
         switch region.regionType {
         case Region.Kind.label:
-          disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
+          disassembly.setLabel(at: region.address, in: bank, named: region.name)
         case Region.Kind.string:
-          disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
-          disassembly.setText(at: region.address..<(region.address + region.length), in: region.bank, lineLength: nil)
+          disassembly.setLabel(at: region.address, in: bank, named: region.name)
+          disassembly.setText(at: region.address..<(region.address + region.length), in: bank, lineLength: nil)
         case Region.Kind.image1bpp:
-          disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
-          disassembly.setData(at: region.address..<(region.address + region.length), in: region.bank, format: .image1bpp)
+          disassembly.setLabel(at: region.address, in: bank, named: region.name)
+          disassembly.setData(at: region.address..<(region.address + region.length), in: bank, format: .image1bpp)
         case Region.Kind.image2bpp:
-          disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
-          disassembly.setData(at: region.address..<(region.address + region.length), in: region.bank, format: .image2bpp)
+          disassembly.setLabel(at: region.address, in: bank, named: region.name)
+          disassembly.setData(at: region.address..<(region.address + region.length), in: bank, format: .image2bpp)
         case Region.Kind.data:
-          disassembly.setLabel(at: region.address, in: region.bank, named: region.name)
-          disassembly.setData(at: region.address..<(region.address + region.length), in: region.bank)
+          disassembly.setLabel(at: region.address, in: bank, named: region.name)
+          disassembly.setData(at: region.address..<(region.address + region.length), in: bank)
         default:
           break
         }

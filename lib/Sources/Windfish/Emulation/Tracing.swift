@@ -9,7 +9,7 @@ public final class TracerMemory: AddressableMemory {
   }
 
   public func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
-    return Disassembler.sourceLocation(for: address, in: 0)
+    return Disassembler.sourceLocation(for: address, in: 0x01)
   }
 }
 
