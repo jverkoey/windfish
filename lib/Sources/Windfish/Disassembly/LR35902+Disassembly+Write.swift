@@ -366,7 +366,7 @@ clean:
 
       var writeContext = (pc: LR35902.Address((bankToWrite == 0) ? 0x0000 : 0x4000),
                           bank: max(1, bankToWrite))
-      let end: LR35902.Address = (bankToWrite == 0) ? (min(LR35902.Address(cartridge.size), 0x4000)) : 0x8000
+      let end: LR35902.Address = (bankToWrite == 0) ? (cartridge.size < 0x4000 ? LR35902.Address(cartridge.size) : 0x4000) : 0x8000
 
       let initialBank = max(1, bankToWrite)
 
