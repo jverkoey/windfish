@@ -242,8 +242,8 @@ extension LCDController {
   static let scanlineCycleLength = 114
 
   private func plot(x: UInt8, y: UInt8, byte: UInt8, palette: Palette) {
-    let color = palette[Int(byte)]
-    screenData[LCDController.screenSize.width * Int(y) + Int(x)] = color
+    let color = palette[Int(bitPattern: UInt(truncatingIfNeeded: byte))]
+    screenData[Int(bitPattern: UInt(truncatingIfNeeded: LCDController.screenSize.width) * UInt(truncatingIfNeeded: y) + UInt(truncatingIfNeeded: x))] = color
   }
 
   private func backgroundPixel(x: UInt8, y: UInt8, window: Bool) -> UInt8 {
@@ -255,7 +255,7 @@ extension LCDController {
     let tileOffsetY = Int16(bitPattern: wideY % 8)
 
     let tileIndex: UInt8
-    let tileMapIndex = Int(tileX + tileY &* 32)
+    let tileMapIndex = Int(truncatingIfNeeded: tileX &+ tileY &* 32)
     switch window ? windowTileMapAddress : backgroundTileMapAddress {
     case .x9800:
       tileIndex = tileMap[tileMapIndex]
@@ -266,12 +266,13 @@ extension LCDController {
     let tileData0: UInt8
     let tileData1: UInt8
     switch tileDataAddress {
-    case .x8000:
-      let tileDataIndex = Int(truncatingIfNeeded: Int16(bitPattern: UInt16(truncatingIfNeeded: tileIndex) &* 16) &+ tileOffsetY &* 2)
+    case .x8800:
+      let signedTileIndex = Int8(bitPattern: tileIndex)
+      let tileDataIndex = 0x1000 + Int(truncatingIfNeeded: (Int16(truncatingIfNeeded: signedTileIndex) &* 16) &+ tileOffsetY &* 2)
       tileData0 = tileData[tileDataIndex]
       tileData1 = tileData[tileDataIndex + 1]
-    case .x8800:
-      let tileDataIndex = Int(truncatingIfNeeded: 0x1000 + Int16(truncatingIfNeeded: Int8(bitPattern: tileIndex)) &* 16 &+ tileOffsetY &* 2)
+    case .x8000:
+      let tileDataIndex = Int(truncatingIfNeeded: Int16(bitPattern: UInt16(truncatingIfNeeded: tileIndex) &* 16) &+ tileOffsetY &* 2)
       tileData0 = tileData[tileDataIndex]
       tileData1 = tileData[tileDataIndex + 1]
     }

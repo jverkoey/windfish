@@ -27,34 +27,17 @@ extension LR35902 {
       if nextAction == .fetchNext && !interrupts.isEmpty {
         // Interrupt phase
         halted = false
-
-        let sourceLocation = memory.sourceLocation(from: pc)
-        nextAction = .continueExecution
-        machineInstruction.instructionEmulator = LR35902.Emulation.interrupt(interrupts: interrupts)
-        machineInstruction.spec = .interrupt(interrupts)
-        machineInstruction.sourceLocation = sourceLocation
-
-      } else if isRunning {
-        // Fetch phase
-        var sourceLocation = memory.sourceLocation(from: pc)
-        let tableIndex = Int(truncatingIfNeeded: memory.read(from: pc))
-        pc += 1
-        let loadedSpec: Instruction.Spec
-        if let spec = machineInstruction.spec, let prefixTable = InstructionSet.prefixTables[spec] {
-          // Finish loading the prefix instruction.
-          sourceLocation = machineInstruction.sourceLocation!
-          loadedSpec = prefixTable[tableIndex]
-          specIndex = 256 + tableIndex
+        if ime {
+          let sourceLocation = memory.sourceLocation(from: pc)
+          nextAction = .continueExecution
+          machineInstruction.instructionEmulator = LR35902.Emulation.interrupt(interrupts: interrupts)
+          machineInstruction.spec = .interrupt(interrupts)
+          machineInstruction.sourceLocation = sourceLocation
         } else {
-          loadedSpec = InstructionSet.table[tableIndex]
-          specIndex = tableIndex
+          fetch(memory: memory)
         }
-        nextAction = .continueExecution
-
-        machineInstruction.spec = loadedSpec
-        machineInstruction.sourceLocation = sourceLocation
-        let emulator = LR35902.Emulation.instructionEmulators[specIndex]
-        machineInstruction.instructionEmulator = emulator
+      } else if isRunning {
+        fetch(memory: memory)
       }
     }
 
@@ -66,5 +49,28 @@ extension LR35902 {
         imeScheduledCyclesRemaining = 0
       }
     }
+  }
+
+  private func fetch(memory: AddressableMemory) {
+    // Fetch phase
+    var sourceLocation = memory.sourceLocation(from: pc)
+    let tableIndex = Int(truncatingIfNeeded: memory.read(from: pc))
+    pc += 1
+    let loadedSpec: Instruction.Spec
+    if let spec = machineInstruction.spec, let prefixTable = InstructionSet.prefixTables[spec] {
+      // Finish loading the prefix instruction.
+      sourceLocation = machineInstruction.sourceLocation!
+      loadedSpec = prefixTable[tableIndex]
+      specIndex = 256 + tableIndex
+    } else {
+      loadedSpec = InstructionSet.table[tableIndex]
+      specIndex = tableIndex
+    }
+    nextAction = .continueExecution
+
+    machineInstruction.spec = loadedSpec
+    machineInstruction.sourceLocation = sourceLocation
+    let emulator = LR35902.Emulation.instructionEmulators[specIndex]
+    machineInstruction.instructionEmulator = emulator
   }
 }

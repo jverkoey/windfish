@@ -517,6 +517,11 @@ final class EmulatorViewController: NSViewController, TabSelectable {
           while self.running {
             gameboy.advance()
 
+            // TODO: Standardize this as a breakpointing mechanism.
+//            if gameboy.cpu.machineInstruction.sourceAddress()! == 0x0048 {
+//              self.running = false
+//            }
+
             if !startCounting && (DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds) >= 1_000_000_000 {
               startCounting = true
               start = DispatchTime.now()
