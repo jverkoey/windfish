@@ -461,6 +461,13 @@ final class EmulatorViewController: NSViewController, TabSelectable {
         repeat {
           document.gameboy.advanceInstruction()
         } while document.gameboy.cpu.machineInstruction.sourceAddress() != nextAddress
+      } else if case .halt = document.gameboy.cpu.machineInstruction.spec {
+        let initialAddress = document.gameboy.cpu.machineInstruction.sourceAddress()!
+        // Advance until an interrupt happens.
+        // TODO: Do this on a thread.
+        repeat {
+          document.gameboy.advanceInstruction()
+        } while document.gameboy.cpu.machineInstruction.sourceAddress() == initialAddress
       } else {
         document.gameboy.advanceInstruction()
       }

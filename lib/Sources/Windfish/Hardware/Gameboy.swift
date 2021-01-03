@@ -112,7 +112,7 @@ extension Gameboy {
     }
     if let sourceLocation = cpu.machineInstruction.sourceLocation {
       var maxCycle = cpu.machineInstruction.cycle
-      while sourceLocation == cpu.machineInstruction.sourceLocation, !cpu.halted, maxCycle <= cpu.machineInstruction.cycle {
+      while sourceLocation == cpu.machineInstruction.sourceLocation, maxCycle <= cpu.machineInstruction.cycle {
         advance()
         maxCycle = max(maxCycle, cpu.machineInstruction.cycle)
       }
