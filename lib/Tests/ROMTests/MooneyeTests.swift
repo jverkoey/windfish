@@ -77,8 +77,12 @@ class MooneyeTests: XCTestCase {
   }
 
   func test_acceptance_boot_regs_dmg0() throws {
-    try XCTSkipUnless(updateGoldens)  // Some registers aren't matching.
+    try XCTSkipUnless(updateGoldens)  // DMG0 is not supported.
     try run(testRom: "Resources/mooneye/acceptance/boot_regs-dmg0", expectedInstructions: 94007)
+  }
+
+  func test_acceptance_boot_regs_dmgABC() throws {
+    try run(testRom: "Resources/mooneye/acceptance/boot_regs-dmgABC", expectedInstructions: 93892)
   }
 
   func test_acceptance_call_timing() throws {
