@@ -562,6 +562,11 @@ extension LCDController: AddressableMemory {
       objEnable                 = (byte & 0b0000_0010) > 0
       backgroundEnable          = (byte & 0b0000_0001) > 0
 
+      if !lcdDisplayEnable {
+        scanlineY = 0
+        lcdMode = .searchingOAM
+      }
+
     case .LY:  scanlineY = 0
     case .LYC: lyc = 0
 

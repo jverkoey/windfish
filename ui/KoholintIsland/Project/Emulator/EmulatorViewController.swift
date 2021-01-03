@@ -510,6 +510,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
         let gameboy = self.document.gameboy
         DispatchQueue.global(qos: .userInteractive).async {
           var start = DispatchTime.now()
+          var lastFrameTick = DispatchTime.now()
           var machineCycles: UInt64 = 0
           var frames: UInt64 = 0
           var startCounting = false
@@ -536,6 +537,14 @@ final class EmulatorViewController: NSViewController, TabSelectable {
               }
 
               self.screenImage = self.document.gameboy.takeScreenshot()
+
+              let frameDeltaSeconds = (DispatchTime.now().uptimeNanoseconds - lastFrameTick.uptimeNanoseconds)
+              let frameLength: UInt64 = 16_666_666
+              if frameDeltaSeconds < frameLength {
+                usleep(useconds_t((frameLength - frameDeltaSeconds) / 1000))
+              }
+
+              lastFrameTick = DispatchTime.now()
 
               DispatchQueue.main.sync {
                 frames += 1
