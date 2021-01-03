@@ -175,9 +175,13 @@ public class Disassembler {
       }
     }
 
+    clearCode(in: range)
     let range = Int(lowerBound)..<Int(upperBound)
     data.insert(integersIn: range)
     text.remove(integersIn: range)
+  }
+  private func clearCode(in range: Range<LR35902.Address>) {
+    let range = Int(range.lowerBound)..<Int(range.upperBound)
     code.remove(integersIn: range)
     for index in range.dropFirst() {
       let location = Gameboy.Cartridge.Location(index)
@@ -192,6 +196,7 @@ public class Disassembler {
       labelTypes[location] = nil
     }
   }
+
   func formatOfData(at address: LR35902.Address, in bank: Gameboy.Cartridge.Bank) -> DataFormat? {
     precondition(bank > 0)
     let location = Gameboy.Cartridge.location(for: address, in: bank)!
@@ -218,7 +223,10 @@ public class Disassembler {
     precondition(bank > 0)
     let lowerBound = Gameboy.Cartridge.location(for: range.lowerBound, in: bank)!
     let upperBound = Gameboy.Cartridge.location(for: range.upperBound, in: bank)!
-    text.insert(integersIn: Int(lowerBound)..<Int(upperBound))
+    clearCode(in: range)
+    let range = Int(lowerBound)..<Int(upperBound)
+    text.insert(integersIn: range)
+    data.remove(integersIn: range)
     if let lineLength = lineLength {
       textLengths[lowerBound..<upperBound] = lineLength
     }

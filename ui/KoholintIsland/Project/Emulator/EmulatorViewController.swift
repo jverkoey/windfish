@@ -454,7 +454,29 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
   @objc func performControlAction(_ sender: NSSegmentedControl) {
     if sender.selectedSegment == 0 {  // Step forward
-      // TODO: Step into and through any control flow.
+      if case .call = document.gameboy.cpu.machineInstruction.spec {
+        let nextAddress = document.gameboy.cpu.machineInstruction.sourceAddress()! + LR35902.InstructionSet.widths[document.gameboy.cpu.machineInstruction.spec!]!.total
+        // Advance until we're ready to execute the next statement after the call.
+        // TODO: Do this on a thread.
+        repeat {
+          document.gameboy.advanceInstruction()
+        } while document.gameboy.cpu.machineInstruction.sourceAddress() != nextAddress
+      } else {
+        document.gameboy.advanceInstruction()
+      }
+
+      let tileData = self.document.gameboy.tileData
+      let tileDataDidChange = self.lastRenderedTileData != tileData
+      if tileDataDidChange {
+        renderTileDataImage(with: tileData)
+        tileDataImageView.image = tileDataImage
+      }
+
+      updateInstructionAssembly()
+      updateRegisters()
+      updateRAM()
+
+      delegate?.emulatorViewControllerDidStepIn(self)
 
     } else if sender.selectedSegment == 1 {  // Step into
       document.gameboy.advanceInstruction()
