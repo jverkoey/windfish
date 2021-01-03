@@ -475,10 +475,18 @@ extension LCDController {
 extension LCDController: AddressableMemory {
   public func read(from address: LR35902.Address) -> UInt8 {
     if LCDController.tileMapRegion.contains(address) {
-      return tileMap[Int(address - LCDController.tileMapRegion.lowerBound)]
+      if lcdMode != .transferringToLCDDriver {
+        return tileMap[Int(address - LCDController.tileMapRegion.lowerBound)]
+      } else {
+        return 0xFF
+      }
     }
     if LCDController.tileDataRegion.contains(address) {
-      return tileData[Int(address - LCDController.tileDataRegion.lowerBound)]
+      if lcdMode != .transferringToLCDDriver {
+        return tileData[Int(address - LCDController.tileDataRegion.lowerBound)]
+      } else {
+        return 0xFF
+      }
     }
     if OAM.addressableRange.contains(address) {
       guard lcdMode == .hblank || lcdMode == .vblank else {
@@ -490,6 +498,16 @@ extension LCDController: AddressableMemory {
     guard let lcdAddress = Addresses(rawValue: address) else {
       preconditionFailure("Invalid address")
     }
+
+    if lcdMode == .transferringToLCDDriver {
+      switch lcdAddress {
+      case .BGP, .OBP0, .OBP1:
+        return 0xFF // Palettes are not readable during pixel transfer
+      default:
+        break // Fall-through
+      }
+    }
+
     switch lcdAddress {
     case .LCDC:
       return (
@@ -533,11 +551,15 @@ extension LCDController: AddressableMemory {
 
   public func write(_ byte: UInt8, to address: LR35902.Address) {
     if LCDController.tileMapRegion.contains(address) {
-      tileMap[Int(address - LCDController.tileMapRegion.lowerBound)] = byte
+      if lcdMode != .transferringToLCDDriver {
+        tileMap[Int(address - LCDController.tileMapRegion.lowerBound)] = byte
+      }
       return
     }
     if LCDController.tileDataRegion.contains(address) {
-      tileData[Int(address - LCDController.tileDataRegion.lowerBound)] = byte
+      if lcdMode != .transferringToLCDDriver {
+        tileData[Int(address - LCDController.tileDataRegion.lowerBound)] = byte
+      }
       return
     }
     if OAM.addressableRange.contains(address) {
@@ -552,6 +574,16 @@ extension LCDController: AddressableMemory {
     guard let lcdAddress = Addresses(rawValue: address) else {
       preconditionFailure("Invalid address")
     }
+
+    if lcdMode == .transferringToLCDDriver {
+      switch lcdAddress {
+      case .BGP, .OBP0, .OBP1:
+        return // Palettes are not writable during pixel transfer
+      default:
+        break // Fall-through
+      }
+    }
+
     switch lcdAddress {
     case .LCDC:
       lcdDisplayEnable          = (byte & 0b1000_0000) > 0
