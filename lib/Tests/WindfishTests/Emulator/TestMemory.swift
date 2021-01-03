@@ -22,7 +22,7 @@ class TestMemory: AddressableMemory {
   }
 
   func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
-    return Disassembler.sourceLocation(for: address, in: 0)
+    return Disassembler.sourceLocation(for: address, in: 0x01)
   }
 
   var defaultReadValue: UInt8 = 0x00

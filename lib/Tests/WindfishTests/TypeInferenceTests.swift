@@ -54,10 +54,10 @@ SECTION "ROM Bank 00", ROM0[$00]
         Disassembler.Line(semantic: .empty, address: nil, bank: nil, scope: nil, data: nil),
         Disassembler.Line(semantic: .instruction(.init(spec: .ld(.a, .imm8), immediate: .imm8(68)),
                                                         .init(opcode: "ld", operands: ["a", "STATF_LYC | STATF_LYCF"])),
-                                 address: 0, bank: 0, scope: "", data: Data([0x3e, 0x44])),
+                                 address: 0, bank: 0x01, scope: "", data: Data([0x3e, 0x44])),
         Disassembler.Line(semantic: .instruction(.init(spec: .ld(.ffimm8addr, .a), immediate: .imm8(65)),
                                                         .init(opcode: "ld", operands: ["[gbSTAT]", "a"])),
-                                 address: 2, bank: 0, scope: "", data: Data([0xe0, 0x41]))
+                                 address: 2, bank: 0x01, scope: "", data: Data([0xe0, 0x41]))
       ])
     }
   }
@@ -270,9 +270,9 @@ jr @-$01
       XCTAssertEqual(content, """
 SECTION "ROM Bank 00", ROM0[$00]
 
-toc_00_0000:
+toc_01_0000:
     nop
-    jr   toc_00_0000
+    jr   toc_01_0000
 
 """)
     }
