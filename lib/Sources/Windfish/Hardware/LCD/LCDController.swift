@@ -381,7 +381,6 @@ extension LCDController {
       searchNextOAM()
 
       if lcdModeCycle >= LCDController.searchingOAMLength {
-//        precondition(intersectedOAMs.count == 0, "Sprites not handled yet.")
         lcdMode = .transferringToLCDDriver
         bgfifo.removeAll()
         spritefifo.removeAll()
@@ -415,6 +414,7 @@ extension LCDController {
         } else {
           // No more lines to draw.
           lcdMode = .vblank
+          lcdModeCycle = 0
 
           vblankCounter += 1
 
@@ -431,6 +431,7 @@ extension LCDController {
         if scanlineY >= 154 {
           scanlineY = 0
           lcdMode = .searchingOAM
+          lcdModeCycle = 0
         }
       }
       break
