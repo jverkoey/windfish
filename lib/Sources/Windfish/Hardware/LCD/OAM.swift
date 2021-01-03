@@ -21,8 +21,8 @@ extension OAM: AddressableMemory {
     let oamIndex = relativeOffset / 4
     let oam = sprites[Int(oamIndex)]
     switch relativeOffset % 4 {
-    case 0: return oam.x
-    case 1: return oam.y
+    case 0: return oam.y
+    case 1: return oam.x
     case 2: return oam.tile
     case 3: return oam.flags
     default: fatalError()
@@ -34,8 +34,8 @@ extension OAM: AddressableMemory {
     let oamIndex = Int(relativeOffset / 4)
     var oam = sprites[oamIndex]
     switch relativeOffset % 4 {
-    case 0: oam.x = byte
-    case 1: oam.y = byte
+    case 0: oam.y = byte
+    case 1: oam.x = byte
     case 2: oam.tile = byte
     case 3: oam.flags = byte
     default: fatalError()

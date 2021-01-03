@@ -13,7 +13,7 @@ extension LR35902.Emulation {
         memory.write(cpu.a, to: cpu.hl)
         return .continueExecution
       }
-      cpu.hl += 1
+      cpu.hl &+= 1
       return .fetchNext
     }
   }
