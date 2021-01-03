@@ -100,14 +100,14 @@ public final class LCDController {
   // MARK: STAT bits (0xFF41)
 
   enum LCDCMode {
-    case hblank
-    case vblank
+    case hblank                   // Mode 0
+    case vblank                   // Mode 1
 
     // TODO: Not able to read oamram during this mode
-    case searchingOAM
+    case searchingOAM             // Mode 2
 
     // TODO: Any reads of vram or oamram during this mode should return 0xff; writes are ignored
-    case transferringToLCDDriver
+    case transferringToLCDDriver  // Mode 3
 
     var bits: UInt8 {
       switch self {
@@ -225,6 +225,7 @@ public final class LCDController {
   private var windowYPlot: UInt8 = 0
   private var bgYPlot: UInt8 = 0
   private var lastBackgroundPixel: UInt8 = 0
+  private var lastStatSignal = false
 
   /**
    Incremented every time a new vblank occurs.
@@ -432,6 +433,23 @@ extension LCDController {
         }
       }
       break
+    }
+
+    checkForStatInterrupt(memory: memory)
+  }
+
+  private func checkForStatInterrupt(memory: AddressableMemory) {
+    let statSignal = (coincidence && enableCoincidenceInterrupt)
+      || ((lcdMode == .hblank) && enableHBlankInterrupt)
+      || ((lcdMode == .searchingOAM) && enableOAMInterrupt)
+      || ((lcdMode == .vblank) && (enableVBlankInterrupt || enableOAMInterrupt))
+    let shouldRaiseStat = !lastStatSignal && statSignal
+    lastStatSignal = statSignal
+
+    if shouldRaiseStat {
+      var interruptFlag = LR35902.Instruction.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
+      interruptFlag.insert(.lcdStat)
+      memory.write(interruptFlag.rawValue, to: LR35902.interruptFlagAddress)
     }
   }
 
