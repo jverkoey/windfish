@@ -22,6 +22,9 @@ public final class LCDController {
 
   init(oam: OAM) {
     self.oam = oam
+    tileMap.initializeMemory(as: UInt8.self, repeating: 0)
+    tileData.initializeMemory(as: UInt8.self, repeating: 0)
+    screenData.initializeMemory(as: UInt8.self, repeating: 0)
   }
 
   let oam: OAM
@@ -400,7 +403,8 @@ extension LCDController {
         scanlineX += 1
       }
 
-      if lcdModeCycle >= 63 {
+      if lcdModeCycle >= LCDController.searchingOAMLength + 43 {
+        precondition(scanlineX >= 160)
         lcdMode = .hblank
         // Don't reset lcdModeCycle yet, as this mode can actually end early.
       }
@@ -425,13 +429,13 @@ extension LCDController {
       }
       break
     case .vblank:
-      if lcdModeCycle % LCDController.scanlineCycleLength == 0 {
+      if lcdModeCycle >= LCDController.scanlineCycleLength {
         scanlineY += 1
+        lcdModeCycle = 0
 
         if scanlineY >= 154 {
           scanlineY = 0
           lcdMode = .searchingOAM
-          lcdModeCycle = 0
         }
       }
       break
