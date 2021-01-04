@@ -11,12 +11,7 @@ extension LR35902.Emulation {
     }
 
     func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.Emulation.EmulationResult {
-      cpu.fsubtract = true
-      let registerValue: UInt8 = cpu[register]
-      let result = cpu.a.subtractingReportingOverflow(registerValue)
-      cpu.fzero = result.partialValue == 0
-      cpu.fcarry = result.overflow
-      cpu.fhalfcarry = (cpu.a & 0x0f) < (registerValue & 0x0f)
+      cp(cpu: cpu, value: cpu[register])
       return .fetchNext
     }
 

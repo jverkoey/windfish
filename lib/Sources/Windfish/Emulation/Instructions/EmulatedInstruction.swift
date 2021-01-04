@@ -87,6 +87,22 @@ extension InstructionEmulator {
     cpu.fhalfcarry = halfResult > 0xf
   }
 
+  /** Compares 8-bit value with cpu.a. */
+  func cp(cpu: LR35902, value: UInt8) {
+    cpu.fsubtract = true
+
+    let wideA = UInt16(truncatingIfNeeded: cpu.a)
+    let wideVal = UInt16(truncatingIfNeeded: value)
+
+    let halfResult: UInt16 = (wideA & 0xf) &- (wideVal & 0xf)
+    let fullResult: UInt16 = wideA &- wideVal
+
+    let result = UInt8(truncatingIfNeeded: fullResult)
+    cpu.fzero = result == 0
+    cpu.fcarry = fullResult > 0xff
+    cpu.fhalfcarry = halfResult > 0xf
+  }
+
   /** Subtracts 8-bit value and a carry from cpu.a. */
   func carrysub(cpu: LR35902, value: UInt8) {
     cpu.fsubtract = true

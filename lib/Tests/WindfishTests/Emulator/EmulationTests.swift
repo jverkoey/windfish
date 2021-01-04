@@ -4,7 +4,7 @@ import XCTest
 class InstructionEmulatorTests: XCTestCase {
   static var testedSpecs = Set<LR35902.Instruction.Spec>()
 
-  // 43 specs to go.
+  // 34 specs to go.
   static override func tearDown() {
     let remainingSpecs = LR35902.InstructionSet.allSpecs().filter { !testedSpecs.contains($0) }
     print("\(remainingSpecs.count) specs remaining to test")
