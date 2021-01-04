@@ -34,6 +34,8 @@ extension Data {
 class BlarggTests: XCTestCase {
   let updateGoldens = false
 
+  // MARK: - Instructions
+
   func test_01_Special() throws {
     try run(rom: "Resources/blargg/cpu_instrs/individual/01-special", expectedInstructions: 1_277_938)
   }
@@ -78,11 +80,27 @@ class BlarggTests: XCTestCase {
     try run(rom: "Resources/blargg/cpu_instrs/individual/11-op a,(hl)", expectedInstructions: 7_453_922)
   }
 
+  // MARK: - Instruction timing
+
   func test_instr_timing() throws {
     try run(rom: "Resources/blargg/instr_timing/instr_timing", expectedInstructions: 273_267)
   }
 
-  func run(rom: String, expectedInstructions: Int) throws {
+  // MARK: - Memory timing
+
+  func test_mem_timing_01_read_timing() throws {
+    try run(rom: "Resources/blargg/mem_timing/individual/01-read_timing", expectedInstructions: 203_908)
+  }
+
+  func test_mem_timing_02_write_timing() throws {
+    try run(rom: "Resources/blargg/mem_timing/individual/02-write_timing", expectedInstructions: 196_800)
+  }
+
+  func test_mem_timing_03_modify_timing() throws {
+    try run(rom: "Resources/blargg/mem_timing/individual/03-modify_timing", expectedInstructions: 217_114)
+  }
+
+  func run(rom: String, expectedInstructions: Int = 2_000_000) throws {
     let path = try XCTUnwrap(Bundle.module.path(forResource: rom, ofType: "gb"))
     let data = try Data(contentsOf: URL(fileURLWithPath: path))
     let gameboy = Gameboy()

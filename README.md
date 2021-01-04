@@ -48,6 +48,9 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 | `10-bit ops.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/10-bit%20ops.png) |
 | `11-op a,(hl).gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/11-op%20a,(hl).png) |
 | `instr_timing` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/instr_timing/instr_timing.png) |
+| `mem_timing/01-read_timing` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/01-read_timing.png) |
+| `mem_timing/02-write_timing` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/02-write_timing.png) |
+| `mem_timing/03-modify_timing` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/03-modify_timing.png) |
 
 ### [mooneye](https://github.com/Gekkio/mooneye-gb/)
 
