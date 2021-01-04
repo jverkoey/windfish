@@ -19,9 +19,9 @@ extension LR35902.Emulation {
         value &-= 1
         cpu.fzero = value == 0
         cpu.fhalfcarry = (value & 0xf) == 0xf
+        memory.write(value, to: cpu.hl)
         return .continueExecution
       }
-      memory.write(value, to: cpu.hl)
       return .fetchNext
     }
 
