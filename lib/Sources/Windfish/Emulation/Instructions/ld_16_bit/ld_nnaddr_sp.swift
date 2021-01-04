@@ -20,11 +20,11 @@ extension LR35902.Emulation {
         return .continueExecution
       }
       if cycle == 3 {
-        memory.write(UInt8(cpu.sp & 0x00FF), to: immediate)
+        memory.write(UInt8(truncatingIfNeeded: cpu.sp & 0x00FF), to: immediate)
         return .continueExecution
       }
       if cycle == 4 {
-        memory.write(UInt8((cpu.sp & 0xFF00) >> 8), to: immediate + 1)
+        memory.write(UInt8(truncatingIfNeeded: (cpu.sp & 0xFF00) >> 8), to: immediate + 1)
         return .continueExecution
       }
       return .fetchNext
