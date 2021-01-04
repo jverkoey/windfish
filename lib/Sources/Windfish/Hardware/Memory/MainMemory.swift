@@ -2,12 +2,13 @@ import Foundation
 
 extension Gameboy {
   public final class Memory {
-    public init(cpu: LR35902, lcdController: LCDController, dmaController: DMAController, oam: OAM, soundController: SoundController) {
+    public init(cpu: LR35902, lcdController: LCDController, dmaController: DMAController, oam: OAM, soundController: SoundController, timer: Timer) {
       self.cpu = cpu
       self.lcdController = lcdController
       self.dmaController = dmaController
       self.oam = oam
       self.soundController = soundController
+      self.timer = timer
     }
 
     public var tracers = ContiguousArray<AddressableMemory>()
@@ -27,7 +28,7 @@ extension Gameboy {
           return cpu
         case Memory.ramAddressableRange, Memory.echoRamAddressableRange:  return ram
         case Memory.hramAddressableRange: return hram
-        case 0xFF00...0xFF07, 0xFF47...0xFF49:
+        case 0xFF00...0xFF03, 0xFF47...0xFF49:
           return ioRegisters
         case DMAController.registerAddress:
           return dmaController
@@ -36,6 +37,8 @@ extension Gameboy {
           return lcdController
         case SoundController.wavePatternRegion, SoundController.soundRegistersRegion:
           return soundController
+        case Timer.timerRegion:
+          return timer
         default:
           print("Unhandled address \(address.hexString)")
           return fallthroughRAM
@@ -51,6 +54,7 @@ extension Gameboy {
     private let dmaController: DMAController
     private let oam: OAM
     private let soundController: SoundController
+    private let timer: Timer
 
     private let fallthroughRAM = GenericRAM()
 

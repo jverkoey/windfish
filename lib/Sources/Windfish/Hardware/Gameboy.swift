@@ -4,7 +4,7 @@ public final class Gameboy {
   public init() {
     self.lcdController = LCDController(oam: oam)
     self.dmaController = DMAController(oam: oam)
-    self.memory = Memory(cpu: cpu, lcdController: lcdController, dmaController: dmaController, oam: oam, soundController: soundController)
+    self.memory = Memory(cpu: cpu, lcdController: lcdController, dmaController: dmaController, oam: oam, soundController: soundController, timer: timer)
     self.dmaProxy = DMAProxy(memory: memory)
   }
 
@@ -40,6 +40,8 @@ public final class Gameboy {
 
   /** The Gameboy's OAM. */
   let oam = OAM()
+
+  let timer = Timer()
 
   let dmaProxy: DMAProxy
 
@@ -102,6 +104,7 @@ extension Gameboy {
 
     let proxyMemory: AddressableMemory = dmaController.oamLocked ? dmaProxy : memory
     cpu.advance(memory: proxyMemory)
+    timer.advance(memory: proxyMemory)
     lcdController.advance(memory: proxyMemory)
   }
 

@@ -34,7 +34,7 @@ extension InstructionEmulatorTests {
           cycle += 1
         } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
-        XCTAssertEqual(cycle, 4, "Test case: \(name)")
+        XCTAssertEqual(cycle, 5, "Test case: \(name)")
         mutations.pc = 0x1212
         mutations.sp = testCase.result.sp
         assertEqual(cpu, mutations, message: "Test case: \(name)")

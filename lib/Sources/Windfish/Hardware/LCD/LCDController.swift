@@ -133,6 +133,9 @@ public final class LCDController {
       if lcdMode == .searchingOAM {
         intersectedOAMs = []
         oamIndex = 0
+        lcdModeCycle = 0
+      } else if lcdMode == .vblank {
+        lcdModeCycle = 0
       } else if lcdMode == .transferringToLCDDriver {
         windowYPlot = scanlineY &- windowY
         bgYPlot = scanlineY &+ scrollY
@@ -414,11 +417,9 @@ extension LCDController {
         scanlineY += 1
         if scanlineY < 144 {
           lcdMode = .searchingOAM
-          lcdModeCycle = 0
         } else {
           // No more lines to draw.
           lcdMode = .vblank
-          lcdModeCycle = 0
 
           vblankCounter += 1
 

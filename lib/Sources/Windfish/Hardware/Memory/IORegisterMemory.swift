@@ -8,10 +8,6 @@ final class IORegisterMemory: AddressableMemory {
     case P1   = 0xFF00
     case SB   = 0xFF01
     case SC   = 0xFF02
-    case DIV  = 0xFF04
-    case TIMA = 0xFF05
-    case TMA  = 0xFF06
-    case TAC  = 0xFF07
 
     case BGP  = 0xFF47
     case OBP0 = 0xFF48
@@ -21,10 +17,6 @@ final class IORegisterMemory: AddressableMemory {
     .P1:   0x00,
     .SB:   0x00,
     .SC:   0x00,
-    .DIV:  0x00,
-    .TIMA: 0x00,
-    .TMA:  0x00,
-    .TAC:  0x00,
     .BGP:  0xFC,
     .OBP0: 0xFF,
     .OBP1: 0xFF,
