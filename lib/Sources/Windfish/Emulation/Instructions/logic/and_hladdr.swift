@@ -1,7 +1,7 @@
 import Foundation
 
 extension LR35902.Emulation {
-  final class and_hladd: InstructionEmulator, InstructionEmulatorInitializable {
+  final class and_hladdr: InstructionEmulator, InstructionEmulatorInitializable {
     init?(spec: LR35902.Instruction.Spec) {
       guard case .and(.hladdr) = spec else {
         return nil

@@ -211,7 +211,7 @@ extension LR35902.Emulation {
     push_rr.self,
 
     // Logic
-    and_hladd.self,
+    and_hladdr.self,
     and_n.self,
     and_r.self,
     cp_hladdr.self,
