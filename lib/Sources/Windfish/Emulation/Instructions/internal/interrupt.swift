@@ -2,10 +2,6 @@ import Foundation
 
 extension LR35902.Emulation {
   final class interrupt: InstructionEmulator {
-    init(interrupts: LR35902.Instruction.Interrupt) {
-      self.interrupts = interrupts
-    }
-
     func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.Emulation.EmulationResult {
       if cycle == 1 {
         cpu.sp &-= 1
@@ -17,7 +13,7 @@ extension LR35902.Emulation {
         memory.write(UInt8(cpu.pc & 0x00FF), to: cpu.sp)
         return .continueExecution
       }
-      var interrupts = self.interrupts
+      var interrupts = LR35902.Instruction.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
       if interrupts.contains(.vBlank) {
         interrupts.remove(.vBlank)
         cpu.pc = 0x0040
@@ -38,7 +34,5 @@ extension LR35902.Emulation {
       cpu.ime = false
       return .fetchNext
     }
-
-    private let interrupts: LR35902.Instruction.Interrupt
   }
 }

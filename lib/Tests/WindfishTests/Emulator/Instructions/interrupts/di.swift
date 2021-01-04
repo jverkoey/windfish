@@ -9,10 +9,10 @@ extension InstructionEmulatorTests {
       let memory = TestMemory()
 
       let cpu = LR35902.zeroed()
+      cpu.ime = false
 
       let mutations = cpu.copy()
       mutations.ime = false
-      mutations.imeScheduledCyclesRemaining = 0
 
       var cycle = 0
       repeat {

@@ -1,5 +1,11 @@
 import Foundation
 
+// References:
+// - https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
+// - https://gekkio.fi/files/gb-docs/gbctr.pdf
+// - https://www.reddit.com/r/EmuDev/comments/7qf352/game_boy_is_0xcb_a_separate_instruction_are/
+//   - "Important: an interrupt CANNOT happen between 0xCB and the other operand."
+
 /** A representation of the LR35902 CPU. */
 public final class LR35902 {
   public typealias Address = UInt16
@@ -85,11 +91,8 @@ public final class LR35902 {
     return !halted
   }
 
-  /**
-   If greater than zero, then this value will be decremented on each machine cycle until it is less then or equal to 0,
-   at which point ime will be enabled.
-   */
-  var imeScheduledCyclesRemaining: Int = 0
+  /** If true, ime will be enabled on the next machine cycle advance. */
+  var imeToggle = false
 
   // MARK: 16-bit registers
   // Note that, though these registers are ultimately backed by the underlying 8 bit registers, each 16-bit register
@@ -172,7 +175,7 @@ public final class LR35902 {
   /** Initializes the state with boot values. */
   public init() {}
 
-  internal init(a: UInt8 = 0, b: UInt8 = 0, c: UInt8 = 0, d: UInt8 = 0, e: UInt8 = 0, h: UInt8 = 0, l: UInt8 = 0, fzero: Bool = false, fsubtract: Bool = false, fhalfcarry: Bool = false, fcarry: Bool = false, ime: Bool = false, interruptEnable: LR35902.Instruction.Interrupt = [], interruptFlag: LR35902.Instruction.Interrupt = [], halted: Bool = false, imeScheduledCyclesRemaining: Int = 0, sp: UInt16 = 0, pc: LR35902.Address = 0, machineInstruction: LR35902.MachineInstruction = MachineInstruction(), registerTraces: [LR35902.Instruction.Numeric : LR35902.RegisterTrace] = [:], nextAction: LR35902.Emulation.EmulationResult = .fetchNext) {
+  internal init(a: UInt8 = 0, b: UInt8 = 0, c: UInt8 = 0, d: UInt8 = 0, e: UInt8 = 0, h: UInt8 = 0, l: UInt8 = 0, fzero: Bool = false, fsubtract: Bool = false, fhalfcarry: Bool = false, fcarry: Bool = false, ime: Bool = false, interruptEnable: LR35902.Instruction.Interrupt = [], interruptFlag: LR35902.Instruction.Interrupt = [], halted: Bool = false, imeToggle: Bool = false, sp: UInt16 = 0, pc: LR35902.Address = 0, machineInstruction: LR35902.MachineInstruction = MachineInstruction(), registerTraces: [LR35902.Instruction.Numeric : LR35902.RegisterTrace] = [:], nextAction: LR35902.Emulation.EmulationResult = .fetchNext) {
     self.a = a
     self.b = b
     self.c = c
@@ -188,7 +191,7 @@ public final class LR35902 {
     self.interruptEnable = interruptEnable
     self.interruptFlag = interruptFlag
     self.halted = halted
-    self.imeScheduledCyclesRemaining = imeScheduledCyclesRemaining
+    self.imeToggle = imeToggle
     self.sp = sp
     self.pc = pc
     self.machineInstruction = machineInstruction
@@ -201,7 +204,7 @@ public final class LR35902 {
   }
 
   public func copy() -> LR35902 {
-    return LR35902(a: a, b: b, c: c, d: d, e: e, h: h, l: l, fzero: fzero, fsubtract: fsubtract, fhalfcarry: fhalfcarry, fcarry: fcarry, ime: ime, interruptEnable: interruptEnable, interruptFlag: interruptFlag, halted: halted, imeScheduledCyclesRemaining: imeScheduledCyclesRemaining, sp: sp, pc: pc, machineInstruction: machineInstruction, registerTraces: registerTraces, nextAction: nextAction)
+    return LR35902(a: a, b: b, c: c, d: d, e: e, h: h, l: l, fzero: fzero, fsubtract: fsubtract, fhalfcarry: fhalfcarry, fcarry: fcarry, ime: ime, interruptEnable: interruptEnable, interruptFlag: interruptFlag, halted: halted, imeToggle: imeToggle, sp: sp, pc: pc, machineInstruction: machineInstruction, registerTraces: registerTraces, nextAction: nextAction)
   }
 }
 
@@ -312,6 +315,74 @@ extension LR35902 {
 
     /** The source location from which this register's value was loaded, if known. */
     public let sourceLocation: Disassembler.SourceLocation?
+  }
+}
+
+// MARK: - Emulation
+
+extension LR35902 {
+  /** Advances the CPU by one machine cycle. */
+  public func advance(memory: AddressableMemory) {
+    // ei requires we wait one full machine cycle before turning on ime, so we wait until the beginning of the next
+    // machine cycle to check whether to turn it on.
+    if imeToggle {
+      ime = true
+      imeToggle = false
+    }
+
+    // https://gekkio.fi/files/gb-docs/gbctr.pdf
+    if isRunning {
+      let machineInstruction = self.machineInstruction
+      // Execution phase
+      if nextAction == .continueExecution, let instructionEmulator = machineInstruction.instructionEmulator {
+        machineInstruction.cycle += 1
+        nextAction = instructionEmulator.advance(cpu: self, memory: memory, cycle: machineInstruction.cycle, sourceLocation: machineInstruction.sourceLocation!)
+      } else {
+        // No instruction was actually loaded into the CPU; let's switch to fetching one.
+        nextAction = .fetchNext
+      }
+    }
+
+    // The LR35902's fetch/execute overlap behavior means we load the next opcode on the same machine cycle as the
+    // last instruction's execution.
+    let interrupts = interruptFlag.intersection(interruptEnable)
+    if halted && !ime && !interrupts.isEmpty {
+      // Stop halting in order to service the interrupt, but service the interrupt on the next machine cycle
+      halted = false
+    } else if nextAction == .fetchNext && ime && !interrupts.isEmpty {
+      // Interrupt phase
+      halted = false
+      let sourceLocation = memory.sourceLocation(from: pc)
+      nextAction = .continueExecution
+      machineInstruction.instructionEmulator = LR35902.Emulation.interrupt()
+      machineInstruction.spec = .interrupt(interrupts)
+      machineInstruction.sourceLocation = sourceLocation
+    } else if isRunning && nextAction == .fetchNext || nextAction == .fetchPrefix {
+      fetch(memory: memory)
+    }
+  }
+
+  private func fetch(memory: AddressableMemory) {
+    // Fetch phase
+    var sourceLocation = memory.sourceLocation(from: pc)
+    let tableIndex = Int(truncatingIfNeeded: memory.read(from: pc))
+    pc += 1
+    let loadedSpec: Instruction.Spec
+    if let spec = machineInstruction.spec, let prefixTable = InstructionSet.prefixTables[spec] {
+      // Finish loading the prefix instruction.
+      sourceLocation = machineInstruction.sourceLocation!
+      loadedSpec = prefixTable[tableIndex]
+      specIndex = 256 + tableIndex
+    } else {
+      loadedSpec = InstructionSet.table[tableIndex]
+      specIndex = tableIndex
+    }
+    nextAction = .continueExecution
+
+    machineInstruction.spec = loadedSpec
+    machineInstruction.sourceLocation = sourceLocation
+    let emulator = LR35902.Emulation.instructionEmulators[specIndex]
+    machineInstruction.instructionEmulator = emulator
   }
 }
 

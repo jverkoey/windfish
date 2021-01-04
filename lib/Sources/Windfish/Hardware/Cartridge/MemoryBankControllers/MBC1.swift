@@ -83,7 +83,7 @@ extension Gameboy.Cartridge {
         precondition(ramEnabled, "RAM is not enabled.")
         switch ramSize {
         case .none:
-          preconditionFailure("Cartridge has no RAM.")
+          return 0xff
         case .one2kb, .one8kb:
           return ram[Int(address) - 0xA000]
         case .four32kb, .sixteen128kb:
@@ -136,8 +136,7 @@ extension Gameboy.Cartridge {
           return
         }
         switch ramSize {
-        case .none:
-          fatalError("Cartridge has no RAM.")
+        case .none:  break  // Do nothing; there's no RAM to write to
         case .one2kb, .one8kb:
           ram[Int(address) - 0xA000] = byte
         case .four32kb, .sixteen128kb:
