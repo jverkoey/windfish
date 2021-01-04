@@ -238,4 +238,52 @@ extension InstructionEmulatorTests {
       ], "\(spec)")
     }
   }
+
+  func test_ld_hl_spsimm8() {
+    for spec in LR35902.InstructionSet.allSpecs() {
+      guard let emulator = LR35902.Emulation.ld_hl_spsimm8(spec: spec) else { continue }
+      InstructionEmulatorTests.testedSpecs.insert(spec)
+      let memory = TestMemory(defaultReadValue: 2)
+
+      let cpu = LR35902.zeroed()
+      cpu.hl = 1
+      cpu.sp = 10
+      let mutations = cpu.copy()
+      mutations.hl = 12
+      mutations.pc += 1
+
+      var cycle = 0
+      repeat {
+        cycle += 1
+      } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
+
+      XCTAssertEqual(cycle, 3, "\(spec)")
+      assertEqual(cpu, mutations)
+    }
+  }
+
+  func test_ld_hl_spsimm8_negative() {
+    for spec in LR35902.InstructionSet.allSpecs() {
+      guard let emulator = LR35902.Emulation.ld_hl_spsimm8(spec: spec) else { continue }
+      InstructionEmulatorTests.testedSpecs.insert(spec)
+      let memory = TestMemory(defaultReadValue: UInt8(bitPattern: Int8(-2)))
+
+      let cpu = LR35902.zeroed()
+      cpu.hl = 1
+      cpu.sp = 10
+      let mutations = cpu.copy()
+      mutations.hl = 8
+      mutations.pc += 1
+      mutations.fcarry = true
+      mutations.fhalfcarry = true
+
+      var cycle = 0
+      repeat {
+        cycle += 1
+      } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
+
+      XCTAssertEqual(cycle, 3, "\(spec)")
+      assertEqual(cpu, mutations)
+    }
+  }
 }
