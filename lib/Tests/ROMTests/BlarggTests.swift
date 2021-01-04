@@ -68,8 +68,7 @@ class BlarggTests: XCTestCase {
   }
 
   func test_09_op_r_r() throws {
-    try XCTSkipUnless(updateGoldens)  // Failing with "CB 28 CB 29 CB 2A CB 2B CB 2C CB 2D CB 2F"
-    try run(rom: "Resources/blargg/cpu_instrs/individual/09-op r,r", expectedInstructions: 10_251_021)
+    try run(rom: "Resources/blargg/cpu_instrs/individual/09-op r,r", expectedInstructions: 4_443_002)
   }
 
   func test_10_bit_ops() throws {

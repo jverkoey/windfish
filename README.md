@@ -44,7 +44,7 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 | `06-ld r,r.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/06-ld%20r,r.png) |
 | `07-jr,jp,call,ret,rst.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/07-jr,jp,call,ret,rst.png) |
 | `08-misc instrs.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/08-misc%20instrs.png) |
-| `09-op r,r.gb` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/09-op%20r,r.png) |
+| `09-op r,r.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/09-op%20r,r.png) |
 | `10-bit ops.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/10-bit%20ops.png) |
 | `11-op a,(hl).gb` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/11-op%20a,(hl).png) |
 
