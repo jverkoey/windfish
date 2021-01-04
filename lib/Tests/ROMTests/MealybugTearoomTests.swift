@@ -5,14 +5,34 @@ import Windfish
 // - https://github.com/mattcurrie/mealybug-tearoom-tests
 
 class MealybugTearoomTests: XCTestCase {
-  let updateGoldens = false
+  let updateGoldens = true
 
-  func test_01_Special() throws {
-    try XCTSkipUnless(updateGoldens)  // DMG0 is not supported.
+  func test_m3_bgp_change() throws {
+    try XCTSkipUnless(updateGoldens)
+    try run(rom: "Resources/mealybug-tearoom/m3_bgp_change")
+  }
+
+  func test_m3_scy_change() throws {
+    try XCTSkipUnless(updateGoldens)
+    try run(rom: "Resources/mealybug-tearoom/m3_scy_change")
+  }
+
+  func test_m3_wx_4_change() throws {
+    try XCTSkipUnless(updateGoldens)
     try run(rom: "Resources/mealybug-tearoom/m3_wx_4_change")
   }
 
-  func run(rom: String, expectedInstructions: Int = 2_000_000) throws {
+  func test_m3_wx_5_change() throws {
+    try XCTSkipUnless(updateGoldens)
+    try run(rom: "Resources/mealybug-tearoom/m3_wx_5_change")
+  }
+
+  func test_m3_wx_6_change() throws {
+    try XCTSkipUnless(updateGoldens)
+    try run(rom: "Resources/mealybug-tearoom/m3_wx_6_change")
+  }
+
+  func run(rom: String, expectedInstructions: Int = 3_000_000) throws {
     let path = try XCTUnwrap(Bundle.module.path(forResource: rom, ofType: "gb"))
     let data = try Data(contentsOf: URL(fileURLWithPath: path))
     let gameboy = Gameboy()
@@ -22,16 +42,8 @@ class MealybugTearoomTests: XCTestCase {
     let instructionsForSuccessToPrint = 17500
 
     var instructions = 0
-    var success = false
     repeat {
       gameboy.advanceInstruction()
-
-      //      if let sourceLocation = gameboy.cpu.machineInstruction.sourceLocation {
-      //        var address = sourceLocation.address()
-      //        let instruction = Disassembler.fetchInstruction(at: &address, memory: gameboy.memory)
-      //        print("\(sourceLocation.address().hexString) \(RGBDSDisassembler.statement(for: instruction).formattedString)")
-      //      }
-
       instructions += 1
     } while instructions < (expectedInstructions + instructionsForSuccessToPrint)
 
@@ -46,9 +58,6 @@ class MealybugTearoomTests: XCTestCase {
       let localFile = NSURL(fileURLWithPath: #file).deletingLastPathComponent!.appendingPathComponent(rom).appendingPathExtension("png")
       try screenshot.write(to: localFile)
     }
-
-    XCTAssertTrue(success, String(bytes: gameboy.serialDataReceived, encoding: .ascii)!)
-    XCTAssertEqual(instructions - instructionsForSuccessToPrint, expectedInstructions)
   }
 
 }
