@@ -165,6 +165,32 @@ extension InstructionEmulatorTests {
     }
   }
 
+  func test_ld_rraddr_n() {
+    for spec in LR35902.InstructionSet.allSpecs() {
+      guard case .ld(let dst, .imm8) = spec,
+            let emulator = LR35902.Emulation.ld_rraddr_n(spec: spec) else { continue }
+      InstructionEmulatorTests.testedSpecs.insert(spec)
+      let memory = TestMemory(defaultReadValue: 0xab)
+
+      let cpu = LR35902.zeroed()
+      cpu[dst] = 0x4567 as UInt16
+      let mutations = cpu.copy()
+      mutations.pc += 1
+
+      var cycle = 0
+      repeat {
+        cycle += 1
+      } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
+
+      XCTAssertEqual(cycle, 3, "\(spec)")
+      assertEqual(cpu, mutations, message: "\(spec)")
+      XCTAssertEqual(memory.reads, [0], "\(spec)")
+      XCTAssertEqual(memory.writes, [
+        .init(byte: 0xab, address: 0x4567)
+      ], "\(spec)")
+    }
+  }
+
   func test_ld_rraddr_r() {
     for spec in LR35902.InstructionSet.allSpecs() {
       guard case .ld(let dst, let src) = spec, !(dst == .hladdr && (src == .h || src == .l)),
