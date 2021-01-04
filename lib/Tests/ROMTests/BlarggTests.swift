@@ -79,6 +79,11 @@ class BlarggTests: XCTestCase {
     try run(rom: "Resources/blargg/cpu_instrs/individual/11-op a,(hl)", expectedInstructions: 7_448_161)
   }
 
+  func test_instr_timing() throws {
+    try XCTSkipUnless(updateGoldens)  // Failed #255
+    try run(rom: "Resources/blargg/instr_timing/instr_timing", expectedInstructions: 7_448_161)
+  }
+
   func run(rom: String, expectedInstructions: Int) throws {
     let path = try XCTUnwrap(Bundle.module.path(forResource: rom, ofType: "gb"))
     let data = try Data(contentsOf: URL(fileURLWithPath: path))
