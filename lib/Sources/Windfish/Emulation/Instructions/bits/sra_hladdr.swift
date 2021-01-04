@@ -14,14 +14,7 @@ extension LR35902.Emulation {
         return .continueExecution
       }
       if cycle == 2 {
-        cpu.fsubtract = false
-        cpu.fhalfcarry = false
-
-        let carry = (value & 1) != 0
-        let result = value &>> 1
-        cpu.fzero = result == 0
-        cpu.fcarry = carry
-        value = result
+        sra(cpu: cpu, value: &value)
         return .continueExecution
       }
       if cycle == 3 {

@@ -124,6 +124,17 @@ extension InstructionEmulator {
     cpu.fhalfcarry = true
     cpu.fzero = (value & (UInt8(1) << bit.rawValue)) == 0
   }
+
+  func sra(cpu: LR35902, value: inout UInt8) {
+    cpu.fsubtract = false
+    cpu.fhalfcarry = false
+    let carry = (value & 1) != 0
+    // msb does not change, so we use int8 to ensure the msb stays set
+    let result = UInt8(bitPattern: Int8(bitPattern: value) &>> 1)
+    value = result
+    cpu.fzero = result == 0
+    cpu.fcarry = carry
+  }
 }
 
 extension LR35902.Emulation {

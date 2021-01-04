@@ -16,11 +16,11 @@ extension InstructionEmulatorTests {
       "zero":       .init(value: 0,           fc: false, result: .init(fc: false, fz: true,  value: 0)),
       "0000_0001":  .init(value: 0b0000_0001, fc: false, result: .init(fc: true,  fz: true,  value: 0)),
       "0001_0000":  .init(value: 0b0001_0000, fc: false, result: .init(fc: false, fz: false, value: 0b0000_1000)),
-      "1000_0000":  .init(value: 0b1000_0000, fc: false, result: .init(fc: false, fz: false,  value: 0b0100_0000)),
+      "1000_0000":  .init(value: 0b1000_0000, fc: false, result: .init(fc: false, fz: false, value: 0b1100_0000)),
       "czero":      .init(value: 0,           fc: true,  result: .init(fc: false, fz: true,  value: 0)),
       "c0000_0001": .init(value: 0b0000_0001, fc: true,  result: .init(fc: true,  fz: true,  value: 0)),
       "c0001_0000": .init(value: 0b0001_0000, fc: true,  result: .init(fc: false, fz: false, value: 0b0000_1000)),
-      "c1000_0000": .init(value: 0b1000_0000, fc: true,  result: .init(fc: false, fz: false, value: 0b0100_0000)),
+      "c1000_0000": .init(value: 0b1000_0000, fc: true,  result: .init(fc: false, fz: false, value: 0b1100_0000)),
     ]
   }
 
