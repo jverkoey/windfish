@@ -15,41 +15,41 @@ class MooneyeTests: XCTestCase {
   }
 
   func test_acceptance_bits_reg_f() throws {
-    try run(testRom: "Resources/mooneye/acceptance/bits/reg_f", expectedInstructions: 93_751)
+    try run(testRom: "Resources/mooneye/acceptance/bits/reg_f", expectedInstructions: 93_835)
   }
 
   func test_acceptance_bits_unused_hwio_gs() throws {
     try XCTSkipUnless(updateGoldens)
-    try run(testRom: "Resources/mooneye/acceptance/bits/unused_hwio-GS", expectedInstructions: 93_218)
+    try run(testRom: "Resources/mooneye/acceptance/bits/unused_hwio-GS")
   }
 
   // MARK: - acceptance/instr
 
   func test_acceptance_instr_daa() throws {
-    try run(testRom: "Resources/mooneye/acceptance/instr/daa", expectedInstructions: 188939)
+    try run(testRom: "Resources/mooneye/acceptance/instr/daa", expectedInstructions: 189521)
   }
 
   // MARK: - acceptance/interrupts
 
   func test_acceptance_interrupts_ie_push() throws {
     try XCTSkipUnless(updateGoldens)  // R1: not cancelled
-    try run(testRom: "Resources/mooneye/acceptance/interrupts/ie_push", expectedInstructions: 92_597)
+    try run(testRom: "Resources/mooneye/acceptance/interrupts/ie_push")
   }
 
   // MARK: - acceptance/oam_dma
 
   func test_acceptance_oam_dma_basic() throws {
     try XCTSkipUnless(updateGoldens)  // FAIL: $FE00
-    try run(testRom: "Resources/mooneye/acceptance/oam_dma/basic", expectedInstructions: 93_847)
+    try run(testRom: "Resources/mooneye/acceptance/oam_dma/basic")
   }
 
   func test_acceptance_oam_dma_reg_read() throws {
-    try run(testRom: "Resources/mooneye/acceptance/oam_dma/reg_read", expectedInstructions: 93_315)
+    try run(testRom: "Resources/mooneye/acceptance/oam_dma/reg_read", expectedInstructions: 93_399)
   }
 
   func test_acceptance_oam_dma_sources_GS() throws {
     try XCTSkipUnless(updateGoldens)  // FAIL: $0000
-    try run(testRom: "Resources/mooneye/acceptance/oam_dma/sources-GS", expectedInstructions: 208_553)
+    try run(testRom: "Resources/mooneye/acceptance/oam_dma/sources-GS")
   }
 
   // MARK: - acceptance/ppu
@@ -78,11 +78,11 @@ class MooneyeTests: XCTestCase {
 
   func test_acceptance_boot_regs_dmg0() throws {
     try XCTSkipUnless(updateGoldens)  // DMG0 is not supported.
-    try run(testRom: "Resources/mooneye/acceptance/boot_regs-dmg0", expectedInstructions: 94007)
+    try run(testRom: "Resources/mooneye/acceptance/boot_regs-dmg0")
   }
 
   func test_acceptance_boot_regs_dmgABC() throws {
-    try run(testRom: "Resources/mooneye/acceptance/boot_regs-dmgABC", expectedInstructions: 93892)
+    try run(testRom: "Resources/mooneye/acceptance/boot_regs-dmgABC", expectedInstructions: 93_979)
   }
 
   func test_acceptance_call_timing() throws {
@@ -93,7 +93,7 @@ class MooneyeTests: XCTestCase {
   // MARK: - emulator-only/
 
   func test_emulator_only_mbc1_bits_bank_1() throws {
-    try run(testRom: "Resources/mooneye/emulator-only/mbc1/bits_bank1", expectedInstructions: 1_571_834)
+    try run(testRom: "Resources/mooneye/emulator-only/mbc1/bits_bank1", expectedInstructions: 1_572_467)
   }
 
   func test_emulator_only_mbc1_bits_bank_2() throws {
