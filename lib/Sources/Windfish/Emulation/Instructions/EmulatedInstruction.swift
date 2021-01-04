@@ -135,6 +135,17 @@ extension InstructionEmulator {
     cpu.fzero = result == 0
     cpu.fcarry = carry
   }
+
+  func rrc(cpu: LR35902, value: inout UInt8) {
+    cpu.fsubtract = false
+    cpu.fhalfcarry = false
+    let carry = (value & 0x01) != 0
+    let result = (value &>> 1) | (carry ? 0b1000_0000 : 0)
+    cpu.fzero = result == 0
+    cpu.fcarry = carry
+    value = result
+  }
+
 }
 
 extension LR35902.Emulation {

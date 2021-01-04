@@ -76,8 +76,7 @@ class BlarggTests: XCTestCase {
   }
 
   func test_11_op_a_hladdr() throws {
-    try XCTSkipUnless(updateGoldens)  // Failing with "CB 0E CB 2E"
-    try run(rom: "Resources/blargg/cpu_instrs/individual/11-op a,(hl)", expectedInstructions: 15_740_332)
+    try run(rom: "Resources/blargg/cpu_instrs/individual/11-op a,(hl)", expectedInstructions: 7_448_161)
   }
 
   func run(rom: String, expectedInstructions: Int) throws {
