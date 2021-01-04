@@ -16,6 +16,10 @@ extension RGBDSDisassembler {
     // Special case specification handling.
     switch instruction.spec {
 
+    case .stop:
+      // STOP always has a ghost operand representing a nop, but it's not actually represented in source.
+      return []
+
     // jp and call prefer labels if those labels are transfers of control.
     case let LR35902.Instruction.Spec.jp(condition, operand) where operand == .imm16,
          let LR35902.Instruction.Spec.call(condition, operand) where operand == .imm16:
