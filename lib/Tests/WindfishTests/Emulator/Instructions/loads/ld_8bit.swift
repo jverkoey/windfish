@@ -365,4 +365,52 @@ extension InstructionEmulatorTests {
     }
   }
 
+  func test_ldh_a_ccaddr() {
+    for spec in LR35902.InstructionSet.allSpecs() {
+      guard let emulator = LR35902.Emulation.ldh_a_ccaddr(spec: spec) else { continue }
+      InstructionEmulatorTests.testedSpecs.insert(spec)
+      let memory = TestMemory(defaultReadValue: 0x12)
+
+      let cpu = LR35902.zeroed()
+      cpu.c = 0xab
+      let mutations = cpu.copy()
+      mutations.a = 0x12
+
+      var cycle = 0
+      repeat {
+        cycle += 1
+      } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
+
+      XCTAssertEqual(cycle, 2, "\(spec)")
+      assertEqual(cpu, mutations, message: "\(spec)")
+      XCTAssertEqual(memory.reads, [0xffab], "\(spec)")
+      XCTAssertEqual(memory.writes, [])
+    }
+  }
+
+  func test_ldh_ccaddr_a() {
+    for spec in LR35902.InstructionSet.allSpecs() {
+      guard let emulator = LR35902.Emulation.ldh_ccaddr_a(spec: spec) else { continue }
+      InstructionEmulatorTests.testedSpecs.insert(spec)
+      let memory = TestMemory()
+
+      let cpu = LR35902.zeroed()
+      cpu.a = 0x12
+      cpu.c = 0xab
+      let mutations = cpu.copy()
+
+      var cycle = 0
+      repeat {
+        cycle += 1
+      } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
+
+      XCTAssertEqual(cycle, 2, "\(spec)")
+      assertEqual(cpu, mutations, message: "\(spec)")
+      XCTAssertEqual(memory.reads, [], "\(spec)")
+      XCTAssertEqual(memory.writes, [
+        .init(byte: 0x12, address: 0xffab)
+      ])
+    }
+  }
+
 }
