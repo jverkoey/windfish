@@ -3,7 +3,7 @@ import Foundation
 extension LR35902.Emulation {
   final class ret_cnd: InstructionEmulator, InstructionEmulatorInitializable {
     init?(spec: LR35902.Instruction.Spec) {
-      guard case .ret(let cnd) = spec else {
+      guard case .ret(let cnd) = spec, cnd != nil else {
         return nil
       }
       self.cnd = cnd

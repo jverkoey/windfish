@@ -14,14 +14,7 @@ extension LR35902.Emulation {
         value = memory.read(from: cpu.hl)
         return .continueExecution
       }
-      if cycle == 2 {
-        bit(cpu: cpu, bit: bit, value: value)
-        return .continueExecution
-      }
-      if cycle == 3 {
-        memory.write(value, to: cpu.hl)
-        return .continueExecution
-      }
+      bit(cpu: cpu, bit: bit, value: value)
       return .fetchNext
     }
 

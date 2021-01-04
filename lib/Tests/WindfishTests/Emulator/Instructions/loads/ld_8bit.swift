@@ -19,6 +19,7 @@ extension InstructionEmulatorTests {
         cycle += 1
       } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
       XCTAssertEqual(cycle, 1)
       mutations[dst] = mutations[src] as UInt8
       assertEqual(cpu, mutations)
@@ -39,6 +40,7 @@ extension InstructionEmulatorTests {
         cycle += 1
       } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
       XCTAssertEqual(cycle, 2)
       mutations.pc += 1
       mutations[dst] = 0x12 as UInt8
@@ -60,6 +62,7 @@ extension InstructionEmulatorTests {
         cycle += 1
       } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
       XCTAssertEqual(cycle, 3)
       mutations.pc += 1
       mutations.a = 0x12
@@ -84,6 +87,7 @@ extension InstructionEmulatorTests {
         cycle += 1
       } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
       XCTAssertEqual(cycle, 3)
       mutations.pc += 1
       assertEqual(cpu, mutations)
@@ -108,6 +112,7 @@ extension InstructionEmulatorTests {
         cycle += 1
       } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
       XCTAssertEqual(cycle, 4)
       mutations.pc += 2
       mutations.a = 0x12
@@ -132,6 +137,7 @@ extension InstructionEmulatorTests {
         cycle += 1
       } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
       XCTAssertEqual(cycle, 4)
       mutations.pc += 2
       assertEqual(cpu, mutations)
@@ -157,6 +163,7 @@ extension InstructionEmulatorTests {
         cycle += 1
       } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
       XCTAssertEqual(cycle, 2)
       mutations[dst] = 0x12 as UInt8
       assertEqual(cpu, mutations)
@@ -182,6 +189,7 @@ extension InstructionEmulatorTests {
         cycle += 1
       } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
       XCTAssertEqual(cycle, 3, "\(spec)")
       assertEqual(cpu, mutations, message: "\(spec)")
       XCTAssertEqual(memory.reads, [0], "\(spec)")
@@ -208,6 +216,7 @@ extension InstructionEmulatorTests {
         cycle += 1
       } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
       XCTAssertEqual(cycle, 2, "\(spec)")
       assertEqual(cpu, mutations, message: "\(spec)")
       XCTAssertEqual(memory.reads, [], "\(spec)")
@@ -232,6 +241,7 @@ extension InstructionEmulatorTests {
         cycle += 1
       } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
       XCTAssertEqual(cycle, 2, "\(spec)")
       assertEqual(cpu, mutations, message: "\(spec)")
       XCTAssertEqual(memory.reads, [], "\(spec)")
@@ -256,6 +266,7 @@ extension InstructionEmulatorTests {
         cycle += 1
       } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
       XCTAssertEqual(cycle, 2, "\(spec)")
       assertEqual(cpu, mutations, message: "\(spec)")
       XCTAssertEqual(memory.reads, [], "\(spec)")
@@ -282,6 +293,7 @@ extension InstructionEmulatorTests {
         cycle += 1
       } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
       XCTAssertEqual(cycle, 2, "\(spec)")
       assertEqual(cpu, mutations, message: "\(spec)")
       XCTAssertEqual(memory.reads, [0x4567], "\(spec)")
@@ -306,6 +318,7 @@ extension InstructionEmulatorTests {
         cycle += 1
       } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
       XCTAssertEqual(cycle, 2, "\(spec)")
       assertEqual(cpu, mutations, message: "\(spec)")
       XCTAssertEqual(memory.reads, [], "\(spec)")
@@ -332,6 +345,7 @@ extension InstructionEmulatorTests {
         cycle += 1
       } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
       XCTAssertEqual(cycle, 2, "\(spec)")
       assertEqual(cpu, mutations, message: "\(spec)")
       XCTAssertEqual(memory.reads, [0x4567], "\(spec)")
@@ -356,6 +370,7 @@ extension InstructionEmulatorTests {
         cycle += 1
       } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
       XCTAssertEqual(cycle, 2, "\(spec)")
       assertEqual(cpu, mutations, message: "\(spec)")
       XCTAssertEqual(memory.reads, [], "\(spec)")
@@ -381,6 +396,7 @@ extension InstructionEmulatorTests {
         cycle += 1
       } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
       XCTAssertEqual(cycle, 2, "\(spec)")
       assertEqual(cpu, mutations, message: "\(spec)")
       XCTAssertEqual(memory.reads, [0xffab], "\(spec)")
@@ -404,6 +420,7 @@ extension InstructionEmulatorTests {
         cycle += 1
       } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
       XCTAssertEqual(cycle, 2, "\(spec)")
       assertEqual(cpu, mutations, message: "\(spec)")
       XCTAssertEqual(memory.reads, [], "\(spec)")

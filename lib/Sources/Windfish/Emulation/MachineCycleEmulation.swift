@@ -3,6 +3,8 @@ import Foundation
 // References:
 // - https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
 // - https://gekkio.fi/files/gb-docs/gbctr.pdf
+// - https://www.reddit.com/r/EmuDev/comments/7qf352/game_boy_is_0xcb_a_separate_instruction_are/
+//   - "Important: an interrupt CANNOT happen between 0xCB and the other operand."
 
 extension LR35902 {
   /** Advances the CPU by one machine cycle. */

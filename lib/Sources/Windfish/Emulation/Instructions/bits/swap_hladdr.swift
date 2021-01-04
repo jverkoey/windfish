@@ -24,9 +24,6 @@ extension LR35902.Emulation {
         let result = (upperNibble >> 4) | (lowerNibble << 4)
         value = result
         cpu.fzero = result == 0
-        return .continueExecution
-      }
-      if cycle == 3 {
         memory.write(value, to: cpu.hl)
         return .continueExecution
       }

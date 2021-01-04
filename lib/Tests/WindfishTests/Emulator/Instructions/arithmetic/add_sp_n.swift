@@ -38,6 +38,7 @@ extension InstructionEmulatorTests {
           cycle += 1
         } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+        InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
         XCTAssertEqual(cycle, 4, "Test case: \(name)")
         mutations.pc += 1
         mutations.sp = testCase.result.sp

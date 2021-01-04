@@ -215,6 +215,7 @@ extension LR35902.Emulation {
     jp_hl.self,
     jr_cnd_nn.self,
     nop.self,
+    ret.self,
     ret_cnd.self,
     reti.self,
     rst_n.self,

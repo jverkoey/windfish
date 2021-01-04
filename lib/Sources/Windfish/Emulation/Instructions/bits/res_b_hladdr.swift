@@ -16,9 +16,6 @@ extension LR35902.Emulation {
       }
       if cycle == 2 {
         value &= ~(UInt8(1) << bit.rawValue)
-        return .continueExecution
-      }
-      if cycle == 3 {
         memory.write(value, to: cpu.hl)
         return .continueExecution
       }

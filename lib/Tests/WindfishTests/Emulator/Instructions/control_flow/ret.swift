@@ -20,8 +20,7 @@ extension InstructionEmulatorTests {
   func test_ret() {
     for (name, testCase) in TestCase.testCases {
       for spec in LR35902.InstructionSet.allSpecs() {
-        guard case .ret(let cnd) = spec, cnd == nil,
-              let emulator = LR35902.Emulation.ret_cnd(spec: spec) else { continue }
+        guard case .ret(nil) = spec, let emulator = LR35902.Emulation.ret(spec: spec) else { continue }
         InstructionEmulatorTests.testedSpecs.insert(spec)
         let memory = TestMemory(defaultReadValue: 0x12)
 
@@ -34,7 +33,8 @@ extension InstructionEmulatorTests {
           cycle += 1
         } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
-        XCTAssertEqual(cycle, 5, "Test case: \(name)")
+        InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
+        XCTAssertEqual(cycle, 4, "Test case: \(name)")
         mutations.pc = 0x1212
         mutations.sp = testCase.result.sp
         assertEqual(cpu, mutations, message: "Test case: \(name)")
@@ -61,6 +61,7 @@ extension InstructionEmulatorTests {
           cycle += 1
         } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+        InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
         XCTAssertEqual(cycle, 4, "Test case: \(name)")
         mutations.pc = 0x1212
         mutations.sp = testCase.result.sp

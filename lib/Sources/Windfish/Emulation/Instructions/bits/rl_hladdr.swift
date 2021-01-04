@@ -22,9 +22,6 @@ extension LR35902.Emulation {
         cpu.fzero = result == 0
         cpu.fcarry = carry
         value = result
-        return .continueExecution
-      }
-      if cycle == 3 {
         memory.write(value, to: cpu.hl)
         return .continueExecution
       }

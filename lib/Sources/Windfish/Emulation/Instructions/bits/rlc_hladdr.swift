@@ -16,15 +16,11 @@ extension LR35902.Emulation {
       if cycle == 2 {
         cpu.fsubtract = false
         cpu.fhalfcarry = false
-
         let carry = (value & 0b1000_0000) != 0
         let result = (value &<< 1) | (carry ? 1 : 0)
         cpu.fzero = result == 0
         cpu.fcarry = carry
         value = result
-        return .continueExecution
-      }
-      if cycle == 3 {
         memory.write(value, to: cpu.hl)
         return .continueExecution
       }

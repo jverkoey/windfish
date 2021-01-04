@@ -17,6 +17,7 @@ extension InstructionEmulatorTests {
         cycle += 1
       } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
       XCTAssertEqual(cycle, 5)
       mutations.pc += 2
       assertEqual(cpu, mutations)
@@ -42,6 +43,7 @@ extension InstructionEmulatorTests {
         cycle += 1
       } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
       XCTAssertEqual(cycle, 3)
       mutations.pc += 2
       mutations[dst] = 0x1212 as UInt16
@@ -65,6 +67,7 @@ extension InstructionEmulatorTests {
         cycle += 1
       } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
 
+      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
       XCTAssertEqual(cycle, 2)
       assertEqual(cpu, mutations)
     }

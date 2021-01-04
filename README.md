@@ -37,7 +37,7 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 | Test name | Status | Screenshot |
 |:-----|:--------|:---|
 | `01-special` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/01-special.png) |
-| `02-interrupts.gb` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/02-interrupts.png) |
+| `02-interrupts.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/02-interrupts.png) |
 | `03-op sp,hl.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/03-op%20sp,hl.png) |
 | `04-op r,imm.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/04-op%20r,imm.png) |
 | `05-op rp.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/05-op%20rp.png) |
@@ -47,7 +47,7 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 | `09-op r,r.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/09-op%20r,r.png) |
 | `10-bit ops.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/10-bit%20ops.png) |
 | `11-op a,(hl).gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/11-op%20a,(hl).png) |
-| `instr_timing` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/blargg/instr_timing/instr_timing.png) |
+| `instr_timing` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/instr_timing/instr_timing.png) |
 
 ### [mooneye](https://github.com/Gekkio/mooneye-gb/)
 

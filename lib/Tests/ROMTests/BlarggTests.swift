@@ -35,53 +35,51 @@ class BlarggTests: XCTestCase {
   let updateGoldens = false
 
   func test_01_Special() throws {
-    try run(rom: "Resources/blargg/cpu_instrs/individual/01-special", expectedInstructions: 1_279_058)
+    try run(rom: "Resources/blargg/cpu_instrs/individual/01-special", expectedInstructions: 1_277_938)
   }
 
   func test_02_interrupts() throws {
-    try XCTSkipUnless(updateGoldens)  // Gets stuck at 0xC7F4 running a jr   @-$00
-    try run(rom: "Resources/blargg/cpu_instrs/individual/02-interrupts", expectedInstructions: 1_092_295)
+    try run(rom: "Resources/blargg/cpu_instrs/individual/02-interrupts", expectedInstructions: 189_922)
   }
 
   func test_03_op_sp_hl() throws {
-    try run(rom: "Resources/blargg/cpu_instrs/individual/03-op sp,hl", expectedInstructions: 1_091_112)
+    try run(rom: "Resources/blargg/cpu_instrs/individual/03-op sp,hl", expectedInstructions: 1_089_978)
   }
 
   func test_04_op_r_imm() throws {
-    try run(rom: "Resources/blargg/cpu_instrs/individual/04-op r,imm", expectedInstructions: 1_283_258)
+    try run(rom: "Resources/blargg/cpu_instrs/individual/04-op r,imm", expectedInstructions: 1_282_124)
   }
 
   func test_05_op_rp() throws {
-    try run(rom: "Resources/blargg/cpu_instrs/individual/05-op rp", expectedInstructions: 1_790_572)
+    try run(rom: "Resources/blargg/cpu_instrs/individual/05-op rp", expectedInstructions: 1_789_466)
   }
 
   func test_06_ld_r_r() throws {
-    try run(rom: "Resources/blargg/cpu_instrs/individual/06-ld r,r", expectedInstructions: 270_401)
+    try run(rom: "Resources/blargg/cpu_instrs/individual/06-ld r,r", expectedInstructions: 269_281)
   }
 
   func test_07_jr_jp_call_ret_rst() throws {
-    try run(rom: "Resources/blargg/cpu_instrs/individual/07-jr,jp,call,ret,rst", expectedInstructions: 322_332)
+    try run(rom: "Resources/blargg/cpu_instrs/individual/07-jr,jp,call,ret,rst", expectedInstructions: 321_079)
   }
 
   func test_08_misc_instrs() throws {
-    try run(rom: "Resources/blargg/cpu_instrs/individual/08-misc instrs", expectedInstructions: 252_567)
+    try run(rom: "Resources/blargg/cpu_instrs/individual/08-misc instrs", expectedInstructions: 251_405)
   }
 
   func test_09_op_r_r() throws {
-    try run(rom: "Resources/blargg/cpu_instrs/individual/09-op r,r", expectedInstructions: 4_443_002)
+    try run(rom: "Resources/blargg/cpu_instrs/individual/09-op r,r", expectedInstructions: 4_441_889)
   }
 
   func test_10_bit_ops() throws {
-    try run(rom: "Resources/blargg/cpu_instrs/individual/10-bit ops", expectedInstructions: 6_733_717)
+    try run(rom: "Resources/blargg/cpu_instrs/individual/10-bit ops", expectedInstructions: 6_732_590)
   }
 
   func test_11_op_a_hladdr() throws {
-    try run(rom: "Resources/blargg/cpu_instrs/individual/11-op a,(hl)", expectedInstructions: 7_448_161)
+    try run(rom: "Resources/blargg/cpu_instrs/individual/11-op a,(hl)", expectedInstructions: 7_453_922)
   }
 
   func test_instr_timing() throws {
-    try XCTSkipUnless(updateGoldens)  // Failed #255
-    try run(rom: "Resources/blargg/instr_timing/instr_timing", expectedInstructions: 7_448_161)
+    try run(rom: "Resources/blargg/instr_timing/instr_timing", expectedInstructions: 273_267)
   }
 
   func run(rom: String, expectedInstructions: Int) throws {

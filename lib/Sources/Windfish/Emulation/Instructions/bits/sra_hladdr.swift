@@ -15,9 +15,6 @@ extension LR35902.Emulation {
       }
       if cycle == 2 {
         sra(cpu: cpu, value: &value)
-        return .continueExecution
-      }
-      if cycle == 3 {
         memory.write(value, to: cpu.hl)
         return .continueExecution
       }
