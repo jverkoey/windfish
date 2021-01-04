@@ -5,11 +5,16 @@ import Windfish
 // - https://github.com/mattcurrie/mealybug-tearoom-tests
 
 class MealybugTearoomTests: XCTestCase {
-  let updateGoldens = true
+  let updateGoldens = false
 
   func test_m3_bgp_change() throws {
     try XCTSkipUnless(updateGoldens)
     try run(rom: "Resources/mealybug-tearoom/m3_bgp_change")
+  }
+
+  func test_m3_lcdc_bg_en_change() throws {
+    try XCTSkipUnless(updateGoldens)
+    try run(rom: "Resources/mealybug-tearoom/m3_lcdc_bg_en_change")
   }
 
   func test_m3_scy_change() throws {
@@ -32,7 +37,7 @@ class MealybugTearoomTests: XCTestCase {
     try run(rom: "Resources/mealybug-tearoom/m3_wx_6_change")
   }
 
-  func run(rom: String, expectedInstructions: Int = 3_000_000) throws {
+  func run(rom: String, expectedInstructions: Int = 2_000_000) throws {
     let path = try XCTUnwrap(Bundle.module.path(forResource: rom, ofType: "gb"))
     let data = try Data(contentsOf: URL(fileURLWithPath: path))
     let gameboy = Gameboy()

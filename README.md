@@ -67,6 +67,17 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 | `acceptance/call_timing` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mooneye/acceptance/call_timing.png) |
 | `emulator-only/mbc1/bits_bank1` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/mooneye/emulator-only/mbc1/bits_bank1.png) |
 
+### [Mealybug Tearoom](https://github.com/mattcurrie/mealybug-tearoom-tests)
+
+| Test name | Status | Screenshot |
+|:-----|:--------|:----|
+| `m3_lcdc_bg_en_change` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mealybug-tearoom/m3_lcdc_bg_en_change.png) |
+| `m3_lcdc_bg_en_change` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mealybug-tearoom/m3_lcdc_bg_en_change.png) |
+| `m3_scy_change` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mealybug-tearoom/m3_scy_change.png) |
+| `m3_wx_4_change` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mealybug-tearoom/m3_wx_4_change.png) |
+| `m3_wx_5_change` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mealybug-tearoom/m3_wx_5_change.png) |
+| `m3_wx_6_change` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mealybug-tearoom/m3_wx_6_change.png) |
+
 ## Learn more
 
 [Learn more about the Windfish architecture](lib/README.md).
