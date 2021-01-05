@@ -5,7 +5,7 @@ import Windfish
 // - https://gekkio.fi/files/mooneye-gb/latest/
 
 class MooneyeTests: XCTestCase {
-  let updateGoldens = false
+  let updateGoldens = true
 
   // MARK: - acceptance/bits
 
@@ -74,6 +74,10 @@ class MooneyeTests: XCTestCase {
   func test_acceptance_add_sp_e_timing() throws {
     try XCTSkipUnless(updateGoldens)  // sp appears to be getting corrupted
     try run(testRom: "Resources/mooneye/acceptance/add_sp_e_timing")
+  }
+
+  func test_acceptance_boot_div_dmgABCmgb() throws {
+    try run(testRom: "Resources/mooneye/acceptance/boot_div-dmgABCmgb", expectedInstructions: 94_125)
   }
 
   func test_acceptance_boot_regs_dmg0() throws {

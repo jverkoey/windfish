@@ -72,21 +72,40 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 
 ### [mooneye](https://github.com/Gekkio/mooneye-gb/)
 
-| Test name | Status | Screenshot |
-|:-----|:--------|:----|
-| `acceptance/bits/mem_oam` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mooneye/acceptance/bits/mem_oam.png) |
-| `acceptance/bits/reg_f` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/mooneye/acceptance/bits/reg_f.png) |
-| `acceptance/bits/unused_hwio-GS` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mooneye/acceptance/bits/unused_hwio-GS.png) |
-| `acceptance/instr/daa` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/mooneye/acceptance/instr/daa.png) |
-| `acceptance/interrupts/ie_push` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mooneye/acceptance/interrupts/ie_push.png) |
-| `acceptance/oam_dma/basic` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mooneye/acceptance/oam_dma/basic.png) |
-| `acceptance/oam_dma/reg_read` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/mooneye/acceptance/oam_dma/reg_read.png) |
-| `acceptance/oam_dma/sources-GS` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mooneye/acceptance/oam_dma/sources-GS.png) |
-| `acceptance/add_sp_e_timing` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mooneye/acceptance/add_sp_e_timing.png) |
-| `acceptance/boot_regs-dmg0` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mooneye/acceptance/boot_regs-dmg0.png) |
-| `acceptance/boot_regs-dmgABC` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/mooneye/acceptance/boot_regs-dmgABC.png) |
-| `acceptance/call_timing` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mooneye/acceptance/call_timing.png) |
-| `emulator-only/mbc1/bits_bank1` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/mooneye/emulator-only/mbc1/bits_bank1.png) |
+<table>
+<tr>
+<td colspan="3"><code>acceptance/bits/</code></td>
+</tr><tr>
+<td align="center"><p>❌<br/><code>acceptance/bits/mem_oam</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/bits/mem_oam.png"></td>
+<td align="center"><p>✅<br/><code>acceptance/bits/reg_f</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/bits/reg_f.png"></td>
+<td align="center"><p>❌<br/><code>acceptance/bits/unused_hwio-GS</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/bits/unused_hwio-GS.png"></td>
+</tr><tr>
+<td colspan="3"><code>acceptance/daa/</code></td>
+</tr><tr>
+<td align="center"><p>✅<br/><code>acceptance/instr/daa</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/instr/daa.png"></td>
+</tr><tr>
+<td colspan="3"><code>acceptance/interrupts/</code></td>
+</tr><tr>
+<td align="center"><p>❌<br/><code>acceptance/interrupts/ie_push</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/interrupts/ie_push.png"></td>
+</tr><tr>
+<td colspan="3"><code>acceptance/oam_dma/</code></td>
+</tr><tr>
+<td align="center"><p>❌<br/><code>acceptance/oam_dma/basic</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/oam_dma/basic.png"></td>
+<td align="center"><p>✅<br/><code>acceptance/oam_dma/reg_read</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/oam_dma/reg_read.png"></td>
+<td align="center"><p>❌<br/><code>acceptance/oam_dma/sources-GS</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/oam_dma/sources-GS.png"></td>
+</tr><tr>
+<td colspan="3"><code>acceptance/</code></td>
+</tr><tr>
+<td align="center"><p>❌<br/><code>acceptance/add_sp_e_timing</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/add_sp_e_timing.png"></td>
+<td align="center"><p>✅<br/><code>acceptance/boot_div-dmgABCmgb</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/boot_div-dmgABCmgb.png"></td>
+<td align="center"><p>❌<br/><code>acceptance/boot_regs-dmg0</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/boot_regs-dmg0.png"></td>
+<td align="center"><p>✅<br/><code>acceptance/boot_regs-dmgABC</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/boot_regs-dmgABC.png"></td>
+<td align="center"><p>❌<br/><code>acceptance/call_timing</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/call_timing.png"></td>
+</tr><tr>
+<td colspan="3"><code>emulator-only/mbc1/</code></td>
+</tr><tr>
+<td align="center"><p>✅<br/><code>emulator-only/mbc1/bits_bank1</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/emulator-only/mbc1/bits_bank1.png"></td>
+</table>
 
 ### [Mealybug Tearoom](https://github.com/mattcurrie/mealybug-tearoom-tests)
 

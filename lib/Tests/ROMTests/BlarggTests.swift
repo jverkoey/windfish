@@ -2,7 +2,8 @@ import XCTest
 import Windfish
 
 // References:
-// - https://gbdev.gg8.se/files/roms/blargg-gb-tests/
+// - ROMS: https://gbdev.gg8.se/files/roms/blargg-gb-tests/
+// - Source: https://github.com/retrio/gb-test-roms
 
 extension Disassembler.SourceLocation {
   func address() -> LR35902.Address {
@@ -32,7 +33,7 @@ extension Data {
 }
 
 class BlarggTests: XCTestCase {
-  let updateGoldens = true
+  let updateGoldens = false
 
   // MARK: - Instructions
 
