@@ -40,7 +40,7 @@ ld   e, a
 """)
 
     let cpu = LR35902.zeroed()
-    disassembly.trace(range: 0..<disassembly.cartridge.size, cpu: cpu)
+    disassembly.trace(range: 0..<disassembly.cartridgeSize, cpu: cpu)
     let lastState = cpu
 
     XCTAssertEqual(lastState.a, 0xE0)
@@ -61,7 +61,7 @@ ld   e, a
 """)
 
     let cpu = LR35902.zeroed()
-    disassembly.trace(range: 0..<disassembly.cartridge.size, cpu: cpu)
+    disassembly.trace(range: 0..<disassembly.cartridgeSize, cpu: cpu)
 
     XCTAssertEqual(cpu.a, 0xE1)
     XCTAssertEqual(cpu.b, 0)
@@ -81,7 +81,7 @@ ld   e, a
 """)
 
     let cpu = LR35902.zeroed()
-    disassembly.trace(range: 0..<disassembly.cartridge.size, cpu: cpu)
+    disassembly.trace(range: 0..<disassembly.cartridgeSize, cpu: cpu)
 
     XCTAssertEqual(cpu.a, 0)
     XCTAssertEqual(cpu.b, 0)
@@ -107,7 +107,7 @@ ld   [$ffcb], a
     let cpu = LR35902()
     cpu.a = 0b0000_1111
 
-    disassembly.trace(range: 0..<disassembly.cartridge.size, cpu: cpu)
+    disassembly.trace(range: 0..<disassembly.cartridgeSize, cpu: cpu)
 
     XCTAssertEqual(cpu.a, 0b0000_1111)
     XCTAssertEqual(cpu.c, 0b0000_1111)
