@@ -82,7 +82,6 @@ extension Timer {
 
     let oldClock = clock
     clock &+= 4
-
     if timerEnabled && fallingEdge(oldClock: oldClock, clock: clock) {
       incTima()
     }
@@ -119,7 +118,8 @@ extension Timer: AddressableMemory {
 
   public func write(_ byte: UInt8, to address: LR35902.Address) {
     switch TimerAddress(rawValue: address)! {
-    case .DIV: clock = 0
+    case .DIV:
+      clock = 0
 
     case .TIMA:
       if timaState == .reloaded {

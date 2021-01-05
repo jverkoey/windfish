@@ -5,6 +5,8 @@ import Foundation
 // - https://gekkio.fi/files/gb-docs/gbctr.pdf
 // - https://www.reddit.com/r/EmuDev/comments/7qf352/game_boy_is_0xcb_a_separate_instruction_are/
 //   - "Important: an interrupt CANNOT happen between 0xCB and the other operand."
+// - https://mgba.io/2017/04/30/emulation-accuracy/
+// - https://www.reddit.com/r/emulation/comments/53jdqj/what_exactly_is_a_cycleaccurate_emulator/
 
 /** A representation of the LR35902 CPU. */
 public final class LR35902 {
@@ -91,8 +93,8 @@ public final class LR35902 {
     return !halted
   }
 
-  /** If true, ime will be enabled on the next machine cycle advance. */
-  var imeToggle = false
+  /** If positive, will be decremented on each machine cycle and ime will be enabled once zero. */
+  var imeToggleDelay = 0
 
   // MARK: 16-bit registers
   // Note that, though these registers are ultimately backed by the underlying 8 bit registers, each 16-bit register
@@ -175,7 +177,7 @@ public final class LR35902 {
   /** Initializes the state with boot values. */
   public init() {}
 
-  internal init(a: UInt8 = 0, b: UInt8 = 0, c: UInt8 = 0, d: UInt8 = 0, e: UInt8 = 0, h: UInt8 = 0, l: UInt8 = 0, fzero: Bool = false, fsubtract: Bool = false, fhalfcarry: Bool = false, fcarry: Bool = false, ime: Bool = false, interruptEnable: LR35902.Instruction.Interrupt = [], interruptFlag: LR35902.Instruction.Interrupt = [], halted: Bool = false, imeToggle: Bool = false, sp: UInt16 = 0, pc: LR35902.Address = 0, machineInstruction: LR35902.MachineInstruction = MachineInstruction(), registerTraces: [LR35902.Instruction.Numeric : LR35902.RegisterTrace] = [:], nextAction: LR35902.Emulation.EmulationResult = .fetchNext) {
+  internal init(a: UInt8 = 0, b: UInt8 = 0, c: UInt8 = 0, d: UInt8 = 0, e: UInt8 = 0, h: UInt8 = 0, l: UInt8 = 0, fzero: Bool = false, fsubtract: Bool = false, fhalfcarry: Bool = false, fcarry: Bool = false, ime: Bool = false, interruptEnable: LR35902.Instruction.Interrupt = [], interruptFlag: LR35902.Instruction.Interrupt = [], halted: Bool = false, imeToggleDelay: Int = 0, sp: UInt16 = 0, pc: LR35902.Address = 0, machineInstruction: LR35902.MachineInstruction = MachineInstruction(), registerTraces: [LR35902.Instruction.Numeric : LR35902.RegisterTrace] = [:], nextAction: LR35902.Emulation.EmulationResult = .fetchNext) {
     self.a = a
     self.b = b
     self.c = c
@@ -191,7 +193,7 @@ public final class LR35902 {
     self.interruptEnable = interruptEnable
     self.interruptFlag = interruptFlag
     self.halted = halted
-    self.imeToggle = imeToggle
+    self.imeToggleDelay = imeToggleDelay
     self.sp = sp
     self.pc = pc
     self.machineInstruction = machineInstruction
@@ -204,7 +206,7 @@ public final class LR35902 {
   }
 
   public func copy() -> LR35902 {
-    return LR35902(a: a, b: b, c: c, d: d, e: e, h: h, l: l, fzero: fzero, fsubtract: fsubtract, fhalfcarry: fhalfcarry, fcarry: fcarry, ime: ime, interruptEnable: interruptEnable, interruptFlag: interruptFlag, halted: halted, imeToggle: imeToggle, sp: sp, pc: pc, machineInstruction: machineInstruction, registerTraces: registerTraces, nextAction: nextAction)
+    return LR35902(a: a, b: b, c: c, d: d, e: e, h: h, l: l, fzero: fzero, fsubtract: fsubtract, fhalfcarry: fhalfcarry, fcarry: fcarry, ime: ime, interruptEnable: interruptEnable, interruptFlag: interruptFlag, halted: halted, imeToggleDelay: imeToggleDelay, sp: sp, pc: pc, machineInstruction: machineInstruction, registerTraces: registerTraces, nextAction: nextAction)
   }
 }
 
@@ -323,26 +325,27 @@ extension LR35902 {
 extension LR35902 {
   /** Advances the CPU by one machine cycle. */
   public func advance(memory: AddressableMemory) {
-    // ei requires we wait one full machine cycle before turning on ime, so we wait until the beginning of the next
-    // machine cycle to check whether to turn it on.
-    if imeToggle {
-      ime = true
-      imeToggle = false
-    }
-
-    // https://gekkio.fi/files/gb-docs/gbctr.pdf
     if isRunning {
-      let machineInstruction = self.machineInstruction
-      // Execution phase
-      if nextAction == .continueExecution, let instructionEmulator = machineInstruction.instructionEmulator {
-        machineInstruction.cycle += 1
-        nextAction = instructionEmulator.advance(cpu: self, memory: memory, cycle: machineInstruction.cycle, sourceLocation: machineInstruction.sourceLocation!)
-      } else {
-        // No instruction was actually loaded into the CPU; let's switch to fetching one.
-        nextAction = .fetchNext
-      }
+      execute(memory: memory)
     }
+    checkInterruptsOrFetch(memory: memory)
+    checkIme()
+  }
 
+  private func execute(memory: AddressableMemory) {
+    // https://gekkio.fi/files/gb-docs/gbctr.pdf
+    let machineInstruction = self.machineInstruction
+    // Execution phase
+    if nextAction == .continueExecution, let instructionEmulator = machineInstruction.instructionEmulator {
+      machineInstruction.cycle += 1
+      nextAction = instructionEmulator.advance(cpu: self, memory: memory, cycle: machineInstruction.cycle, sourceLocation: machineInstruction.sourceLocation!)
+    } else {
+      // No instruction was actually loaded into the CPU; let's switch to fetching one.
+      nextAction = .fetchNext
+    }
+  }
+
+  private func checkInterruptsOrFetch(memory: AddressableMemory) {
     // The LR35902's fetch/execute overlap behavior means we load the next opcode on the same machine cycle as the
     // last instruction's execution.
     let interrupts = interruptFlag.intersection(interruptEnable)
@@ -359,6 +362,15 @@ extension LR35902 {
       machineInstruction.sourceLocation = sourceLocation
     } else if isRunning && nextAction == .fetchNext || nextAction == .fetchPrefix {
       fetch(memory: memory)
+    }
+  }
+
+  private func checkIme() {
+    if imeToggleDelay > 0 {
+      imeToggleDelay -= 1
+      if imeToggleDelay == 0 {
+        ime = true
+      }
     }
   }
 

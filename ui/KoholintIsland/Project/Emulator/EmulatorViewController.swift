@@ -511,11 +511,24 @@ final class EmulatorViewController: NSViewController, TabSelectable {
         DispatchQueue.global(qos: .userInteractive).async {
           var start = DispatchTime.now()
           var lastFrameTick = DispatchTime.now()
+          var machineCycle: UInt64 = 0
           var machineCycles: UInt64 = 0
           var frames: UInt64 = 0
           var startCounting = false
           while self.running {
             gameboy.advance()
+
+//            if machineCycle >= 440563 {
+//              if let sourceLocation = gameboy.cpu.machineInstruction.sourceLocation {
+//                var address = sourceLocation.address()
+//                let instruction = Disassembler.fetchInstruction(at: &address, memory: gameboy.memory)
+//                let div = gameboy.memory.read(from: 0xFF04)
+//                let tima = gameboy.memory.read(from: 0xFF05)
+//                let tma = gameboy.memory.read(from: 0xFF06)
+//                let tac = gameboy.memory.read(from: 0xFF07)
+//                print("\(machineCycle): \(div.hexString) \(tima.hexString) \(tma.hexString) \(tac.binaryString) - [0x\(sourceLocation.address().hexString)] \(RGBDSDisassembler.statement(for: instruction).formattedString)")
+//              }
+//            }
 
             // TODO: Standardize this as a breakpointing mechanism.
 //            if gameboy.cpu.machineInstruction.sourceAddress()! == 0x0048 {
@@ -530,6 +543,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
             if !gameboy.cpu.halted && startCounting {
               machineCycles += 1
             }
+            machineCycle += 1
 
             if self.lastVblankCounter != gameboy.lcdController.vblankCounter {
               self.lastVblankCounter = gameboy.lcdController.vblankCounter

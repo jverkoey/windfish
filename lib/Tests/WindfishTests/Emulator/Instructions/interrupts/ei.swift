@@ -11,7 +11,7 @@ extension InstructionEmulatorTests {
       let cpu = LR35902.zeroed()
 
       let mutations = cpu.copy()
-      mutations.imeToggle = true
+      mutations.imeToggleDelay = 2
 
       var cycle = 0
       repeat {

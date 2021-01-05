@@ -24,6 +24,7 @@ extension Gameboy.Cartridge {
 
       // TODO: Allow this to be saved to and loaded from disk.
       ram = UnsafeMutableRawBufferPointer.allocate(byteCount: self.ramSize.capacity, alignment: 1)
+      ram.initializeMemory(as: UInt8.self, repeating: 0xff)
     }
 
     private(set) var selectedBank: Gameboy.Cartridge.Bank = 0
