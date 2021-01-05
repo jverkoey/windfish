@@ -77,6 +77,16 @@ extension String {
   }
 }
 
+extension NSImage {
+  /// Create a CGImage using the best representation of the image available in the NSImage for the image size
+  ///
+  /// - Returns: Converted image, or nil
+  func asCGImage() -> CGImage? {
+    var rect = NSRect(origin: CGPoint(x: 0, y: 0), size: self.size)
+    return self.cgImage(forProposedRect: &rect, context: NSGraphicsContext.current, hints: nil)
+  }
+}
+
 extension FixedWidthInteger {
   /** Returns a string representation of the integer in the given representation format. */
   fileprivate func stringWithRepresentation(_ representation: NumericalRepresentation) -> String {
@@ -171,6 +181,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   let screenImageView = PixelImageView()
   let fpsLabel = CreateLabel()
   private let cpuView = LR35902View()
+  private var screenHistory: [NSImage] = []
 
   init(document: ProjectDocument) {
     self.document = document
@@ -452,6 +463,23 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     self.tileDataImage = image
   }
 
+  private func writeImageHistory(to filename: String) {
+    let documentsDirectoryPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
+    let path = documentsDirectoryPath.appending(filename)
+    let fileProperties = [kCGImagePropertyGIFDictionary as String: [kCGImagePropertyGIFLoopCount as String: 0]]
+    let gifProperties = [kCGImagePropertyGIFDictionary as String: [kCGImagePropertyGIFDelayTime as String: 0.016]] as CFDictionary?
+    let lastFrameProperties = [kCGImagePropertyGIFDictionary as String: [kCGImagePropertyGIFDelayTime as String: 2]] as CFDictionary?
+    let cfURL = URL(fileURLWithPath: path) as CFURL
+    print(cfURL)
+    if let destination = CGImageDestinationCreateWithURL(cfURL, kUTTypeGIF, screenHistory.count, nil) {
+      CGImageDestinationSetProperties(destination, fileProperties as CFDictionary?)
+      for image in screenHistory {
+        CGImageDestinationAddImage(destination, image.asCGImage()!, image == screenHistory.last ? lastFrameProperties : gifProperties)
+      }
+      CGImageDestinationFinalize(destination)
+    }
+  }
+
   @objc func performControlAction(_ sender: NSSegmentedControl) {
     if sender.selectedSegment == 0 {  // Step forward
       if case .call = document.gameboy.cpu.machineInstruction.spec {
@@ -566,6 +594,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
               }
 
               self.screenImage = self.document.gameboy.takeScreenshot()
+              self.screenHistory.append(self.screenImage!)
 
               let frameDeltaSeconds = (DispatchTime.now().uptimeNanoseconds - lastFrameTick.uptimeNanoseconds)
               let frameLength: UInt64 = 16_666_666
@@ -595,6 +624,8 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
           // Advance to the next full instruction.
           gameboy.advanceInstruction()
+
+          self.writeImageHistory(to: "recording.gif")
 
           DispatchQueue.main.sync {
             self.updateInstructionAssembly()
