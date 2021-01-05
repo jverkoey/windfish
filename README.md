@@ -54,6 +54,10 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 <td align="center"><p>✅<br/><code>10-bit ops.gb</code></p><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/10-bit%20ops.png"></td>
 <td align="center"><p>✅<br/><code>11-op a,(hl).gb</code></p><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/11-op%20a,(hl).png"></td>
 </tr><tr>
+<td colspan="3"><code>interrupt_time/</code></td>
+</tr><tr>
+<td align="center"><p>❌<br/><code>instr_timing</code></p><img src="lib/Tests/ROMTests/Resources/blargg/interrupt_time/interrupt_time.png"><br/><a href="https://github.com/jverkoey/windfish/issues/18">#18</a></td>
+</tr><tr>
 <td colspan="3"><code>instr_timing/</code></td>
 </tr><tr>
 <td align="center"><p>✅<br/><code>instr_timing</code></p><img src="lib/Tests/ROMTests/Resources/blargg/instr_timing/instr_timing.png"></td>
