@@ -67,17 +67,34 @@ class MooneyeTests: XCTestCase {
   // MARK: - acceptance/ppu
 
   func test_acceptance_ppu_hblank_ly_scx_timing_GS() throws {
-    try XCTSkipUnless(updateGoldens)  // Never completes
+    try XCTSkipUnless(updateGoldens)
     try run(testRom: "Resources/mooneye/acceptance/ppu/hblank_ly_scx_timing-GS")
   }
 
   func test_acceptance_ppu_intr_1_2_timing_GS() throws {
-    try XCTSkipUnless(updateGoldens)  // Never completes
+    try XCTSkipUnless(updateGoldens)  // Strange lines
     try run(testRom: "Resources/mooneye/acceptance/ppu/intr_1_2_timing-GS")
   }
 
   func test_acceptance_ppu_intr_2_0_timing() throws {
     try run(testRom: "Resources/mooneye/acceptance/ppu/intr_2_0_timing", expectedInstructions: 106_974)
+  }
+
+  func test_acceptance_ppu_intr_2_mode0_timing_sprites() throws {
+    try XCTSkipUnless(updateGoldens)  // No reason for failure shown
+    try run(testRom: "Resources/mooneye/acceptance/ppu/intr_2_mode0_timing_sprites")
+  }
+
+  func test_acceptance_ppu_intr_2_mode0_timing() throws {
+    try run(testRom: "Resources/mooneye/acceptance/ppu/intr_2_mode0_timing", expectedInstructions: 107_025)
+  }
+
+  func test_acceptance_ppu_intr_2_mode3_timing() throws {
+    try run(testRom: "Resources/mooneye/acceptance/ppu/intr_2_mode3_timing", expectedInstructions: 106_972)
+  }
+
+  func test_acceptance_ppu_intr_2_oam_ok_timing() throws {
+    try run(testRom: "Resources/mooneye/acceptance/ppu/intr_2_oam_ok_timing", expectedInstructions: 107_425)
   }
 
   // MARK: - acceptance/
