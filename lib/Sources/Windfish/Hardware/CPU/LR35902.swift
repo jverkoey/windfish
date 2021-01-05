@@ -350,16 +350,14 @@ extension LR35902 {
     // last instruction's execution.
     let interrupts = interruptFlag.intersection(interruptEnable)
     if halted && !ime && !interrupts.isEmpty {
-      // Stop halting in order to service the interrupt, but service the interrupt on the next machine cycle
+      // Wake up but don't service the interrupt because ime is disabled.
       halted = false
     } else if nextAction == .fetchNext && ime && !interrupts.isEmpty {
       // Interrupt phase
       halted = false
-      let sourceLocation = memory.sourceLocation(from: pc)
       nextAction = .continueExecution
       machineInstruction.instructionEmulator = LR35902.Emulation.interrupt()
       machineInstruction.spec = .interrupt(interrupts)
-      machineInstruction.sourceLocation = sourceLocation
     } else if isRunning && nextAction == .fetchNext || nextAction == .fetchPrefix {
       fetch(memory: memory)
     }
