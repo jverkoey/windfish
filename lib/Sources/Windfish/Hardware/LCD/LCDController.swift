@@ -98,8 +98,11 @@ public final class LCDController {
         scanlineY = 0
         changeMode(to: .searchingOAM)
       }
-      // TODO: Do we need to do anything when the LCD is enabled again?
+      // TODO: Do we need to do anything when the LCD is enabled again? There is mention that the first frame after
+      // turning the LCD back on should be ignored.
       // - https://github.com/spec-chum/SpecBoy/blob/5d1294d77648897a2a218a7fdcc33fbeb1e79038/SpecBoy/Ppu.cs#L95-L100
+      // - https://github.com/trekawek/coffee-gb/blob/088b86fb17109b8cac98e6394108b3561f443d54/src/main/java/eu/rekawek/coffeegb/gpu/Gpu.java#L275-L277
+      // - https://www.reddit.com/r/EmuDev/comments/6exyxu/does_the_game_boy_skip_the_first_frame_after/dieiau8/
     }
   }
   var windowTileMapAddress = TileMapAddress.x9800      // bit 6
@@ -431,7 +434,6 @@ extension LCDController {
           changeMode(to: .vblank)
 
           vblankCounter += 1
-
           var interruptFlag = LR35902.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
           interruptFlag.insert(.vBlank)
           memory.write(interruptFlag.rawValue, to: LR35902.interruptFlagAddress)

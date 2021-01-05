@@ -10,7 +10,14 @@ extension Gameboy {
       UInt8(NSColor.lightGray.whiteComponent * 255),
       0xFF,
     ])
-    var pixels = screenData.map { colors[Int(truncatingIfNeeded: $0)] }
+    var pixels: [UInt8]
+    if lcdController.lcdDisplayEnable {
+      pixels = screenData.map { colors[Int(truncatingIfNeeded: $0)] }
+    } else {
+      // When the display is turned off, we show a black screen.
+      // TODO: Does turning the frame off actually just clobber VRAM? Or is the screen simply "off"?
+      pixels = screenData.map { _ in colors[0] }
+    }
     let providerRef = CGDataProvider(data: NSData(bytes: &pixels, length: pixels.count))!
     let cgImage = CGImage(
       width: LCDController.screenSize.width,
