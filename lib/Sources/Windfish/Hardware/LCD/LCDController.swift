@@ -530,6 +530,8 @@ extension LCDController {
     // Only yPosition is evaluated against the sprite; x appears to have no impact on the selection of sprites.
     // - https://github.com/trekawek/coffee-gb/blob/088b86fb17109b8cac98e6394108b3561f443d54/src/main/java/eu/rekawek/coffeegb/gpu/phase/OamSearch.java#L88-L91
     // - https://github.com/LIJI32/SameBoy/blob/29a3b18186c181399f4b99b9111ca9d8b5726886/Core/display.c#L456-L459
+    // Note that this contracts the oam.x != 0 shown in "The Ultimate Game Boy Talk":
+    // - https://youtu.be/HyzD8pNlpwI?t=2784
     if sprite.y <= yPosition && yPosition < sprite.y + spriteSize.height() {
       intersectedOAMs.append(sprite)
     }
