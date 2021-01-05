@@ -4,8 +4,20 @@ import Windfish
 // References:
 // - https://gekkio.fi/files/mooneye-gb/latest/
 
+extension Gameboy {
+  func takeScaledScreenshot() -> NSImage {
+    let image = takeScreenshot()
+    let scaledImage = NSImage(size: NSSize(width: image.size.width, height: image.size.height))
+    scaledImage.lockFocus()
+    NSGraphicsContext.current?.imageInterpolation = .none
+    image.draw(at: .zero, from: NSRect(x: 0, y: 0, width: image.size.width, height: image.size.height), operation: .copy, fraction: 1.0)
+    scaledImage.unlockFocus()
+    return scaledImage
+  }
+}
+
 class MooneyeTests: XCTestCase {
-  let updateGoldens = true
+  let updateGoldens = false
 
   // MARK: - acceptance/bits
 
@@ -133,7 +145,7 @@ class MooneyeTests: XCTestCase {
       instructions += 1
     } while instructions <= expectedInstructions
 
-    let screenshot: Data = gameboy.takeScreenshot().png!
+    let screenshot: Data = gameboy.takeScaledScreenshot().png!
 
     if let screenshotPath = Bundle.module.path(forResource: testRom, ofType: "png") {
       let existingScreenshot = try Data(contentsOf: URL(fileURLWithPath: screenshotPath))
