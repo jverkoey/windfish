@@ -75,7 +75,7 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 <tr>
 <td colspan="4"><code>acceptance/bits/</code></td>
 </tr><tr>
-<td align="center"><p>❌<br/><code>mem_oam</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/bits/mem_oam.png"></td>
+<td align="center"><p>❌<br/><code>mem_oam</code></p><img style="image-rendering:pixelated" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/bits/mem_oam.png"></td>
 <td align="center"><p>✅<br/><code>reg_f</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/bits/reg_f.png"></td>
 <td align="center"><p>❌<br/><code>unused_hwio-GS</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/bits/unused_hwio-GS.png"></td>
 </tr><tr>
