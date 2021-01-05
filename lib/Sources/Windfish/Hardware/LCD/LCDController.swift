@@ -393,6 +393,8 @@ extension LCDController {
     switch lcdMode {
     case .searchingOAM:
       // One OAM search takes two T-cycles, so we can perform two per machine cycle.
+      // TODO: If/when there is a need to switch advance to sub-machine cycle emulation, this will need to be changed
+      // to a T-cycle-based implementation.
       searchNextOAM()
       searchNextOAM()
 
@@ -524,9 +526,11 @@ extension LCDController {
     }
     let sprite = oam.sprites[oamIndex]
     oamIndex += 1
-    if sprite.x > 0
-        && scanlineY + 16 >= sprite.y
-        && scanlineY + 16 < sprite.y + spriteSize.height() {
+    let yPosition = scanlineY + 16
+    // Only yPosition is evaluated against the sprite; x appears to have no impact on the selection of sprites.
+    // - https://github.com/trekawek/coffee-gb/blob/088b86fb17109b8cac98e6394108b3561f443d54/src/main/java/eu/rekawek/coffeegb/gpu/phase/OamSearch.java#L88-L91
+    // - https://github.com/LIJI32/SameBoy/blob/29a3b18186c181399f4b99b9111ca9d8b5726886/Core/display.c#L456-L459
+    if sprite.y <= yPosition && yPosition < sprite.y + spriteSize.height() {
       intersectedOAMs.append(sprite)
     }
   }
