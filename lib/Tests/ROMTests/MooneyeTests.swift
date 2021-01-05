@@ -97,6 +97,16 @@ class MooneyeTests: XCTestCase {
     try run(testRom: "Resources/mooneye/acceptance/ppu/intr_2_oam_ok_timing", expectedInstructions: 107_425)
   }
 
+  func test_acceptance_ppu_stat_lyc_onoff() throws {
+    try XCTSkipUnless(updateGoldens)  // Fail: r1 step 1
+    try run(testRom: "Resources/mooneye/acceptance/ppu/stat_lyc_onoff")
+  }
+
+  func test_acceptance_ppu_vblank_stat_intr_GS() throws {
+    try XCTSkipIf(true)  // Never completes
+    try run(testRom: "Resources/mooneye/acceptance/ppu/vblank_stat_intr-GS")
+  }
+
   // MARK: - acceptance/
 
   func test_acceptance_add_sp_e_timing() throws {
