@@ -61,7 +61,7 @@ class BlarggTests: XCTestCase {
   // MARK: - Serial interrupt timing
 
   func test_interrupt_time() throws {
-    try XCTSkipUnless(updateGoldens)
+    try XCTSkipUnless(updateGoldens)  // TODO: Implement serial interrupts.
     try run(rom: "Resources/blargg/interrupt_time/interrupt_time")
   }
 

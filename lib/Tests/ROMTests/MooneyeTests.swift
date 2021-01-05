@@ -62,7 +62,7 @@ class MooneyeTests: XCTestCase {
   }
 
   func test_acceptance_ppu_intr_2_0_timing() throws {
-    try run(testRom: "Resources/mooneye/acceptance/ppu/intr_2_0_timing", expectedInstructions: 106_974)
+    try run(testRom: "Resources/mooneye/acceptance/ppu/intr_2_0_timing", expectedInstructions: 106_973)
   }
 
   func test_acceptance_ppu_intr_2_mode0_timing_sprites() throws {
