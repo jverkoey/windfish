@@ -427,7 +427,7 @@ extension LCDController {
 
           vblankCounter += 1
 
-          var interruptFlag = LR35902.Instruction.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
+          var interruptFlag = LR35902.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
           interruptFlag.insert(.vBlank)
           memory.write(interruptFlag.rawValue, to: LR35902.interruptFlagAddress)
 
@@ -456,7 +456,7 @@ extension LCDController {
   }
 
   private func raiseLCDStatInterrupt(memory: AddressableMemory) {
-    var interruptFlag = LR35902.Instruction.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
+    var interruptFlag = LR35902.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
     interruptFlag.insert(.lcdStat)
     memory.write(interruptFlag.rawValue, to: LR35902.interruptFlagAddress)
   }

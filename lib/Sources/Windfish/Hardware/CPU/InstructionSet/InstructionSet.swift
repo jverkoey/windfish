@@ -5,18 +5,6 @@ extension LR35902 {
   public struct InstructionSet: CPU.InstructionSet {
     public typealias InstructionType = LR35902.Instruction
 
-    public static var widths: [Instruction.Spec: InstructionWidth<UInt16>] = {
-      return computeAllWidths()
-    }()
-
-    public static var opcodeBytes: [Instruction.Spec : [UInt8]] = {
-      return computeAllOpcodeBytes()
-    }()
-
-    public static var opcodeStrings: [SpecType : String] = {
-      return computeAllOpcodeStrings()
-    }()
-
     public static let table: [Instruction.Spec] = [
       /* 0x00 */ .nop,
       /* 0x01 */ .ld(.bc, .imm16),
@@ -293,5 +281,17 @@ extension LR35902 {
     public static let prefixTables: [Instruction.Spec: [Instruction.Spec]] = [
       .prefix(.cb): tableCB
     ]
+
+    public static var widths: [Instruction.Spec: InstructionWidth<UInt16>] = {
+      return computeAllWidths()
+    }()
+
+    public static var opcodeBytes: [Instruction.Spec : [UInt8]] = {
+      return computeAllOpcodeBytes()
+    }()
+
+    public static var opcodeStrings: [SpecType : String] = {
+      return computeAllOpcodeStrings()
+    }()
   }
 }

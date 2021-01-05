@@ -110,7 +110,8 @@ extension Gameboy {
 
   /** Advances the emulation by one instruction. */
   public func advanceInstruction() {
-    if cpu.machineInstruction.spec == nil {
+    if cpu.machineInstruction.instructionEmulator == nil {
+      // Initial bootstrap.
       advance()
     }
     if let sourceLocation = cpu.machineInstruction.sourceLocation {

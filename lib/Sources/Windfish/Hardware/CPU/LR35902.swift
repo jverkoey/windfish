@@ -76,10 +76,25 @@ public final class LR35902 {
   public var ime: Bool = false
 
   /** Enabled bits represent a requested interrupt. */
-  var interruptEnable: LR35902.Instruction.Interrupt = []
+  var interruptEnable: Interrupt = []
 
   /** Enabled bits represent a requested interrupt. */
-  public var interruptFlag: LR35902.Instruction.Interrupt = []
+  public var interruptFlag: Interrupt = []
+
+  /** A representation of a Gameboy interrupt. */
+  public struct Interrupt: OptionSet, Hashable {
+    public init(rawValue: UInt8) {
+      self.rawValue = rawValue
+    }
+
+    public let rawValue: UInt8
+
+    public static let vBlank       = Interrupt(rawValue: 0b0000_0001)
+    public static let lcdStat      = Interrupt(rawValue: 0b0000_0010)
+    public static let timer        = Interrupt(rawValue: 0b0000_0100)
+    public static let serial       = Interrupt(rawValue: 0b0000_1000)
+    public static let joypad       = Interrupt(rawValue: 0b0001_0000)
+  }
 
   /**
    The halt status.
@@ -177,7 +192,7 @@ public final class LR35902 {
   /** Initializes the state with boot values. */
   public init() {}
 
-  internal init(a: UInt8 = 0, b: UInt8 = 0, c: UInt8 = 0, d: UInt8 = 0, e: UInt8 = 0, h: UInt8 = 0, l: UInt8 = 0, fzero: Bool = false, fsubtract: Bool = false, fhalfcarry: Bool = false, fcarry: Bool = false, ime: Bool = false, interruptEnable: LR35902.Instruction.Interrupt = [], interruptFlag: LR35902.Instruction.Interrupt = [], halted: Bool = false, imeToggleDelay: Int = 0, sp: UInt16 = 0, pc: LR35902.Address = 0, machineInstruction: LR35902.MachineInstruction = MachineInstruction(), registerTraces: [LR35902.Instruction.Numeric : LR35902.RegisterTrace] = [:], nextAction: LR35902.Emulation.EmulationResult = .fetchNext) {
+  internal init(a: UInt8 = 0, b: UInt8 = 0, c: UInt8 = 0, d: UInt8 = 0, e: UInt8 = 0, h: UInt8 = 0, l: UInt8 = 0, fzero: Bool = false, fsubtract: Bool = false, fhalfcarry: Bool = false, fcarry: Bool = false, ime: Bool = false, interruptEnable: LR35902.Interrupt = [], interruptFlag: LR35902.Interrupt = [], halted: Bool = false, imeToggleDelay: Int = 0, sp: UInt16 = 0, pc: LR35902.Address = 0, machineInstruction: LR35902.MachineInstruction = MachineInstruction(), registerTraces: [LR35902.Instruction.Numeric : LR35902.RegisterTrace] = [:], nextAction: LR35902.Emulation.EmulationResult = .fetchNext) {
     self.a = a
     self.b = b
     self.c = c
@@ -357,7 +372,7 @@ extension LR35902 {
       halted = false
       nextAction = .continueExecution
       machineInstruction.instructionEmulator = LR35902.Emulation.interrupt()
-      machineInstruction.spec = .interrupt(interrupts)
+      machineInstruction.spec = nil
     } else if isRunning && nextAction == .fetchNext || nextAction == .fetchPrefix {
       fetch(memory: memory)
     }
@@ -410,8 +425,8 @@ extension LR35902: AddressableMemory {
 
   public func write(_ byte: UInt8, to address: Address) {
     switch address {
-    case LR35902.interruptEnableAddress: interruptEnable = LR35902.Instruction.Interrupt(rawValue: byte)
-    case LR35902.interruptFlagAddress:   interruptFlag = LR35902.Instruction.Interrupt(rawValue: byte)
+    case LR35902.interruptEnableAddress: interruptEnable = LR35902.Interrupt(rawValue: byte)
+    case LR35902.interruptFlagAddress:   interruptFlag = LR35902.Interrupt(rawValue: byte)
     default: fatalError()
     }
   }

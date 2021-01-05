@@ -4,11 +4,11 @@ extension LR35902.Emulation {
   final class interrupt: InstructionEmulator {
     func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.Emulation.EmulationResult {
       if cycle == 1 {
-        interrupts = LR35902.Instruction.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
+        interrupts = LR35902.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
         return .continueExecution
       }
       if cycle == 2 {
-        let enabled = LR35902.Instruction.Interrupt(rawValue: memory.read(from: LR35902.interruptEnableAddress))
+        let enabled = LR35902.Interrupt(rawValue: memory.read(from: LR35902.interruptEnableAddress))
         let requestedInterrupts = enabled.intersection(interrupts)
         if requestedInterrupts.isEmpty {
           return .fetchNext
@@ -47,7 +47,7 @@ extension LR35902.Emulation {
       return .fetchNext
     }
 
-    private var interrupts: LR35902.Instruction.Interrupt = .init()
+    private var interrupts: LR35902.Interrupt = .init()
     private var targetpc: LR35902.Address = 0
   }
 }

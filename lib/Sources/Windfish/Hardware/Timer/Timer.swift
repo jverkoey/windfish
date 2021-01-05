@@ -74,7 +74,7 @@ extension Timer {
     if timaState == .reloaded {
       timaState = .running
     } else if timaState == .reloading {
-      var interruptFlag = LR35902.Instruction.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
+      var interruptFlag = LR35902.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
       interruptFlag.insert(.timer)
       memory.write(interruptFlag.rawValue, to: LR35902.interruptFlagAddress)
       timaState = .reloaded
