@@ -56,7 +56,7 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 </tr><tr>
 <td colspan="3"><code>interrupt_time/</code></td>
 </tr><tr>
-<td align="center"><p>❌<br/><code>instr_timing</code></p><img src="lib/Tests/ROMTests/Resources/blargg/interrupt_time/interrupt_time.png"><br/><a href="https://github.com/jverkoey/windfish/issues/18">#18</a></td>
+<td align="center"><p>❌<br/><code>instr_timing</code></p><img src="lib/Tests/ROMTests/Resources/blargg/interrupt_time/interrupt_time.png"><br/>🐞<a href="https://github.com/jverkoey/windfish/issues/18">#18</a></td>
 </tr><tr>
 <td colspan="3"><code>instr_timing/</code></td>
 </tr><tr>
