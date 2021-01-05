@@ -36,6 +36,9 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 
 <table>
 <tr>
+<td colspan="3"><code>cpu_instrs</code></td>
+</tr>
+<tr>
 <td align="center"><p>✅<br/><code>01-special</code></p><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/01-special.png"></td>
 <td align="center"><p>✅<br/><code>02-interrupts.gb</code></p><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/02-interrupts.png"></td>
 <td align="center"><p>✅<br/><code>03-op sp,hl.gb</code></p><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/03-op%20sp,hl.png"></td>
