@@ -125,6 +125,15 @@ class MooneyeTests: XCTestCase {
     try run(testRom: "Resources/mooneye/acceptance/ei_timing")
   }
 
+  func test_acceptance_if_ie_registers() throws {
+    try XCTSkipUnless(updateGoldens)  // C: E8! E: E0!
+    try run(testRom: "Resources/mooneye/acceptance/if_ie_registers")
+  }
+
+  func test_acceptance_intr_timing() throws {
+    try run(testRom: "Resources/mooneye/acceptance/intr_timing", expectedInstructions: 93_905)
+  }
+
   // MARK: - emulator-only/
 
   func test_emulator_only_mbc1_bits_bank_1() throws {
