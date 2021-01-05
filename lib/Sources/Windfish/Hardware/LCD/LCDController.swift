@@ -631,8 +631,8 @@ extension LCDController: AddressableMemory {
         lcdMode = .searchingOAM
       }
 
-    case .LY:  scanlineY = 0
-    case .LYC: lyc = 0
+    case .LY:   scanlineY = 0
+    case .LYC:  lyc = byte
 
     case .SCY:  scrollY = byte
     case .SCX:  scrollX = byte

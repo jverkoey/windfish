@@ -517,7 +517,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
           var startCounting = false
           while self.running {
             gameboy.advance()
-//
+
 //            if machineCycle >= 620146 {
 //              if let sourceLocation = gameboy.cpu.machineInstruction.sourceLocation {
 //                var address = sourceLocation.address()
@@ -527,6 +527,8 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 //                let LY = gameboy.memory.read(from: 0xFF44)
 //                let LYC = gameboy.memory.read(from: 0xFF45)
 //                let STAT = gameboy.memory.read(from: 0xFF41)
+//                let SCX = gameboy.memory.read(from: 0xFF43)
+//                let SCY = gameboy.memory.read(from: 0xFF42)
 //                let ime = gameboy.cpu.ime
 //                let servicingInterrupt: Int
 //                if case .interrupt = gameboy.cpu.machineInstruction.spec {
@@ -534,7 +536,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 //                } else {
 //                  servicingInterrupt = 0
 //                }
-//                print("[0x\(sourceLocation.address().hexString)]@\(gameboy.cartridge!.selectedBank.hexString) LY: \(LY) LYC: \(LYC) STAT: \(STAT.binaryString) IME: \(ime) !\(servicingInterrupt) IF: \(IF.binaryString) IE: \(IE.binaryString) cycle: \(machineCycle) \(RGBDSDisassembler.statement(for: instruction).formattedString)")
+//                print("[0x\(sourceLocation.address().hexString)]@\(gameboy.cartridge!.selectedBank.hexString) SCX: \(SCX) SCY: \(SCY) LY: \(LY) LYC: \(LYC) STAT: \(STAT.binaryString) IME: \(ime) !\(servicingInterrupt) IF: \(IF.binaryString) IE: \(IE.binaryString) cycle: \(machineCycle) \(RGBDSDisassembler.statement(for: instruction).formattedString)")
 //              }
 //            }
 
