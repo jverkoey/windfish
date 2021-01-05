@@ -101,34 +101,15 @@ public final class LCDController {
   var backgroundEnable = true                          // bit 0
 
   // MARK: STAT bits (0xFF41)
-
-  enum LCDCMode {
-    case hblank                   // Mode 0
-    case vblank                   // Mode 1
-
-    // TODO: Not able to read oamram during this mode
-    case searchingOAM             // Mode 2
-
-    // TODO: Any reads of vram or oamram during this mode should return 0xff; writes are ignored
-    case transferringToLCDDriver  // Mode 3
-
-    var bits: UInt8 {
-      switch self {
-      case .hblank:                   return 0b0000_0000
-      case .vblank:                   return 0b0000_0001
-      case .searchingOAM:             return 0b0000_0010
-      case .transferringToLCDDriver:  return 0b0000_0011
-      }
-    }
+                                                  // 76543210
+  var enableCoincidenceInterrupt = false          //  x
+  var enableOAMInterrupt = false                  //   x
+  var enableVBlankInterrupt = false               //    x
+  var enableHBlankInterrupt = false               //     x
+  var coincidence: Bool {                         //      x
+    return scanlineY == lyc                       // 76543210
   }
-  var enableCoincidenceInterrupt = false          // bit 6
-  var enableOAMInterrupt = false                  // bit 5
-  var enableVBlankInterrupt = false               // bit 4
-  var enableHBlankInterrupt = false               // bit 3
-  var coincidence: Bool {                         // bit 2
-    return scanlineY == lyc
-  }
-  private var lcdMode = LCDCMode.searchingOAM {   // bits 1 and 0
+  private var lcdMode = LCDCMode.searchingOAM {   //       xx
     didSet {
       if lcdMode == .searchingOAM {
         intersectedOAMs = []
@@ -141,8 +122,28 @@ public final class LCDController {
         bgYPlot = scanlineY &+ scrollY
         transferringToLCDDriverCycle = 0
         scanlineX = 0
+        scanlineScrollX = scrollX
       }
     }
+  }
+  enum LCDCMode {
+    var bits: UInt8 {
+      switch self {
+      case .hblank:                   return 0b0000_0000
+      case .vblank:                   return 0b0000_0001
+      case .searchingOAM:             return 0b0000_0010
+      case .transferringToLCDDriver:  return 0b0000_0011
+      }
+    }
+
+    case hblank                   // Mode 0
+    case vblank                   // Mode 1
+
+    // TODO: Not able to read oamram during this mode
+    case searchingOAM             // Mode 2
+
+    // TODO: Any reads of vram or oamram during this mode should return 0xff; writes are ignored
+    case transferringToLCDDriver  // Mode 3
   }
 
   // MARK: SY and XX (0xFF42 and 0xFF43)
@@ -228,6 +229,7 @@ public final class LCDController {
   private var spritefifo: [Pixel] = []
   private var transferringToLCDDriverCycle: Int = 0
   private var scanlineX: UInt8 = 0
+  private var scanlineScrollX: UInt8 = 0
   private var windowYPlot: UInt8 = 0
   private var bgYPlot: UInt8 = 0
   private var lastBackgroundPixel: UInt8 = 0
@@ -297,7 +299,7 @@ extension LCDController {
            palette: backgroundPalette)
     } else if backgroundEnable {
       plot(x: scanlineX, y: scanlineY,
-           byte: backgroundPixel(x: scanlineX &+ scrollX, y: bgYPlot, window: false),
+           byte: backgroundPixel(x: scanlineX &+ scanlineScrollX, y: bgYPlot, window: false),
            palette: backgroundPalette)
     } else {
       lastBackgroundPixel = 0
