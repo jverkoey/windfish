@@ -76,36 +76,36 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 <tr>
 <td colspan="3"><code>acceptance/bits/</code></td>
 </tr><tr>
-<td align="center"><p>❌<br/><code>acceptance/bits/mem_oam</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/bits/mem_oam.png"></td>
-<td align="center"><p>✅<br/><code>acceptance/bits/reg_f</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/bits/reg_f.png"></td>
-<td align="center"><p>❌<br/><code>acceptance/bits/unused_hwio-GS</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/bits/unused_hwio-GS.png"></td>
+<td align="center"><p>❌<br/><code>mem_oam</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/bits/mem_oam.png"></td>
+<td align="center"><p>✅<br/><code>reg_f</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/bits/reg_f.png"></td>
+<td align="center"><p>❌<br/><code>unused_hwio-GS</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/bits/unused_hwio-GS.png"></td>
 </tr><tr>
 <td colspan="3"><code>acceptance/daa/</code></td>
 </tr><tr>
-<td align="center"><p>✅<br/><code>acceptance/instr/daa</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/instr/daa.png"></td>
+<td align="center"><p>✅<br/><code>daa</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/instr/daa.png"></td>
 </tr><tr>
 <td colspan="3"><code>acceptance/interrupts/</code></td>
 </tr><tr>
-<td align="center"><p>❌<br/><code>acceptance/interrupts/ie_push</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/interrupts/ie_push.png"></td>
+<td align="center"><p>❌<br/><code>ie_push</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/interrupts/ie_push.png"></td>
 </tr><tr>
 <td colspan="3"><code>acceptance/oam_dma/</code></td>
 </tr><tr>
-<td align="center"><p>❌<br/><code>acceptance/oam_dma/basic</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/oam_dma/basic.png"></td>
-<td align="center"><p>✅<br/><code>acceptance/oam_dma/reg_read</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/oam_dma/reg_read.png"></td>
-<td align="center"><p>❌<br/><code>acceptance/oam_dma/sources-GS</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/oam_dma/sources-GS.png"></td>
+<td align="center"><p>❌<br/><code>basic</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/oam_dma/basic.png"></td>
+<td align="center"><p>✅<br/><code>reg_read</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/oam_dma/reg_read.png"></td>
+<td align="center"><p>❌<br/><code>sources-GS</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/oam_dma/sources-GS.png"></td>
 </tr><tr>
 <td colspan="3"><code>acceptance/</code></td>
 </tr><tr>
-<td align="center"><p>❌<br/><code>acceptance/add_sp_e_timing</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/add_sp_e_timing.png"></td>
-<td align="center"><p>✅<br/><code>acceptance/boot_div-dmgABCmgb</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/boot_div-dmgABCmgb.png"></td>
-<td align="center"><p>❌<br/><code>acceptance/boot_regs-dmg0</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/boot_regs-dmg0.png"></td>
+<td align="center"><p>❌<br/><code>add_sp_e_timing</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/add_sp_e_timing.png"></td>
+<td align="center"><p>✅<br/><code>boot_div-dmgABCmgb</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/boot_div-dmgABCmgb.png"></td>
+<td align="center"><p>❌<br/><code>boot_regs-dmg0</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/boot_regs-dmg0.png"></td>
 </tr><tr>
-<td align="center"><p>✅<br/><code>acceptance/boot_regs-dmgABC</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/boot_regs-dmgABC.png"></td>
-<td align="center"><p>❌<br/><code>acceptance/call_timing</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/call_timing.png"></td>
+<td align="center"><p>✅<br/><code>boot_regs-dmgABC</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/boot_regs-dmgABC.png"></td>
+<td align="center"><p>❌<br/><code>call_timing</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/call_timing.png"></td>
 </tr><tr>
 <td colspan="3"><code>emulator-only/mbc1/</code></td>
 </tr><tr>
-<td align="center"><p>✅<br/><code>emulator-only/mbc1/bits_bank1</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/emulator-only/mbc1/bits_bank1.png"></td>
+<td align="center"><p>✅<br/><code>bits_bank1</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/emulator-only/mbc1/bits_bank1.png"></td>
 </table>
 
 ### [Mealybug Tearoom](https://github.com/mattcurrie/mealybug-tearoom-tests)
