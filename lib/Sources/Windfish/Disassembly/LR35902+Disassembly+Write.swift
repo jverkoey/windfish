@@ -343,7 +343,7 @@ clean:
     var macrosAsm: String? = nil
     var writtenMacros = Set<String>()
 
-    for bankToWrite in UInt8(0)..<UInt8(cartridge.numberOfBanks) {
+    for bankToWrite in UInt8(0)..<UInt8(numberOfBanks) {
       var bankLines: [Line] = []
       defer {
         var lastLine: Line?
@@ -365,7 +365,7 @@ clean:
 
       var writeContext = (pc: LR35902.Address((bankToWrite == 0) ? 0x0000 : 0x4000),
                           bank: max(1, bankToWrite))
-      let end: LR35902.Address = (bankToWrite == 0) ? (cartridge.size < 0x4000 ? LR35902.Address(cartridge.size) : 0x4000) : 0x8000
+      let end: LR35902.Address = (bankToWrite == 0) ? (cartridgeSize < 0x4000 ? LR35902.Address(cartridgeSize) : 0x4000) : 0x8000
 
       let initialBank = max(1, bankToWrite)
 
@@ -813,14 +813,14 @@ clean:
     if let macrosAsm = macrosAsm {
       sources["macros.asm"] = .macros(content: macrosAsm)
     }
-    gameAsm += ((UInt8(0)..<UInt8(cartridge.numberOfBanks))
+    gameAsm += ((UInt8(0)..<UInt8(numberOfBanks))
                   .map { "INCLUDE \"bank_\($0.hexString).asm\"" }
                   .joined(separator: "\n") + "\n")
 
     sources["game.asm"] = .game(content: gameAsm)
 
     let disassembledLocations = knownLocations()
-    let bankPercents: [Gameboy.Cartridge.Bank: Double] = (0..<cartridge.numberOfBanks).reduce(into: [:]) { accumulator, bank in
+    let bankPercents: [Gameboy.Cartridge.Bank: Double] = (0..<numberOfBanks).reduce(into: [:]) { accumulator, bank in
       let disassembledBankLocations = disassembledLocations.intersection(
         IndexSet(integersIn: (Int(bank) * Int(Gameboy.Cartridge.bankSize))..<(Int(bank + 1) * Int(Gameboy.Cartridge.bankSize)))
       )
@@ -828,7 +828,7 @@ clean:
     }
     let statistics = Statistics(
       instructionsDecoded: instructionsDecoded,
-      percent: Double(disassembledLocations.count * 100) / Double(cartridge.size),
+      percent: Double(disassembledLocations.count * 100) / Double(cartridgeSize),
       bankPercents: bankPercents
     )
 

@@ -12,19 +12,57 @@ extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {
   }
 }
 
+private final class DisassemblerMemory: AddressableMemory {
+  init(data: Data) {
+    self.data = data
+  }
+  let data: Data
+
+  var selectedBank: Gameboy.Cartridge.Bank = 0
+
+  func read(from address: LR35902.Address) -> UInt8 {
+    // Read-only memory (ROM) bank 00
+    if address <= 0x3FFF {
+      return data[Int(address)]
+    }
+
+    // Read-only memory (ROM) bank 01-7F
+    if address >= 0x4000 && address <= 0x7FFF {
+      guard let location = Gameboy.Cartridge.location(for: address, in: max(1, selectedBank)) else {
+        preconditionFailure("Invalid location for address 0x\(address.hexString) in bank 0x\(selectedBank.hexString)")
+      }
+      return data[Int(location)]
+    }
+
+    fatalError()
+  }
+
+  func write(_ byte: UInt8, to address: LR35902.Address) {
+    fatalError()
+  }
+
+  func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
+    return .cartridge(Gameboy.Cartridge.location(for: address, in: (selectedBank == 0) ? 1 : selectedBank)!)
+  }
+}
+
 /// A class that owns and manages disassembly information for a given ROM.
 public class Disassembler {
 
-  public let cartridge: Gameboy.Cartridge
-  public let cartridgeData: Data
+  private let memory: DisassemblerMemory
+  let cartridgeData: Data
+  let cartridgeSize: Gameboy.Cartridge.Length
+  public let numberOfBanks: Gameboy.Cartridge.Bank
   public init(data: Data) {
-    self.cartridge = Gameboy.Cartridge(data: data)
     self.cartridgeData = data
+    self.memory = DisassemblerMemory(data: data)
+    self.cartridgeSize = Gameboy.Cartridge.Length(data.count)
+    self.numberOfBanks = Gameboy.Cartridge.Bank((cartridgeSize + Gameboy.Cartridge.bankSize - 1) / Gameboy.Cartridge.bankSize)
   }
 
   /** Returns true if the program counter is pointing to addressable memory. */
   func pcIsValid(pc: LR35902.Address, bank: Gameboy.Cartridge.Bank) -> Bool {
-    return pc < 0x8000 && Gameboy.Cartridge.location(for: pc, in: bank)! < cartridge.size
+    return pc < 0x8000 && Gameboy.Cartridge.location(for: pc, in: bank)! < cartridgeSize
   }
 
   public func disassembleAsGameboyCartridge() {
@@ -750,7 +788,8 @@ public class Disassembler {
 
         // Don't commit the fetch to the context pc yet in case the instruction was invalid.
         var instructionPc = runContext.pc
-        let instruction = Disassembler.fetchInstruction(at: &instructionPc, memory: cartridge)
+        memory.selectedBank = runContext.bank
+        let instruction = Disassembler.fetchInstruction(at: &instructionPc, memory: memory)
 
         // STOP must be followed by 0
         if case .stop = instruction.spec, case let .imm8(immediate) = instruction.immediate, immediate != 0 {
