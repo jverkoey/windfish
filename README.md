@@ -34,23 +34,28 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 
 ### [blargg](https://gbdev.gg8.se/files/roms/blargg-gb-tests/)
 
-| Test name | Status | Screenshot |
-|:-----|:--------|:---|
-| `01-special` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/01-special.png) |
-| `02-interrupts.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/02-interrupts.png) |
-| `03-op sp,hl.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/03-op%20sp,hl.png) |
-| `04-op r,imm.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/04-op%20r,imm.png) |
-| `05-op rp.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/05-op%20rp.png) |
-| `06-ld r,r.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/06-ld%20r,r.png) |
-| `07-jr,jp,call,ret,rst.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/07-jr,jp,call,ret,rst.png) |
-| `08-misc instrs.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/08-misc%20instrs.png) |
-| `09-op r,r.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/09-op%20r,r.png) |
-| `10-bit ops.gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/10-bit%20ops.png) |
-| `11-op a,(hl).gb` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/11-op%20a,(hl).png) |
-| `instr_timing` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/instr_timing/instr_timing.png) |
-| `mem_timing/01-read_timing` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/01-read_timing.png) |
-| `mem_timing/02-write_timing` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/02-write_timing.png) |
-| `mem_timing/03-modify_timing` | ✅ | ![Test result](lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/03-modify_timing.png) |
+<table>
+<tr>
+<td align="center">✅<br/><code>01-special</code><br/><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/01-special.png"></td>
+<td align="center">✅<br/><code>02-interrupts.gb</code><br/><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/02-interrupts.png"></td>
+<td align="center">✅<br/><code>03-op sp,hl.gb</code><br/><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/03-op%20sp,hl.png"></td>
+<td align="center">✅<br/><code>04-op r,imm.gb</code><br/><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/04-op%20r,imm.png"></td>
+</tr><tr>
+<td align="center">✅<br/><code>05-op rp.gb</code><br/><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/05-op%20rp.png"></td>
+<td align="center">✅<br/><code>06-ld r,r.gb</code><br/><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/06-ld%20r,r.png"></td>
+<td align="center">✅<br/><code>07-jr,jp,call,ret,rst.gb</code><br/><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/07-jr,jp,call,ret,rst.png"></td>
+<td align="center">✅<br/><code>08-misc instrs.gb</code><br/><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/08-misc%20instrs.png"></td>
+</tr><tr>
+<td align="center">✅<br/><code>09-op r,r.gb</code><br/><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/09-op%20r,r.png"></td>
+<td align="center">✅<br/><code>10-bit ops.gb</code><br/><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/10-bit%20ops.png"></td>
+<td align="center">✅<br/><code>11-op a,(hl).gb</code><br/><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/11-op%20a,(hl).png"></td>
+<td align="center">✅<br/><code>instr_timing</code><br/><img src="lib/Tests/ROMTests/Resources/blargg/instr_timing/instr_timing.png"></td>
+</tr><tr>
+<td align="center">✅<br/><code>mem_timing/01-read_timing</code><br/><img src="lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/01-read_timing.png"></td>
+<td align="center">✅<br/><code>mem_timing/02-write_timing</code><br/><img src="lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/02-write_timing.png"></td>
+<td align="center">✅<br/><code>mem_timing/03-modify_timing</code><br/><img src="lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/03-modify_timing.png"></td>
+</tr>
+</table>
 
 ### [mooneye](https://github.com/Gekkio/mooneye-gb/)
 

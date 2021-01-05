@@ -32,7 +32,7 @@ extension Data {
 }
 
 class BlarggTests: XCTestCase {
-  let updateGoldens = false
+  let updateGoldens = true
 
   // MARK: - Instructions
 
@@ -84,6 +84,13 @@ class BlarggTests: XCTestCase {
 
   func test_instr_timing() throws {
     try run(rom: "Resources/blargg/instr_timing/instr_timing", expectedInstructions: 273_267)
+  }
+
+  // MARK: - Serial interrupt timing
+
+  func test_interrupt_time() throws {
+    try XCTSkipUnless(updateGoldens)
+    try run(rom: "Resources/blargg/interrupt_time/interrupt_time")
   }
 
   // MARK: - Memory timing
