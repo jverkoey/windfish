@@ -793,6 +793,13 @@ public class Disassembler {
 
         // STOP must be followed by 0
         if case .stop = instruction.spec, case let .imm8(immediate) = instruction.immediate, immediate != 0 {
+          // STOP wasn't followed by a 0, so skip this byte.
+          advance(1)
+          continue
+        }
+
+        if case .invalid = instruction.spec {
+          // This isn't a valid instruction; skip it.
           advance(1)
           continue
         }

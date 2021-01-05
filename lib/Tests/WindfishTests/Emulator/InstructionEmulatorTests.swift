@@ -24,5 +24,7 @@ class InstructionEmulatorTests: XCTestCase {
       guard let timings = timings[$0] else { return nil}
       return "\((index - 1).hexString) \(timings.map { "\($0 * 4)" }.joined(separator: ", "))"
     }.joined(separator: "\n"))
+
+    // TODO: Verify all timings and flag modifications against https://github.com/izik1/gbops/blob/master/dmgops.json
   }
 }
