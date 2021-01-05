@@ -99,6 +99,7 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 <td align="center"><p>❌<br/><code>acceptance/add_sp_e_timing</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/add_sp_e_timing.png"></td>
 <td align="center"><p>✅<br/><code>acceptance/boot_div-dmgABCmgb</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/boot_div-dmgABCmgb.png"></td>
 <td align="center"><p>❌<br/><code>acceptance/boot_regs-dmg0</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/boot_regs-dmg0.png"></td>
+</tr><tr>
 <td align="center"><p>✅<br/><code>acceptance/boot_regs-dmgABC</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/boot_regs-dmgABC.png"></td>
 <td align="center"><p>❌<br/><code>acceptance/call_timing</code></p><img src="lib/Tests/ROMTests/Resources/mooneye/acceptance/call_timing.png"></td>
 </tr><tr>
