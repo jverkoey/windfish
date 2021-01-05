@@ -105,18 +105,22 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 <td colspan="4"><code>emulator-only/mbc1/</code></td>
 </tr><tr>
 <td align="center"><p>✅<br/><code>bits_bank1</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/emulator-only/mbc1/bits_bank1.png"></td>
+</tr>
 </table>
 
 ### [Mealybug Tearoom](https://github.com/mattcurrie/mealybug-tearoom-tests)
 
-| Test name | Status | Screenshot |
-|:-----|:--------|:----|
-| `m3_lcdc_bg_en_change` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mealybug-tearoom/m3_lcdc_bg_en_change.png) |
-| `m3_lcdc_bg_en_change` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mealybug-tearoom/m3_lcdc_bg_en_change.png) |
-| `m3_scy_change` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mealybug-tearoom/m3_scy_change.png) |
-| `m3_wx_4_change` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mealybug-tearoom/m3_wx_4_change.png) |
-| `m3_wx_5_change` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mealybug-tearoom/m3_wx_5_change.png) |
-| `m3_wx_6_change` | ❌ | ![Test result](lib/Tests/ROMTests/Resources/mealybug-tearoom/m3_wx_6_change.png) |
+<table>
+<tr>
+<td align="center"><p>❌<br/><code>m3_lcdc_bg_en_change</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mealybug-tearoom/m3_lcdc_bg_en_change.png"></td>
+<td align="center"><p>❌<br/><code>m3_lcdc_bg_en_change</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mealybug-tearoom/m3_lcdc_bg_en_change.png"></td>
+<td align="center"><p>❌<br/><code>m3_scy_change</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mealybug-tearoom/m3_scy_change.png"></td>
+<td align="center"><p>❌<br/><code>m3_wx_4_change</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mealybug-tearoom/m3_wx_4_change.png"></td>
+</tr><tr>
+<td align="center"><p>❌<br/><code>m3_wx_5_change</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mealybug-tearoom/m3_wx_5_change.png"></td>
+<td align="center"><p>❌<br/><code>m3_wx_6_change</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mealybug-tearoom/m3_wx_6_change.png"></td>
+</tr>
+</table>
 
 ## Learn more
 
