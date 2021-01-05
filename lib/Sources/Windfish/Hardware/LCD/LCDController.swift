@@ -96,7 +96,7 @@ public final class LCDController {
       //
       if oldValue && !lcdDisplayEnable {
         scanlineY = 0
-        lcdMode = .searchingOAM
+        changeMode(to: .searchingOAM)
       }
       // TODO: Do we need to do anything when the LCD is enabled again?
       // - https://github.com/spec-chum/SpecBoy/blob/5d1294d77648897a2a218a7fdcc33fbeb1e79038/SpecBoy/Ppu.cs#L95-L100
@@ -119,23 +119,7 @@ public final class LCDController {
   var coincidence: Bool {                         //      x
     return scanlineY == lyc                       // 76543210
   }
-  private var lcdMode = LCDCMode.searchingOAM {   //       xx
-    didSet {
-      if lcdMode == .searchingOAM {
-        intersectedOAMs = []
-        oamIndex = 0
-        lcdModeCycle = 0
-      } else if lcdMode == .vblank {
-        lcdModeCycle = 0
-      } else if lcdMode == .transferringToLCDDriver {
-        windowYPlot = scanlineY &- windowY
-        bgYPlot = scanlineY &+ scrollY
-        transferringToLCDDriverCycle = 0
-        scanlineX = 0
-        scanlineScrollX = scrollX
-      }
-    }
-  }
+  private var lcdMode = LCDCMode.searchingOAM     //       xx
   enum LCDCMode {
     var bits: UInt8 {
       switch self {
@@ -410,7 +394,7 @@ extension LCDController {
       searchNextOAM()
 
       if lcdModeCycle >= LCDController.searchingOAMLength {
-        lcdMode = .transferringToLCDDriver
+        changeMode(to: .transferringToLCDDriver)
         bgfifo.removeAll()
         spritefifo.removeAll()
       }
@@ -431,7 +415,7 @@ extension LCDController {
 
       if lcdModeCycle >= LCDController.searchingOAMLength + 43 {
         precondition(scanlineX >= 160)
-        lcdMode = .hblank
+        changeMode(to: .hblank)
         // Don't reset lcdModeCycle yet, as this mode can actually end early.
 
         requestHBlankInterruptIfNeeded(memory: memory)
@@ -441,10 +425,10 @@ extension LCDController {
       if lcdModeCycle >= LCDController.scanlineCycleLength {
         scanlineY += 1
         if scanlineY < 144 {
-          lcdMode = .searchingOAM
+          changeMode(to: .searchingOAM)
         } else {
           // No more lines to draw.
-          lcdMode = .vblank
+          changeMode(to: .vblank)
 
           vblankCounter += 1
 
@@ -466,7 +450,7 @@ extension LCDController {
 
         if scanlineY >= 154 {
           scanlineY = 0
-          lcdMode = .searchingOAM
+          changeMode(to: .searchingOAM)
           requestOAMInterruptIfNeeded(memory: memory)
         }
 
@@ -474,6 +458,30 @@ extension LCDController {
       }
       break
     }
+  }
+
+  private func changeMode(to mode: LCDCMode) {
+    switch mode {
+    case .searchingOAM:
+      intersectedOAMs = []
+      oamIndex = 0
+      lcdModeCycle = 0
+
+    case .vblank:
+      lcdModeCycle = 0
+
+    case .transferringToLCDDriver:
+      windowYPlot = scanlineY &- windowY
+      bgYPlot = scanlineY &+ scrollY
+      transferringToLCDDriverCycle = 0
+      scanlineX = 0
+      scanlineScrollX = scrollX
+
+    case .hblank:
+      break
+    }
+
+    lcdMode = mode
   }
 
   private func raiseLCDStatInterrupt(memory: AddressableMemory) {
@@ -661,7 +669,7 @@ extension LCDController: AddressableMemory {
 
       if !lcdDisplayEnable {
         scanlineY = 0
-        lcdMode = .searchingOAM
+        changeMode(to: .searchingOAM)
       }
 
     case .LY:
