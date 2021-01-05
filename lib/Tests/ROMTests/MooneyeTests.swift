@@ -17,7 +17,7 @@ extension Gameboy {
 }
 
 class MooneyeTests: XCTestCase {
-  let updateGoldens = false
+  let updateGoldens = true
 
   // MARK: - acceptance/bits
 
@@ -92,6 +92,11 @@ class MooneyeTests: XCTestCase {
     try run(testRom: "Resources/mooneye/acceptance/boot_div-dmgABCmgb", expectedInstructions: 94_125)
   }
 
+  func test_acceptance_boot_hwio_dmgABCmgb() throws {
+    try XCTSkipUnless(updateGoldens)  // DMG0 is not supported.
+    try run(testRom: "Resources/mooneye/acceptance/boot_hwio-dmgABCmgb")
+  }
+
   func test_acceptance_boot_regs_dmg0() throws {
     try XCTSkipUnless(updateGoldens)  // DMG0 is not supported.
     try run(testRom: "Resources/mooneye/acceptance/boot_regs-dmg0")
@@ -104,6 +109,20 @@ class MooneyeTests: XCTestCase {
   func test_acceptance_call_timing() throws {
     try XCTSkipUnless(updateGoldens)  // sp appears to be getting corrupted
     try run(testRom: "Resources/mooneye/acceptance/call_timing")
+  }
+
+  func test_acceptance_div_timing() throws {
+    try run(testRom: "Resources/mooneye/acceptance/div_timing", expectedInstructions: 93_999)
+  }
+
+  func test_acceptance_ei_sequence() throws {
+    try XCTSkipUnless(updateGoldens)  // C: A2!
+    try run(testRom: "Resources/mooneye/acceptance/ei_sequence", expectedInstructions: 93_927)
+  }
+
+  func test_acceptance_ei_timing() throws {
+    try XCTSkipUnless(updateGoldens)  // B: 01!
+    try run(testRom: "Resources/mooneye/acceptance/ei_timing")
   }
 
   // MARK: - emulator-only/

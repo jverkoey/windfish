@@ -100,7 +100,12 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 <td align="center"><p>❌<br/><code>boot_regs-dmg0</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/boot_regs-dmg0.png"></td>
 <td align="center"><p>✅<br/><code>boot_regs-dmgABC</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/boot_regs-dmgABC.png"></td>
 </tr><tr>
+<td align="center"><p>❌<br/><code>boot_hwio-dmgABCmgb</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/boot_hwio-dmgABCmgb.png"></td>
 <td align="center"><p>❌<br/><code>call_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/call_timing.png"></td>
+<td align="center"><p>✅<br/><code>div_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/div_timing.png"></td>
+<td align="center"><p>❌<br/><code>ei_sequence</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/ei_sequence.png"></td>
+</tr><tr>
+<td align="center"><p>❌<br/><code>ei_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/ei_timing.png"></td>
 </tr><tr>
 <td colspan="4"><code>emulator-only/mbc1/</code></td>
 </tr><tr>
