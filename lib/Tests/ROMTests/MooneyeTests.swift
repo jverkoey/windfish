@@ -157,6 +157,30 @@ class MooneyeTests: XCTestCase {
     try run(testRom: "Resources/mooneye/acceptance/oam_dma_timing", expectedInstructions: 113_865)
   }
 
+  func test_acceptance_pop_timing() throws {
+    try run(testRom: "Resources/mooneye/acceptance/pop_timing", expectedInstructions: 94_106)
+  }
+
+  func test_acceptance_push_timing() throws {
+    try XCTSkipUnless(updateGoldens)  // D: 81! H: 42!
+    try run(testRom: "Resources/mooneye/acceptance/push_timing")
+  }
+
+  func test_acceptance_rapid_di_ei() throws {
+    try XCTSkipUnless(updateGoldens)  // B: 00! C: 00! D: 01!
+    try run(testRom: "Resources/mooneye/acceptance/rapid_di_ei")
+  }
+
+  func test_acceptance_ret_timing() throws {
+    try XCTSkipIf(true)  // Upper Bits of ROM Bank Number not implemented yet
+    try run(testRom: "Resources/mooneye/acceptance/ret_timing")
+  }
+
+  func test_acceptance_rst_timing() throws {
+    try XCTSkipUnless(updateGoldens)  // B: 81!
+    try run(testRom: "Resources/mooneye/acceptance/rst_timing")
+  }
+
   // MARK: - emulator-only/
 
   func test_emulator_only_mbc1_bits_bank_1() throws {

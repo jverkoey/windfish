@@ -28,7 +28,7 @@ extension Gameboy {
           return cpu
         case Memory.ramAddressableRange, Memory.echoRamAddressableRange:  return ram
         case Memory.hramAddressableRange: return hram
-        case 0xFF00...0xFF03, 0xFF47...0xFF49:
+        case 0xFF00...0xFF02, 0xFF47...0xFF49:
           return ioRegisters
         case DMAController.registerAddress:
           return dmaController

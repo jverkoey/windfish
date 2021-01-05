@@ -113,6 +113,11 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 <td align="center"><p>✅<br/><code>oam_dma_restart</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/oam_dma_restart.png"></td>
 <td align="center"><p>❌<br/><code>oam_dma_start</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/oam_dma_start.png"></td>
 <td align="center"><p>✅<br/><code>oam_dma_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/oam_dma_timing.png"></td>
+<td align="center"><p>✅<br/><code>pop_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/pop_timing.png"></td>
+</tr><tr>
+<td align="center"><p>❌<br/><code>push_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/push_timing.png"></td>
+<td align="center"><p>❌<br/><code>rapid_di_ei</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/rapid_di_ei.png"></td>
+<td align="center"><p>❌<br/><code>rst_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/rst_timing.png"></td>
 </tr><tr>
 <td colspan="4"><code>emulator-only/mbc1/</code></td>
 </tr><tr>
