@@ -517,14 +517,24 @@ final class EmulatorViewController: NSViewController, TabSelectable {
           var startCounting = false
           while self.running {
             gameboy.advance()
-
-//            if machineCycle >= 0 {
+//
+//            if machineCycle >= 620146 {
 //              if let sourceLocation = gameboy.cpu.machineInstruction.sourceLocation {
 //                var address = sourceLocation.address()
 //                let instruction = self.document.disassemblyResults?.disassembly?.instruction(at: address, in: max(1, gameboy.cartridge!.selectedBank)) ?? Disassembler.fetchInstruction(at: &address, memory: gameboy.memory)
 //                let IF = gameboy.memory.read(from: 0xFF0F)
 //                let IE = gameboy.memory.read(from: 0xFFFF)
-//                print("[0x\(sourceLocation.address().hexString)] sp: \(gameboy.cpu.sp.hexString) IF: \(IF.binaryString) IE: \(IE.binaryString) cycle: \(machineCycle) \(RGBDSDisassembler.statement(for: instruction).formattedString)")
+//                let LY = gameboy.memory.read(from: 0xFF44)
+//                let LYC = gameboy.memory.read(from: 0xFF45)
+//                let STAT = gameboy.memory.read(from: 0xFF41)
+//                let ime = gameboy.cpu.ime
+//                let servicingInterrupt: Int
+//                if case .interrupt = gameboy.cpu.machineInstruction.spec {
+//                  servicingInterrupt = 1
+//                } else {
+//                  servicingInterrupt = 0
+//                }
+//                print("[0x\(sourceLocation.address().hexString)]@\(gameboy.cartridge!.selectedBank.hexString) LY: \(LY) LYC: \(LYC) STAT: \(STAT.binaryString) IME: \(ime) !\(servicingInterrupt) IF: \(IF.binaryString) IE: \(IE.binaryString) cycle: \(machineCycle) \(RGBDSDisassembler.statement(for: instruction).formattedString)")
 //              }
 //            }
 

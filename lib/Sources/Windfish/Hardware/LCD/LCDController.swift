@@ -410,6 +410,8 @@ extension LCDController {
         precondition(scanlineX >= 160)
         lcdMode = .hblank
         // Don't reset lcdModeCycle yet, as this mode can actually end early.
+
+        requestHBlankInterruptIfNeeded(memory: memory)
       }
       break
     case .hblank:
@@ -426,7 +428,12 @@ extension LCDController {
           var interruptFlag = LR35902.Instruction.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
           interruptFlag.insert(.vBlank)
           memory.write(interruptFlag.rawValue, to: LR35902.interruptFlagAddress)
+
+          requestVBlankInterruptIfNeeded(memory: memory)
         }
+
+        requestOAMInterruptIfNeeded(memory: memory)
+        requestCoincidenceInterruptIfNeeded(memory: memory)
       }
       break
     case .vblank:
@@ -437,26 +444,42 @@ extension LCDController {
         if scanlineY >= 154 {
           scanlineY = 0
           lcdMode = .searchingOAM
+          requestOAMInterruptIfNeeded(memory: memory)
         }
+
+        requestCoincidenceInterruptIfNeeded(memory: memory)
       }
       break
     }
-
-    checkForStatInterrupt(memory: memory)
   }
 
-  private func checkForStatInterrupt(memory: AddressableMemory) {
-    let statSignal = (coincidence && enableCoincidenceInterrupt)
-      || ((lcdMode == .hblank) && enableHBlankInterrupt)
-      || ((lcdMode == .searchingOAM) && enableOAMInterrupt)
-      || ((lcdMode == .vblank) && (enableVBlankInterrupt || enableOAMInterrupt))
-    let shouldRaiseStat = !lastStatSignal && statSignal
-    lastStatSignal = statSignal
+  private func raiseLCDStatInterrupt(memory: AddressableMemory) {
+    var interruptFlag = LR35902.Instruction.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
+    interruptFlag.insert(.lcdStat)
+    memory.write(interruptFlag.rawValue, to: LR35902.interruptFlagAddress)
+  }
 
-    if shouldRaiseStat {
-      var interruptFlag = LR35902.Instruction.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
-      interruptFlag.insert(.lcdStat)
-      memory.write(interruptFlag.rawValue, to: LR35902.interruptFlagAddress)
+  private func requestOAMInterruptIfNeeded(memory: AddressableMemory) {
+    if enableOAMInterrupt {
+      raiseLCDStatInterrupt(memory: memory)
+    }
+  }
+
+  private func requestHBlankInterruptIfNeeded(memory: AddressableMemory) {
+    if enableHBlankInterrupt {
+      raiseLCDStatInterrupt(memory: memory)
+    }
+  }
+
+  private func requestVBlankInterruptIfNeeded(memory: AddressableMemory) {
+    if enableVBlankInterrupt {
+      raiseLCDStatInterrupt(memory: memory)
+    }
+  }
+
+  private func requestCoincidenceInterruptIfNeeded(memory: AddressableMemory) {
+    if coincidence && enableCoincidenceInterrupt {
+      raiseLCDStatInterrupt(memory: memory)
     }
   }
 

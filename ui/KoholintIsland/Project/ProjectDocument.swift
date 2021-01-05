@@ -912,7 +912,7 @@ extension ProjectDocument {
       }
 
       DispatchQueue.main.async {
-        self.metadata?.numberOfBanks = disassembly.cartridge.numberOfBanks
+        self.metadata?.numberOfBanks = disassembly.numberOfBanks
         self.metadata?.bankMap = bankMap
         self.disassemblyResults = DisassemblyResults(
           files: disassemblyFiles,
