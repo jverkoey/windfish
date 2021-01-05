@@ -52,7 +52,7 @@ class MealybugTearoomTests: XCTestCase {
       instructions += 1
     } while instructions < (expectedInstructions + instructionsForSuccessToPrint)
 
-    let screenshot: Data = gameboy.takeScreenshot().png!
+    let screenshot: Data = gameboy.takeScaledScreenshot().png!
 
     if let screenshotPath = Bundle.module.path(forResource: rom, ofType: "png") {
       let existingScreenshot = try Data(contentsOf: URL(fileURLWithPath: screenshotPath))

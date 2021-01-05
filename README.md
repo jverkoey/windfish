@@ -39,33 +39,33 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 <td colspan="4"><code>cpu_instrs/</code></td>
 </tr>
 <tr>
-<td align="center"><p>✅<br/><code>01-special</code></p><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/01-special.png"></td>
-<td align="center"><p>✅<br/><code>02-interrupts.gb</code></p><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/02-interrupts.png"></td>
-<td align="center"><p>✅<br/><code>03-op sp,hl.gb</code></p><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/03-op%20sp,hl.png"></td>
-<td align="center"><p>✅<br/><code>04-op r,imm.gb</code></p><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/04-op%20r,imm.png"></td>
+<td align="center"><p>✅<br/><code>01-special</code></p><img width="160" src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/01-special.png"></td>
+<td align="center"><p>✅<br/><code>02-interrupts.gb</code></p><img width="160" src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/02-interrupts.png"></td>
+<td align="center"><p>✅<br/><code>03-op sp,hl.gb</code></p><img width="160" src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/03-op%20sp,hl.png"></td>
+<td align="center"><p>✅<br/><code>04-op r,imm.gb</code></p><img width="160" src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/04-op%20r,imm.png"></td>
 </tr><tr>
-<td align="center"><p>✅<br/><code>05-op rp.gb</code></p><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/05-op%20rp.png"></td>
-<td align="center"><p>✅<br/><code>06-ld r,r.gb</code></p><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/06-ld%20r,r.png"></td>
-<td align="center"><p>✅<br/><code>07-jr,jp,call,ret,rst.gb</code></p><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/07-jr,jp,call,ret,rst.png"></td>
-<td align="center"><p>✅<br/><code>08-misc instrs.gb</code></p><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/08-misc%20instrs.png"></td>
+<td align="center"><p>✅<br/><code>05-op rp.gb</code></p><img width="160" src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/05-op%20rp.png"></td>
+<td align="center"><p>✅<br/><code>06-ld r,r.gb</code></p><img width="160" src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/06-ld%20r,r.png"></td>
+<td align="center"><p>✅<br/><code>07-jr,jp,call,ret,rst.gb</code></p><img width="160" src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/07-jr,jp,call,ret,rst.png"></td>
+<td align="center"><p>✅<br/><code>08-misc instrs.gb</code></p><img width="160" src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/08-misc%20instrs.png"></td>
 </tr><tr>
-<td align="center"><p>✅<br/><code>09-op r,r.gb</code></p><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/09-op%20r,r.png"></td>
-<td align="center"><p>✅<br/><code>10-bit ops.gb</code></p><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/10-bit%20ops.png"></td>
-<td align="center"><p>✅<br/><code>11-op a,(hl).gb</code></p><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/11-op%20a,(hl).png"></td>
+<td align="center"><p>✅<br/><code>09-op r,r.gb</code></p><img width="160" src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/09-op%20r,r.png"></td>
+<td align="center"><p>✅<br/><code>10-bit ops.gb</code></p><img width="160" src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/10-bit%20ops.png"></td>
+<td align="center"><p>✅<br/><code>11-op a,(hl).gb</code></p><img width="160" src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/11-op%20a,(hl).png"></td>
 </tr><tr>
 <td colspan="4"><code>interrupt_time/</code></td>
 </tr><tr>
-<td align="center"><p>❌<br/><code>instr_timing</code></p><img src="lib/Tests/ROMTests/Resources/blargg/interrupt_time/interrupt_time.png"><br/>🐞<a href="https://github.com/jverkoey/windfish/issues/18">#18</a></td>
+<td align="center"><p>❌<br/><code>instr_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/blargg/interrupt_time/interrupt_time.png"><br/>🐞<a href="https://github.com/jverkoey/windfish/issues/18">#18</a></td>
 </tr><tr>
 <td colspan="4"><code>instr_timing/</code></td>
 </tr><tr>
-<td align="center"><p>✅<br/><code>instr_timing</code></p><img src="lib/Tests/ROMTests/Resources/blargg/instr_timing/instr_timing.png"></td>
+<td align="center"><p>✅<br/><code>instr_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/blargg/instr_timing/instr_timing.png"></td>
 </tr><tr>
 <td colspan="4"><code>mem_timing/</code></td>
 </tr><tr>
-<td align="center"><p>✅<br/><code>01-read_timing</code></p><img src="lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/01-read_timing.png"></td>
-<td align="center"><p>✅<br/><code>02-write_timing</code></p><img src="lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/02-write_timing.png"></td>
-<td align="center"><p>✅<br/><code>03-modify_timing</code></p><img src="lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/03-modify_timing.png"></td>
+<td align="center"><p>✅<br/><code>01-read_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/01-read_timing.png"></td>
+<td align="center"><p>✅<br/><code>02-write_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/02-write_timing.png"></td>
+<td align="center"><p>✅<br/><code>03-modify_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/03-modify_timing.png"></td>
 </tr>
 </table>
 

@@ -149,7 +149,7 @@ class BlarggTests: XCTestCase {
       }
     } while (instructions < expectedInstructions + instructionsForSuccessToPrint) && (!success || remainingPrintInstructions > 0)
 
-    let screenshot: Data = gameboy.takeScreenshot().png!
+    let screenshot: Data = gameboy.takeScaledScreenshot().png!
 
     if let screenshotPath = Bundle.module.path(forResource: rom, ofType: "png") {
       let existingScreenshot = try Data(contentsOf: URL(fileURLWithPath: screenshotPath))
