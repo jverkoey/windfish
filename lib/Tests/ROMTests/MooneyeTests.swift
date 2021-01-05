@@ -89,8 +89,7 @@ class MooneyeTests: XCTestCase {
   }
 
   func test_acceptance_ppu_vblank_stat_intr_GS() throws {
-    try XCTSkipIf(true)  // Never completes
-    try run(testRom: "Resources/mooneye/acceptance/ppu/vblank_stat_intr-GS")
+    try run(testRom: "Resources/mooneye/acceptance/ppu/vblank_stat_intr-GS", expectedInstructions: 120_806)
   }
 
   // MARK: - acceptance/

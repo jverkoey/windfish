@@ -105,6 +105,8 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 <td align="center"><p>✅<br/><code>intr_2_oam_ok_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/ppu/intr_2_oam_ok_timing.png"></td>
 <td align="center"><p>❌<br/><code>stat_lyc_onoff</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/ppu/stat_lyc_onoff.png"></td>
 </tr><tr>
+<td align="center"><p>✅<br/><code>vblank_stat_intr-GS</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/ppu/vblank_stat_intr-GS.png"></td>
+</tr><tr>
 <td colspan="4"><code>acceptance/</code></td>
 </tr><tr>
 <td align="center"><p>❌<br/><code>add_sp_e_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/add_sp_e_timing.png"></td>
