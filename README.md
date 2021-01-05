@@ -36,7 +36,7 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 
 <table>
 <tr>
-<td colspan="3"><code>cpu_instrs</code></td>
+<td colspan="3"><code>cpu_instrs/</code></td>
 </tr>
 <tr>
 <td align="center"><p>✅<br/><code>01-special</code></p><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/01-special.png"></td>
@@ -53,7 +53,12 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 </tr><tr>
 <td align="center"><p>✅<br/><code>10-bit ops.gb</code></p><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/10-bit%20ops.png"></td>
 <td align="center"><p>✅<br/><code>11-op a,(hl).gb</code></p><img src="lib/Tests/ROMTests/Resources/blargg/cpu_instrs/individual/11-op%20a,(hl).png"></td>
+</tr><tr>
+<td colspan="3"><code>instr_timing/</code></td>
+</tr><tr>
 <td align="center"><p>✅<br/><code>instr_timing</code></p><img src="lib/Tests/ROMTests/Resources/blargg/instr_timing/instr_timing.png"></td>
+</tr><tr>
+<td colspan="3"><code>mem_timing/</code></td>
 </tr><tr>
 <td align="center"><p>✅<br/><code>mem_timing/01-read_timing</code></p><img src="lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/01-read_timing.png"></td>
 <td align="center"><p>✅<br/><code>mem_timing/02-write_timing</code></p><img src="lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/02-write_timing.png"></td>
