@@ -518,15 +518,13 @@ final class EmulatorViewController: NSViewController, TabSelectable {
           while self.running {
             gameboy.advance()
 
-//            if machineCycle >= 440563 {
+//            if machineCycle >= 0 {
 //              if let sourceLocation = gameboy.cpu.machineInstruction.sourceLocation {
 //                var address = sourceLocation.address()
-//                let instruction = Disassembler.fetchInstruction(at: &address, memory: gameboy.memory)
-//                let div = gameboy.memory.read(from: 0xFF04)
-//                let tima = gameboy.memory.read(from: 0xFF05)
-//                let tma = gameboy.memory.read(from: 0xFF06)
-//                let tac = gameboy.memory.read(from: 0xFF07)
-//                print("\(machineCycle): \(div.hexString) \(tima.hexString) \(tma.hexString) \(tac.binaryString) - [0x\(sourceLocation.address().hexString)] \(RGBDSDisassembler.statement(for: instruction).formattedString)")
+//                let instruction = self.document.disassemblyResults?.disassembly?.instruction(at: address, in: max(1, gameboy.cartridge!.selectedBank)) ?? Disassembler.fetchInstruction(at: &address, memory: gameboy.memory)
+//                let IF = gameboy.memory.read(from: 0xFF0F)
+//                let IE = gameboy.memory.read(from: 0xFFFF)
+//                print("[0x\(sourceLocation.address().hexString)] sp: \(gameboy.cpu.sp.hexString) IF: \(IF.binaryString) IE: \(IE.binaryString) cycle: \(machineCycle) \(RGBDSDisassembler.statement(for: instruction).formattedString)")
 //              }
 //            }
 

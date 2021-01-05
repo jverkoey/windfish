@@ -5,36 +5,7 @@ import Windfish
 // - ROMS: https://gbdev.gg8.se/files/roms/blargg-gb-tests/
 // - Source: https://github.com/retrio/gb-test-roms
 
-extension Disassembler.SourceLocation {
-  func address() -> LR35902.Address {
-    switch self {
-    case .cartridge(let location):
-      return Gameboy.Cartridge.addressAndBank(from: location).address
-    case .memory(let address):
-      return address
-    }
-  }
-}
-
-extension NSBitmapImageRep {
-  var png: Data? { representation(using: .png, properties: [:]) }
-}
-extension Data {
-  var bitmap: NSBitmapImageRep? { NSBitmapImageRep(data: self) }
-}
-extension NSImage {
-  var png: Data? { tiffRepresentation?.bitmap?.png }
-}
-
-extension Data {
-  var checksum: Int {
-    return self.map { Int($0) }.reduce(0, +) & 0xff
-  }
-}
-
 class BlarggTests: XCTestCase {
-  let updateGoldens = false
-
   // MARK: - Instructions
 
   func test_01_Special() throws {

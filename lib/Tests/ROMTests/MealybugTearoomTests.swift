@@ -5,8 +5,6 @@ import Windfish
 // - https://github.com/mattcurrie/mealybug-tearoom-tests
 
 class MealybugTearoomTests: XCTestCase {
-  let updateGoldens = false
-
   func test_m3_bgp_change() throws {
     try XCTSkipUnless(updateGoldens)
     try run(rom: "Resources/mealybug-tearoom/m3_bgp_change")

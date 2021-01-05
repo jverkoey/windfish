@@ -13,20 +13,19 @@ extension LR35902.Emulation {
         if requestedInterrupts.isEmpty {
           return .fetchNext
         }
-        var interrupts = LR35902.Instruction.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
-        if interrupts.contains(.vBlank) {
+        if requestedInterrupts.contains(.vBlank) {
           interrupts.remove(.vBlank)
           targetpc = 0x0040
-        } else if interrupts.contains(.lcdStat) {
+        } else if requestedInterrupts.contains(.lcdStat) {
           interrupts.remove(.lcdStat)
           targetpc = 0x0048
-        } else if interrupts.contains(.timer) {
+        } else if requestedInterrupts.contains(.timer) {
           interrupts.remove(.timer)
           targetpc = 0x0050
-        } else if interrupts.contains(.serial) {
+        } else if requestedInterrupts.contains(.serial) {
           interrupts.remove(.serial)
           targetpc = 0x0058
-        } else if interrupts.contains(.joypad) {
+        } else if requestedInterrupts.contains(.joypad) {
           interrupts.remove(.joypad)
           targetpc = 0x0060
         }

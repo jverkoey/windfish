@@ -4,21 +4,7 @@ import Windfish
 // References:
 // - https://gekkio.fi/files/mooneye-gb/latest/
 
-extension Gameboy {
-  func takeScaledScreenshot() -> NSImage {
-    let image = takeScreenshot()
-    let scaledImage = NSImage(size: NSSize(width: image.size.width, height: image.size.height))
-    scaledImage.lockFocus()
-    NSGraphicsContext.current?.imageInterpolation = .none
-    image.draw(at: .zero, from: NSRect(x: 0, y: 0, width: image.size.width, height: image.size.height), operation: .copy, fraction: 1.0)
-    scaledImage.unlockFocus()
-    return scaledImage
-  }
-}
-
 class MooneyeTests: XCTestCase {
-  let updateGoldens = true
-
   // MARK: - acceptance/bits
 
   func test_acceptance_bits_mem_oam() throws {
@@ -72,7 +58,7 @@ class MooneyeTests: XCTestCase {
   }
 
   func test_acceptance_ppu_intr_1_2_timing_GS() throws {
-    try XCTSkipUnless(updateGoldens)  // Strange lines
+    try XCTSkipUnless(updateGoldens)  // D: 14! E: 15!
     try run(testRom: "Resources/mooneye/acceptance/ppu/intr_1_2_timing-GS")
   }
 
@@ -203,7 +189,7 @@ class MooneyeTests: XCTestCase {
   }
 
   func test_acceptance_rst_timing() throws {
-    try XCTSkipUnless(updateGoldens)  // B: 81!
+    try XCTSkipUnless(updateGoldens)  // B: 81! D: FF!
     try run(testRom: "Resources/mooneye/acceptance/rst_timing")
   }
 
