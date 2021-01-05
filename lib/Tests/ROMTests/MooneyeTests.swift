@@ -77,8 +77,7 @@ class MooneyeTests: XCTestCase {
   }
 
   func test_acceptance_ppu_intr_2_0_timing() throws {
-    try XCTSkipUnless(updateGoldens)  // Never completes
-    try run(testRom: "Resources/mooneye/acceptance/ppu/intr_2_0_timing")
+    try run(testRom: "Resources/mooneye/acceptance/ppu/intr_2_0_timing", expectedInstructions: 106_974)
   }
 
   // MARK: - acceptance/
