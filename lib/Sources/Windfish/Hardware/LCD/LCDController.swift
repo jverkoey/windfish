@@ -98,6 +98,8 @@ public final class LCDController {
         scanlineY = 0
         lcdMode = .searchingOAM
       }
+      // TODO: Do we need to do anything when the LCD is enabled again?
+      // - https://github.com/spec-chum/SpecBoy/blob/5d1294d77648897a2a218a7fdcc33fbeb1e79038/SpecBoy/Ppu.cs#L95-L100
     }
   }
   var windowTileMapAddress = TileMapAddress.x9800      // bit 6
@@ -662,8 +664,20 @@ extension LCDController: AddressableMemory {
         lcdMode = .searchingOAM
       }
 
-    case .LY:   scanlineY = 0
-    case .LYC:  lyc = byte
+    case .LY:
+      // "Any writes to LY while the LCD is enabled are ignored. That bit of info is from Pan Docs, which is incorrect."
+      // - https://forums.nesdev.com/viewtopic.php?t=16434#p203762
+      // "When the LCD is off this register is fixed at 00h."
+      // - https://github.com/AntonioND/giibiiadvance/blob/master/docs/TCAGBD.pdf
+      // With the above in mind, we simply ignore writes to this register. Note that this contradicts the Pan Docs which
+      // states that "Writing will reset the counter."
+      // - https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
+      break
+
+    case .LYC:
+      lyc = byte
+      // TODO: Do we need to fire a coincidence check here?
+      // - https://github.com/spec-chum/SpecBoy/blob/5d1294d77648897a2a218a7fdcc33fbeb1e79038/SpecBoy/Ppu.cs#L126
 
     case .SCY:  scrollY = byte
     case .SCX:  scrollX = byte
