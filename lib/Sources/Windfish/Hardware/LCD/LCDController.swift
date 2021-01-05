@@ -79,14 +79,22 @@ public final class LCDController {
    */
   var lcdDisplayEnable = true {                       // bit 7
     willSet {
+      // "Stopping LCD operation (bit 7 from 1 to 0) must be performed during V-blank to work properly."
+      // - https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
       precondition(
-        (lcdDisplayEnable && !newValue) && scanlineY >= 144  // Can only change during v-blank
-          || lcdDisplayEnable == newValue             // No change
-          || !lcdDisplayEnable && newValue            // Can always enable.
+        (lcdDisplayEnable && !newValue) && lcdMode == .vblank // Can only change during v-blank
+          || lcdDisplayEnable == newValue                     // No change
+          || !lcdDisplayEnable && newValue                    // Can always enable.
       )
     }
     didSet {
-      if !lcdDisplayEnable {
+      // When lcdDisplayEnable transfers from on to off:
+      // - ly is reset to zero.
+      // - LCD clock is reset to zero.
+      // - Enters mode 0 (OAM search)
+      // - https://www.reddit.com/r/Gameboy/comments/a1c8h0/what_happens_when_a_gameboy_screen_is_disabled/eap4f8c/?utm_source=reddit&utm_medium=web2x&context=3
+      //
+      if oldValue && !lcdDisplayEnable {
         scanlineY = 0
         lcdMode = .searchingOAM
       }
@@ -376,6 +384,10 @@ extension LCDController {
 
   /** Executes a single machine cycle.  */
   public func advance(memory: AddressableMemory) {
+    //
+    // - https://www.reddit.com/r/Gameboy/comments/a1c8h0/what_happens_when_a_gameboy_screen_is_disabled/eap4f8c/?utm_source=reddit&utm_medium=web2x&context=3
+    // - https://github.com/trekawek/coffee-gb/blob/088b86fb17109b8cac98e6394108b3561f443d54/src/main/java/eu/rekawek/coffeegb/gpu/Gpu.java#L171-L173
+    // - https://github.com/spec-chum/SpecBoy/blob/5d1294d77648897a2a218a7fdcc33fbeb1e79038/SpecBoy/Ppu.cs#L214-L217
     guard lcdDisplayEnable else {
       return
     }
@@ -513,14 +525,14 @@ extension LCDController {
 extension LCDController: AddressableMemory {
   public func read(from address: LR35902.Address) -> UInt8 {
     if LCDController.tileMapRegion.contains(address) {
-      if lcdMode != .transferringToLCDDriver {
+      if isVramAccessible() {
         return tileMap[Int(address - LCDController.tileMapRegion.lowerBound)]
       } else {
         return 0xFF
       }
     }
     if LCDController.tileDataRegion.contains(address) {
-      if lcdMode != .transferringToLCDDriver {
+      if isVramAccessible() {
         return tileData[Int(address - LCDController.tileDataRegion.lowerBound)]
       } else {
         return 0xFF
@@ -587,15 +599,27 @@ extension LCDController: AddressableMemory {
     }
   }
 
+  private func isVramAccessible() -> Bool {
+    // "When the LCD display is off you can write to video memory at any time with out restrictions. While it is on you
+    // can only write to video memory during H-Blank and V-Blank."
+    // - https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
+    // - https://github.com/spec-chum/SpecBoy/blob/master/SpecBoy/Ppu.cs#L132-L142
+    // Note that coffee-gb appears to have disabled any of these checks and always allows VRAM access.
+    // - https://github.com/trekawek/coffee-gb/blob/088b86fb17109b8cac98e6394108b3561f443d54/src/main/java/eu/rekawek/coffeegb/gpu/Gpu.java#L94
+    // Sameboy allows read/write to be selectively enabled/disabled depending on hardware.
+    // - https://github.com/LIJI32/SameBoy/blob/29a3b18186c181399f4b99b9111ca9d8b5726886/Core/display.c#L992-L993
+    return !lcdDisplayEnable || lcdMode != .transferringToLCDDriver
+  }
+
   public func write(_ byte: UInt8, to address: LR35902.Address) {
     if LCDController.tileMapRegion.contains(address) {
-      if lcdMode != .transferringToLCDDriver {
+      if isVramAccessible() {
         tileMap[Int(address - LCDController.tileMapRegion.lowerBound)] = byte
       }
       return
     }
     if LCDController.tileDataRegion.contains(address) {
-      if lcdMode != .transferringToLCDDriver {
+      if isVramAccessible() {
         tileData[Int(address - LCDController.tileDataRegion.lowerBound)] = byte
       }
       return
