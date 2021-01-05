@@ -55,8 +55,10 @@ Test ROMs:
 Open source emulators:
 
 - [coffee-gb](https://github.com/trekawek/coffee-gb/tree/master/src/main/java/eu/rekawek/coffeegb)
-- PPU: fifo queue.
+  - PPU: fifo queue.
 - [Sameboy](https://github.com/LIJI32/SameBoy)
+  - PPU: fifo queue.
+  - Code can be a bit difficult to follow because cycles can be executed from anywhere and there is some goto/lable magic happening with GB_STATE_MACHINE.
 - [mame](https://github.com/mamedev/mame/tree/30371b5717b3aa88da7f3d19235821f7eca0d429/src/devices/cpu/lr35902)
 - [BremuGb](https://github.com/Briensturm/BremuGb/tree/78dfd4bb469637892596017c354a0fd1a74f0855/Src/BremuGb.Lib)
   - PPU: non-fifo.
