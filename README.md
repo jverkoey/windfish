@@ -64,9 +64,9 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 </tr><tr>
 <td colspan="3"><code>mem_timing/</code></td>
 </tr><tr>
-<td align="center"><p>✅<br/><code>mem_timing/01-read_timing</code></p><img src="lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/01-read_timing.png"></td>
-<td align="center"><p>✅<br/><code>mem_timing/02-write_timing</code></p><img src="lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/02-write_timing.png"></td>
-<td align="center"><p>✅<br/><code>mem_timing/03-modify_timing</code></p><img src="lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/03-modify_timing.png"></td>
+<td align="center"><p>✅<br/><code>01-read_timing</code></p><img src="lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/01-read_timing.png"></td>
+<td align="center"><p>✅<br/><code>02-write_timing</code></p><img src="lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/02-write_timing.png"></td>
+<td align="center"><p>✅<br/><code>03-modify_timing</code></p><img src="lib/Tests/ROMTests/Resources/blargg/mem_timing/individual/03-modify_timing.png"></td>
 </tr>
 </table>
 
