@@ -1,5 +1,9 @@
 import Foundation
 
+// References:
+// - https://izik1.github.io/gbops/
+// - https://www.pastraiser.com/cpu/gameboy/gameboy_opcodes.html
+
 extension LR35902.InstructionSet {
   static let tableCB: [LR35902.Instruction.Spec] = [
     /* 0x00 */ .cb(.rlc(.b)),

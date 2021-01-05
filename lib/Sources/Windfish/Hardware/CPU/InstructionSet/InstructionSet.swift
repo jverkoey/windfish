@@ -1,6 +1,10 @@
 import Foundation
 import CPU
 
+// References:
+// - https://izik1.github.io/gbops/
+// - https://www.pastraiser.com/cpu/gameboy/gameboy_opcodes.html
+
 extension LR35902 {
   public struct InstructionSet: CPU.InstructionSet {
     public typealias InstructionType = LR35902.Instruction

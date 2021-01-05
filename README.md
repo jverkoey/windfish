@@ -28,6 +28,43 @@ Windfish supports several powerful features for disassembling Gameboy ROMs, incl
 
 The Windfish disassembler is best invoked through the KoholintIsland front-end application.
 
+## Reference material
+
+Technical references:
+
+- [Game Boy: Complete Technical Reference](https://github.com/Gekkio/gb-ctr)
+- [Game Boy: Complete Technical Reference (pdf)](https://gekkio.fi/files/gb-docs/gbctr.pdf)
+- [Game Boy CPU Manual](https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf)
+- [Pan Docs](https://gbdev.io/pandocs/)
+- [GameBoy Memory Map](http://gameboy.mongenel.com/dmg/asmmemmap.html)
+
+On accuracy:
+
+- [Mooneye GB: A Gameboy emulator written in Rust](https://gekkio.fi/blog/2015/mooneye-gb-a-gameboy-emulator-written-in-rust/)
+- [Nitty Gritty Gameboy Cycle Timing](http://blog.kevtris.org/blogfiles/Nitty%20Gritty%20Gameboy%20VRAM%20Timing.txt)
+
+PPU:
+
+- [Writing an emulator: the first pixel](https://blog.tigris.fr/2019/09/15/writing-an-emulator-the-first-pixel/))
+
+Test ROMs:
+
+- [Mooneye GB](https://github.com/Gekkio/mooneye-gb/tree/master/tests)
+- [blargg](https://gbdev.gg8.se/files/roms/blargg-gb-tests/)
+
+Open source emulators:
+
+- [coffee-gb](https://github.com/trekawek/coffee-gb/tree/master/src/main/java/eu/rekawek/coffeegb)
+- PPU: fifo queue.
+- [Sameboy](https://github.com/LIJI32/SameBoy)
+- [mame](https://github.com/mamedev/mame/tree/30371b5717b3aa88da7f3d19235821f7eca0d429/src/devices/cpu/lr35902)
+- [BremuGb](https://github.com/Briensturm/BremuGb/tree/78dfd4bb469637892596017c354a0fd1a74f0855/Src/BremuGb.Lib)
+  - PPU: non-fifo.
+
+Videos:
+
+- [The Ultimate Game Boy Talk (33c3)](https://www.youtube.com/watch?v=HyzD8pNlpwI&t=29m19s)
+
 ## Emulation test matrix
 
 The Windfish emulator is validated against test ROMs in order to ensure consistency + completeness of the implementation.
