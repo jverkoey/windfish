@@ -174,8 +174,8 @@ extension PPU: AddressableMemory {
     case .LY:   return registers.ly
     case .LYC:  return registers.lyc
 
-    case .SCY:  return registers.scrollY
-    case .SCX:  return registers.scrollX
+    case .SCY:  return registers.scy
+    case .SCX:  return registers.scx
 
     case .WY:   return registers.windowY
     case .WX:   return registers.windowX
@@ -264,8 +264,8 @@ extension PPU: AddressableMemory {
       // TODO: Do we need to fire a coincidence check here?
       // - https://github.com/spec-chum/SpecBoy/blob/5d1294d77648897a2a218a7fdcc33fbeb1e79038/SpecBoy/Ppu.cs#L126
 
-    case .SCY:  registers.scrollY = byte
-    case .SCX:  registers.scrollX = byte
+    case .SCY:  registers.scy = byte
+    case .SCX:  registers.scx = byte
 
     case .WY:   registers.windowY = byte
     case .WX:   registers.windowX = byte

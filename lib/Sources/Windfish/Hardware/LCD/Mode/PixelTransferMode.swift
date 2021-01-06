@@ -1,6 +1,9 @@
 import Foundation
 
 extension PPU {
+  private static let TilesPerRow: UInt16 = 32
+  private static let PixelsPerTile: UInt16 = 8
+
   final class PixelTransferMode: PPUMode {
     init(registers: LCDRegisters, lineCycleDriver: LineCycleDriver) {
       self.registers = registers
@@ -12,16 +15,32 @@ extension PPU {
 
     var intersectedOAMs: [OAM.Sprite] = []
 
-    // MARK: .transferringToLCDDriver state
+    final class Fetcher {
+      var tileMapAddress: LR35902.Address = 0
+      var tileDataAddress: TileDataAddress = .x8000
+      var tileMapAddressOffset: UInt16 = 0
+      var tilePixelY: UInt16 = 0
+
+      func start(tileMapAddress: TileMapAddress, tileDataAddress: TileDataAddress, x: UInt8, y: UInt8) {
+        let wideX = UInt16(truncatingIfNeeded: x)
+        let wideY = UInt16(truncatingIfNeeded: y)
+        let tileY = wideY / PPU.PixelsPerTile
+
+        self.tileMapAddress = tileMapAddress.address + tileY * PPU.TilesPerRow
+        self.tileDataAddress = tileDataAddress
+        self.tileMapAddressOffset = wideX / PPU.PixelsPerTile
+        self.tilePixelY = wideY % PPU.PixelsPerTile
+      }
+    }
+    private let fetcher = Fetcher()
+    private var fifo: [Pixel] = []
+
     private struct Pixel {
       let color: UInt8
       let palette: UInt8
       let spritePriority: UInt8
       let bgPriority: UInt8
     }
-    private var bgfifo: [Pixel] = []
-    private var spritefifo: [Pixel] = []
-    private var transferringToLCDDriverCycle: Int = 0
     private var scanlineX: UInt8 = 0
     private var scanlineScrollX: UInt8 = 0
     private var windowYPlot: UInt8 = 0
@@ -30,11 +49,20 @@ extension PPU {
 
     /** Starts the mode. */
     func start() {
+      // Note that we don't reset lineCycleDriver.cycles here because we're continuing to cycle through this ly.
+
+      // TODO: Check registers.backgroundEnable and registers.windowEnable
+      precondition(registers.backgroundEnable)  // Disabled behavior not currently implemented.
+
+      fetcher.start(tileMapAddress: registers.backgroundTileMapAddress,
+                    tileDataAddress: registers.tileDataAddress,
+                    x: registers.scx,
+                    y: registers.ly &+ registers.scy)
+
       windowYPlot = registers.ly &- registers.windowY
-      bgYPlot = registers.ly &+ registers.scrollY
-      transferringToLCDDriverCycle = 0
+      bgYPlot = registers.ly &+ registers.scy
       scanlineX = 0
-      scanlineScrollX = registers.scrollX
+      scanlineScrollX = registers.scx
     }
 
     /** Executes a single machine cycle.  */
@@ -43,9 +71,7 @@ extension PPU {
 
       var nextMode: LCDCMode? = nil
 
-      transferringToLCDDriverCycle += 1
-
-      if transferringToLCDDriverCycle > 1 && scanlineX < 160 {
+      if lineCycleDriver.cycles > PPU.searchingOAMLength + 1 && scanlineX < 160 {
         plot()
         scanlineX += 1
         plot()
@@ -70,44 +96,6 @@ extension PPU {
     private func plot(x: UInt8, y: UInt8, byte: UInt8, palette: Palette) {
       let color = palette[Int(bitPattern: UInt(truncatingIfNeeded: byte))]
       registers.screenData[Int(bitPattern: UInt(truncatingIfNeeded: PPU.screenSize.width) * UInt(truncatingIfNeeded: y) + UInt(truncatingIfNeeded: x))] = color
-    }
-
-    private func backgroundPixel(x: UInt8, y: UInt8, window: Bool) -> UInt8 {
-      let wideX = UInt16(truncatingIfNeeded: x)
-      let wideY = UInt16(truncatingIfNeeded: y)
-      let tileX = Int16(bitPattern: wideX / 8)
-      let tileY = Int16(bitPattern: wideY / 8)
-      let tileOffsetX = Int16(bitPattern: wideX % 8)
-      let tileOffsetY = Int16(bitPattern: wideY % 8)
-
-      let tileIndex: UInt8
-      let tileMapIndex = Int(truncatingIfNeeded: tileX &+ tileY &* 32)
-      switch window ? registers.windowTileMapAddress : registers.backgroundTileMapAddress {
-      case .x9800:
-        tileIndex = registers.tileMap[tileMapIndex]
-      case .x9C00:
-        tileIndex = registers.tileMap[0x400 + tileMapIndex]
-      }
-
-      let tileData0: UInt8
-      let tileData1: UInt8
-      switch registers.tileDataAddress {
-      case .x8800:
-        let signedTileIndex = Int8(bitPattern: tileIndex)
-        let tileDataIndex = 0x1000 + Int(truncatingIfNeeded: (Int16(truncatingIfNeeded: signedTileIndex) &* 16) &+ tileOffsetY &* 2)
-        tileData0 = registers.tileData[tileDataIndex]
-        tileData1 = registers.tileData[tileDataIndex + 1]
-      case .x8000:
-        let tileDataIndex = Int(truncatingIfNeeded: Int16(bitPattern: UInt16(truncatingIfNeeded: tileIndex) &* 16) &+ tileOffsetY &* 2)
-        tileData0 = registers.tileData[tileDataIndex]
-        tileData1 = registers.tileData[tileDataIndex + 1]
-      }
-
-      let lsb: UInt8 = (tileData0 & (0x80 >> tileOffsetX)) > 0 ? 0b01 : 0
-      let msb: UInt8 = (tileData1 & (0x80 >> tileOffsetX)) > 0 ? 0b10 : 0
-
-      lastBackgroundPixel = msb | lsb
-      return lastBackgroundPixel
     }
 
     private func plot() {
@@ -192,5 +180,42 @@ extension PPU {
       }
     }
 
+    private func backgroundPixel(x: UInt8, y: UInt8, window: Bool) -> UInt8 {
+      let wideX = UInt16(truncatingIfNeeded: x)
+      let wideY = UInt16(truncatingIfNeeded: y)
+      let tileX = Int16(bitPattern: wideX / 8)
+      let tileY = Int16(bitPattern: wideY / 8)
+      let tileOffsetX = Int16(bitPattern: wideX % 8)
+      let tileOffsetY = Int16(bitPattern: wideY % 8)
+
+      let tileIndex: UInt8
+      let tileMapIndex = Int(truncatingIfNeeded: tileX &+ tileY &* 32)
+      switch window ? registers.windowTileMapAddress : registers.backgroundTileMapAddress {
+      case .x9800:
+        tileIndex = registers.tileMap[tileMapIndex]
+      case .x9C00:
+        tileIndex = registers.tileMap[0x400 + tileMapIndex]
+      }
+
+      let tileData0: UInt8
+      let tileData1: UInt8
+      switch registers.tileDataAddress {
+      case .x8800:
+        let signedTileIndex = Int8(bitPattern: tileIndex)
+        let tileDataIndex = 0x1000 + Int(truncatingIfNeeded: (Int16(truncatingIfNeeded: signedTileIndex) &* 16) &+ tileOffsetY &* 2)
+        tileData0 = registers.tileData[tileDataIndex]
+        tileData1 = registers.tileData[tileDataIndex + 1]
+      case .x8000:
+        let tileDataIndex = Int(truncatingIfNeeded: Int16(bitPattern: UInt16(truncatingIfNeeded: tileIndex) &* 16) &+ tileOffsetY &* 2)
+        tileData0 = registers.tileData[tileDataIndex]
+        tileData1 = registers.tileData[tileDataIndex + 1]
+      }
+
+      let lsb: UInt8 = (tileData0 & (0x80 >> tileOffsetX)) > 0 ? 0b01 : 0
+      let msb: UInt8 = (tileData1 & (0x80 >> tileOffsetX)) > 0 ? 0b10 : 0
+
+      lastBackgroundPixel = msb | lsb
+      return lastBackgroundPixel
+    }
   }
 }

@@ -96,10 +96,10 @@ extension PPU {
     var lcdMode = LCDCMode.searchingOAM        //       xx
                                                // 76543210
 
-    // MARK: SY and XX (0xFF42 and 0xFF43)
+    // MARK: SY and SX (0xFF42 and 0xFF43)
 
-    var scrollY: UInt8 = 0
-    var scrollX: UInt8 = 0
+    var scy: UInt8 = 0
+    var scx: UInt8 = 0
 
     // MARK: LY (0xFF44)
 
@@ -198,10 +198,24 @@ extension PPU {
   enum TileMapAddress {
     case x9800 // 0
     case x9C00 // 1
+
+    var address: LR35902.Address {
+      switch self {
+      case .x9800: return 0x9800
+      case .x9C00: return 0x9C00
+      }
+    }
   }
   enum TileDataAddress {
     case x8800 // 0
     case x8000 // 1
+
+    var address: LR35902.Address {
+      switch self {
+      case .x8800: return 0x8800 + 0x800  // Data is accessed using a signed int8, so offset to the center of the region
+      case .x8000: return 0x8000
+      }
+    }
   }
   enum SpriteSize {
     case x8x8  // 0
