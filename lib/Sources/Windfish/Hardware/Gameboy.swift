@@ -53,11 +53,11 @@ public final class Gameboy {
   }
 
   public var screenData: UnsafeMutableRawBufferPointer {
-    return lcdController.screenData
+    return lcdController.registers.screenData
   }
 
   public var tileData: Data {
-    return Data(lcdController.tileData)
+    return Data(lcdController.registers.tileData)
   }
 
   public static var tileDataRegionSize: Int {

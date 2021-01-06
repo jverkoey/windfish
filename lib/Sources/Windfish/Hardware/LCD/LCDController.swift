@@ -14,27 +14,17 @@ public final class LCDController {
   static let registerRegion1: ClosedRange<LR35902.Address> = 0xFF40...0xFF45
   static let registerRegion2: ClosedRange<LR35902.Address> = 0xFF47...0xFF4B
 
-  deinit {
-    tileMap.deallocate()
-    tileData.deallocate()
-    screenData.deallocate()
-  }
-
   init(oam: OAM) {
     self.oam = oam
-    tileMap.initializeMemory(as: UInt8.self, repeating: 0)
-    tileData.initializeMemory(as: UInt8.self, repeating: 0)
-    screenData.initializeMemory(as: UInt8.self, repeating: 0)
+    self.modeOAMSearch = OAMSearchMode(oam: oam, registers: registers)
   }
 
   let oam: OAM
-
-  var tileMap = UnsafeMutableRawBufferPointer.allocate(byteCount: tileMapRegion.count, alignment: 1)
-  var tileData = UnsafeMutableRawBufferPointer.allocate(byteCount: tileDataRegion.count, alignment: 1)
+  let registers = LCDRegisters()
+  private let modeOAMSearch: OAMSearchMode
 
   var bufferToggle = false
   public static let screenSize = (width: 160, height: 144)
-  var screenData = UnsafeMutableRawBufferPointer.allocate(byteCount: LCDController.screenSize.width * LCDController.screenSize.height, alignment: 1)
 
   enum Addresses: LR35902.Address {
     case LCDC = 0xFF40
@@ -51,169 +41,10 @@ public final class LCDController {
     case WX   = 0xFF4B
   }
 
-  // MARK: LCDC bits (0xFF40)
-
-  enum TileMapAddress {
-    case x9800 // 0
-    case x9C00 // 1
-  }
-  enum TileDataAddress {
-    case x8800 // 0
-    case x8000 // 1
-  }
-  enum SpriteSize {
-    case x8x8  // 0
-    case x8x16 // 1
-
-    func height() -> UInt8 {
-      switch self {
-      case .x8x8:  return 8
-      case .x8x16: return 16
-      }
-    }
-  }
-  /**
-   Whether the display is turned on or not.
-
-   Can only be disabled during V-blank.
-   */
-  var lcdDisplayEnable = true {                       // bit 7
-    willSet {
-      // "Stopping LCD operation (bit 7 from 1 to 0) must be performed during V-blank to work properly."
-      // - https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
-      precondition(
-        (lcdDisplayEnable && !newValue) && lcdMode == .vblank // Can only change during v-blank
-          || lcdDisplayEnable == newValue                     // No change
-          || !lcdDisplayEnable && newValue                    // Can always enable.
-      )
-    }
-    didSet {
-      // When lcdDisplayEnable transfers from on to off:
-      // - ly is reset to zero.
-      // - LCD clock is reset to zero.
-      // - Enters mode 0 (OAM search)
-      // - https://www.reddit.com/r/Gameboy/comments/a1c8h0/what_happens_when_a_gameboy_screen_is_disabled/eap4f8c/?utm_source=reddit&utm_medium=web2x&context=3
-      //
-      if oldValue && !lcdDisplayEnable {
-        scanlineY = 0
-        changeMode(to: .searchingOAM)
-      }
-      // TODO: Do we need to do anything when the LCD is enabled again? There is mention that the first frame after
-      // turning the LCD back on should be ignored.
-      // - https://github.com/spec-chum/SpecBoy/blob/5d1294d77648897a2a218a7fdcc33fbeb1e79038/SpecBoy/Ppu.cs#L95-L100
-      // - https://github.com/trekawek/coffee-gb/blob/088b86fb17109b8cac98e6394108b3561f443d54/src/main/java/eu/rekawek/coffeegb/gpu/Gpu.java#L275-L277
-      // - https://www.reddit.com/r/EmuDev/comments/6exyxu/does_the_game_boy_skip_the_first_frame_after/dieiau8/
-    }
-  }
-  var windowTileMapAddress = TileMapAddress.x9800      // bit 6
-  var windowEnable = false                             // bit 5
-  var tileDataAddress = TileDataAddress.x8000          // bit 4
-  var backgroundTileMapAddress = TileMapAddress.x9800  // bit 3
-  var spriteSize = SpriteSize.x8x8                     // bit 2
-  var objEnable = false                                // bit 1
-  var backgroundEnable = true                          // bit 0
-
-  // MARK: STAT bits (0xFF41)
-                                                  // 76543210
-  var enableCoincidenceInterrupt = false          //  x
-  var enableOAMInterrupt = false                  //   x
-  var enableVBlankInterrupt = false               //    x
-  var enableHBlankInterrupt = false               //     x
-  var coincidence: Bool {                         //      x
-    return scanlineY == lyc                       // 76543210
-  }
-  private var lcdMode = LCDCMode.searchingOAM     //       xx
-  enum LCDCMode {
-    var bits: UInt8 {
-      switch self {
-      case .hblank:                   return 0b0000_0000
-      case .vblank:                   return 0b0000_0001
-      case .searchingOAM:             return 0b0000_0010
-      case .transferringToLCDDriver:  return 0b0000_0011
-      }
-    }
-
-    case hblank                   // Mode 0
-    case vblank                   // Mode 1
-
-    // TODO: Not able to read oamram during this mode
-    case searchingOAM             // Mode 2
-
-    // TODO: Any reads of vram or oamram during this mode should return 0xff; writes are ignored
-    case transferringToLCDDriver  // Mode 3
-  }
-
-  // MARK: SY and XX (0xFF42 and 0xFF43)
-
-  var scrollY: UInt8 = 0
-  var scrollX: UInt8 = 0
-
-  // MARK: LY (0xFF44)
-
-  /** The vertical line to which data is transferred to the display. */
-  var scanlineY: UInt8 = 0
-
-  // MARK: LYC (0xFF45)
-
-  var lyc: UInt8 = 0
-
-  // MARK: BGP (0xFF47)
-
-  typealias Palette = [UInt8]
-
-  private func bitsForPalette(_ palette: Palette) -> UInt8 {
-    return (palette[0] & UInt8(0b0000_0011))
-        | ((palette[1] & UInt8(0b0000_0011)) << 2)
-        | ((palette[2] & UInt8(0b0000_0011)) << 4)
-        | ((palette[3] & UInt8(0b0000_0011)) << 6)
-  }
-
-  private func paletteFromBits(_ bits: UInt8) -> Palette {
-    return [
-      bits & 0b0000_0011,
-      (bits >> 2) & 0b0000_0011,
-      (bits >> 4) & 0b0000_0011,
-      (bits >> 6) & 0b0000_0011,
-    ]
-  }
-
-  /** Shade values for background and window tiles. */
-  var backgroundPalette: Palette = [
-    0,
-    1,
-    2,
-    3,
-  ]
-
-  // MARK: OBP0 and OBP1 (0xFF48 and 0xFF49)
-
-  /** Shade values for background and window tiles. */
-  var objectPallete0: Palette = [
-    0,
-    1,
-    2,
-    3,
-  ]
-
-  /** Shade values for background and window tiles. */
-  var objectPallete1: Palette = [
-    0,
-    1,
-    2,
-    3,
-  ]
-
-  // MARK: WY and WX (0xFF4A and 0xFF4B)
-
-  var windowY: UInt8 = 0
-  var windowX: UInt8 = 0
-
   // MARK: .searchingOAM state
 
   /** How many cycles have been advanced for the current lcdMode. */
   private var lcdModeCycle: Int = 0
-  private var intersectedOAMs: [OAM.Sprite] = []
-  private var oamIndex = 0
 
   // MARK: .transferringToLCDDriver state
   private struct Pixel {
@@ -248,7 +79,7 @@ extension LCDController {
 
   private func plot(x: UInt8, y: UInt8, byte: UInt8, palette: Palette) {
     let color = palette[Int(bitPattern: UInt(truncatingIfNeeded: byte))]
-    screenData[Int(bitPattern: UInt(truncatingIfNeeded: LCDController.screenSize.width) * UInt(truncatingIfNeeded: y) + UInt(truncatingIfNeeded: x))] = color
+    registers.screenData[Int(bitPattern: UInt(truncatingIfNeeded: LCDController.screenSize.width) * UInt(truncatingIfNeeded: y) + UInt(truncatingIfNeeded: x))] = color
   }
 
   private func backgroundPixel(x: UInt8, y: UInt8, window: Bool) -> UInt8 {
@@ -261,25 +92,25 @@ extension LCDController {
 
     let tileIndex: UInt8
     let tileMapIndex = Int(truncatingIfNeeded: tileX &+ tileY &* 32)
-    switch window ? windowTileMapAddress : backgroundTileMapAddress {
+    switch window ? registers.windowTileMapAddress : registers.backgroundTileMapAddress {
     case .x9800:
-      tileIndex = tileMap[tileMapIndex]
+      tileIndex = registers.tileMap[tileMapIndex]
     case .x9C00:
-      tileIndex = tileMap[0x400 + tileMapIndex]
+      tileIndex = registers.tileMap[0x400 + tileMapIndex]
     }
 
     let tileData0: UInt8
     let tileData1: UInt8
-    switch tileDataAddress {
+    switch registers.tileDataAddress {
     case .x8800:
       let signedTileIndex = Int8(bitPattern: tileIndex)
       let tileDataIndex = 0x1000 + Int(truncatingIfNeeded: (Int16(truncatingIfNeeded: signedTileIndex) &* 16) &+ tileOffsetY &* 2)
-      tileData0 = tileData[tileDataIndex]
-      tileData1 = tileData[tileDataIndex + 1]
+      tileData0 = registers.tileData[tileDataIndex]
+      tileData1 = registers.tileData[tileDataIndex + 1]
     case .x8000:
       let tileDataIndex = Int(truncatingIfNeeded: Int16(bitPattern: UInt16(truncatingIfNeeded: tileIndex) &* 16) &+ tileOffsetY &* 2)
-      tileData0 = tileData[tileDataIndex]
-      tileData1 = tileData[tileDataIndex + 1]
+      tileData0 = registers.tileData[tileDataIndex]
+      tileData1 = registers.tileData[tileDataIndex + 1]
     }
 
     let lsb: UInt8 = (tileData0 & (0x80 >> tileOffsetX)) > 0 ? 0b01 : 0
@@ -290,35 +121,36 @@ extension LCDController {
   }
 
   private func plot() {
-    if windowEnable && (windowX &- 7) <= scanlineX && windowY <= scanlineY {
-      plot(x: scanlineX, y: scanlineY,
-           byte: backgroundPixel(x: scanlineX &- (windowX &- 7), y: windowYPlot, window: true),
-           palette: backgroundPalette)
-    } else if backgroundEnable {
-      plot(x: scanlineX, y: scanlineY,
+    if registers.windowEnable && (registers.windowX &- 7) <= scanlineX && registers.windowY <= registers.ly {
+      plot(x: scanlineX, y: registers.ly,
+           byte: backgroundPixel(x: scanlineX &- (registers.windowX &- 7), y: windowYPlot, window: true),
+           palette: registers.backgroundPalette)
+    } else if registers.backgroundEnable {
+      plot(x: scanlineX, y: registers.ly,
            byte: backgroundPixel(x: scanlineX &+ scanlineScrollX, y: bgYPlot, window: false),
-           palette: backgroundPalette)
+           palette: registers.backgroundPalette)
     } else {
       lastBackgroundPixel = 0
     }
 
-    if intersectedOAMs.isEmpty {
+    // TODO: Provide the intersected OAMs to the pixel pushing mode on initialization.
+    if modeOAMSearch.intersectedOAMs.isEmpty {
       return
     }
 
-    for sprite in intersectedOAMs {
+    for sprite in modeOAMSearch.intersectedOAMs {
       guard sprite.x > scanlineX && sprite.x <= scanlineX + 8 else {
         continue
       }
       let wideScanlineX = Int16(truncatingIfNeeded: Int8(bitPattern: scanlineX))
-      let wideScanlineY = Int16(truncatingIfNeeded: Int8(bitPattern: scanlineY))
+      let wideScanlineY = Int16(truncatingIfNeeded: Int8(bitPattern: registers.ly))
       let wideSpriteX = Int16(truncatingIfNeeded: Int8(bitPattern: sprite.x))
       let wideSpriteY = Int16(truncatingIfNeeded: Int8(bitPattern: sprite.y))
       let tileIndex: Int16
       var tileOffsetX = wideScanlineX + 8 - wideSpriteX
       var tileOffsetY = wideScanlineY + 16 - wideSpriteY
 
-      switch spriteSize {
+      switch registers.spriteSize {
       case .x8x16:
         let wideTile = Int16(truncatingIfNeeded: Int8(bitPattern: sprite.tile))
         if tileOffsetY > 7 && !sprite.yflip {
@@ -348,8 +180,8 @@ extension LCDController {
       let tileData0: UInt8
       let tileData1: UInt8
       let tileDataIndex = Int(truncatingIfNeeded: (tileIndex &* 16) &+ tileOffsetY &* 2)
-      tileData0 = tileData[tileDataIndex]
-      tileData1 = tileData[tileDataIndex + 1]
+      tileData0 = registers.tileData[tileDataIndex]
+      tileData1 = registers.tileData[tileDataIndex + 1]
 
       let lsb: UInt8 = (tileData0 & (0x80 >> tileOffsetX)) > 0 ? 0b01 : 0
       let msb: UInt8 = (tileData1 & (0x80 >> tileOffsetX)) > 0 ? 0b10 : 0
@@ -360,24 +192,24 @@ extension LCDController {
           let palette: Palette
           switch sprite.palette {
           case .obj0pal:
-            palette = objectPallete0
+            palette = registers.objectPallete0
           case .obj1pal:
-            palette = objectPallete1
+            palette = registers.objectPallete1
           }
-          plot(x: scanlineX, y: scanlineY, byte: pixel, palette: palette)
+          plot(x: scanlineX, y: registers.ly, byte: pixel, palette: palette)
         }
         break
       }
     }
   }
 
-  /** Executes a single machine cycle.  */
+  /** Executes a single machine cycle. */
   public func advance(memory: AddressableMemory) {
     //
     // - https://www.reddit.com/r/Gameboy/comments/a1c8h0/what_happens_when_a_gameboy_screen_is_disabled/eap4f8c/?utm_source=reddit&utm_medium=web2x&context=3
     // - https://github.com/trekawek/coffee-gb/blob/088b86fb17109b8cac98e6394108b3561f443d54/src/main/java/eu/rekawek/coffeegb/gpu/Gpu.java#L171-L173
     // - https://github.com/spec-chum/SpecBoy/blob/5d1294d77648897a2a218a7fdcc33fbeb1e79038/SpecBoy/Ppu.cs#L214-L217
-    guard lcdDisplayEnable else {
+    guard registers.lcdDisplayEnable else {
       return
     }
 
@@ -390,18 +222,15 @@ extension LCDController {
     // - https://github.com/LIJI32/SameBoy/blob/29a3b18186c181399f4b99b9111ca9d8b5726886/Core/display.c#L1357-L1378
     // - https://github.com/trekawek/coffee-gb/blob/088b86fb17109b8cac98e6394108b3561f443d54/src/main/java/eu/rekawek/coffeegb/gpu/Gpu.java#L178-L182
 
-    switch lcdMode {
+    switch registers.lcdMode {
     case .searchingOAM:
-      // One OAM search takes two T-cycles, so we can perform two per machine cycle.
-      // TODO: If/when there is a need to switch advance to sub-machine cycle emulation, this will need to be changed
-      // to a T-cycle-based implementation.
-      searchNextOAM()
-      searchNextOAM()
+      modeOAMSearch.advance()
 
-      if lcdModeCycle >= LCDController.searchingOAMLength {
+      if modeOAMSearch.finished {
         changeMode(to: .transferringToLCDDriver)
         bgfifo.removeAll()
         spritefifo.removeAll()
+        lcdModeCycle = 20
       }
       break
     case .transferringToLCDDriver:
@@ -428,8 +257,8 @@ extension LCDController {
       break
     case .hblank:
       if lcdModeCycle >= LCDController.scanlineCycleLength {
-        scanlineY += 1
-        if scanlineY < 144 {
+        registers.ly += 1
+        if registers.ly < 144 {
           changeMode(to: .searchingOAM)
         } else {
           // No more lines to draw.
@@ -449,11 +278,11 @@ extension LCDController {
       break
     case .vblank:
       if lcdModeCycle >= LCDController.scanlineCycleLength {
-        scanlineY += 1
+        registers.ly += 1
         lcdModeCycle = 0
 
-        if scanlineY >= 154 {
-          scanlineY = 0
+        if registers.ly >= 154 {
+          registers.ly = 0
           changeMode(to: .searchingOAM)
           requestOAMInterruptIfNeeded(memory: memory)
         }
@@ -467,25 +296,26 @@ extension LCDController {
   private func changeMode(to mode: LCDCMode) {
     switch mode {
     case .searchingOAM:
-      intersectedOAMs = []
-      oamIndex = 0
+      modeOAMSearch.start()
+
+      // TODO: Remove this once the mode handles all timing.
       lcdModeCycle = 0
 
     case .vblank:
       lcdModeCycle = 0
 
     case .transferringToLCDDriver:
-      windowYPlot = scanlineY &- windowY
-      bgYPlot = scanlineY &+ scrollY
+      windowYPlot = registers.ly &- registers.windowY
+      bgYPlot = registers.ly &+ registers.scrollY
       transferringToLCDDriverCycle = 0
       scanlineX = 0
-      scanlineScrollX = scrollX
+      scanlineScrollX = registers.scrollX
 
     case .hblank:
       break
     }
 
-    lcdMode = mode
+    registers.lcdMode = mode
   }
 
   private func raiseLCDStatInterrupt(memory: AddressableMemory) {
@@ -495,45 +325,26 @@ extension LCDController {
   }
 
   private func requestOAMInterruptIfNeeded(memory: AddressableMemory) {
-    if enableOAMInterrupt {
+    if registers.enableOAMInterrupt {
       raiseLCDStatInterrupt(memory: memory)
     }
   }
 
   private func requestHBlankInterruptIfNeeded(memory: AddressableMemory) {
-    if enableHBlankInterrupt {
+    if registers.enableHBlankInterrupt {
       raiseLCDStatInterrupt(memory: memory)
     }
   }
 
   private func requestVBlankInterruptIfNeeded(memory: AddressableMemory) {
-    if enableVBlankInterrupt {
+    if registers.enableVBlankInterrupt {
       raiseLCDStatInterrupt(memory: memory)
     }
   }
 
   private func requestCoincidenceInterruptIfNeeded(memory: AddressableMemory) {
-    if coincidence && enableCoincidenceInterrupt {
+    if registers.coincidence && registers.enableCoincidenceInterrupt {
       raiseLCDStatInterrupt(memory: memory)
-    }
-  }
-
-  // MARK: OAM search
-
-  private func searchNextOAM() {
-    guard intersectedOAMs.count < 10 else {
-      return
-    }
-    let sprite = oam.sprites[oamIndex]
-    oamIndex += 1
-    let yPosition = scanlineY + 16
-    // Only yPosition is evaluated against the sprite; x appears to have no impact on the selection of sprites.
-    // - https://github.com/trekawek/coffee-gb/blob/088b86fb17109b8cac98e6394108b3561f443d54/src/main/java/eu/rekawek/coffeegb/gpu/phase/OamSearch.java#L88-L91
-    // - https://github.com/LIJI32/SameBoy/blob/29a3b18186c181399f4b99b9111ca9d8b5726886/Core/display.c#L456-L459
-    // Note that this contracts the oam.x != 0 shown in "The Ultimate Game Boy Talk":
-    // - https://youtu.be/HyzD8pNlpwI?t=2784
-    if sprite.y <= yPosition && yPosition < sprite.y + spriteSize.height() {
-      intersectedOAMs.append(sprite)
     }
   }
 }
@@ -544,20 +355,20 @@ extension LCDController: AddressableMemory {
   public func read(from address: LR35902.Address) -> UInt8 {
     if LCDController.tileMapRegion.contains(address) {
       if isVramAccessible() {
-        return tileMap[Int(address - LCDController.tileMapRegion.lowerBound)]
+        return registers.tileMap[Int(address - LCDController.tileMapRegion.lowerBound)]
       } else {
         return 0xFF
       }
     }
     if LCDController.tileDataRegion.contains(address) {
       if isVramAccessible() {
-        return tileData[Int(address - LCDController.tileDataRegion.lowerBound)]
+        return registers.tileData[Int(address - LCDController.tileDataRegion.lowerBound)]
       } else {
         return 0xFF
       }
     }
     if OAM.addressableRange.contains(address) {
-      guard lcdMode == .hblank || lcdMode == .vblank else {
+      guard registers.lcdMode == .hblank || registers.lcdMode == .vblank else {
         return 0xFF  // OAM are only accessible during hblank and vblank
       }
       return oam.read(from: address)
@@ -567,7 +378,7 @@ extension LCDController: AddressableMemory {
       preconditionFailure("Invalid address")
     }
 
-    if lcdMode == .transferringToLCDDriver {
+    if registers.lcdMode == .transferringToLCDDriver {
       switch lcdAddress {
       case .BGP, .OBP0, .OBP1:
         return 0xFF // Palettes are not readable during pixel transfer
@@ -577,40 +388,22 @@ extension LCDController: AddressableMemory {
     }
 
     switch lcdAddress {
-    case .LCDC:
-      return (
-        (lcdDisplayEnable                       ? 0b1000_0000 : 0)
-          | (windowTileMapAddress == .x9C00     ? 0b0100_0000 : 0)
-          | (windowEnable                       ? 0b0010_0000 : 0)
-          | (tileDataAddress == .x8000          ? 0b0001_0000 : 0)
-          | (backgroundTileMapAddress == .x9C00 ? 0b0000_1000 : 0)
-          | (spriteSize == .x8x16               ? 0b0000_0100 : 0)
-          | (objEnable                          ? 0b0000_0010 : 0)
-          | (backgroundEnable                   ? 0b0000_0001 : 0)
-      )
+    case .LCDC: return registers.lcdc
 
-    case .LY:   return scanlineY
-    case .LYC:  return lyc
+    case .LY:   return registers.ly
+    case .LYC:  return registers.lyc
 
-    case .SCY:  return scrollY
-    case .SCX:  return scrollX
+    case .SCY:  return registers.scrollY
+    case .SCX:  return registers.scrollX
 
-    case .WY:   return windowY
-    case .WX:   return windowX
+    case .WY:   return registers.windowY
+    case .WX:   return registers.windowX
 
-    case .BGP:  return bitsForPalette(backgroundPalette)
-    case .OBP0: return bitsForPalette(objectPallete0)
-    case .OBP1: return bitsForPalette(objectPallete1)
+    case .BGP:  return registers.bitsForPalette(registers.backgroundPalette)
+    case .OBP0: return registers.bitsForPalette(registers.objectPallete0)
+    case .OBP1: return registers.bitsForPalette(registers.objectPallete1)
 
-    case .STAT:
-      return (
-        (enableCoincidenceInterrupt   ? 0b0100_0000 : 0)
-          | (enableOAMInterrupt       ? 0b0010_0000 : 0)
-          | (enableVBlankInterrupt    ? 0b0001_0000 : 0)
-          | (enableHBlankInterrupt    ? 0b0000_1000 : 0)
-          | (coincidence              ? 0b0000_0100 : 0)
-          | lcdMode.bits
-      )
+    case .STAT: return registers.stat
 
     default:
       fatalError()
@@ -626,24 +419,24 @@ extension LCDController: AddressableMemory {
     // - https://github.com/trekawek/coffee-gb/blob/088b86fb17109b8cac98e6394108b3561f443d54/src/main/java/eu/rekawek/coffeegb/gpu/Gpu.java#L94
     // Sameboy allows read/write to be selectively enabled/disabled depending on hardware.
     // - https://github.com/LIJI32/SameBoy/blob/29a3b18186c181399f4b99b9111ca9d8b5726886/Core/display.c#L992-L993
-    return !lcdDisplayEnable || lcdMode != .transferringToLCDDriver
+    return !registers.lcdDisplayEnable || registers.lcdMode != .transferringToLCDDriver
   }
 
   public func write(_ byte: UInt8, to address: LR35902.Address) {
     if LCDController.tileMapRegion.contains(address) {
       if isVramAccessible() {
-        tileMap[Int(address - LCDController.tileMapRegion.lowerBound)] = byte
+        registers.tileMap[Int(address - LCDController.tileMapRegion.lowerBound)] = byte
       }
       return
     }
     if LCDController.tileDataRegion.contains(address) {
       if isVramAccessible() {
-        tileData[Int(address - LCDController.tileDataRegion.lowerBound)] = byte
+        registers.tileData[Int(address - LCDController.tileDataRegion.lowerBound)] = byte
       }
       return
     }
     if OAM.addressableRange.contains(address) {
-      guard lcdMode == .hblank || lcdMode == .vblank else {
+      guard registers.lcdMode == .hblank || registers.lcdMode == .vblank else {
         // OAM are only accessible during hblank and vblank.
         // Note that DMAController has direct write access and circumvents this check when running.
         return
@@ -655,7 +448,7 @@ extension LCDController: AddressableMemory {
       preconditionFailure("Invalid address")
     }
 
-    if lcdMode == .transferringToLCDDriver {
+    if registers.lcdMode == .transferringToLCDDriver {
       switch lcdAddress {
       case .BGP, .OBP0, .OBP1:
         return // Palettes are not writable during pixel transfer
@@ -666,19 +459,25 @@ extension LCDController: AddressableMemory {
 
     switch lcdAddress {
     case .LCDC:
-      lcdDisplayEnable          = (byte & 0b1000_0000) > 0
-      windowTileMapAddress      = (byte & 0b0100_0000) > 0 ? .x9C00 : .x9800
-      windowEnable              = (byte & 0b0010_0000) > 0
-      tileDataAddress           = (byte & 0b0001_0000) > 0 ? .x8000 : .x8800
-      backgroundTileMapAddress  = (byte & 0b0000_1000) > 0 ? .x9C00 : .x9800
-      spriteSize                = (byte & 0b0000_0100) > 0 ? .x8x16 : .x8x8
-      objEnable                 = (byte & 0b0000_0010) > 0
-      backgroundEnable          = (byte & 0b0000_0001) > 0
+      let wasLCDDisplayEnabled = registers.lcdDisplayEnable
 
-      if !lcdDisplayEnable {
-        scanlineY = 0
+      registers.lcdc = byte
+
+      // When lcdDisplayEnable transfers from on to off:
+      // - ly is reset to zero.
+      // - LCD clock is reset to zero.
+      // - Enters mode 0 (OAM search)
+      // - https://www.reddit.com/r/Gameboy/comments/a1c8h0/what_happens_when_a_gameboy_screen_is_disabled/eap4f8c/?utm_source=reddit&utm_medium=web2x&context=3
+      //
+      if wasLCDDisplayEnabled && !registers.lcdDisplayEnable {
+        registers.ly = 0
         changeMode(to: .searchingOAM)
       }
+      // TODO: Do we need to do anything when the LCD is enabled again? There is mention that the first frame after
+      // turning the LCD back on should be ignored.
+      // - https://github.com/spec-chum/SpecBoy/blob/5d1294d77648897a2a218a7fdcc33fbeb1e79038/SpecBoy/Ppu.cs#L95-L100
+      // - https://github.com/trekawek/coffee-gb/blob/088b86fb17109b8cac98e6394108b3561f443d54/src/main/java/eu/rekawek/coffeegb/gpu/Gpu.java#L275-L277
+      // - https://www.reddit.com/r/EmuDev/comments/6exyxu/does_the_game_boy_skip_the_first_frame_after/dieiau8/
 
     case .LY:
       // "Any writes to LY while the LCD is enabled are ignored. That bit of info is from Pan Docs, which is incorrect."
@@ -690,26 +489,21 @@ extension LCDController: AddressableMemory {
       // - https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
       break
 
-    case .LYC:
-      lyc = byte
+    case .LYC:  registers.lyc = byte
       // TODO: Do we need to fire a coincidence check here?
       // - https://github.com/spec-chum/SpecBoy/blob/5d1294d77648897a2a218a7fdcc33fbeb1e79038/SpecBoy/Ppu.cs#L126
 
-    case .SCY:  scrollY = byte
-    case .SCX:  scrollX = byte
+    case .SCY:  registers.scrollY = byte
+    case .SCX:  registers.scrollX = byte
 
-    case .WY:   windowY = byte
-    case .WX:   windowX = byte
+    case .WY:   registers.windowY = byte
+    case .WX:   registers.windowX = byte
 
-    case .BGP:  backgroundPalette = paletteFromBits(byte)
-    case .OBP0: objectPallete0 = paletteFromBits(byte)
-    case .OBP1: objectPallete1 = paletteFromBits(byte)
+    case .BGP:  registers.backgroundPalette = registers.paletteFromBits(byte)
+    case .OBP0: registers.objectPallete0 = registers.paletteFromBits(byte)
+    case .OBP1: registers.objectPallete1 = registers.paletteFromBits(byte)
 
-    case .STAT:
-      enableCoincidenceInterrupt  = (byte & 0b0100_0000) > 0
-      enableOAMInterrupt          = (byte & 0b0010_0000) > 0
-      enableVBlankInterrupt       = (byte & 0b0001_0000) > 0
-      enableHBlankInterrupt       = (byte & 0b0000_1000) > 0
+    case .STAT: registers.stat = byte
 
     default:
       fatalError()
