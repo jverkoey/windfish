@@ -228,11 +228,9 @@ extension LCDController {
     case .searchingOAM:
       if let nextMode = modeOAMSearch.advance(memory: memory) {
         changeMode(to: nextMode)
-        bgfifo.removeAll()
-        spritefifo.removeAll()
         lcdModeCycle = 20
       }
-      break
+      
     case .transferringToLCDDriver:
       transferringToLCDDriverCycle += 1
 
@@ -254,7 +252,7 @@ extension LCDController {
 
         registers.requestHBlankInterruptIfNeeded(memory: memory)
       }
-      break
+
     case .hblank:
       if lcdModeCycle >= LCDController.scanlineCycleLength {
         registers.ly += 1
@@ -275,25 +273,18 @@ extension LCDController {
         registers.requestOAMInterruptIfNeeded(memory: memory)
         registers.requestCoincidenceInterruptIfNeeded(memory: memory)
       }
-      break
+
     case .vblank:
       if let nextMode = modeVBlank.advance(memory: memory) {
         changeMode(to: nextMode)
       }
-      break
     }
   }
 
   private func changeMode(to mode: LCDCMode) {
     switch mode {
-    case .searchingOAM:
-      modeOAMSearch.start()
-
-      // TODO: Remove this once the mode handles all timing.
-      lcdModeCycle = 0
-
-    case .vblank:
-      lcdModeCycle = 0
+    case .searchingOAM: modeOAMSearch.start()
+    case .vblank:       modeVBlank.start()
 
     case .transferringToLCDDriver:
       windowYPlot = registers.ly &- registers.windowY
