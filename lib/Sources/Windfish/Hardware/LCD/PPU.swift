@@ -31,6 +31,7 @@ public final class PPU {
   let oam: OAM
   let registers = LCDRegisters()
 
+  /** An executable representation of the LCDMode register. */
   private var mode: PPUMode {
     get {
       switch registers.lcdMode {
@@ -93,6 +94,7 @@ extension PPU {
       return
     }
 
+    // Advance the state machine.
     if let nextMode = self.mode.advance(memory: memory) {
       if registers.lcdMode == .searchingOAM && nextMode == .pixelTransfer {
         // Modes aren't directly aware of each others' existence, so we copy the intersected OAMs to the pixel transfer
@@ -100,7 +102,7 @@ extension PPU {
         modePixelTransfer.intersectedOAMs = modeOAMSearch.intersectedOAMs
       }
       if nextMode == .vblank {
-        vblankCounter += 1
+        vblankCounter += 1  // Signal to observers of the emulator that vblank has been entered.
       }
       changeMode(to: nextMode)
     }
