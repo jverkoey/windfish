@@ -4,8 +4,8 @@ import Foundation
 // - https://news.ycombinator.com/item?id=13291588
 //   - Interesting question brought up here of "How was the game boy able to do the OAM scan in 20 cycles?"
 
-extension LCDController {
-  final class OAMSearchMode {
+extension PPU {
+  final class OAMSearchMode: PPUMode{
     init(oam: OAM, registers: LCDRegisters, lineCycleDriver: LineCycleDriver) {
       self.oam = oam
       self.registers = registers
@@ -33,7 +33,7 @@ extension LCDController {
       // The search is performed in a single machine cycle because there are no apparent interactions between OAM search
       // and other parts of the hardware that require per-cycle emulation.
       if didSearch {
-        return lineCycleDriver.cycles >= LCDController.searchingOAMLength ? .transferringToLCDDriver : nil
+        return lineCycleDriver.cycles >= PPU.searchingOAMLength ? .pixelTransfer : nil
       }
 
       // TODO: Implement the OAM Search CPU Bug outlined in "The Ultimate Game Boy Talk (33c3)"

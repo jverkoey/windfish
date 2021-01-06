@@ -1,7 +1,7 @@
 import Foundation
 
-extension LCDController {
-  final class HBlankMode {
+extension PPU {
+  final class HBlankMode: PPUMode {
     init(registers: LCDRegisters, lineCycleDriver: LineCycleDriver) {
       self.registers = registers
       self.lineCycleDriver = lineCycleDriver
@@ -11,8 +11,7 @@ extension LCDController {
     private let lineCycleDriver: LineCycleDriver
 
     /** Starts the mode. */
-    func start() {
-    }
+    func start() {}
 
     /** Executes a single machine cycle.  */
     func advance(memory: AddressableMemory) -> LCDCMode? {
@@ -20,7 +19,7 @@ extension LCDController {
 
       var nextMode: LCDCMode? = nil
 
-      if lineCycleDriver.cycles >= LCDController.scanlineCycleLength {
+      if lineCycleDriver.cycles >= PPU.scanlineCycleLength {
         registers.ly += 1
         if registers.ly < 144 {
           nextMode = .searchingOAM

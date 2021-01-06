@@ -2,7 +2,7 @@ import Foundation
 
 public final class Gameboy {
   public init() {
-    self.lcdController = LCDController(oam: oam)
+    self.lcdController = PPU(oam: oam)
     self.dmaController = DMAController(oam: oam)
     self.memory = Memory(cpu: cpu, lcdController: lcdController, dmaController: dmaController, oam: oam, soundController: soundController, timer: timer)
     self.dmaProxy = DMAProxy(memory: memory)
@@ -24,7 +24,7 @@ public final class Gameboy {
   public let memory: Memory
 
   /** The Gameboy's liquid crystal display (LCD) controller. */
-  public let lcdController: LCDController
+  public let lcdController: PPU
 
   public var serialDataReceived: [UInt8] {
     get {
@@ -61,7 +61,7 @@ public final class Gameboy {
   }
 
   public static var tileDataRegionSize: Int {
-    return LCDController.tileDataRegion.count
+    return PPU.tileDataRegion.count
   }
 }
 

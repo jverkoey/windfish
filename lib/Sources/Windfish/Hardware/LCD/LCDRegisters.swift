@@ -1,6 +1,6 @@
 import Foundation
 
-extension LCDController {
+extension PPU {
   final class LCDRegisters {
     deinit {
       tileMap.deallocate()
@@ -18,7 +18,7 @@ extension LCDController {
 
     var tileMap = UnsafeMutableRawBufferPointer.allocate(byteCount: tileMapRegion.count, alignment: 1)
     var tileData = UnsafeMutableRawBufferPointer.allocate(byteCount: tileDataRegion.count, alignment: 1)
-    var screenData = UnsafeMutableRawBufferPointer.allocate(byteCount: LCDController.screenSize.width * LCDController.screenSize.height, alignment: 1)
+    var screenData = UnsafeMutableRawBufferPointer.allocate(byteCount: PPU.screenSize.width * PPU.screenSize.height, alignment: 1)
 
     // MARK: LCDC bits (0xFF40)
 
@@ -221,7 +221,7 @@ extension LCDController {
       case .hblank:                   return 0b0000_0000
       case .vblank:                   return 0b0000_0001
       case .searchingOAM:             return 0b0000_0010
-      case .transferringToLCDDriver:  return 0b0000_0011
+      case .pixelTransfer:  return 0b0000_0011
       }
     }
 
@@ -232,6 +232,6 @@ extension LCDController {
     case searchingOAM             // Mode 2
 
     // TODO: Any reads of vram or oamram during this mode should return 0xff; writes are ignored
-    case transferringToLCDDriver  // Mode 3
+    case pixelTransfer  // Mode 3
   }
 }

@@ -2,7 +2,7 @@ import Foundation
 
 extension Gameboy {
   public final class Memory {
-    public init(cpu: LR35902, lcdController: LCDController, dmaController: DMAController, oam: OAM, soundController: SoundController, timer: Timer) {
+    public init(cpu: LR35902, lcdController: PPU, dmaController: DMAController, oam: OAM, soundController: SoundController, timer: Timer) {
       self.cpu = cpu
       self.lcdController = lcdController
       self.dmaController = dmaController
@@ -15,7 +15,7 @@ extension Gameboy {
 
     public var cartridge: Cartridge?
     public let cpu: LR35902
-    public let lcdController: LCDController
+    public let lcdController: PPU
 
     // MARK: - Memory mapping
 
@@ -32,7 +32,7 @@ extension Gameboy {
           return ioRegisters
         case DMAController.registerAddress:
           return dmaController
-        case LCDController.tileMapRegion, LCDController.tileDataRegion, LCDController.registerRegion1, LCDController.registerRegion2,
+        case PPU.tileMapRegion, PPU.tileDataRegion, PPU.registerRegion1, PPU.registerRegion2,
              OAM.addressableRange:
           return lcdController
         case SoundController.wavePatternRegion, SoundController.soundRegistersRegion:

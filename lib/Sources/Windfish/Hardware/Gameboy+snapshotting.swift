@@ -20,11 +20,11 @@ extension Gameboy {
     }
     let providerRef = CGDataProvider(data: NSData(bytes: &pixels, length: pixels.count))!
     let cgImage = CGImage(
-      width: LCDController.screenSize.width,
-      height: LCDController.screenSize.height,
+      width: PPU.screenSize.width,
+      height: PPU.screenSize.height,
       bitsPerComponent: 8,
       bitsPerPixel: 8,
-      bytesPerRow: LCDController.screenSize.width,
+      bytesPerRow: PPU.screenSize.width,
       space: CGColorSpaceCreateDeviceGray(),
       bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.none.rawValue),
       provider: providerRef,
@@ -33,8 +33,8 @@ extension Gameboy {
       intent: .defaultIntent
     )!
 
-    let imageSize = NSSize(width: CGFloat(LCDController.screenSize.width),
-                           height: CGFloat(LCDController.screenSize.height))
+    let imageSize = NSSize(width: CGFloat(PPU.screenSize.width),
+                           height: CGFloat(PPU.screenSize.height))
     return NSImage(cgImage: cgImage, size: imageSize)
   }
 }

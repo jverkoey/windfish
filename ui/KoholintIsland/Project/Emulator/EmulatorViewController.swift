@@ -323,8 +323,8 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       fpsLabel.topAnchor.constraint(equalToSystemSpacingBelow: controls.bottomAnchor, multiplier: 1),
 
       screenImageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
-      screenImageView.widthAnchor.constraint(equalToConstant: CGFloat(LCDController.screenSize.width)),
-      screenImageView.heightAnchor.constraint(equalToConstant: CGFloat(LCDController.screenSize.height)),
+      screenImageView.widthAnchor.constraint(equalToConstant: CGFloat(PPU.screenSize.width)),
+      screenImageView.heightAnchor.constraint(equalToConstant: CGFloat(PPU.screenSize.height)),
       screenImageView.topAnchor.constraint(equalToSystemSpacingBelow: fpsLabel.bottomAnchor, multiplier: 1),
 
       cpuView.topAnchor.constraint(equalToSystemSpacingBelow: screenImageView.bottomAnchor, multiplier: 1),
