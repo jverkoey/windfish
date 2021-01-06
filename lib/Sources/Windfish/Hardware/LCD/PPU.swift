@@ -117,6 +117,18 @@ extension PPU {
 // MARK: - AddressableMemory
 
 extension PPU: AddressableMemory {
+  private func isVramAccessible() -> Bool {
+    // "When the LCD display is off you can write to video memory at any time with out restrictions. While it is on you
+    // can only write to video memory during H-Blank and V-Blank."
+    // - https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
+    // - https://github.com/spec-chum/SpecBoy/blob/master/SpecBoy/Ppu.cs#L132-L142
+    // Note that coffee-gb appears to have disabled any of these checks and always allows VRAM access.
+    // - https://github.com/trekawek/coffee-gb/blob/088b86fb17109b8cac98e6394108b3561f443d54/src/main/java/eu/rekawek/coffeegb/gpu/Gpu.java#L94
+    // Sameboy allows read/write to be selectively enabled/disabled depending on hardware.
+    // - https://github.com/LIJI32/SameBoy/blob/29a3b18186c181399f4b99b9111ca9d8b5726886/Core/display.c#L992-L993
+    return !registers.lcdDisplayEnable || registers.lcdMode != .pixelTransfer
+  }
+
   public func read(from address: LR35902.Address) -> UInt8 {
     if PPU.tileMapRegion.contains(address) {
       if isVramAccessible() {
@@ -173,18 +185,6 @@ extension PPU: AddressableMemory {
     default:
       fatalError()
     }
-  }
-
-  private func isVramAccessible() -> Bool {
-    // "When the LCD display is off you can write to video memory at any time with out restrictions. While it is on you
-    // can only write to video memory during H-Blank and V-Blank."
-    // - https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
-    // - https://github.com/spec-chum/SpecBoy/blob/master/SpecBoy/Ppu.cs#L132-L142
-    // Note that coffee-gb appears to have disabled any of these checks and always allows VRAM access.
-    // - https://github.com/trekawek/coffee-gb/blob/088b86fb17109b8cac98e6394108b3561f443d54/src/main/java/eu/rekawek/coffeegb/gpu/Gpu.java#L94
-    // Sameboy allows read/write to be selectively enabled/disabled depending on hardware.
-    // - https://github.com/LIJI32/SameBoy/blob/29a3b18186c181399f4b99b9111ca9d8b5726886/Core/display.c#L992-L993
-    return !registers.lcdDisplayEnable || registers.lcdMode != .pixelTransfer
   }
 
   public func write(_ byte: UInt8, to address: LR35902.Address) {
