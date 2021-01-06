@@ -2,9 +2,9 @@ import Foundation
 
 public final class Gameboy {
   public init() {
-    self.lcdController = PPU(oam: oam)
+    self.ppu = PPU(oam: oam)
     self.dmaController = DMAController(oam: oam)
-    self.memory = Memory(cpu: cpu, lcdController: lcdController, dmaController: dmaController, oam: oam, soundController: soundController, timer: timer)
+    self.memory = Memory(cpu: cpu, lcdController: ppu, dmaController: dmaController, oam: oam, soundController: soundController, timer: timer)
     self.dmaProxy = DMAProxy(memory: memory)
   }
 
@@ -24,7 +24,7 @@ public final class Gameboy {
   public let memory: Memory
 
   /** The Gameboy's liquid crystal display (LCD) controller. */
-  public let lcdController: PPU
+  public let ppu: PPU
 
   public var serialDataReceived: [UInt8] {
     get {
@@ -53,11 +53,11 @@ public final class Gameboy {
   }
 
   public var screenData: UnsafeMutableRawBufferPointer {
-    return lcdController.registers.screenData
+    return ppu.registers.screenData
   }
 
   public var tileData: Data {
-    return Data(lcdController.registers.tileData)
+    return Data(ppu.registers.tileData)
   }
 
   public static var tileDataRegionSize: Int {
@@ -102,10 +102,13 @@ extension Gameboy {
     // DMA controller is always able to access memory directly.
     dmaController.advance(memory: memory)
 
+    // "While DMA Transfer is active, the source is not accessible."
+    // - https://youtu.be/HyzD8pNlpwI?t=2948
+    // TODO: Does this include timer + PPU? Or is just the CPU restricted from accessing source?
     let proxyMemory: AddressableMemory = dmaController.oamLocked ? dmaProxy : memory
     cpu.advance(memory: proxyMemory)
     timer.advance(memory: proxyMemory)
-    lcdController.advance(memory: proxyMemory)
+    ppu.advance(memory: proxyMemory)
   }
 
   /** Advances the emulation by one instruction. */

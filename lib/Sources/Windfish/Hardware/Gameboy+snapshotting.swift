@@ -11,7 +11,7 @@ extension Gameboy {
       0xFF,
     ])
     var pixels: [UInt8]
-    if lcdController.registers.lcdDisplayEnable {
+    if ppu.registers.lcdDisplayEnable {
       pixels = screenData.map { colors[Int(truncatingIfNeeded: $0)] }
     } else {
       // When the display is turned off, we show a black screen.

@@ -117,7 +117,7 @@ extension PPU {
 // MARK: - AddressableMemory
 
 extension PPU: AddressableMemory {
-  private func isVramAccessible() -> Bool {
+  private func VRAMIsAccessible() -> Bool {
     // "When the LCD display is off you can write to video memory at any time with out restrictions. While it is on you
     // can only write to video memory during H-Blank and V-Blank."
     // - https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
@@ -129,23 +129,27 @@ extension PPU: AddressableMemory {
     return !registers.lcdDisplayEnable || registers.lcdMode != .pixelTransfer
   }
 
+  private func OAMIsAccessible() -> Bool {
+    // "Cannot access OAM during OAM search or pixel transfer because that's when sprites are drawn."
+    // - https://youtu.be/HyzD8pNlpwI?t=2879
+    return registers.lcdMode != .searchingOAM && registers.lcdMode != .pixelTransfer
+  }
+
   public func read(from address: LR35902.Address) -> UInt8 {
     if PPU.tileMapRegion.contains(address) {
-      if isVramAccessible() {
-        return registers.tileMap[Int(address - PPU.tileMapRegion.lowerBound)]
-      } else {
+      guard VRAMIsAccessible() else {
         return 0xFF
       }
+      return registers.tileMap[Int(address - PPU.tileMapRegion.lowerBound)]
     }
     if PPU.tileDataRegion.contains(address) {
-      if isVramAccessible() {
-        return registers.tileData[Int(address - PPU.tileDataRegion.lowerBound)]
-      } else {
+      guard VRAMIsAccessible() else {
         return 0xFF
       }
+      return registers.tileData[Int(address - PPU.tileDataRegion.lowerBound)]
     }
     if OAM.addressableRange.contains(address) {
-      guard registers.lcdMode == .hblank || registers.lcdMode == .vblank else {
+      guard OAMIsAccessible() else {
         return 0xFF  // OAM are only accessible during hblank and vblank
       }
       return oam.read(from: address)
@@ -189,19 +193,21 @@ extension PPU: AddressableMemory {
 
   public func write(_ byte: UInt8, to address: LR35902.Address) {
     if PPU.tileMapRegion.contains(address) {
-      if isVramAccessible() {
-        registers.tileMap[Int(address - PPU.tileMapRegion.lowerBound)] = byte
+      guard VRAMIsAccessible() else {
+        return
       }
+      registers.tileMap[Int(address - PPU.tileMapRegion.lowerBound)] = byte
       return
     }
     if PPU.tileDataRegion.contains(address) {
-      if isVramAccessible() {
-        registers.tileData[Int(address - PPU.tileDataRegion.lowerBound)] = byte
+      guard VRAMIsAccessible() else {
+        return
       }
+      registers.tileData[Int(address - PPU.tileDataRegion.lowerBound)] = byte
       return
     }
     if OAM.addressableRange.contains(address) {
-      guard registers.lcdMode == .hblank || registers.lcdMode == .vblank else {
+      guard OAMIsAccessible() else {
         // OAM are only accessible during hblank and vblank.
         // Note that DMAController has direct write access and circumvents this check when running.
         return

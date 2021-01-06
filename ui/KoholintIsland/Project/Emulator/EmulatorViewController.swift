@@ -583,8 +583,8 @@ final class EmulatorViewController: NSViewController, TabSelectable {
             }
             machineCycle += 1
 
-            if self.lastVblankCounter != gameboy.lcdController.vblankCounter {
-              self.lastVblankCounter = gameboy.lcdController.vblankCounter
+            if self.lastVblankCounter != gameboy.ppu.vblankCounter {
+              self.lastVblankCounter = gameboy.ppu.vblankCounter
 
               let tileData = gameboy.tileData
 
