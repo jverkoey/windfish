@@ -17,11 +17,13 @@ public final class LCDController {
   init(oam: OAM) {
     self.oam = oam
     self.modeOAMSearch = OAMSearchMode(oam: oam, registers: registers)
+    self.modeVBlank = VBlankMode(registers: registers)
   }
 
   let oam: OAM
   let registers = LCDRegisters()
   private let modeOAMSearch: OAMSearchMode
+  private let modeVBlank: VBlankMode
 
   var bufferToggle = false
   public static let screenSize = (width: 160, height: 144)
@@ -224,10 +226,8 @@ extension LCDController {
 
     switch registers.lcdMode {
     case .searchingOAM:
-      modeOAMSearch.advance()
-
-      if modeOAMSearch.finished {
-        changeMode(to: .transferringToLCDDriver)
+      if let nextMode = modeOAMSearch.advance(memory: memory) {
+        changeMode(to: nextMode)
         bgfifo.removeAll()
         spritefifo.removeAll()
         lcdModeCycle = 20
@@ -252,7 +252,7 @@ extension LCDController {
         changeMode(to: .hblank)
         // Don't reset lcdModeCycle yet, as this mode can actually end early.
 
-        requestHBlankInterruptIfNeeded(memory: memory)
+        registers.requestHBlankInterruptIfNeeded(memory: memory)
       }
       break
     case .hblank:
@@ -269,25 +269,16 @@ extension LCDController {
           interruptFlag.insert(.vBlank)
           memory.write(interruptFlag.rawValue, to: LR35902.interruptFlagAddress)
 
-          requestVBlankInterruptIfNeeded(memory: memory)
+          registers.requestVBlankInterruptIfNeeded(memory: memory)
         }
 
-        requestOAMInterruptIfNeeded(memory: memory)
-        requestCoincidenceInterruptIfNeeded(memory: memory)
+        registers.requestOAMInterruptIfNeeded(memory: memory)
+        registers.requestCoincidenceInterruptIfNeeded(memory: memory)
       }
       break
     case .vblank:
-      if lcdModeCycle >= LCDController.scanlineCycleLength {
-        registers.ly += 1
-        lcdModeCycle = 0
-
-        if registers.ly >= 154 {
-          registers.ly = 0
-          changeMode(to: .searchingOAM)
-          requestOAMInterruptIfNeeded(memory: memory)
-        }
-
-        requestCoincidenceInterruptIfNeeded(memory: memory)
+      if let nextMode = modeVBlank.advance(memory: memory) {
+        changeMode(to: nextMode)
       }
       break
     }
@@ -316,36 +307,6 @@ extension LCDController {
     }
 
     registers.lcdMode = mode
-  }
-
-  private func raiseLCDStatInterrupt(memory: AddressableMemory) {
-    var interruptFlag = LR35902.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
-    interruptFlag.insert(.lcdStat)
-    memory.write(interruptFlag.rawValue, to: LR35902.interruptFlagAddress)
-  }
-
-  private func requestOAMInterruptIfNeeded(memory: AddressableMemory) {
-    if registers.enableOAMInterrupt {
-      raiseLCDStatInterrupt(memory: memory)
-    }
-  }
-
-  private func requestHBlankInterruptIfNeeded(memory: AddressableMemory) {
-    if registers.enableHBlankInterrupt {
-      raiseLCDStatInterrupt(memory: memory)
-    }
-  }
-
-  private func requestVBlankInterruptIfNeeded(memory: AddressableMemory) {
-    if registers.enableVBlankInterrupt {
-      raiseLCDStatInterrupt(memory: memory)
-    }
-  }
-
-  private func requestCoincidenceInterruptIfNeeded(memory: AddressableMemory) {
-    if registers.coincidence && registers.enableCoincidenceInterrupt {
-      raiseLCDStatInterrupt(memory: memory)
-    }
   }
 }
 

@@ -142,6 +142,38 @@ extension LCDController {
     var windowY: UInt8 = 0
     var windowX: UInt8 = 0
 
+    // MARK: Raising interrupts
+
+    private func raiseLCDStatInterrupt(memory: AddressableMemory) {
+      var interruptFlag = LR35902.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
+      interruptFlag.insert(.lcdStat)
+      memory.write(interruptFlag.rawValue, to: LR35902.interruptFlagAddress)
+    }
+
+    func requestOAMInterruptIfNeeded(memory: AddressableMemory) {
+      if enableOAMInterrupt {
+        raiseLCDStatInterrupt(memory: memory)
+      }
+    }
+
+    func requestHBlankInterruptIfNeeded(memory: AddressableMemory) {
+      if enableHBlankInterrupt {
+        raiseLCDStatInterrupt(memory: memory)
+      }
+    }
+
+    func requestVBlankInterruptIfNeeded(memory: AddressableMemory) {
+      if enableVBlankInterrupt {
+        raiseLCDStatInterrupt(memory: memory)
+      }
+    }
+
+    func requestCoincidenceInterruptIfNeeded(memory: AddressableMemory) {
+      if coincidence && enableCoincidenceInterrupt {
+        raiseLCDStatInterrupt(memory: memory)
+      }
+    }
+
     // MARK: Data types
 
     func bitsForPalette(_ palette: Palette) -> UInt8 {

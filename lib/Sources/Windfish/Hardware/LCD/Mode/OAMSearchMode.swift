@@ -18,10 +18,6 @@ extension LCDController {
     private var didSearch = false
     private var cycles = 0
 
-    var finished: Bool {
-      return cycles >= LCDController.searchingOAMLength
-    }
-
     /** Starts the mode. */
     func start() {
       intersectedOAMs = []
@@ -29,12 +25,13 @@ extension LCDController {
     }
 
     /** Executes a single machine cycle.  */
-    func advance() {
+    func advance(memory: AddressableMemory) -> LCDCMode? {
       cycles += 1
-      // The search is performed in a single machine cycle as there are no apparent interactions between OAM search
+
+      // The search is performed in a single machine cycle because there are no apparent interactions between OAM search
       // and other parts of the hardware that require per-cycle emulation.
       if didSearch {
-        return
+        return cycles >= LCDController.searchingOAMLength ? .transferringToLCDDriver : nil
       }
 
       // TODO: Implement the OAM Search CPU Bug outlined in "The Ultimate Game Boy Talk (33c3)"
@@ -52,6 +49,8 @@ extension LCDController {
         }
       }
       didSearch = true
+
+      return nil
     }
   }
 }
