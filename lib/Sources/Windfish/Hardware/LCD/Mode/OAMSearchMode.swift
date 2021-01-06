@@ -6,32 +6,34 @@ import Foundation
 
 extension LCDController {
   final class OAMSearchMode {
-    init(oam: OAM, registers: LCDRegisters) {
+    init(oam: OAM, registers: LCDRegisters, lineCycleDriver: LineCycleDriver) {
       self.oam = oam
       self.registers = registers
+      self.lineCycleDriver = lineCycleDriver
     }
     var intersectedOAMs: [OAM.Sprite] = []
 
     private let oam: OAM
     private let registers: LCDRegisters
+    private let lineCycleDriver: LineCycleDriver
 
     private var didSearch = false
-    private var cycles = 0
 
     /** Starts the mode. */
     func start() {
       intersectedOAMs = []
+      lineCycleDriver.cycles = 0
       didSearch = false
     }
 
     /** Executes a single machine cycle.  */
     func advance(memory: AddressableMemory) -> LCDCMode? {
-      cycles += 1
+      lineCycleDriver.cycles += 1
 
       // The search is performed in a single machine cycle because there are no apparent interactions between OAM search
       // and other parts of the hardware that require per-cycle emulation.
       if didSearch {
-        return cycles >= LCDController.searchingOAMLength ? .transferringToLCDDriver : nil
+        return lineCycleDriver.cycles >= LCDController.searchingOAMLength ? .transferringToLCDDriver : nil
       }
 
       // TODO: Implement the OAM Search CPU Bug outlined in "The Ultimate Game Boy Talk (33c3)"

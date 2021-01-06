@@ -16,17 +16,24 @@ public final class LCDController {
 
   init(oam: OAM) {
     self.oam = oam
-    self.modeOAMSearch = OAMSearchMode(oam: oam, registers: registers)
-    self.modeVBlank = VBlankMode(registers: registers)
+    self.modeOAMSearch = OAMSearchMode(oam: oam, registers: registers, lineCycleDriver: lineCycleDriver)
+    self.modeVBlank = VBlankMode(registers: registers, lineCycleDriver: lineCycleDriver)
+    self.modeHBlank = HBlankMode(registers: registers, lineCycleDriver: lineCycleDriver)
   }
 
   let oam: OAM
   let registers = LCDRegisters()
   private let modeOAMSearch: OAMSearchMode
   private let modeVBlank: VBlankMode
+  private let modeHBlank: HBlankMode
 
   var bufferToggle = false
   public static let screenSize = (width: 160, height: 144)
+
+  final class LineCycleDriver {
+    var cycles: Int = 0
+  }
+  private let lineCycleDriver = LineCycleDriver()
 
   enum Addresses: LR35902.Address {
     case LCDC = 0xFF40
@@ -230,7 +237,7 @@ extension LCDController {
         changeMode(to: nextMode)
         lcdModeCycle = 20
       }
-      
+
     case .transferringToLCDDriver:
       transferringToLCDDriverCycle += 1
 
@@ -254,24 +261,12 @@ extension LCDController {
       }
 
     case .hblank:
-      if lcdModeCycle >= LCDController.scanlineCycleLength {
-        registers.ly += 1
-        if registers.ly < 144 {
-          changeMode(to: .searchingOAM)
-        } else {
-          // No more lines to draw.
-          changeMode(to: .vblank)
-
+      if let nextMode = modeHBlank.advance(memory: memory) {
+        // TODO: Once all modes are handled by classes this switch statement can be removed and this handled generally.
+        if nextMode == .vblank {
           vblankCounter += 1
-          var interruptFlag = LR35902.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
-          interruptFlag.insert(.vBlank)
-          memory.write(interruptFlag.rawValue, to: LR35902.interruptFlagAddress)
-
-          registers.requestVBlankInterruptIfNeeded(memory: memory)
         }
-
-        registers.requestOAMInterruptIfNeeded(memory: memory)
-        registers.requestCoincidenceInterruptIfNeeded(memory: memory)
+        changeMode(to: nextMode)
       }
 
     case .vblank:

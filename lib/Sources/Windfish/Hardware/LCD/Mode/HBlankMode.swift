@@ -1,7 +1,7 @@
 import Foundation
 
 extension LCDController {
-  final class VBlankMode {
+  final class HBlankMode {
     init(registers: LCDRegisters, lineCycleDriver: LineCycleDriver) {
       self.registers = registers
       self.lineCycleDriver = lineCycleDriver
@@ -12,7 +12,6 @@ extension LCDController {
 
     /** Starts the mode. */
     func start() {
-      lineCycleDriver.cycles = 0
     }
 
     /** Executes a single machine cycle.  */
@@ -21,16 +20,22 @@ extension LCDController {
 
       var nextMode: LCDCMode? = nil
 
-      if lineCycleDriver.cycles % LCDController.scanlineCycleLength == 0 {
+      if lineCycleDriver.cycles >= LCDController.scanlineCycleLength {
         registers.ly += 1
-
-        if registers.ly >= 154 {
-          registers.ly = 0
-          registers.requestOAMInterruptIfNeeded(memory: memory)
-
+        if registers.ly < 144 {
           nextMode = .searchingOAM
+        } else {
+          // No more lines to draw.
+          nextMode = .vblank
+
+          var interruptFlag = LR35902.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
+          interruptFlag.insert(.vBlank)
+          memory.write(interruptFlag.rawValue, to: LR35902.interruptFlagAddress)
+
+          registers.requestVBlankInterruptIfNeeded(memory: memory)
         }
 
+        registers.requestOAMInterruptIfNeeded(memory: memory)
         registers.requestCoincidenceInterruptIfNeeded(memory: memory)
       }
 
