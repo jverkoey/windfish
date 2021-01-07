@@ -11,6 +11,37 @@ class PPUTests: XCTestCase {
     XCTAssertEqual(controller.registers.lyc, 0)
   }
 
+  func testModeTimings() {
+    let controller = PPU(oam: OAM())
+    let memory = TestMemory()
+
+    // Initial state.
+    XCTAssertEqual(controller.registers.lcdMode, .searchingOAM)
+
+    for line: UInt8 in 0..<154 {
+      for cycle in 1...114 {
+        controller.advance(memory: memory)
+
+        if line < 144 {
+          if cycle <= 20 {
+            XCTAssertEqual(controller.registers.lcdMode, .searchingOAM, "line: \(line) cycle: \(cycle)")
+          } else if cycle <= 63 {
+            XCTAssertEqual(controller.registers.lcdMode, .pixelTransfer, "line: \(line) cycle: \(cycle)")
+          } else {
+            XCTAssertEqual(controller.registers.lcdMode, .hblank, "line: \(line) cycle: \(cycle)")
+          }
+        } else {
+          XCTAssertEqual(controller.registers.lcdMode, .vblank, "line: \(line) cycle: \(cycle)")
+        }
+      }
+    }
+
+    // Mode is committed one cycle delayed
+    XCTAssertEqual(controller.registers.lcdMode, .vblank)
+    controller.advance(memory: memory)
+    XCTAssertEqual(controller.registers.lcdMode, .searchingOAM)
+  }
+
   func testLYTimings() {
     let controller = PPU(oam: OAM())
     let memory = TestMemory()
