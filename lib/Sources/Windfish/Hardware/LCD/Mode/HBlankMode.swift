@@ -20,8 +20,8 @@ extension PPU {
       var nextMode: LCDCMode? = nil
 
       if lineCycleDriver.cycles >= PPU.scanlineCycleLength {
-        registers.ly += 1
-        if registers.ly < 144 {
+        lineCycleDriver.scanline += 1
+        if lineCycleDriver.scanline < 144 {
           nextMode = .searchingOAM
         } else {
           // No more lines to draw.
@@ -35,7 +35,6 @@ extension PPU {
         }
 
         registers.requestOAMInterruptIfNeeded(memory: memory)
-        registers.requestCoincidenceInterruptIfNeeded(memory: memory)
       }
 
       return nextMode

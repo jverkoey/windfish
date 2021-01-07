@@ -92,7 +92,7 @@ extension PPU {
     var enableOAMInterrupt = false             //   x
     var enableVBlankInterrupt = false          //    x
     var enableHBlankInterrupt = false          //     x
-    var coincidence: Bool { return ly == lyc } //      x
+    var coincidence: Bool = true               //      x
     var lcdMode = LCDCMode.searchingOAM        //       xx
                                                // 76543210
 
@@ -144,7 +144,7 @@ extension PPU {
 
     // MARK: Raising interrupts
 
-    private func raiseLCDStatInterrupt(memory: AddressableMemory) {
+    func raiseLCDStatInterrupt(memory: AddressableMemory) {
       var interruptFlag = LR35902.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
       interruptFlag.insert(.lcdStat)
       memory.write(interruptFlag.rawValue, to: LR35902.interruptFlagAddress)
@@ -164,12 +164,6 @@ extension PPU {
 
     func requestVBlankInterruptIfNeeded(memory: AddressableMemory) {
       if enableVBlankInterrupt {
-        raiseLCDStatInterrupt(memory: memory)
-      }
-    }
-
-    func requestCoincidenceInterruptIfNeeded(memory: AddressableMemory) {
-      if coincidence && enableCoincidenceInterrupt {
         raiseLCDStatInterrupt(memory: memory)
       }
     }
@@ -232,20 +226,16 @@ extension PPU {
   enum LCDCMode {
     var bits: UInt8 {
       switch self {
-      case .hblank:                   return 0b0000_0000
-      case .vblank:                   return 0b0000_0001
-      case .searchingOAM:             return 0b0000_0010
+      case .hblank:         return 0b0000_0000
+      case .vblank:         return 0b0000_0001
+      case .searchingOAM:   return 0b0000_0010
       case .pixelTransfer:  return 0b0000_0011
       }
     }
 
-    case hblank                   // Mode 0
-    case vblank                   // Mode 1
-
-    // TODO: Not able to read oamram during this mode
-    case searchingOAM             // Mode 2
-
-    // TODO: Any reads of vram or oamram during this mode should return 0xff; writes are ignored
+    case hblank         // Mode 0
+    case vblank         // Mode 1
+    case searchingOAM   // Mode 2
     case pixelTransfer  // Mode 3
   }
 }

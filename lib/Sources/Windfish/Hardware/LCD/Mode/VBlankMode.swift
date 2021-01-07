@@ -21,8 +21,9 @@ extension PPU {
 
       var nextMode: LCDCMode? = nil
 
-      if lineCycleDriver.cycles % PPU.scanlineCycleLength == 0 {
-        registers.ly += 1
+      if lineCycleDriver.cycles >= PPU.scanlineCycleLength {
+        lineCycleDriver.cycles = 0
+        lineCycleDriver.scanline += 1
 
         // TODO: Evaluate whether line 153 needs to treated as line 0 for lcd STAT purposes.
         // - http://forums.nesdev.com/viewtopic.php?f=20&t=13727
@@ -31,14 +32,11 @@ extension PPU {
         // - https://github.com/LIJI32/SameBoy/blob/29a3b18186c181399f4b99b9111ca9d8b5726886/Core/display.c#L1357-L1378
         // - https://github.com/trekawek/coffee-gb/blob/088b86fb17109b8cac98e6394108b3561f443d54/src/main/java/eu/rekawek/coffeegb/gpu/Gpu.java#L178-L182
 
-        if registers.ly >= 154 {
-          registers.ly = 0
+        if lineCycleDriver.scanline >= 154 {
+          lineCycleDriver.scanline = 0
           registers.requestOAMInterruptIfNeeded(memory: memory)
-
           nextMode = .searchingOAM
         }
-
-        registers.requestCoincidenceInterruptIfNeeded(memory: memory)
       }
 
       return nextMode

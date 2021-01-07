@@ -10,11 +10,108 @@ class PPUTests: XCTestCase {
     XCTAssertEqual(controller.registers.ly, 0)
     XCTAssertEqual(controller.registers.lyc, 0)
   }
+
+  func testLYTimings() {
+    let controller = PPU(oam: OAM())
+    let memory = TestMemory()
+
+    // Initial state.
+    XCTAssertEqual(controller.registers.ly, 0)
+
+    for line: UInt8 in 0..<154 {
+      for cycle in 1...114 {
+        controller.advance(memory: memory)
+
+        if line < 153 {
+          if cycle < 114 {
+            // Still on the same line.
+            XCTAssertEqual(controller.registers.ly, line, "line: \(line) cycle: \(cycle)")
+          } else {
+            // We've advanced a line.
+            XCTAssertEqual(controller.registers.ly, line + 1, "line: \(line) cycle: \(cycle)")
+          }
+        }
+        if line == 153 {
+          if cycle == 1 {
+            // Still on the same line.
+            XCTAssertEqual(controller.registers.ly, line, "line: \(line) cycle: \(cycle)")
+          } else {
+            // Remainder of line is simulated as line zero.
+            XCTAssertEqual(controller.registers.ly, 0, "line: \(line) cycle: \(cycle)")
+          }
+        }
+      }
+    }
+
+    // Final state should equal initial state.
+    XCTAssertEqual(controller.registers.ly, 0)
+  }
+
+  func testCoincidenceTimings() {
+    for lyc: UInt8 in [0, 1, 143, 144, 152, 153] {
+      let controller = PPU(oam: OAM())
+      let memory = TestMemory()
+
+      // Initial state.
+      XCTAssertTrue(controller.registers.coincidence, "lyc: \(lyc)")
+
+      controller.registers.lyc = lyc
+
+      for line: UInt8 in 0..<154 {
+        for cycle in 1...114 {
+          controller.advance(memory: memory)
+
+          if cycle == 1 {
+            // Coincidence is never set on the first cycle.
+            XCTAssertFalse(controller.registers.coincidence, "lyc: \(lyc) line: \(line) cycle: \(cycle)")
+          } else if line < 153 {
+            // Coincidence is true when the line == lyc
+            if line == lyc {
+              XCTAssertTrue(controller.registers.coincidence, "lyc: \(lyc) line: \(line) cycle: \(cycle)")
+            } else {
+              XCTAssertFalse(controller.registers.coincidence, "lyc: \(lyc) line: \(line) cycle: \(cycle)")
+            }
+          } else {
+            if lyc == 153 {
+              // ly coincidence is only set for 153 on the second cycle
+              if cycle == 2 {
+                XCTAssertTrue(controller.registers.coincidence, "lyc: \(lyc) line: \(line) cycle: \(cycle)")
+              } else {
+                XCTAssertFalse(controller.registers.coincidence, "lyc: \(lyc) line: \(line) cycle: \(cycle)")
+              }
+            } else if lyc == 0 {
+              // ly is set to 0 on cycle 2 but it only affects coincidence starting on cycle 4.
+              if cycle >= 4 {
+                XCTAssertTrue(controller.registers.coincidence, "lyc: \(lyc) line: \(line) cycle: \(cycle)")
+              } else {
+                XCTAssertFalse(controller.registers.coincidence, "lyc: \(lyc) line: \(line) cycle: \(cycle)")
+              }
+            }
+          }
+        }
+      }
+
+      // Coincidence at end is only true for the lyc == 0 case
+      if lyc == 0 {
+        XCTAssertTrue(controller.registers.coincidence, "lyc: \(lyc)")
+      } else {
+        XCTAssertFalse(controller.registers.coincidence, "lyc: \(lyc)")
+      }
+    }
+  }
 }
 
 class PPUFetcherTests: XCTestCase {
+  var registers: PPU.LCDRegisters!
+
+  override func setUp() {
+    super.setUp()
+
+    registers = .init()
+  }
+
   func testZero() {
-    let fetcher = PPU.PixelTransferMode.Fetcher()
+    let fetcher = PPU.PixelTransferMode.Fetcher(registers: registers)
 
     // Zero
     for tileMapAddress: PPU.TileMapAddress in [.x9800, .x9C00] {
@@ -28,7 +125,7 @@ class PPUFetcherTests: XCTestCase {
   }
 
   func testXValues() {
-    let fetcher = PPU.PixelTransferMode.Fetcher()
+    let fetcher = PPU.PixelTransferMode.Fetcher(registers: registers)
 
     for tileMapAddress: PPU.TileMapAddress in [.x9800, .x9C00] {
       // Edge of tile 0/1
@@ -58,7 +155,7 @@ class PPUFetcherTests: XCTestCase {
   }
 
   func testYValues() {
-    let fetcher = PPU.PixelTransferMode.Fetcher()
+    let fetcher = PPU.PixelTransferMode.Fetcher(registers: registers)
 
     for tileMapAddress: PPU.TileMapAddress in [.x9800, .x9C00] {
       // Tile 0, row 1

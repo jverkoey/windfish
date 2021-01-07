@@ -34,7 +34,8 @@ public final class PPU {
   /** An executable representation of the LCDMode register. */
   private var mode: PPUMode {
     get {
-      switch registers.lcdMode {
+      // If a deferred mode has been set we prefer that over what's actually in the register.
+      switch deferredLCDMode ?? registers.lcdMode {
       case .searchingOAM:   return modeOAMSearch
       case .vblank:         return modeVBlank
       case .pixelTransfer:  return modePixelTransfer
@@ -52,8 +53,57 @@ public final class PPU {
 
   final class LineCycleDriver {
     var cycles: Int = 0
+
+    /**
+     The effective scanline of the PPU.
+
+     This value typically equals ly, but in some cases deviates when ly. See the advance method for detailed timing on
+     this behavior.
+     */
+    var scanline: UInt8 = 0
   }
   private let lineCycleDriver = LineCycleDriver()
+
+  /**
+   LCD Mode gets synchronized to the register on the second cycle of the mode.
+
+   This value is set to the register on the subsequent machine instruction from which it was set.
+
+   Resources:
+   - Section 8.9. "LY, LYC, STAT and IF Timings. STAT LY=LYC interrupt" in https://github.com/AntonioND/giibiiadvance/blob/master/docs/TCAGBD.pdf
+
+   Note the timing charts below, in which STAT mode is updated one machine cycle into the relevant phase. The M-clocks
+   indicates the cycle count at the start of a single machine cycle advance. | is used to indicate a mode change.
+
+   ## Line 0...143
+   ```
+              | OAM Search             | Pixel Transfer  | H-Blank
+   M-clocks   | 0   1   2   3   ...  19| 20  21  22  23 ... 112 113
+   STAT mode  | 0   2   2   2         2|  2   3   3   3       0   0
+   ```
+
+   ## Line 144
+   ```
+              | VBlank
+   M-clocks   | 0   1   2   3   ...  19  20  21  22  23 ... 112 113
+   STAT mode  | 0   1   1   1         1   1   1   1   1       1   1
+   ```
+
+   ## Line 145...153
+   ```
+                ...continuation of VBlank
+   M-clocks     0   1   2   3   ...  19  20  21  22  23 ... 112 113
+   STAT mode    1   1   1   1         1   1   1   1   1       1   1
+   ```
+   */
+  private var deferredLCDMode: LCDCMode?
+
+  /**
+   The ly value that should be used for ly==lyc comparison.
+
+   This always shows the value of ly from one machine cycle prior.
+   */
+  private var lyForComparison: UInt8 = 0
 
   enum Addresses: LR35902.Address {
     case LCDC = 0xFF40
@@ -94,6 +144,12 @@ extension PPU {
       return
     }
 
+    // See docs of deferredLCDMode for more details on this timing.
+    if let deferredLCDMode = deferredLCDMode {
+      registers.lcdMode = deferredLCDMode
+      self.deferredLCDMode = nil
+    }
+
     // Advance the state machine.
     if let nextMode = self.mode.advance(memory: memory) {
       if registers.lcdMode == .searchingOAM && nextMode == .pixelTransfer {
@@ -106,10 +162,100 @@ extension PPU {
       }
       changeMode(to: nextMode)
     }
+
+    /**
+     ly == lyc interrupt flag gets set on a specific cycle depending on the line:
+
+     ## Line 0
+     ```
+                | OAM Search             | Pixel Transfer  | H-Blank
+     M-clocks   | 0   1   2   3   ...  19| 20  21  22  23 ... 112 113
+     LY         | 0   0   0   0         0|  0   0   0   0       0   0
+     LY for LYC | 0   0   0   0         0|  0   0   0   0       0   0
+     IF LY==LYC |                        |
+     ```
+
+     ## Line 1-143
+     ```
+                | OAM Search             | Pixel Transfer  | H-Blank
+     M-clocks   | 0   1   2   3   ...  19| 20  21  22  23 ... 112 113
+     LY         |13  13  13  13        13| 13  13  13  13      13  13
+     LY for LYC |    13  13  13        13| 13  13  13  13      13  13
+     IF LY==LYC |     1                  |
+     ```
+
+     ## Line 144-152
+     ```
+                | V-Blank
+     M-clocks   |  0   1   2   3   ...  19| 20  21  22  23 ... 112 113
+     LY         |144 144 144 144       144|144 144 144 144     144 144
+     LY for LYC |    144 144 144       144|144 144 144 144     144 144
+     IF LY==LYC |      1                  |
+     ```
+
+     ## Line 153
+     ```
+                | V-Blank
+     M-clocks   |  0   1   2   3   ...  19| 20  21  22  23 ... 112 113
+     LY         |153   0   0   0         0|  0   0   0   0       0   0
+     LY for LYC |    153       0         0|  0   0   0   0       0   0
+     IF LY==LYC |      1       1          |
+     ```
+
+     Key points:
+     - Line 0: No LY==LYC interrupt fired
+     - Lines 1...152: LY==LYC interrupt fired on second machine cycle of the line
+     - Line 153: LY==LYC interrupt fired twice; once for 
+
+     Resources:
+     - "8.9.1. Timings in DMG" in https://github.com/AntonioND/giibiiadvance/blob/master/docs/TCAGBD.pdf
+    */
+
+    precondition(lineCycleDriver.scanline >= 0 && lineCycleDriver.scanline <= 153, "Scanline is out of bounds.")
+
+    // Flush the scanline to ly
+    if lineCycleDriver.scanline < 153 {
+      registers.ly = lineCycleDriver.scanline
+    } else if lineCycleDriver.scanline == 153 {
+      if lineCycleDriver.cycles <= 1 {
+        registers.ly = lineCycleDriver.scanline
+      } else {
+        registers.ly = 0  // Force ly to 0 for the remainder of this line.
+      }
+    }
+
+    // Update coincidence
+    if lineCycleDriver.cycles == 1 || (lineCycleDriver.cycles == 3 && lineCycleDriver.scanline == 153) {
+      // Coincidence is always off when the hardware is loading LY for comparison.
+      registers.coincidence = false
+    } else {
+      // At all other times, coincidence should reflect equality of the last cycle's ly value and lyc.
+      registers.coincidence = lyForComparison == registers.lyc
+    }
+
+    // Fire interrupts
+    if lineCycleDriver.scanline >= 1 && lineCycleDriver.scanline <= 153 && lineCycleDriver.cycles == 2 {
+      // Always fire on the second cycle of the line.
+      requestCoincidenceInterruptIfNeeded(memory: memory)
+    } else if lineCycleDriver.scanline == 153 && (lineCycleDriver.cycles == 2 || lineCycleDriver.cycles == 4) {
+      // Except on line 153, which fires on cycle 2 for ly==lyc==153 and on cycle 4 for ly==lyc==0
+      requestCoincidenceInterruptIfNeeded(memory: memory)
+    }
+
+    // Queue up LY for comparison for the next machine cycle
+    lyForComparison = registers.ly
+  }
+
+  private func requestCoincidenceInterruptIfNeeded(memory: AddressableMemory) {
+    if registers.coincidence && registers.enableCoincidenceInterrupt {
+      registers.raiseLCDStatInterrupt(memory: memory)
+    }
   }
 
   private func changeMode(to mode: LCDCMode) {
-    registers.lcdMode = mode
+    // See docs of deferredLCDMode for more details on this timing.
+    deferredLCDMode = mode
+
     self.mode.start()
   }
 }
@@ -242,6 +388,7 @@ extension PPU: AddressableMemory {
       //
       if wasLCDDisplayEnabled && !registers.lcdDisplayEnable {
         registers.ly = 0
+        lineCycleDriver.scanline = 0
         changeMode(to: .searchingOAM)
       }
       // TODO: Do we need to do anything when the LCD is enabled again? There is mention that the first frame after

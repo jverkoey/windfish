@@ -8,6 +8,7 @@ extension PPU {
     init(registers: LCDRegisters, lineCycleDriver: LineCycleDriver) {
       self.registers = registers
       self.lineCycleDriver = lineCycleDriver
+      self.fetcher = Fetcher(registers: registers)
     }
 
     private let registers: LCDRegisters
@@ -16,6 +17,11 @@ extension PPU {
     var intersectedOAMs: [OAM.Sprite] = []
 
     final class Fetcher {
+      init(registers: LCDRegisters) {
+        self.registers = registers
+      }
+
+      private let registers: LCDRegisters
       var tileMapAddress: LR35902.Address = 0
       var tileDataAddress: TileDataAddress = .x8000
       var tileMapAddressOffset: UInt16 = 0
@@ -31,8 +37,13 @@ extension PPU {
         self.tileMapAddressOffset = wideX / PPU.PixelsPerTile
         self.tilePixelY = wideY % PPU.PixelsPerTile
       }
+
+      func advance() {
+        // TODO: Figure out what level of timing is needed here. Likely needs tick-level granularity.
+        let tileIndex = registers.tileMap[Int(truncatingIfNeeded: tileMapAddress + tileMapAddressOffset - PPU.tileMapRegion.lowerBound)]
+      }
     }
-    private let fetcher = Fetcher()
+    private let fetcher: Fetcher
     private var fifo: [Pixel] = []
 
     private struct Pixel {
@@ -57,10 +68,10 @@ extension PPU {
       fetcher.start(tileMapAddress: registers.backgroundTileMapAddress,
                     tileDataAddress: registers.tileDataAddress,
                     x: registers.scx,
-                    y: registers.ly &+ registers.scy)
+                    y: lineCycleDriver.scanline &+ registers.scy)
 
-      windowYPlot = registers.ly &- registers.windowY
-      bgYPlot = registers.ly &+ registers.scy
+      windowYPlot = lineCycleDriver.scanline &- registers.windowY
+      bgYPlot = lineCycleDriver.scanline &+ registers.scy
       scanlineX = 0
       scanlineScrollX = registers.scx
     }
@@ -99,12 +110,12 @@ extension PPU {
     }
 
     private func plot() {
-      if registers.windowEnable && (registers.windowX &- 7) <= scanlineX && registers.windowY <= registers.ly {
-        plot(x: scanlineX, y: registers.ly,
+      if registers.windowEnable && (registers.windowX &- 7) <= scanlineX && registers.windowY <= lineCycleDriver.scanline {
+        plot(x: scanlineX, y: lineCycleDriver.scanline,
              byte: backgroundPixel(x: scanlineX &- (registers.windowX &- 7), y: windowYPlot, window: true),
              palette: registers.backgroundPalette)
       } else if registers.backgroundEnable {
-        plot(x: scanlineX, y: registers.ly,
+        plot(x: scanlineX, y: lineCycleDriver.scanline,
              byte: backgroundPixel(x: scanlineX &+ scanlineScrollX, y: bgYPlot, window: false),
              palette: registers.backgroundPalette)
       } else {
@@ -120,7 +131,7 @@ extension PPU {
           continue
         }
         let wideScanlineX = Int16(truncatingIfNeeded: Int8(bitPattern: scanlineX))
-        let wideScanlineY = Int16(truncatingIfNeeded: Int8(bitPattern: registers.ly))
+        let wideScanlineY = Int16(truncatingIfNeeded: Int8(bitPattern: lineCycleDriver.scanline))
         let wideSpriteX = Int16(truncatingIfNeeded: Int8(bitPattern: sprite.x))
         let wideSpriteY = Int16(truncatingIfNeeded: Int8(bitPattern: sprite.y))
         let tileIndex: Int16
@@ -173,7 +184,7 @@ extension PPU {
             case .obj1pal:
               palette = registers.objectPallete1
             }
-            plot(x: scanlineX, y: registers.ly, byte: pixel, palette: palette)
+            plot(x: scanlineX, y: lineCycleDriver.scanline, byte: pixel, palette: palette)
           }
           break
         }
