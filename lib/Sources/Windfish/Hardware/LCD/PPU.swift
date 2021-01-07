@@ -402,8 +402,8 @@ extension PPU: AddressableMemory {
       // - https://forums.nesdev.com/viewtopic.php?t=16434#p203762
       // "When the LCD is off this register is fixed at 00h."
       // - https://github.com/AntonioND/giibiiadvance/blob/master/docs/TCAGBD.pdf
-      // With the above in mind, we simply ignore writes to this register. Note that this contradicts the Pan Docs which
-      // states that "Writing will reset the counter."
+      // With the above in mind, we simply ignore writes to this register. This relies on turning the LCD off setting
+      // ly to 0. Note that this behavior contradicts the Pan Docs which states that "Writing will reset the counter."
       // - https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
       break
 
