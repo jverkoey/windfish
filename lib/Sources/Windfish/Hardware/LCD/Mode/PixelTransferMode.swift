@@ -1,5 +1,16 @@
 import Foundation
 
+extension UnsafeMutableRawBufferPointer {
+  fileprivate subscript(index: LR35902.Address) -> UInt8 {
+    get { return self[Int16(bitPattern: index)] }
+    set { self[Int16(bitPattern: index)] = newValue }
+  }
+  fileprivate subscript(index: Int16) -> UInt8 {
+    get { return self[Int(truncatingIfNeeded: index)] }
+    set { self[Int(truncatingIfNeeded: index)] = newValue }
+  }
+}
+
 extension PPU {
   private static let TilesPerRow: UInt16 = 32
   private static let PixelsPerTile: UInt16 = 8
@@ -8,7 +19,8 @@ extension PPU {
     init(registers: LCDRegisters, lineCycleDriver: LineCycleDriver) {
       self.registers = registers
       self.lineCycleDriver = lineCycleDriver
-      self.fetcher = Fetcher(registers: registers)
+      self.fifo = Fifo()
+      self.fetcher = Fetcher(registers: registers, fifo: fifo)
     }
 
     private let registers: LCDRegisters
@@ -16,42 +28,118 @@ extension PPU {
 
     var intersectedOAMs: [OAM.Sprite] = []
 
-    final class Fetcher {
-      init(registers: LCDRegisters) {
-        self.registers = registers
-      }
-
-      private let registers: LCDRegisters
-      var tileMapAddress: LR35902.Address = 0
-      var tileDataAddress: TileDataAddress = .x8000
-      var tileMapAddressOffset: UInt16 = 0
-      var tilePixelY: UInt16 = 0
-
-      func start(tileMapAddress: TileMapAddress, tileDataAddress: TileDataAddress, x: UInt8, y: UInt8) {
-        let wideX = UInt16(truncatingIfNeeded: x)
-        let wideY = UInt16(truncatingIfNeeded: y)
-        let tileY = wideY / PPU.PixelsPerTile
-
-        self.tileMapAddress = tileMapAddress.address + tileY * PPU.TilesPerRow
-        self.tileDataAddress = tileDataAddress
-        self.tileMapAddressOffset = wideX / PPU.PixelsPerTile
-        self.tilePixelY = wideY % PPU.PixelsPerTile
-      }
-
-      func advance() {
-        // TODO: Figure out what level of timing is needed here. Likely needs tick-level granularity.
-        let tileIndex = registers.tileMap[Int(truncatingIfNeeded: tileMapAddress + tileMapAddressOffset - PPU.tileMapRegion.lowerBound)]
-      }
-    }
-    private let fetcher: Fetcher
-    private var fifo: [Pixel] = []
-
-    private struct Pixel {
-      let color: UInt8
-      let palette: UInt8
+    struct Pixel {
+      let colorIndex: UInt8
+      let palette: Palette
       let spritePriority: UInt8
       let bgPriority: UInt8
     }
+    final class Fifo {
+      var pixels: [Pixel] = []
+
+      func dequeuePixel() -> UInt8 {
+        let pixel = pixels.removeFirst()
+        return pixel.palette[Int(truncatingIfNeeded: pixel.colorIndex)]
+      }
+    }
+    final class Fetcher {
+      init(registers: LCDRegisters, fifo: Fifo) {
+        self.registers = registers
+        self.fifo = fifo
+      }
+
+      private let registers: LCDRegisters
+      private let fifo: Fifo
+
+      var tileMapAddress: LR35902.Address = 0
+      var tileDataAddress: TileDataAddress = .x8000
+      var tileMapAddressOffset: UInt16 = 0
+      var tilePixelY: Int16 = 0
+      private var tickAlternator = false
+      private enum State {
+        case readTileNumber
+        case readData0
+        case readData1
+        case pushToFifo
+      }
+      private var state: State = .readTileNumber
+      private var tileIndex: UInt8 = 0
+      private var data0: UInt8 = 0
+      private var data1: UInt8 = 0
+
+      /** Prepares the fetcher to start fetching a new line of pixels. */
+      func start(tileMapAddress: TileMapAddress, tileDataAddress: TileDataAddress, x: UInt8, y: UInt8) {
+        let wideX = UInt16(truncatingIfNeeded: x)
+        let wideY = UInt16(truncatingIfNeeded: y)
+
+        self.tileMapAddress = tileMapAddress.address + (wideY / PPU.PixelsPerTile) * PPU.TilesPerRow
+        self.tileDataAddress = tileDataAddress
+        tileMapAddressOffset = wideX / PPU.PixelsPerTile
+        tilePixelY = Int16(bitPattern: wideY % PPU.PixelsPerTile)
+        fifo.pixels.removeAll()
+      }
+
+      func tick() {
+        // Fetcher operates on a 2 t-cycle clock speed.
+        // - "The Ultimate Game Boy Talk (33c3)": https://youtu.be/HyzD8pNlpwI?t=3054
+        tickAlternator = !tickAlternator
+        if tickAlternator {
+          return
+        }
+
+        switch state {
+        case .readTileNumber:
+          tileIndex = registers.tileMap[tileMapAddress + tileMapAddressOffset - PPU.tileMapRegion.lowerBound]
+          state = .readData0
+
+        case .readData0:
+          data0 = getBackgroundTileData(tileIndex: tileIndex, byte: 0)
+          state = .readData1
+
+        case .readData1:
+          data1 = getBackgroundTileData(tileIndex: tileIndex, byte: 1)
+          state = .pushToFifo
+
+        case .pushToFifo:
+          guard fifo.pixels.count <= 8 else {
+            break
+          }
+          for i: UInt8 in stride(from: 7, through: 0, by: -1) {
+            let bitMask: UInt8 = 1 << i
+            let lsb: UInt8 = ((data0 & bitMask) > 0) ? 0b01 : 0
+            let msb: UInt8 = ((data1 & bitMask) > 0) ? 0b10 : 0
+            fifo.pixels.append(.init(colorIndex: msb | lsb, palette: registers.backgroundPalette,
+                                     spritePriority: 0, bgPriority: 0))
+          }
+          tileMapAddressOffset = (tileMapAddress + 1) % PPU.TilesPerRow
+          state = .readTileNumber
+        }
+      }
+
+      private func getBackgroundTileData(tileIndex: UInt8, byte: Int16) -> UInt8 {
+        // For simplicity's sake, we always treat the tile index as a signed 16 bit value. We can do this because the
+        // tile index can never, by definition, be greater than 255, so there's no risk of the unsigned tile index
+        // becoming negative.
+        let dataIndex: Int16
+        switch tileDataAddress {
+        // Converting from UInt8 to Int16 requires a bit of a dance depending on the intended representation of the
+        // UInt8's value. When it's actually a signed value, we need to be careful that extending the size of the byte
+        // also extends the sign bit. Doing so requires that we bit-pattern cast to an Int8 and then extend the size to
+        // an Int16.
+        case .x8800: dataIndex = Int16(truncatingIfNeeded: Int8(bitPattern: tileIndex))
+        // Extending an unsigned byte is a bit more straightforward, as we can directly extend the type to a UInt16.
+        case .x8000: dataIndex = Int16(bitPattern: UInt16(truncatingIfNeeded: tileIndex))
+        }
+        let address = tileDataAddress.baseAddress &+ UInt16(bitPattern: dataIndex &* 16 + tilePixelY &* 2 + byte)
+        return registers.tileData[Int(truncatingIfNeeded: address - PPU.tileDataRegion.lowerBound)]
+      }
+    }
+    private let fetcher: Fetcher
+    private var fifo: Fifo
+    private var droppedPixels: UInt8 = 0
+    private var screenPlotAnchor: Int = 0
+    private var screenPlotOffset: Int = 0
+
     private var scanlineX: UInt8 = 0
     private var scanlineScrollX: UInt8 = 0
     private var windowYPlot: UInt8 = 0
@@ -64,21 +152,67 @@ extension PPU {
 
       // TODO: Check registers.backgroundEnable and registers.windowEnable
       precondition(registers.backgroundEnable)  // Disabled behavior not currently implemented.
+      precondition(!registers.windowEnable)  // Window not currently implemented.
 
+      // FIFO+Fetcher logic
       fetcher.start(tileMapAddress: registers.backgroundTileMapAddress,
                     tileDataAddress: registers.tileDataAddress,
                     x: registers.scx,
                     y: lineCycleDriver.scanline &+ registers.scy)
+      droppedPixels = 0
+      screenPlotAnchor = Int(truncatingIfNeeded: lineCycleDriver.scanline) * PPU.screenSize.width
+      screenPlotOffset = 0
 
+      // Old logic
       windowYPlot = lineCycleDriver.scanline &- registers.windowY
       bgYPlot = lineCycleDriver.scanline &+ registers.scy
       scanlineX = 0
       scanlineScrollX = registers.scx
     }
 
+    func tick(memory: AddressableMemory) -> LCDCMode? {
+      fetcher.tick()
+
+      if registers.backgroundEnable {
+        guard fifo.pixels.count > 8 else {
+          return nil
+        }
+
+        // Scrolling is implemented by dropping pixels from the fifo up until the scx.
+        // - "The Ultimate Game Boy Talk (33c3)": https://youtu.be/HyzD8pNlpwI?t=3104
+        if droppedPixels < registers.scx % UInt8(truncatingIfNeeded: PPU.PixelsPerTile) {
+          fifo.pixels.removeFirst()
+          droppedPixels += 1
+          return nil
+        }
+
+        // TODO: Check if we need to start fetching the window.
+      }
+
+      if registers.objEnable {
+        // TODO: Implement spriting.
+      }
+
+      registers.screenData[screenPlotAnchor + screenPlotOffset] = fifo.dequeuePixel()
+
+      screenPlotOffset += 1
+      if screenPlotOffset >= 160 {
+        registers.requestHBlankInterruptIfNeeded(memory: memory)
+        return .hblank
+      }
+      return nil
+    }
+
     /** Executes a single machine cycle.  */
     func advance(memory: AddressableMemory) -> LCDCMode? {
       lineCycleDriver.cycles += 1
+
+      for _ in 1...4 {
+        if let nextMode = tick(memory: memory) {
+          return nextMode
+        }
+      }
+      return nil
 
       var nextMode: LCDCMode? = nil
 

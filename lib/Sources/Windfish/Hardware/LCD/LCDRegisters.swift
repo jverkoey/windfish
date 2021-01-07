@@ -187,7 +187,7 @@ extension PPU {
     }
   }
 
-  typealias Palette = [UInt8]
+  typealias Palette = ContiguousArray<UInt8>
 
   enum TileMapAddress {
     case x9800 // 0
@@ -204,7 +204,7 @@ extension PPU {
     case x8800 // 0
     case x8000 // 1
 
-    var address: LR35902.Address {
+    var baseAddress: LR35902.Address {
       switch self {
       case .x8800: return 0x8800 + 0x800  // Data is accessed using a signed int8, so offset to the center of the region
       case .x8000: return 0x8000
