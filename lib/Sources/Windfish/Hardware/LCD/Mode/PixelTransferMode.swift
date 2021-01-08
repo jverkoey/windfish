@@ -223,8 +223,10 @@ extension PPU {
     func advance(memory: AddressableMemory) -> LCDCMode? {
       lineCycleDriver.cycles += 1
 
-      for _ in 1...4 {
+      for i in 1...4 {
         if let nextMode = tick(memory: memory) {
+          // TODO: This doesn't always consume an entire machine cycle, so may need to move to tick-based emulation
+          // in order to time this correctly.
           return nextMode
         }
       }
