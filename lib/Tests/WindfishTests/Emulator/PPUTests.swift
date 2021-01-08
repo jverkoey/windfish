@@ -238,135 +238,226 @@ class PPUFetcherTests: XCTestCase {
     }
   }
 
+  func testStateMachineLines() {
+    for ly in [
+      0, 1, 7,  // ytile: 0
+      8,        // ytile: 1
+      16,       // ytile: 2
+        26,     // ytile: 3
+    ] {
+      let assertContext = "ly: \(ly)"
+      registers.tileMap[0 + (ly / 8) * 32] = 0xab
+      registers.tileMap[1 + (ly / 8) * 32] = 0xcd
+      registers.tileMap[2 + (ly / 8) * 32] = 0xef
+      registers.tileData[(ly % 8) * 2 + 0xab * 16]     = 0b1010_1010
+      registers.tileData[(ly % 8) * 2 + 0xab * 16 + 1] = 0b0101_0101
+      registers.tileData[(ly % 8) * 2 + 0xcd * 16]     = 0b0101_0101
+      registers.tileData[(ly % 8) * 2 + 0xcd * 16 + 1] = 0b1010_1010
+      registers.tileData[(ly % 8) * 2 + 0xef * 16]     = 0b0111_1000
+      registers.tileData[(ly % 8) * 2 + 0xef * 16 + 1] = 0b0001_1110
+      let fifo = PPU.PixelTransferMode.Fifo()
+      let fetcher = PPU.PixelTransferMode.Fetcher(registers: registers, fifo: fifo)
 
-  func testStateMachineRow0() {
-    registers.tileMap[0] = 0xab
-    registers.tileMap[1] = 0xcd
-    registers.tileData[0xab * 16]     = 0b1010_1010
-    registers.tileData[0xab * 16 + 1] = 0b0101_0101
-    registers.tileData[0xcd * 16]     = 0b0101_0101
-    registers.tileData[0xcd * 16 + 1] = 0b1010_1010
-    let fifo = PPU.PixelTransferMode.Fifo()
-    let fetcher = PPU.PixelTransferMode.Fetcher(registers: registers, fifo: fifo)
+      fetcher.start(tileMapAddress: .x9800, tileDataAddress: .x8000, x: 0, y: UInt8(truncatingIfNeeded: ly))
 
-    fetcher.start(tileMapAddress: .x9800, tileDataAddress: .x8000, x: 0, y: 0)
+      // Initial state
+      var state = StateMachineState(
+        tileMapAddress: 0x9800 + UInt16(truncatingIfNeeded: (ly / 8) * 32),
+        tileDataAddress: .x8000,
+        tileMapAddressOffset: 0,
+        tilePixelY: Int16(truncatingIfNeeded: ly % 8),
+        tickAlternator: false,
+        state: .readTileNumber,
+        tileIndex: 0,
+        data0: 0,
+        data1: 0,
+        pixels: []
+      )
+      state.assertEqual(fetcher, assertContext)
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
 
-    // Initial state
-    var state = StateMachineState(
-      tileMapAddress: 0x9800,
-      tileDataAddress: .x8000,
-      tileMapAddressOffset: 0,
-      tilePixelY: 0,
-      tickAlternator: false,
-      state: .readTileNumber,
-      tileIndex: 0,
-      data0: 0,
-      data1: 0,
-      pixels: []
-    )
-    state.assertEqual(fetcher)
-    XCTAssertEqual(fifo.pixels, state.pixels)
+      // MARK: Push 8 pixels of tile 0
 
-    // MARK: Push 8 pixels of tile 0
+      // read tile number
+      fetcher.tick()
+      state.tickAlternator = true
+      state.assertEqual(fetcher, assertContext)
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      fetcher.tick()
+      state.tickAlternator = false
+      state.tileIndex = 0xab
+      state.state = .readData0
+      state.assertEqual(fetcher, assertContext)
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
 
-    // read tile number
-    fetcher.tick()
-    state.tickAlternator = true
-    state.assertEqual(fetcher)
-    XCTAssertEqual(fifo.pixels, state.pixels)
-    fetcher.tick()
-    state.tickAlternator = false
-    state.tileIndex = 0xab
-    state.state = .readData0
-    state.assertEqual(fetcher)
-    XCTAssertEqual(fifo.pixels, state.pixels)
+      // Read data 0
+      fetcher.tick()
+      state.tickAlternator = true
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      fetcher.tick()
+      state.tickAlternator = false
+      state.data0 = 0b1010_1010
+      state.state = .readData1
+      state.assertEqual(fetcher, assertContext)
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
 
-    // Read data 0
-    fetcher.tick()
-    state.tickAlternator = true
-    XCTAssertEqual(fifo.pixels, state.pixels)
-    fetcher.tick()
-    state.tickAlternator = false
-    state.data0 = 0b1010_1010
-    state.state = .readData1
-    state.assertEqual(fetcher)
-    XCTAssertEqual(fifo.pixels, state.pixels)
+      // Read data 1
+      fetcher.tick()
+      state.tickAlternator = true
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      fetcher.tick()
+      state.tickAlternator = false
+      state.data1 = 0b0101_0101
+      state.state = .pushToFifo
+      state.assertEqual(fetcher, assertContext)
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
 
-    // Read data 1
-    fetcher.tick()
-    state.tickAlternator = true
-    XCTAssertEqual(fifo.pixels, state.pixels)
-    fetcher.tick()
-    state.tickAlternator = false
-    state.data1 = 0b0101_0101
-    state.state = .pushToFifo
-    state.assertEqual(fetcher)
-    XCTAssertEqual(fifo.pixels, state.pixels)
+      // Push to fifo
+      fetcher.tick()
+      state.tickAlternator = true
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      fetcher.tick()
+      state.tickAlternator = false
+      state.state = .readTileNumber
+      state.tileMapAddressOffset += 1
+      state.pixels = [
+        0b01, 0b10, 0b01, 0b10,
+        0b01, 0b10, 0b01, 0b10,
+      ].map { .init(colorIndex: $0, palette: registers.backgroundPalette, spritePriority: 0, bgPriority: 0)}
+      state.assertEqual(fetcher, assertContext)
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
 
-    // Push to fifo
-    fetcher.tick()
-    state.tickAlternator = true
-    XCTAssertEqual(fifo.pixels, state.pixels)
-    fetcher.tick()
-    state.tickAlternator = false
-    state.state = .readTileNumber
-    state.tileMapAddressOffset += 1
-    state.pixels = [
-      0b01, 0b10, 0b01, 0b10,
-      0b01, 0b10, 0b01, 0b10,
-    ].map { .init(colorIndex: $0, palette: registers.backgroundPalette, spritePriority: 0, bgPriority: 0)}
-    state.assertEqual(fetcher)
-    XCTAssertEqual(fifo.pixels, state.pixels)
+      // MARK: Push 8 pixels of tile 1
 
-    // MARK: Push 8 pixels of tile 1
+      // read tile number
+      fetcher.tick()
+      state.tickAlternator = true
+      state.assertEqual(fetcher, assertContext)
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      fetcher.tick()
+      state.tickAlternator = false
+      state.tileIndex = 0xcd
+      state.state = .readData0
+      state.assertEqual(fetcher, assertContext)
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
 
-    // read tile number
-    fetcher.tick()
-    state.tickAlternator = true
-    state.assertEqual(fetcher)
-    XCTAssertEqual(fifo.pixels, state.pixels)
-    fetcher.tick()
-    state.tickAlternator = false
-    state.tileIndex = 0xcd
-    state.state = .readData0
-    state.assertEqual(fetcher)
-    XCTAssertEqual(fifo.pixels, state.pixels)
+      // Read data 0
+      fetcher.tick()
+      state.tickAlternator = true
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      fetcher.tick()
+      state.tickAlternator = false
+      state.data0 = 0b0101_0101
+      state.state = .readData1
+      state.assertEqual(fetcher, assertContext)
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
 
-    // Read data 0
-    fetcher.tick()
-    state.tickAlternator = true
-    XCTAssertEqual(fifo.pixels, state.pixels)
-    fetcher.tick()
-    state.tickAlternator = false
-    state.data0 = 0b0101_0101
-    state.state = .readData1
-    state.assertEqual(fetcher)
-    XCTAssertEqual(fifo.pixels, state.pixels)
+      // Read data 1
+      fetcher.tick()
+      state.tickAlternator = true
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      fetcher.tick()
+      state.tickAlternator = false
+      state.data1 = 0b1010_1010
+      state.state = .pushToFifo
+      state.assertEqual(fetcher, assertContext)
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
 
-    // Read data 1
-    fetcher.tick()
-    state.tickAlternator = true
-    XCTAssertEqual(fifo.pixels, state.pixels)
-    fetcher.tick()
-    state.tickAlternator = false
-    state.data1 = 0b1010_1010
-    state.state = .pushToFifo
-    state.assertEqual(fetcher)
-    XCTAssertEqual(fifo.pixels, state.pixels)
+      // Push to fifo
+      fetcher.tick()
+      state.tickAlternator = true
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      fetcher.tick()
+      state.tickAlternator = false
+      state.state = .readTileNumber
+      state.tileMapAddressOffset += 1
+      state.pixels.append(contentsOf: [
+        0b10, 0b01, 0b10, 0b01,
+        0b10, 0b01, 0b10, 0b01,
+      ].map { .init(colorIndex: $0, palette: registers.backgroundPalette, spritePriority: 0, bgPriority: 0)})
+      state.assertEqual(fetcher, assertContext)
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
 
-    // Push to fifo
-    fetcher.tick()
-    state.tickAlternator = true
-    XCTAssertEqual(fifo.pixels, state.pixels)
-    fetcher.tick()
-    state.tickAlternator = false
-    state.state = .readTileNumber
-    state.tileMapAddressOffset += 1
-    state.pixels.append(contentsOf: [
-      0b10, 0b01, 0b10, 0b01,
-      0b10, 0b01, 0b10, 0b01,
-    ].map { .init(colorIndex: $0, palette: registers.backgroundPalette, spritePriority: 0, bgPriority: 0)})
-    state.assertEqual(fetcher)
-    XCTAssertEqual(fifo.pixels, state.pixels)
+      // MARK: Stall on 8 pixels of tile 2 due to fifo not being dequeued
+
+      // read tile number
+      fetcher.tick()
+      state.tickAlternator = true
+      state.assertEqual(fetcher, assertContext)
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      fetcher.tick()
+      state.tickAlternator = false
+      state.tileIndex = 0xef
+      state.state = .readData0
+      state.assertEqual(fetcher, assertContext)
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+
+      // Read data 0
+      fetcher.tick()
+      state.tickAlternator = true
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      fetcher.tick()
+      state.tickAlternator = false
+      state.data0 = 0b0111_1000
+      state.state = .readData1
+      state.assertEqual(fetcher, assertContext)
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+
+      // Read data 1
+      fetcher.tick()
+      state.tickAlternator = true
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      fetcher.tick()
+      state.tickAlternator = false
+      state.data1 = 0b0001_1110
+      state.state = .pushToFifo
+      state.assertEqual(fetcher, assertContext)
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+
+      // Push to fifo
+      fetcher.tick()
+      state.tickAlternator = true
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      fetcher.tick()
+      state.tickAlternator = false
+      state.assertEqual(fetcher, assertContext)
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+
+      // MARK: Continue stalling even with 7 pixels dequeued
+
+      // Clear the first 7 pixels.
+      fifo.pixels.removeFirst(7)
+      state.pixels.removeFirst(7)
+
+      // Still stalled
+      fetcher.tick()
+      state.tickAlternator = true
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      fetcher.tick()
+      state.tickAlternator = false
+      state.assertEqual(fetcher, assertContext)
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+
+      // MARK: Push 8 pixels of tile 2 now that fifo is free
+
+      // Clear one more pixel.
+      fifo.pixels.removeFirst()
+      state.pixels.removeFirst()
+
+      // Fetcher no longer stalled
+      fetcher.tick()
+      state.tickAlternator = true
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      fetcher.tick()
+      state.tickAlternator = false
+      state.state = .readTileNumber
+      state.tileMapAddressOffset += 1
+      state.pixels.append(contentsOf: [
+        0b00, 0b01, 0b01, 0b11,
+        0b11, 0b10, 0b10, 0b00,
+      ].map { .init(colorIndex: $0, palette: registers.backgroundPalette, spritePriority: 0, bgPriority: 0)})
+      state.assertEqual(fetcher, assertContext)
+      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+    }
   }
 }
