@@ -118,7 +118,16 @@ extension PPU {
                                      spritePriority: 0, bgPriority: 0))
           }
           tileMapAddressOffset = (tileMapAddressOffset + 1) % PPU.TilesPerRow
-          state = .readTileNumber
+
+          // The existence of a distinct pushToFifo state is somewhat ambiguous, as both of the canonical references on
+          // PPU timing seem to imply that there are only 6 t-cycles for a given block of 8 pixels.
+          // - http://blog.kevtris.org/blogfiles/Nitty%20Gritty%20Gameboy%20VRAM%20Timing.txt
+          // - https://youtu.be/HyzD8pNlpwI?t=3087
+          // It's unclear when the fifo is updated, but keeping it as a separate state causes the baseline t-cycle for a
+          // line to be 175 rather than 173. So to avoid the extra two t-cycles we skip directly to the readData0 state
+          // and read the tile index here. There might be a more accurate way to represent this.
+          tileIndex = registers.tileMap[tileMapAddress + tileMapAddressOffset - PPU.tileMapRegion.lowerBound]
+          state = .readData0
         }
       }
 
@@ -154,6 +163,8 @@ extension PPU {
     private var droppedPixels: UInt8 = 0
     private var screenPlotAnchor: Int = 0
     private var screenPlotOffset: Int = 0
+    private var oamIterator: IndexingIterator<[OAM.Sprite]>?
+    private var tcycle: Int = 0
 
     private var scanlineX: UInt8 = 0
     private var scanlineScrollX: UInt8 = 0
@@ -177,6 +188,8 @@ extension PPU {
       droppedPixels = 0
       screenPlotAnchor = Int(truncatingIfNeeded: lineCycleDriver.scanline) * PPU.screenSize.width
       screenPlotOffset = 0
+      oamIterator = intersectedOAMs.makeIterator()
+      tcycle = 0
 
       // Old logic
       windowYPlot = lineCycleDriver.scanline &- registers.windowY
@@ -186,19 +199,36 @@ extension PPU {
     }
 
     func tick(memory: AddressableMemory) -> LCDCMode? {
+      tcycle += 1
+
       fetcher.tick()
 
       if registers.backgroundEnable {
-        //
-        guard fifo.pixels.count > 8 else {
+        // The fifo requires at least 9 pixels in order to be able to pop a pixel off. This ensures that there are
+        // always at least 8 pixels for the purposes of compositing sprites onto the background pixels.
+        // Until there are at least 9 pixels, the fifo stalls.
+        if fifo.pixels.count <= 8 {
           return nil
         }
 
         // Scrolling is implemented by dropping pixels from the fifo up until the scx.
         // - "The Ultimate Game Boy Talk (33c3)": https://youtu.be/HyzD8pNlpwI?t=3104
+        //
+        // "The program running on the GB CPU can still change various registers like SCX and SCY when a line is being
+        // "drawn to the screen. (I.e. during mode 3.) At least one officially released game makes heavy used of that:
+        // Prehistorik Man which is using it in its intro to draw text using palette changes, and probably in some
+        // places in the gameplay as well. Not to mention demoscene demos, which (ab)use this a lot, for example Mental
+        // Respirator and 20Y, which use this for things like wobbly image stretching and other special effects."
+        // - http://forums.nesdev.com/viewtopic.php?f=20&t=10771#p122197
+        // This is why we use registers.scx directly here rather than a cached value at the start of the line.
         if droppedPixels < registers.scx % UInt8(truncatingIfNeeded: PPU.PixelsPerTile) {
           fifo.pixels.removeFirst()
           droppedPixels += 1
+
+          // Because scx can change mid-line, we can't use the simple (173 + (xscroll % 7)) formula outlined in
+          // http://blog.kevtris.org/blogfiles/Nitty%20Gritty%20Gameboy%20VRAM%20Timing.txt
+          // Instead, we offset the tcycle counter for each cycle spent dropping a pixel.
+          tcycle -= 1
           return nil
         }
 
@@ -206,13 +236,22 @@ extension PPU {
       }
 
       if registers.objEnable {
+        // When a sprite is detected, the fetcher switches temporarily to a sprite fetch mode
+        // - "The Ultimate Game Boy Talk (33c3)": https://youtu.be/HyzD8pNlpwI?t=3179
         // TODO: Implement spriting.
+//        while let sprite = oamIterator?.next() {
+//          if sprite.x == 0
+//        }
       }
 
+      // This is first executed on cycle 4 of the pixel transfer. It takes two machine cycles to load one tile line
+      // into the fifo, and the fifo must always have at least 8 pixels in it before pixels can be dequeued, so we
+      // load a second tile's line for an additional two machine cycles.
       registers.screenData[screenPlotAnchor + screenPlotOffset] = fifo.dequeuePixel()
 
       screenPlotOffset += 1
       if screenPlotOffset >= 160 {
+        precondition(tcycle == 173)
         registers.requestHBlankInterruptIfNeeded(memory: memory)
         return .hblank
       }

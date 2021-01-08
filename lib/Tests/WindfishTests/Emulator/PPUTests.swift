@@ -318,7 +318,8 @@ class PPUFetcherTests: XCTestCase {
       XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
       fetcher.tick()
       state.tickAlternator = false
-      state.state = .readTileNumber
+      state.tileIndex = 0xcd
+      state.state = .readData0
       state.tileMapAddressOffset += 1
       state.pixels = [
         0b01, 0b10, 0b01, 0b10,
@@ -328,18 +329,6 @@ class PPUFetcherTests: XCTestCase {
       XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
 
       // MARK: Push 8 pixels of tile 1
-
-      // read tile number
-      fetcher.tick()
-      state.tickAlternator = true
-      state.assertEqual(fetcher, assertContext)
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
-      fetcher.tick()
-      state.tickAlternator = false
-      state.tileIndex = 0xcd
-      state.state = .readData0
-      state.assertEqual(fetcher, assertContext)
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
 
       // Read data 0
       fetcher.tick()
@@ -369,7 +358,8 @@ class PPUFetcherTests: XCTestCase {
       XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
       fetcher.tick()
       state.tickAlternator = false
-      state.state = .readTileNumber
+      state.tileIndex = 0xef
+      state.state = .readData0
       state.tileMapAddressOffset += 1
       state.pixels.append(contentsOf: [
         0b10, 0b01, 0b10, 0b01,
@@ -379,18 +369,6 @@ class PPUFetcherTests: XCTestCase {
       XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
 
       // MARK: Stall on 8 pixels of tile 2 due to fifo not being dequeued
-
-      // read tile number
-      fetcher.tick()
-      state.tickAlternator = true
-      state.assertEqual(fetcher, assertContext)
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
-      fetcher.tick()
-      state.tickAlternator = false
-      state.tileIndex = 0xef
-      state.state = .readData0
-      state.assertEqual(fetcher, assertContext)
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
 
       // Read data 0
       fetcher.tick()
@@ -450,7 +428,8 @@ class PPUFetcherTests: XCTestCase {
       XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
       fetcher.tick()
       state.tickAlternator = false
-      state.state = .readTileNumber
+      state.state = .readData0
+      state.tileIndex = 0
       state.tileMapAddressOffset += 1
       state.pixels.append(contentsOf: [
         0b00, 0b01, 0b01, 0b11,
