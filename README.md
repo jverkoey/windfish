@@ -138,12 +138,12 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 </tr><tr>
 <td align="center"><p>❌<br/><code>hblank_ly_scx_timing-GS</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/ppu/hblank_ly_scx_timing-GS.png"></td>
 <td align="center"><p>✅<br/><code>intr_1_2_timing-GS</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/ppu/intr_1_2_timing-GS.png"></td>
-<td align="center"><p>✅<br/><code>intr_2_0_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/ppu/intr_2_0_timing.png"></td>
+<td align="center"><p>❌<br/><code>intr_2_0_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/ppu/intr_2_0_timing.png"></td>
 <td align="center"><p>❌<br/><code>intr_2_mode0_timing_sprites</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/ppu/intr_2_mode0_timing_sprites.png"></td>
 </tr><tr>
-<td align="center"><p>✅<br/><code>intr_2_mode0_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/ppu/intr_2_mode0_timing.png"></td>
-<td align="center"><p>✅<br/><code>intr_2_mode3_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/ppu/intr_2_mode3_timing.png"></td>
-<td align="center"><p>✅<br/><code>intr_2_oam_ok_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/ppu/intr_2_oam_ok_timing.png"></td>
+<td align="center"><p>❌<br/><code>intr_2_mode0_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/ppu/intr_2_mode0_timing.png"></td>
+<td align="center"><p>❌<br/><code>intr_2_mode3_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/ppu/intr_2_mode3_timing.png"></td>
+<td align="center"><p>❌<br/><code>intr_2_oam_ok_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/ppu/intr_2_oam_ok_timing.png"></td>
 <td align="center"><p>❌<br/><code>stat_lyc_onoff</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/ppu/stat_lyc_onoff.png"></td>
 </tr><tr>
 <td align="center"><p>✅<br/><code>vblank_stat_intr-GS</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/ppu/vblank_stat_intr-GS.png"></td>
@@ -166,7 +166,7 @@ The Windfish emulator is validated against test ROMs in order to ensure consiste
 <td align="center"><p>❌<br/><code>jp_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/jp_timing.png"></td>
 </tr><tr>
 <td align="center"><p>✅<br/><code>oam_dma_restart</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/oam_dma_restart.png"></td>
-<td align="center"><p>❌<br/><code>oam_dma_start</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/oam_dma_start.png"></td>
+<td align="center"><p>✅<br/><code>oam_dma_start</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/oam_dma_start.png"></td>
 <td align="center"><p>✅<br/><code>oam_dma_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/oam_dma_timing.png"></td>
 <td align="center"><p>✅<br/><code>pop_timing</code></p><img width="160" src="lib/Tests/ROMTests/Resources/mooneye/acceptance/pop_timing.png"></td>
 </tr><tr>
