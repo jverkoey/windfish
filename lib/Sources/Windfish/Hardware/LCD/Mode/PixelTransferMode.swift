@@ -59,15 +59,68 @@ extension PPU {
       private(set) var tilePixelY: Int16 = 0
       private(set) var tickAlternator = false
       enum State {
+        // Background fetching
         case readTileNumber
         case readData0
         case readData1
         case pushToFifo
+        // Sprite fetching
+        case readSpriteTileNumber
+        case readSpriteFlags
+        case readSpriteData0
+        case readSpriteData1
+        case overlaySpriteOnFifo
       }
       private(set) var state: State = .readTileNumber
       private(set) var tileIndex: UInt8 = 0
       private(set) var data0: UInt8 = 0
       private(set) var data1: UInt8 = 0
+      private(set) var sprite: OAM.Sprite?
+      private(set) var spriteTilePixelY: Int16 = 0
+
+      func isFetchingSprite() -> Bool {
+        return state == .readSpriteTileNumber
+          || state == .readSpriteFlags
+          || state == .readSpriteData0
+          || state == .readSpriteData1
+          || state == .overlaySpriteOnFifo
+      }
+
+      func startSprite(_ sprite: OAM.Sprite, y: UInt8) {
+        self.sprite = sprite
+        state = .readSpriteTileNumber
+
+        // Compute the upper-left corner of the sprite in order to calculate the intersection of ly with the sprite.
+        // - 2.8.2 "Sprites": https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
+        let spriteTopLeftY = sprite.y - 16
+        let spriteTilePixelY = Int16(truncatingIfNeeded: y - spriteTopLeftY)
+
+        if sprite.yflip {
+          // Flipping the y-value is equivalent to a bit complement masked to the appropriate number of bits (4 for a
+          // height of 16, 3 for a height of 8).
+          switch registers.spriteSize {
+          case .x8x16:
+            // 0  0b0000 15 0b1111
+            // 1  0b0001 14 0b1110
+            // 2  0b0010 13 0b1101
+            // 3  0b0011 12 0b1100
+            // 4  0b0100 11 0b1011
+            // 5  0b0101 10 0b1010
+            // 6  0b0110  9 0b1001
+            // 7  0b0111  8 0b1000
+            self.spriteTilePixelY = (~spriteTilePixelY) & 0b1111
+          case .x8x8:
+            // 0  0b0000 7 0b0111
+            // 1  0b0001 6 0b0110
+            // 2  0b0010 5 0b0101
+            // 3  0b0011 4 0b0100
+            self.spriteTilePixelY = (~spriteTilePixelY) & 0b0111
+          }
+        } else {
+          self.spriteTilePixelY = spriteTilePixelY
+        }
+        precondition(self.spriteTilePixelY >= 0 && self.spriteTilePixelY < registers.spriteSize.height())
+      }
 
       /** Prepares the fetcher to start fetching a new line of pixels. */
       func start(tileMapAddress: TileMapAddress, tileDataAddress: TileDataAddress, x: UInt8, y: UInt8) {
@@ -128,6 +181,51 @@ extension PPU {
           // and read the tile index here. There might be a more accurate way to represent this.
           tileIndex = registers.tileMap[tileMapAddress + tileMapAddressOffset - PPU.tileMapRegion.lowerBound]
           state = .readData0
+
+        // Both of the following states are no-ops because we've already snapshotted the sprite data in the OAM search
+        // and OAM writes are locked down during pixel transfer mode, so we don't need to read these values again.
+        // TODO: Are these t-cycle nops required?
+        case .readSpriteTileNumber: state = .readSpriteFlags
+        case .readSpriteFlags:      state = .readSpriteData0
+
+        case .readSpriteData0:
+          data0 = getSpriteTileData(byte: 0)
+          state = .readSpriteData1
+
+        case .readSpriteData1:
+          data1 = getSpriteTileData(byte: 1)
+          state = .overlaySpriteOnFifo
+
+        case .overlaySpriteOnFifo:
+          guard let sprite = sprite else {
+            fatalError()
+          }
+          let palette: Palette
+          switch sprite.palette {
+          case .obj0pal:
+            palette = registers.objectPallete0
+          case .obj1pal:
+            palette = registers.objectPallete1
+          }
+          for i: Int in 0...7 {
+            let pixel = fifo.pixels[i]
+
+            if pixel.spritePriority == 1 {
+              continue
+            }
+
+            let bitIndex = sprite.xflip ? i : (7 - i)
+            let bitMask: UInt8 = 1 << UInt8(truncatingIfNeeded: bitIndex)
+            let lsb: UInt8 = ((data0 & bitMask) > 0) ? 0b01 : 0
+            let msb: UInt8 = ((data1 & bitMask) > 0) ? 0b10 : 0
+            let spriteColorIndex = msb | lsb
+
+            let pixelColorIndex = fifo.pixels[i].colorIndex
+            if (sprite.priority && pixelColorIndex == 0) || !sprite.priority && spriteColorIndex != 0 {
+              fifo.pixels[i] = .init(colorIndex: spriteColorIndex, palette: palette, spritePriority: 1, bgPriority: 0)
+            }
+          }
+          state = .readData0
         }
       }
 
@@ -157,14 +255,25 @@ extension PPU {
         let address = tileDataAddress.baseAddress &+ UInt16(bitPattern: tileOffset + tileLineOffset + byte)
         return registers.tileData[Int(truncatingIfNeeded: address - PPU.tileDataRegion.lowerBound)]
       }
+
+      private func getSpriteTileData(byte: Int16) -> UInt8 {
+        guard let sprite = sprite else {
+          fatalError()
+        }
+        let dataIndex = Int16(bitPattern: UInt16(truncatingIfNeeded: sprite.tile))
+        let tileOffset = dataIndex &* PPU.BytesPerTile
+        let tileLineOffset = spriteTilePixelY &* PPU.BytesPerLine
+        let address = 0x8000 &+ UInt16(bitPattern: tileOffset + tileLineOffset + byte)
+        return registers.tileData[Int(truncatingIfNeeded: address - PPU.tileDataRegion.lowerBound)]
+      }
     }
     private let fetcher: Fetcher
     private var fifo: Fifo
     private var droppedPixels: UInt8 = 0
     private var screenPlotAnchor: Int = 0
-    private var screenPlotOffset: Int = 0
-    private var oamIterator: IndexingIterator<[OAM.Sprite]>?
+    private var screenPlotOffset: UInt8 = 0
     private var tcycle: Int = 0
+    private var drawnSprites = Set<Int>()
 
     private var scanlineX: UInt8 = 0
     private var scanlineScrollX: UInt8 = 0
@@ -188,8 +297,8 @@ extension PPU {
       droppedPixels = 0
       screenPlotAnchor = Int(truncatingIfNeeded: lineCycleDriver.scanline) * PPU.screenSize.width
       screenPlotOffset = 0
-      oamIterator = intersectedOAMs.makeIterator()
       tcycle = 0
+      drawnSprites.removeAll(keepingCapacity: true)
 
       // Old logic
       windowYPlot = lineCycleDriver.scanline &- registers.windowY
@@ -236,22 +345,32 @@ extension PPU {
       }
 
       if registers.objEnable {
+        if fetcher.isFetchingSprite() {
+          return nil  // Stall until we've finished fetching the sprite.
+        }
+
         // When a sprite is detected, the fetcher switches temporarily to a sprite fetch mode
         // - "The Ultimate Game Boy Talk (33c3)": https://youtu.be/HyzD8pNlpwI?t=3179
-        // TODO: Implement spriting.
-//        while let sprite = oamIterator?.next() {
-//          if sprite.x == 0
-//        }
+        for (index, sprite) in intersectedOAMs.enumerated() {
+          if drawnSprites.contains(index) {
+            continue  // Skip sprites we've already drawn.
+          }
+          if sprite.x - 8 == screenPlotOffset {
+            drawnSprites.insert(index)
+            fetcher.startSprite(sprite, y: registers.ly)
+            return nil
+          }
+        }
       }
 
       // This is first executed on cycle 4 of the pixel transfer. It takes two machine cycles to load one tile line
       // into the fifo, and the fifo must always have at least 8 pixels in it before pixels can be dequeued, so we
       // load a second tile's line for an additional two machine cycles.
-      registers.screenData[screenPlotAnchor + screenPlotOffset] = fifo.dequeuePixel()
+      registers.screenData[screenPlotAnchor + Int(truncatingIfNeeded: screenPlotOffset)] = fifo.dequeuePixel()
 
       screenPlotOffset += 1
       if screenPlotOffset >= 160 {
-        precondition(tcycle == 173)
+        precondition(!drawnSprites.isEmpty || tcycle == 173)
         registers.requestHBlankInterruptIfNeeded(memory: memory)
         return .hblank
       }
