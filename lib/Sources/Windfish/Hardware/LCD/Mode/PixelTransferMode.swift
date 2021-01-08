@@ -14,6 +14,8 @@ extension UnsafeMutableRawBufferPointer {
 extension PPU {
   private static let TilesPerRow: UInt16 = 32
   private static let PixelsPerTile: UInt16 = 8
+  private static let BytesPerTile: Int16 = 16
+  private static let BytesPerLine: Int16 = 2
 
   final class PixelTransferMode: PPUMode {
     init(registers: LCDRegisters, lineCycleDriver: LineCycleDriver) {
@@ -28,7 +30,7 @@ extension PPU {
 
     var intersectedOAMs: [OAM.Sprite] = []
 
-    struct Pixel {
+    struct Pixel: Equatable {
       let colorIndex: UInt8
       let palette: Palette
       let spritePriority: UInt8
@@ -51,27 +53,29 @@ extension PPU {
       private let registers: LCDRegisters
       private let fifo: Fifo
 
-      var tileMapAddress: LR35902.Address = 0
-      var tileDataAddress: TileDataAddress = .x8000
-      var tileMapAddressOffset: UInt16 = 0
-      var tilePixelY: Int16 = 0
-      private var tickAlternator = false
-      private enum State {
+      private(set) var tileMapAddress: LR35902.Address = 0
+      private(set) var tileDataAddress: TileDataAddress = .x8000
+      private(set) var tileMapAddressOffset: UInt16 = 0
+      private(set) var tilePixelY: Int16 = 0
+      private(set) var tickAlternator = false
+      enum State {
         case readTileNumber
         case readData0
         case readData1
         case pushToFifo
       }
-      private var state: State = .readTileNumber
-      private var tileIndex: UInt8 = 0
-      private var data0: UInt8 = 0
-      private var data1: UInt8 = 0
+      private(set) var state: State = .readTileNumber
+      private(set) var tileIndex: UInt8 = 0
+      private(set) var data0: UInt8 = 0
+      private(set) var data1: UInt8 = 0
 
       /** Prepares the fetcher to start fetching a new line of pixels. */
       func start(tileMapAddress: TileMapAddress, tileDataAddress: TileDataAddress, x: UInt8, y: UInt8) {
         let wideX = UInt16(truncatingIfNeeded: x)
         let wideY = UInt16(truncatingIfNeeded: y)
 
+        tickAlternator = false
+        state = .readTileNumber
         self.tileMapAddress = tileMapAddress.address + (wideY / PPU.PixelsPerTile) * PPU.TilesPerRow
         self.tileDataAddress = tileDataAddress
         tileMapAddressOffset = wideX / PPU.PixelsPerTile
@@ -101,7 +105,9 @@ extension PPU {
           state = .pushToFifo
 
         case .pushToFifo:
-          guard fifo.pixels.count <= 8 else {
+          if fifo.pixels.count > 8 {
+            // Fetcher stalls when the fifo doesn't have enough space to push a new block of 8 pixels.
+            // - "The Ultimate Game Boy Talk (33c3)": https://youtu.be/HyzD8pNlpwI?t=3074
             break
           }
           for i: UInt8 in stride(from: 7, through: 0, by: -1) {
@@ -111,7 +117,7 @@ extension PPU {
             fifo.pixels.append(.init(colorIndex: msb | lsb, palette: registers.backgroundPalette,
                                      spritePriority: 0, bgPriority: 0))
           }
-          tileMapAddressOffset = (tileMapAddress + 1) % PPU.TilesPerRow
+          tileMapAddressOffset = (tileMapAddressOffset + 1) % PPU.TilesPerRow
           state = .readTileNumber
         }
       }
@@ -130,7 +136,16 @@ extension PPU {
         // Extending an unsigned byte is a bit more straightforward, as we can directly extend the type to a UInt16.
         case .x8000: dataIndex = Int16(bitPattern: UInt16(truncatingIfNeeded: tileIndex))
         }
-        let address = tileDataAddress.baseAddress &+ UInt16(bitPattern: dataIndex &* 16 + tilePixelY &* 2 + byte)
+        // Each Tile occupies 16 bytes, where each 2 bytes represent a line:
+        // Byte 0-1  First Line (Upper 8 pixels)
+        // Byte 2-3  Next Line
+        // etc.
+        // - https://gbdev.io/pandocs/#video-display
+        // tilePixelY determines which byte pair we want to read, and is doubled to account for the two-byte size of a
+        // single line.
+        let tileOffset = dataIndex &* PPU.BytesPerTile
+        let tileLineOffset = tilePixelY &* PPU.BytesPerLine
+        let address = tileDataAddress.baseAddress &+ UInt16(bitPattern: tileOffset + tileLineOffset + byte)
         return registers.tileData[Int(truncatingIfNeeded: address - PPU.tileDataRegion.lowerBound)]
       }
     }
@@ -174,6 +189,7 @@ extension PPU {
       fetcher.tick()
 
       if registers.backgroundEnable {
+        //
         guard fifo.pixels.count > 8 else {
           return nil
         }

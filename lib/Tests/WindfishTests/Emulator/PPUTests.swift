@@ -25,7 +25,7 @@ class PPUTests: XCTestCase {
         if line < 144 {
           if cycle <= 20 {
             XCTAssertEqual(controller.registers.lcdMode, .searchingOAM, "line: \(line) cycle: \(cycle)")
-          } else if cycle <= 63 {
+          } else if cycle <= 64 {
             XCTAssertEqual(controller.registers.lcdMode, .pixelTransfer, "line: \(line) cycle: \(cycle)")
           } else {
             XCTAssertEqual(controller.registers.lcdMode, .hblank, "line: \(line) cycle: \(cycle)")
@@ -142,28 +142,30 @@ class PPUFetcherTests: XCTestCase {
   }
 
   func testZero() {
-    let fetcher = PPU.PixelTransferMode.Fetcher(registers: registers)
+    let fifo = PPU.PixelTransferMode.Fifo()
+    let fetcher = PPU.PixelTransferMode.Fetcher(registers: registers, fifo: fifo)
 
-    // Zero
-    for tileMapAddress: PPU.TileMapAddress in [.x9800, .x9C00] {
-      fetcher.start(tileMapAddress: tileMapAddress, tileDataAddress: .x8000, x: 0, y: 0)
+    for tileDataAddress: PPU.TileDataAddress in [.x8000, .x8800] {
+      for tileMapAddress: PPU.TileMapAddress in [.x9800, .x9C00] {
+        fetcher.start(tileMapAddress: tileMapAddress, tileDataAddress: tileDataAddress, x: 0, y: 0)
 
-      XCTAssertEqual(fetcher.tileMapAddress, tileMapAddress.address)
-      XCTAssertEqual(fetcher.tileDataAddress, .x8000)
-      XCTAssertEqual(fetcher.tileMapAddressOffset, 0)
-      XCTAssertEqual(fetcher.tilePixelY, 0)
+        XCTAssertEqual(fetcher.tileMapAddress, tileMapAddress.address)
+        XCTAssertEqual(fetcher.tileDataAddress, tileDataAddress)
+        XCTAssertEqual(fetcher.tileMapAddressOffset, 0)
+        XCTAssertEqual(fetcher.tilePixelY, 0)
+      }
     }
   }
 
   func testXValues() {
-    let fetcher = PPU.PixelTransferMode.Fetcher(registers: registers)
+    let fifo = PPU.PixelTransferMode.Fifo()
+    let fetcher = PPU.PixelTransferMode.Fetcher(registers: registers, fifo: fifo)
 
     for tileMapAddress: PPU.TileMapAddress in [.x9800, .x9C00] {
       // Edge of tile 0/1
       fetcher.start(tileMapAddress: tileMapAddress, tileDataAddress: .x8000, x: 7, y: 0)
 
       XCTAssertEqual(fetcher.tileMapAddress, tileMapAddress.address)
-      XCTAssertEqual(fetcher.tileDataAddress, .x8000)
       XCTAssertEqual(fetcher.tileMapAddressOffset, 0)
       XCTAssertEqual(fetcher.tilePixelY, 0)
 
@@ -171,7 +173,6 @@ class PPUFetcherTests: XCTestCase {
       fetcher.start(tileMapAddress: tileMapAddress, tileDataAddress: .x8000, x: 8, y: 0)
 
       XCTAssertEqual(fetcher.tileMapAddress, tileMapAddress.address)
-      XCTAssertEqual(fetcher.tileDataAddress, .x8000)
       XCTAssertEqual(fetcher.tileMapAddressOffset, 1)
       XCTAssertEqual(fetcher.tilePixelY, 0)
 
@@ -179,21 +180,20 @@ class PPUFetcherTests: XCTestCase {
       fetcher.start(tileMapAddress: tileMapAddress, tileDataAddress: .x8000, x: 16, y: 0)
 
       XCTAssertEqual(fetcher.tileMapAddress, tileMapAddress.address)
-      XCTAssertEqual(fetcher.tileDataAddress, .x8000)
       XCTAssertEqual(fetcher.tileMapAddressOffset, 2)
       XCTAssertEqual(fetcher.tilePixelY, 0)
     }
   }
 
   func testYValues() {
-    let fetcher = PPU.PixelTransferMode.Fetcher(registers: registers)
+    let fifo = PPU.PixelTransferMode.Fifo()
+    let fetcher = PPU.PixelTransferMode.Fetcher(registers: registers, fifo: fifo)
 
     for tileMapAddress: PPU.TileMapAddress in [.x9800, .x9C00] {
       // Tile 0, row 1
       fetcher.start(tileMapAddress: tileMapAddress, tileDataAddress: .x8000, x: 0, y: 1)
 
       XCTAssertEqual(fetcher.tileMapAddress, tileMapAddress.address)
-      XCTAssertEqual(fetcher.tileDataAddress, .x8000)
       XCTAssertEqual(fetcher.tileMapAddressOffset, 0)
       XCTAssertEqual(fetcher.tilePixelY, 1)
 
@@ -201,9 +201,172 @@ class PPUFetcherTests: XCTestCase {
       fetcher.start(tileMapAddress: tileMapAddress, tileDataAddress: .x8000, x: 0, y: 8)
 
       XCTAssertEqual(fetcher.tileMapAddress, tileMapAddress.address + 32)
-      XCTAssertEqual(fetcher.tileDataAddress, .x8000)
       XCTAssertEqual(fetcher.tileMapAddressOffset, 0)
       XCTAssertEqual(fetcher.tilePixelY, 0)
+
+      // Tile 2, row 2
+      fetcher.start(tileMapAddress: tileMapAddress, tileDataAddress: .x8000, x: 0, y: 18)
+
+      XCTAssertEqual(fetcher.tileMapAddress, tileMapAddress.address + 32 * 2)
+      XCTAssertEqual(fetcher.tileMapAddressOffset, 0)
+      XCTAssertEqual(fetcher.tilePixelY, 2)
     }
+  }
+
+  struct StateMachineState {
+    var tileMapAddress: LR35902.Address
+    var tileDataAddress: PPU.TileDataAddress
+    var tileMapAddressOffset: UInt16
+    var tilePixelY: Int16
+    var tickAlternator: Bool
+    var state: PPU.PixelTransferMode.Fetcher.State
+    var tileIndex: UInt8
+    var data0: UInt8
+    var data1: UInt8
+    var pixels: [PPU.PixelTransferMode.Pixel]
+
+    func assertEqual(_ state: PPU.PixelTransferMode.Fetcher, _ message: String = "", file: StaticString = #file, line: UInt = #line) {
+      XCTAssertEqual(tileMapAddress, state.tileMapAddress,              "tileMapAddress mismatch \(message)", file: file, line: line)
+      XCTAssertEqual(tileDataAddress, state.tileDataAddress,            "tileDataAddress mismatch \(message)", file: file, line: line)
+      XCTAssertEqual(tileMapAddressOffset, state.tileMapAddressOffset,  "tileMapAddressOffset mismatch \(message)", file: file, line: line)
+      XCTAssertEqual(tilePixelY, state.tilePixelY,                      "tilePixelY mismatch \(message)", file: file, line: line)
+      XCTAssertEqual(tickAlternator, state.tickAlternator,              "tickAlternator mismatch \(message)", file: file, line: line)
+      XCTAssertEqual(self.state, state.state,                           "state mismatch \(message)", file: file, line: line)
+      XCTAssertEqual(tileIndex, state.tileIndex,                        "tileIndex mismatch \(message)", file: file, line: line)
+      XCTAssertEqual(data0, state.data0,                                "data0 mismatch \(message)", file: file, line: line)
+      XCTAssertEqual(data1, state.data1,                                "data1 mismatch \(message)", file: file, line: line)
+    }
+  }
+
+
+  func testStateMachineRow0() {
+    registers.tileMap[0] = 0xab
+    registers.tileMap[1] = 0xcd
+    registers.tileData[0xab * 16]     = 0b1010_1010
+    registers.tileData[0xab * 16 + 1] = 0b0101_0101
+    registers.tileData[0xcd * 16]     = 0b0101_0101
+    registers.tileData[0xcd * 16 + 1] = 0b1010_1010
+    let fifo = PPU.PixelTransferMode.Fifo()
+    let fetcher = PPU.PixelTransferMode.Fetcher(registers: registers, fifo: fifo)
+
+    fetcher.start(tileMapAddress: .x9800, tileDataAddress: .x8000, x: 0, y: 0)
+
+    // Initial state
+    var state = StateMachineState(
+      tileMapAddress: 0x9800,
+      tileDataAddress: .x8000,
+      tileMapAddressOffset: 0,
+      tilePixelY: 0,
+      tickAlternator: false,
+      state: .readTileNumber,
+      tileIndex: 0,
+      data0: 0,
+      data1: 0,
+      pixels: []
+    )
+    state.assertEqual(fetcher)
+    XCTAssertEqual(fifo.pixels, state.pixels)
+
+    // MARK: Push 8 pixels of tile 0
+
+    // read tile number
+    fetcher.tick()
+    state.tickAlternator = true
+    state.assertEqual(fetcher)
+    XCTAssertEqual(fifo.pixels, state.pixels)
+    fetcher.tick()
+    state.tickAlternator = false
+    state.tileIndex = 0xab
+    state.state = .readData0
+    state.assertEqual(fetcher)
+    XCTAssertEqual(fifo.pixels, state.pixels)
+
+    // Read data 0
+    fetcher.tick()
+    state.tickAlternator = true
+    XCTAssertEqual(fifo.pixels, state.pixels)
+    fetcher.tick()
+    state.tickAlternator = false
+    state.data0 = 0b1010_1010
+    state.state = .readData1
+    state.assertEqual(fetcher)
+    XCTAssertEqual(fifo.pixels, state.pixels)
+
+    // Read data 1
+    fetcher.tick()
+    state.tickAlternator = true
+    XCTAssertEqual(fifo.pixels, state.pixels)
+    fetcher.tick()
+    state.tickAlternator = false
+    state.data1 = 0b0101_0101
+    state.state = .pushToFifo
+    state.assertEqual(fetcher)
+    XCTAssertEqual(fifo.pixels, state.pixels)
+
+    // Push to fifo
+    fetcher.tick()
+    state.tickAlternator = true
+    XCTAssertEqual(fifo.pixels, state.pixels)
+    fetcher.tick()
+    state.tickAlternator = false
+    state.state = .readTileNumber
+    state.tileMapAddressOffset += 1
+    state.pixels = [
+      0b01, 0b10, 0b01, 0b10,
+      0b01, 0b10, 0b01, 0b10,
+    ].map { .init(colorIndex: $0, palette: registers.backgroundPalette, spritePriority: 0, bgPriority: 0)}
+    state.assertEqual(fetcher)
+    XCTAssertEqual(fifo.pixels, state.pixels)
+
+    // MARK: Push 8 pixels of tile 1
+
+    // read tile number
+    fetcher.tick()
+    state.tickAlternator = true
+    state.assertEqual(fetcher)
+    XCTAssertEqual(fifo.pixels, state.pixels)
+    fetcher.tick()
+    state.tickAlternator = false
+    state.tileIndex = 0xcd
+    state.state = .readData0
+    state.assertEqual(fetcher)
+    XCTAssertEqual(fifo.pixels, state.pixels)
+
+    // Read data 0
+    fetcher.tick()
+    state.tickAlternator = true
+    XCTAssertEqual(fifo.pixels, state.pixels)
+    fetcher.tick()
+    state.tickAlternator = false
+    state.data0 = 0b0101_0101
+    state.state = .readData1
+    state.assertEqual(fetcher)
+    XCTAssertEqual(fifo.pixels, state.pixels)
+
+    // Read data 1
+    fetcher.tick()
+    state.tickAlternator = true
+    XCTAssertEqual(fifo.pixels, state.pixels)
+    fetcher.tick()
+    state.tickAlternator = false
+    state.data1 = 0b1010_1010
+    state.state = .pushToFifo
+    state.assertEqual(fetcher)
+    XCTAssertEqual(fifo.pixels, state.pixels)
+
+    // Push to fifo
+    fetcher.tick()
+    state.tickAlternator = true
+    XCTAssertEqual(fifo.pixels, state.pixels)
+    fetcher.tick()
+    state.tickAlternator = false
+    state.state = .readTileNumber
+    state.tileMapAddressOffset += 1
+    state.pixels.append(contentsOf: [
+      0b10, 0b01, 0b10, 0b01,
+      0b10, 0b01, 0b10, 0b01,
+    ].map { .init(colorIndex: $0, palette: registers.backgroundPalette, spritePriority: 0, bgPriority: 0)})
+    state.assertEqual(fetcher)
+    XCTAssertEqual(fifo.pixels, state.pixels)
   }
 }
