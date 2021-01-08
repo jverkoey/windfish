@@ -2,7 +2,7 @@ import Foundation
 import Cocoa
 import Windfish
 
-let updateGoldens = false
+let updateGoldens = true
 
 extension Disassembler.SourceLocation {
   func address() -> LR35902.Address {

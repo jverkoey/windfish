@@ -200,6 +200,11 @@ extension PPU {
           guard let sprite = sprite else {
             fatalError()
           }
+          guard sprite.x > 0 else {
+            // Nothing to draw here, jump immediately to the next state.
+            state = .readData0
+            break
+          }
           let palette: Palette
           switch sprite.palette {
           case .obj0pal:
@@ -207,7 +212,8 @@ extension PPU {
           case .obj1pal:
             palette = registers.objectPallete1
           }
-          for i: Int in 0...7 {
+          let offset = (sprite.x < 8) ? Int(truncatingIfNeeded: 8 - sprite.x) : 0
+          for i: Int in offset...7 {
             let pixel = fifo.pixels[i]
 
             if pixel.spritePriority == 1 {
@@ -281,7 +287,7 @@ extension PPU {
 
       // TODO: Check registers.backgroundEnable and registers.windowEnable
       precondition(registers.backgroundEnable)  // Disabled behavior not currently implemented.
-      precondition(!registers.windowEnable)  // Window not currently implemented.
+//      precondition(!registers.windowEnable)  // Window not currently implemented.
 
       // FIFO+Fetcher logic
       fetcher.start(tileMapAddress: registers.backgroundTileMapAddress,
@@ -343,7 +349,10 @@ extension PPU {
           if drawnSprites.contains(index) {
             continue  // Skip sprites we've already drawn.
           }
-          if sprite.x - 8 == screenPlotOffset {
+          if screenPlotOffset == 0 && sprite.x < 8 {
+            drawnSprites.insert(index)
+            fetcher.startSprite(sprite, y: registers.ly)
+          } else if sprite.x - 8 == screenPlotOffset {
             drawnSprites.insert(index)
             fetcher.startSprite(sprite, y: registers.ly)
             return nil
