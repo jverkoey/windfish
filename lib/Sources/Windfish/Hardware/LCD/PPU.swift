@@ -163,6 +163,19 @@ extension PPU {
       changeMode(to: nextMode)
     }
 
+    precondition(lineCycleDriver.scanline >= 0 && lineCycleDriver.scanline <= 153, "Scanline is out of bounds.")
+
+    // Flush the scanline to ly
+    if lineCycleDriver.scanline < 153 {
+      registers.ly = lineCycleDriver.scanline
+    } else if lineCycleDriver.scanline == 153 {
+      if lineCycleDriver.cycles <= 1 {
+        registers.ly = lineCycleDriver.scanline
+      } else {
+        registers.ly = 0  // Force ly to 0 for the remainder of this line.
+      }
+    }
+
     /**
      ly == lyc interrupt flag gets set on a specific cycle depending on the line:
 
@@ -205,24 +218,16 @@ extension PPU {
      Key points:
      - Line 0: No LY==LYC interrupt fired
      - Lines 1...152: LY==LYC interrupt fired on second machine cycle of the line
-     - Line 153: LY==LYC interrupt fired twice; once for 
+     - Line 153: LY==LYC interrupt fired twice; once for line 153, and again for line 0
 
      Resources:
      - "8.9.1. Timings in DMG" in https://github.com/AntonioND/giibiiadvance/blob/master/docs/TCAGBD.pdf
+     - http://forums.nesdev.com/viewtopic.php?f=20&t=13727
+     - https://github.com/shonumi/gbe-plus/commit/c878372d271439e093ce0347fc92a39050090680
+     - https://github.com/spec-chum/SpecBoy/blob/master/SpecBoy/Ppu.cs
+     - https://github.com/LIJI32/SameBoy/blob/29a3b18186c181399f4b99b9111ca9d8b5726886/Core/display.c#L1357-L1378
+     - https://github.com/trekawek/coffee-gb/blob/088b86fb17109b8cac98e6394108b3561f443d54/src/main/java/eu/rekawek/coffeegb/gpu/Gpu.java#L178-L182
     */
-
-    precondition(lineCycleDriver.scanline >= 0 && lineCycleDriver.scanline <= 153, "Scanline is out of bounds.")
-
-    // Flush the scanline to ly
-    if lineCycleDriver.scanline < 153 {
-      registers.ly = lineCycleDriver.scanline
-    } else if lineCycleDriver.scanline == 153 {
-      if lineCycleDriver.cycles <= 1 {
-        registers.ly = lineCycleDriver.scanline
-      } else {
-        registers.ly = 0  // Force ly to 0 for the remainder of this line.
-      }
-    }
 
     // Update coincidence
     if lineCycleDriver.cycles == 1 || (lineCycleDriver.cycles == 3 && lineCycleDriver.scanline == 153) {
@@ -235,10 +240,10 @@ extension PPU {
 
     // Fire interrupts
     if lineCycleDriver.scanline >= 1 && lineCycleDriver.scanline <= 153 && lineCycleDriver.cycles == 2 {
-      // Always fire on the second cycle of the line.
+      // Always fire on the second cycle of the line...
       requestCoincidenceInterruptIfNeeded(memory: memory)
     } else if lineCycleDriver.scanline == 153 && (lineCycleDriver.cycles == 2 || lineCycleDriver.cycles == 4) {
-      // Except on line 153, which fires on cycle 2 for ly==lyc==153 and on cycle 4 for ly==lyc==0
+      // ...except on line 153, which fires on cycle 2 for ly==lyc==153 and on cycle 4 for ly==lyc==0
       requestCoincidenceInterruptIfNeeded(memory: memory)
     }
 
