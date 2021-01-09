@@ -90,6 +90,9 @@ extension PPU {
         self.sprite = sprite
         state = .readSpriteTileNumber
 
+        // It's possible to interrupt the fetcher mid-cycle, so we re-align timing by resetting the tickAlternator to
+        // its initial state.
+        tickAlternator = false
         // Compute the upper-left corner of the sprite in order to calculate the intersection of ly with the sprite.
         // - 2.8.2 "Sprites": https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
         let spriteTopLeftY = sprite.y - 16
