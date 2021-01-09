@@ -370,6 +370,9 @@ extension PPU {
 
       screenPlotOffset += 1
       if screenPlotOffset >= 160 {
+        // Either http://blog.kevtris.org/blogfiles/Nitty%20Gritty%20Gameboy%20VRAM%20Timing.txt has the wrong t-cycle
+        // timings, or our counting is wrong here, because the doc says there are 173 cycles per line in the simple
+        // case, but mooneye's hardware tests expect ~171 cycles.
         precondition(!drawnSprites.isEmpty || tcycle == 171)
         registers.requestHBlankInterruptIfNeeded(memory: memory)
         return .hblank
