@@ -33,7 +33,6 @@ extension PPU {
     struct Pixel: Equatable {
       let colorIndex: UInt8
       let palette: Palette
-      let spritePriority: UInt8
       let bgPriority: UInt8
     }
     final class Fifo {
@@ -181,8 +180,7 @@ extension PPU {
             let bitMask: UInt8 = 1 << i
             let lsb: UInt8 = ((data0 & bitMask) > 0) ? 0b01 : 0
             let msb: UInt8 = ((data1 & bitMask) > 0) ? 0b10 : 0
-            fifo.pixels.append(.init(colorIndex: msb | lsb, palette: registers.backgroundPalette,
-                                     spritePriority: 0, bgPriority: 0))
+            fifo.pixels.append(.init(colorIndex: msb | lsb, palette: registers.backgroundPalette, bgPriority: 0))
           }
           tileMapAddressOffset = (tileMapAddressOffset + 1) % PPU.TilesPerRow
           state = .readTileNumber
@@ -221,7 +219,7 @@ extension PPU {
           for i: Int in offset...7 {
             let pixel = fifo.pixels[i]
 
-            if pixel.spritePriority == 1 {
+            if pixel.bgPriority == 1 {
               continue
             }
 
@@ -231,9 +229,9 @@ extension PPU {
             let msb: UInt8 = ((data1 & bitMask) > 0) ? 0b10 : 0
             let spriteColorIndex = msb | lsb
 
-            let pixelColorIndex = fifo.pixels[i].colorIndex
-            if (sprite.priority && pixelColorIndex == 0) || !sprite.priority && spriteColorIndex != 0 {
-              fifo.pixels[i] = .init(colorIndex: spriteColorIndex, palette: palette, spritePriority: 1, bgPriority: 0)
+            let existingColorIndex = fifo.pixels[i].colorIndex
+            if (sprite.priority && existingColorIndex == 0) || !sprite.priority && spriteColorIndex != 0 {
+              fifo.pixels[i] = .init(colorIndex: spriteColorIndex, palette: palette, bgPriority: 1)
             }
           }
           state = .readTileNumber
@@ -367,9 +365,10 @@ extension PPU {
         }
       }
 
-      // This is first executed on cycle 4 of the pixel transfer. It takes two machine cycles to load one tile line
+      // This is first executed on t-cycle 4 of the pixel transfer. It takes two machine cycles to load one tile line
       // into the fifo, and the fifo must always have at least 8 pixels in it before pixels can be dequeued, so we
       // load a second tile's line for an additional two machine cycles.
+      precondition(debug_tcycle >= 4)
       registers.screenData[screenPlotAnchor + Int(truncatingIfNeeded: screenPlotOffset)] = fifo.dequeuePixel()
 
       screenPlotOffset += 1
