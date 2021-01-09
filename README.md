@@ -51,6 +51,9 @@ Test ROMs:
 
 - [Mooneye GB](https://github.com/Gekkio/mooneye-gb/tree/master/tests)
 - [blargg](https://gbdev.gg8.se/files/roms/blargg-gb-tests/)
+- [mealybug-tearoom](https://github.com/mattcurrie/mealybug-tearoom-tests)
+- [Gambatte](https://github.com/sinamas/gambatte/tree/master/test/hwtests)
+- [Game Boy test ROM do's and don'ts](https://gekkio.fi/blog/2016/game-boy-test-rom-dos-and-donts/)
 
 Open source emulators with both fifo PPU and cycle-accuracy:
 
