@@ -141,9 +141,11 @@ extension PPU {
       func tick() {
         // Fetcher operates on a 2 t-cycle clock speed.
         // - "The Ultimate Game Boy Talk (33c3)": https://youtu.be/HyzD8pNlpwI?t=3054
-        tickAlternator = !tickAlternator
-        if tickAlternator {
-          return
+        if state != .pushToFifo {
+          tickAlternator = !tickAlternator
+          if tickAlternator {
+            return
+          }
         }
 
         switch state {
@@ -184,6 +186,7 @@ extension PPU {
           }
           tileMapAddressOffset = (tileMapAddressOffset + 1) % PPU.TilesPerRow
           state = .readTileNumber
+          tickAlternator = false
 
         // Both of the following states are no-ops because we've already snapshotted the sprite data in the OAM search
         // and OAM writes are locked down during pixel transfer mode, so we don't need to read these values again.
