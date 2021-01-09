@@ -157,7 +157,7 @@ extension PPU {
     }
 
     // Advance the state machine by one machine cycle.
-    for i in 1...4 {
+    for _ in 1...4 {
       if let nextMode = self.mode.tick(memory: memory) {
         if registers.lcdMode == .searchingOAM && nextMode == .pixelTransfer {
           // Modes aren't directly aware of each others' existence, so we copy the intersected OAMs to the pixel
