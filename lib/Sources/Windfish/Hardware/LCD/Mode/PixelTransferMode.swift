@@ -317,7 +317,7 @@ extension PPU {
         // The fifo requires at least 9 pixels in order to be able to pop a pixel off. This ensures that there are
         // always at least 8 pixels for the purposes of compositing sprites onto the background pixels.
         // Until there are at least 9 pixels, the fifo stalls.
-        if fifo.pixels.count <= 8 {
+        if fifo.pixels.count < 9 {
           return nil
         }
 
