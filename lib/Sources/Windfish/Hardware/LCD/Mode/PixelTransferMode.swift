@@ -155,7 +155,17 @@ extension PPU {
 
         case .readData1:
           data1 = getBackgroundTileData(tileIndex: tileIndex, byte: 1)
+
+          // The existence of a distinct pushToFifo state is somewhat ambiguous, as both of the canonical references on
+          // PPU timing seem to imply that there are only 6 t-cycles for a given block of 8 pixels.
+          // - http://blog.kevtris.org/blogfiles/Nitty%20Gritty%20Gameboy%20VRAM%20Timing.txt
+          // - https://youtu.be/HyzD8pNlpwI?t=3087
+          // It's unclear when the fifo is updated, but keeping it as a separate state causes the mooneye
+          // acceptance/ppu/intr_2_0_timing test to fail due to an additional cycle. Instead, we fallthrough directly
+          // to the pushToFifo on this state. If the fifo is stalled, then additional t-cycles will be consumed until
+          // the fifo has capacity again.
           state = .pushToFifo
+          fallthrough
 
         case .pushToFifo:
           if fifo.pixels.count > 8 {
@@ -163,6 +173,7 @@ extension PPU {
             // - "The Ultimate Game Boy Talk (33c3)": https://youtu.be/HyzD8pNlpwI?t=3074
             break
           }
+
           for i: UInt8 in stride(from: 7, through: 0, by: -1) {
             let bitMask: UInt8 = 1 << i
             let lsb: UInt8 = ((data0 & bitMask) > 0) ? 0b01 : 0
@@ -172,15 +183,7 @@ extension PPU {
           }
           tileMapAddressOffset = (tileMapAddressOffset + 1) % PPU.TilesPerRow
 
-          // The existence of a distinct pushToFifo state is somewhat ambiguous, as both of the canonical references on
-          // PPU timing seem to imply that there are only 6 t-cycles for a given block of 8 pixels.
-          // - http://blog.kevtris.org/blogfiles/Nitty%20Gritty%20Gameboy%20VRAM%20Timing.txt
-          // - https://youtu.be/HyzD8pNlpwI?t=3087
-          // It's unclear when the fifo is updated, but keeping it as a separate state causes the baseline t-cycle for a
-          // line to be 175 rather than 173. So to avoid the extra two t-cycles we skip directly to the readData0 state
-          // and read the tile index here. There might be a more accurate way to represent this.
-          tileIndex = registers.tileMap[tileMapAddress + tileMapAddressOffset - PPU.tileMapRegion.lowerBound]
-          state = .readData0
+          state = .readTileNumber
 
         // Both of the following states are no-ops because we've already snapshotted the sprite data in the OAM search
         // and OAM writes are locked down during pixel transfer mode, so we don't need to read these values again.
@@ -367,7 +370,7 @@ extension PPU {
 
       screenPlotOffset += 1
       if screenPlotOffset >= 160 {
-        precondition(!drawnSprites.isEmpty || tcycle == 173)
+        precondition(!drawnSprites.isEmpty || tcycle == 171)
         registers.requestHBlankInterruptIfNeeded(memory: memory)
         return .hblank
       }
