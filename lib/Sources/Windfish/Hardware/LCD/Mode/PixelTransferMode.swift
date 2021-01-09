@@ -160,7 +160,7 @@ extension PPU {
           // PPU timing seem to imply that there are only 6 t-cycles for a given block of 8 pixels.
           // - http://blog.kevtris.org/blogfiles/Nitty%20Gritty%20Gameboy%20VRAM%20Timing.txt
           // - https://youtu.be/HyzD8pNlpwI?t=3087
-          // It's unclear when the fifo is updated, but keeping it as a separate state causes the mooneye
+          // It's unclear when the fifo is updated, but treating it as a separate state causes the mooneye
           // acceptance/ppu/intr_2_0_timing test to fail due to an additional cycle. Instead, we fallthrough directly
           // to pushToFifo after reading data1. If the fifo is stalled, then additional t-cycles will be consumed until
           // the fifo has capacity again.
@@ -182,7 +182,6 @@ extension PPU {
                                      spritePriority: 0, bgPriority: 0))
           }
           tileMapAddressOffset = (tileMapAddressOffset + 1) % PPU.TilesPerRow
-
           state = .readTileNumber
 
         // Both of the following states are no-ops because we've already snapshotted the sprite data in the OAM search
@@ -234,7 +233,7 @@ extension PPU {
               fifo.pixels[i] = .init(colorIndex: spriteColorIndex, palette: palette, spritePriority: 1, bgPriority: 0)
             }
           }
-          state = .readData0
+          state = .readTileNumber
         }
       }
 
