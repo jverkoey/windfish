@@ -22,18 +22,18 @@ extension PPU {
     /** Starts the mode. */
     func start() {
       intersectedOAMs = []
-      lineCycleDriver.cycles = 0
+      lineCycleDriver.tcycles = 0
       didSearch = false
     }
 
-    /** Executes a single machine cycle.  */
-    func advance(memory: AddressableMemory) -> LCDCMode? {
-      lineCycleDriver.cycles += 1
+    /** Executes a single t-cycle.  */
+    func tick(memory: AddressableMemory) -> LCDCMode? {
+      lineCycleDriver.tcycles += 1
 
-      // The search is performed in a single machine cycle because there are no apparent interactions between OAM search
+      // The search is performed in a single cycle because there are no apparent interactions between OAM search
       // and other parts of the hardware that require per-cycle emulation.
       if didSearch {
-        return lineCycleDriver.cycles >= PPU.searchingOAMLength ? .pixelTransfer : nil
+        return lineCycleDriver.tcycles >= PPU.TCycleTiming.searchingOAM ? .pixelTransfer : nil
       }
 
       // TODO: Implement the OAM Search CPU Bug outlined in "The Ultimate Game Boy Talk (33c3)"

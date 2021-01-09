@@ -280,7 +280,7 @@ extension PPU {
     private var droppedPixels: UInt8 = 0
     private var screenPlotAnchor: Int = 0
     private var screenPlotOffset: UInt8 = 0
-    private var tcycle: Int = 0
+    private var debug_tcycle: Int = 0
     private var drawnSprites = Set<Int>()
 
     /** Starts the mode. */
@@ -299,12 +299,14 @@ extension PPU {
       droppedPixels = 0
       screenPlotAnchor = Int(truncatingIfNeeded: lineCycleDriver.scanline) * PPU.screenSize.width
       screenPlotOffset = 0
-      tcycle = 0
+      debug_tcycle = 0
       drawnSprites.removeAll(keepingCapacity: true)
     }
 
+    /** Executes a single t-cycle. */
     func tick(memory: AddressableMemory) -> LCDCMode? {
-      tcycle += 1
+      lineCycleDriver.tcycles += 1
+      debug_tcycle += 1
 
       fetcher.tick()
 
@@ -333,7 +335,7 @@ extension PPU {
           // Because scx can change mid-line, we can't use the simple (173 + (xscroll % 7)) formula outlined in
           // http://blog.kevtris.org/blogfiles/Nitty%20Gritty%20Gameboy%20VRAM%20Timing.txt
           // Instead, we offset the tcycle counter for each cycle spent dropping a pixel.
-          tcycle -= 1
+          debug_tcycle -= 1
           return nil
         }
 
@@ -372,23 +374,9 @@ extension PPU {
         // Either http://blog.kevtris.org/blogfiles/Nitty%20Gritty%20Gameboy%20VRAM%20Timing.txt has the wrong t-cycle
         // timings, or our counting is wrong here, because the doc says there are 173 cycles per line in the simple
         // case, but mooneye's hardware tests expect ~171 cycles.
-        precondition(!drawnSprites.isEmpty || tcycle == 171)
+        precondition(!drawnSprites.isEmpty || debug_tcycle == 171)
         registers.requestHBlankInterruptIfNeeded(memory: memory)
         return .hblank
-      }
-      return nil
-    }
-
-    /** Executes a single machine cycle.  */
-    func advance(memory: AddressableMemory) -> LCDCMode? {
-      lineCycleDriver.cycles += 1
-
-      for _ in 1...4 {
-        if let nextMode = tick(memory: memory) {
-          // TODO: This doesn't always consume an entire machine cycle, so may need to move to tick-based emulation
-          // in order to time this correctly.
-          return nextMode
-        }
       }
       return nil
     }

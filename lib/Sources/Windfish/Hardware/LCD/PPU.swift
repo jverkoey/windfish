@@ -10,8 +10,8 @@ import Foundation
 
 protocol PPUMode {
   func start()
-  /** Executes a single machine cycle.  */
-  func advance(memory: AddressableMemory) -> PPU.LCDCMode?
+  /** Executes a single t-cycle.  */
+  func tick(memory: AddressableMemory) -> PPU.LCDCMode?
 }
 
 public final class PPU {
@@ -52,7 +52,10 @@ public final class PPU {
   public static let screenSize = (width: 160, height: 144)
 
   final class LineCycleDriver {
-    var cycles: Int = 0
+    var tcycles: Int = 0
+    var mcycles: Int {
+      return tcycles / 4
+    }
 
     /**
      The effective scanline of the PPU.
@@ -131,8 +134,11 @@ public final class PPU {
 // MARK: - Emulation
 
 extension PPU {
-  static let searchingOAMLength = 20
-  static let scanlineCycleLength = 114
+  typealias TCycle = Int
+  struct TCycleTiming {
+    static let searchingOAM: TCycle = 20 * 4
+    static let scanline: TCycle = 114 * 4
+  }
 
   /** Executes a single machine cycle. */
   public func advance(memory: AddressableMemory) {
@@ -150,17 +156,19 @@ extension PPU {
       self.deferredLCDMode = nil
     }
 
-    // Advance the state machine.
-    if let nextMode = self.mode.advance(memory: memory) {
-      if registers.lcdMode == .searchingOAM && nextMode == .pixelTransfer {
-        // Modes aren't directly aware of each others' existence, so we copy the intersected OAMs to the pixel transfer
-        // mode to keep a clear separation of concerns.
-        modePixelTransfer.intersectedOAMs = modeOAMSearch.intersectedOAMs
+    // Advance the state machine by one machine cycle.
+    for i in 1...4 {
+      if let nextMode = self.mode.tick(memory: memory) {
+        if registers.lcdMode == .searchingOAM && nextMode == .pixelTransfer {
+          // Modes aren't directly aware of each others' existence, so we copy the intersected OAMs to the pixel
+          // transfer mode to keep a clear separation of concerns.
+          modePixelTransfer.intersectedOAMs = modeOAMSearch.intersectedOAMs
+        }
+        if nextMode == .vblank {
+          vblankCounter += 1  // Signal to observers of the emulator that vblank has been entered.
+        }
+        changeMode(to: nextMode)
       }
-      if nextMode == .vblank {
-        vblankCounter += 1  // Signal to observers of the emulator that vblank has been entered.
-      }
-      changeMode(to: nextMode)
     }
 
     precondition(lineCycleDriver.scanline >= 0 && lineCycleDriver.scanline <= 153, "Scanline is out of bounds.")
@@ -169,7 +177,7 @@ extension PPU {
     if lineCycleDriver.scanline < 153 {
       registers.ly = lineCycleDriver.scanline
     } else if lineCycleDriver.scanline == 153 {
-      if lineCycleDriver.cycles <= 1 {
+      if lineCycleDriver.mcycles <= 1 {
         registers.ly = lineCycleDriver.scanline
       } else {
         registers.ly = 0  // Force ly to 0 for the remainder of this line.
@@ -229,8 +237,10 @@ extension PPU {
      - https://github.com/trekawek/coffee-gb/blob/088b86fb17109b8cac98e6394108b3561f443d54/src/main/java/eu/rekawek/coffeegb/gpu/Gpu.java#L178-L182
     */
 
+    let mcycles = lineCycleDriver.mcycles
+
     // Update coincidence
-    if lineCycleDriver.cycles == 1 || (lineCycleDriver.cycles == 3 && lineCycleDriver.scanline == 153) {
+    if mcycles == 1 || (mcycles == 3 && lineCycleDriver.scanline == 153) {
       // Coincidence is always off when the hardware is loading LY for comparison.
       registers.coincidence = false
     } else {
@@ -239,10 +249,10 @@ extension PPU {
     }
 
     // Fire interrupts
-    if lineCycleDriver.scanline >= 1 && lineCycleDriver.scanline <= 153 && lineCycleDriver.cycles == 2 {
+    if lineCycleDriver.scanline >= 1 && lineCycleDriver.scanline <= 153 && mcycles == 2 {
       // Always fire on the second cycle of the line...
       requestCoincidenceInterruptIfNeeded(memory: memory)
-    } else if lineCycleDriver.scanline == 153 && (lineCycleDriver.cycles == 2 || lineCycleDriver.cycles == 4) {
+    } else if lineCycleDriver.scanline == 153 && (mcycles == 2 || mcycles == 4) {
       // ...except on line 153, which fires on cycle 2 for ly==lyc==153 and on cycle 4 for ly==lyc==0
       requestCoincidenceInterruptIfNeeded(memory: memory)
     }

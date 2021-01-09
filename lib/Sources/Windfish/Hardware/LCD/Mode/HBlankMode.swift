@@ -13,13 +13,13 @@ extension PPU {
     /** Starts the mode. */
     func start() {}
 
-    /** Executes a single machine cycle.  */
-    func advance(memory: AddressableMemory) -> LCDCMode? {
-      lineCycleDriver.cycles += 1
+    /** Executes a single t-cycle.  */
+    func tick(memory: AddressableMemory) -> LCDCMode? {
+      lineCycleDriver.tcycles += 1
 
       var nextMode: LCDCMode? = nil
 
-      if lineCycleDriver.cycles >= PPU.scanlineCycleLength {
+      if lineCycleDriver.tcycles >= PPU.TCycleTiming.scanline {
         lineCycleDriver.scanline += 1
         if lineCycleDriver.scanline < 144 {
           nextMode = .searchingOAM

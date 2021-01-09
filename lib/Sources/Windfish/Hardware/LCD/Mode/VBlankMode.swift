@@ -12,17 +12,17 @@ extension PPU {
 
     /** Starts the mode. */
     func start() {
-      lineCycleDriver.cycles = 0
+      lineCycleDriver.tcycles = 0
     }
 
-    /** Executes a single machine cycle.  */
-    func advance(memory: AddressableMemory) -> LCDCMode? {
-      lineCycleDriver.cycles += 1
+    /** Executes a single t-cycle.  */
+    func tick(memory: AddressableMemory) -> LCDCMode? {
+      lineCycleDriver.tcycles += 1
 
       var nextMode: LCDCMode? = nil
 
-      if lineCycleDriver.cycles >= PPU.scanlineCycleLength {
-        lineCycleDriver.cycles = 0
+      if lineCycleDriver.tcycles >= PPU.TCycleTiming.scanline {
+        lineCycleDriver.tcycles = 0
         lineCycleDriver.scanline += 1
 
         if lineCycleDriver.scanline >= 154 {
