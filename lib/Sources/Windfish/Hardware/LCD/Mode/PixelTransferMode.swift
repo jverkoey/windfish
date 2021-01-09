@@ -162,7 +162,7 @@ extension PPU {
           // - https://youtu.be/HyzD8pNlpwI?t=3087
           // It's unclear when the fifo is updated, but keeping it as a separate state causes the mooneye
           // acceptance/ppu/intr_2_0_timing test to fail due to an additional cycle. Instead, we fallthrough directly
-          // to the pushToFifo on this state. If the fifo is stalled, then additional t-cycles will be consumed until
+          // to pushToFifo after reading data1. If the fifo is stalled, then additional t-cycles will be consumed until
           // the fifo has capacity again.
           state = .pushToFifo
           fallthrough
