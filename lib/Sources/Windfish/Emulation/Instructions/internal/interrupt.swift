@@ -8,7 +8,12 @@ extension LR35902.Emulation {
         return .continueExecution
       }
       if cycle == 2 {
+        // "gekkio recently published a test that shows that the GB CPU reads IE twice when firing an interrupt – once
+        // when it checks if an interrupt occurred, and once when it checks which interrupt occured. These reads are not
+        // in the same M-Cycle."
+        // - https://www.reddit.com/r/EmuDev/comments/7206vh/sameboy_now_correctly_emulates_pinball_deluxe/
         let enabled = LR35902.Interrupt(rawValue: memory.read(from: LR35902.interruptEnableAddress))
+
         let requestedInterrupts = enabled.intersection(interrupts)
         if requestedInterrupts.isEmpty {
           return .fetchNext
