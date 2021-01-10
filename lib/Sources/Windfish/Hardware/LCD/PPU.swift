@@ -155,6 +155,9 @@ extension PPU {
     // See docs of deferredLCDMode for more details on this timing.
     if let deferredLCDMode = deferredLCDMode {
       registers.lcdMode = deferredLCDMode
+      if deferredLCDMode == .hblank {
+        registers.requestHBlankInterruptIfNeeded(memory: memory)
+      }
       self.deferredLCDMode = nil
     }
 

@@ -380,7 +380,6 @@ extension PPU {
         // timings, or our counting is wrong here, because the doc says there are 173 cycles per line in the simple
         // case, but mooneye's hardware tests expect ~171 cycles.
         precondition(!drawnSprites.isEmpty || debug_tcycle == 171)
-        registers.requestHBlankInterruptIfNeeded(memory: memory)
         return .hblank
       }
       return nil
