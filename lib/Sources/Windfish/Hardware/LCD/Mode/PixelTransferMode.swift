@@ -141,11 +141,11 @@ extension PPU {
       func tick() {
         // Fetcher operates on a 2 t-cycle clock speed.
         // - "The Ultimate Game Boy Talk (33c3)": https://youtu.be/HyzD8pNlpwI?t=3054
-        if state != .pushToFifo {
-          tickAlternator = !tickAlternator
-          if tickAlternator {
-            return
-          }
+        tickAlternator = !tickAlternator
+
+        // pushToFifo fires on every t-cycle; all other stages fire on every other t-cycle.
+        if state != .pushToFifo && tickAlternator {
+          return
         }
 
         switch state {
@@ -186,7 +186,6 @@ extension PPU {
           }
           tileMapAddressOffset = (tileMapAddressOffset + 1) % PPU.TilesPerRow
           state = .readTileNumber
-          tickAlternator = false
 
         // TODO: Break the sprite fifo out to a separate fetcher so that the bg fetcher and sprite fetcher can
         // interleave.
