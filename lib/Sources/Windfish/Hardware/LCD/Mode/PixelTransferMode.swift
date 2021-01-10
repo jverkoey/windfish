@@ -188,6 +188,9 @@ extension PPU {
           state = .readTileNumber
           tickAlternator = false
 
+        // TODO: Break the sprite fifo out to a separate fetcher so that the bg fetcher and sprite fetcher can
+        // interleave.
+
         // Both of the following states are no-ops because we've already snapshotted the sprite data in the OAM search
         // and OAM writes are locked down during pixel transfer mode, so we don't need to read these values again.
         // TODO: Are these t-cycle nops required?
@@ -206,35 +209,33 @@ extension PPU {
           guard let sprite = sprite else {
             fatalError()
           }
-          guard sprite.x > 0 else {
-            // Nothing to draw here, jump immediately to the next state.
-            state = .readData0
-            break
-          }
-          let palette: Palette
-          switch sprite.palette {
-          case .obj0pal:
-            palette = registers.objectPallete0
-          case .obj1pal:
-            palette = registers.objectPallete1
-          }
-          let offset = (sprite.x < 8) ? Int(truncatingIfNeeded: 8 - sprite.x) : 0
-          for i: Int in offset...7 {
-            let pixel = fifo.pixels[i]
-
-            if pixel.bgPriority == 1 {
-              continue
+          if sprite.x > 0 {
+            let palette: Palette
+            switch sprite.palette {
+            case .obj0pal:
+              palette = registers.objectPallete0
+            case .obj1pal:
+              palette = registers.objectPallete1
             }
+            precondition(fifo.pixels.count >= 8)
+            let offset = (sprite.x < 8) ? Int(truncatingIfNeeded: 8 - sprite.x) : 0
+            for i: Int in offset...7 {
+              let pixel = fifo.pixels[i]
 
-            let bitIndex = sprite.xflip ? i : (7 - i)
-            let bitMask: UInt8 = 1 << UInt8(truncatingIfNeeded: bitIndex)
-            let lsb: UInt8 = ((data0 & bitMask) > 0) ? 0b01 : 0
-            let msb: UInt8 = ((data1 & bitMask) > 0) ? 0b10 : 0
-            let spriteColorIndex = msb | lsb
+              if pixel.bgPriority == 1 {
+                continue
+              }
 
-            let existingColorIndex = fifo.pixels[i].colorIndex
-            if (sprite.priority && existingColorIndex == 0) || !sprite.priority && spriteColorIndex != 0 {
-              fifo.pixels[i] = .init(colorIndex: spriteColorIndex, palette: palette, bgPriority: 1)
+              let bitIndex = sprite.xflip ? i : (7 - i)
+              let bitMask: UInt8 = 1 << UInt8(truncatingIfNeeded: bitIndex)
+              let lsb: UInt8 = ((data0 & bitMask) > 0) ? 0b01 : 0
+              let msb: UInt8 = ((data1 & bitMask) > 0) ? 0b10 : 0
+              let spriteColorIndex = msb | lsb
+
+              let existingColorIndex = fifo.pixels[i].colorIndex
+              if (sprite.priority && existingColorIndex == 0) || !sprite.priority && spriteColorIndex != 0 {
+                fifo.pixels[i] = .init(colorIndex: spriteColorIndex, palette: palette, bgPriority: 1)
+              }
             }
           }
           state = .readTileNumber
@@ -367,6 +368,7 @@ extension PPU {
           if screenPlotOffset == 0 && sprite.x < 8 {
             drawnSprites.insert(index)
             fetcher.startSprite(sprite, y: registers.ly)
+            return nil
           } else if sprite.x - 8 == screenPlotOffset {
             drawnSprites.insert(index)
             fetcher.startSprite(sprite, y: registers.ly)
