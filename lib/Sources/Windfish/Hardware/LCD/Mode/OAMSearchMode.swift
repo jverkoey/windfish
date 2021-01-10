@@ -48,8 +48,12 @@ extension PPU {
         // - https://youtu.be/HyzD8pNlpwI?t=2784
         if sprite.y <= yPosition && yPosition < sprite.y + registers.spriteSize.height() {
           intersectedOAMs.append(sprite)
+          if intersectedOAMs.count >= 10 {
+            break
+          }
         }
       }
+      precondition(intersectedOAMs.count <= 10)
       didSearch = true
 
       return nil
