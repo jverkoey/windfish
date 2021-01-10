@@ -65,7 +65,7 @@ public final class PPU {
      */
     var scanline: UInt8 = 0
   }
-  private let lineCycleDriver = LineCycleDriver()
+  let lineCycleDriver = LineCycleDriver()
 
   /**
    LCD Mode gets synchronized to the register on the second cycle of the mode.
@@ -99,14 +99,14 @@ public final class PPU {
    STAT mode    1   1   1   1         1   1   1   1   1       1   1
    ```
    */
-  private var deferredLCDMode: LCDCMode?
+  private var deferredLCDMode: LCDCMode? = .searchingOAM
 
   /**
    The ly value that should be used for ly==lyc comparison.
 
    This always shows the value of ly from one machine cycle prior.
    */
-  private var lyForComparison: UInt8 = 0
+  var lyForComparison: UInt8?
 
   enum Addresses: LR35902.Address {
     case LCDC = 0xFF40
@@ -134,10 +134,12 @@ public final class PPU {
 // MARK: - Emulation
 
 extension PPU {
-  typealias TCycle = Int
   struct TCycleTiming {
-    static let searchingOAM: TCycle = 20 * 4
-    static let scanline: TCycle = 114 * 4
+    /** The number of t-cycles it takes to search OAM. */
+    static let searchingOAM: Gameboy.TCycle = 20 * 4
+
+    /** The maximum number of t-cycles required for single scanline's OAM search, pixel transfer, and hblank. */
+    static let scanline: Gameboy.TCycle = 114 * 4
   }
 
   /** Executes a single machine cycle. */
@@ -173,16 +175,7 @@ extension PPU {
 
     precondition(lineCycleDriver.scanline >= 0 && lineCycleDriver.scanline <= 153, "Scanline is out of bounds.")
 
-    // Flush the scanline to ly
-    if lineCycleDriver.scanline < 153 {
-      registers.ly = lineCycleDriver.scanline
-    } else if lineCycleDriver.scanline == 153 {
-      if lineCycleDriver.mcycles <= 1 {
-        registers.ly = lineCycleDriver.scanline
-      } else {
-        registers.ly = 0  // Force ly to 0 for the remainder of this line.
-      }
-    }
+    // MARK: - ly and lyc==ly coincidence calculations
 
     /**
      ly == lyc interrupt flag gets set on a specific cycle depending on the line:
@@ -237,28 +230,65 @@ extension PPU {
      - https://github.com/trekawek/coffee-gb/blob/088b86fb17109b8cac98e6394108b3561f443d54/src/main/java/eu/rekawek/coffeegb/gpu/Gpu.java#L178-L182
     */
 
-    let mcycles = lineCycleDriver.mcycles
-
-    // Update coincidence
-    if mcycles == 1 || (mcycles == 3 && lineCycleDriver.scanline == 153) {
-      // Coincidence is always off when the hardware is loading LY for comparison.
-      registers.coincidence = false
+    // The scanline represents the screen line being drawn, while ly is somewhat of a virtual value that interprets the
+    // scanline based on the timings outlined above.
+    let ly: UInt8
+    if lineCycleDriver.scanline < 153 {
+      ly = lineCycleDriver.scanline
     } else {
-      // At all other times, coincidence should reflect equality of the last cycle's ly value and lyc.
-      registers.coincidence = lyForComparison == registers.lyc
+      precondition(lineCycleDriver.scanline == 153)
+      if lineCycleDriver.tcycles < 4 {
+        ly = lineCycleDriver.scanline
+      } else {
+        ly = 0  // Force ly to 0 for the remainder of this line.
+      }
     }
 
-    // Fire interrupts
-    if lineCycleDriver.scanline >= 1 && lineCycleDriver.scanline <= 153 && mcycles == 2 {
+    if registers.ly != ly {
+      registers.ly = ly
+      lyForComparison = nil  // Simulate a load of ly by clearing this out for a cycle.
+    } else {
+      lyForComparison = registers.ly
+    }
+    registers.coincidence = lyForComparison == registers.lyc
+
+    // MARK: - Interrupt handling
+
+    // MARK: STAT[oam]
+
+    if lineCycleDriver.scanline == 0 {
+      if lineCycleDriver.tcycles < 4 {
+        // First line fires on the first cycle.
+        registers.requestOAMInterruptIfNeeded(memory: memory)
+      }
+    } else {
+      // Subsequent lines fire on the second cycle
+      if lineCycleDriver.tcycles >= 4 && lineCycleDriver.tcycles < 8  {
+        registers.requestOAMInterruptIfNeeded(memory: memory)
+      }
+    }
+    if lineCycleDriver.scanline == 153 && (lineCycleDriver.tcycles >= 12 && lineCycleDriver.tcycles < 16) {
+      registers.requestOAMInterruptIfNeeded(memory: memory)
+    }
+
+    // MARK: STAT[coincidence]
+
+    if lineCycleDriver.tcycles >= 4 && lineCycleDriver.tcycles < 8  {
       // Always fire on the second cycle of the line...
       requestCoincidenceInterruptIfNeeded(memory: memory)
-    } else if lineCycleDriver.scanline == 153 && (mcycles == 2 || mcycles == 4) {
-      // ...except on line 153, which fires on cycle 2 for ly==lyc==153 and on cycle 4 for ly==lyc==0
+    }
+    if lineCycleDriver.scanline == 153 && (lineCycleDriver.tcycles >= 12 && lineCycleDriver.tcycles < 16) {
+      // ...except on line 153, which fires also fires on cycle 4
       requestCoincidenceInterruptIfNeeded(memory: memory)
     }
 
-    // Queue up LY for comparison for the next machine cycle
-    lyForComparison = registers.ly
+    // MARK: VBlank
+
+    if lineCycleDriver.scanline == 144 && (lineCycleDriver.tcycles >= 4 && lineCycleDriver.tcycles < 8) {
+      var interruptFlag = LR35902.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
+      interruptFlag.insert(.vBlank)
+      memory.write(interruptFlag.rawValue, to: LR35902.interruptFlagAddress)
+    }
   }
 
   private func requestCoincidenceInterruptIfNeeded(memory: AddressableMemory) {

@@ -93,7 +93,7 @@ extension PPU {
     var enableVBlankInterrupt = false          //    x
     var enableHBlankInterrupt = false          //     x
     var coincidence: Bool = true               //      x
-    var lcdMode = LCDCMode.searchingOAM        //       xx
+    var lcdMode = LCDCMode.hblank              //       xx
                                                // 76543210
 
     // MARK: SY and SX (0xFF42 and 0xFF43)

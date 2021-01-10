@@ -27,14 +27,8 @@ extension PPU {
           // No more lines to draw.
           nextMode = .vblank
 
-          var interruptFlag = LR35902.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
-          interruptFlag.insert(.vBlank)
-          memory.write(interruptFlag.rawValue, to: LR35902.interruptFlagAddress)
-
           registers.requestVBlankInterruptIfNeeded(memory: memory)
         }
-
-        registers.requestOAMInterruptIfNeeded(memory: memory)
       }
 
       return nextMode
