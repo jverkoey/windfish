@@ -89,11 +89,11 @@ public final class LR35902 {
 
     public let rawValue: UInt8
 
-    public static let vBlank       = Interrupt(rawValue: 0b0000_0001)
-    public static let lcdStat      = Interrupt(rawValue: 0b0000_0010)
-    public static let timer        = Interrupt(rawValue: 0b0000_0100)
-    public static let serial       = Interrupt(rawValue: 0b0000_1000)
     public static let joypad       = Interrupt(rawValue: 0b0001_0000)
+    public static let serial       = Interrupt(rawValue: 0b0000_1000)
+    public static let timer        = Interrupt(rawValue: 0b0000_0100)
+    public static let lcdStat      = Interrupt(rawValue: 0b0000_0010)
+    public static let vBlank       = Interrupt(rawValue: 0b0000_0001)
   }
 
   /**
