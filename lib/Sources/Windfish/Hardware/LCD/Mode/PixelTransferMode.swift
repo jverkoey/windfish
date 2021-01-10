@@ -312,6 +312,13 @@ extension PPU {
       lineCycleDriver.tcycles += 1
       debug_tcycle += 1
 
+      // The minimum number of t-cycles for pixel transfer is 172, but this implementation only takes 171. It's unclear
+      // where the cycle is being lost, so for now to pass mooneye/acceptance/ppu/hblank_ly_scx_timing-GS we pad with
+      // one nop to get from 171 to 172.
+      if debug_tcycle == 1 {
+        return nil // Skip the first t-cycle tick.
+      }
+
       fetcher.tick()
 
       if registers.backgroundEnable {
@@ -378,8 +385,8 @@ extension PPU {
       if screenPlotOffset >= 160 {
         // Either http://blog.kevtris.org/blogfiles/Nitty%20Gritty%20Gameboy%20VRAM%20Timing.txt has the wrong t-cycle
         // timings, or our counting is wrong here, because the doc says there are 173 cycles per line in the simple
-        // case, but mooneye's hardware tests expect ~171 cycles.
-        precondition(!drawnSprites.isEmpty || debug_tcycle == 171)
+        // case, but mooneye's hardware tests expect 172 cycles.
+        precondition(!drawnSprites.isEmpty || debug_tcycle == 172)
         return .hblank
       }
       return nil
