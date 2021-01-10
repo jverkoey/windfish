@@ -53,8 +53,7 @@ class MooneyeTests: XCTestCase {
   // MARK: - acceptance/ppu
 
   func test_acceptance_ppu_hblank_ly_scx_timing_GS() throws {
-    try XCTSkipUnless(updateGoldens)  // Fails on scx = 1
-    try run(testRom: "Resources/mooneye/acceptance/ppu/hblank_ly_scx_timing-GS")
+    try run(testRom: "Resources/mooneye/acceptance/ppu/hblank_ly_scx_timing-GS", expectedInstructions: 352_607)
   }
 
   func test_acceptance_ppu_intr_1_2_timing_GS() throws {
