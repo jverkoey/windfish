@@ -184,7 +184,7 @@ extension Gameboy {
       lastPrintedScanline = ppu.lineCycleDriver.scanline
     }
     var cycleState = CycleState(
-      mcycle: ppu.lineCycleDriver.mcycles,
+      mcycle: ppu.lineCycleDriver.tcycles / 4,
       mode: ppu.registers.lcdMode,
       ly: ppu.registers.ly,
       lyForComparison: ppu.lyForComparison,

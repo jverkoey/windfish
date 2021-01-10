@@ -53,8 +53,8 @@ public final class PPU {
 
   final class LineCycleDriver {
     var tcycles: Int = 0
-    var mcycles: Int {
-      return tcycles / 4
+    var lineTCycles: Int {
+      return tcycles % PPU.TCycleTiming.scanline
     }
 
     /**
@@ -186,6 +186,9 @@ extension PPU {
 
     precondition(lineCycleDriver.scanline >= 0 && lineCycleDriver.scanline <= 153, "Scanline is out of bounds.")
 
+    // Pre-compute this value because we're about to reuse it a bunch.
+    let lineTCycles = lineCycleDriver.lineTCycles
+
     // MARK: - ly and lyc==ly coincidence calculations
 
     /**
@@ -248,7 +251,7 @@ extension PPU {
       ly = lineCycleDriver.scanline
     } else {
       precondition(lineCycleDriver.scanline == Scanlines.last)
-      if lineCycleDriver.tcycles < 4 {
+      if lineTCycles < 4 {
         ly = lineCycleDriver.scanline
       } else {
         ly = 0  // Force ly to 0 for the remainder of this line.
@@ -268,27 +271,27 @@ extension PPU {
     // MARK: STAT[oam]
 
     if lineCycleDriver.scanline == 0 {
-      if lineCycleDriver.tcycles < 4 {
+      if lineTCycles < 4 {
         // First line fires on the first cycle.
         registers.requestOAMInterruptIfNeeded(memory: memory)
       }
     } else {
       // Subsequent lines fire on the second cycle
-      if lineCycleDriver.tcycles >= 4 && lineCycleDriver.tcycles < 8 {
+      if lineTCycles >= 4 && lineTCycles < 8 {
         registers.requestOAMInterruptIfNeeded(memory: memory)
       }
     }
-    if lineCycleDriver.scanline == Scanlines.last && (lineCycleDriver.tcycles >= 12 && lineCycleDriver.tcycles < 16) {
+    if lineCycleDriver.scanline == Scanlines.last && (lineTCycles >= 12 && lineTCycles < 16) {
       registers.requestOAMInterruptIfNeeded(memory: memory)
     }
 
     // MARK: STAT[coincidence]
 
-    if lineCycleDriver.tcycles >= 4 && lineCycleDriver.tcycles < 8  {
+    if lineTCycles >= 4 && lineTCycles < 8  {
       // Always fire on the second cycle of the line...
       requestCoincidenceInterruptIfNeeded(memory: memory)
     }
-    if lineCycleDriver.scanline == Scanlines.last && (lineCycleDriver.tcycles >= 12 && lineCycleDriver.tcycles < 16) {
+    if lineCycleDriver.scanline == Scanlines.last && (lineTCycles >= 12 && lineTCycles < 16) {
       // ...except on line 153, which fires also fires on cycle 4
       requestCoincidenceInterruptIfNeeded(memory: memory)
     }
@@ -297,16 +300,16 @@ extension PPU {
 
     // Passing mooneye/acceptance/ppu/intr_1_2_timing-GS requires that we fire the vblank interrupt a couple
     // cycles earlier than expected. We should be firing on lineCycleDriver.scanline == Scanlines.firstVBlank with
-    // lineCycleDriver.tcycles >= 4 if https://github.com/AntonioND/giibiiadvance/blob/master/docs/TCAGBD.pdf is
+    // lineTCycles >= 4 if https://github.com/AntonioND/giibiiadvance/blob/master/docs/TCAGBD.pdf is
     // accurate.
     // TODO: Identify which extra cycles are requiring this shift back by two machine cycles.
-    if lineCycleDriver.scanline == Scanlines.firstVBlank - 1 && (lineCycleDriver.tcycles >= TCycleTiming.scanline - 4 && lineCycleDriver.tcycles < TCycleTiming.scanline) {
+    if lineCycleDriver.scanline == Scanlines.firstVBlank - 1 && (lineTCycles >= TCycleTiming.scanline - 4 && lineTCycles < TCycleTiming.scanline) {
       registers.requestVBlankInterruptIfNeeded(memory: memory)
     }
 
     // MARK: VBlank
 
-    if lineCycleDriver.scanline == Scanlines.firstVBlank && (lineCycleDriver.tcycles >= 4 && lineCycleDriver.tcycles < 8) {
+    if lineCycleDriver.scanline == Scanlines.firstVBlank && (lineTCycles >= 4 && lineTCycles < 8) {
       var interruptFlag = LR35902.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
       interruptFlag.insert(.vBlank)
       memory.write(interruptFlag.rawValue, to: LR35902.interruptFlagAddress)
@@ -322,6 +325,15 @@ extension PPU {
   private func changeMode(to mode: LCDCMode) {
     // See docs of deferredLCDMode for more details on this timing.
     deferredLCDMode = mode
+
+    // Sanity check t-cycle timings.
+    precondition(
+      !registers.lcdDisplayEnable
+        || (registers.lcdMode == .searchingOAM && lineCycleDriver.tcycles == 20 * 4)
+        || (registers.lcdMode == .vblank && lineCycleDriver.tcycles == 114 * 4 * 10)
+        || (registers.lcdMode == .hblank)
+        || (registers.lcdMode == .pixelTransfer && lineCycleDriver.tcycles >= 43 * 4)
+    )
 
     self.mode.start()
   }

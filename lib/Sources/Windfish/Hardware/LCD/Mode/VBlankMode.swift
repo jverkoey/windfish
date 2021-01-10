@@ -21,8 +21,7 @@ extension PPU {
 
       var nextMode: LCDCMode? = nil
 
-      if lineCycleDriver.tcycles >= PPU.TCycleTiming.scanline {
-        lineCycleDriver.tcycles = 0
+      if lineCycleDriver.tcycles % PPU.TCycleTiming.scanline == 0 {
         lineCycleDriver.scanline += 1
 
         if lineCycleDriver.scanline >= 154 {
