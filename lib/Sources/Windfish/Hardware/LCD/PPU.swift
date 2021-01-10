@@ -142,6 +142,11 @@ extension PPU {
     static let scanline: Gameboy.TCycle = 114 * 4
   }
 
+  struct Scanlines {
+    static let last: UInt8 = 153
+    static let firstVBlank: UInt8 = 144
+  }
+
   /** Executes a single machine cycle. */
   public func advance(memory: AddressableMemory) {
     // The entire PPU stops executing when lcdDisplayEnable is disabled.
@@ -155,10 +160,13 @@ extension PPU {
     // See docs of deferredLCDMode for more details on this timing.
     if let deferredLCDMode = deferredLCDMode {
       registers.lcdMode = deferredLCDMode
+      self.deferredLCDMode = nil
+
       if deferredLCDMode == .hblank {
+        // The hblank interrupt happens one machine cycle after the pixel transfer phase completes, so we piggy-back
+        // the deferred lcd mode logic to fire the interrupt one cycle after the mode change.
         registers.requestHBlankInterruptIfNeeded(memory: memory)
       }
-      self.deferredLCDMode = nil
     }
 
     // Advance the state machine by one machine cycle.
@@ -236,10 +244,10 @@ extension PPU {
     // The scanline represents the screen line being drawn, while ly is somewhat of a virtual value that interprets the
     // scanline based on the timings outlined above.
     let ly: UInt8
-    if lineCycleDriver.scanline < 153 {
+    if lineCycleDriver.scanline < Scanlines.last {
       ly = lineCycleDriver.scanline
     } else {
-      precondition(lineCycleDriver.scanline == 153)
+      precondition(lineCycleDriver.scanline == Scanlines.last)
       if lineCycleDriver.tcycles < 4 {
         ly = lineCycleDriver.scanline
       } else {
@@ -266,11 +274,11 @@ extension PPU {
       }
     } else {
       // Subsequent lines fire on the second cycle
-      if lineCycleDriver.tcycles >= 4 && lineCycleDriver.tcycles < 8  {
+      if lineCycleDriver.tcycles >= 4 && lineCycleDriver.tcycles < 8 {
         registers.requestOAMInterruptIfNeeded(memory: memory)
       }
     }
-    if lineCycleDriver.scanline == 153 && (lineCycleDriver.tcycles >= 12 && lineCycleDriver.tcycles < 16) {
+    if lineCycleDriver.scanline == Scanlines.last && (lineCycleDriver.tcycles >= 12 && lineCycleDriver.tcycles < 16) {
       registers.requestOAMInterruptIfNeeded(memory: memory)
     }
 
@@ -280,14 +288,25 @@ extension PPU {
       // Always fire on the second cycle of the line...
       requestCoincidenceInterruptIfNeeded(memory: memory)
     }
-    if lineCycleDriver.scanline == 153 && (lineCycleDriver.tcycles >= 12 && lineCycleDriver.tcycles < 16) {
+    if lineCycleDriver.scanline == Scanlines.last && (lineCycleDriver.tcycles >= 12 && lineCycleDriver.tcycles < 16) {
       // ...except on line 153, which fires also fires on cycle 4
       requestCoincidenceInterruptIfNeeded(memory: memory)
     }
 
+    // MARK: STAT[VBlank]
+
+    // Passing mooneye/acceptance/ppu/intr_1_2_timing-GS requires that we fire the vblank interrupt a couple
+    // cycles earlier than expected. We should be firing on lineCycleDriver.scanline == Scanlines.firstVBlank with
+    // lineCycleDriver.tcycles >= 4 if https://github.com/AntonioND/giibiiadvance/blob/master/docs/TCAGBD.pdf is
+    // accurate.
+    // TODO: Identify which extra cycles are requiring this shift back by two machine cycles.
+    if lineCycleDriver.scanline == Scanlines.firstVBlank - 1 && (lineCycleDriver.tcycles >= TCycleTiming.scanline - 4 && lineCycleDriver.tcycles < TCycleTiming.scanline) {
+      registers.requestVBlankInterruptIfNeeded(memory: memory)
+    }
+
     // MARK: VBlank
 
-    if lineCycleDriver.scanline == 144 && (lineCycleDriver.tcycles >= 4 && lineCycleDriver.tcycles < 8) {
+    if lineCycleDriver.scanline == Scanlines.firstVBlank && (lineCycleDriver.tcycles >= 4 && lineCycleDriver.tcycles < 8) {
       var interruptFlag = LR35902.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
       interruptFlag.insert(.vBlank)
       memory.write(interruptFlag.rawValue, to: LR35902.interruptFlagAddress)

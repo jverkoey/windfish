@@ -27,7 +27,6 @@ extension PPU {
 
         if lineCycleDriver.scanline >= 154 {
           lineCycleDriver.scanline = 0
-          registers.requestOAMInterruptIfNeeded(memory: memory)
           nextMode = .searchingOAM
         }
       }

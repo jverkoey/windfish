@@ -26,8 +26,6 @@ extension PPU {
         } else {
           // No more lines to draw.
           nextMode = .vblank
-
-          registers.requestVBlankInterruptIfNeeded(memory: memory)
         }
       }
 
