@@ -52,9 +52,9 @@ public final class PPU {
 
   public static let screenSize = (width: 160, height: 144)
 
-  final class LineCycleDriver {
-    var tcycles: Int = 0
-    var lineTCycles: Int {
+  public final class LineCycleDriver {
+    public internal(set) var tcycles: Int = 0
+    public var lineTCycles: Int {
       return tcycles % PPU.TCycleTiming.scanline
     }
 
@@ -64,9 +64,9 @@ public final class PPU {
      This value typically equals ly, but in some cases deviates when ly. See the advance method for detailed timing on
      this behavior.
      */
-    var scanline: UInt8 = 0
+    public internal(set) var scanline: UInt8 = 0
   }
-  let lineCycleDriver = LineCycleDriver()
+  public let lineCycleDriver = LineCycleDriver()
 
   /**
    LCD Mode gets synchronized to the register on the second cycle of the mode.

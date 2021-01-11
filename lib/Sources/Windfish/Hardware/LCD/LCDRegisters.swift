@@ -104,11 +104,11 @@ extension PPU {
     // MARK: LY (0xFF44)
 
     /** The vertical line to which data is transferred to the display. */
-    var ly: UInt8 = 0
+    public internal(set) var ly: UInt8 = 0
 
     // MARK: LYC (0xFF45)
 
-    var lyc: UInt8 = 0
+    public internal(set) var lyc: UInt8 = 0
 
     // MARK: BGP (0xFF47)
     /** Shade values for background and window tiles. */

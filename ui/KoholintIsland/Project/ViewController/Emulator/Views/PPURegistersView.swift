@@ -6,25 +6,31 @@ import Windfish
 final class PPURegistersView: NSView {
   let modeView = LabeledView(longestWord: "searchingOAM")
   let statFlagsView = STATFlagsView()
+  let lyView = RegisterView<UInt8>(formatter: nil, longestValue: "000")
   override init(frame frameRect: NSRect) {
     super.init(frame: frameRect)
 
     modeView.name = "mode:"
-    modeView.translatesAutoresizingMaskIntoConstraints = false
-    addSubview(modeView)
+    lyView.name = "ly:"
 
-    statFlagsView.translatesAutoresizingMaskIntoConstraints = false
-    addSubview(statFlagsView)
+    for view in [modeView, statFlagsView, lyView] {
+      view.translatesAutoresizingMaskIntoConstraints = false
+      addSubview(view)
+    }
 
     NSLayoutConstraint.activate([
       modeView.leadingAnchor.constraint(equalTo: leadingAnchor),
       statFlagsView.leadingAnchor.constraint(equalTo: leadingAnchor),
-      modeView.trailingAnchor.constraint(equalTo: trailingAnchor),
-      statFlagsView.trailingAnchor.constraint(equalTo: trailingAnchor),
+      lyView.leadingAnchor.constraint(equalTo: leadingAnchor),
+
+      modeView.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor),
+      statFlagsView.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor),
+      lyView.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor),
 
       modeView.topAnchor.constraint(equalTo: topAnchor),
       statFlagsView.topAnchor.constraint(equalTo: modeView.bottomAnchor),
-      statFlagsView.bottomAnchor.constraint(equalTo: bottomAnchor),
+      lyView.topAnchor.constraint(equalTo: statFlagsView.bottomAnchor),
+      lyView.bottomAnchor.constraint(equalTo: bottomAnchor),
     ])
   }
 
@@ -40,5 +46,6 @@ final class PPURegistersView: NSView {
     case .searchingOAM:   modeView.value = "searchingOAM"
     }
     statFlagsView.update(with: ppu)
+    lyView.value = ppu.registers.ly
   }
 }

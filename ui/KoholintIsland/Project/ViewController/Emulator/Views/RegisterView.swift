@@ -2,20 +2,20 @@ import Foundation
 
 import Cocoa
 
-final class RegisterView: NSView {
+final class RegisterView<T: BinaryInteger>: NSView {
   let label = CreateLabel()
   let textField = FixedWidthTextView()
   let columnLayoutGuide = NSLayoutGuide()
 
-  override init(frame frameRect: NSRect) {
-    super.init(frame: frameRect)
+  init(formatter: Formatter? = UInt8HexFormatter(), longestValue: String = "0xFF") {
+    super.init(frame: .zero)
 
     let monospacedFont = NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
 
     label.font = monospacedFont
 
     textField.font = monospacedFont
-    textField.formatter = UInt8HexFormatter()
+    textField.formatter = formatter
     textField.isEditable = false // TODO: Allow editing.
     textField.objectValue = 0
 
@@ -34,7 +34,7 @@ final class RegisterView: NSView {
       columnLayoutGuide.widthAnchor.constraint(equalToConstant: 4),
 
       textField.leadingAnchor.constraint(equalTo: columnLayoutGuide.trailingAnchor),
-      textField.widthAnchor.constraint(equalToConstant: NSString(string: "0xFF").size(withAttributes: [.font: monospacedFont]).width + 10),
+      textField.widthAnchor.constraint(equalToConstant: NSString(string: longestValue).size(withAttributes: [.font: textField.font!]).width + 10),
       textField.trailingAnchor.constraint(equalTo: trailingAnchor),
 
       label.firstBaselineAnchor.constraint(equalTo: textField.firstBaselineAnchor),
@@ -57,7 +57,7 @@ final class RegisterView: NSView {
     }
   }
 
-  var value: UInt8 {
+  var value: T {
     set {
       if newValue != _value {
         textField.objectValue = newValue
@@ -66,5 +66,5 @@ final class RegisterView: NSView {
     }
     get { return _value }
   }
-  var _value: UInt8 = 0
+  var _value: T = 0
 }
