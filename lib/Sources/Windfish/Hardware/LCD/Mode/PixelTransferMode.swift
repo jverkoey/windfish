@@ -36,12 +36,42 @@ extension PPU {
       let bgPriority: UInt8
     }
     final class Fifo {
-      var pixels: [Pixel] = []
+      func clear() {
+        count = 0
+        firstPixelIndex = 0
+        nextPixelIndex = 0
+      }
+
+      public subscript(index: Int) -> Pixel {
+        get { return pixels[(firstPixelIndex + index) % 16] }
+        set { pixels[(firstPixelIndex + index) % 16] = newValue }
+      }
+
+      func queuePixel(_ pixel: Pixel) {
+        pixels[nextPixelIndex] = pixel
+        nextPixelIndex = (nextPixelIndex + 1) % 16
+        count += 1
+      }
+
+      func removeFirst() {
+        precondition(count > 0)
+        firstPixelIndex = (firstPixelIndex + 1) % 16
+        count -= 1
+      }
 
       func dequeuePixel() -> UInt8 {
-        let pixel = pixels.removeFirst()
+        precondition(count > 0)
+
+        let pixel = pixels[firstPixelIndex]
+        firstPixelIndex = (firstPixelIndex + 1) % 16
+        count -= 1
         return pixel.palette[Int(truncatingIfNeeded: pixel.colorIndex)]
       }
+
+      private var nextPixelIndex = 0
+      private var firstPixelIndex = 0
+      internal private(set) var count = 0
+      private var pixels = ContiguousArray<Pixel>(repeating: PPU.PixelTransferMode.Pixel(colorIndex: 0, palette: [], bgPriority: 0), count: 16)
     }
     final class Fetcher {
       init(registers: LCDRegisters, fifo: Fifo) {
@@ -135,7 +165,7 @@ extension PPU {
         self.tileDataAddress = tileDataAddress
         tileMapAddressOffset = wideX / PPU.PixelsPerTile
         tilePixelY = Int16(bitPattern: wideY % PPU.PixelsPerTile)
-        fifo.pixels.removeAll()
+        fifo.clear()
       }
 
       func tick() {
@@ -172,7 +202,7 @@ extension PPU {
           fallthrough
 
         case .pushToFifo:
-          if fifo.pixels.count > 8 {
+          if fifo.count > 8 {
             // Fetcher stalls when the fifo doesn't have enough space to push a new block of 8 pixels.
             // - "The Ultimate Game Boy Talk (33c3)": https://youtu.be/HyzD8pNlpwI?t=3074
             break
@@ -182,7 +212,7 @@ extension PPU {
             let bitMask: UInt8 = 1 << i
             let lsb: UInt8 = ((data0 & bitMask) > 0) ? 0b01 : 0
             let msb: UInt8 = ((data1 & bitMask) > 0) ? 0b10 : 0
-            fifo.pixels.append(.init(colorIndex: msb | lsb, palette: registers.backgroundPalette, bgPriority: 0))
+            fifo.queuePixel(.init(colorIndex: msb | lsb, palette: registers.backgroundPalette, bgPriority: 0))
           }
           tileMapAddressOffset = (tileMapAddressOffset + 1) % PPU.TilesPerRow
           state = .readTileNumber
@@ -216,10 +246,10 @@ extension PPU {
             case .obj1pal:
               palette = registers.objectPallete1
             }
-            precondition(fifo.pixels.count >= 8)
+            precondition(fifo.count >= 8)
             let offset = (sprite.x < 8) ? Int(truncatingIfNeeded: 8 - sprite.x) : 0
             for i: Int in offset...7 {
-              let pixel = fifo.pixels[i]
+              let pixel = fifo[i]
 
               if pixel.bgPriority == 1 {
                 continue
@@ -231,9 +261,9 @@ extension PPU {
               let msb: UInt8 = ((data1 & bitMask) > 0) ? 0b10 : 0
               let spriteColorIndex = msb | lsb
 
-              let existingColorIndex = fifo.pixels[i].colorIndex
+              let existingColorIndex = fifo[i].colorIndex
               if (sprite.priority && existingColorIndex == 0) || !sprite.priority && spriteColorIndex != 0 {
-                fifo.pixels[i] = .init(colorIndex: spriteColorIndex, palette: palette, bgPriority: 1)
+                fifo[i] = .init(colorIndex: spriteColorIndex, palette: palette, bgPriority: 1)
               }
             }
           }
@@ -325,7 +355,7 @@ extension PPU {
         // The fifo requires at least 9 pixels in order to be able to pop a pixel off. This ensures that there are
         // always at least 8 pixels for the purposes of compositing sprites onto the background pixels.
         // Until there are at least 9 pixels, the fifo stalls.
-        if fifo.pixels.count < 9 {
+        if fifo.count < 9 {
           return nil
         }
 
@@ -340,7 +370,7 @@ extension PPU {
         // - http://forums.nesdev.com/viewtopic.php?f=20&t=10771#p122197
         // This is why we use registers.scx directly here rather than a cached value at the start of the line.
         if droppedPixels < registers.scx % UInt8(truncatingIfNeeded: PPU.PixelsPerTile) {
-          fifo.pixels.removeFirst()
+          fifo.removeFirst()
           droppedPixels += 1
 
           // Because scx can change mid-line, we can't use the simple (173 + (xscroll % 7)) formula outlined in
