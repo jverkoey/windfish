@@ -9,8 +9,6 @@ import Cocoa
 import Combine
 
 final class OutlineViewController: NSViewController {
-  let document: ProjectDocument
-
   let containerView = NSScrollView()
   let outlineView = NSOutlineView()
   let treeController = NSTreeController()
@@ -19,12 +17,20 @@ final class OutlineViewController: NSViewController {
   private var disassembledSubscriber: AnyCancellable?
   private var treeControllerObserver: NSKeyValueObservation?
 
-  init(document: ProjectDocument) {
-    self.document = document
-
+  init() {
     super.init(nibName: nil, bundle: nil)
+  }
 
-    disassembledSubscriber = NotificationCenter.default.publisher(for: .disassembled, object: document)
+  override func viewWillAppear() {
+    super.viewWillAppear()
+
+    guard let projectDocument = projectDocument else {
+      fatalError()
+    }
+
+    populateFromDocument()
+
+    disassembledSubscriber = NotificationCenter.default.publisher(for: .disassembled, object: projectDocument)
       .receive(on: RunLoop.main)
       .sink(receiveValue: { notification in
         let selectionIndexPaths = self.treeController.selectionIndexPaths
@@ -34,7 +40,11 @@ final class OutlineViewController: NSViewController {
   }
 
   private func populateFromDocument() {
-    guard let disassemblyFiles = document.disassemblyResults?.files else {
+    guard let projectDocument = projectDocument else {
+      fatalError()
+    }
+
+    guard let disassemblyFiles = projectDocument.disassemblyResults?.files else {
       return
     }
     let children = treeController.arrangedObjects.children![0]
@@ -122,8 +132,6 @@ final class OutlineViewController: NSViewController {
 
     containerView.documentView = outlineView
 
-    populateFromDocument()
-
     // Clear any default selection.
     outlineView.deselectAll(self)
 
@@ -137,9 +145,13 @@ final class OutlineViewController: NSViewController {
         return
       }
       lastSelectedObjects = selectedNodes
+
+      guard let projectDocument = self.projectDocument else {
+        fatalError()
+      }
       NotificationCenter.default.post(
         name: .selectedFileDidChange,
-        object: self.document,
+        object: projectDocument,
         userInfo: ["selectedNodes": treeController.selectedObjects]
       )
     }

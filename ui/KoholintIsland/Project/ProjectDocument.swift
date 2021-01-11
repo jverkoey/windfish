@@ -209,6 +209,10 @@ class ProjectDocument: NSDocument {
   var configuration = ProjectConfiguration()
   var gameboy = Gameboy()
 
+  deinit {
+    lcdWindowController.close()
+  }
+
   override init() {
     super.init()
 
@@ -477,6 +481,20 @@ class ProjectDocument: NSDocument {
     wc.window?.toolbar = toolbar
 
     window.makeKeyAndOrderFront(nil)
+  }
+
+  lazy var lcdWindowController: NSWindowController = {
+    let contentViewController = LCDViewController(document: self)
+    let window = NSWindow(contentViewController: contentViewController)
+    window.setContentSize(NSSize(width: PPU.screenSize.width * 2, height: PPU.screenSize.height * 2))
+    window.setFrameAutosaveName("lcdWindowFrame")
+    let wc = NSWindowController(window: window)
+    wc.contentViewController = contentViewController
+    return wc
+  }()
+
+  @objc func toggleLCD(_ sender: Any?) {
+    lcdWindowController.showWindow(self)
   }
 }
 

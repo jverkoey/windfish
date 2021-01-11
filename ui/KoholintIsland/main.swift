@@ -64,6 +64,10 @@ extension NSApplication {
     findPrevItem.keyEquivalentModifierMask = [.command, .shift]
     findMenu.submenu?.addItem(findPrevItem)
 
+    let emulationMenu = NSMenuItem()
+    emulationMenu.submenu = NSMenu(title: "Emulation")
+    emulationMenu.submenu?.addItem(NSMenuItem(title: "LCD", action: #selector(ProjectDocument.toggleLCD(_:)), keyEquivalent: "1"))
+
     let windowMenu = NSMenuItem()
     windowMenu.submenu = NSMenu(title: "Window")
     windowMenu.submenu?.addItem(NSMenuItem(title: "Minmize", action: #selector(NSWindow.miniaturize(_:)), keyEquivalent: "m"))
@@ -76,6 +80,7 @@ extension NSApplication {
     mainMenu.addItem(fileMenu)
     mainMenu.addItem(editMenu)
     mainMenu.addItem(findMenu)
+    mainMenu.addItem(emulationMenu)
     mainMenu.addItem(windowMenu)
     return mainMenu
   }

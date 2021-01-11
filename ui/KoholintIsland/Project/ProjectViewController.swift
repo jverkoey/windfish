@@ -9,6 +9,12 @@ import Combine
 
 import Windfish
 
+extension NSViewController {
+  var projectDocument: ProjectDocument? {
+    return self.view.window?.windowController?.document as? ProjectDocument
+  }
+}
+
 final class ProjectViewController: NSViewController, EmulatorViewControllerDelegate {
 
   let document: ProjectDocument
@@ -31,7 +37,7 @@ final class ProjectViewController: NSViewController, EmulatorViewControllerDeleg
     self.document = document
 
     self.splitViewController = NSSplitViewController()
-    self.sidebarViewController = OutlineViewController(document: document)
+    self.sidebarViewController = OutlineViewController()
     self.contentViewController = ContentViewController(document: document)
     self.inspectorViewController = InspectorViewController(document: document)
 
@@ -134,7 +140,10 @@ final class ProjectViewController: NSViewController, EmulatorViewControllerDeleg
         lastSelectedFile = node.title
         self.contentViewController.filename = node.title
 
-        if let metadata = self.document.metadata, let bank = metadata.bankMap[node.title] {
+        guard let document = self.view.window?.windowController?.document as? ProjectDocument else {
+          return
+        }
+        if let metadata = document.metadata, let bank = metadata.bankMap[node.title] {
           self.contentViewController.bank = bank
         } else {
           self.contentViewController.bank = nil
