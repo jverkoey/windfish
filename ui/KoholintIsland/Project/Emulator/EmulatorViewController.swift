@@ -172,9 +172,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   weak var delegate: EmulatorViewControllerDelegate?
 
   let document: ProjectDocument
-  let ramController = NSArrayController()
   let registerStateController = NSArrayController()
-  var ramTableView: EditorTableView?
   let instructionAssemblyLabel = CreateLabel()
   let instructionBytesLabel = CreateLabel()
   let tileDataImageView = PixelImageView()
@@ -285,33 +283,6 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     tileDataImageView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(tileDataImageView)
 
-    let ramTableView = EditorTableView(elementsController: ramController)
-    ramTableView.translatesAutoresizingMaskIntoConstraints = false
-    ramTableView.tableView?.delegate = self
-    view.addSubview(ramTableView)
-    self.ramTableView = ramTableView
-
-    // MARK: Model
-
-    let ramColumns = [
-      Column(name: "Address", identifier: .address, width: 50),
-      Column(name: "Name", identifier: .variableName, width: 50),
-      Column(name: "Value", identifier: .registerValue, width: 40),
-      Column(name: "Source", identifier: .registerSourceLocation, width: 65),
-      Column(name: "Variable", identifier: .registerVariableAddress, width: 50),
-    ]
-    for columnInfo in ramColumns {
-      let column = NSTableColumn(identifier: columnInfo.identifier)
-      column.isEditable = false
-      column.headerCell.stringValue = columnInfo.name
-      column.width = columnInfo.width
-      ramTableView.tableView?.addTableColumn(column)
-    }
-
-    registerStateController.addObject("Unknown")
-    registerStateController.addObject("Literal")
-    registerStateController.addObject("Address")
-
     // MARK: Layout
 
     NSLayoutConstraint.activate([
@@ -358,20 +329,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       tileDataImageView.widthAnchor.constraint(equalToConstant: 128),
       tileDataImageView.heightAnchor.constraint(equalToConstant: 192),
       tileDataImageView.topAnchor.constraint(equalToSystemSpacingBelow: instructionBytesLabel.bottomAnchor, multiplier: 1),
-
-      ramTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-      ramTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-      ramTableView.topAnchor.constraint(equalToSystemSpacingBelow: tileDataImageView.bottomAnchor, multiplier: 1),
-      ramTableView.heightAnchor.constraint(equalToConstant: 220),
     ])
-
-    ramController.sortDescriptors = [
-      NSSortDescriptor(key: NSUserInterfaceItemIdentifier.address.rawValue, ascending: true),
-    ]
-
-    ramTableView.tableView?.bind(.content, to: ramController, withKeyPath: "arrangedObjects", options: nil)
-    ramTableView.tableView?.bind(.selectionIndexes, to: ramController, withKeyPath:"selectionIndexes", options: nil)
-    ramTableView.tableView?.bind(.sortDescriptors, to: ramController, withKeyPath: "sortDescriptors", options: nil)
 
     let tileData = self.document.gameboy.tileData
     renderTileDataImage(with: tileData)
