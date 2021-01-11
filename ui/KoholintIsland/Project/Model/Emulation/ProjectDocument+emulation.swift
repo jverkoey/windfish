@@ -13,42 +13,22 @@ protocol EmulationObservers {
 extension ProjectDocument {
   /** Advances the emulation until the statement following the current one is reached. */
   func stepForward() {
-    if emulating {
-      return  // Ignore subsequent invocations.
+    guard let spec = gameboy.cpu.machineInstruction.spec else {
+      gameboy.advance()
+      self.emulationObservers.forEach { $0.emulationDidStop() }
+      return
     }
-    emulating = true
-
-    emulationObservers.forEach { $0.emulationDidStart() }
-
-    DispatchQueue.global(qos: .userInteractive).async {
-      let gameboy = self.gameboy
-      if case .call = gameboy.cpu.machineInstruction.spec {
-        let nextAddress = gameboy.cpu.machineInstruction.sourceAddress()! + LR35902.InstructionSet.widths[gameboy.cpu.machineInstruction.spec!]!.total
-        // Advance until we're ready to execute the next statement after the call.
-
-        // TODO: Use the "run" invocation with a breakpoint condition instead so that we get fps and recording.
-        repeat {
-          gameboy.advanceInstruction()
-        } while self.emulating && gameboy.cpu.machineInstruction.sourceAddress() != nextAddress
-      } else if case .halt = gameboy.cpu.machineInstruction.spec {
-        let initialAddress = gameboy.cpu.machineInstruction.sourceAddress()!
-        // Advance until an interrupt happens.
-
-        // TODO: Use the "run" invocation with a breakpoint condition instead so that we get fps and recording.
-        repeat {
-          gameboy.advanceInstruction()
-        } while self.emulating && gameboy.cpu.machineInstruction.sourceAddress() == initialAddress
-      } else {
-        gameboy.advanceInstruction()
+    if case .call = spec {
+      let nextAddress = gameboy.cpu.machineInstruction.sourceAddress()! + LR35902.InstructionSet.widths[spec]!.total
+      // Advance until we're ready to execute the next statement.
+      run { gameboy -> Bool in
+        gameboy.cpu.machineInstruction.sourceAddress() == nextAddress
       }
-
-      let tileDataImage = self.tileDataImage
-      let screenImage = self.screenImage
-
-      DispatchQueue.main.sync {
-        self.emulating = false
-        self.informObserversOfEmulationAdvance(screenImage: screenImage, tileDataImage: tileDataImage, fps: nil, ips: nil)
-        self.emulationObservers.forEach { $0.emulationDidStop() }
+    } else {
+      let initialAddress = gameboy.cpu.machineInstruction.sourceAddress()!
+      // Advance until an interrupt happens.
+      run { gameboy -> Bool in
+        gameboy.cpu.machineInstruction.sourceAddress() != initialAddress
       }
     }
   }
@@ -87,7 +67,7 @@ extension ProjectDocument {
     emulating = false
   }
 
-  func run() {
+  func run(breakpoint: @escaping (Gameboy) -> Bool = { _ in false }) {
     if emulating {
       return  // Ignore subsequent invocations.
     }
@@ -102,7 +82,7 @@ extension ProjectDocument {
       var lastFrameTick = DispatchTime.now()
       var machineCycle: UInt64 = 0
       var frames: UInt64 = 0
-      while self.emulating {
+      while !breakpoint(gameboy) && self.emulating {
         gameboy.advance()
 
         machineCycle += 1
@@ -132,11 +112,19 @@ extension ProjectDocument {
         }
       }
 
-      // Advance to the next full instruction.
-      gameboy.advanceInstruction()
+      // When emulation was terminated we might have ended mid-way through an instruction, so we run until the current
+      // instruction concludes.
+      // TODO: Don't advance if we've just loaded the instruction (i.e. cycles == 0)
+      if !self.emulating {
+        // Advance to the next full instruction.
+        gameboy.advanceInstruction()
+      }
+
       let tileDataImage = self.tileDataImage
       let screenImage = self.screenImage
       DispatchQueue.main.sync {
+        self.emulating = false
+
         self.informObserversOfEmulationAdvance(screenImage: screenImage, tileDataImage: tileDataImage, fps: nil, ips: nil)
         self.emulationObservers.forEach { $0.emulationDidStop() }
       }
