@@ -9,11 +9,10 @@ protocol EmulationObservers {
 extension ProjectDocument {
   /** Advances the emulation until the statement following the current one is reached. */
   func stepForward() {
-    emulating = !emulating
-
-    if !emulating {
-      return
+    if emulating {
+      return  // Ignore subsequent invocations.
     }
+    emulating = true
 
     DispatchQueue.global(qos: .userInteractive).async {
       let gameboy = self.gameboy

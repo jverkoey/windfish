@@ -314,8 +314,7 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
       tileDataImageView.topAnchor.constraint(equalToSystemSpacingBelow: instructionBytesLabel.bottomAnchor, multiplier: 1),
     ])
 
-    let tileData = self.document.gameboy.tileData
-    renderTileDataImage(with: tileData)
+    self.tileDataImage = document.gameboy.takeSnapshotOfTileData()
     tileDataImageView.image = tileDataImage
 
     updateInstructionAssembly()
@@ -336,74 +335,6 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
   var screenImage: NSImage?
   var lastVblankCounter = 0
 
-  func renderTileDataImage(with data: Data) {
-    self.lastRenderedTileData = data
-
-    // TODO: Also render the tile data regions, possibly as lines extending outward from the right-hand side of the
-    // image so as not to clutter the tiles themselves.
-
-    let ntiles = Gameboy.tileDataRegionSize / 16
-    let ncolumns = 16
-    let nrows = ntiles / ncolumns
-    let pixelsPerTile = 8
-    let imageSize = NSSize(width: CGFloat(ncolumns * pixelsPerTile), height: CGFloat(nrows * pixelsPerTile))
-
-    let colorForBytePair: (UInt8, UInt8, UInt8) -> UInt8 = { highByte, lowByte, bit in
-      let mask = UInt8(0x01) << bit
-      return (((highByte & mask) >> bit) << 1) | ((lowByte & mask) >> bit)
-    }
-
-    var tileColumn = 0
-    var tileRow = 0
-    var pixelRow = 0
-    var imageData = Data(count: ncolumns * 8 * nrows * 8)
-    var iterator = data.makeIterator()
-
-    while let lowByte = iterator.next() {
-      let highByte = iterator.next()!
-
-      for i in 0..<8 {
-        let color = colorForBytePair(highByte, lowByte, UInt8(7 - i))
-        imageData[Int(tileColumn * 8 + i) + Int((tileRow * 8 + pixelRow) * (ncolumns * 8))] = color
-      }
-      pixelRow += 1
-      if pixelRow >= 16 {
-        tileColumn += 1
-        pixelRow = 0
-
-        if tileColumn >= ncolumns {
-          tileColumn = 0
-          tileRow += 2
-        }
-      }
-    }
-
-    let colors: [UInt8: UInt8] = [
-      0: 0x00,
-      1: UInt8(NSColor.darkGray.whiteComponent * 255),
-      2: UInt8(NSColor.lightGray.whiteComponent * 255),
-      3: 0xFF,
-    ]
-    var pixels = imageData.map { colors[$0]! }
-    let providerRef = CGDataProvider(data: NSData(bytes: &pixels, length: pixels.count))!
-    let cgImage = CGImage(
-      width: ncolumns * 8,
-      height: nrows * 8,
-      bitsPerComponent: 8,
-      bitsPerPixel: 8,
-      bytesPerRow: ncolumns * 8,
-      space: CGColorSpaceCreateDeviceGray(),
-      bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.none.rawValue),
-      provider: providerRef,
-      decode: nil,
-      shouldInterpolate: false,
-      intent: .defaultIntent
-    )!
-    let image = NSImage(cgImage: cgImage, size: imageSize)
-
-    self.tileDataImage = image
-  }
-
   private func writeImageHistory(to filename: String) {
     let documentsDirectoryPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
     let path = documentsDirectoryPath.appending(filename)
@@ -422,12 +353,8 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
   }
 
   func emulationDidAdvance() {
-    let tileData = self.document.gameboy.tileData
-    let tileDataDidChange = self.lastRenderedTileData != tileData
-    if tileDataDidChange {
-      renderTileDataImage(with: tileData)
-      tileDataImageView.image = tileDataImage
-    }
+    self.tileDataImage = document.gameboy.takeSnapshotOfTileData()
+    tileDataImageView.image = tileDataImage
 
     updateInstructionAssembly()
     updateRegisters()
@@ -443,12 +370,7 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
     } else if sender.selectedSegment == 1 {  // Step into
       document.gameboy.advanceInstruction()
 
-      let tileData = self.document.gameboy.tileData
-      let tileDataDidChange = self.lastRenderedTileData != tileData
-      if tileDataDidChange {
-        renderTileDataImage(with: tileData)
-        tileDataImageView.image = tileDataImage
-      }
+      self.tileDataImage = document.gameboy.takeSnapshotOfTileData()
 
       updateInstructionAssembly()
       updateRegisters()
@@ -513,13 +435,7 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
             if self.lastVblankCounter != gameboy.ppu.vblankCounter {
               self.lastVblankCounter = gameboy.ppu.vblankCounter
 
-              let tileData = gameboy.tileData
-
-              let tileDataDidChange = self.lastRenderedTileData != tileData
-              if tileDataDidChange {
-                self.renderTileDataImage(with: tileData)
-              }
-
+              self.tileDataImage = self.document.gameboy.takeSnapshotOfTileData()
               self.screenImage = self.document.gameboy.takeScreenshot()
               self.screenHistory.append(self.screenImage!)
 
@@ -537,9 +453,7 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
                 let instructionsPerSecond = Double(machineCycles) / deltaSeconds
                 let framesPerSecond = Double(frames) / deltaSeconds
 
-                if tileDataDidChange {
-                  self.tileDataImageView.image = self.tileDataImage
-                }
+                self.tileDataImageView.image = self.tileDataImage
                 NotificationCenter.default.post(name: .emulationScreenUpdated, object: self.document, userInfo: ["screenImage": self.screenImage])
 
                 self.fpsLabel.stringValue = String(format: "fps: %.2f ips: %.2f", framesPerSecond, instructionsPerSecond)
