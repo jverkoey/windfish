@@ -36,6 +36,7 @@ public final class PPU {
   private var mode: PPUMode {
     get {
       // If a deferred mode has been set we prefer that over what's actually in the register.
+      // TODO: This is accounting for 2s of execution time; consider swapping it to an explicit setter instead.
       switch deferredLCDMode ?? registers.lcdMode {
       case .searchingOAM:   return modeOAMSearch
       case .vblank:         return modeVBlank
