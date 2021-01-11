@@ -28,6 +28,9 @@ class ProjectDocument: NSDocument {
   var configuration = ProjectConfiguration()
   var gameboy = Gameboy()
 
+  var emulating = false
+  var emulationObservers: [EmulationObservers] = []
+
   deinit {
     lcdWindowController.close()
   }

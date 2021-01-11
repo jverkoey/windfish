@@ -151,7 +151,7 @@ protocol EmulatorViewControllerDelegate: NSObject {
   func emulatorViewControllerDidStepIn(_ emulatorViewController: EmulatorViewController)
 }
 
-final class EmulatorViewController: NSViewController, TabSelectable {
+final class EmulatorViewController: NSViewController, TabSelectable, EmulationObservers {
   let deselectedTabImage = NSImage(systemSymbolName: "cpu", accessibilityDescription: nil)!
   let selectedTabImage = NSImage(systemSymbolName: "cpu", accessibilityDescription: nil)!
 
@@ -184,6 +184,12 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
   private var programCounterObserver: NSKeyValueObservation?
   private var disassembledSubscriber: AnyCancellable?
+
+  override func viewWillAppear() {
+    super.viewWillAppear()
+
+    document.emulationObservers.append(self)
+  }
 
   override func loadView() {
     view = NSView()
@@ -415,38 +421,24 @@ final class EmulatorViewController: NSViewController, TabSelectable {
     }
   }
 
+  func emulationDidAdvance() {
+    let tileData = self.document.gameboy.tileData
+    let tileDataDidChange = self.lastRenderedTileData != tileData
+    if tileDataDidChange {
+      renderTileDataImage(with: tileData)
+      tileDataImageView.image = tileDataImage
+    }
+
+    updateInstructionAssembly()
+    updateRegisters()
+    updateRAM()
+
+    delegate?.emulatorViewControllerDidStepIn(self)
+  }
+
   @objc func performControlAction(_ sender: NSSegmentedControl) {
     if sender.selectedSegment == 0 {  // Step forward
-      if case .call = document.gameboy.cpu.machineInstruction.spec {
-        let nextAddress = document.gameboy.cpu.machineInstruction.sourceAddress()! + LR35902.InstructionSet.widths[document.gameboy.cpu.machineInstruction.spec!]!.total
-        // Advance until we're ready to execute the next statement after the call.
-        // TODO: Do this on a thread.
-        repeat {
-          document.gameboy.advanceInstruction()
-        } while document.gameboy.cpu.machineInstruction.sourceAddress() != nextAddress
-      } else if case .halt = document.gameboy.cpu.machineInstruction.spec {
-        let initialAddress = document.gameboy.cpu.machineInstruction.sourceAddress()!
-        // Advance until an interrupt happens.
-        // TODO: Do this on a thread.
-        repeat {
-          document.gameboy.advanceInstruction()
-        } while document.gameboy.cpu.machineInstruction.sourceAddress() == initialAddress
-      } else {
-        document.gameboy.advanceInstruction()
-      }
-
-      let tileData = self.document.gameboy.tileData
-      let tileDataDidChange = self.lastRenderedTileData != tileData
-      if tileDataDidChange {
-        renderTileDataImage(with: tileData)
-        tileDataImageView.image = tileDataImage
-      }
-
-      updateInstructionAssembly()
-      updateRegisters()
-      updateRAM()
-
-      delegate?.emulatorViewControllerDidStepIn(self)
+      document.stepForward()
 
     } else if sender.selectedSegment == 1 {  // Step into
       document.gameboy.advanceInstruction()
