@@ -18,13 +18,27 @@ extension ProjectDocument {
       self.emulationObservers.forEach { $0.emulationDidStop() }
       return
     }
+    // If we're about to make a call...
     if case .call = spec {
       let nextAddress = gameboy.cpu.machineInstruction.sourceAddress()! + LR35902.InstructionSet.widths[spec]!.total
-      // Advance until we're ready to execute the next statement.
+      // ..then advance until we're ready to execute the next statement.
       run { gameboy -> Bool in
         gameboy.cpu.machineInstruction.sourceAddress() == nextAddress
       }
-      // TODO: Handle macros by stepping to the end of the macro's group of instructions.
+
+      // If we're in a macro...
+    } else if let sourceAddressAndBank = gameboy.cpu.machineInstruction.sourceAddressAndBank(),
+              let disassemblyResults = disassemblyResults,
+              let lineNumber = disassemblyResults.lineFor(address: sourceAddressAndBank.address, bank: sourceAddressAndBank.bank),
+              let line = disassemblyResults.bankLines?[(sourceAddressAndBank.address < 0x4000) ? 0 : sourceAddressAndBank.bank]?[lineNumber],
+              case .macro = line.semantic,
+              let data = line.data {
+      // ...then advance until we're out of the macro's instructions.
+      let range = gameboy.cpu.machineInstruction.sourceAddress()!..<(gameboy.cpu.machineInstruction.sourceAddress()! + LR35902.Address(truncatingIfNeeded: data.count))
+      run { gameboy -> Bool in
+        !range.contains(gameboy.cpu.machineInstruction.sourceAddress()!)
+      }
+
     } else {
       stepInto()
     }
