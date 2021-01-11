@@ -51,7 +51,7 @@ final class ContentViewController: NSViewController {
   }
   private func refreshBank() {
     if let bank = bank {
-      let bankLines = document.disassemblyResults?.bankLines?[bank]
+      let bankLines = projectDocument?.disassemblyResults?.bankLines?[bank]
       lineNumbersRuler?.bankLines = bankLines
     } else {
       lineNumbersRuler?.bankLines = nil
@@ -64,11 +64,11 @@ final class ContentViewController: NSViewController {
   }
 
   private func refreshFileContents() {
-    if let bank = bank, let bankTextStorage = document.disassemblyResults?.bankTextStorage,
+    if let bank = bank, let bankTextStorage = projectDocument?.disassemblyResults?.bankTextStorage,
        let bankString = bankTextStorage[bank] {
       textStorage = NSTextStorage(attributedString: bankString)
     } else if let filename = filename {
-      let string = String(data: document.disassemblyResults!.files[filename]!, encoding: .utf8)!
+      let string = String(data: projectDocument!.disassemblyResults!.files[filename]!, encoding: .utf8)!
 
       let storage = NSTextStorage(string: string, attributes: DefaultCodeAttributes())
       textStorage = storage
@@ -98,7 +98,6 @@ final class ContentViewController: NSViewController {
     }
   }
 
-  let document: ProjectDocument
   private var disassembledSubscriber: AnyCancellable?
 
   private var didProcessEditingSubscriber: AnyCancellable?
@@ -109,9 +108,7 @@ final class ContentViewController: NSViewController {
     }
   }
 
-  init(document: ProjectDocument) {
-    self.document = document
-
+  init() {
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -158,25 +155,27 @@ final class ContentViewController: NSViewController {
     ])
 
     self.bank = nil
+  }
 
-    disassembledSubscriber = NotificationCenter.default.publisher(for: .disassembled, object: document)
+  override func viewWillAppear() {
+    disassembledSubscriber = NotificationCenter.default.publisher(for: .disassembled, object: projectDocument)
       .receive(on: RunLoop.main)
       .sink(receiveValue: { notification in
         self.refreshBank()
         self.refreshFileContents()
-        if let cartridge = self.document.gameboy.cartridge {
-          textView.emulationLine = self.document.disassemblyResults?.lineFor(address: self.document.gameboy.cpu.pc, bank: cartridge.selectedBank)
+        if let projectDocument = self.projectDocument, let cartridge = projectDocument.gameboy.cartridge {
+          self.textView!.emulationLine = projectDocument.disassemblyResults?.lineFor(address: projectDocument.gameboy.cpu.pc, bank: cartridge.selectedBank)
         }
       })
 
     didProcessEditingSubscriber = NotificationCenter.default.publisher(for: NSTextStorage.didProcessEditingNotification)
       .receive(on: RunLoop.main)
       .sink(receiveValue: { notification in
-        guard notification.object as? NSTextStorage === textView.textStorage else {
+        guard notification.object as? NSTextStorage === self.textView!.textStorage else {
           return
         }
         self.lineAnalysis = nil
-        lineNumbersRuler.needsDisplay = true
+        self.lineNumbersRuler!.needsDisplay = true
       })
   }
 }

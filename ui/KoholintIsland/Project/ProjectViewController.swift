@@ -38,7 +38,7 @@ final class ProjectViewController: NSViewController, EmulatorViewControllerDeleg
 
     self.splitViewController = NSSplitViewController()
     self.sidebarViewController = OutlineViewController()
-    self.contentViewController = ContentViewController(document: document)
+    self.contentViewController = ContentViewController()
     self.inspectorViewController = InspectorViewController(document: document)
 
     let leadingSidebarItem = NSSplitViewItem(sidebarWithViewController: sidebarViewController)
