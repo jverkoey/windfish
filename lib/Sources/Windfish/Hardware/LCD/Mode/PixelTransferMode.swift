@@ -207,12 +207,13 @@ extension PPU {
             // - "The Ultimate Game Boy Talk (33c3)": https://youtu.be/HyzD8pNlpwI?t=3074
             break
           }
+          let backgroundPalette = registers.backgroundPalette
 
-          for i: UInt8 in stride(from: 7, through: 0, by: -1) {
-            let bitMask: UInt8 = 1 << i
+          for i: UInt8 in 0...7 {
+            let bitMask: UInt8 = 1 << (7 - i)
             let lsb: UInt8 = ((data0 & bitMask) > 0) ? 0b01 : 0
             let msb: UInt8 = ((data1 & bitMask) > 0) ? 0b10 : 0
-            fifo.queuePixel(.init(colorIndex: msb | lsb, palette: registers.backgroundPalette, bgPriority: 0))
+            fifo.queuePixel(.init(colorIndex: msb | lsb, palette: backgroundPalette, bgPriority: 0))
           }
           tileMapAddressOffset = (tileMapAddressOffset + 1) % PPU.TilesPerRow
           state = .readTileNumber
@@ -315,7 +316,7 @@ extension PPU {
     private var screenPlotAnchor: Int = 0
     private var screenPlotOffset: UInt8 = 0
     private var debug_tcycle: Int = 0
-    private var drawnSprites = Set<Int>()
+    private var drawnSprites = ContiguousArray<Bool>(repeating: false, count: 10)
 
     /** Starts the mode. */
     func start() {
@@ -334,7 +335,9 @@ extension PPU {
       screenPlotAnchor = Int(truncatingIfNeeded: lineCycleDriver.scanline) * PPU.screenSize.width
       screenPlotOffset = 0
       debug_tcycle = 0
-      drawnSprites.removeAll(keepingCapacity: true)
+      for i in 0..<drawnSprites.count {
+        drawnSprites[i] = false
+      }
     }
 
     /** Executes a single t-cycle. */
@@ -391,15 +394,11 @@ extension PPU {
         // When a sprite is detected, the fetcher switches temporarily to a sprite fetch mode
         // - "The Ultimate Game Boy Talk (33c3)": https://youtu.be/HyzD8pNlpwI?t=3179
         for (index, sprite) in intersectedOAMs.enumerated() {
-          if drawnSprites.contains(index) {
+          if drawnSprites[index] {
             continue  // Skip sprites we've already drawn.
           }
-          if screenPlotOffset == 0 && sprite.x < 8 {
-            drawnSprites.insert(index)
-            fetcher.startSprite(sprite, y: registers.ly)
-            return nil
-          } else if sprite.x - 8 == screenPlotOffset {
-            drawnSprites.insert(index)
+          if (screenPlotOffset == 0 && sprite.x < 8) || (sprite.x - 8 == screenPlotOffset) {
+            drawnSprites[index] = true
             fetcher.startSprite(sprite, y: registers.ly)
             return nil
           }
