@@ -55,19 +55,21 @@ class ProjectDocument: NSDocument {
     window.setContentSize(NSSize(width: 1280, height: 768))
     window.toolbarStyle = .unifiedCompact
     window.tabbingMode = .disallowed
+    window.setFrameOrigin(.init(x: 0, y: NSScreen.main!.frame.maxY - window.frame.height))
     let wc = NSWindowController(window: window)
     wc.window?.styleMask.insert(.fullSizeContentView)
     wc.contentViewController = contentViewController
     addWindowController(wc)
-    window.setFrameAutosaveName("windowFrame")
 
     let toolbar = NSToolbar()
     toolbar.delegate = self
     wc.window?.toolbar = toolbar
 
     addWindowController(lcdWindowController)
-    lcdWindowController.showWindow(self)
-    lcdWindowController.window?.orderFront(self)
+    addWindowController(ppuWindowController)
+
+    toggleLCD(self)
+    togglePPU(self)
 
     window.makeKeyAndOrderFront(nil)
   }
@@ -76,10 +78,24 @@ class ProjectDocument: NSDocument {
     let contentViewController = LCDViewController()
     let window = NSWindow(contentViewController: contentViewController)
     window.subtitle = "LCD"
-    window.isRestorable = true
     window.setContentSize(NSSize(width: PPU.screenSize.width * 2, height: PPU.screenSize.height * 2))
     window.contentMinSize = NSSize(width: PPU.screenSize.width, height: PPU.screenSize.height)
+    window.setFrameOrigin(.init(x: NSScreen.main!.frame.maxX - window.frame.width,
+                                y: NSScreen.main!.frame.maxY - window.frame.height))
     window.aspectRatio = window.contentMinSize
+    let wc = NSWindowController(window: window)
+    wc.contentViewController = contentViewController
+    return wc
+  }()
+
+  lazy var ppuWindowController: NSWindowController = {
+    let contentViewController = PPUViewController()
+    let window = NSWindow(contentViewController: contentViewController)
+    window.subtitle = "PPU"
+    window.contentMinSize = NSSize(width: 400, height: 400)
+    window.setFrameOrigin(.init(x: NSScreen.main!.frame.maxX - window.frame.width,
+                                y: NSScreen.main!.frame.maxY - window.frame.height - lcdWindowController.window!.frame.height))
+    window.setContentSize(window.contentMinSize)
     let wc = NSWindowController(window: window)
     wc.contentViewController = contentViewController
     return wc
@@ -87,6 +103,12 @@ class ProjectDocument: NSDocument {
 
   @objc func toggleLCD(_ sender: Any?) {
     lcdWindowController.showWindow(self)
+    lcdWindowController.window?.orderFront(self)
+  }
+
+  @objc func togglePPU(_ sender: Any?) {
+    ppuWindowController.showWindow(self)
+    ppuWindowController.window?.orderFront(self)
   }
 }
 

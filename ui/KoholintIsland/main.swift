@@ -67,6 +67,7 @@ extension NSApplication {
     let emulationMenu = NSMenuItem()
     emulationMenu.submenu = NSMenu(title: "Emulation")
     emulationMenu.submenu?.addItem(NSMenuItem(title: "LCD", action: #selector(ProjectDocument.toggleLCD(_:)), keyEquivalent: "1"))
+    emulationMenu.submenu?.addItem(NSMenuItem(title: "PPU", action: #selector(ProjectDocument.togglePPU(_:)), keyEquivalent: "2"))
 
     let windowMenu = NSMenuItem()
     windowMenu.submenu = NSMenu(title: "Window")
