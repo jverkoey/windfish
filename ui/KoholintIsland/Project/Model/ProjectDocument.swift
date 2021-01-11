@@ -29,6 +29,11 @@ class ProjectDocument: NSDocument {
   var gameboy = Gameboy()
 
   var emulating = false
+  var lastVblankCounter: Int? = nil
+  var lastVBlankImage: NSImage? = nil
+  var lastTileDataCounter: Int? = nil
+  var lastTileDataImage: NSImage? = nil
+  var vblankHistory: [NSImage] = []
   var emulationObservers: [EmulationObservers] = []
 
   deinit {

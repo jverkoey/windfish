@@ -164,7 +164,6 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
   let tileDataImageView = PixelImageView()
   let fpsLabel = CreateLabel()
   private let cpuView = LR35902View()
-  private var screenHistory: [NSImage] = []
 
   init(document: ProjectDocument) {
     self.document = document
@@ -314,12 +313,10 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
       tileDataImageView.topAnchor.constraint(equalToSystemSpacingBelow: instructionBytesLabel.bottomAnchor, multiplier: 1),
     ])
 
-    self.tileDataImage = document.gameboy.takeSnapshotOfTileData()
-    tileDataImageView.image = tileDataImage
+    tileDataImageView.image = document.gameboy.takeSnapshotOfTileData()
 
     updateInstructionAssembly()
     updateRegisters()
-    updateRAM()
 
     disassembledSubscriber = NotificationCenter.default.publisher(for: .disassembled, object: document)
       .receive(on: RunLoop.main)
@@ -328,39 +325,32 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
       })
   }
 
-  var running = false
-  var lastRenderedTileData: Data?
-  var lastRenderedScreenData: Data?
-  var tileDataImage: NSImage?
-  var screenImage: NSImage?
-  var lastVblankCounter = 0
+  func emulationDidAdvance(screenImage: NSImage, tileDataImage: NSImage, fps: Double?, ips: Double?) {
+    tileDataImageView.image = document.gameboy.takeSnapshotOfTileData()
 
-  private func writeImageHistory(to filename: String) {
-    let documentsDirectoryPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
-    let path = documentsDirectoryPath.appending(filename)
-    let fileProperties = [kCGImagePropertyGIFDictionary as String: [kCGImagePropertyGIFLoopCount as String: 0]]
-    let gifProperties = [kCGImagePropertyGIFDictionary as String: [kCGImagePropertyGIFDelayTime as String: 0.016]] as CFDictionary?
-    let lastFrameProperties = [kCGImagePropertyGIFDictionary as String: [kCGImagePropertyGIFDelayTime as String: 2]] as CFDictionary?
-    let cfURL = URL(fileURLWithPath: path) as CFURL
-    print(cfURL)
-    if let destination = CGImageDestinationCreateWithURL(cfURL, kUTTypeGIF, screenHistory.count, nil) {
-      CGImageDestinationSetProperties(destination, fileProperties as CFDictionary?)
-      for image in screenHistory {
-        CGImageDestinationAddImage(destination, image.asCGImage()!, image == screenHistory.last ? lastFrameProperties : gifProperties)
-      }
-      CGImageDestinationFinalize(destination)
+    updateRegisters()
+
+    if let fps = fps, let ips = ips {
+      self.fpsLabel.stringValue = String(format: "fps: %.2f ips: %.2f", fps, ips)
+    } else {
+      self.fpsLabel.stringValue = "Not running"
     }
   }
 
-  func emulationDidAdvance() {
-    self.tileDataImage = document.gameboy.takeSnapshotOfTileData()
-    tileDataImageView.image = tileDataImage
+  func emulationDidStart() {
+    // Avoid flashing the instruction labels if the emulation concludes quickly enough.
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+      if self.document.emulating {
+        self.instructionAssemblyLabel.stringValue = "Running..."
+        self.instructionBytesLabel.stringValue = "Running..."
+      }
+    }
+  }
 
-    updateInstructionAssembly()
-    updateRegisters()
-    updateRAM()
-
+  func emulationDidStop() {
+//    self.writeImageHistory(to: "recording.gif")
     delegate?.emulatorViewControllerDidStepIn(self)
+    self.updateInstructionAssembly()
   }
 
   @objc func performControlAction(_ sender: NSSegmentedControl) {
@@ -368,112 +358,14 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
       document.stepForward()
 
     } else if sender.selectedSegment == 1 {  // Step into
-      document.gameboy.advanceInstruction()
-
-      self.tileDataImage = document.gameboy.takeSnapshotOfTileData()
-
-      updateInstructionAssembly()
-      updateRegisters()
-      updateRAM()
-
-      delegate?.emulatorViewControllerDidStepIn(self)
+      document.stepInto()
 
     } else if sender.selectedSegment == 2 {  // Play
-      running = !running
-      if running {
-        instructionAssemblyLabel.stringValue = "Running..."
-        instructionBytesLabel.stringValue = "Running..."
-
-        let gameboy = self.document.gameboy
-        DispatchQueue.global(qos: .userInteractive).async {
-          var start = DispatchTime.now()
-          var lastFrameTick = DispatchTime.now()
-          var machineCycle: UInt64 = 0
-          var machineCycles: UInt64 = 0
-          var frames: UInt64 = 0
-          var startCounting = false
-          while self.running {
-            gameboy.advance()
-
-//            if machineCycle >= 620146 {
-//              if let sourceLocation = gameboy.cpu.machineInstruction.sourceLocation {
-//                var address = sourceLocation.address()
-//                let instruction = self.document.disassemblyResults?.disassembly?.instruction(at: address, in: max(1, gameboy.cartridge!.selectedBank)) ?? Disassembler.fetchInstruction(at: &address, memory: gameboy.memory)
-//                let IF = gameboy.memory.read(from: 0xFF0F)
-//                let IE = gameboy.memory.read(from: 0xFFFF)
-//                let LY = gameboy.memory.read(from: 0xFF44)
-//                let LYC = gameboy.memory.read(from: 0xFF45)
-//                let STAT = gameboy.memory.read(from: 0xFF41)
-//                let SCX = gameboy.memory.read(from: 0xFF43)
-//                let SCY = gameboy.memory.read(from: 0xFF42)
-//                let ime = gameboy.cpu.ime
-//                let servicingInterrupt: Int
-//                if case .interrupt = gameboy.cpu.machineInstruction.spec {
-//                  servicingInterrupt = 1
-//                } else {
-//                  servicingInterrupt = 0
-//                }
-//                print("[0x\(sourceLocation.address().hexString)]@\(gameboy.cartridge!.selectedBank.hexString) SCX: \(SCX) SCY: \(SCY) LY: \(LY) LYC: \(LYC) STAT: \(STAT.binaryString) IME: \(ime) !\(servicingInterrupt) IF: \(IF.binaryString) IE: \(IE.binaryString) cycle: \(machineCycle) \(RGBDSDisassembler.statement(for: instruction).formattedString)")
-//              }
-//            }
-
-            // TODO: Standardize this as a breakpointing mechanism.
-//            if gameboy.cpu.machineInstruction.sourceAddress()! == 0x0048 {
-//              self.running = false
-//            }
-
-            if !startCounting && (DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds) >= 1_000_000_000 {
-              startCounting = true
-              start = DispatchTime.now()
-            }
-
-            if !gameboy.cpu.halted && startCounting {
-              machineCycles += 1
-            }
-            machineCycle += 1
-
-            if self.lastVblankCounter != gameboy.ppu.vblankCounter {
-              self.lastVblankCounter = gameboy.ppu.vblankCounter
-
-              self.tileDataImage = self.document.gameboy.takeSnapshotOfTileData()
-              self.screenImage = self.document.gameboy.takeScreenshot()
-              self.screenHistory.append(self.screenImage!)
-
-              let frameDeltaSeconds = (DispatchTime.now().uptimeNanoseconds - lastFrameTick.uptimeNanoseconds)
-              let frameLength: UInt64 = 16_666_666
-              if frameDeltaSeconds < frameLength {
-                usleep(useconds_t((frameLength - frameDeltaSeconds) / 1000))
-              }
-
-              lastFrameTick = DispatchTime.now()
-
-              DispatchQueue.main.sync {
-                frames += 1
-                let deltaSeconds = Double((DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds)) / 1_000_000_000
-                let instructionsPerSecond = Double(machineCycles) / deltaSeconds
-                let framesPerSecond = Double(frames) / deltaSeconds
-
-                self.tileDataImageView.image = self.tileDataImage
-                NotificationCenter.default.post(name: .emulationScreenUpdated, object: self.document, userInfo: ["screenImage": self.screenImage])
-
-                self.fpsLabel.stringValue = String(format: "fps: %.2f ips: %.2f", framesPerSecond, instructionsPerSecond)
-                self.updateRegisters()
-                self.updateRAM()
-              }
-            }
-          }
-
-          // Advance to the next full instruction.
-          gameboy.advanceInstruction()
-
-          self.writeImageHistory(to: "recording.gif")
-
-          DispatchQueue.main.sync {
-            self.updateInstructionAssembly()
-          }
-        }
+      if document.emulating {
+        document.stop()
+      } else {
+        document.run()
       }
-      // TODO: Only allow this if the instruction causes a transfer of control flow.
 
     } else if sender.selectedSegment == 3 {  // Clear
       for register in LR35902.Instruction.Numeric.registers8 {
@@ -485,7 +377,6 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
       // TODO: Reset RAM.
 
       updateRegisters()
-      updateRAM()
     }
   }
 }
@@ -566,22 +457,6 @@ extension EmulatorViewController: NSTextFieldDelegate {
 
   func updateRegisters() {
     cpuView.update(with: document.gameboy.cpu)
-  }
-
-  func updateRAM() {
-    // TODO: Make this handle the various memory regions better.
-//    let globalMap = document.configuration.globals.reduce(into: [:]) { accumulator, global in
-//      accumulator[global.address] = global
-//    }
-//    ramController.content = document.memoryUnit.map { address, value -> RAMValue in
-//      let globalName = globalMap[address]?.name
-//      let valueString = "0x" + value.hexString
-//      return RAMValue(address: address,
-//                      variableName: globalName,
-//                      value: valueString,
-//                      sourceLocation: nil,
-//                      variableAddress: 0)
-//    }
   }
 }
 

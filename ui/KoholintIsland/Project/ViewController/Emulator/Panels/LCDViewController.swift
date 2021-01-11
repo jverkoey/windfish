@@ -41,14 +41,16 @@ final class LCDViewController: NSViewController {
   override func viewWillAppear() {
     super.viewWillAppear()
 
-    guard let projectDocument = projectDocument else {
+    guard let document = projectDocument else {
       fatalError()
     }
     // TODO: Directly subscribe to an emulator instance stored on the document.
-    screenSubscriber = NotificationCenter.default.publisher(for: .emulationScreenUpdated, object: projectDocument)
+    screenSubscriber = NotificationCenter.default.publisher(for: .emulationScreenUpdated, object: document)
       .receive(on: RunLoop.main)
       .sink(receiveValue: { notification in
         self.screenImageView.image = notification.userInfo?["screenImage"] as? NSImage
       })
+
+    screenImageView.image = document.gameboy.takeScreenshot()
   }
 }

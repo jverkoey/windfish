@@ -130,6 +130,14 @@ public final class PPU {
    Primarily used by the emulator to observe whether a new vblank has occurred and to extract the vram data if so.
    */
   public private(set) var vblankCounter: Int = 0
+
+  /**
+   Incremented every time a tile data is written to.
+
+   Primarily used by the emulator to observe whether changes have been made to the tile data since the last time a
+   snapshot wsa taken.
+   */
+  public private(set) var tileDataCounter: Int = 0
 }
 
 // MARK: - Emulation
@@ -430,6 +438,7 @@ extension PPU: AddressableMemory {
         return
       }
       registers.tileData[Int(address - PPU.tileDataRegion.lowerBound)] = byte
+      tileDataCounter += 1
       return
     }
     if OAM.addressableRange.contains(address) {
