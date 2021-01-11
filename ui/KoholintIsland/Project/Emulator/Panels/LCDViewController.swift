@@ -2,11 +2,7 @@ import Foundation
 import Cocoa
 
 final class LCDViewController: NSViewController {
-  let document: ProjectDocument
-
-  init(document: ProjectDocument) {
-    self.document = document
-
+  init() {
     super.init(nibName: nil, bundle: nil)
   }
 

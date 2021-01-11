@@ -481,13 +481,18 @@ class ProjectDocument: NSDocument {
     wc.window?.toolbar = toolbar
 
     window.makeKeyAndOrderFront(nil)
+
+    addWindowController(lcdWindowController)
   }
 
   lazy var lcdWindowController: NSWindowController = {
-    let contentViewController = LCDViewController(document: self)
+    let contentViewController = LCDViewController()
     let window = NSWindow(contentViewController: contentViewController)
+    window.subtitle = "LCD"
     window.setContentSize(NSSize(width: PPU.screenSize.width * 2, height: PPU.screenSize.height * 2))
-    window.setFrameAutosaveName("lcdWindowFrame")
+    window.contentMinSize = NSSize(width: PPU.screenSize.width, height: PPU.screenSize.height)
+    window.aspectRatio = window.contentMinSize
+//    window.setFrameAutosaveName("lcdWindowFrame")
     let wc = NSWindowController(window: window)
     wc.contentViewController = contentViewController
     return wc
