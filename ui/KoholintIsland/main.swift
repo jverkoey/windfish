@@ -35,6 +35,7 @@ extension NSApplication {
     fileMenu.submenu?.addItem(NSMenuItem(title: "Open project…", action: #selector(NSDocumentController.openDocument(_:)), keyEquivalent: "o"))
     fileMenu.submenu?.addItem(NSMenuItem.separator())
     fileMenu.submenu?.addItem(NSMenuItem(title: "Load ROM…", action: #selector(ProjectDocument.loadRom(_:)), keyEquivalent: "l"))
+    fileMenu.submenu?.addItem(NSMenuItem(title: "Import symbols…", action: #selector(ProjectDocument.importSymbols(_:)), keyEquivalent: "i"))
     fileMenu.submenu?.addItem(NSMenuItem.separator())
     fileMenu.submenu?.addItem(NSMenuItem(title: "Close", action: #selector(NSWindow.performClose(_:)), keyEquivalent: "w"))
     fileMenu.submenu?.addItem(NSMenuItem(title: "Save project", action: #selector(NSDocument.save(_:)), keyEquivalent: "s"))
