@@ -334,9 +334,6 @@ extension PPU {
         || (registers.lcdMode == .hblank)
         || (registers.lcdMode == .pixelTransfer && lineCycleDriver.tcycles >= 43 * 4)
     )
-    if registers.lcdMode == .pixelTransfer {
-      print(lineCycleDriver.tcycles)
-    }
 
     self.mode.start()
   }
