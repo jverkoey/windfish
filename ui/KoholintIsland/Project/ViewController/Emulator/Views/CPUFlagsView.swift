@@ -3,7 +3,7 @@ import Cocoa
 
 import Windfish
 
-final class FlagsView: NSView {
+final class CPUFlagsView: NSView {
   let zeroLabel = CreateLabel()
   let subtractLabel = CreateLabel()
   let carryLabel = CreateLabel()

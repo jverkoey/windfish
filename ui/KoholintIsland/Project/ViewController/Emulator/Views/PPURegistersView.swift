@@ -5,6 +5,7 @@ import Windfish
 
 final class PPURegistersView: NSView {
   let modeView = LabeledView(longestWord: "searchingOAM")
+  let statFlagsView = STATFlagsView()
   override init(frame frameRect: NSRect) {
     super.init(frame: frameRect)
 
@@ -12,13 +13,18 @@ final class PPURegistersView: NSView {
     modeView.translatesAutoresizingMaskIntoConstraints = false
     addSubview(modeView)
 
+    statFlagsView.translatesAutoresizingMaskIntoConstraints = false
+    addSubview(statFlagsView)
+
     NSLayoutConstraint.activate([
       modeView.leadingAnchor.constraint(equalTo: leadingAnchor),
-      modeView.topAnchor.constraint(equalTo: topAnchor),
+      statFlagsView.leadingAnchor.constraint(equalTo: leadingAnchor),
       modeView.trailingAnchor.constraint(equalTo: trailingAnchor),
+      statFlagsView.trailingAnchor.constraint(equalTo: trailingAnchor),
 
       modeView.topAnchor.constraint(equalTo: topAnchor),
-      modeView.bottomAnchor.constraint(equalTo: bottomAnchor),
+      statFlagsView.topAnchor.constraint(equalTo: modeView.bottomAnchor),
+      statFlagsView.bottomAnchor.constraint(equalTo: bottomAnchor),
     ])
   }
 
@@ -33,5 +39,6 @@ final class PPURegistersView: NSView {
     case .pixelTransfer:  modeView.value = "pixelTransfer"
     case .searchingOAM:   modeView.value = "searchingOAM"
     }
+    statFlagsView.update(with: ppu)
   }
 }

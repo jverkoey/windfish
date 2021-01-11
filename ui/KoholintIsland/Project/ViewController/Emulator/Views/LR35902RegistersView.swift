@@ -14,7 +14,7 @@ final class LR35902RegistersView: NSView {
   let eView = RegisterView()
   let hView = RegisterView()
   let lView = RegisterView()
-  let flagsView = FlagsView()
+  let flagsView = CPUFlagsView()
   override init(frame frameRect: NSRect) {
     super.init(frame: frameRect)
 
