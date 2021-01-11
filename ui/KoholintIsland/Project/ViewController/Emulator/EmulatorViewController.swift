@@ -163,6 +163,7 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
   let instructionBytesLabel = CreateLabel()
   let tileDataImageView = PixelImageView()
   let fpsLabel = CreateLabel()
+  let breakpointEditor = NSPredicateEditor()
   private let cpuView = LR35902RegistersView()
 
   init(document: ProjectDocument) {
@@ -254,6 +255,30 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
     tileDataImageView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(tileDataImageView)
 
+    breakpointEditor.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(breakpointEditor)
+
+    breakpointEditor.rowHeight = 25
+    let operators = [
+      NSNumber(value: NSComparisonPredicate.Operator.equalTo.rawValue)
+    ]
+    breakpointEditor.rowTemplates = [
+      NSPredicateEditorRowTemplate(compoundTypes: [NSNumber(value: NSCompoundPredicate.LogicalType.or.rawValue),
+                                                   NSNumber(value: NSCompoundPredicate.LogicalType.and.rawValue),
+                                                   NSNumber(value: NSCompoundPredicate.LogicalType.not.rawValue)]),
+      NSPredicateEditorRowTemplate(leftExpressions: [NSExpression(forConstantValue: true)],
+                                   rightExpressionAttributeType: .booleanAttributeType,
+                                   modifier: .direct,
+                                   operators: operators,
+                                   options: 0),
+      NSPredicateEditorRowTemplate(leftExpressions: [NSExpression(forConstantValue: false)],
+                                   rightExpressionAttributeType: .booleanAttributeType,
+                                   modifier: .direct,
+                                   operators: operators,
+                                   options: 0)
+    ]
+    breakpointEditor.addRow(self)
+
     // MARK: Layout
 
     NSLayoutConstraint.activate([
@@ -287,6 +312,10 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
       tileDataImageView.widthAnchor.constraint(equalToConstant: 128),
       tileDataImageView.heightAnchor.constraint(equalToConstant: 192),
       tileDataImageView.topAnchor.constraint(equalToSystemSpacingBelow: instructionBytesLabel.bottomAnchor, multiplier: 1),
+
+      breakpointEditor.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+      breakpointEditor.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+      breakpointEditor.topAnchor.constraint(equalTo: tileDataImageView.bottomAnchor),
     ])
 
     tileDataImageView.image = document.gameboy.takeSnapshotOfTileData()
