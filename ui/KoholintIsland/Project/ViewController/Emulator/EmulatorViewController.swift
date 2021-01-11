@@ -201,19 +201,22 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
     controls.translatesAutoresizingMaskIntoConstraints = false
     controls.trackingMode = .momentary
     controls.segmentStyle = .smallSquare
-    controls.segmentCount = 4
+    controls.segmentCount = 5
     controls.setImage(NSImage(systemSymbolName: "arrowshape.bounce.forward.fill", accessibilityDescription: nil)!, forSegment: 0)
     controls.setImage(NSImage(systemSymbolName: "arrow.down.to.line.alt", accessibilityDescription: nil)!, forSegment: 1)
-    controls.setImage(NSImage(systemSymbolName: "play", accessibilityDescription: nil)!, forSegment: 2)
-    controls.setImage(NSImage(systemSymbolName: "clear", accessibilityDescription: nil)!, forSegment: 3)
+    controls.setImage(NSImage(systemSymbolName: "arrow.right.to.line.alt", accessibilityDescription: nil)!, forSegment: 2)
+    controls.setImage(NSImage(systemSymbolName: "play", accessibilityDescription: nil)!, forSegment: 3)
+    controls.setImage(NSImage(systemSymbolName: "clear", accessibilityDescription: nil)!, forSegment: 4)
     controls.setWidth(40, forSegment: 0)
     controls.setWidth(40, forSegment: 1)
     controls.setWidth(40, forSegment: 2)
     controls.setWidth(40, forSegment: 3)
+    controls.setWidth(40, forSegment: 4)
     controls.setEnabled(true, forSegment: 0)
     controls.setEnabled(true, forSegment: 1)
     controls.setEnabled(true, forSegment: 2)
     controls.setEnabled(true, forSegment: 3)
+    controls.setEnabled(true, forSegment: 4)
     controls.target = self
     controls.action = #selector(performControlAction(_:))
     view.addSubview(controls)
@@ -333,14 +336,17 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
     } else if sender.selectedSegment == 1 {  // Step into
       document.stepInto()
 
-    } else if sender.selectedSegment == 2 {  // Play
+    } else if sender.selectedSegment == 2 {  // Advance one machine cycle
+      document.advance()
+
+    } else if sender.selectedSegment == 3 {  // Play
       if document.emulating {
         document.stop()
       } else {
         document.run()
       }
 
-    } else if sender.selectedSegment == 3 {  // Clear
+    } else if sender.selectedSegment == 4 {  // Clear
       for register in LR35902.Instruction.Numeric.registers8 {
         document.gameboy.cpu.clear(register)
       }

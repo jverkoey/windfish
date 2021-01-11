@@ -58,6 +58,23 @@ extension ProjectDocument {
     }
   }
 
+  /** Advances the emulation by a single machine cycle. */
+  func advance() {
+    guard gameboy.cpu.machineInstruction.spec != nil else {
+      gameboy.advance()
+      self.emulationObservers.forEach { $0.emulationDidStop() }
+      return
+    }
+    var didAdvance = false
+    run { gameboy -> Bool in
+      if !didAdvance {
+        didAdvance = true
+        return false  // Advance once.
+      }
+      return true
+    }
+  }
+
   func informObserversOfEmulationAdvance(screenImage: NSImage, tileDataImage: NSImage, fps: Double?, ips: Double?) {
     self.emulationObservers.forEach {
       $0.emulationDidAdvance(screenImage: screenImage, tileDataImage: tileDataImage, fps: fps, ips: ips)
