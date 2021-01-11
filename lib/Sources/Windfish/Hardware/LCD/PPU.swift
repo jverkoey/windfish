@@ -7,6 +7,7 @@ import Foundation
 // - http://gameboy.mongenel.com/dmg/asmmemmap.html
 // - https://hacktix.github.io/GBEDG/ppu/#the-concept-of-scanlines
 // - https://blog.tigris.fr/2019/09/15/writing-an-emulator-the-first-pixel/
+// - https://www.reddit.com/r/EmuDev/comments/89tw4f/gb_ppucpu_register_access_conflicts/
 
 protocol PPUMode {
   func start()
