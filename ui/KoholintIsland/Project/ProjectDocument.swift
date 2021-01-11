@@ -489,6 +489,7 @@ class ProjectDocument: NSDocument {
     let contentViewController = LCDViewController()
     let window = NSWindow(contentViewController: contentViewController)
     window.subtitle = "LCD"
+    window.isRestorable = true
     window.setContentSize(NSSize(width: PPU.screenSize.width * 2, height: PPU.screenSize.height * 2))
     window.contentMinSize = NSSize(width: PPU.screenSize.width, height: PPU.screenSize.height)
     window.aspectRatio = window.contentMinSize
