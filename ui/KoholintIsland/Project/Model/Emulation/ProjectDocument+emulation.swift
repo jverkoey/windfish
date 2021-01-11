@@ -3,6 +3,7 @@ import Cocoa
 
 import Windfish
 
+// TODO: Rename to EmulationObserver
 protocol EmulationObservers {
   func emulationDidAdvance(screenImage: NSImage, tileDataImage: NSImage, fps: Double?, ips: Double?)
   func emulationDidStart()
