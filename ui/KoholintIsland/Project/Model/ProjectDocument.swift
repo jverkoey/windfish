@@ -78,7 +78,6 @@ class ProjectDocument: NSDocument {
     window.setContentSize(NSSize(width: PPU.screenSize.width * 2, height: PPU.screenSize.height * 2))
     window.contentMinSize = NSSize(width: PPU.screenSize.width, height: PPU.screenSize.height)
     window.aspectRatio = window.contentMinSize
-//    window.setFrameAutosaveName("lcdWindowFrame")
     let wc = NSWindowController(window: window)
     wc.contentViewController = contentViewController
     return wc
