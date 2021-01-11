@@ -3,7 +3,7 @@ import Cocoa
 
 import Windfish
 
-final class LR35902View: NSView {
+final class LR35902RegistersView: NSView {
   let pcView = AddressView()
   let spView = AddressView()
   let aView = RegisterView()

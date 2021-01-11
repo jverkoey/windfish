@@ -1,7 +1,7 @@
 import Foundation
 
 extension PPU {
-  final class LCDRegisters {
+  public final class LCDRegisters {
     deinit {
       tileMap.deallocate()
       tileData.deallocate()
@@ -87,14 +87,14 @@ extension PPU {
         enableHBlankInterrupt       = (newValue & 0b0000_1000) > 0
       }
     }
-                                               // 76543210
-    var enableCoincidenceInterrupt = false     //  x
-    var enableOAMInterrupt = false             //   x
-    var enableVBlankInterrupt = false          //    x
-    var enableHBlankInterrupt = false          //     x
-    var coincidence: Bool = true               //      x
-    var lcdMode = LCDCMode.hblank              //       xx
-                                               // 76543210
+                                                                    // 76543210
+    public internal(set) var enableCoincidenceInterrupt = false     //  x
+    public internal(set) var enableOAMInterrupt = false             //   x
+    public internal(set) var enableVBlankInterrupt = false          //    x
+    public internal(set) var enableHBlankInterrupt = false          //     x
+    public internal(set) var coincidence: Bool = true               //      x
+    public internal(set) var lcdMode = LCDCMode.hblank              //       xx
+                                                                    // 76543210
 
     // MARK: SY and SX (0xFF42 and 0xFF43)
 
@@ -223,8 +223,8 @@ extension PPU {
     }
   }
 
-  enum LCDCMode {
-    var bits: UInt8 {
+  public enum LCDCMode {
+    public var bits: UInt8 {
       switch self {
       case .hblank:         return 0b0000_0000
       case .vblank:         return 0b0000_0001

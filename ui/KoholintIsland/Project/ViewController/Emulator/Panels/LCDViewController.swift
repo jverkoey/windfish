@@ -1,6 +1,5 @@
 import Foundation
 import Cocoa
-import Combine
 
 final class PixelImageView: NSImageView {
   override init(frame frameRect: NSRect) {
@@ -29,7 +28,6 @@ final class LCDViewController: NSViewController {
     view.addSubview(screenImageView)
   }
 
-  private var screenSubscriber: AnyCancellable?
   override func viewWillAppear() {
     super.viewWillAppear()
 

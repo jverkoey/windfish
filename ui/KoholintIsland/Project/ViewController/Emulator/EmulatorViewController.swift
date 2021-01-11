@@ -163,7 +163,7 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
   let instructionBytesLabel = CreateLabel()
   let tileDataImageView = PixelImageView()
   let fpsLabel = CreateLabel()
-  private let cpuView = LR35902View()
+  private let cpuView = LR35902RegistersView()
 
   init(document: ProjectDocument) {
     self.document = document
@@ -224,25 +224,6 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
     cpuView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(cpuView)
 
-    let bankLabel = CreateLabel()
-    bankLabel.translatesAutoresizingMaskIntoConstraints = false
-    bankLabel.stringValue = "bank:"
-    bankLabel.font = monospacedFont
-    bankLabel.alignment = .right
-    view.addSubview(bankLabel)
-
-    let bankTextField = NSTextField()
-    bankTextField.translatesAutoresizingMaskIntoConstraints = false
-    bankTextField.formatter = UInt8HexFormatter()
-    if let cartridge = self.document.gameboy.cartridge {
-      bankTextField.stringValue = bankTextField.formatter!.string(for: cartridge.selectedBank)!
-    }
-    bankTextField.isEditable = false
-    bankTextField.identifier = .bank
-    bankTextField.font = monospacedFont
-    bankTextField.delegate = self
-    view.addSubview(bankTextField)
-
     let instructionLabel = CreateLabel()
     instructionLabel.translatesAutoresizingMaskIntoConstraints = false
     instructionLabel.stringValue = "Instruction:"
@@ -283,17 +264,9 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
       cpuView.topAnchor.constraint(equalToSystemSpacingBelow: fpsLabel.bottomAnchor, multiplier: 1),
       cpuView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
 
-      bankLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
-      bankLabel.firstBaselineAnchor.constraint(equalTo: bankTextField.firstBaselineAnchor),
-
-      bankTextField.leadingAnchor.constraint(equalTo: bankLabel.trailingAnchor),
-      bankTextField.widthAnchor.constraint(equalToConstant: 50),
-      bankTextField.topAnchor.constraint(equalTo: cpuView.bottomAnchor),
-
       instructionLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
       instructionLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -4),
-      instructionLabel.topAnchor.constraint(equalTo: bankLabel.bottomAnchor),
-      instructionLabel.topAnchor.constraint(equalTo: bankTextField.bottomAnchor),
+      instructionLabel.topAnchor.constraint(equalTo: cpuView.bottomAnchor),
 
       instructionAssemblyLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
       instructionAssemblyLabel.widthAnchor.constraint(lessThanOrEqualToConstant: 300),

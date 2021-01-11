@@ -3,7 +3,7 @@ import Cocoa
 
 final class AddressView: NSView {
   let label = CreateLabel()
-  let textField = FixedTextView()
+  let textField = FixedWidthTextView()
   let columnLayoutGuide = NSLayoutGuide()
 
   override init(frame frameRect: NSRect) {

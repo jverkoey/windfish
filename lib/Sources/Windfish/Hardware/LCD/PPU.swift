@@ -30,7 +30,7 @@ public final class PPU {
   }
 
   let oam: OAM
-  let registers = LCDRegisters()
+  public let registers = LCDRegisters()
 
   /** An executable representation of the LCDMode register. */
   private var mode: PPUMode {
