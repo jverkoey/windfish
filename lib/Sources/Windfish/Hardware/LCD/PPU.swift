@@ -50,7 +50,6 @@ public final class PPU {
   private let modeHBlank: HBlankMode
   private let modePixelTransfer: PixelTransferMode
 
-  var bufferToggle = false
   public static let screenSize = (width: 160, height: 144)
 
   final class LineCycleDriver {

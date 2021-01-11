@@ -8,5 +8,4 @@ final class PPUViewController: NSViewController {
     view.wantsLayer = true
     view.layer?.backgroundColor = NSColor.red.cgColor
   }
-
 }
