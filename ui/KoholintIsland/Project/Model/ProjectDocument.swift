@@ -65,9 +65,11 @@ class ProjectDocument: NSDocument {
     toolbar.delegate = self
     wc.window?.toolbar = toolbar
 
-    window.makeKeyAndOrderFront(nil)
-
     addWindowController(lcdWindowController)
+    lcdWindowController.showWindow(self)
+    lcdWindowController.window?.orderFront(self)
+
+    window.makeKeyAndOrderFront(nil)
   }
 
   lazy var lcdWindowController: NSWindowController = {
