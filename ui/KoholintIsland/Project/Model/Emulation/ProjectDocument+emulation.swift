@@ -24,6 +24,7 @@ extension ProjectDocument {
       run { gameboy -> Bool in
         gameboy.cpu.machineInstruction.sourceAddress() == nextAddress
       }
+      // TODO: Handle macros by stepping to the end of the macro's group of instructions.
     } else {
       stepInto()
     }
