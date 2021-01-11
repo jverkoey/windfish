@@ -151,20 +151,6 @@ protocol EmulatorViewControllerDelegate: NSObject {
   func emulatorViewControllerDidStepIn(_ emulatorViewController: EmulatorViewController)
 }
 
-final class PixelImageView: NSImageView {
-  override init(frame frameRect: NSRect) {
-    super.init(frame: frameRect)
-
-    wantsLayer = true
-    layer?.shouldRasterize = true
-    layer?.magnificationFilter = .nearest
-  }
-
-  required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-}
-
 final class EmulatorViewController: NSViewController, TabSelectable {
   let deselectedTabImage = NSImage(systemSymbolName: "cpu", accessibilityDescription: nil)!
   let selectedTabImage = NSImage(systemSymbolName: "cpu", accessibilityDescription: nil)!
@@ -176,7 +162,6 @@ final class EmulatorViewController: NSViewController, TabSelectable {
   let instructionAssemblyLabel = CreateLabel()
   let instructionBytesLabel = CreateLabel()
   let tileDataImageView = PixelImageView()
-  let screenImageView = PixelImageView()
   let fpsLabel = CreateLabel()
   private let cpuView = LR35902View()
   private var screenHistory: [NSImage] = []
@@ -230,9 +215,6 @@ final class EmulatorViewController: NSViewController, TabSelectable {
 
     fpsLabel.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(fpsLabel)
-
-    screenImageView.translatesAutoresizingMaskIntoConstraints = false
-    view.addSubview(screenImageView)
 
     cpuView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(cpuView)
@@ -293,12 +275,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
       fpsLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
       fpsLabel.topAnchor.constraint(equalToSystemSpacingBelow: controls.bottomAnchor, multiplier: 1),
 
-      screenImageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
-      screenImageView.widthAnchor.constraint(equalToConstant: CGFloat(PPU.screenSize.width)),
-      screenImageView.heightAnchor.constraint(equalToConstant: CGFloat(PPU.screenSize.height)),
-      screenImageView.topAnchor.constraint(equalToSystemSpacingBelow: fpsLabel.bottomAnchor, multiplier: 1),
-
-      cpuView.topAnchor.constraint(equalToSystemSpacingBelow: screenImageView.bottomAnchor, multiplier: 1),
+      cpuView.topAnchor.constraint(equalToSystemSpacingBelow: fpsLabel.bottomAnchor, multiplier: 1),
       cpuView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
 
       bankLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
@@ -571,7 +548,7 @@ final class EmulatorViewController: NSViewController, TabSelectable {
                 if tileDataDidChange {
                   self.tileDataImageView.image = self.tileDataImage
                 }
-                self.screenImageView.image = self.screenImage
+                NotificationCenter.default.post(name: .emulationScreenUpdated, object: self.document, userInfo: ["screenImage": self.screenImage])
 
                 self.fpsLabel.stringValue = String(format: "fps: %.2f ips: %.2f", framesPerSecond, instructionsPerSecond)
                 self.updateRegisters()
