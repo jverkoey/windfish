@@ -25,35 +25,21 @@ extension ProjectDocument {
         gameboy.cpu.machineInstruction.sourceAddress() == nextAddress
       }
     } else {
-      let initialAddress = gameboy.cpu.machineInstruction.sourceAddress()!
-      // Advance until an interrupt happens.
-      run { gameboy -> Bool in
-        gameboy.cpu.machineInstruction.sourceAddress() != initialAddress
-      }
+      stepInto()
     }
   }
 
   /** Advances the emulation by one instruction. */
   func stepInto() {
-    if emulating {
-      return  // Ignore subsequent invocations.
+    guard gameboy.cpu.machineInstruction.spec != nil else {
+      gameboy.advance()
+      self.emulationObservers.forEach { $0.emulationDidStop() }
+      return
     }
-    emulating = true
-
-    emulationObservers.forEach { $0.emulationDidStart() }
-
-    DispatchQueue.global(qos: .userInteractive).async {
-      let gameboy = self.gameboy
-      gameboy.advanceInstruction()
-
-      let tileDataImage = self.tileDataImage
-      let screenImage = self.screenImage
-
-      DispatchQueue.main.sync {
-        self.emulating = false
-        self.informObserversOfEmulationAdvance(screenImage: screenImage, tileDataImage: tileDataImage, fps: nil, ips: nil)
-        self.emulationObservers.forEach { $0.emulationDidStop() }
-      }
+    let initialAddress = gameboy.cpu.machineInstruction.sourceAddress()!
+    // Advance until an interrupt happens.
+    run { gameboy -> Bool in
+      gameboy.cpu.machineInstruction.sourceAddress() != initialAddress
     }
   }
 
