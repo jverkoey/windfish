@@ -35,6 +35,7 @@ class ProjectDocument: NSDocument {
   var lastTileDataImage: NSImage? = nil
   var vblankHistory: [NSImage] = []
   var emulationObservers: [EmulationObservers] = []
+  var breakpointPredicate: NSPredicate?
 
   deinit {
     lcdWindowController.close()

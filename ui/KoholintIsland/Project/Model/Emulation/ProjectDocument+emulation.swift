@@ -10,6 +10,11 @@ protocol EmulationObservers {
   func emulationDidStop()
 }
 
+private final class EmulationBreakpointContext: NSObject {
+  @objc dynamic var pc: LR35902.Address = 0
+  @objc dynamic var bank: Gameboy.Cartridge.Bank = 0
+}
+
 extension ProjectDocument {
   /** Advances the emulation until the statement following the current one is reached. */
   func stepForward() {
@@ -85,7 +90,7 @@ extension ProjectDocument {
     emulating = false
   }
 
-  func run(breakpoint: @escaping (Gameboy) -> Bool = { _ in false }) {
+  func run(breakpoint: ((Gameboy) -> Bool)? = nil) {
     if emulating {
       return  // Ignore subsequent invocations.
     }
@@ -93,15 +98,33 @@ extension ProjectDocument {
 
     emulationObservers.forEach { $0.emulationDidStart() }
 
+    let breakpointContext = EmulationBreakpointContext()
+
     DispatchQueue.global(qos: .userInteractive).async {
       let gameboy = self.gameboy
+
+      let breakpointEvaluator: (() -> Bool)?
+      if let breakpoint = breakpoint {
+        breakpointEvaluator = { breakpoint(gameboy) }
+      } else if let breakpointPredicate = self.breakpointPredicate {
+        breakpointEvaluator = { breakpointPredicate.evaluate(with: breakpointContext) }
+      } else {
+        breakpointEvaluator = nil
+      }
 
       var start = DispatchTime.now()
       var lastFrameTick = DispatchTime.now()
       var machineCycle: UInt64 = 0
       var frames: UInt64 = 0
-      while !breakpoint(gameboy) && self.emulating {
+
+      breakpointContext.pc = gameboy.cpu.pc
+      breakpointContext.bank = gameboy.cartridge!.selectedBank
+
+      while !(breakpointEvaluator?() ?? true) && self.emulating {
         gameboy.advance()
+
+        breakpointContext.pc = gameboy.cpu.pc
+        breakpointContext.bank = gameboy.cartridge!.selectedBank
 
         machineCycle += 1
 

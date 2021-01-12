@@ -182,7 +182,6 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
     let width: CGFloat
   }
 
-  private var programCounterObserver: NSKeyValueObservation?
   private var disassembledSubscriber: AnyCancellable?
 
   override func viewWillAppear() {
@@ -266,17 +265,18 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
       NSPredicateEditorRowTemplate(compoundTypes: [NSNumber(value: NSCompoundPredicate.LogicalType.or.rawValue),
                                                    NSNumber(value: NSCompoundPredicate.LogicalType.and.rawValue),
                                                    NSNumber(value: NSCompoundPredicate.LogicalType.not.rawValue)]),
-      NSPredicateEditorRowTemplate(leftExpressions: [NSExpression(forConstantValue: true)],
-                                   rightExpressionAttributeType: .booleanAttributeType,
+      NSPredicateEditorRowTemplate(leftExpressions: [NSExpression(forKeyPath: "pc")],
+                                   rightExpressionAttributeType: .integer16AttributeType,
                                    modifier: .direct,
                                    operators: operators,
                                    options: 0),
-      NSPredicateEditorRowTemplate(leftExpressions: [NSExpression(forConstantValue: false)],
-                                   rightExpressionAttributeType: .booleanAttributeType,
+      NSPredicateEditorRowTemplate(leftExpressions: [NSExpression(forKeyPath: "bank")],
+                                   rightExpressionAttributeType: .integer16AttributeType,
                                    modifier: .direct,
                                    operators: operators,
-                                   options: 0)
+                                   options: 0),
     ]
+    breakpointEditor.addRow(self)
     breakpointEditor.addRow(self)
 
     // MARK: Layout
@@ -328,6 +328,13 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
       .sink(receiveValue: { notification in
         self.updateInstructionAssembly()
       })
+
+    breakpointEditor.action = #selector(didChangeBreakpoint(_:))
+    breakpointEditor.target = self
+  }
+
+  @objc func didChangeBreakpoint(_ sender: NSPredicateEditor) {
+    self.document.breakpointPredicate = sender.predicate
   }
 
   func emulationDidAdvance(screenImage: NSImage, tileDataImage: NSImage, fps: Double?, ips: Double?) {
