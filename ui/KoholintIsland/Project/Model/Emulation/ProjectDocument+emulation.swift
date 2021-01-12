@@ -20,6 +20,9 @@ extension ProjectDocument {
   func stepForward() {
     guard let spec = gameboy.cpu.machineInstruction.spec else {
       gameboy.advance()
+      let tileDataImage = self.tileDataImage
+      let screenImage = self.screenImage
+      informObserversOfEmulationAdvance(screenImage: screenImage, tileDataImage: tileDataImage, fps: nil, ips: nil)
       self.emulationObservers.forEach { $0.emulationDidStop() }
       return
     }
@@ -53,6 +56,9 @@ extension ProjectDocument {
   func stepInto() {
     guard gameboy.cpu.machineInstruction.spec != nil else {
       gameboy.advance()
+      let tileDataImage = self.tileDataImage
+      let screenImage = self.screenImage
+      informObserversOfEmulationAdvance(screenImage: screenImage, tileDataImage: tileDataImage, fps: nil, ips: nil)
       self.emulationObservers.forEach { $0.emulationDidStop() }
       return
     }
@@ -67,6 +73,9 @@ extension ProjectDocument {
   func advance() {
     guard gameboy.cpu.machineInstruction.spec != nil else {
       gameboy.advance()
+      let tileDataImage = self.tileDataImage
+      let screenImage = self.screenImage
+      informObserversOfEmulationAdvance(screenImage: screenImage, tileDataImage: tileDataImage, fps: nil, ips: nil)
       self.emulationObservers.forEach { $0.emulationDidStop() }
       return
     }
@@ -117,6 +126,7 @@ extension ProjectDocument {
       var machineCycle: UInt64 = 0
       var frames: UInt64 = 0
 
+      // TODO: This should use the loaded instruction's address.
       breakpointContext.pc = gameboy.cpu.pc
       breakpointContext.bank = gameboy.cartridge!.selectedBank
 
