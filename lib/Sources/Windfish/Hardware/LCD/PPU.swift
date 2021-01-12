@@ -296,7 +296,7 @@ extension PPU {
 
     // MARK: STAT[coincidence]
 
-    if lineTCycles >= 4 && lineTCycles < 8  {
+    if lineTCycles >= 4 && lineTCycles < 8 {
       // Always fire on the second cycle of the line...
       requestCoincidenceInterruptIfNeeded(memory: memory)
     }
