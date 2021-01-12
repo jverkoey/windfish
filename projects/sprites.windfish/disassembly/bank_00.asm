@@ -1566,17 +1566,40 @@ run_testcase.run_testcase@wait_ly_6:
     jp   setup_and_wait_mode2@wait_ly_7
 
 testcase_round_a_ret:
-    db   $06, $00, $04, $F0, $41, $E6, $03, $20
-    db   $F9, $78, $0E, $01, $B9, $C2, $06, $0C
+    ld   b, $00
+testcase_round_a_ret.loop_01_0B9A:
+    inc  b
+    ld   a, [gbSTAT]
+    and  %00000011
+    jr   nz, .loop_01_0B9A
 
-testcase_round_b:
-    db   $21, $B3, $0B, $E5, $21, $60, $C0, $E5
-    db   $C3, $E3, $0B
+    ld   a, b
+    ld   c, $01
+    cp   c
+    jp   nz, test_fail
+
+.testcase_round_b:
+    ld   hl, $0BB3
+    push hl
+    ld   hl, $C060
+    push hl
+    jp   setup_and_wait_mode2@wait_ly_7
 
 testcase_round_b_ret:
-    db   $06, $00, $04, $F0, $41, $E6, $03, $20
-    db   $F9, $78, $0E, $02, $B9, $C2, $06, $0C
-    db   $C9
+    ld   b, $00
+testcase_round_b_ret.loop_01_0BB5:
+    inc  b
+    ld   a, [gbSTAT]
+    and  %00000011
+    jr   nz, .loop_01_0BB5
+
+    ld   a, b
+    ld   c, $02
+    cp   c
+    jp   nz, test_fail
+
+    ret
+
 
 prepare_sprites:
     ld   a, [de]
@@ -1639,7 +1662,9 @@ toc_01_0BF1:
     jp   fail_halt
 
 test_fail:
-    db   $F3, $21, $0D, $0C, $C3, $F0, $47
+    di
+    ld   hl, $0C0D
+    jp   quit
 
 test_fail@quit_inline_2:
     db   $CD, $FC, $48, $54, $45, $53, $54, $20
