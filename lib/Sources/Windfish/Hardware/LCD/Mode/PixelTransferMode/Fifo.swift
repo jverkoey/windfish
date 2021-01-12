@@ -39,6 +39,16 @@ extension PPU.PixelTransferMode {
       return pixel.palette[Int(truncatingIfNeeded: pixel.colorIndex)]
     }
 
+    func allPixels() -> [Pixel] {
+      var pixels: [Pixel] = []
+      var i = firstPixelIndex
+      while i != nextPixelIndex {
+        pixels.append(self[i])
+        i = (i + 1) % 16
+      }
+      return pixels
+    }
+
     private var nextPixelIndex = 0
     private var firstPixelIndex = 0
     internal private(set) var count = 0

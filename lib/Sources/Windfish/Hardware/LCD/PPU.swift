@@ -21,6 +21,14 @@ public final class PPU {
   static let registerRegion1: ClosedRange<LR35902.Address> = 0xFF40...0xFF45
   static let registerRegion2: ClosedRange<LR35902.Address> = 0xFF47...0xFF4B
 
+  struct TCycleTiming {
+    /** The number of t-cycles it takes to search OAM. */
+    static let searchingOAM: Gameboy.TCycle = 20 * 4
+
+    /** The maximum number of t-cycles required for single scanline's OAM search, pixel transfer, and hblank. */
+    static let scanline: Gameboy.TCycle = 114 * 4
+  }
+
   init(oam: OAM) {
     self.oam = oam
     self.modeOAMSearch = OAMSearchMode(oam: oam, registers: registers, lineCycleDriver: lineCycleDriver)
@@ -69,9 +77,8 @@ public final class PPU {
   public let lineCycleDriver = LineCycleDriver()
 
   /**
-   LCD Mode gets synchronized to the register on the second cycle of the mode.
-
-   This value is set to the register on the subsequent machine instruction from which it was set.
+   Changes to the LCD Mode register are delayed by a single machine cycle; rather than set the LCD mode directly, this
+   value is set and flushed to the LCD mode on a subsequent machine cycle.
 
    Resources:
    - Section 8.9. "LY, LYC, STAT and IF Timings. STAT LY=LYC interrupt" in https://github.com/AntonioND/giibiiadvance/blob/master/docs/TCAGBD.pdf
@@ -107,7 +114,7 @@ public final class PPU {
 
    This always shows the value of ly from one machine cycle prior.
    */
-  var lyForComparison: UInt8?
+  var lyForComparison: UInt8? = 0
 
   enum Addresses: LR35902.Address {
     case LCDC = 0xFF40
@@ -143,14 +150,6 @@ public final class PPU {
 // MARK: - Emulation
 
 extension PPU {
-  struct TCycleTiming {
-    /** The number of t-cycles it takes to search OAM. */
-    static let searchingOAM: Gameboy.TCycle = 20 * 4
-
-    /** The maximum number of t-cycles required for single scanline's OAM search, pixel transfer, and hblank. */
-    static let scanline: Gameboy.TCycle = 114 * 4
-  }
-
   struct Scanlines {
     static let last: UInt8 = 153
     static let firstVBlank: UInt8 = 144
@@ -269,7 +268,11 @@ extension PPU {
 
     if registers.ly != ly {
       registers.ly = ly
-      lyForComparison = nil  // Simulate a load of ly by clearing this out for a cycle.
+      if ly == 0 {
+        lyForComparison = 0  // lyForComparison is always 0 on the first line.
+      } else {
+        lyForComparison = nil  // Simulate a load of ly by clearing this out for a cycle.
+      }
     } else {
       lyForComparison = registers.ly
     }

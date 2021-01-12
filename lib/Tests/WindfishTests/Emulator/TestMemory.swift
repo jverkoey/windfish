@@ -11,7 +11,7 @@ class TestMemory: AddressableMemory {
   }
   func read(from address: LR35902.Address) -> UInt8 {
     reads.append(address)
-    return defaultReadValue
+    return storage[address] ?? defaultReadValue
   }
 
   func write(_ byte: UInt8, to address: LR35902.Address) {
@@ -19,6 +19,7 @@ class TestMemory: AddressableMemory {
       return
     }
     writes.append(WriteOp(byte: byte, address: address))
+    storage[address] = byte
   }
 
   func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
@@ -32,5 +33,6 @@ class TestMemory: AddressableMemory {
     let address: LR35902.Address
   }
   var writes: [WriteOp] = []
+  var storage: [LR35902.Address: UInt8] = [:]
   var ignoreWrites = false
 }

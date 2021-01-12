@@ -6,9 +6,18 @@ class PPUTests: XCTestCase {
     let controller = PPU(oam: OAM())
 
     XCTAssertEqual(controller.read(from: PPU.Addresses.LCDC.rawValue), 0b1001_0001)
-    XCTAssertEqual(controller.read(from: PPU.Addresses.STAT.rawValue), 0b0000_0110)
+    XCTAssertEqual(controller.read(from: PPU.Addresses.STAT.rawValue), 0b0000_0100)
     XCTAssertEqual(controller.registers.ly, 0)
     XCTAssertEqual(controller.registers.lyc, 0)
+    XCTAssertTrue(controller.registers.coincidence)
+  }
+
+  func testSequence() {
+    let controller = PPU(oam: OAM())
+    let memory = TestMemory()
+
+    XCTAssertEqual(controller.registers.lcdMode, .hblank)
+    XCTAssertEqual(controller.lyForComparison, 0)
   }
 
   func testModeTimings() {
@@ -16,7 +25,7 @@ class PPUTests: XCTestCase {
     let memory = TestMemory()
 
     // Initial state.
-    XCTAssertEqual(controller.registers.lcdMode, .searchingOAM)
+    XCTAssertEqual(controller.registers.lcdMode, .hblank)
 
     for line: UInt8 in 0..<154 {
       for cycle in 1...114 {
@@ -25,7 +34,7 @@ class PPUTests: XCTestCase {
         if line < 144 {
           if cycle <= 20 {
             XCTAssertEqual(controller.registers.lcdMode, .searchingOAM, "line: \(line) cycle: \(cycle)")
-          } else if cycle <= 64 {
+          } else if cycle <= 63 {
             XCTAssertEqual(controller.registers.lcdMode, .pixelTransfer, "line: \(line) cycle: \(cycle)")
           } else {
             XCTAssertEqual(controller.registers.lcdMode, .hblank, "line: \(line) cycle: \(cycle)")
@@ -63,13 +72,8 @@ class PPUTests: XCTestCase {
           }
         }
         if line == 153 {
-          if cycle == 1 {
-            // Still on the same line.
-            XCTAssertEqual(controller.registers.ly, line, "line: \(line) cycle: \(cycle)")
-          } else {
-            // Remainder of line is simulated as line zero.
-            XCTAssertEqual(controller.registers.ly, 0, "line: \(line) cycle: \(cycle)")
-          }
+          // Remainder of line is simulated as line zero.
+          XCTAssertEqual(controller.registers.ly, 0, "line: \(line) cycle: \(cycle)")
         }
       }
     }
@@ -274,7 +278,7 @@ class PPUFetcherTests: XCTestCase {
         pixels: []
       )
       state.assertEqual(fetcher, assertContext)
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
 
       // MARK: Push 8 pixels of tile 0
 
@@ -282,40 +286,40 @@ class PPUFetcherTests: XCTestCase {
       fetcher.tick()
       state.tickAlternator = true
       state.assertEqual(fetcher, assertContext)
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
       fetcher.tick()
       state.tickAlternator = false
       state.tileIndex = 0xab
       state.state = .readData0
       state.assertEqual(fetcher, assertContext)
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
 
       // Read data 0
       fetcher.tick()
       state.tickAlternator = true
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
       fetcher.tick()
       state.tickAlternator = false
       state.data0 = 0b1010_1010
       state.state = .readData1
       state.assertEqual(fetcher, assertContext)
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
 
       // Read data 1
       fetcher.tick()
       state.tickAlternator = true
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
       fetcher.tick()
       state.tickAlternator = false
       state.data1 = 0b0101_0101
       state.state = .pushToFifo
       state.assertEqual(fetcher, assertContext)
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
 
       // Push to fifo
       fetcher.tick()
       state.tickAlternator = true
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
       fetcher.tick()
       state.tickAlternator = false
       state.tileIndex = 0xcd
@@ -324,38 +328,38 @@ class PPUFetcherTests: XCTestCase {
       state.pixels = [
         0b01, 0b10, 0b01, 0b10,
         0b01, 0b10, 0b01, 0b10,
-      ].map { .init(colorIndex: $0, palette: registers.backgroundPalette, spritePriority: 0, bgPriority: 0)}
+      ].map { .init(colorIndex: $0, palette: registers.backgroundPalette, bgPriority: 0)}
       state.assertEqual(fetcher, assertContext)
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
 
       // MARK: Push 8 pixels of tile 1
 
       // Read data 0
       fetcher.tick()
       state.tickAlternator = true
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
       fetcher.tick()
       state.tickAlternator = false
       state.data0 = 0b0101_0101
       state.state = .readData1
       state.assertEqual(fetcher, assertContext)
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
 
       // Read data 1
       fetcher.tick()
       state.tickAlternator = true
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
       fetcher.tick()
       state.tickAlternator = false
       state.data1 = 0b1010_1010
       state.state = .pushToFifo
       state.assertEqual(fetcher, assertContext)
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
 
       // Push to fifo
       fetcher.tick()
       state.tickAlternator = true
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
       fetcher.tick()
       state.tickAlternator = false
       state.tileIndex = 0xef
@@ -364,68 +368,70 @@ class PPUFetcherTests: XCTestCase {
       state.pixels.append(contentsOf: [
         0b10, 0b01, 0b10, 0b01,
         0b10, 0b01, 0b10, 0b01,
-      ].map { .init(colorIndex: $0, palette: registers.backgroundPalette, spritePriority: 0, bgPriority: 0)})
+      ].map { .init(colorIndex: $0, palette: registers.backgroundPalette, bgPriority: 0)})
       state.assertEqual(fetcher, assertContext)
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
 
       // MARK: Stall on 8 pixels of tile 2 due to fifo not being dequeued
 
       // Read data 0
       fetcher.tick()
       state.tickAlternator = true
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
       fetcher.tick()
       state.tickAlternator = false
       state.data0 = 0b0111_1000
       state.state = .readData1
       state.assertEqual(fetcher, assertContext)
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
 
       // Read data 1
       fetcher.tick()
       state.tickAlternator = true
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
       fetcher.tick()
       state.tickAlternator = false
       state.data1 = 0b0001_1110
       state.state = .pushToFifo
       state.assertEqual(fetcher, assertContext)
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
 
       // Push to fifo
       fetcher.tick()
       state.tickAlternator = true
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
       fetcher.tick()
       state.tickAlternator = false
       state.assertEqual(fetcher, assertContext)
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
 
       // MARK: Continue stalling even with 7 pixels dequeued
 
       // Clear the first 7 pixels.
-      fifo.pixels.removeFirst(7)
+      for _ in 0..<7 {
+        fifo.removeFirst()
+      }
       state.pixels.removeFirst(7)
 
       // Still stalled
       fetcher.tick()
       state.tickAlternator = true
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
       fetcher.tick()
       state.tickAlternator = false
       state.assertEqual(fetcher, assertContext)
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
 
       // MARK: Push 8 pixels of tile 2 now that fifo is free
 
       // Clear one more pixel.
-      fifo.pixels.removeFirst()
+      fifo.removeFirst()
       state.pixels.removeFirst()
 
       // Fetcher no longer stalled
       fetcher.tick()
       state.tickAlternator = true
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
       fetcher.tick()
       state.tickAlternator = false
       state.state = .readData0
@@ -434,9 +440,9 @@ class PPUFetcherTests: XCTestCase {
       state.pixels.append(contentsOf: [
         0b00, 0b01, 0b01, 0b11,
         0b11, 0b10, 0b10, 0b00,
-      ].map { .init(colorIndex: $0, palette: registers.backgroundPalette, spritePriority: 0, bgPriority: 0)})
+      ].map { .init(colorIndex: $0, palette: registers.backgroundPalette, bgPriority: 0)})
       state.assertEqual(fetcher, assertContext)
-      XCTAssertEqual(fifo.pixels, state.pixels, assertContext)
+      XCTAssertEqual(fifo.allPixels(), state.pixels, assertContext)
     }
   }
 }
