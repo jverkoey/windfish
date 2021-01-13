@@ -1,9 +1,4 @@
-//
-//  HorizontalLine.swift
-//
-//  Created by Jeff Verkoeyen on 12/1/20.
-//
-
+import AppKit
 import Foundation
 import Cocoa
 

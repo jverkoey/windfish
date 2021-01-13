@@ -1,9 +1,4 @@
-//
-//  TabViewController.swiftui
-//
-//  Created by Jeff Verkoeyen on 12/7/20.
-//
-
+import AppKit
 import Foundation
 import Cocoa
 

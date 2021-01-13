@@ -1,5 +1,5 @@
+import AppKit
 import Foundation
-
 import Cocoa
 
 final class RegisterView<T: BinaryInteger>: NSView {

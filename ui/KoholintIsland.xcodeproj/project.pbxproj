@@ -48,54 +48,30 @@
 		667B1BAE2578565A00CE670F /* OutlineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1BAD2578565A00CE670F /* OutlineViewController.swift */; };
 		667B1C0225789BAE00CE670F /* InspectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1C0125789BAE00CE670F /* InspectorViewController.swift */; };
 		66820CA7258DB6E8009507BB /* EmulatorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66820CA6258DB6E8009507BB /* EmulatorViewController.swift */; };
-		6699B67725AEA038005DB9BB /* GBMemoryByteArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B63025AEA035005DB9BB /* GBMemoryByteArray.m */; };
-		6699B67825AEA038005DB9BB /* GBCheatTextFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B63225AEA035005DB9BB /* GBCheatTextFieldCell.m */; };
 		6699B67925AEA038005DB9BB /* CPU.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B63425AEA036005DB9BB /* CPU.png */; };
-		6699B67A25AEA038005DB9BB /* GBSplitView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B63525AEA036005DB9BB /* GBSplitView.m */; };
-		6699B67B25AEA038005DB9BB /* GBAudioClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B63725AEA036005DB9BB /* GBAudioClient.m */; };
 		6699B67C25AEA038005DB9BB /* PkgInfo in Resources */ = {isa = PBXBuildFile; fileRef = 6699B63925AEA036005DB9BB /* PkgInfo */; };
 		6699B67D25AEA038005DB9BB /* Speaker.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B63C25AEA036005DB9BB /* Speaker.png */; };
 		6699B67E25AEA038005DB9BB /* Display.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B63D25AEA036005DB9BB /* Display.png */; };
-		6699B67F25AEA038005DB9BB /* GBImageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B63F25AEA036005DB9BB /* GBImageCell.m */; };
-		6699B68025AEA038005DB9BB /* GBOptionalVisualEffectView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B64125AEA036005DB9BB /* GBOptionalVisualEffectView.m */; };
 		6699B68125AEA038005DB9BB /* Joypad@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B64425AEA036005DB9BB /* Joypad@2x.png */; };
-		6699B68225AEA038005DB9BB /* NSImageNamedDarkSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B64525AEA036005DB9BB /* NSImageNamedDarkSupport.m */; };
-		6699B68325AEA038005DB9BB /* GBBorderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B64625AEA036005DB9BB /* GBBorderView.m */; };
-		6699B68425AEA038005DB9BB /* GBTerminalTextFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B64725AEA036005DB9BB /* GBTerminalTextFieldCell.m */; };
-		6699B68525AEA038005DB9BB /* GBCheatWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B64825AEA036005DB9BB /* GBCheatWindowController.m */; };
-		6699B68625AEA038005DB9BB /* GBCompleteByteSlice.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B64925AEA036005DB9BB /* GBCompleteByteSlice.m */; };
 		6699B68725AEA038005DB9BB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B64A25AEA036005DB9BB /* main.m */; };
 		6699B68925AEA038005DB9BB /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6699B64C25AEA036005DB9BB /* Preferences.xib */; };
-		6699B68A25AEA038005DB9BB /* GBButtons.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B64D25AEA036005DB9BB /* GBButtons.m */; };
 		6699B68B25AEA038005DB9BB /* License.html in Resources */ = {isa = PBXBuildFile; fileRef = 6699B64E25AEA036005DB9BB /* License.html */; };
 		6699B68C25AEA038005DB9BB /* Cartridge.icns in Resources */ = {isa = PBXBuildFile; fileRef = 6699B64F25AEA036005DB9BB /* Cartridge.icns */; };
 		6699B68D25AEA038005DB9BB /* Speaker~dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B65125AEA036005DB9BB /* Speaker~dark.png */; };
 		6699B68E25AEA038005DB9BB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B65325AEA036005DB9BB /* AppDelegate.m */; };
-		6699B68F25AEA038005DB9BB /* GBOpenGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B65525AEA036005DB9BB /* GBOpenGLView.m */; };
-		6699B69025AEA038005DB9BB /* GBView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B65625AEA037005DB9BB /* GBView.m */; };
 		6699B69125AEA038005DB9BB /* PopoverView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6699B65825AEA037005DB9BB /* PopoverView.xib */; };
 		6699B69225AEA038005DB9BB /* Document.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6699B65A25AEA037005DB9BB /* Document.xib */; };
-		6699B69325AEA038005DB9BB /* GBImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B65B25AEA037005DB9BB /* GBImageView.m */; };
 		6699B69425AEA038005DB9BB /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 6699B65D25AEA037005DB9BB /* AppIcon.icns */; };
-		6699B69525AEA038005DB9BB /* GBGLShader.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B66025AEA037005DB9BB /* GBGLShader.m */; };
-		6699B69625AEA038005DB9BB /* GBViewGL.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B66125AEA037005DB9BB /* GBViewGL.m */; };
 		6699B69725AEA038005DB9BB /* Joypad~dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B66325AEA037005DB9BB /* Joypad~dark.png */; };
-		6699B69825AEA038005DB9BB /* GBPreferencesWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B66625AEA037005DB9BB /* GBPreferencesWindow.m */; };
-		6699B69925AEA038005DB9BB /* Document.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B66725AEA037005DB9BB /* Document.m */; };
 		6699B69A25AEA038005DB9BB /* ColorCartridge.icns in Resources */ = {isa = PBXBuildFile; fileRef = 6699B66825AEA037005DB9BB /* ColorCartridge.icns */; };
-		6699B69B25AEA038005DB9BB /* GBWarningPopover.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B66A25AEA037005DB9BB /* GBWarningPopover.m */; };
 		6699B69C25AEA038005DB9BB /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6699B66B25AEA037005DB9BB /* Info.plist */; };
 		6699B69D25AEA038005DB9BB /* CPU@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B66C25AEA037005DB9BB /* CPU@2x.png */; };
 		6699B69E25AEA038005DB9BB /* Joypad~dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B66D25AEA037005DB9BB /* Joypad~dark@2x.png */; };
 		6699B69F25AEA038005DB9BB /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6699B66E25AEA037005DB9BB /* MainMenu.xib */; };
-		6699B6A025AEA038005DB9BB /* NSString+StringForKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B66F25AEA037005DB9BB /* NSString+StringForKey.m */; };
 		6699B6A125AEA038005DB9BB /* Speaker~dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B67125AEA037005DB9BB /* Speaker~dark@2x.png */; };
-		6699B6A225AEA038005DB9BB /* NSObject+MavericksCompat.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B67225AEA037005DB9BB /* NSObject+MavericksCompat.m */; };
 		6699B6A325AEA038005DB9BB /* Joypad.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B67325AEA037005DB9BB /* Joypad.png */; };
 		6699B6A425AEA038005DB9BB /* Display@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B67425AEA038005DB9BB /* Display@2x.png */; };
-		6699B6A525AEA038005DB9BB /* GBColorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B67525AEA038005DB9BB /* GBColorCell.m */; };
 		6699B6A625AEA038005DB9BB /* Speaker@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B67625AEA038005DB9BB /* Speaker@2x.png */; };
-		6699B6B825AEA0A4005DB9BB /* Sameboy in Frameworks */ = {isa = PBXBuildFile; productRef = 6699B6B725AEA0A4005DB9BB /* Sameboy */; };
 		6699B78825AEA2D7005DB9BB /* HFRepresenter_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B74825AEA2D2005DB9BB /* HFRepresenter_Internal.h */; };
 		6699B78925AEA2D7005DB9BB /* HFTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B74925AEA2D2005DB9BB /* HFTypes.h */; };
 		6699B78A25AEA2D7005DB9BB /* HFController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B74A25AEA2D3005DB9BB /* HFController.m */; };
@@ -161,7 +137,6 @@
 		6699B7C625AEA2D7005DB9BB /* HFByteArray_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B78625AEA2D7005DB9BB /* HFByteArray_Internal.h */; };
 		6699B7C725AEA2D7005DB9BB /* HFGlyphTrie.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B78725AEA2D7005DB9BB /* HFGlyphTrie.m */; };
 		6699B7DA25AEA30E005DB9BB /* libHexFiend.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6699B73925AEA2B7005DB9BB /* libHexFiend.a */; };
-		6699B89725AEAA85005DB9BB /* GBViewMetal.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B64B25AEA036005DB9BB /* GBViewMetal.m */; };
 		6699B8A225AEAAC3005DB9BB /* AAOmniScaleLegacy.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84D25AEA96A005DB9BB /* AAOmniScaleLegacy.fsh */; };
 		6699B8A325AEAAC3005DB9BB /* AAScale2x.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B85125AEA96A005DB9BB /* AAScale2x.fsh */; };
 		6699B8A425AEAAC3005DB9BB /* AAScale4x.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84B25AEA96A005DB9BB /* AAScale4x.fsh */; };
@@ -185,6 +160,9 @@
 		6699B98325AEB5F4005DB9BB /* dmg_boot.asm in Sources */ = {isa = PBXBuildFile; fileRef = 6699B8C425AEAC55005DB9BB /* dmg_boot.asm */; };
 		6699B98425AEB5F4005DB9BB /* cgb_boot_fast.asm in Sources */ = {isa = PBXBuildFile; fileRef = 6699B8C225AEAC55005DB9BB /* cgb_boot_fast.asm */; };
 		6699B98525AEB5F4005DB9BB /* sgb2_boot.asm in Sources */ = {isa = PBXBuildFile; fileRef = 6699B8BF25AEAC55005DB9BB /* sgb2_boot.asm */; };
+		6699B9EE25AEB92A005DB9BB /* Sameboy in Frameworks */ = {isa = PBXBuildFile; productRef = 6699B9ED25AEB92A005DB9BB /* Sameboy */; };
+		6699BA0725AEBB25005DB9BB /* Sameboy in Frameworks */ = {isa = PBXBuildFile; productRef = 6699BA0625AEBB25005DB9BB /* Sameboy */; };
+		6699BA0F25AEBCE6005DB9BB /* libHexFiend.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6699B73925AEA2B7005DB9BB /* libHexFiend.a */; };
 		66ABD4A425870117007F2788 /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ABD4A325870117007F2788 /* StatisticsView.swift */; };
 		66ABD4AA25871479007F2788 /* OpcodeDocumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ABD4A925871479007F2788 /* OpcodeDocumentation.swift */; };
 		66C617C6257F04D600E372BA /* RegionInspectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */; };
@@ -231,6 +209,13 @@
 			remoteInfo = gbdis;
 		};
 		6699B7D825AEA30A005DB9BB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 665D4F4D2575F75400C3A03B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6699B73825AEA2B7005DB9BB;
+			remoteInfo = HexFiend;
+		};
+		6699BA0D25AEBCE1005DB9BB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 665D4F4D2575F75400C3A03B /* Project object */;
 			proxyType = 1;
@@ -482,6 +467,8 @@
 		6699B8C325AEAC55005DB9BB /* agb_boot.asm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm.asm; path = agb_boot.asm; sourceTree = "<group>"; };
 		6699B8C425AEAC55005DB9BB /* dmg_boot.asm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm.asm; path = dmg_boot.asm; sourceTree = "<group>"; };
 		6699B92D25AEB22F005DB9BB /* SameBoyLogo.pb12 */ = {isa = PBXFileReference; lastKnownFileType = file; path = SameBoyLogo.pb12; sourceTree = "<group>"; };
+		6699B9C125AEB8B5005DB9BB /* SameboyUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SameboyUI.h; sourceTree = "<group>"; };
+		6699B9C325AEB8B5005DB9BB /* SameboyUI.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SameboyUI.m; sourceTree = "<group>"; };
 		66ABD4A325870117007F2788 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
 		66ABD4A925871479007F2788 /* OpcodeDocumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpcodeDocumentation.swift; sourceTree = "<group>"; };
 		66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegionInspectorViewController.swift; sourceTree = "<group>"; };
@@ -502,7 +489,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6699BA0F25AEBCE6005DB9BB /* libHexFiend.a in Frameworks */,
 				6604B514259069A700D068E8 /* Windfish in Frameworks */,
+				6699BA0725AEBB25005DB9BB /* Sameboy in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -524,8 +513,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6699B9EE25AEB92A005DB9BB /* Sameboy in Frameworks */,
 				6699B7DA25AEA30E005DB9BB /* libHexFiend.a in Frameworks */,
-				6699B6B825AEA0A4005DB9BB /* Sameboy in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -632,6 +621,7 @@
 				665D4F772575F75700C3A03B /* KoholintIslandUITests */,
 				6699B58E25AE9F85005DB9BB /* Sameboy */,
 				6699B73A25AEA2B7005DB9BB /* HexFiend */,
+				6699B9C025AEB8B5005DB9BB /* SameboyUI */,
 				665D4F562575F75400C3A03B /* Products */,
 				665D4FA12576C99000C3A03B /* Frameworks */,
 			);
@@ -993,6 +983,15 @@
 			path = ../../third_party/Sameboy/BootROMs;
 			sourceTree = "<group>";
 		};
+		6699B9C025AEB8B5005DB9BB /* SameboyUI */ = {
+			isa = PBXGroup;
+			children = (
+				6699B9C125AEB8B5005DB9BB /* SameboyUI.h */,
+				6699B9C325AEB8B5005DB9BB /* SameboyUI.m */,
+			);
+			path = SameboyUI;
+			sourceTree = "<group>";
+		};
 		66ABD4A825871458007F2788 /* LR35902 */ = {
 			isa = PBXGroup;
 			children = (
@@ -1069,11 +1068,14 @@
 			buildRules = (
 			);
 			dependencies = (
+				6699BA0E25AEBCE1005DB9BB /* PBXTargetDependency */,
+				6699BA0525AEBB1F005DB9BB /* PBXTargetDependency */,
 				665D4FA02576C98C00C3A03B /* PBXTargetDependency */,
 			);
 			name = KoholintIsland;
 			packageProductDependencies = (
 				6604B513259069A700D068E8 /* Windfish */,
+				6699BA0625AEBB25005DB9BB /* Sameboy */,
 			);
 			productName = gbdis;
 			productReference = 665D4F552575F75400C3A03B /* KoholintIsland.app */;
@@ -1128,12 +1130,12 @@
 				6699B8D825AEACFA005DB9BB /* PBXBuildRule */,
 			);
 			dependencies = (
+				6699B9EC25AEB925005DB9BB /* PBXTargetDependency */,
 				6699B7D925AEA30A005DB9BB /* PBXTargetDependency */,
-				6699B6B625AEA0A1005DB9BB /* PBXTargetDependency */,
 			);
 			name = Sameboy;
 			packageProductDependencies = (
-				6699B6B725AEA0A4005DB9BB /* Sameboy */,
+				6699B9ED25AEB92A005DB9BB /* Sameboy */,
 			);
 			productName = Sameboy;
 			productReference = 6699B58D25AE9F85005DB9BB /* Sameboy.app */;
@@ -1339,38 +1341,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6699B6A025AEA038005DB9BB /* NSString+StringForKey.m in Sources */,
-				6699B89725AEAA85005DB9BB /* GBViewMetal.m in Sources */,
-				6699B67B25AEA038005DB9BB /* GBAudioClient.m in Sources */,
-				6699B68325AEA038005DB9BB /* GBBorderView.m in Sources */,
-				6699B6A225AEA038005DB9BB /* NSObject+MavericksCompat.m in Sources */,
-				6699B68F25AEA038005DB9BB /* GBOpenGLView.m in Sources */,
-				6699B69325AEA038005DB9BB /* GBImageView.m in Sources */,
-				6699B67825AEA038005DB9BB /* GBCheatTextFieldCell.m in Sources */,
 				6699B98425AEB5F4005DB9BB /* cgb_boot_fast.asm in Sources */,
-				6699B68025AEA038005DB9BB /* GBOptionalVisualEffectView.m in Sources */,
-				6699B68425AEA038005DB9BB /* GBTerminalTextFieldCell.m in Sources */,
-				6699B68525AEA038005DB9BB /* GBCheatWindowController.m in Sources */,
-				6699B6A525AEA038005DB9BB /* GBColorCell.m in Sources */,
-				6699B68225AEA038005DB9BB /* NSImageNamedDarkSupport.m in Sources */,
-				6699B67F25AEA038005DB9BB /* GBImageCell.m in Sources */,
 				6699B98325AEB5F4005DB9BB /* dmg_boot.asm in Sources */,
-				6699B69925AEA038005DB9BB /* Document.m in Sources */,
 				6699B98025AEB5F4005DB9BB /* cgb_boot.asm in Sources */,
-				6699B69625AEA038005DB9BB /* GBViewGL.m in Sources */,
-				6699B67725AEA038005DB9BB /* GBMemoryByteArray.m in Sources */,
-				6699B69025AEA038005DB9BB /* GBView.m in Sources */,
-				6699B69525AEA038005DB9BB /* GBGLShader.m in Sources */,
-				6699B68625AEA038005DB9BB /* GBCompleteByteSlice.m in Sources */,
 				6699B68725AEA038005DB9BB /* main.m in Sources */,
 				6699B98125AEB5F4005DB9BB /* sgb_boot.asm in Sources */,
 				6699B68E25AEA038005DB9BB /* AppDelegate.m in Sources */,
-				6699B69B25AEA038005DB9BB /* GBWarningPopover.m in Sources */,
-				6699B68A25AEA038005DB9BB /* GBButtons.m in Sources */,
-				6699B69825AEA038005DB9BB /* GBPreferencesWindow.m in Sources */,
 				6699B98525AEB5F4005DB9BB /* sgb2_boot.asm in Sources */,
 				6699B98225AEB5F4005DB9BB /* agb_boot.asm in Sources */,
-				6699B67A25AEA038005DB9BB /* GBSplitView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1426,14 +1404,23 @@
 			isa = PBXTargetDependency;
 			productRef = 665D4F9F2576C98C00C3A03B /* LR35902 */;
 		};
-		6699B6B625AEA0A1005DB9BB /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = 6699B6B525AEA0A1005DB9BB /* Sameboy */;
-		};
 		6699B7D925AEA30A005DB9BB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 6699B73825AEA2B7005DB9BB /* HexFiend */;
 			targetProxy = 6699B7D825AEA30A005DB9BB /* PBXContainerItemProxy */;
+		};
+		6699B9EC25AEB925005DB9BB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 6699B9EB25AEB925005DB9BB /* Sameboy */;
+		};
+		6699BA0525AEBB1F005DB9BB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 6699BA0425AEBB1F005DB9BB /* Sameboy */;
+		};
+		6699BA0E25AEBCE1005DB9BB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6699B73825AEA2B7005DB9BB /* HexFiend */;
+			targetProxy = 6699BA0D25AEBCE1005DB9BB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1514,6 +1501,10 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"-framework",
+					PreferencePanes,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.featherless.KoholintIsland;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1710,6 +1701,10 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				OTHER_LDFLAGS = (
+					"-framework",
+					PreferencePanes,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.featherless.KoholintIsland;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1732,6 +1727,10 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"-framework",
+					PreferencePanes,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.featherless.KoholintIsland;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2027,11 +2026,19 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = LR35902;
 		};
-		6699B6B525AEA0A1005DB9BB /* Sameboy */ = {
+		6699B9EB25AEB925005DB9BB /* Sameboy */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Sameboy;
 		};
-		6699B6B725AEA0A4005DB9BB /* Sameboy */ = {
+		6699B9ED25AEB92A005DB9BB /* Sameboy */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Sameboy;
+		};
+		6699BA0425AEBB1F005DB9BB /* Sameboy */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Sameboy;
+		};
+		6699BA0625AEBB25005DB9BB /* Sameboy */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Sameboy;
 		};

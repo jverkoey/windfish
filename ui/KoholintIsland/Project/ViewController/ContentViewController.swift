@@ -1,13 +1,9 @@
-//
-//  ContentViewController.swiftui
-//
-//  Created by Jeff Verkoeyen on 12/2/20.
-//
-
+import AppKit
 import Foundation
 import Darwin
 import Cocoa
 import Combine
+
 import Windfish
 
 func CreateScrollView(bounds: NSRect) -> NSScrollView {

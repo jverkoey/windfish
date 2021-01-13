@@ -1,9 +1,4 @@
-//
-//  RegionInspectorViewController.swiftui
-//
-//  Created by Jeff Verkoeyen on 12/3/20.
-//
-
+import AppKit
 import Foundation
 import Cocoa
 import Windfish

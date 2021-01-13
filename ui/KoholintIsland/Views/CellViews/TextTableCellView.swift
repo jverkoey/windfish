@@ -1,9 +1,4 @@
-//
-//  TextTableCellView.swiftui
-//
-//  Created by Jeff Verkoeyen on 12/2/20.
-//
-
+import AppKit
 import Foundation
 import Cocoa
 

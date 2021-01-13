@@ -1,9 +1,5 @@
-//
-//  Document.swift
-//
-//  Created by Jeff Verkoeyen on 11/30/20.
-//
-
+import AppKit
+import Foundation
 import Cocoa
 
 import Windfish

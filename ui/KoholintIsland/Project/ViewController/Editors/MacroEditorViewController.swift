@@ -1,5 +1,7 @@
+import AppKit
 import Foundation
 import Cocoa
+
 import Windfish
 
 final class TextViewStringTransformer: ValueTransformer {
