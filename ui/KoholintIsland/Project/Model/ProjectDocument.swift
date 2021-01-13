@@ -8,6 +8,7 @@ import Windfish
 class ProjectDocument: NSDocument {
   weak var contentViewController: ProjectViewController?
 
+  var sameboy: Document?
   var isDisassembling = false
   var romData: Data? {
     didSet {
@@ -171,6 +172,14 @@ extension ProjectDocument {
     if let window = contentViewController?.view.window {
       openPanel.beginSheetModal(for: window) { response in
         if response == .OK, let url = openPanel.url {
+          self.sameboy = try! Document(contentsOf: url, ofType: "rom")
+
+          self.sameboy!.makeWindowControllers()
+          for windowController in self.sameboy!.windowControllers {
+            self.addWindowController(windowController)
+            windowController.window?.makeKeyAndOrderFront(self)
+          }
+
           let data = try! Data(contentsOf: url)
           self.romData = data
 

@@ -163,6 +163,29 @@
 		6699B9EE25AEB92A005DB9BB /* Sameboy in Frameworks */ = {isa = PBXBuildFile; productRef = 6699B9ED25AEB92A005DB9BB /* Sameboy */; };
 		6699BA0725AEBB25005DB9BB /* Sameboy in Frameworks */ = {isa = PBXBuildFile; productRef = 6699BA0625AEBB25005DB9BB /* Sameboy */; };
 		6699BA0F25AEBCE6005DB9BB /* libHexFiend.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6699B73925AEA2B7005DB9BB /* libHexFiend.a */; };
+		6699BA3925AEBF9B005DB9BB /* Document.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6699B65A25AEA037005DB9BB /* Document.xib */; };
+		6699BA4425AEC406005DB9BB /* sgb2_boot.asm in Sources */ = {isa = PBXBuildFile; fileRef = 6699B8BF25AEAC55005DB9BB /* sgb2_boot.asm */; };
+		6699BA4525AEC406005DB9BB /* agb_boot.asm in Sources */ = {isa = PBXBuildFile; fileRef = 6699B8C325AEAC55005DB9BB /* agb_boot.asm */; };
+		6699BA4625AEC406005DB9BB /* sgb_boot.asm in Sources */ = {isa = PBXBuildFile; fileRef = 6699B8BE25AEAC55005DB9BB /* sgb_boot.asm */; };
+		6699BA4725AEC406005DB9BB /* dmg_boot.asm in Sources */ = {isa = PBXBuildFile; fileRef = 6699B8C425AEAC55005DB9BB /* dmg_boot.asm */; };
+		6699BA4825AEC406005DB9BB /* cgb_boot_fast.asm in Sources */ = {isa = PBXBuildFile; fileRef = 6699B8C225AEAC55005DB9BB /* cgb_boot_fast.asm */; };
+		6699BA4925AEC406005DB9BB /* cgb_boot.asm in Sources */ = {isa = PBXBuildFile; fileRef = 6699B8C025AEAC55005DB9BB /* cgb_boot.asm */; };
+		6699BA7025AEC45E005DB9BB /* AAOmniScaleLegacy.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84D25AEA96A005DB9BB /* AAOmniScaleLegacy.fsh */; };
+		6699BA7125AEC45E005DB9BB /* AAScale2x.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B85125AEA96A005DB9BB /* AAScale2x.fsh */; };
+		6699BA7225AEC45E005DB9BB /* AAScale4x.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84B25AEA96A005DB9BB /* AAScale4x.fsh */; };
+		6699BA7325AEC45E005DB9BB /* Bilinear.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84525AEA969005DB9BB /* Bilinear.fsh */; };
+		6699BA7425AEC45E005DB9BB /* CRT.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B85325AEA96A005DB9BB /* CRT.fsh */; };
+		6699BA7525AEC45E005DB9BB /* HQ2x.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84A25AEA96A005DB9BB /* HQ2x.fsh */; };
+		6699BA7625AEC45E005DB9BB /* LCD.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84C25AEA96A005DB9BB /* LCD.fsh */; };
+		6699BA7725AEC45E005DB9BB /* MasterShader.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B85225AEA96A005DB9BB /* MasterShader.fsh */; };
+		6699BA7825AEC45E005DB9BB /* MasterShader.metal in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B85025AEA96A005DB9BB /* MasterShader.metal */; };
+		6699BA7925AEC45E005DB9BB /* MonoLCD.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84925AEA969005DB9BB /* MonoLCD.fsh */; };
+		6699BA7A25AEC45E005DB9BB /* NearestNeighbor.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84725AEA969005DB9BB /* NearestNeighbor.fsh */; };
+		6699BA7B25AEC45E005DB9BB /* OmniScale.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84F25AEA96A005DB9BB /* OmniScale.fsh */; };
+		6699BA7C25AEC45E005DB9BB /* OmniScaleLegacy.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84625AEA969005DB9BB /* OmniScaleLegacy.fsh */; };
+		6699BA7D25AEC45E005DB9BB /* Scale2x.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84825AEA969005DB9BB /* Scale2x.fsh */; };
+		6699BA7E25AEC45E005DB9BB /* Scale4x.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B85425AEA96A005DB9BB /* Scale4x.fsh */; };
+		6699BA7F25AEC45E005DB9BB /* SmoothBilinear.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84E25AEA96A005DB9BB /* SmoothBilinear.fsh */; };
 		66ABD4A425870117007F2788 /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ABD4A325870117007F2788 /* StatisticsView.swift */; };
 		66ABD4AA25871479007F2788 /* OpcodeDocumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ABD4A925871479007F2788 /* OpcodeDocumentation.swift */; };
 		66C617C6257F04D600E372BA /* RegionInspectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */; };
@@ -179,6 +202,19 @@
 
 /* Begin PBXBuildRule section */
 		6699B8D825AEACFA005DB9BB /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			filePatterns = "*.asm";
+			fileType = pattern.proxy;
+			inputFiles = (
+			);
+			isEditable = 1;
+			outputFiles = (
+				"$(DERIVED_FILE_DIR)/${INPUT_FILE_BASE}.bin",
+			);
+			script = "rgbasm -i ${SRCROOT}/../third_party/Sameboy/BootROMs/ -i ${SRCROOT}/Sameboy -o ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.o ${INPUT_FILE_PATH}\nrgblink -o ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.bin ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.o\ncp ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.bin ${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\n\n\n\n\n\n\n\n\n";
+		};
+		6699BA4F25AEC414005DB9BB /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
 			compilerSpec = com.apple.compilers.proxy.script;
 			filePatterns = "*.asm";
@@ -250,6 +286,31 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6699BA6525AEC444005DB9BB /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Shaders;
+			dstSubfolderSpec = 7;
+			files = (
+				6699BA7025AEC45E005DB9BB /* AAOmniScaleLegacy.fsh in CopyFiles */,
+				6699BA7125AEC45E005DB9BB /* AAScale2x.fsh in CopyFiles */,
+				6699BA7225AEC45E005DB9BB /* AAScale4x.fsh in CopyFiles */,
+				6699BA7325AEC45E005DB9BB /* Bilinear.fsh in CopyFiles */,
+				6699BA7425AEC45E005DB9BB /* CRT.fsh in CopyFiles */,
+				6699BA7525AEC45E005DB9BB /* HQ2x.fsh in CopyFiles */,
+				6699BA7625AEC45E005DB9BB /* LCD.fsh in CopyFiles */,
+				6699BA7725AEC45E005DB9BB /* MasterShader.fsh in CopyFiles */,
+				6699BA7825AEC45E005DB9BB /* MasterShader.metal in CopyFiles */,
+				6699BA7925AEC45E005DB9BB /* MonoLCD.fsh in CopyFiles */,
+				6699BA7A25AEC45E005DB9BB /* NearestNeighbor.fsh in CopyFiles */,
+				6699BA7B25AEC45E005DB9BB /* OmniScale.fsh in CopyFiles */,
+				6699BA7C25AEC45E005DB9BB /* OmniScaleLegacy.fsh in CopyFiles */,
+				6699BA7D25AEC45E005DB9BB /* Scale2x.fsh in CopyFiles */,
+				6699BA7E25AEC45E005DB9BB /* Scale4x.fsh in CopyFiles */,
+				6699BA7F25AEC45E005DB9BB /* SmoothBilinear.fsh in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -304,77 +365,29 @@
 		6699B58D25AE9F85005DB9BB /* Sameboy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sameboy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6699B59A25AE9F88005DB9BB /* Sameboy.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Sameboy.entitlements; sourceTree = "<group>"; };
 		6699B62E25AEA035005DB9BB /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		6699B62F25AEA035005DB9BB /* GBOptionalVisualEffectView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBOptionalVisualEffectView.h; sourceTree = "<group>"; };
-		6699B63025AEA035005DB9BB /* GBMemoryByteArray.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBMemoryByteArray.m; sourceTree = "<group>"; };
-		6699B63125AEA035005DB9BB /* GBPreferencesWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBPreferencesWindow.h; sourceTree = "<group>"; };
-		6699B63225AEA035005DB9BB /* GBCheatTextFieldCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBCheatTextFieldCell.m; sourceTree = "<group>"; };
-		6699B63325AEA035005DB9BB /* GBViewMetal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBViewMetal.h; sourceTree = "<group>"; };
 		6699B63425AEA036005DB9BB /* CPU.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CPU.png; sourceTree = "<group>"; };
-		6699B63525AEA036005DB9BB /* GBSplitView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBSplitView.m; sourceTree = "<group>"; };
-		6699B63625AEA036005DB9BB /* Document.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Document.h; sourceTree = "<group>"; };
-		6699B63725AEA036005DB9BB /* GBAudioClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBAudioClient.m; sourceTree = "<group>"; };
-		6699B63825AEA036005DB9BB /* GBImageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBImageCell.h; sourceTree = "<group>"; };
 		6699B63925AEA036005DB9BB /* PkgInfo */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = PkgInfo; sourceTree = "<group>"; };
-		6699B63A25AEA036005DB9BB /* GBOpenGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBOpenGLView.h; sourceTree = "<group>"; };
-		6699B63B25AEA036005DB9BB /* GBColorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBColorCell.h; sourceTree = "<group>"; };
 		6699B63C25AEA036005DB9BB /* Speaker.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Speaker.png; sourceTree = "<group>"; };
 		6699B63D25AEA036005DB9BB /* Display.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Display.png; sourceTree = "<group>"; };
-		6699B63E25AEA036005DB9BB /* GBButtons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBButtons.h; sourceTree = "<group>"; };
-		6699B63F25AEA036005DB9BB /* GBImageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBImageCell.m; sourceTree = "<group>"; };
-		6699B64025AEA036005DB9BB /* GBSplitView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBSplitView.h; sourceTree = "<group>"; };
-		6699B64125AEA036005DB9BB /* GBOptionalVisualEffectView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBOptionalVisualEffectView.m; sourceTree = "<group>"; };
-		6699B64225AEA036005DB9BB /* NSString+StringForKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+StringForKey.h"; sourceTree = "<group>"; };
-		6699B64325AEA036005DB9BB /* GBCheatTextFieldCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBCheatTextFieldCell.h; sourceTree = "<group>"; };
 		6699B64425AEA036005DB9BB /* Joypad@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Joypad@2x.png"; sourceTree = "<group>"; };
-		6699B64525AEA036005DB9BB /* NSImageNamedDarkSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSImageNamedDarkSupport.m; sourceTree = "<group>"; };
-		6699B64625AEA036005DB9BB /* GBBorderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBBorderView.m; sourceTree = "<group>"; };
-		6699B64725AEA036005DB9BB /* GBTerminalTextFieldCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBTerminalTextFieldCell.m; sourceTree = "<group>"; };
-		6699B64825AEA036005DB9BB /* GBCheatWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBCheatWindowController.m; sourceTree = "<group>"; };
-		6699B64925AEA036005DB9BB /* GBCompleteByteSlice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBCompleteByteSlice.m; sourceTree = "<group>"; };
 		6699B64A25AEA036005DB9BB /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		6699B64B25AEA036005DB9BB /* GBViewMetal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBViewMetal.m; sourceTree = "<group>"; };
 		6699B64C25AEA036005DB9BB /* Preferences.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
-		6699B64D25AEA036005DB9BB /* GBButtons.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBButtons.m; sourceTree = "<group>"; };
 		6699B64E25AEA036005DB9BB /* License.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = License.html; sourceTree = "<group>"; };
 		6699B64F25AEA036005DB9BB /* Cartridge.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Cartridge.icns; sourceTree = "<group>"; };
-		6699B65025AEA036005DB9BB /* GBAudioClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBAudioClient.h; sourceTree = "<group>"; };
 		6699B65125AEA036005DB9BB /* Speaker~dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Speaker~dark.png"; sourceTree = "<group>"; };
-		6699B65225AEA036005DB9BB /* GBCheatWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBCheatWindowController.h; sourceTree = "<group>"; };
 		6699B65325AEA036005DB9BB /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		6699B65425AEA036005DB9BB /* GBBorderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBBorderView.h; sourceTree = "<group>"; };
-		6699B65525AEA036005DB9BB /* GBOpenGLView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBOpenGLView.m; sourceTree = "<group>"; };
-		6699B65625AEA037005DB9BB /* GBView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBView.m; sourceTree = "<group>"; };
-		6699B65725AEA037005DB9BB /* GBCompleteByteSlice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBCompleteByteSlice.h; sourceTree = "<group>"; };
 		6699B65825AEA037005DB9BB /* PopoverView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PopoverView.xib; sourceTree = "<group>"; };
-		6699B65925AEA037005DB9BB /* GBTerminalTextFieldCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBTerminalTextFieldCell.h; sourceTree = "<group>"; };
 		6699B65A25AEA037005DB9BB /* Document.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Document.xib; sourceTree = "<group>"; };
-		6699B65B25AEA037005DB9BB /* GBImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBImageView.m; sourceTree = "<group>"; };
-		6699B65C25AEA037005DB9BB /* GBMemoryByteArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBMemoryByteArray.h; sourceTree = "<group>"; };
 		6699B65D25AEA037005DB9BB /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
-		6699B65E25AEA037005DB9BB /* GBView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBView.h; sourceTree = "<group>"; };
-		6699B65F25AEA037005DB9BB /* GBGLShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBGLShader.h; sourceTree = "<group>"; };
-		6699B66025AEA037005DB9BB /* GBGLShader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBGLShader.m; sourceTree = "<group>"; };
-		6699B66125AEA037005DB9BB /* GBViewGL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBViewGL.m; sourceTree = "<group>"; };
-		6699B66225AEA037005DB9BB /* GBViewGL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBViewGL.h; sourceTree = "<group>"; };
 		6699B66325AEA037005DB9BB /* Joypad~dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Joypad~dark.png"; sourceTree = "<group>"; };
-		6699B66425AEA037005DB9BB /* KeyboardShortcutPrivateAPIs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyboardShortcutPrivateAPIs.h; sourceTree = "<group>"; };
-		6699B66525AEA037005DB9BB /* GBImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBImageView.h; sourceTree = "<group>"; };
-		6699B66625AEA037005DB9BB /* GBPreferencesWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBPreferencesWindow.m; sourceTree = "<group>"; };
-		6699B66725AEA037005DB9BB /* Document.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Document.m; sourceTree = "<group>"; };
 		6699B66825AEA037005DB9BB /* ColorCartridge.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = ColorCartridge.icns; sourceTree = "<group>"; };
-		6699B66925AEA037005DB9BB /* GBWarningPopover.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBWarningPopover.h; sourceTree = "<group>"; };
-		6699B66A25AEA037005DB9BB /* GBWarningPopover.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBWarningPopover.m; sourceTree = "<group>"; };
 		6699B66B25AEA037005DB9BB /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6699B66C25AEA037005DB9BB /* CPU@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CPU@2x.png"; sourceTree = "<group>"; };
 		6699B66D25AEA037005DB9BB /* Joypad~dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Joypad~dark@2x.png"; sourceTree = "<group>"; };
 		6699B66E25AEA037005DB9BB /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
-		6699B66F25AEA037005DB9BB /* NSString+StringForKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+StringForKey.m"; sourceTree = "<group>"; };
-		6699B67025AEA037005DB9BB /* BigSurToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BigSurToolbar.h; sourceTree = "<group>"; };
 		6699B67125AEA037005DB9BB /* Speaker~dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Speaker~dark@2x.png"; sourceTree = "<group>"; };
-		6699B67225AEA037005DB9BB /* NSObject+MavericksCompat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+MavericksCompat.m"; sourceTree = "<group>"; };
 		6699B67325AEA037005DB9BB /* Joypad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Joypad.png; sourceTree = "<group>"; };
 		6699B67425AEA038005DB9BB /* Display@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Display@2x.png"; sourceTree = "<group>"; };
-		6699B67525AEA038005DB9BB /* GBColorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBColorCell.m; sourceTree = "<group>"; };
 		6699B67625AEA038005DB9BB /* Speaker@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Speaker@2x.png"; sourceTree = "<group>"; };
 		6699B73925AEA2B7005DB9BB /* libHexFiend.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libHexFiend.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6699B74825AEA2D2005DB9BB /* HFRepresenter_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFRepresenter_Internal.h; sourceTree = "<group>"; };
@@ -467,8 +480,7 @@
 		6699B8C325AEAC55005DB9BB /* agb_boot.asm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm.asm; path = agb_boot.asm; sourceTree = "<group>"; };
 		6699B8C425AEAC55005DB9BB /* dmg_boot.asm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm.asm; path = dmg_boot.asm; sourceTree = "<group>"; };
 		6699B92D25AEB22F005DB9BB /* SameBoyLogo.pb12 */ = {isa = PBXFileReference; lastKnownFileType = file; path = SameBoyLogo.pb12; sourceTree = "<group>"; };
-		6699B9C125AEB8B5005DB9BB /* SameboyUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SameboyUI.h; sourceTree = "<group>"; };
-		6699B9C325AEB8B5005DB9BB /* SameboyUI.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SameboyUI.m; sourceTree = "<group>"; };
+		6699BA2625AEBDDF005DB9BB /* KoholintIsland-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "KoholintIsland-Bridging-Header.h"; sourceTree = "<group>"; };
 		66ABD4A325870117007F2788 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
 		66ABD4A925871479007F2788 /* OpcodeDocumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpcodeDocumentation.swift; sourceTree = "<group>"; };
 		66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegionInspectorViewController.swift; sourceTree = "<group>"; };
@@ -621,7 +633,6 @@
 				665D4F772575F75700C3A03B /* KoholintIslandUITests */,
 				6699B58E25AE9F85005DB9BB /* Sameboy */,
 				6699B73A25AEA2B7005DB9BB /* HexFiend */,
-				6699B9C025AEB8B5005DB9BB /* SameboyUI */,
 				665D4F562575F75400C3A03B /* Products */,
 				665D4FA12576C99000C3A03B /* Frameworks */,
 			);
@@ -653,6 +664,7 @@
 				667B1B622578541F00CE670F /* NotificationNames.swift */,
 				665D4F8C2575F92500C3A03B /* main.swift */,
 				667B1B7A257854BF00CE670F /* Resources */,
+				6699BA2625AEBDDF005DB9BB /* KoholintIsland-Bridging-Header.h */,
 			);
 			path = KoholintIsland;
 			sourceTree = "<group>";
@@ -787,69 +799,21 @@
 				6699B62E25AEA035005DB9BB /* AppDelegate.h */,
 				6699B65325AEA036005DB9BB /* AppDelegate.m */,
 				6699B65D25AEA037005DB9BB /* AppIcon.icns */,
-				6699B67025AEA037005DB9BB /* BigSurToolbar.h */,
 				6699B64F25AEA036005DB9BB /* Cartridge.icns */,
 				6699B66825AEA037005DB9BB /* ColorCartridge.icns */,
 				6699B63425AEA036005DB9BB /* CPU.png */,
 				6699B66C25AEA037005DB9BB /* CPU@2x.png */,
 				6699B63D25AEA036005DB9BB /* Display.png */,
 				6699B67425AEA038005DB9BB /* Display@2x.png */,
-				6699B63625AEA036005DB9BB /* Document.h */,
-				6699B66725AEA037005DB9BB /* Document.m */,
 				6699B65A25AEA037005DB9BB /* Document.xib */,
-				6699B65025AEA036005DB9BB /* GBAudioClient.h */,
-				6699B63725AEA036005DB9BB /* GBAudioClient.m */,
-				6699B65425AEA036005DB9BB /* GBBorderView.h */,
-				6699B64625AEA036005DB9BB /* GBBorderView.m */,
-				6699B63E25AEA036005DB9BB /* GBButtons.h */,
-				6699B64D25AEA036005DB9BB /* GBButtons.m */,
-				6699B64325AEA036005DB9BB /* GBCheatTextFieldCell.h */,
-				6699B63225AEA035005DB9BB /* GBCheatTextFieldCell.m */,
-				6699B65225AEA036005DB9BB /* GBCheatWindowController.h */,
-				6699B64825AEA036005DB9BB /* GBCheatWindowController.m */,
-				6699B63B25AEA036005DB9BB /* GBColorCell.h */,
-				6699B67525AEA038005DB9BB /* GBColorCell.m */,
-				6699B65725AEA037005DB9BB /* GBCompleteByteSlice.h */,
-				6699B64925AEA036005DB9BB /* GBCompleteByteSlice.m */,
-				6699B65F25AEA037005DB9BB /* GBGLShader.h */,
-				6699B66025AEA037005DB9BB /* GBGLShader.m */,
-				6699B63825AEA036005DB9BB /* GBImageCell.h */,
-				6699B63F25AEA036005DB9BB /* GBImageCell.m */,
-				6699B66525AEA037005DB9BB /* GBImageView.h */,
-				6699B65B25AEA037005DB9BB /* GBImageView.m */,
-				6699B65C25AEA037005DB9BB /* GBMemoryByteArray.h */,
-				6699B63025AEA035005DB9BB /* GBMemoryByteArray.m */,
-				6699B63A25AEA036005DB9BB /* GBOpenGLView.h */,
-				6699B65525AEA036005DB9BB /* GBOpenGLView.m */,
-				6699B62F25AEA035005DB9BB /* GBOptionalVisualEffectView.h */,
-				6699B64125AEA036005DB9BB /* GBOptionalVisualEffectView.m */,
-				6699B63125AEA035005DB9BB /* GBPreferencesWindow.h */,
-				6699B66625AEA037005DB9BB /* GBPreferencesWindow.m */,
-				6699B64025AEA036005DB9BB /* GBSplitView.h */,
-				6699B63525AEA036005DB9BB /* GBSplitView.m */,
-				6699B65925AEA037005DB9BB /* GBTerminalTextFieldCell.h */,
-				6699B64725AEA036005DB9BB /* GBTerminalTextFieldCell.m */,
-				6699B65E25AEA037005DB9BB /* GBView.h */,
-				6699B65625AEA037005DB9BB /* GBView.m */,
-				6699B66225AEA037005DB9BB /* GBViewGL.h */,
-				6699B66125AEA037005DB9BB /* GBViewGL.m */,
-				6699B63325AEA035005DB9BB /* GBViewMetal.h */,
-				6699B64B25AEA036005DB9BB /* GBViewMetal.m */,
-				6699B66925AEA037005DB9BB /* GBWarningPopover.h */,
-				6699B66A25AEA037005DB9BB /* GBWarningPopover.m */,
 				6699B66B25AEA037005DB9BB /* Info.plist */,
 				6699B67325AEA037005DB9BB /* Joypad.png */,
 				6699B64425AEA036005DB9BB /* Joypad@2x.png */,
 				6699B66325AEA037005DB9BB /* Joypad~dark.png */,
 				6699B66D25AEA037005DB9BB /* Joypad~dark@2x.png */,
-				6699B66425AEA037005DB9BB /* KeyboardShortcutPrivateAPIs.h */,
 				6699B64E25AEA036005DB9BB /* License.html */,
 				6699B64A25AEA036005DB9BB /* main.m */,
 				6699B66E25AEA037005DB9BB /* MainMenu.xib */,
-				6699B64525AEA036005DB9BB /* NSImageNamedDarkSupport.m */,
-				6699B67225AEA037005DB9BB /* NSObject+MavericksCompat.m */,
-				6699B64225AEA036005DB9BB /* NSString+StringForKey.h */,
-				6699B66F25AEA037005DB9BB /* NSString+StringForKey.m */,
 				6699B63925AEA036005DB9BB /* PkgInfo */,
 				6699B65825AEA037005DB9BB /* PopoverView.xib */,
 				6699B64C25AEA036005DB9BB /* Preferences.xib */,
@@ -983,15 +947,6 @@
 			path = ../../third_party/Sameboy/BootROMs;
 			sourceTree = "<group>";
 		};
-		6699B9C025AEB8B5005DB9BB /* SameboyUI */ = {
-			isa = PBXGroup;
-			children = (
-				6699B9C125AEB8B5005DB9BB /* SameboyUI.h */,
-				6699B9C325AEB8B5005DB9BB /* SameboyUI.m */,
-			);
-			path = SameboyUI;
-			sourceTree = "<group>";
-		};
 		66ABD4A825871458007F2788 /* LR35902 */ = {
 			isa = PBXGroup;
 			children = (
@@ -1064,8 +1019,10 @@
 				665D4F512575F75400C3A03B /* Sources */,
 				665D4F522575F75400C3A03B /* Frameworks */,
 				665D4F532575F75400C3A03B /* Resources */,
+				6699BA6525AEC444005DB9BB /* CopyFiles */,
 			);
 			buildRules = (
+				6699BA4F25AEC414005DB9BB /* PBXBuildRule */,
 			);
 			dependencies = (
 				6699BA0E25AEBCE1005DB9BB /* PBXTargetDependency */,
@@ -1214,6 +1171,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6699BA3925AEBF9B005DB9BB /* Document.xib in Resources */,
 				667B1B75257854BB00CE670F /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1280,6 +1238,8 @@
 				665198DD25ABF8FC0075C3FC /* DataType.swift in Sources */,
 				66820CA7258DB6E8009507BB /* EmulatorViewController.swift in Sources */,
 				667B1B912578557D00CE670F /* URL+localizedName.swift in Sources */,
+				6699BA4525AEC406005DB9BB /* agb_boot.asm in Sources */,
+				6699BA4825AEC406005DB9BB /* cgb_boot_fast.asm in Sources */,
 				667B1B9F2578560A00CE670F /* TextTableCellView.swift in Sources */,
 				66EDEA0425ACD182008E322F /* PPURegistersView.swift in Sources */,
 				665198D225ABF8DC0075C3FC /* Region.swift in Sources */,
@@ -1292,6 +1252,7 @@
 				665D4F5B2575F75400C3A03B /* ProjectViewController.swift in Sources */,
 				667B1B632578541F00CE670F /* NotificationNames.swift in Sources */,
 				665198E225ABF9070075C3FC /* Global.swift in Sources */,
+				6699BA4425AEC406005DB9BB /* sgb2_boot.asm in Sources */,
 				66ABD4A425870117007F2788 /* StatisticsView.swift in Sources */,
 				66472ED7258E7F7600A03CD4 /* CodeTextView.swift in Sources */,
 				665198E725ABF9230075C3FC /* Macro.swift in Sources */,
@@ -1299,6 +1260,7 @@
 				667B1B8B2578554600CE670F /* ProjectOutlineNode.swift in Sources */,
 				665D4F592575F75400C3A03B /* AppDelegate.swift in Sources */,
 				66763D97257C0D4900824278 /* TextView.swift in Sources */,
+				6699BA4925AEC406005DB9BB /* cgb_boot.asm in Sources */,
 				66EDE9FF25ACD15A008E322F /* AddressView.swift in Sources */,
 				665198F425ABF95E0075C3FC /* DisassemblyResults.swift in Sources */,
 				6667E4BE25ACD3A600F14435 /* LabeledView.swift in Sources */,
@@ -1309,12 +1271,14 @@
 				665D4F5D2575F75400C3A03B /* ProjectDocument.swift in Sources */,
 				6651991925ABFB000075C3FC /* ProjectDocument+emulation.swift in Sources */,
 				66ABD4AA25871479007F2788 /* OpcodeDocumentation.swift in Sources */,
+				6699BA4625AEC406005DB9BB /* sgb_boot.asm in Sources */,
 				665D4FAE257727CA00C3A03B /* HorizontalLine.swift in Sources */,
 				665198FF25ABF97F0075C3FC /* ProjectMetadata.swift in Sources */,
 				66783F802585B694008C34FA /* MacroEditorViewController.swift in Sources */,
 				665198C125ABEA7F0075C3FC /* LCDViewController.swift in Sources */,
 				667B1C0225789BAE00CE670F /* InspectorViewController.swift in Sources */,
 				664833E12598558D00B955F4 /* CPUFlagsView.swift in Sources */,
+				6699BA4725AEC406005DB9BB /* dmg_boot.asm in Sources */,
 				66C617CC257F1AE200E372BA /* TabViewController.swift in Sources */,
 				66EDE9FA25ACD13B008E322F /* FixedWidthTextView.swift in Sources */,
 				6667E4C325ACD71A00F14435 /* STATFlagsView.swift in Sources */,
@@ -1497,6 +1461,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 69Y7ARDN28;
 				ENABLE_HARDENED_RUNTIME = YES;
+				HEADER_SEARCH_PATHS = ../third_party/Sameboy;
 				INFOPLIST_FILE = KoholintIsland/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1509,6 +1474,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.featherless.KoholintIsland;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_DISABLE_SAFETY_CHECKS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "KoholintIsland/KoholintIsland-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = "Release-iterative";
@@ -1696,6 +1662,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 69Y7ARDN28;
 				ENABLE_HARDENED_RUNTIME = YES;
+				HEADER_SEARCH_PATHS = ../third_party/Sameboy;
 				INFOPLIST_FILE = KoholintIsland/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1707,6 +1674,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.featherless.KoholintIsland;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "KoholintIsland/KoholintIsland-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -1723,6 +1691,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 69Y7ARDN28;
 				ENABLE_HARDENED_RUNTIME = YES;
+				HEADER_SEARCH_PATHS = ../third_party/Sameboy;
 				INFOPLIST_FILE = KoholintIsland/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1735,6 +1704,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.featherless.KoholintIsland;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_DISABLE_SAFETY_CHECKS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "KoholintIsland/KoholintIsland-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
