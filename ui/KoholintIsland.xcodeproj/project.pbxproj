@@ -212,6 +212,7 @@
 			outputFiles = (
 				"$(DERIVED_FILE_DIR)/${INPUT_FILE_BASE}.bin",
 			);
+			runOncePerArchitecture = 0;
 			script = "rgbasm -i ${SRCROOT}/../third_party/Sameboy/BootROMs/ -i ${SRCROOT}/Sameboy -o ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.o ${INPUT_FILE_PATH}\nrgblink -o ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.bin ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.o\ncp ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.bin ${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\n\n\n\n\n\n\n\n\n";
 		};
 		6699BA4F25AEC414005DB9BB /* PBXBuildRule */ = {
@@ -225,6 +226,7 @@
 			outputFiles = (
 				"$(DERIVED_FILE_DIR)/${INPUT_FILE_BASE}.bin",
 			);
+			runOncePerArchitecture = 0;
 			script = "rgbasm -i ${SRCROOT}/../third_party/Sameboy/BootROMs/ -i ${SRCROOT}/Sameboy -o ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.o ${INPUT_FILE_PATH}\nrgblink -o ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.bin ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.o\ncp ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.bin ${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\n\n\n\n\n\n\n\n\n";
 		};
 /* End PBXBuildRule section */
