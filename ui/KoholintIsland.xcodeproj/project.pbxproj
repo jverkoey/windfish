@@ -48,6 +48,143 @@
 		667B1BAE2578565A00CE670F /* OutlineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1BAD2578565A00CE670F /* OutlineViewController.swift */; };
 		667B1C0225789BAE00CE670F /* InspectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1C0125789BAE00CE670F /* InspectorViewController.swift */; };
 		66820CA7258DB6E8009507BB /* EmulatorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66820CA6258DB6E8009507BB /* EmulatorViewController.swift */; };
+		6699B67725AEA038005DB9BB /* GBMemoryByteArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B63025AEA035005DB9BB /* GBMemoryByteArray.m */; };
+		6699B67825AEA038005DB9BB /* GBCheatTextFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B63225AEA035005DB9BB /* GBCheatTextFieldCell.m */; };
+		6699B67925AEA038005DB9BB /* CPU.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B63425AEA036005DB9BB /* CPU.png */; };
+		6699B67A25AEA038005DB9BB /* GBSplitView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B63525AEA036005DB9BB /* GBSplitView.m */; };
+		6699B67B25AEA038005DB9BB /* GBAudioClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B63725AEA036005DB9BB /* GBAudioClient.m */; };
+		6699B67C25AEA038005DB9BB /* PkgInfo in Resources */ = {isa = PBXBuildFile; fileRef = 6699B63925AEA036005DB9BB /* PkgInfo */; };
+		6699B67D25AEA038005DB9BB /* Speaker.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B63C25AEA036005DB9BB /* Speaker.png */; };
+		6699B67E25AEA038005DB9BB /* Display.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B63D25AEA036005DB9BB /* Display.png */; };
+		6699B67F25AEA038005DB9BB /* GBImageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B63F25AEA036005DB9BB /* GBImageCell.m */; };
+		6699B68025AEA038005DB9BB /* GBOptionalVisualEffectView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B64125AEA036005DB9BB /* GBOptionalVisualEffectView.m */; };
+		6699B68125AEA038005DB9BB /* Joypad@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B64425AEA036005DB9BB /* Joypad@2x.png */; };
+		6699B68225AEA038005DB9BB /* NSImageNamedDarkSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B64525AEA036005DB9BB /* NSImageNamedDarkSupport.m */; };
+		6699B68325AEA038005DB9BB /* GBBorderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B64625AEA036005DB9BB /* GBBorderView.m */; };
+		6699B68425AEA038005DB9BB /* GBTerminalTextFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B64725AEA036005DB9BB /* GBTerminalTextFieldCell.m */; };
+		6699B68525AEA038005DB9BB /* GBCheatWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B64825AEA036005DB9BB /* GBCheatWindowController.m */; };
+		6699B68625AEA038005DB9BB /* GBCompleteByteSlice.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B64925AEA036005DB9BB /* GBCompleteByteSlice.m */; };
+		6699B68725AEA038005DB9BB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B64A25AEA036005DB9BB /* main.m */; };
+		6699B68925AEA038005DB9BB /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6699B64C25AEA036005DB9BB /* Preferences.xib */; };
+		6699B68A25AEA038005DB9BB /* GBButtons.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B64D25AEA036005DB9BB /* GBButtons.m */; };
+		6699B68B25AEA038005DB9BB /* License.html in Resources */ = {isa = PBXBuildFile; fileRef = 6699B64E25AEA036005DB9BB /* License.html */; };
+		6699B68C25AEA038005DB9BB /* Cartridge.icns in Resources */ = {isa = PBXBuildFile; fileRef = 6699B64F25AEA036005DB9BB /* Cartridge.icns */; };
+		6699B68D25AEA038005DB9BB /* Speaker~dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B65125AEA036005DB9BB /* Speaker~dark.png */; };
+		6699B68E25AEA038005DB9BB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B65325AEA036005DB9BB /* AppDelegate.m */; };
+		6699B68F25AEA038005DB9BB /* GBOpenGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B65525AEA036005DB9BB /* GBOpenGLView.m */; };
+		6699B69025AEA038005DB9BB /* GBView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B65625AEA037005DB9BB /* GBView.m */; };
+		6699B69125AEA038005DB9BB /* PopoverView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6699B65825AEA037005DB9BB /* PopoverView.xib */; };
+		6699B69225AEA038005DB9BB /* Document.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6699B65A25AEA037005DB9BB /* Document.xib */; };
+		6699B69325AEA038005DB9BB /* GBImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B65B25AEA037005DB9BB /* GBImageView.m */; };
+		6699B69425AEA038005DB9BB /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 6699B65D25AEA037005DB9BB /* AppIcon.icns */; };
+		6699B69525AEA038005DB9BB /* GBGLShader.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B66025AEA037005DB9BB /* GBGLShader.m */; };
+		6699B69625AEA038005DB9BB /* GBViewGL.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B66125AEA037005DB9BB /* GBViewGL.m */; };
+		6699B69725AEA038005DB9BB /* Joypad~dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B66325AEA037005DB9BB /* Joypad~dark.png */; };
+		6699B69825AEA038005DB9BB /* GBPreferencesWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B66625AEA037005DB9BB /* GBPreferencesWindow.m */; };
+		6699B69925AEA038005DB9BB /* Document.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B66725AEA037005DB9BB /* Document.m */; };
+		6699B69A25AEA038005DB9BB /* ColorCartridge.icns in Resources */ = {isa = PBXBuildFile; fileRef = 6699B66825AEA037005DB9BB /* ColorCartridge.icns */; };
+		6699B69B25AEA038005DB9BB /* GBWarningPopover.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B66A25AEA037005DB9BB /* GBWarningPopover.m */; };
+		6699B69C25AEA038005DB9BB /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6699B66B25AEA037005DB9BB /* Info.plist */; };
+		6699B69D25AEA038005DB9BB /* CPU@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B66C25AEA037005DB9BB /* CPU@2x.png */; };
+		6699B69E25AEA038005DB9BB /* Joypad~dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B66D25AEA037005DB9BB /* Joypad~dark@2x.png */; };
+		6699B69F25AEA038005DB9BB /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6699B66E25AEA037005DB9BB /* MainMenu.xib */; };
+		6699B6A025AEA038005DB9BB /* NSString+StringForKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B66F25AEA037005DB9BB /* NSString+StringForKey.m */; };
+		6699B6A125AEA038005DB9BB /* Speaker~dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B67125AEA037005DB9BB /* Speaker~dark@2x.png */; };
+		6699B6A225AEA038005DB9BB /* NSObject+MavericksCompat.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B67225AEA037005DB9BB /* NSObject+MavericksCompat.m */; };
+		6699B6A325AEA038005DB9BB /* Joypad.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B67325AEA037005DB9BB /* Joypad.png */; };
+		6699B6A425AEA038005DB9BB /* Display@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B67425AEA038005DB9BB /* Display@2x.png */; };
+		6699B6A525AEA038005DB9BB /* GBColorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B67525AEA038005DB9BB /* GBColorCell.m */; };
+		6699B6A625AEA038005DB9BB /* Speaker@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B67625AEA038005DB9BB /* Speaker@2x.png */; };
+		6699B6B825AEA0A4005DB9BB /* Sameboy in Frameworks */ = {isa = PBXBuildFile; productRef = 6699B6B725AEA0A4005DB9BB /* Sameboy */; };
+		6699B78825AEA2D7005DB9BB /* HFRepresenter_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B74825AEA2D2005DB9BB /* HFRepresenter_Internal.h */; };
+		6699B78925AEA2D7005DB9BB /* HFTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B74925AEA2D2005DB9BB /* HFTypes.h */; };
+		6699B78A25AEA2D7005DB9BB /* HFController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B74A25AEA2D3005DB9BB /* HFController.m */; };
+		6699B78B25AEA2D7005DB9BB /* HFRepresenterHexTextView.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B74B25AEA2D3005DB9BB /* HFRepresenterHexTextView.h */; };
+		6699B78C25AEA2D7005DB9BB /* HFByteArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B74C25AEA2D3005DB9BB /* HFByteArray.m */; };
+		6699B78D25AEA2D7005DB9BB /* HFRepresenterTextViewCallout.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B74D25AEA2D3005DB9BB /* HFRepresenterTextViewCallout.m */; };
+		6699B78E25AEA2D7005DB9BB /* HFHexTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B74E25AEA2D3005DB9BB /* HFHexTextView.m */; };
+		6699B78F25AEA2D7005DB9BB /* HFRepresenterStringEncodingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B74F25AEA2D3005DB9BB /* HFRepresenterStringEncodingTextView.m */; };
+		6699B79025AEA2D7005DB9BB /* HFLineCountingView.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B75025AEA2D3005DB9BB /* HFLineCountingView.h */; };
+		6699B79125AEA2D7005DB9BB /* HFTextRepresenter_KeyBinding.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B75125AEA2D3005DB9BB /* HFTextRepresenter_KeyBinding.m */; };
+		6699B79225AEA2D7005DB9BB /* HFFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B75225AEA2D3005DB9BB /* HFFunctions.m */; };
+		6699B79325AEA2D7005DB9BB /* HFByteSlice_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B75325AEA2D3005DB9BB /* HFByteSlice_Private.h */; };
+		6699B79425AEA2D7005DB9BB /* HFStatusBarRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B75425AEA2D3005DB9BB /* HFStatusBarRepresenter.m */; };
+		6699B79525AEA2D7005DB9BB /* HFHexTextRepresenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B75525AEA2D3005DB9BB /* HFHexTextRepresenter.h */; };
+		6699B79625AEA2D7005DB9BB /* HFHexTextView.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B75625AEA2D3005DB9BB /* HFHexTextView.h */; };
+		6699B79725AEA2D7005DB9BB /* HFRepresenterTextViewCallout.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B75725AEA2D3005DB9BB /* HFRepresenterTextViewCallout.h */; };
+		6699B79825AEA2D7005DB9BB /* HFLayoutRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B75825AEA2D3005DB9BB /* HFLayoutRepresenter.m */; };
+		6699B79925AEA2D7005DB9BB /* HFPrivilegedHelperConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B75925AEA2D3005DB9BB /* HFPrivilegedHelperConnection.h */; };
+		6699B79A25AEA2D7005DB9BB /* HFVerticalScrollerRepresenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B75A25AEA2D3005DB9BB /* HFVerticalScrollerRepresenter.h */; };
+		6699B79B25AEA2D7005DB9BB /* HFRepresenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B75B25AEA2D3005DB9BB /* HFRepresenter.h */; };
+		6699B79C25AEA2D7005DB9BB /* HFLayoutRepresenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B75C25AEA2D3005DB9BB /* HFLayoutRepresenter.h */; };
+		6699B79D25AEA2D7005DB9BB /* HFFullMemoryByteArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B75D25AEA2D3005DB9BB /* HFFullMemoryByteArray.m */; };
+		6699B79E25AEA2D7005DB9BB /* HFLineCountingRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B75E25AEA2D3005DB9BB /* HFLineCountingRepresenter.m */; };
+		6699B79F25AEA2D7005DB9BB /* HFGlyphTrie.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B75F25AEA2D3005DB9BB /* HFGlyphTrie.h */; };
+		6699B7A025AEA2D7005DB9BB /* HFRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B76025AEA2D3005DB9BB /* HFRepresenter.m */; };
+		6699B7A125AEA2D7005DB9BB /* HFFullMemoryByteArray.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B76125AEA2D3005DB9BB /* HFFullMemoryByteArray.h */; };
+		6699B7A225AEA2D7005DB9BB /* HFAnnotatedTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B76225AEA2D3005DB9BB /* HFAnnotatedTree.h */; };
+		6699B7A325AEA2D7005DB9BB /* HFController.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B76325AEA2D4005DB9BB /* HFController.h */; };
+		6699B7A425AEA2D7005DB9BB /* HFPasteboardOwner.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B76425AEA2D4005DB9BB /* HFPasteboardOwner.m */; };
+		6699B7A525AEA2D7005DB9BB /* HFLineCountingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B76525AEA2D4005DB9BB /* HFLineCountingView.m */; };
+		6699B7A625AEA2D7005DB9BB /* HFBTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B76625AEA2D4005DB9BB /* HFBTree.h */; };
+		6699B7A725AEA2D7005DB9BB /* HFFunctions_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B76725AEA2D4005DB9BB /* HFFunctions_Private.h */; };
+		6699B7A825AEA2D7005DB9BB /* HFByteArray.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B76825AEA2D4005DB9BB /* HFByteArray.h */; };
+		6699B7A925AEA2D7005DB9BB /* HFRepresenterTextView.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B76925AEA2D4005DB9BB /* HFRepresenterTextView.h */; };
+		6699B7AA25AEA2D7005DB9BB /* HFSharedMemoryByteSlice.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B76A25AEA2D4005DB9BB /* HFSharedMemoryByteSlice.h */; };
+		6699B7AB25AEA2D7005DB9BB /* HFTextVisualStyleRun.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B76B25AEA2D4005DB9BB /* HFTextVisualStyleRun.m */; };
+		6699B7AC25AEA2D7005DB9BB /* HFFullMemoryByteSlice.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B76C25AEA2D4005DB9BB /* HFFullMemoryByteSlice.m */; };
+		6699B7AD25AEA2D7005DB9BB /* HFByteSlice.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B76D25AEA2D4005DB9BB /* HFByteSlice.h */; };
+		6699B7AE25AEA2D7005DB9BB /* HFVerticalScrollerRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B76E25AEA2D4005DB9BB /* HFVerticalScrollerRepresenter.m */; };
+		6699B7AF25AEA2D7005DB9BB /* HFStringEncodingTextRepresenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B76F25AEA2D4005DB9BB /* HFStringEncodingTextRepresenter.h */; };
+		6699B7B025AEA2D7005DB9BB /* HFBTree.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B77025AEA2D4005DB9BB /* HFBTree.m */; };
+		6699B7B125AEA2D7005DB9BB /* HFByteSlice.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B77125AEA2D4005DB9BB /* HFByteSlice.m */; };
+		6699B7B225AEA2D7005DB9BB /* HFFullMemoryByteSlice.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B77225AEA2D4005DB9BB /* HFFullMemoryByteSlice.h */; };
+		6699B7B325AEA2D7005DB9BB /* HFAnnotatedTree.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B77325AEA2D4005DB9BB /* HFAnnotatedTree.m */; };
+		6699B7B425AEA2D7005DB9BB /* HFTextVisualStyleRun.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B77425AEA2D4005DB9BB /* HFTextVisualStyleRun.h */; };
+		6699B7B525AEA2D7005DB9BB /* HFBTreeByteArray.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B77525AEA2D4005DB9BB /* HFBTreeByteArray.h */; };
+		6699B7B625AEA2D7005DB9BB /* HFRepresenterStringEncodingTextView.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B77625AEA2D4005DB9BB /* HFRepresenterStringEncodingTextView.h */; };
+		6699B7B725AEA2D7005DB9BB /* HexFiend.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B77725AEA2D4005DB9BB /* HexFiend.h */; };
+		6699B7B825AEA2D7005DB9BB /* HFLineCountingRepresenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B77825AEA2D7005DB9BB /* HFLineCountingRepresenter.h */; };
+		6699B7B925AEA2D7005DB9BB /* HFFunctions.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B77925AEA2D7005DB9BB /* HFFunctions.h */; };
+		6699B7BA25AEA2D7005DB9BB /* HFRepresenterHexTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B77A25AEA2D7005DB9BB /* HFRepresenterHexTextView.m */; };
+		6699B7BB25AEA2D7005DB9BB /* HFHexTextRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B77B25AEA2D7005DB9BB /* HFHexTextRepresenter.m */; };
+		6699B7BC25AEA2D7005DB9BB /* HFStatusBarRepresenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B77C25AEA2D7005DB9BB /* HFStatusBarRepresenter.h */; };
+		6699B7BD25AEA2D7005DB9BB /* HFRepresenterTextView_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B77D25AEA2D7005DB9BB /* HFRepresenterTextView_Internal.h */; };
+		6699B7BE25AEA2D7005DB9BB /* HFTextRepresenter_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B77E25AEA2D7005DB9BB /* HFTextRepresenter_Internal.h */; };
+		6699B7BF25AEA2D7005DB9BB /* HFStringEncodingTextRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B77F25AEA2D7005DB9BB /* HFStringEncodingTextRepresenter.m */; };
+		6699B7C025AEA2D7005DB9BB /* HFSharedMemoryByteSlice.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B78025AEA2D7005DB9BB /* HFSharedMemoryByteSlice.m */; };
+		6699B7C125AEA2D7005DB9BB /* HFTextRepresenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B78125AEA2D7005DB9BB /* HFTextRepresenter.h */; };
+		6699B7C225AEA2D7005DB9BB /* HFTextRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B78225AEA2D7005DB9BB /* HFTextRepresenter.m */; };
+		6699B7C325AEA2D7005DB9BB /* HFRepresenterTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B78325AEA2D7005DB9BB /* HFRepresenterTextView.m */; };
+		6699B7C425AEA2D7005DB9BB /* HFBTreeByteArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B78425AEA2D7005DB9BB /* HFBTreeByteArray.m */; };
+		6699B7C525AEA2D7005DB9BB /* HFPasteboardOwner.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B78525AEA2D7005DB9BB /* HFPasteboardOwner.h */; };
+		6699B7C625AEA2D7005DB9BB /* HFByteArray_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 6699B78625AEA2D7005DB9BB /* HFByteArray_Internal.h */; };
+		6699B7C725AEA2D7005DB9BB /* HFGlyphTrie.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B78725AEA2D7005DB9BB /* HFGlyphTrie.m */; };
+		6699B7DA25AEA30E005DB9BB /* libHexFiend.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6699B73925AEA2B7005DB9BB /* libHexFiend.a */; };
+		6699B89725AEAA85005DB9BB /* GBViewMetal.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699B64B25AEA036005DB9BB /* GBViewMetal.m */; };
+		6699B8A225AEAAC3005DB9BB /* AAOmniScaleLegacy.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84D25AEA96A005DB9BB /* AAOmniScaleLegacy.fsh */; };
+		6699B8A325AEAAC3005DB9BB /* AAScale2x.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B85125AEA96A005DB9BB /* AAScale2x.fsh */; };
+		6699B8A425AEAAC3005DB9BB /* AAScale4x.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84B25AEA96A005DB9BB /* AAScale4x.fsh */; };
+		6699B8A525AEAAC3005DB9BB /* Bilinear.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84525AEA969005DB9BB /* Bilinear.fsh */; };
+		6699B8A625AEAAC3005DB9BB /* CRT.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B85325AEA96A005DB9BB /* CRT.fsh */; };
+		6699B8A725AEAAC3005DB9BB /* HQ2x.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84A25AEA96A005DB9BB /* HQ2x.fsh */; };
+		6699B8A825AEAAC3005DB9BB /* LCD.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84C25AEA96A005DB9BB /* LCD.fsh */; };
+		6699B8A925AEAAC3005DB9BB /* MasterShader.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B85225AEA96A005DB9BB /* MasterShader.fsh */; };
+		6699B8AA25AEAAC3005DB9BB /* MasterShader.metal in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B85025AEA96A005DB9BB /* MasterShader.metal */; };
+		6699B8AB25AEAAC3005DB9BB /* MonoLCD.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84925AEA969005DB9BB /* MonoLCD.fsh */; };
+		6699B8AC25AEAAC3005DB9BB /* NearestNeighbor.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84725AEA969005DB9BB /* NearestNeighbor.fsh */; };
+		6699B8AD25AEAAC3005DB9BB /* OmniScale.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84F25AEA96A005DB9BB /* OmniScale.fsh */; };
+		6699B8AE25AEAAC3005DB9BB /* OmniScaleLegacy.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84625AEA969005DB9BB /* OmniScaleLegacy.fsh */; };
+		6699B8AF25AEAAC3005DB9BB /* Scale2x.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84825AEA969005DB9BB /* Scale2x.fsh */; };
+		6699B8B025AEAAC3005DB9BB /* Scale4x.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B85425AEA96A005DB9BB /* Scale4x.fsh */; };
+		6699B8B125AEAAC3005DB9BB /* SmoothBilinear.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6699B84E25AEA96A005DB9BB /* SmoothBilinear.fsh */; };
+		6699B92125AEB181005DB9BB /* SameBoyLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B8C125AEAC55005DB9BB /* SameBoyLogo.png */; };
+		6699B98025AEB5F4005DB9BB /* cgb_boot.asm in Sources */ = {isa = PBXBuildFile; fileRef = 6699B8C025AEAC55005DB9BB /* cgb_boot.asm */; };
+		6699B98125AEB5F4005DB9BB /* sgb_boot.asm in Sources */ = {isa = PBXBuildFile; fileRef = 6699B8BE25AEAC55005DB9BB /* sgb_boot.asm */; };
+		6699B98225AEB5F4005DB9BB /* agb_boot.asm in Sources */ = {isa = PBXBuildFile; fileRef = 6699B8C325AEAC55005DB9BB /* agb_boot.asm */; };
+		6699B98325AEB5F4005DB9BB /* dmg_boot.asm in Sources */ = {isa = PBXBuildFile; fileRef = 6699B8C425AEAC55005DB9BB /* dmg_boot.asm */; };
+		6699B98425AEB5F4005DB9BB /* cgb_boot_fast.asm in Sources */ = {isa = PBXBuildFile; fileRef = 6699B8C225AEAC55005DB9BB /* cgb_boot_fast.asm */; };
+		6699B98525AEB5F4005DB9BB /* sgb2_boot.asm in Sources */ = {isa = PBXBuildFile; fileRef = 6699B8BF25AEAC55005DB9BB /* sgb2_boot.asm */; };
 		66ABD4A425870117007F2788 /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ABD4A325870117007F2788 /* StatisticsView.swift */; };
 		66ABD4AA25871479007F2788 /* OpcodeDocumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ABD4A925871479007F2788 /* OpcodeDocumentation.swift */; };
 		66C617C6257F04D600E372BA /* RegionInspectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */; };
@@ -61,6 +198,22 @@
 		66EDE9FF25ACD15A008E322F /* AddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EDE9FE25ACD15A008E322F /* AddressView.swift */; };
 		66EDEA0425ACD182008E322F /* PPURegistersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EDEA0325ACD182008E322F /* PPURegistersView.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXBuildRule section */
+		6699B8D825AEACFA005DB9BB /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			filePatterns = "*.asm";
+			fileType = pattern.proxy;
+			inputFiles = (
+			);
+			isEditable = 1;
+			outputFiles = (
+				"$(DERIVED_FILE_DIR)/${INPUT_FILE_BASE}.bin",
+			);
+			script = "rgbasm -i ${SRCROOT}/../third_party/Sameboy/BootROMs/ -i ${SRCROOT}/Sameboy -o ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.o ${INPUT_FILE_PATH}\nrgblink -o ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.bin ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.o\ncp ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.bin ${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\n\n\n\n\n\n\n\n\n";
+		};
+/* End PBXBuildRule section */
 
 /* Begin PBXContainerItemProxy section */
 		665D4F6A2575F75700C3A03B /* PBXContainerItemProxy */ = {
@@ -77,7 +230,42 @@
 			remoteGlobalIDString = 665D4F542575F75400C3A03B;
 			remoteInfo = gbdis;
 		};
+		6699B7D825AEA30A005DB9BB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 665D4F4D2575F75400C3A03B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6699B73825AEA2B7005DB9BB;
+			remoteInfo = HexFiend;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		6699B88B25AEAA45005DB9BB /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Shaders;
+			dstSubfolderSpec = 7;
+			files = (
+				6699B8A225AEAAC3005DB9BB /* AAOmniScaleLegacy.fsh in CopyFiles */,
+				6699B8A325AEAAC3005DB9BB /* AAScale2x.fsh in CopyFiles */,
+				6699B8A425AEAAC3005DB9BB /* AAScale4x.fsh in CopyFiles */,
+				6699B8A525AEAAC3005DB9BB /* Bilinear.fsh in CopyFiles */,
+				6699B8A625AEAAC3005DB9BB /* CRT.fsh in CopyFiles */,
+				6699B8A725AEAAC3005DB9BB /* HQ2x.fsh in CopyFiles */,
+				6699B8A825AEAAC3005DB9BB /* LCD.fsh in CopyFiles */,
+				6699B8A925AEAAC3005DB9BB /* MasterShader.fsh in CopyFiles */,
+				6699B8AA25AEAAC3005DB9BB /* MasterShader.metal in CopyFiles */,
+				6699B8AB25AEAAC3005DB9BB /* MonoLCD.fsh in CopyFiles */,
+				6699B8AC25AEAAC3005DB9BB /* NearestNeighbor.fsh in CopyFiles */,
+				6699B8AD25AEAAC3005DB9BB /* OmniScale.fsh in CopyFiles */,
+				6699B8AE25AEAAC3005DB9BB /* OmniScaleLegacy.fsh in CopyFiles */,
+				6699B8AF25AEAAC3005DB9BB /* Scale2x.fsh in CopyFiles */,
+				6699B8B025AEAAC3005DB9BB /* Scale4x.fsh in CopyFiles */,
+				6699B8B125AEAAC3005DB9BB /* SmoothBilinear.fsh in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		66115ED3258E7E930084368B /* KoholintIsland.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KoholintIsland.entitlements; sourceTree = "<group>"; };
@@ -127,6 +315,173 @@
 		667B1BAD2578565A00CE670F /* OutlineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineViewController.swift; sourceTree = "<group>"; };
 		667B1C0125789BAE00CE670F /* InspectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InspectorViewController.swift; sourceTree = "<group>"; };
 		66820CA6258DB6E8009507BB /* EmulatorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulatorViewController.swift; sourceTree = "<group>"; };
+		6699B58025AE9EF1005DB9BB /* third_party */ = {isa = PBXFileReference; lastKnownFileType = folder; name = third_party; path = ../third_party; sourceTree = "<group>"; };
+		6699B58D25AE9F85005DB9BB /* Sameboy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sameboy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6699B59A25AE9F88005DB9BB /* Sameboy.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Sameboy.entitlements; sourceTree = "<group>"; };
+		6699B62E25AEA035005DB9BB /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		6699B62F25AEA035005DB9BB /* GBOptionalVisualEffectView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBOptionalVisualEffectView.h; sourceTree = "<group>"; };
+		6699B63025AEA035005DB9BB /* GBMemoryByteArray.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBMemoryByteArray.m; sourceTree = "<group>"; };
+		6699B63125AEA035005DB9BB /* GBPreferencesWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBPreferencesWindow.h; sourceTree = "<group>"; };
+		6699B63225AEA035005DB9BB /* GBCheatTextFieldCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBCheatTextFieldCell.m; sourceTree = "<group>"; };
+		6699B63325AEA035005DB9BB /* GBViewMetal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBViewMetal.h; sourceTree = "<group>"; };
+		6699B63425AEA036005DB9BB /* CPU.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CPU.png; sourceTree = "<group>"; };
+		6699B63525AEA036005DB9BB /* GBSplitView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBSplitView.m; sourceTree = "<group>"; };
+		6699B63625AEA036005DB9BB /* Document.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Document.h; sourceTree = "<group>"; };
+		6699B63725AEA036005DB9BB /* GBAudioClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBAudioClient.m; sourceTree = "<group>"; };
+		6699B63825AEA036005DB9BB /* GBImageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBImageCell.h; sourceTree = "<group>"; };
+		6699B63925AEA036005DB9BB /* PkgInfo */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = PkgInfo; sourceTree = "<group>"; };
+		6699B63A25AEA036005DB9BB /* GBOpenGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBOpenGLView.h; sourceTree = "<group>"; };
+		6699B63B25AEA036005DB9BB /* GBColorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBColorCell.h; sourceTree = "<group>"; };
+		6699B63C25AEA036005DB9BB /* Speaker.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Speaker.png; sourceTree = "<group>"; };
+		6699B63D25AEA036005DB9BB /* Display.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Display.png; sourceTree = "<group>"; };
+		6699B63E25AEA036005DB9BB /* GBButtons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBButtons.h; sourceTree = "<group>"; };
+		6699B63F25AEA036005DB9BB /* GBImageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBImageCell.m; sourceTree = "<group>"; };
+		6699B64025AEA036005DB9BB /* GBSplitView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBSplitView.h; sourceTree = "<group>"; };
+		6699B64125AEA036005DB9BB /* GBOptionalVisualEffectView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBOptionalVisualEffectView.m; sourceTree = "<group>"; };
+		6699B64225AEA036005DB9BB /* NSString+StringForKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+StringForKey.h"; sourceTree = "<group>"; };
+		6699B64325AEA036005DB9BB /* GBCheatTextFieldCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBCheatTextFieldCell.h; sourceTree = "<group>"; };
+		6699B64425AEA036005DB9BB /* Joypad@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Joypad@2x.png"; sourceTree = "<group>"; };
+		6699B64525AEA036005DB9BB /* NSImageNamedDarkSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSImageNamedDarkSupport.m; sourceTree = "<group>"; };
+		6699B64625AEA036005DB9BB /* GBBorderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBBorderView.m; sourceTree = "<group>"; };
+		6699B64725AEA036005DB9BB /* GBTerminalTextFieldCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBTerminalTextFieldCell.m; sourceTree = "<group>"; };
+		6699B64825AEA036005DB9BB /* GBCheatWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBCheatWindowController.m; sourceTree = "<group>"; };
+		6699B64925AEA036005DB9BB /* GBCompleteByteSlice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBCompleteByteSlice.m; sourceTree = "<group>"; };
+		6699B64A25AEA036005DB9BB /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		6699B64B25AEA036005DB9BB /* GBViewMetal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBViewMetal.m; sourceTree = "<group>"; };
+		6699B64C25AEA036005DB9BB /* Preferences.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
+		6699B64D25AEA036005DB9BB /* GBButtons.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBButtons.m; sourceTree = "<group>"; };
+		6699B64E25AEA036005DB9BB /* License.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = License.html; sourceTree = "<group>"; };
+		6699B64F25AEA036005DB9BB /* Cartridge.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Cartridge.icns; sourceTree = "<group>"; };
+		6699B65025AEA036005DB9BB /* GBAudioClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBAudioClient.h; sourceTree = "<group>"; };
+		6699B65125AEA036005DB9BB /* Speaker~dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Speaker~dark.png"; sourceTree = "<group>"; };
+		6699B65225AEA036005DB9BB /* GBCheatWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBCheatWindowController.h; sourceTree = "<group>"; };
+		6699B65325AEA036005DB9BB /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		6699B65425AEA036005DB9BB /* GBBorderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBBorderView.h; sourceTree = "<group>"; };
+		6699B65525AEA036005DB9BB /* GBOpenGLView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBOpenGLView.m; sourceTree = "<group>"; };
+		6699B65625AEA037005DB9BB /* GBView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBView.m; sourceTree = "<group>"; };
+		6699B65725AEA037005DB9BB /* GBCompleteByteSlice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBCompleteByteSlice.h; sourceTree = "<group>"; };
+		6699B65825AEA037005DB9BB /* PopoverView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PopoverView.xib; sourceTree = "<group>"; };
+		6699B65925AEA037005DB9BB /* GBTerminalTextFieldCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBTerminalTextFieldCell.h; sourceTree = "<group>"; };
+		6699B65A25AEA037005DB9BB /* Document.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Document.xib; sourceTree = "<group>"; };
+		6699B65B25AEA037005DB9BB /* GBImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBImageView.m; sourceTree = "<group>"; };
+		6699B65C25AEA037005DB9BB /* GBMemoryByteArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBMemoryByteArray.h; sourceTree = "<group>"; };
+		6699B65D25AEA037005DB9BB /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
+		6699B65E25AEA037005DB9BB /* GBView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBView.h; sourceTree = "<group>"; };
+		6699B65F25AEA037005DB9BB /* GBGLShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBGLShader.h; sourceTree = "<group>"; };
+		6699B66025AEA037005DB9BB /* GBGLShader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBGLShader.m; sourceTree = "<group>"; };
+		6699B66125AEA037005DB9BB /* GBViewGL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBViewGL.m; sourceTree = "<group>"; };
+		6699B66225AEA037005DB9BB /* GBViewGL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBViewGL.h; sourceTree = "<group>"; };
+		6699B66325AEA037005DB9BB /* Joypad~dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Joypad~dark.png"; sourceTree = "<group>"; };
+		6699B66425AEA037005DB9BB /* KeyboardShortcutPrivateAPIs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyboardShortcutPrivateAPIs.h; sourceTree = "<group>"; };
+		6699B66525AEA037005DB9BB /* GBImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBImageView.h; sourceTree = "<group>"; };
+		6699B66625AEA037005DB9BB /* GBPreferencesWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBPreferencesWindow.m; sourceTree = "<group>"; };
+		6699B66725AEA037005DB9BB /* Document.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Document.m; sourceTree = "<group>"; };
+		6699B66825AEA037005DB9BB /* ColorCartridge.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = ColorCartridge.icns; sourceTree = "<group>"; };
+		6699B66925AEA037005DB9BB /* GBWarningPopover.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBWarningPopover.h; sourceTree = "<group>"; };
+		6699B66A25AEA037005DB9BB /* GBWarningPopover.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBWarningPopover.m; sourceTree = "<group>"; };
+		6699B66B25AEA037005DB9BB /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6699B66C25AEA037005DB9BB /* CPU@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CPU@2x.png"; sourceTree = "<group>"; };
+		6699B66D25AEA037005DB9BB /* Joypad~dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Joypad~dark@2x.png"; sourceTree = "<group>"; };
+		6699B66E25AEA037005DB9BB /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
+		6699B66F25AEA037005DB9BB /* NSString+StringForKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+StringForKey.m"; sourceTree = "<group>"; };
+		6699B67025AEA037005DB9BB /* BigSurToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BigSurToolbar.h; sourceTree = "<group>"; };
+		6699B67125AEA037005DB9BB /* Speaker~dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Speaker~dark@2x.png"; sourceTree = "<group>"; };
+		6699B67225AEA037005DB9BB /* NSObject+MavericksCompat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+MavericksCompat.m"; sourceTree = "<group>"; };
+		6699B67325AEA037005DB9BB /* Joypad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Joypad.png; sourceTree = "<group>"; };
+		6699B67425AEA038005DB9BB /* Display@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Display@2x.png"; sourceTree = "<group>"; };
+		6699B67525AEA038005DB9BB /* GBColorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBColorCell.m; sourceTree = "<group>"; };
+		6699B67625AEA038005DB9BB /* Speaker@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Speaker@2x.png"; sourceTree = "<group>"; };
+		6699B73925AEA2B7005DB9BB /* libHexFiend.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libHexFiend.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		6699B74825AEA2D2005DB9BB /* HFRepresenter_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFRepresenter_Internal.h; sourceTree = "<group>"; };
+		6699B74925AEA2D2005DB9BB /* HFTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFTypes.h; sourceTree = "<group>"; };
+		6699B74A25AEA2D3005DB9BB /* HFController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFController.m; sourceTree = "<group>"; };
+		6699B74B25AEA2D3005DB9BB /* HFRepresenterHexTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFRepresenterHexTextView.h; sourceTree = "<group>"; };
+		6699B74C25AEA2D3005DB9BB /* HFByteArray.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFByteArray.m; sourceTree = "<group>"; };
+		6699B74D25AEA2D3005DB9BB /* HFRepresenterTextViewCallout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFRepresenterTextViewCallout.m; sourceTree = "<group>"; };
+		6699B74E25AEA2D3005DB9BB /* HFHexTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFHexTextView.m; sourceTree = "<group>"; };
+		6699B74F25AEA2D3005DB9BB /* HFRepresenterStringEncodingTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFRepresenterStringEncodingTextView.m; sourceTree = "<group>"; };
+		6699B75025AEA2D3005DB9BB /* HFLineCountingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFLineCountingView.h; sourceTree = "<group>"; };
+		6699B75125AEA2D3005DB9BB /* HFTextRepresenter_KeyBinding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFTextRepresenter_KeyBinding.m; sourceTree = "<group>"; };
+		6699B75225AEA2D3005DB9BB /* HFFunctions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFFunctions.m; sourceTree = "<group>"; };
+		6699B75325AEA2D3005DB9BB /* HFByteSlice_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFByteSlice_Private.h; sourceTree = "<group>"; };
+		6699B75425AEA2D3005DB9BB /* HFStatusBarRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFStatusBarRepresenter.m; sourceTree = "<group>"; };
+		6699B75525AEA2D3005DB9BB /* HFHexTextRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFHexTextRepresenter.h; sourceTree = "<group>"; };
+		6699B75625AEA2D3005DB9BB /* HFHexTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFHexTextView.h; sourceTree = "<group>"; };
+		6699B75725AEA2D3005DB9BB /* HFRepresenterTextViewCallout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFRepresenterTextViewCallout.h; sourceTree = "<group>"; };
+		6699B75825AEA2D3005DB9BB /* HFLayoutRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFLayoutRepresenter.m; sourceTree = "<group>"; };
+		6699B75925AEA2D3005DB9BB /* HFPrivilegedHelperConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFPrivilegedHelperConnection.h; sourceTree = "<group>"; };
+		6699B75A25AEA2D3005DB9BB /* HFVerticalScrollerRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFVerticalScrollerRepresenter.h; sourceTree = "<group>"; };
+		6699B75B25AEA2D3005DB9BB /* HFRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFRepresenter.h; sourceTree = "<group>"; };
+		6699B75C25AEA2D3005DB9BB /* HFLayoutRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFLayoutRepresenter.h; sourceTree = "<group>"; };
+		6699B75D25AEA2D3005DB9BB /* HFFullMemoryByteArray.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFFullMemoryByteArray.m; sourceTree = "<group>"; };
+		6699B75E25AEA2D3005DB9BB /* HFLineCountingRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFLineCountingRepresenter.m; sourceTree = "<group>"; };
+		6699B75F25AEA2D3005DB9BB /* HFGlyphTrie.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFGlyphTrie.h; sourceTree = "<group>"; };
+		6699B76025AEA2D3005DB9BB /* HFRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFRepresenter.m; sourceTree = "<group>"; };
+		6699B76125AEA2D3005DB9BB /* HFFullMemoryByteArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFFullMemoryByteArray.h; sourceTree = "<group>"; };
+		6699B76225AEA2D3005DB9BB /* HFAnnotatedTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFAnnotatedTree.h; sourceTree = "<group>"; };
+		6699B76325AEA2D4005DB9BB /* HFController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFController.h; sourceTree = "<group>"; };
+		6699B76425AEA2D4005DB9BB /* HFPasteboardOwner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFPasteboardOwner.m; sourceTree = "<group>"; };
+		6699B76525AEA2D4005DB9BB /* HFLineCountingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFLineCountingView.m; sourceTree = "<group>"; };
+		6699B76625AEA2D4005DB9BB /* HFBTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFBTree.h; sourceTree = "<group>"; };
+		6699B76725AEA2D4005DB9BB /* HFFunctions_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFFunctions_Private.h; sourceTree = "<group>"; };
+		6699B76825AEA2D4005DB9BB /* HFByteArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFByteArray.h; sourceTree = "<group>"; };
+		6699B76925AEA2D4005DB9BB /* HFRepresenterTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFRepresenterTextView.h; sourceTree = "<group>"; };
+		6699B76A25AEA2D4005DB9BB /* HFSharedMemoryByteSlice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFSharedMemoryByteSlice.h; sourceTree = "<group>"; };
+		6699B76B25AEA2D4005DB9BB /* HFTextVisualStyleRun.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFTextVisualStyleRun.m; sourceTree = "<group>"; };
+		6699B76C25AEA2D4005DB9BB /* HFFullMemoryByteSlice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFFullMemoryByteSlice.m; sourceTree = "<group>"; };
+		6699B76D25AEA2D4005DB9BB /* HFByteSlice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFByteSlice.h; sourceTree = "<group>"; };
+		6699B76E25AEA2D4005DB9BB /* HFVerticalScrollerRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFVerticalScrollerRepresenter.m; sourceTree = "<group>"; };
+		6699B76F25AEA2D4005DB9BB /* HFStringEncodingTextRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFStringEncodingTextRepresenter.h; sourceTree = "<group>"; };
+		6699B77025AEA2D4005DB9BB /* HFBTree.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFBTree.m; sourceTree = "<group>"; };
+		6699B77125AEA2D4005DB9BB /* HFByteSlice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFByteSlice.m; sourceTree = "<group>"; };
+		6699B77225AEA2D4005DB9BB /* HFFullMemoryByteSlice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFFullMemoryByteSlice.h; sourceTree = "<group>"; };
+		6699B77325AEA2D4005DB9BB /* HFAnnotatedTree.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFAnnotatedTree.m; sourceTree = "<group>"; };
+		6699B77425AEA2D4005DB9BB /* HFTextVisualStyleRun.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFTextVisualStyleRun.h; sourceTree = "<group>"; };
+		6699B77525AEA2D4005DB9BB /* HFBTreeByteArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFBTreeByteArray.h; sourceTree = "<group>"; };
+		6699B77625AEA2D4005DB9BB /* HFRepresenterStringEncodingTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFRepresenterStringEncodingTextView.h; sourceTree = "<group>"; };
+		6699B77725AEA2D4005DB9BB /* HexFiend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HexFiend.h; sourceTree = "<group>"; };
+		6699B77825AEA2D7005DB9BB /* HFLineCountingRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFLineCountingRepresenter.h; sourceTree = "<group>"; };
+		6699B77925AEA2D7005DB9BB /* HFFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFFunctions.h; sourceTree = "<group>"; };
+		6699B77A25AEA2D7005DB9BB /* HFRepresenterHexTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFRepresenterHexTextView.m; sourceTree = "<group>"; };
+		6699B77B25AEA2D7005DB9BB /* HFHexTextRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFHexTextRepresenter.m; sourceTree = "<group>"; };
+		6699B77C25AEA2D7005DB9BB /* HFStatusBarRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFStatusBarRepresenter.h; sourceTree = "<group>"; };
+		6699B77D25AEA2D7005DB9BB /* HFRepresenterTextView_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFRepresenterTextView_Internal.h; sourceTree = "<group>"; };
+		6699B77E25AEA2D7005DB9BB /* HFTextRepresenter_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFTextRepresenter_Internal.h; sourceTree = "<group>"; };
+		6699B77F25AEA2D7005DB9BB /* HFStringEncodingTextRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFStringEncodingTextRepresenter.m; sourceTree = "<group>"; };
+		6699B78025AEA2D7005DB9BB /* HFSharedMemoryByteSlice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFSharedMemoryByteSlice.m; sourceTree = "<group>"; };
+		6699B78125AEA2D7005DB9BB /* HFTextRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFTextRepresenter.h; sourceTree = "<group>"; };
+		6699B78225AEA2D7005DB9BB /* HFTextRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFTextRepresenter.m; sourceTree = "<group>"; };
+		6699B78325AEA2D7005DB9BB /* HFRepresenterTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFRepresenterTextView.m; sourceTree = "<group>"; };
+		6699B78425AEA2D7005DB9BB /* HFBTreeByteArray.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFBTreeByteArray.m; sourceTree = "<group>"; };
+		6699B78525AEA2D7005DB9BB /* HFPasteboardOwner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFPasteboardOwner.h; sourceTree = "<group>"; };
+		6699B78625AEA2D7005DB9BB /* HFByteArray_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFByteArray_Internal.h; sourceTree = "<group>"; };
+		6699B78725AEA2D7005DB9BB /* HFGlyphTrie.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HFGlyphTrie.m; sourceTree = "<group>"; };
+		6699B7CD25AEA2DD005DB9BB /* HexFiend_2_Framework_Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HexFiend_2_Framework_Prefix.pch; sourceTree = "<group>"; };
+		6699B84525AEA969005DB9BB /* Bilinear.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = Bilinear.fsh; sourceTree = "<group>"; };
+		6699B84625AEA969005DB9BB /* OmniScaleLegacy.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = OmniScaleLegacy.fsh; sourceTree = "<group>"; };
+		6699B84725AEA969005DB9BB /* NearestNeighbor.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = NearestNeighbor.fsh; sourceTree = "<group>"; };
+		6699B84825AEA969005DB9BB /* Scale2x.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = Scale2x.fsh; sourceTree = "<group>"; };
+		6699B84925AEA969005DB9BB /* MonoLCD.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = MonoLCD.fsh; sourceTree = "<group>"; };
+		6699B84A25AEA96A005DB9BB /* HQ2x.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = HQ2x.fsh; sourceTree = "<group>"; };
+		6699B84B25AEA96A005DB9BB /* AAScale4x.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = AAScale4x.fsh; sourceTree = "<group>"; };
+		6699B84C25AEA96A005DB9BB /* LCD.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = LCD.fsh; sourceTree = "<group>"; };
+		6699B84D25AEA96A005DB9BB /* AAOmniScaleLegacy.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = AAOmniScaleLegacy.fsh; sourceTree = "<group>"; };
+		6699B84E25AEA96A005DB9BB /* SmoothBilinear.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = SmoothBilinear.fsh; sourceTree = "<group>"; };
+		6699B84F25AEA96A005DB9BB /* OmniScale.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = OmniScale.fsh; sourceTree = "<group>"; };
+		6699B85025AEA96A005DB9BB /* MasterShader.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = MasterShader.metal; sourceTree = "<group>"; };
+		6699B85125AEA96A005DB9BB /* AAScale2x.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = AAScale2x.fsh; sourceTree = "<group>"; };
+		6699B85225AEA96A005DB9BB /* MasterShader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = MasterShader.fsh; sourceTree = "<group>"; };
+		6699B85325AEA96A005DB9BB /* CRT.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = CRT.fsh; sourceTree = "<group>"; };
+		6699B85425AEA96A005DB9BB /* Scale4x.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = Scale4x.fsh; sourceTree = "<group>"; };
+		6699B8BD25AEAC54005DB9BB /* pb12.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pb12.c; sourceTree = "<group>"; };
+		6699B8BE25AEAC55005DB9BB /* sgb_boot.asm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm.asm; path = sgb_boot.asm; sourceTree = "<group>"; };
+		6699B8BF25AEAC55005DB9BB /* sgb2_boot.asm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm.asm; path = sgb2_boot.asm; sourceTree = "<group>"; };
+		6699B8C025AEAC55005DB9BB /* cgb_boot.asm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm.asm; path = cgb_boot.asm; sourceTree = "<group>"; };
+		6699B8C125AEAC55005DB9BB /* SameBoyLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SameBoyLogo.png; sourceTree = "<group>"; };
+		6699B8C225AEAC55005DB9BB /* cgb_boot_fast.asm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm.asm; path = cgb_boot_fast.asm; sourceTree = "<group>"; };
+		6699B8C325AEAC55005DB9BB /* agb_boot.asm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm.asm; path = agb_boot.asm; sourceTree = "<group>"; };
+		6699B8C425AEAC55005DB9BB /* dmg_boot.asm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm.asm; path = dmg_boot.asm; sourceTree = "<group>"; };
+		6699B92D25AEB22F005DB9BB /* SameBoyLogo.pb12 */ = {isa = PBXFileReference; lastKnownFileType = file; path = SameBoyLogo.pb12; sourceTree = "<group>"; };
 		66ABD4A325870117007F2788 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
 		66ABD4A925871479007F2788 /* OpcodeDocumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpcodeDocumentation.swift; sourceTree = "<group>"; };
 		66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegionInspectorViewController.swift; sourceTree = "<group>"; };
@@ -159,6 +514,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		665D4F712575F75700C3A03B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6699B58A25AE9F85005DB9BB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6699B7DA25AEA30E005DB9BB /* libHexFiend.a in Frameworks */,
+				6699B6B825AEA0A4005DB9BB /* Sameboy in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6699B73725AEA2B7005DB9BB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -254,10 +625,14 @@
 		665D4F4C2575F75400C3A03B = {
 			isa = PBXGroup;
 			children = (
+				6699B58025AE9EF1005DB9BB /* third_party */,
 				66C642FB2589DD1000035EC9 /* lib */,
 				665D4F572575F75400C3A03B /* KoholintIsland */,
 				665D4F6C2575F75700C3A03B /* KoholintIslandTests */,
 				665D4F772575F75700C3A03B /* KoholintIslandUITests */,
+				6699B58E25AE9F85005DB9BB /* Sameboy */,
+				6699B73A25AEA2B7005DB9BB /* HexFiend */,
+				665D4F562575F75400C3A03B /* Products */,
 				665D4FA12576C99000C3A03B /* Frameworks */,
 			);
 			sourceTree = "<group>";
@@ -268,9 +643,10 @@
 				665D4F552575F75400C3A03B /* KoholintIsland.app */,
 				665D4F692575F75700C3A03B /* KoholintIslandTests.xctest */,
 				665D4F742575F75700C3A03B /* KoholintIslandUITests.xctest */,
+				6699B58D25AE9F85005DB9BB /* Sameboy.app */,
+				6699B73925AEA2B7005DB9BB /* libHexFiend.a */,
 			);
 			name = Products;
-			path = ..;
 			sourceTree = "<group>";
 		};
 		665D4F572575F75400C3A03B /* KoholintIsland */ = {
@@ -287,7 +663,6 @@
 				667B1B622578541F00CE670F /* NotificationNames.swift */,
 				665D4F8C2575F92500C3A03B /* main.swift */,
 				667B1B7A257854BF00CE670F /* Resources */,
-				665D4F562575F75400C3A03B /* Products */,
 			);
 			path = KoholintIsland;
 			sourceTree = "<group>";
@@ -403,6 +778,221 @@
 			path = Emulator;
 			sourceTree = "<group>";
 		};
+		6699B58E25AE9F85005DB9BB /* Sameboy */ = {
+			isa = PBXGroup;
+			children = (
+				6699B8BC25AEAC41005DB9BB /* BootROMs */,
+				6699B84425AEA951005DB9BB /* Shaders */,
+				6699B6C925AEA261005DB9BB /* HexFiend */,
+				6699B62925AE9FF2005DB9BB /* Cocoa */,
+				6699B59A25AE9F88005DB9BB /* Sameboy.entitlements */,
+				6699B92D25AEB22F005DB9BB /* SameBoyLogo.pb12 */,
+			);
+			path = Sameboy;
+			sourceTree = "<group>";
+		};
+		6699B62925AE9FF2005DB9BB /* Cocoa */ = {
+			isa = PBXGroup;
+			children = (
+				6699B62E25AEA035005DB9BB /* AppDelegate.h */,
+				6699B65325AEA036005DB9BB /* AppDelegate.m */,
+				6699B65D25AEA037005DB9BB /* AppIcon.icns */,
+				6699B67025AEA037005DB9BB /* BigSurToolbar.h */,
+				6699B64F25AEA036005DB9BB /* Cartridge.icns */,
+				6699B66825AEA037005DB9BB /* ColorCartridge.icns */,
+				6699B63425AEA036005DB9BB /* CPU.png */,
+				6699B66C25AEA037005DB9BB /* CPU@2x.png */,
+				6699B63D25AEA036005DB9BB /* Display.png */,
+				6699B67425AEA038005DB9BB /* Display@2x.png */,
+				6699B63625AEA036005DB9BB /* Document.h */,
+				6699B66725AEA037005DB9BB /* Document.m */,
+				6699B65A25AEA037005DB9BB /* Document.xib */,
+				6699B65025AEA036005DB9BB /* GBAudioClient.h */,
+				6699B63725AEA036005DB9BB /* GBAudioClient.m */,
+				6699B65425AEA036005DB9BB /* GBBorderView.h */,
+				6699B64625AEA036005DB9BB /* GBBorderView.m */,
+				6699B63E25AEA036005DB9BB /* GBButtons.h */,
+				6699B64D25AEA036005DB9BB /* GBButtons.m */,
+				6699B64325AEA036005DB9BB /* GBCheatTextFieldCell.h */,
+				6699B63225AEA035005DB9BB /* GBCheatTextFieldCell.m */,
+				6699B65225AEA036005DB9BB /* GBCheatWindowController.h */,
+				6699B64825AEA036005DB9BB /* GBCheatWindowController.m */,
+				6699B63B25AEA036005DB9BB /* GBColorCell.h */,
+				6699B67525AEA038005DB9BB /* GBColorCell.m */,
+				6699B65725AEA037005DB9BB /* GBCompleteByteSlice.h */,
+				6699B64925AEA036005DB9BB /* GBCompleteByteSlice.m */,
+				6699B65F25AEA037005DB9BB /* GBGLShader.h */,
+				6699B66025AEA037005DB9BB /* GBGLShader.m */,
+				6699B63825AEA036005DB9BB /* GBImageCell.h */,
+				6699B63F25AEA036005DB9BB /* GBImageCell.m */,
+				6699B66525AEA037005DB9BB /* GBImageView.h */,
+				6699B65B25AEA037005DB9BB /* GBImageView.m */,
+				6699B65C25AEA037005DB9BB /* GBMemoryByteArray.h */,
+				6699B63025AEA035005DB9BB /* GBMemoryByteArray.m */,
+				6699B63A25AEA036005DB9BB /* GBOpenGLView.h */,
+				6699B65525AEA036005DB9BB /* GBOpenGLView.m */,
+				6699B62F25AEA035005DB9BB /* GBOptionalVisualEffectView.h */,
+				6699B64125AEA036005DB9BB /* GBOptionalVisualEffectView.m */,
+				6699B63125AEA035005DB9BB /* GBPreferencesWindow.h */,
+				6699B66625AEA037005DB9BB /* GBPreferencesWindow.m */,
+				6699B64025AEA036005DB9BB /* GBSplitView.h */,
+				6699B63525AEA036005DB9BB /* GBSplitView.m */,
+				6699B65925AEA037005DB9BB /* GBTerminalTextFieldCell.h */,
+				6699B64725AEA036005DB9BB /* GBTerminalTextFieldCell.m */,
+				6699B65E25AEA037005DB9BB /* GBView.h */,
+				6699B65625AEA037005DB9BB /* GBView.m */,
+				6699B66225AEA037005DB9BB /* GBViewGL.h */,
+				6699B66125AEA037005DB9BB /* GBViewGL.m */,
+				6699B63325AEA035005DB9BB /* GBViewMetal.h */,
+				6699B64B25AEA036005DB9BB /* GBViewMetal.m */,
+				6699B66925AEA037005DB9BB /* GBWarningPopover.h */,
+				6699B66A25AEA037005DB9BB /* GBWarningPopover.m */,
+				6699B66B25AEA037005DB9BB /* Info.plist */,
+				6699B67325AEA037005DB9BB /* Joypad.png */,
+				6699B64425AEA036005DB9BB /* Joypad@2x.png */,
+				6699B66325AEA037005DB9BB /* Joypad~dark.png */,
+				6699B66D25AEA037005DB9BB /* Joypad~dark@2x.png */,
+				6699B66425AEA037005DB9BB /* KeyboardShortcutPrivateAPIs.h */,
+				6699B64E25AEA036005DB9BB /* License.html */,
+				6699B64A25AEA036005DB9BB /* main.m */,
+				6699B66E25AEA037005DB9BB /* MainMenu.xib */,
+				6699B64525AEA036005DB9BB /* NSImageNamedDarkSupport.m */,
+				6699B67225AEA037005DB9BB /* NSObject+MavericksCompat.m */,
+				6699B64225AEA036005DB9BB /* NSString+StringForKey.h */,
+				6699B66F25AEA037005DB9BB /* NSString+StringForKey.m */,
+				6699B63925AEA036005DB9BB /* PkgInfo */,
+				6699B65825AEA037005DB9BB /* PopoverView.xib */,
+				6699B64C25AEA036005DB9BB /* Preferences.xib */,
+				6699B63C25AEA036005DB9BB /* Speaker.png */,
+				6699B67625AEA038005DB9BB /* Speaker@2x.png */,
+				6699B65125AEA036005DB9BB /* Speaker~dark.png */,
+				6699B67125AEA037005DB9BB /* Speaker~dark@2x.png */,
+			);
+			name = Cocoa;
+			path = ../../third_party/Sameboy/Cocoa;
+			sourceTree = "<group>";
+		};
+		6699B6C925AEA261005DB9BB /* HexFiend */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = HexFiend;
+			path = ../../third_party/Sameboy/HexFiend;
+			sourceTree = "<group>";
+		};
+		6699B73A25AEA2B7005DB9BB /* HexFiend */ = {
+			isa = PBXGroup;
+			children = (
+				6699B7CD25AEA2DD005DB9BB /* HexFiend_2_Framework_Prefix.pch */,
+				6699B77725AEA2D4005DB9BB /* HexFiend.h */,
+				6699B76225AEA2D3005DB9BB /* HFAnnotatedTree.h */,
+				6699B77325AEA2D4005DB9BB /* HFAnnotatedTree.m */,
+				6699B76625AEA2D4005DB9BB /* HFBTree.h */,
+				6699B77025AEA2D4005DB9BB /* HFBTree.m */,
+				6699B77525AEA2D4005DB9BB /* HFBTreeByteArray.h */,
+				6699B78425AEA2D7005DB9BB /* HFBTreeByteArray.m */,
+				6699B78625AEA2D7005DB9BB /* HFByteArray_Internal.h */,
+				6699B76825AEA2D4005DB9BB /* HFByteArray.h */,
+				6699B74C25AEA2D3005DB9BB /* HFByteArray.m */,
+				6699B75325AEA2D3005DB9BB /* HFByteSlice_Private.h */,
+				6699B76D25AEA2D4005DB9BB /* HFByteSlice.h */,
+				6699B77125AEA2D4005DB9BB /* HFByteSlice.m */,
+				6699B76325AEA2D4005DB9BB /* HFController.h */,
+				6699B74A25AEA2D3005DB9BB /* HFController.m */,
+				6699B76125AEA2D3005DB9BB /* HFFullMemoryByteArray.h */,
+				6699B75D25AEA2D3005DB9BB /* HFFullMemoryByteArray.m */,
+				6699B77225AEA2D4005DB9BB /* HFFullMemoryByteSlice.h */,
+				6699B76C25AEA2D4005DB9BB /* HFFullMemoryByteSlice.m */,
+				6699B76725AEA2D4005DB9BB /* HFFunctions_Private.h */,
+				6699B77925AEA2D7005DB9BB /* HFFunctions.h */,
+				6699B75225AEA2D3005DB9BB /* HFFunctions.m */,
+				6699B75F25AEA2D3005DB9BB /* HFGlyphTrie.h */,
+				6699B78725AEA2D7005DB9BB /* HFGlyphTrie.m */,
+				6699B75525AEA2D3005DB9BB /* HFHexTextRepresenter.h */,
+				6699B77B25AEA2D7005DB9BB /* HFHexTextRepresenter.m */,
+				6699B75625AEA2D3005DB9BB /* HFHexTextView.h */,
+				6699B74E25AEA2D3005DB9BB /* HFHexTextView.m */,
+				6699B75C25AEA2D3005DB9BB /* HFLayoutRepresenter.h */,
+				6699B75825AEA2D3005DB9BB /* HFLayoutRepresenter.m */,
+				6699B77825AEA2D7005DB9BB /* HFLineCountingRepresenter.h */,
+				6699B75E25AEA2D3005DB9BB /* HFLineCountingRepresenter.m */,
+				6699B75025AEA2D3005DB9BB /* HFLineCountingView.h */,
+				6699B76525AEA2D4005DB9BB /* HFLineCountingView.m */,
+				6699B78525AEA2D7005DB9BB /* HFPasteboardOwner.h */,
+				6699B76425AEA2D4005DB9BB /* HFPasteboardOwner.m */,
+				6699B75925AEA2D3005DB9BB /* HFPrivilegedHelperConnection.h */,
+				6699B74825AEA2D2005DB9BB /* HFRepresenter_Internal.h */,
+				6699B75B25AEA2D3005DB9BB /* HFRepresenter.h */,
+				6699B76025AEA2D3005DB9BB /* HFRepresenter.m */,
+				6699B74B25AEA2D3005DB9BB /* HFRepresenterHexTextView.h */,
+				6699B77A25AEA2D7005DB9BB /* HFRepresenterHexTextView.m */,
+				6699B77625AEA2D4005DB9BB /* HFRepresenterStringEncodingTextView.h */,
+				6699B74F25AEA2D3005DB9BB /* HFRepresenterStringEncodingTextView.m */,
+				6699B77D25AEA2D7005DB9BB /* HFRepresenterTextView_Internal.h */,
+				6699B76925AEA2D4005DB9BB /* HFRepresenterTextView.h */,
+				6699B78325AEA2D7005DB9BB /* HFRepresenterTextView.m */,
+				6699B75725AEA2D3005DB9BB /* HFRepresenterTextViewCallout.h */,
+				6699B74D25AEA2D3005DB9BB /* HFRepresenterTextViewCallout.m */,
+				6699B76A25AEA2D4005DB9BB /* HFSharedMemoryByteSlice.h */,
+				6699B78025AEA2D7005DB9BB /* HFSharedMemoryByteSlice.m */,
+				6699B77C25AEA2D7005DB9BB /* HFStatusBarRepresenter.h */,
+				6699B75425AEA2D3005DB9BB /* HFStatusBarRepresenter.m */,
+				6699B76F25AEA2D4005DB9BB /* HFStringEncodingTextRepresenter.h */,
+				6699B77F25AEA2D7005DB9BB /* HFStringEncodingTextRepresenter.m */,
+				6699B77E25AEA2D7005DB9BB /* HFTextRepresenter_Internal.h */,
+				6699B75125AEA2D3005DB9BB /* HFTextRepresenter_KeyBinding.m */,
+				6699B78125AEA2D7005DB9BB /* HFTextRepresenter.h */,
+				6699B78225AEA2D7005DB9BB /* HFTextRepresenter.m */,
+				6699B77425AEA2D4005DB9BB /* HFTextVisualStyleRun.h */,
+				6699B76B25AEA2D4005DB9BB /* HFTextVisualStyleRun.m */,
+				6699B74925AEA2D2005DB9BB /* HFTypes.h */,
+				6699B75A25AEA2D3005DB9BB /* HFVerticalScrollerRepresenter.h */,
+				6699B76E25AEA2D4005DB9BB /* HFVerticalScrollerRepresenter.m */,
+			);
+			name = HexFiend;
+			path = ../third_party/Sameboy/HexFiend;
+			sourceTree = "<group>";
+		};
+		6699B84425AEA951005DB9BB /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				6699B84D25AEA96A005DB9BB /* AAOmniScaleLegacy.fsh */,
+				6699B85125AEA96A005DB9BB /* AAScale2x.fsh */,
+				6699B84B25AEA96A005DB9BB /* AAScale4x.fsh */,
+				6699B84525AEA969005DB9BB /* Bilinear.fsh */,
+				6699B85325AEA96A005DB9BB /* CRT.fsh */,
+				6699B84A25AEA96A005DB9BB /* HQ2x.fsh */,
+				6699B84C25AEA96A005DB9BB /* LCD.fsh */,
+				6699B85225AEA96A005DB9BB /* MasterShader.fsh */,
+				6699B85025AEA96A005DB9BB /* MasterShader.metal */,
+				6699B84925AEA969005DB9BB /* MonoLCD.fsh */,
+				6699B84725AEA969005DB9BB /* NearestNeighbor.fsh */,
+				6699B84F25AEA96A005DB9BB /* OmniScale.fsh */,
+				6699B84625AEA969005DB9BB /* OmniScaleLegacy.fsh */,
+				6699B84825AEA969005DB9BB /* Scale2x.fsh */,
+				6699B85425AEA96A005DB9BB /* Scale4x.fsh */,
+				6699B84E25AEA96A005DB9BB /* SmoothBilinear.fsh */,
+			);
+			name = Shaders;
+			path = ../../third_party/Sameboy/Shaders;
+			sourceTree = "<group>";
+		};
+		6699B8BC25AEAC41005DB9BB /* BootROMs */ = {
+			isa = PBXGroup;
+			children = (
+				6699B8C325AEAC55005DB9BB /* agb_boot.asm */,
+				6699B8C225AEAC55005DB9BB /* cgb_boot_fast.asm */,
+				6699B8C025AEAC55005DB9BB /* cgb_boot.asm */,
+				6699B8C425AEAC55005DB9BB /* dmg_boot.asm */,
+				6699B8BD25AEAC54005DB9BB /* pb12.c */,
+				6699B8C125AEAC55005DB9BB /* SameBoyLogo.png */,
+				6699B8BE25AEAC55005DB9BB /* sgb_boot.asm */,
+				6699B8BF25AEAC55005DB9BB /* sgb2_boot.asm */,
+			);
+			name = BootROMs;
+			path = ../../third_party/Sameboy/BootROMs;
+			sourceTree = "<group>";
+		};
 		66ABD4A825871458007F2788 /* LR35902 */ = {
 			isa = PBXGroup;
 			children = (
@@ -420,6 +1010,52 @@
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		6699B73525AEA2B7005DB9BB /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6699B79925AEA2D7005DB9BB /* HFPrivilegedHelperConnection.h in Headers */,
+				6699B79625AEA2D7005DB9BB /* HFHexTextView.h in Headers */,
+				6699B79325AEA2D7005DB9BB /* HFByteSlice_Private.h in Headers */,
+				6699B78925AEA2D7005DB9BB /* HFTypes.h in Headers */,
+				6699B7A725AEA2D7005DB9BB /* HFFunctions_Private.h in Headers */,
+				6699B7C625AEA2D7005DB9BB /* HFByteArray_Internal.h in Headers */,
+				6699B7A225AEA2D7005DB9BB /* HFAnnotatedTree.h in Headers */,
+				6699B78B25AEA2D7005DB9BB /* HFRepresenterHexTextView.h in Headers */,
+				6699B7A625AEA2D7005DB9BB /* HFBTree.h in Headers */,
+				6699B7A325AEA2D7005DB9BB /* HFController.h in Headers */,
+				6699B7B525AEA2D7005DB9BB /* HFBTreeByteArray.h in Headers */,
+				6699B7B925AEA2D7005DB9BB /* HFFunctions.h in Headers */,
+				6699B7A825AEA2D7005DB9BB /* HFByteArray.h in Headers */,
+				6699B7AA25AEA2D7005DB9BB /* HFSharedMemoryByteSlice.h in Headers */,
+				6699B7B625AEA2D7005DB9BB /* HFRepresenterStringEncodingTextView.h in Headers */,
+				6699B7AD25AEA2D7005DB9BB /* HFByteSlice.h in Headers */,
+				6699B7A925AEA2D7005DB9BB /* HFRepresenterTextView.h in Headers */,
+				6699B79525AEA2D7005DB9BB /* HFHexTextRepresenter.h in Headers */,
+				6699B79A25AEA2D7005DB9BB /* HFVerticalScrollerRepresenter.h in Headers */,
+				6699B79725AEA2D7005DB9BB /* HFRepresenterTextViewCallout.h in Headers */,
+				6699B7C125AEA2D7005DB9BB /* HFTextRepresenter.h in Headers */,
+				6699B79025AEA2D7005DB9BB /* HFLineCountingView.h in Headers */,
+				6699B79B25AEA2D7005DB9BB /* HFRepresenter.h in Headers */,
+				6699B7A125AEA2D7005DB9BB /* HFFullMemoryByteArray.h in Headers */,
+				6699B7B425AEA2D7005DB9BB /* HFTextVisualStyleRun.h in Headers */,
+				6699B7B225AEA2D7005DB9BB /* HFFullMemoryByteSlice.h in Headers */,
+				6699B7B725AEA2D7005DB9BB /* HexFiend.h in Headers */,
+				6699B7AF25AEA2D7005DB9BB /* HFStringEncodingTextRepresenter.h in Headers */,
+				6699B7B825AEA2D7005DB9BB /* HFLineCountingRepresenter.h in Headers */,
+				6699B7C525AEA2D7005DB9BB /* HFPasteboardOwner.h in Headers */,
+				6699B79C25AEA2D7005DB9BB /* HFLayoutRepresenter.h in Headers */,
+				6699B7BE25AEA2D7005DB9BB /* HFTextRepresenter_Internal.h in Headers */,
+				6699B79F25AEA2D7005DB9BB /* HFGlyphTrie.h in Headers */,
+				6699B7BC25AEA2D7005DB9BB /* HFStatusBarRepresenter.h in Headers */,
+				6699B7BD25AEA2D7005DB9BB /* HFRepresenterTextView_Internal.h in Headers */,
+				6699B78825AEA2D7005DB9BB /* HFRepresenter_Internal.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		665D4F542575F75400C3A03B /* KoholintIsland */ = {
@@ -479,6 +1115,47 @@
 			productReference = 665D4F742575F75700C3A03B /* KoholintIslandUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		6699B58C25AE9F85005DB9BB /* Sameboy */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6699B59B25AE9F88005DB9BB /* Build configuration list for PBXNativeTarget "Sameboy" */;
+			buildPhases = (
+				6699B58925AE9F85005DB9BB /* Sources */,
+				6699B58A25AE9F85005DB9BB /* Frameworks */,
+				6699B58B25AE9F85005DB9BB /* Resources */,
+				6699B88B25AEAA45005DB9BB /* CopyFiles */,
+			);
+			buildRules = (
+				6699B8D825AEACFA005DB9BB /* PBXBuildRule */,
+			);
+			dependencies = (
+				6699B7D925AEA30A005DB9BB /* PBXTargetDependency */,
+				6699B6B625AEA0A1005DB9BB /* PBXTargetDependency */,
+			);
+			name = Sameboy;
+			packageProductDependencies = (
+				6699B6B725AEA0A4005DB9BB /* Sameboy */,
+			);
+			productName = Sameboy;
+			productReference = 6699B58D25AE9F85005DB9BB /* Sameboy.app */;
+			productType = "com.apple.product-type.application";
+		};
+		6699B73825AEA2B7005DB9BB /* HexFiend */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6699B73F25AEA2B7005DB9BB /* Build configuration list for PBXNativeTarget "HexFiend" */;
+			buildPhases = (
+				6699B73525AEA2B7005DB9BB /* Headers */,
+				6699B73625AEA2B7005DB9BB /* Sources */,
+				6699B73725AEA2B7005DB9BB /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HexFiend;
+			productName = HexFiend;
+			productReference = 6699B73925AEA2B7005DB9BB /* libHexFiend.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -500,6 +1177,12 @@
 						CreatedOnToolsVersion = 12.2;
 						TestTargetID = 665D4F542575F75400C3A03B;
 					};
+					6699B58C25AE9F85005DB9BB = {
+						CreatedOnToolsVersion = 12.3;
+					};
+					6699B73825AEA2B7005DB9BB = {
+						CreatedOnToolsVersion = 12.3;
+					};
 				};
 			};
 			buildConfigurationList = 665D4F502575F75400C3A03B /* Build configuration list for PBXProject "KoholintIsland" */;
@@ -518,6 +1201,8 @@
 				665D4F542575F75400C3A03B /* KoholintIsland */,
 				665D4F682575F75700C3A03B /* KoholintIslandTests */,
 				665D4F732575F75700C3A03B /* KoholintIslandUITests */,
+				6699B58C25AE9F85005DB9BB /* Sameboy */,
+				6699B73825AEA2B7005DB9BB /* HexFiend */,
 			);
 		};
 /* End PBXProject section */
@@ -542,6 +1227,36 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6699B58B25AE9F85005DB9BB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6699B69C25AEA038005DB9BB /* Info.plist in Resources */,
+				6699B69A25AEA038005DB9BB /* ColorCartridge.icns in Resources */,
+				6699B69F25AEA038005DB9BB /* MainMenu.xib in Resources */,
+				6699B6A425AEA038005DB9BB /* Display@2x.png in Resources */,
+				6699B69225AEA038005DB9BB /* Document.xib in Resources */,
+				6699B68925AEA038005DB9BB /* Preferences.xib in Resources */,
+				6699B67E25AEA038005DB9BB /* Display.png in Resources */,
+				6699B68B25AEA038005DB9BB /* License.html in Resources */,
+				6699B69425AEA038005DB9BB /* AppIcon.icns in Resources */,
+				6699B92125AEB181005DB9BB /* SameBoyLogo.png in Resources */,
+				6699B6A625AEA038005DB9BB /* Speaker@2x.png in Resources */,
+				6699B68C25AEA038005DB9BB /* Cartridge.icns in Resources */,
+				6699B67C25AEA038005DB9BB /* PkgInfo in Resources */,
+				6699B69D25AEA038005DB9BB /* CPU@2x.png in Resources */,
+				6699B6A125AEA038005DB9BB /* Speaker~dark@2x.png in Resources */,
+				6699B67D25AEA038005DB9BB /* Speaker.png in Resources */,
+				6699B68D25AEA038005DB9BB /* Speaker~dark.png in Resources */,
+				6699B69725AEA038005DB9BB /* Joypad~dark.png in Resources */,
+				6699B68125AEA038005DB9BB /* Joypad@2x.png in Resources */,
+				6699B69E25AEA038005DB9BB /* Joypad~dark@2x.png in Resources */,
+				6699B6A325AEA038005DB9BB /* Joypad.png in Resources */,
+				6699B67925AEA038005DB9BB /* CPU.png in Resources */,
+				6699B69125AEA038005DB9BB /* PopoverView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -620,6 +1335,80 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6699B58925AE9F85005DB9BB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6699B6A025AEA038005DB9BB /* NSString+StringForKey.m in Sources */,
+				6699B89725AEAA85005DB9BB /* GBViewMetal.m in Sources */,
+				6699B67B25AEA038005DB9BB /* GBAudioClient.m in Sources */,
+				6699B68325AEA038005DB9BB /* GBBorderView.m in Sources */,
+				6699B6A225AEA038005DB9BB /* NSObject+MavericksCompat.m in Sources */,
+				6699B68F25AEA038005DB9BB /* GBOpenGLView.m in Sources */,
+				6699B69325AEA038005DB9BB /* GBImageView.m in Sources */,
+				6699B67825AEA038005DB9BB /* GBCheatTextFieldCell.m in Sources */,
+				6699B98425AEB5F4005DB9BB /* cgb_boot_fast.asm in Sources */,
+				6699B68025AEA038005DB9BB /* GBOptionalVisualEffectView.m in Sources */,
+				6699B68425AEA038005DB9BB /* GBTerminalTextFieldCell.m in Sources */,
+				6699B68525AEA038005DB9BB /* GBCheatWindowController.m in Sources */,
+				6699B6A525AEA038005DB9BB /* GBColorCell.m in Sources */,
+				6699B68225AEA038005DB9BB /* NSImageNamedDarkSupport.m in Sources */,
+				6699B67F25AEA038005DB9BB /* GBImageCell.m in Sources */,
+				6699B98325AEB5F4005DB9BB /* dmg_boot.asm in Sources */,
+				6699B69925AEA038005DB9BB /* Document.m in Sources */,
+				6699B98025AEB5F4005DB9BB /* cgb_boot.asm in Sources */,
+				6699B69625AEA038005DB9BB /* GBViewGL.m in Sources */,
+				6699B67725AEA038005DB9BB /* GBMemoryByteArray.m in Sources */,
+				6699B69025AEA038005DB9BB /* GBView.m in Sources */,
+				6699B69525AEA038005DB9BB /* GBGLShader.m in Sources */,
+				6699B68625AEA038005DB9BB /* GBCompleteByteSlice.m in Sources */,
+				6699B68725AEA038005DB9BB /* main.m in Sources */,
+				6699B98125AEB5F4005DB9BB /* sgb_boot.asm in Sources */,
+				6699B68E25AEA038005DB9BB /* AppDelegate.m in Sources */,
+				6699B69B25AEA038005DB9BB /* GBWarningPopover.m in Sources */,
+				6699B68A25AEA038005DB9BB /* GBButtons.m in Sources */,
+				6699B69825AEA038005DB9BB /* GBPreferencesWindow.m in Sources */,
+				6699B98525AEB5F4005DB9BB /* sgb2_boot.asm in Sources */,
+				6699B98225AEB5F4005DB9BB /* agb_boot.asm in Sources */,
+				6699B67A25AEA038005DB9BB /* GBSplitView.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6699B73625AEA2B7005DB9BB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6699B7BB25AEA2D7005DB9BB /* HFHexTextRepresenter.m in Sources */,
+				6699B7AC25AEA2D7005DB9BB /* HFFullMemoryByteSlice.m in Sources */,
+				6699B7C725AEA2D7005DB9BB /* HFGlyphTrie.m in Sources */,
+				6699B78A25AEA2D7005DB9BB /* HFController.m in Sources */,
+				6699B7BA25AEA2D7005DB9BB /* HFRepresenterHexTextView.m in Sources */,
+				6699B79425AEA2D7005DB9BB /* HFStatusBarRepresenter.m in Sources */,
+				6699B7B125AEA2D7005DB9BB /* HFByteSlice.m in Sources */,
+				6699B7B325AEA2D7005DB9BB /* HFAnnotatedTree.m in Sources */,
+				6699B78E25AEA2D7005DB9BB /* HFHexTextView.m in Sources */,
+				6699B7B025AEA2D7005DB9BB /* HFBTree.m in Sources */,
+				6699B78D25AEA2D7005DB9BB /* HFRepresenterTextViewCallout.m in Sources */,
+				6699B78F25AEA2D7005DB9BB /* HFRepresenterStringEncodingTextView.m in Sources */,
+				6699B7C325AEA2D7005DB9BB /* HFRepresenterTextView.m in Sources */,
+				6699B7BF25AEA2D7005DB9BB /* HFStringEncodingTextRepresenter.m in Sources */,
+				6699B7A425AEA2D7005DB9BB /* HFPasteboardOwner.m in Sources */,
+				6699B79225AEA2D7005DB9BB /* HFFunctions.m in Sources */,
+				6699B7A525AEA2D7005DB9BB /* HFLineCountingView.m in Sources */,
+				6699B79125AEA2D7005DB9BB /* HFTextRepresenter_KeyBinding.m in Sources */,
+				6699B7AB25AEA2D7005DB9BB /* HFTextVisualStyleRun.m in Sources */,
+				6699B7A025AEA2D7005DB9BB /* HFRepresenter.m in Sources */,
+				6699B79D25AEA2D7005DB9BB /* HFFullMemoryByteArray.m in Sources */,
+				6699B79825AEA2D7005DB9BB /* HFLayoutRepresenter.m in Sources */,
+				6699B7C425AEA2D7005DB9BB /* HFBTreeByteArray.m in Sources */,
+				6699B7C225AEA2D7005DB9BB /* HFTextRepresenter.m in Sources */,
+				6699B79E25AEA2D7005DB9BB /* HFLineCountingRepresenter.m in Sources */,
+				6699B78C25AEA2D7005DB9BB /* HFByteArray.m in Sources */,
+				6699B7C025AEA2D7005DB9BB /* HFSharedMemoryByteSlice.m in Sources */,
+				6699B7AE25AEA2D7005DB9BB /* HFVerticalScrollerRepresenter.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -636,6 +1425,15 @@
 		665D4FA02576C98C00C3A03B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = 665D4F9F2576C98C00C3A03B /* LR35902 */;
+		};
+		6699B6B625AEA0A1005DB9BB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 6699B6B525AEA0A1005DB9BB /* Sameboy */;
+		};
+		6699B7D925AEA30A005DB9BB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6699B73825AEA2B7005DB9BB /* HexFiend */;
+			targetProxy = 6699B7D825AEA30A005DB9BB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1026,6 +1824,135 @@
 			};
 			name = Release;
 		};
+		6699B59C25AE9F88005DB9BB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Sameboy/Sameboy.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 69Y7ARDN28;
+				ENABLE_HARDENED_RUNTIME = YES;
+				HEADER_SEARCH_PATHS = ../third_party/Sameboy;
+				INFOPLIST_FILE = ../third_party/Sameboy/Cocoa/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				OTHER_CODE_SIGN_FLAGS = "--deep";
+				OTHER_LDFLAGS = (
+					"-framework",
+					PreferencePanes,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.featherless.Sameboy;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+			};
+			name = Debug;
+		};
+		6699B59D25AE9F88005DB9BB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Sameboy/Sameboy.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 69Y7ARDN28;
+				ENABLE_HARDENED_RUNTIME = YES;
+				HEADER_SEARCH_PATHS = ../third_party/Sameboy;
+				INFOPLIST_FILE = ../third_party/Sameboy/Cocoa/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				OTHER_CODE_SIGN_FLAGS = "--deep";
+				OTHER_LDFLAGS = (
+					"-framework",
+					PreferencePanes,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.featherless.Sameboy;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+			};
+			name = Release;
+		};
+		6699B59E25AE9F88005DB9BB /* Release-iterative */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Sameboy/Sameboy.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 69Y7ARDN28;
+				ENABLE_HARDENED_RUNTIME = YES;
+				HEADER_SEARCH_PATHS = ../third_party/Sameboy;
+				INFOPLIST_FILE = ../third_party/Sameboy/Cocoa/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				OTHER_CODE_SIGN_FLAGS = "--deep";
+				OTHER_LDFLAGS = (
+					"-framework",
+					PreferencePanes,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.featherless.Sameboy;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+			};
+			name = "Release-iterative";
+		};
+		6699B74025AEA2B7005DB9BB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 69Y7ARDN28;
+				EXECUTABLE_PREFIX = lib;
+				GCC_PREFIX_HEADER = ../third_party/Sameboy/HexFiend/HexFiend_2_Framework_Prefix.pch;
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		6699B74125AEA2B7005DB9BB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 69Y7ARDN28;
+				EXECUTABLE_PREFIX = lib;
+				GCC_PREFIX_HEADER = ../third_party/Sameboy/HexFiend/HexFiend_2_Framework_Prefix.pch;
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		6699B74225AEA2B7005DB9BB /* Release-iterative */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 69Y7ARDN28;
+				EXECUTABLE_PREFIX = lib;
+				GCC_PREFIX_HEADER = ../third_party/Sameboy/HexFiend/HexFiend_2_Framework_Prefix.pch;
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = "Release-iterative";
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1069,6 +1996,26 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		6699B59B25AE9F88005DB9BB /* Build configuration list for PBXNativeTarget "Sameboy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6699B59C25AE9F88005DB9BB /* Debug */,
+				6699B59D25AE9F88005DB9BB /* Release */,
+				6699B59E25AE9F88005DB9BB /* Release-iterative */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6699B73F25AEA2B7005DB9BB /* Build configuration list for PBXNativeTarget "HexFiend" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6699B74025AEA2B7005DB9BB /* Debug */,
+				6699B74125AEA2B7005DB9BB /* Release */,
+				6699B74225AEA2B7005DB9BB /* Release-iterative */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1079,6 +2026,14 @@
 		665D4F9F2576C98C00C3A03B /* LR35902 */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = LR35902;
+		};
+		6699B6B525AEA0A1005DB9BB /* Sameboy */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Sameboy;
+		};
+		6699B6B725AEA0A4005DB9BB /* Sameboy */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Sameboy;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
