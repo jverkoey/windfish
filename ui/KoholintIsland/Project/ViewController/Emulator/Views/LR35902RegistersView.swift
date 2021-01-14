@@ -101,17 +101,18 @@ final class LR35902RegistersView: NSView {
     fatalError("init(coder:) has not been implemented")
   }
 
-  func update(with cpu: LR35902) {
-    pcView.value = cpu.machineInstruction.sourceAddress() ?? 0x100
-    spView.value = cpu.sp
-    aView.value = cpu.a
-    fView.value = cpu.f
-    bView.value = cpu.b
-    cView.value = cpu.c
-    dView.value = cpu.d
-    eView.value = cpu.e
-    hView.value = cpu.h
-    lView.value = cpu.l
-    flagsView.update(with: cpu)
+  func update(with emulator: Emulator) {
+    let gb = emulator.gb.pointee
+    pcView.value = gb.pc
+    spView.value = gb.sp
+    aView.value  = gb.a
+    fView.value  = gb.f
+    bView.value  = gb.b
+    cView.value  = gb.c
+    dView.value  = gb.d
+    eView.value  = gb.e
+    hView.value  = gb.h
+    lView.value  = gb.l
+    flagsView.update(with: emulator)
   }
 }

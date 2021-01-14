@@ -17,6 +17,7 @@ final class AddressView: NSView {
     textField.font = monospacedFont
     textField.formatter = LR35902AddressFormatter()
     textField.isEditable = false // TODO: Allow editing.
+    textField.objectValue = 0
 
     label.translatesAutoresizingMaskIntoConstraints = false
     textField.translatesAutoresizingMaskIntoConstraints = false

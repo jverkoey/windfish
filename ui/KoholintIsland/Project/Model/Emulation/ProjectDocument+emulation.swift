@@ -9,6 +9,8 @@ protocol EmulationObservers {
   func emulationDidAdvance(screenImage: NSImage, tileDataImage: NSImage, fps: Double?, ips: Double?)
   func emulationDidStart()
   func emulationDidStop()
+
+  func emulationDidAdvance()
 }
 
 private final class EmulationBreakpointContext: NSObject {

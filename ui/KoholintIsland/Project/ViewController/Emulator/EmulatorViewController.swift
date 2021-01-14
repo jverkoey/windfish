@@ -350,6 +350,10 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
     }
   }
 
+  func emulationDidAdvance() {
+    updateRegisters()
+  }
+
   func emulationDidStart() {
     // Avoid flashing the instruction labels if the emulation concludes quickly enough.
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -468,7 +472,7 @@ extension EmulatorViewController: NSTextFieldDelegate {
   }
 
   func updateRegisters() {
-    cpuView.update(with: document.gameboy.cpu)
+    cpuView.update(with: document.sameboy)
   }
 }
 

@@ -36,6 +36,9 @@ extension PPUViewController: EmulationObservers {
     registersView.update(with: document.gameboy.ppu)
   }
 
+  func emulationDidAdvance() {
+  }
+
   func emulationDidStart() {}
   func emulationDidStop() {}
 }
