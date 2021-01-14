@@ -45,6 +45,7 @@ extension ProjectDocument: EmulatorDelegate {
 
   func getDebuggerInput() -> String? {
     // TODO: Block until a command is provided via the UI.
+//    return "registers"
     return nil
   }
 }
