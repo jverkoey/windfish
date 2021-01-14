@@ -34,6 +34,7 @@ class ProjectDocument: NSDocument {
         }
 
         sameboy.start()
+        sameboy.debuggerBreak()
 
       } else {
         preconditionFailure()
@@ -63,6 +64,7 @@ class ProjectDocument: NSDocument {
 
     super.init()
 
+    self.sameboy.setDebuggerEnabled(true)
     self.sameboy.delegate = self
 
     self.sameboyView.emulator = self.sameboy

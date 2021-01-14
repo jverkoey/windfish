@@ -377,11 +377,7 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
       document.advance()
 
     } else if sender.selectedSegment == 3 {  // Play
-      if document.emulating {
-        document.stop()
-      } else {
-        document.run()
-      }
+      document.sameboy.debuggerExecuteCommand("step")
 
     } else if sender.selectedSegment == 4 {  // Clear
       for register in LR35902.Instruction.Numeric.registers8 {

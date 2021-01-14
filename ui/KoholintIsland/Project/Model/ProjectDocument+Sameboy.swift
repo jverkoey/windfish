@@ -42,4 +42,9 @@ extension ProjectDocument: EmulatorDelegate {
     sameboyView.flip()
     sameboy.lcdOutput = sameboyView.pixels()
   }
+
+  func getDebuggerInput() -> String? {
+    // TODO: Block until a command is provided via the UI.
+    return nil
+  }
 }
