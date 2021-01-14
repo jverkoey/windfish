@@ -9,6 +9,8 @@ class ProjectDocument: NSDocument {
   weak var contentViewController: ProjectViewController?
 
   var sameboy: Emulator
+  var sameboyView = GBView()
+
   var isDisassembling = false
   var romData: Data? {
     didSet {
@@ -16,9 +18,22 @@ class ProjectDocument: NSDocument {
         gameboy.cartridge = .init(data: romData)
         gameboy.cpu.pc = 0x100  // Assume the boot sequence has concluded.
 
-        romData.withUnsafeBytes { buffer in
-          self.sameboy.loadROM(fromBuffer: buffer, size: romData.count)
+        sameboyView.screenSizeChanged()
+
+        let screenSize = sameboy.screenSize
+        if let window = self.lcdWindowController.window {
+          self.lcdWindowController.window?.contentMinSize = screenSize
+          if window.contentView!.bounds.size.width < screenSize.width ||
+              window.contentView!.bounds.size.width < screenSize.height {
+            window.zoom(nil)
+          }
         }
+
+        romData.withUnsafeBytes { buffer in
+          sameboy.loadROM(fromBuffer: buffer, size: romData.count)
+        }
+
+        sameboy.start()
 
       } else {
         preconditionFailure()
@@ -49,6 +64,8 @@ class ProjectDocument: NSDocument {
     super.init()
 
     self.sameboy.delegate = self
+
+    self.sameboyView.emulator = self.sameboy
 
     applyDefaults()
   }

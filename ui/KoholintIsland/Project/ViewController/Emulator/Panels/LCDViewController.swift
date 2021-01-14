@@ -19,14 +19,8 @@ final class PixelImageView: NSImageView {
 }
 
 final class LCDViewController: NSViewController {
-  let screenImageView = PixelImageView()
-
   override func loadView() {
     view = NSView()
-
-    screenImageView.frame = view.bounds
-    screenImageView.autoresizingMask = [.width, .height]
-    view.addSubview(screenImageView)
   }
 
   override func viewWillAppear() {
@@ -35,16 +29,9 @@ final class LCDViewController: NSViewController {
     guard let document = projectDocument else {
       fatalError()
     }
-    document.emulationObservers.append(self)
-    screenImageView.image = document.gameboy.takeScreenshot()
-  }
-}
 
-extension LCDViewController: EmulationObservers {
-  func emulationDidAdvance(screenImage: NSImage, tileDataImage: NSImage, fps: Double?, ips: Double?) {
-    screenImageView.image = screenImage
+    document.sameboyView.frame = view.bounds
+    document.sameboyView.autoresizingMask = [.width, .height]
+    view.addSubview(document.sameboyView)
   }
-
-  func emulationDidStart() {}
-  func emulationDidStop() {}
 }

@@ -3,7 +3,7 @@ import Cocoa
 extension ProjectDocument: EmulatorDelegate {
   // MARK: - EmulatorDelegate
   func willRun() {
-
+    sameboy.lcdOutput = sameboyView.pixels()
   }
 
   func didRun() {
@@ -32,5 +32,14 @@ extension ProjectDocument: EmulatorDelegate {
       GB_BOOT_ROM_AGB.rawValue: "agb_boot",
     ]
     sameboy.loadBootROM(Bundle.main.path(forResource: names[type.rawValue], ofType: "bin")!)
+  }
+
+  func gotNewSample(_ sample: UnsafeMutablePointer<GB_sample_t>) {
+    
+  }
+
+  func vblank() {
+    sameboyView.flip()
+    sameboy.lcdOutput = sameboyView.pixels()
   }
 }
