@@ -57,6 +57,10 @@ static uint32_t rgbEncode(GB_gameboy_t *gb, uint8_t r, uint8_t g, uint8_t b)
     return self;
 }
 
+- (GB_gameboy_t *)gb {
+  return &_gb;
+}
+
 - (void)setDelegate:(id<EmulatorDelegate>)delegate {
   if (_delegate == delegate) {
     return;

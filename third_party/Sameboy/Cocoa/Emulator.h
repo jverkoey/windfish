@@ -19,6 +19,8 @@ __attribute__((objc_subclassing_restricted))
 - (nonnull instancetype)initWithModel:(GB_model_t)model;
 - (nonnull instancetype)init NS_UNAVAILABLE;
 
+@property (nonatomic, nonnull, readonly) GB_gameboy_t *gb;
+
 @property (nonatomic, nullable, weak) id<EmulatorDelegate> delegate;
 
 #pragma mark Emulation
