@@ -10,6 +10,8 @@ class ProjectDocument: NSDocument {
 
   var sameboy: Emulator
   var sameboyView = GBView()
+  var sameboyDebuggerSemaphore = DispatchSemaphore(value: 0)
+  var nextDebuggerCommand: String? = nil
 
   var isDisassembling = false
   var romData: Data? {

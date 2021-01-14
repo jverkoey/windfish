@@ -372,16 +372,31 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
 
   @objc func performControlAction(_ sender: NSSegmentedControl) {
     if sender.selectedSegment == 0 {  // Step forward
-      document.stepForward()
+      guard document.sameboy.gb.pointee.debug_stopped else {
+        return // Emulation must be stopped first.
+      }
+
+      document.nextDebuggerCommand = "next"
+      document.sameboyDebuggerSemaphore.signal()
 
     } else if sender.selectedSegment == 1 {  // Step into
-      document.stepInto()
+      guard document.sameboy.gb.pointee.debug_stopped else {
+        return // Emulation must be stopped first.
+      }
+
+      document.nextDebuggerCommand = "step"
+      document.sameboyDebuggerSemaphore.signal()
 
     } else if sender.selectedSegment == 2 {  // Advance one machine cycle
-      document.advance()
 
     } else if sender.selectedSegment == 3 {  // Play
-      document.sameboy.debuggerExecuteCommand("step")
+      document.sameboy.gb.pointee.debug_stopped = !document.sameboy.gb.pointee.debug_stopped
+
+      if !document.sameboy.gb.pointee.debug_stopped {
+        // Disconnect the debugger repl.
+        document.nextDebuggerCommand = nil
+        document.sameboyDebuggerSemaphore.signal()
+      }
 
     } else if sender.selectedSegment == 4 {  // Clear
       for register in LR35902.Instruction.Numeric.registers8 {

@@ -182,17 +182,10 @@ final class ProjectViewController: NSViewController, EmulatorViewControllerDeleg
   }
 
   func emulatorViewControllerDidStepIn(_ emulatorViewController: EmulatorViewController) {
-    if let addressAndBank = self.document.gameboy.cpu.machineInstruction.sourceAddressAndBank() {
-      self.contentViewController.textView?.emulationLine = self.document.disassemblyResults?.lineFor(address: addressAndBank.address,
-                                                                                                     bank: addressAndBank.bank)
-
-      self.jumpTo(address: addressAndBank.address, bank: addressAndBank.bank)
-    } else if let cartridge = self.document.gameboy.cartridge {
-      self.contentViewController.textView?.emulationLine = self.document.disassemblyResults?.lineFor(address: self.document.gameboy.cpu.pc,
-                                                                                                     bank: cartridge.selectedBank)
-
-      self.jumpTo(address: self.document.gameboy.cpu.pc, bank: cartridge.selectedBank)
-    }
+    let address = self.document.sameboy.gb.pointee.pc
+    let bank = Gameboy.Cartridge.Bank(truncatingIfNeeded: self.document.sameboy.gb.pointee.mbc_rom_bank)
+    self.contentViewController.textView?.emulationLine = self.document.disassemblyResults?.lineFor(address: address, bank: bank)
+    self.jumpTo(address: address, bank: bank)
   }
 
   func jumpTo(address: LR35902.Address, bank _bank: Gameboy.Cartridge.Bank, highlight: Bool = false) {

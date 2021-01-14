@@ -47,10 +47,19 @@ extension ProjectDocument: EmulatorDelegate {
       self.emulationObservers.forEach { $0.emulationDidAdvance() }
     }
   }
-//
-//  func getDebuggerInput() -> String? {
-//    // TODO: Block until a command is provided via the UI.
-////    return "registers"
-//    return nil
-//  }
+
+  func getDebuggerInput() -> String? {
+    DispatchQueue.main.async {
+      // Ensure that all observers execute on the main thread.
+      self.emulationObservers.forEach {
+        $0.emulationDidAdvance()
+        $0.emulationDidStop()
+      }
+    }
+
+    sameboyDebuggerSemaphore.wait()
+    let nextDebuggerCommand = self.nextDebuggerCommand
+    self.nextDebuggerCommand = nil
+    return nextDebuggerCommand
+  }
 }
