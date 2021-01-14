@@ -8,13 +8,18 @@ import Windfish
 class ProjectDocument: NSDocument {
   weak var contentViewController: ProjectViewController?
 
-  var sameboy: Document?
+  var sameboy: Emulator
   var isDisassembling = false
   var romData: Data? {
     didSet {
       if let romData = romData {
         gameboy.cartridge = .init(data: romData)
         gameboy.cpu.pc = 0x100  // Assume the boot sequence has concluded.
+
+        romData.withUnsafeBytes { buffer in
+          self.sameboy.loadROM(fromBuffer: buffer, size: romData.count)
+        }
+
       } else {
         preconditionFailure()
       }
@@ -39,7 +44,11 @@ class ProjectDocument: NSDocument {
   }
 
   override init() {
+    self.sameboy = Emulator(model: GB_MODEL_DMG_B)
+
     super.init()
+
+    self.sameboy.delegate = self
 
     applyDefaults()
   }
@@ -172,14 +181,6 @@ extension ProjectDocument {
     if let window = contentViewController?.view.window {
       openPanel.beginSheetModal(for: window) { response in
         if response == .OK, let url = openPanel.url {
-          self.sameboy = try! Document(contentsOf: url, ofType: "rom")
-
-          self.sameboy!.makeWindowControllers()
-          for windowController in self.sameboy!.windowControllers {
-            self.addWindowController(windowController)
-            windowController.window?.makeKeyAndOrderFront(self)
-          }
-
           let data = try! Data(contentsOf: url)
           self.romData = data
 

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6604B514259069A700D068E8 /* Windfish in Frameworks */ = {isa = PBXBuildFile; productRef = 6604B513259069A700D068E8 /* Windfish */; };
+		662B362A25B00FFD00C5E690 /* ProjectDocument+Sameboy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662B362925B00FFD00C5E690 /* ProjectDocument+Sameboy.swift */; };
 		66472ED7258E7F7600A03CD4 /* CodeTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66472ED6258E7F7600A03CD4 /* CodeTextView.swift */; };
 		664833E12598558D00B955F4 /* CPUFlagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664833E02598558D00B955F4 /* CPUFlagsView.swift */; };
 		664833E9259855CC00B955F4 /* LR35902RegistersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664833E8259855CC00B955F4 /* LR35902RegistersView.swift */; };
@@ -317,6 +318,7 @@
 
 /* Begin PBXFileReference section */
 		66115ED3258E7E930084368B /* KoholintIsland.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KoholintIsland.entitlements; sourceTree = "<group>"; };
+		662B362925B00FFD00C5E690 /* ProjectDocument+Sameboy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProjectDocument+Sameboy.swift"; sourceTree = "<group>"; };
 		66472ED6258E7F7600A03CD4 /* CodeTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeTextView.swift; sourceTree = "<group>"; };
 		664833E02598558D00B955F4 /* CPUFlagsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUFlagsView.swift; sourceTree = "<group>"; };
 		664833E8259855CC00B955F4 /* LR35902RegistersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LR35902RegistersView.swift; sourceTree = "<group>"; };
@@ -588,6 +590,7 @@
 				665198F225ABF9570075C3FC /* Disassembly */,
 				665198F025ABF9450075C3FC /* Configuration */,
 				665D4F5C2575F75400C3A03B /* ProjectDocument.swift */,
+				662B362925B00FFD00C5E690 /* ProjectDocument+Sameboy.swift */,
 				665198FE25ABF97F0075C3FC /* ProjectMetadata.swift */,
 				6651990325ABF9AB0075C3FC /* ProjectDocument+defaults.swift */,
 				6651990D25ABFA380075C3FC /* ProjectDocument+importSymbols.swift */,
@@ -1254,6 +1257,7 @@
 				665D4F5B2575F75400C3A03B /* ProjectViewController.swift in Sources */,
 				667B1B632578541F00CE670F /* NotificationNames.swift in Sources */,
 				665198E225ABF9070075C3FC /* Global.swift in Sources */,
+				662B362A25B00FFD00C5E690 /* ProjectDocument+Sameboy.swift in Sources */,
 				6699BA4425AEC406005DB9BB /* sgb2_boot.asm in Sources */,
 				66ABD4A425870117007F2788 /* StatisticsView.swift in Sources */,
 				66472ED7258E7F7600A03CD4 /* CodeTextView.swift in Sources */,
