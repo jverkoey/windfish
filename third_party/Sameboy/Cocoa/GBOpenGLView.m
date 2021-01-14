@@ -1,5 +1,6 @@
 #import "GBOpenGLView.h"
 #import "GBView.h"
+#import "Emulator.h"
 #include <OpenGL/gl.h>
 
 @implementation GBOpenGLView
@@ -14,10 +15,10 @@
     double scale = self.window.backingScaleFactor;
     glViewport(0, 0, self.bounds.size.width * scale, self.bounds.size.height * scale);
     
-    if (gbview.gb) {
+    if (gbview.emulator) {
         [self.shader renderBitmap:gbview.currentBuffer
                          previous:gbview.frameBlendingMode? gbview.previousBuffer : NULL
-                            sized:NSMakeSize(GB_get_screen_width(gbview.gb), GB_get_screen_height(gbview.gb))
+                            sized:gbview.emulator.screenSize
                            inSize:self.bounds.size
                             scale:scale
                  withBlendingMode:gbview.frameBlendingMode];

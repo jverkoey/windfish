@@ -1,4 +1,5 @@
 #import <Cocoa/Cocoa.h>
+#include "Emulator.h"
 #include "GBView.h"
 #include "GBImageView.h"
 #include "GBSplitView.h"
@@ -6,7 +7,7 @@
 @class GBCheatWindowController;
 
 @interface Document : NSDocument <NSWindowDelegate, GBImageViewDelegate, NSTableViewDataSource, NSTableViewDelegate, NSSplitViewDelegate>
-@property (nonatomic, readonly) GB_gameboy_t *gb;
+@property (nonatomic, strong, readonly) Emulator *emulator;
 @property (nonatomic, strong) IBOutlet GBView *view;
 @property (nonatomic, strong) IBOutlet NSTextView *consoleOutput;
 @property (nonatomic, strong) IBOutlet NSPanel *consoleWindow;
@@ -40,8 +41,6 @@
 @property (nonatomic, readonly) Document *partner;
 @property (nonatomic, readonly) bool isSlave;
 
--(uint8_t) readMemory:(uint16_t) addr;
--(void) writeMemory:(uint16_t) addr value:(uint8_t)value;
 -(void) performAtomicBlock: (void (^)())block;
 -(void) connectLinkCable:(NSMenuItem *)sender;
 @end

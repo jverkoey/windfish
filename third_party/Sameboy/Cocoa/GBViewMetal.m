@@ -1,4 +1,5 @@
 #import "GBViewMetal.h"
+#import "Emulator.h"
 #pragma clang diagnostic ignored "-Wpartial-availability"
 
 
@@ -37,10 +38,11 @@ static const vector_float2 rect[] =
     MTLTextureDescriptor *texture_descriptor = [[MTLTextureDescriptor alloc] init];
     
     texture_descriptor.pixelFormat = MTLPixelFormatRGBA8Unorm;
-    
-    texture_descriptor.width = GB_get_screen_width(self.gb);
-    texture_descriptor.height = GB_get_screen_height(self.gb);
-    
+
+    NSSize screenSize = self.emulator.screenSize;
+    texture_descriptor.width = screenSize.width;
+    texture_descriptor.height = screenSize.height;
+
     texture = [device newTextureWithDescriptor:texture_descriptor];
     previous_texture = [device newTextureWithDescriptor:texture_descriptor];
 
@@ -134,9 +136,10 @@ static const vector_float2 rect[] =
 - (void)drawInMTKView:(nonnull MTKView *)view
 {
     if (!(view.window.occlusionState & NSWindowOcclusionStateVisible)) return;
-    if (!self.gb) return;
-    if (texture.width  != GB_get_screen_width(self.gb) ||
-        texture.height != GB_get_screen_height(self.gb)) {
+    if (!self.emulator) return;
+    NSSize screenSize = self.emulator.screenSize;
+    if (texture.width  != screenSize.width ||
+        texture.height != screenSize.height) {
         [self allocateTextures];
     }
     

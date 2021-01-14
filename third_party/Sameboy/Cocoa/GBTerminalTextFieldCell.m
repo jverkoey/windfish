@@ -1,8 +1,9 @@
 #import <Carbon/Carbon.h>
 #import "GBTerminalTextFieldCell.h"
+#import "Emulator.h"
 
 @interface GBTerminalTextView : NSTextView
-@property GB_gameboy_t *gb;
+@property Emulator *emulator;
 @end
 
 @implementation GBTerminalTextFieldCell
@@ -13,12 +14,12 @@
 - (NSTextView *)fieldEditorForView:(NSView *)controlView
 {
     if (field_editor) {
-        field_editor.gb = self.gb;
+        field_editor.emulator = self.emulator;
         return field_editor;
     }
     field_editor = [[GBTerminalTextView alloc] init];
     [field_editor setFieldEditor:YES];
-    field_editor.gb = self.gb;
+    field_editor.emulator = self.emulator;
     return field_editor;
 }
 
@@ -209,7 +210,7 @@
     }
     char *substring = strdup([self.string substringToIndex:auto_complete_range.location].UTF8String);
     uintptr_t context = auto_complete_context;
-    char *completion = GB_debugger_complete_substring(self.gb, substring, &context);
+    char *completion = [_emulator debuggerCompleteSubstring:substring context:&context];
     free(substring);
     if (completion) {
         NSString *ns_completion = @(completion);

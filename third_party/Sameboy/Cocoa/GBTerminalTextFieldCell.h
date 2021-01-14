@@ -1,6 +1,7 @@
 #import <Cocoa/Cocoa.h>
-#include <Core/gb.h>
+
+@class Emulator;
 
 @interface GBTerminalTextFieldCell : NSTextFieldCell
-@property (nonatomic) GB_gameboy_t *gb;
+@property (nonatomic) Emulator *emulator;
 @end

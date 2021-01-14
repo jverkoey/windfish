@@ -38,7 +38,7 @@
     __block unsigned long long length = range.length;
     if (_mode == GBMemoryEntireSpace) {
         while (length) {
-            *(dst++) = [_document readMemory:addr++];
+            *(dst++) = [_document.emulator readMemory:addr++];
             length--;
         }
     }
@@ -75,7 +75,7 @@
                     assert(false);
             }
             while (length) {
-                *(_dst++) = [_document readMemory:addr++];
+                *(_dst++) = [_document.emulator readMemory:addr++];
                 length--;
             }
             switch (_mode) {
@@ -152,7 +152,7 @@
         uint8_t *src = values;
         unsigned long long length = lrange.length;
         while (length) {
-            [_document writeMemory:addr++ value:*(src++)];
+            [_document.emulator writeMemory:addr++ value:*(src++)];
             length--;
         }
         switch (_mode) {

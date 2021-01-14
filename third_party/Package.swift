@@ -32,6 +32,8 @@ let package = Package(
         "BigSurToolbar.h",
         "Document.h",
         "Document.m",
+        "Emulator.h",
+        "Emulator.m",
         "GBAudioClient.h",
         "GBAudioClient.m",
         "GBBorderView.h",

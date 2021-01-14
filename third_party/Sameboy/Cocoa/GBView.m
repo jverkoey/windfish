@@ -6,6 +6,7 @@
 #import "GBButtons.h"
 #import "NSString+StringForKey.h"
 #import "Document.h"
+#import "Emulator.h"
 
 #define JOYSTICK_HIGH 0x4000
 #define JOYSTICK_LOW 0x3800
@@ -160,8 +161,9 @@ static const uint8_t workboy_vk_to_key[] = {
     if (image_buffers[0]) free(image_buffers[0]);
     if (image_buffers[1]) free(image_buffers[1]);
     if (image_buffers[2]) free(image_buffers[2]);
-    
-    size_t buffer_size = sizeof(image_buffers[0][0]) * GB_get_screen_width(_gb) * GB_get_screen_height(_gb);
+
+    NSSize screenSize = _emulator.screenSize;
+    size_t buffer_size = sizeof(image_buffers[0][0]) * screenSize.width * screenSize.height;
     
     image_buffers[0] = calloc(1, buffer_size);
     image_buffers[1] = calloc(1, buffer_size);
@@ -187,10 +189,10 @@ static const uint8_t workboy_vk_to_key[] = {
 - (GB_frame_blending_mode_t)frameBlendingMode
 {
     if (_frameBlendingMode == GB_FRAME_BLENDING_MODE_ACCURATE) {
-        if (!_gb || GB_is_sgb(_gb)) {
+        if (!_emulator || _emulator.isSGB) {
             return GB_FRAME_BLENDING_MODE_SIMPLE;
         }
-        return GB_is_odd_frame(_gb)? GB_FRAME_BLENDING_MODE_ACCURATE_ODD : GB_FRAME_BLENDING_MODE_ACCURATE_EVEN;
+        return _emulator.isOddFrame ? GB_FRAME_BLENDING_MODE_ACCURATE_ODD : GB_FRAME_BLENDING_MODE_ACCURATE_EVEN;
     }
     return _frameBlendingMode;
 }
@@ -233,18 +235,17 @@ static const uint8_t workboy_vk_to_key[] = {
 - (void)setFrame:(NSRect)frame
 {
     frame = self.superview.frame;
-    if (_gb && ![[NSUserDefaults standardUserDefaults] boolForKey:@"GBAspectRatioUnkept"]) {
+    if (_emulator && ![[NSUserDefaults standardUserDefaults] boolForKey:@"GBAspectRatioUnkept"]) {
         double ratio = frame.size.width / frame.size.height;
-        double width = GB_get_screen_width(_gb);
-        double height = GB_get_screen_height(_gb);
-        if (ratio >= width / height) {
-            double new_width = round(frame.size.height / height * width);
+        NSSize screenSize = _emulator.screenSize;
+        if (ratio >= screenSize.width / screenSize.height) {
+            double new_width = round(frame.size.height / screenSize.height * screenSize.width);
             frame.origin.x = floor((frame.size.width - new_width) / 2);
             frame.size.width = new_width;
             frame.origin.y = 0;
         }
         else {
-            double new_height = round(frame.size.width / width * height);
+            double new_height = round(frame.size.width / screenSize.width * screenSize.height);
             frame.origin.y = floor((frame.size.height - new_height) / 2);
             frame.size.height = new_height;
             frame.origin.x = 0;
@@ -257,9 +258,9 @@ static const uint8_t workboy_vk_to_key[] = {
 - (void) flip
 {
     if (analogClockMultiplierValid && [[NSUserDefaults standardUserDefaults] boolForKey:@"GBAnalogControls"]) {
-        GB_set_clock_multiplier(_gb, analogClockMultiplier);
-        if (self.document.partner) {
-            GB_set_clock_multiplier(self.document.partner.gb, analogClockMultiplier);
+        _emulator.clockMultiplier = analogClockMultiplier;
+        if (self.emulator.partner) {
+            self.emulator.partner.clockMultiplier = analogClockMultiplier;
         }
         if (analogClockMultiplier == 1.0) {
             analogClockMultiplierValid = false;
@@ -268,17 +269,13 @@ static const uint8_t workboy_vk_to_key[] = {
     else {
         if (underclockKeyDown && clockMultiplier > 0.5) {
             clockMultiplier -= 1.0/16;
-            GB_set_clock_multiplier(_gb, clockMultiplier);
-            if (self.document.partner) {
-                GB_set_clock_multiplier(self.document.partner.gb, clockMultiplier);
-            }
+            _emulator.clockMultiplier = clockMultiplier;
+            self.emulator.partner.clockMultiplier = analogClockMultiplier;
         }
         if (!underclockKeyDown && clockMultiplier < 1.0) {
             clockMultiplier += 1.0/16;
-            GB_set_clock_multiplier(_gb, clockMultiplier);
-            if (self.document.partner) {
-                GB_set_clock_multiplier(self.document.partner.gb, clockMultiplier);
-            }
+            _emulator.clockMultiplier = clockMultiplier;
+            self.emulator.partner.clockMultiplier = analogClockMultiplier;
         }
     }
     current_buffer = (current_buffer + 1) % self.numberOfBuffers;
@@ -293,14 +290,14 @@ static const uint8_t workboy_vk_to_key[] = {
 {
     if ([theEvent type] != NSEventTypeFlagsChanged && theEvent.isARepeat) return;
     unsigned short keyCode = theEvent.keyCode;
-    if (GB_workboy_is_enabled(_gb)) {
+    if (_emulator.workboyEnabled) {
         if (theEvent.keyCode < sizeof(workboy_vk_to_key) && workboy_vk_to_key[theEvent.keyCode]) {
-            GB_workboy_set_key(_gb, workboy_vk_to_key[theEvent.keyCode]);
+            [_emulator setWorkboyKey:workboy_vk_to_key[theEvent.keyCode]];
             return;
         }
         unichar c = [theEvent type] != NSEventTypeFlagsChanged? [theEvent.charactersIgnoringModifiers.lowercaseString characterAtIndex:0] : 0;
         if (c < sizeof(workboy_ascii_to_key) && workboy_ascii_to_key[c]) {
-            GB_workboy_set_key(_gb, workboy_ascii_to_key[c]);
+            [_emulator setWorkboyKey:workboy_ascii_to_key[c]];
             return;
         }
     }
@@ -308,8 +305,8 @@ static const uint8_t workboy_vk_to_key[] = {
     bool handled = false;
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    unsigned player_count = GB_get_player_count(_gb);
-    if (self.document.partner) {
+    unsigned player_count = _emulator.numberOfPlayers;
+    if (self.emulator.partner) {
         player_count = 2;
     }
     for (unsigned player = 0; player < player_count; player++) {
@@ -321,19 +318,19 @@ static const uint8_t workboy_vk_to_key[] = {
                 handled = true;
                 switch (button) {
                     case GBTurbo:
-                        if (self.document.isSlave) {
-                            GB_set_turbo_mode(self.document.partner.gb, true, false);
+                        if (self.emulator.isSlave) {
+                            [self.emulator.partner setTurboMode:true noFrameSkip:false];
                         }
                         else {
-                            GB_set_turbo_mode(_gb, true, self.isRewinding);
+                            [_emulator setTurboMode:true noFrameSkip:self.isRewinding];
                         }
                         analogClockMultiplierValid = false;
                         break;
                         
                     case GBRewind:
-                        if (!self.document.partner) {
+                        if (!self.emulator.partner) {
                             self.isRewinding = true;
-                            GB_set_turbo_mode(_gb, false, false);
+                            [_emulator setTurboMode:false noFrameSkip:false];
                         }
                         break;
                         
@@ -343,16 +340,18 @@ static const uint8_t workboy_vk_to_key[] = {
                         break;
                         
                     default:
-                        if (self.document.partner) {
+                        if (self.emulator.partner) {
                             if (player == 0) {
-                                GB_set_key_state_for_player(_gb, (GB_key_t)button, 0, true);
+                                [_emulator setKeyStateForButton:(GB_key_t)button forPlayer:0 pressed:true];
                             }
                             else {
-                                GB_set_key_state_for_player(self.document.partner.gb, (GB_key_t)button, 0, true);
+                              [self.emulator.partner setKeyStateForButton:(GB_key_t)button
+                                                                forPlayer:0
+                                                                  pressed:true];
                             }
                         }
                         else {
-                            GB_set_key_state_for_player(_gb, (GB_key_t)button, player, true);
+                            [_emulator setKeyStateForButton:(GB_key_t)button forPlayer:player pressed:true];
                         }
                         break;
                 }
@@ -368,20 +367,20 @@ static const uint8_t workboy_vk_to_key[] = {
 -(void)keyUp:(NSEvent *)theEvent
 {
     unsigned short keyCode = theEvent.keyCode;
-    if (GB_workboy_is_enabled(_gb)) {
+    if (_emulator.workboyEnabled) {
         if (keyCode == kVK_Shift || keyCode == kVK_RightShift) {
-            GB_workboy_set_key(_gb, GB_WORKBOY_SHIFT_UP);
+            [_emulator setWorkboyKey:GB_WORKBOY_SHIFT_UP];
         }
         else {
-            GB_workboy_set_key(_gb, GB_WORKBOY_NONE);
+            [_emulator setWorkboyKey:GB_WORKBOY_NONE];
         }
 
     }
     bool handled = false;
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    unsigned player_count = GB_get_player_count(_gb);
-    if (self.document.partner) {
+    unsigned player_count = _emulator.numberOfPlayers;
+    if (self.emulator.partner) {
         player_count = 2;
     }
     for (unsigned player = 0; player < player_count; player++) {
@@ -393,11 +392,11 @@ static const uint8_t workboy_vk_to_key[] = {
                 handled = true;
                 switch (button) {
                     case GBTurbo:
-                        if (self.document.isSlave) {
-                            GB_set_turbo_mode(self.document.partner.gb, false, false);
+                        if (self.emulator.isSlave) {
+                            [self.emulator.partner setTurboMode:false noFrameSkip:false];
                         }
                         else {
-                            GB_set_turbo_mode(_gb, false, false);
+                            [_emulator setTurboMode:false noFrameSkip:false];
                         }
                         analogClockMultiplierValid = false;
                         break;
@@ -412,16 +411,18 @@ static const uint8_t workboy_vk_to_key[] = {
                         break;
                         
                     default:
-                        if (self.document.partner) {
+                        if (self.emulator.partner) {
                             if (player == 0) {
-                                GB_set_key_state_for_player(_gb, (GB_key_t)button, 0, false);
+                                [_emulator setKeyStateForButton:(GB_key_t)button forPlayer:0 pressed:false];
                             }
                             else {
-                                GB_set_key_state_for_player(self.document.partner.gb, (GB_key_t)button, 0, false);
+                              [self.emulator.partner setKeyStateForButton:(GB_key_t)button
+                                                                forPlayer:0
+                                                                  pressed:false];
                             }
                         }
                         else {
-                            GB_set_key_state_for_player(_gb, (GB_key_t)button, player, false);
+                            [_emulator setKeyStateForButton:(GB_key_t)button forPlayer:player pressed:false];
                         }
                         break;
                 }
@@ -464,8 +465,8 @@ static const uint8_t workboy_vk_to_key[] = {
 {
     if (![self.window isMainWindow]) return;
     
-    unsigned player_count = GB_get_player_count(_gb);
-    if (self.document.partner) {
+    unsigned player_count = _emulator.numberOfPlayers;
+    if (self.emulator.partner) {
         player_count = 2;
     }
 
@@ -493,11 +494,11 @@ static const uint8_t workboy_vk_to_key[] = {
             usage = (const JOYButtonUsage[]){JOYButtonUsageY, JOYButtonUsageA, JOYButtonUsageB, JOYButtonUsageX}[(usage - JOYButtonUsageGeneric0) & 3];
         }
         
-        GB_gameboy_t *effectiveGB = _gb;
+        Emulator *effectiveEmulator = _emulator;
         unsigned effectivePlayer = player;
         
-        if (player && self.document.partner) {
-            effectiveGB = self.document.partner.gb;
+        if (player && self.emulator.partner) {
+            effectiveEmulator = self.emulator.partner;
             effectivePlayer = 0;
             if (controller != self.document.partner.view->lastController) {
                 [self setRumble:0];
@@ -514,42 +515,42 @@ static const uint8_t workboy_vk_to_key[] = {
         switch (usage) {
                 
             case JOYButtonUsageNone: break;
-            case JOYButtonUsageA: GB_set_key_state_for_player(effectiveGB, GB_KEY_A, effectivePlayer, button.isPressed); break;
-            case JOYButtonUsageB: GB_set_key_state_for_player(effectiveGB, GB_KEY_B, effectivePlayer, button.isPressed); break;
+            case JOYButtonUsageA: [effectiveEmulator setKeyStateForButton:GB_KEY_A forPlayer:effectivePlayer pressed:button.isPressed]; break;
+            case JOYButtonUsageB: [effectiveEmulator setKeyStateForButton:GB_KEY_B forPlayer:effectivePlayer pressed:button.isPressed]; break;
             case JOYButtonUsageC: break;
             case JOYButtonUsageStart:
-            case JOYButtonUsageX: GB_set_key_state_for_player(effectiveGB, GB_KEY_START, effectivePlayer, button.isPressed); break;
+            case JOYButtonUsageX: [effectiveEmulator setKeyStateForButton:GB_KEY_START forPlayer:effectivePlayer pressed:button.isPressed]; break;
             case JOYButtonUsageSelect:
-            case JOYButtonUsageY: GB_set_key_state_for_player(effectiveGB, GB_KEY_SELECT, effectivePlayer, button.isPressed); break;
+            case JOYButtonUsageY: [effectiveEmulator setKeyStateForButton:GB_KEY_SELECT forPlayer:effectivePlayer pressed:button.isPressed]; break;
             case JOYButtonUsageR2:
             case JOYButtonUsageL2:
             case JOYButtonUsageZ: {
                 self.isRewinding = button.isPressed;
                 if (button.isPressed) {
-                    if (self.document.isSlave) {
-                        GB_set_turbo_mode(self.document.partner.gb, false, false);
+                    if (self.emulator.isSlave) {
+                        [self.emulator.partner setTurboMode:false noFrameSkip:false];
                     }
                     else {
-                        GB_set_turbo_mode(_gb, false, false);
+                        [self.emulator setTurboMode:false noFrameSkip:false];
                     }
                 }
                 break;
             }
         
             case JOYButtonUsageL1: {
-                if (self.document.isSlave) {
-                    GB_set_turbo_mode(self.document.partner.gb, button.isPressed, false); break;
+                if (self.emulator.isSlave) {
+                    [self.emulator.partner setTurboMode:button.isPressed noFrameSkip:false]; break;
                 }
                 else {
-                    GB_set_turbo_mode(_gb, button.isPressed, button.isPressed && self.isRewinding); break;
+                    [_emulator setTurboMode:button.isPressed noFrameSkip:button.isPressed && self.isRewinding]; break;
                 }
             }
 
             case JOYButtonUsageR1: underclockKeyDown = button.isPressed; break;
-            case JOYButtonUsageDPadLeft: GB_set_key_state_for_player(effectiveGB, GB_KEY_LEFT, effectivePlayer, button.isPressed); break;
-            case JOYButtonUsageDPadRight: GB_set_key_state_for_player(effectiveGB, GB_KEY_RIGHT, effectivePlayer, button.isPressed); break;
-            case JOYButtonUsageDPadUp: GB_set_key_state_for_player(effectiveGB, GB_KEY_UP, effectivePlayer, button.isPressed); break;
-            case JOYButtonUsageDPadDown: GB_set_key_state_for_player(effectiveGB, GB_KEY_DOWN, effectivePlayer, button.isPressed); break;
+            case JOYButtonUsageDPadLeft: [effectiveEmulator setKeyStateForButton:GB_KEY_LEFT forPlayer:effectivePlayer pressed:button.isPressed]; break;
+            case JOYButtonUsageDPadRight: [effectiveEmulator setKeyStateForButton:GB_KEY_RIGHT forPlayer:effectivePlayer pressed:button.isPressed]; break;
+            case JOYButtonUsageDPadUp: [effectiveEmulator setKeyStateForButton:GB_KEY_UP forPlayer:effectivePlayer pressed:button.isPressed]; break;
+            case JOYButtonUsageDPadDown: [effectiveEmulator setKeyStateForButton:GB_KEY_DOWN forPlayer:effectivePlayer pressed:button.isPressed]; break;
 
             default:
                 break;
