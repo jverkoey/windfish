@@ -111,7 +111,9 @@ class ProjectDocument: NSDocument {
 
   lazy var lcdWindowController: NSWindowController = {
     let contentViewController = LCDViewController()
-    let window = NSWindow(contentViewController: contentViewController)
+    let window = NSPanel(contentViewController: contentViewController)
+    window.isFloatingPanel = true
+    window.styleMask.insert(.hudWindow)
     window.subtitle = "LCD"
     window.setContentSize(NSSize(width: PPU.screenSize.width * 2, height: PPU.screenSize.height * 2))
     window.contentMinSize = NSSize(width: PPU.screenSize.width, height: PPU.screenSize.height)
@@ -124,7 +126,9 @@ class ProjectDocument: NSDocument {
 
   lazy var ppuWindowController: NSWindowController = {
     let contentViewController = PPUViewController()
-    let window = NSWindow(contentViewController: contentViewController)
+    let window = NSPanel(contentViewController: contentViewController)
+    window.isFloatingPanel = true
+    window.styleMask.insert(.hudWindow)
     window.subtitle = "PPU"
     window.contentMinSize = NSSize(width: 400, height: 400)
     window.setFrameOrigin(.init(x: NSScreen.main!.frame.maxX - window.frame.width,
