@@ -16,7 +16,7 @@ extension NSViewController {
   }
 }
 
-final class ProjectViewController: NSViewController, EmulatorViewControllerDelegate {
+final class ProjectViewController: NSViewController {
 
   let document: ProjectDocument
   let containerView = NSView()
@@ -54,8 +54,6 @@ final class ProjectViewController: NSViewController, EmulatorViewControllerDeleg
     splitViewController.addSplitViewItem(trailingSidebarItem)
 
     super.init(nibName: nil, bundle: nil)
-
-    inspectorViewController.emulatorViewController.delegate = self
 
     self.addChild(self.splitViewController)
   }
@@ -181,11 +179,10 @@ final class ProjectViewController: NSViewController, EmulatorViewControllerDeleg
     }
   }
 
-  func emulatorViewControllerDidStepIn(_ emulatorViewController: EmulatorViewController) {
-    let address = document.address
-    let bank = document.bank
-    self.contentViewController.sourceView?.emulationLine = self.document.disassemblyResults?.lineFor(address: address, bank: bank)
-    self.jumpTo(address: address, bank: bank)
+  override func viewWillAppear() {
+    super.viewWillAppear()
+
+    document.emulationObservers.append(self)
   }
 
   func jumpTo(address: LR35902.Address, bank _bank: Gameboy.Cartridge.Bank, highlight: Bool = false) {
@@ -241,5 +238,20 @@ extension ProjectViewController: LabelJumper {
       return
     }
     showRegion(region)
+  }
+}
+
+extension ProjectViewController: EmulationObservers {
+  func emulationDidAdvance() {
+  }
+
+  func emulationDidStart() {
+  }
+
+  func emulationDidStop() {
+    let address = document.address
+    let bank = document.bank
+    self.contentViewController.sourceView?.emulationLine = self.document.disassemblyResults?.lineFor(address: address, bank: bank)
+    self.jumpTo(address: address, bank: bank)
   }
 }
