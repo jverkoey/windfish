@@ -125,6 +125,10 @@ class ProjectDocument: NSDocument {
   @IBOutlet var tilemapPaletteButton: NSPopUpButton?
   @IBOutlet var tilemapMapButton: NSPopUpButton?
   @IBOutlet var tilemapSetButton: NSPopUpButton?
+  var oamInfo = ContiguousArray<GB_oam_info_t>(repeating: GB_oam_info_t(), count: 40)
+  var oamUpdating = false
+  var oamCount: UInt8 = 0
+  var oamHeight: UInt8 = 0
 
   lazy var lcdWindowController: NSWindowController = {
     let contentViewController = LCDViewController()

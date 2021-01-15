@@ -1,5 +1,7 @@
 import Foundation
 
+import Windfish
+
 extension ProjectDocument {
 
   @IBAction func vramTabChanged(_ sender: Any?) {
@@ -112,23 +114,23 @@ extension ProjectDocument {
                                                    mapType: GB_map_type_t(rawValue: UInt32(tilemapMapButton.indexOfSelectedItem)),
                                                    tilesetType: GB_tileset_type_t(rawValue: UInt32(tilemapSetButton.indexOfSelectedItem)))
       tilemapImageView.layer?.magnificationFilter = .nearest
+
+    case 2:  // OAM
+      oamInfo.withUnsafeMutableBufferPointer { buffer in
+        oamCount = sameboy.getOAMInfo(buffer.baseAddress!, spriteHeight:&oamHeight)
+      }
+      guard let spritesTableView = spritesTableView else {
+        return
+      }
+      DispatchQueue.main.async {
+        self.oamUpdating = true
+        spritesTableView.reloadData()
+        self.oamUpdating = false
+      }
+
     default:
       break
     }
-//        case 2:
-//        /* OAM */
-//        {
-//            oamCount = [_emulator getOAMInfo:oamInfo spriteHeight:&oamHeight];
-//            dispatch_async(dispatch_get_main_queue(), ^{
-//                if (!oamUpdating) {
-//                    oamUpdating = true;
-//                    [self.spritesTableView reloadData];
-//                    oamUpdating = false;
-//                }
-//            });
-//        }
-//        break;
-//
 //        case 3:
 //        /* Palettes */
 //        {
@@ -138,5 +140,77 @@ extension ProjectDocument {
 //        }
 //        break;
 //    }
+  }
+}
+
+extension ProjectDocument: NSTableViewDelegate {
+
+}
+
+extension ProjectDocument: NSTableViewDataSource {
+
+  func numberOfRows(in tableView: NSTableView) -> Int {
+    switch tableView {
+    case paletteTableView:
+      return 16
+    case spritesTableView:
+      return Int(oamCount)
+    default:
+      return 0
+    }
+  }
+
+  func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
+    guard let tableColumn = tableColumn,
+          let columnIndex = tableView.tableColumns.firstIndex(of: tableColumn) else {
+      return nil
+    }
+    switch tableView {
+    case paletteTableView:
+      if columnIndex == 0 {
+        return "\(row >= 8 ? "Object" : "Background") \(row & 7)"
+      }
+      let paletteData = sameboy.getDirectAccess(row >= 8 ? GB_DIRECT_ACCESS_OBP : GB_DIRECT_ACCESS_BGP, size: nil, bank: nil)
+      return withUnsafeBytes(of: paletteData) { buffer in
+        let index = columnIndex - 1 + (row & 7) * 4
+        return (buffer[(index << 1) + 1] << 8) | buffer[(index << 1)]
+      }
+
+    case spritesTableView:
+      switch columnIndex {
+      case 0:
+        let imageData = withUnsafeMutableBytes(of: &oamInfo[row].image.0) { pointer -> Data in
+          return Data(bytesNoCopy: pointer.baseAddress!, count: 64 * 4 * 2, deallocator: .none)
+        }
+        return Emulator.image(from: imageData, width: 8, height: UInt(truncatingIfNeeded: oamHeight), scale: 16 / Double(oamHeight))
+      case 1: return oamInfo[row].x - 8
+      case 2: return oamInfo[row].y - 16
+      case 3: return "$" + oamInfo[row].tile.hexString
+      case 4: return "$" + (LR35902.Address(0x8000) + LR35902.Address(truncatingIfNeeded: oamInfo[row].tile) * 0x10).hexString
+      case 5: return "$" + oamInfo[row].oam_addr.hexString
+      case 6: return (
+        ((oamInfo[row].flags & 0x80) != 0 ? "P" : "-")
+          + ((oamInfo[row].flags & 0x40) != 0 ? "Y" : "-")
+          + ((oamInfo[row].flags & 0x20) != 0 ? "X" : "-")
+          + ((oamInfo[row].flags & 0x08) != 0 ? "1" : "0")
+          + "\(oamInfo[row].flags & 0x07)"
+      )
+      case 7: return oamInfo[row].obscured_by_line_limit ? "Dropped: Too many sprites in line" : ""
+      default:
+        fatalError()
+      }
+
+    default:
+      fatalError()
+    }
+    return nil
+  }
+
+  func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool {
+    return tableView == spritesTableView
+  }
+
+  func tableView(_ tableView: NSTableView, shouldEdit tableColumn: NSTableColumn?, row: Int) -> Bool {
+    return false
   }
 }
