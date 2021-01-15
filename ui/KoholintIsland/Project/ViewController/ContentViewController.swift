@@ -20,63 +20,10 @@ final class ContentViewController: NSViewController {
 
   var filename: String?
 
-  var bank: Gameboy.Cartridge.Bank? {
-    didSet {
-      refreshFileContents()
-      refreshBank()
-    }
-  }
-  private func refreshBank() {
-    if let bank = bank {
-      let bankLines = projectDocument?.disassemblyResults?.bankLines?[bank]
-      lineNumbersRuler?.bankLines = bankLines
-    } else {
-      lineNumbersRuler?.bankLines = nil
-    }
-    lineNumbersRuler?.needsDisplay = true
-
-    if let lineNumbersRuler = lineNumbersRuler {
-      containerView?.contentView.contentInsets.left = lineNumbersRuler.ruleThickness
-    }
-  }
-
-  private func refreshFileContents() {
-    if let bank = bank, let bankTextStorage = projectDocument?.disassemblyResults?.bankTextStorage,
-       let bankString = bankTextStorage[bank] {
-      textStorage = NSTextStorage(attributedString: bankString)
-    } else if let filename = filename {
-      let string = String(data: projectDocument!.disassemblyResults!.files[filename]!, encoding: .utf8)!
-
-      let storage = NSTextStorage(string: string, attributes: DefaultCodeAttributes())
-      textStorage = storage
-    } else {
-      textStorage = NSTextStorage()
-    }
-  }
-
-  var textStorage = NSTextStorage() {
-    didSet {
-      if oldValue.string != textStorage.string {
-        textView?.highlightedLine = nil
-      }
-      let originalOffset = containerView?.documentVisibleRect.origin
-      textView?.layoutManager?.replaceTextStorage(textStorage)
-      textView?.linkTextAttributes = [
-        .foregroundColor: NSColor.linkColor,
-        .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .medium),
-        .underlineColor: NSColor.linkColor,
-        .underlineStyle: NSUnderlineStyle.single.rawValue,
-        .cursor: NSCursor.pointingHand,
-      ]
-      if let originalOffset = originalOffset {
-        textView?.layoutManager?.ensureLayout(for: textView!.textContainer!)
-        containerView?.documentView?.scroll(CGPoint(x: originalOffset.x, y: originalOffset.y))
-      }
-    }
-  }
+  var bank: Gameboy.Cartridge.Bank? { didSet { didSetBank() } }
+  var textStorage = NSTextStorage() { didSet { didSetTextStorage(oldValue: oldValue) } }
 
   private var disassembledSubscriber: AnyCancellable?
-
   private var didProcessEditingSubscriber: AnyCancellable?
   var lineAnalysis: LineAnalysis? {
     didSet {
@@ -85,19 +32,8 @@ final class ContentViewController: NSViewController {
     }
   }
 
-  init() {
-    super.init(nibName: nil, bundle: nil)
-  }
-
-  required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-
   override func loadView() {
     view = NSView()
-
-    view.wantsLayer = true
-    view.layer?.backgroundColor = NSColor.textBackgroundColor.cgColor
 
     let containerView = CreateScrollView(bounds: view.bounds)
     containerView.translatesAutoresizingMaskIntoConstraints = false
@@ -155,6 +91,61 @@ final class ContentViewController: NSViewController {
         self.lineNumbersRuler!.needsDisplay = true
       })
   }
+}
+
+extension ContentViewController {
+  fileprivate func didSetBank() {
+    refreshFileContents()
+    refreshBank()
+  }
+
+  private func refreshBank() {
+    if let bank = bank {
+      let bankLines = projectDocument?.disassemblyResults?.bankLines?[bank]
+      lineNumbersRuler?.bankLines = bankLines
+    } else {
+      lineNumbersRuler?.bankLines = nil
+    }
+    lineNumbersRuler?.needsDisplay = true
+
+    if let lineNumbersRuler = lineNumbersRuler {
+      containerView?.contentView.contentInsets.left = lineNumbersRuler.ruleThickness
+    }
+  }
+
+  private func refreshFileContents() {
+    if let bank = bank, let bankTextStorage = projectDocument?.disassemblyResults?.bankTextStorage,
+       let bankString = bankTextStorage[bank] {
+      textStorage = NSTextStorage(attributedString: bankString)
+    } else if let filename = filename {
+      let string = String(data: projectDocument!.disassemblyResults!.files[filename]!, encoding: .utf8)!
+
+      let storage = NSTextStorage(string: string, attributes: DefaultCodeAttributes())
+      textStorage = storage
+    } else {
+      textStorage = NSTextStorage()
+    }
+  }
+
+  fileprivate func didSetTextStorage(oldValue: NSTextStorage) {
+    if oldValue.string != textStorage.string {
+      textView?.highlightedLine = nil
+    }
+    let originalOffset = containerView?.documentVisibleRect.origin
+    textView?.layoutManager?.replaceTextStorage(textStorage)
+    textView?.linkTextAttributes = [
+      .foregroundColor: NSColor.linkColor,
+      .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .medium),
+      .underlineColor: NSColor.linkColor,
+      .underlineStyle: NSUnderlineStyle.single.rawValue,
+      .cursor: NSCursor.pointingHand,
+    ]
+    if let originalOffset = originalOffset {
+      textView?.layoutManager?.ensureLayout(for: textView!.textContainer!)
+      containerView?.documentView?.scroll(CGPoint(x: originalOffset.x, y: originalOffset.y))
+    }
+  }
+
 }
 
 final class LineAnalysis {
