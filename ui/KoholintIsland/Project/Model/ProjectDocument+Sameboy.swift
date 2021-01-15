@@ -43,6 +43,9 @@ extension ProjectDocument: EmulatorDelegate {
     sameboy.lcdOutput = sameboyView.pixels()
 
     DispatchQueue.main.async {
+      if let vramWindow = self.vramWindow, vramWindow.isVisible {
+        self.reloadVRAMData(nil)
+      }
       // Ensure that all observers execute on the main thread.
       self.emulationObservers.forEach { $0.emulationDidAdvance() }
     }

@@ -11,6 +11,8 @@
 		662B362A25B00FFD00C5E690 /* ProjectDocument+Sameboy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662B362925B00FFD00C5E690 /* ProjectDocument+Sameboy.swift */; };
 		662B36B425B1280300C5E690 /* ScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662B36B325B1280300C5E690 /* ScrollView.swift */; };
 		662B36CA25B13D2100C5E690 /* ProjectDocument+Debugging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662B36C925B13D2100C5E690 /* ProjectDocument+Debugging.swift */; };
+		662B36D125B1419F00C5E690 /* VRAMViewer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 662B36D025B1419F00C5E690 /* VRAMViewer.xib */; };
+		662B36DD25B1442300C5E690 /* ProjectDocument+VRAMViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662B36DC25B1442300C5E690 /* ProjectDocument+VRAMViewer.swift */; };
 		66472ED7258E7F7600A03CD4 /* SourceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66472ED6258E7F7600A03CD4 /* SourceView.swift */; };
 		664833E12598558D00B955F4 /* CPUFlagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664833E02598558D00B955F4 /* CPUFlagsView.swift */; };
 		664833E9259855CC00B955F4 /* LR35902RegistersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664833E8259855CC00B955F4 /* LR35902RegistersView.swift */; };
@@ -323,6 +325,8 @@
 		662B362925B00FFD00C5E690 /* ProjectDocument+Sameboy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProjectDocument+Sameboy.swift"; sourceTree = "<group>"; };
 		662B36B325B1280300C5E690 /* ScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollView.swift; sourceTree = "<group>"; };
 		662B36C925B13D2100C5E690 /* ProjectDocument+Debugging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProjectDocument+Debugging.swift"; sourceTree = "<group>"; };
+		662B36D025B1419F00C5E690 /* VRAMViewer.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VRAMViewer.xib; sourceTree = "<group>"; };
+		662B36DC25B1442300C5E690 /* ProjectDocument+VRAMViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProjectDocument+VRAMViewer.swift"; sourceTree = "<group>"; };
 		66472ED6258E7F7600A03CD4 /* SourceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceView.swift; sourceTree = "<group>"; };
 		664833E02598558D00B955F4 /* CPUFlagsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUFlagsView.swift; sourceTree = "<group>"; };
 		664833E8259855CC00B955F4 /* LR35902RegistersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LR35902RegistersView.swift; sourceTree = "<group>"; };
@@ -566,6 +570,7 @@
 		665198BF25ABEA6D0075C3FC /* Panels */ = {
 			isa = PBXGroup;
 			children = (
+				662B36D025B1419F00C5E690 /* VRAMViewer.xib */,
 				665198C025ABEA7F0075C3FC /* LCDViewController.swift */,
 				66EDE9EF25ACCCE2008E322F /* PPUViewController.swift */,
 			);
@@ -594,6 +599,7 @@
 				665198F225ABF9570075C3FC /* Disassembly */,
 				665198F025ABF9450075C3FC /* Configuration */,
 				665D4F5C2575F75400C3A03B /* ProjectDocument.swift */,
+				662B36DC25B1442300C5E690 /* ProjectDocument+VRAMViewer.swift */,
 				662B36C925B13D2100C5E690 /* ProjectDocument+Debugging.swift */,
 				662B362925B00FFD00C5E690 /* ProjectDocument+Sameboy.swift */,
 				665198FE25ABF97F0075C3FC /* ProjectMetadata.swift */,
@@ -1184,6 +1190,7 @@
 			files = (
 				6699BA3925AEBF9B005DB9BB /* Document.xib in Resources */,
 				667B1B75257854BB00CE670F /* Assets.xcassets in Resources */,
+				662B36D125B1419F00C5E690 /* VRAMViewer.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1275,6 +1282,7 @@
 				66763D97257C0D4900824278 /* TextView.swift in Sources */,
 				6699BA4925AEC406005DB9BB /* cgb_boot.asm in Sources */,
 				66EDE9FF25ACD15A008E322F /* AddressView.swift in Sources */,
+				662B36DD25B1442300C5E690 /* ProjectDocument+VRAMViewer.swift in Sources */,
 				665198F425ABF95E0075C3FC /* DisassemblyResults.swift in Sources */,
 				6667E4BE25ACD3A600F14435 /* LabeledView.swift in Sources */,
 				665D4F8D2575F92500C3A03B /* main.swift in Sources */,

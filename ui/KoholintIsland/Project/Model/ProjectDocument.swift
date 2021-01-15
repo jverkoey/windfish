@@ -101,13 +101,22 @@ class ProjectDocument: NSDocument {
     wc.window?.toolbar = toolbar
 
     addWindowController(lcdWindowController)
+    addWindowController(vramWindowController)
     addWindowController(ppuWindowController)
 
     toggleLCD(self)
+    toggleVRAM(self)
     togglePPU(self)
 
     window.makeKeyAndOrderFront(nil)
   }
+
+  @IBOutlet var vramTabView: NSTabView?
+  @IBOutlet var vramWindow: NSPanel?
+  @IBOutlet var paletteTableView: NSTableView?
+  @IBOutlet var spritesTableView: NSTableView?
+  @IBOutlet var tilesetPaletteButton: NSPopUpButton?
+  @IBOutlet var tilesetImageView: GBImageView?
 
   lazy var lcdWindowController: NSWindowController = {
     let contentViewController = LCDViewController()
@@ -122,6 +131,14 @@ class ProjectDocument: NSDocument {
     let wc: NSWindowController = NSWindowController(window: window)
     wc.contentViewController = contentViewController
     return wc
+  }()
+
+  lazy var vramWindowController: NSWindowController = {
+    Bundle.main.loadNibNamed("VRAMViewer", owner: self, topLevelObjects: nil)
+    guard let vramWindow = vramWindow else {
+      fatalError()
+    }
+    return NSWindowController(window: vramWindow)
   }()
 
   lazy var ppuWindowController: NSWindowController = {
@@ -142,6 +159,12 @@ class ProjectDocument: NSDocument {
   @objc func toggleLCD(_ sender: Any?) {
     lcdWindowController.showWindow(self)
     lcdWindowController.window?.orderFront(self)
+  }
+
+  @objc func toggleVRAM(_ sender: Any?) {
+    vramWindowController.showWindow(self)
+    vramWindowController.window?.orderFront(self)
+    reloadVRAMData(nil)
   }
 
   @objc func togglePPU(_ sender: Any?) {
