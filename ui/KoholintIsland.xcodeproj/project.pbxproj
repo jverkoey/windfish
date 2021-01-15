@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		6604B514259069A700D068E8 /* Windfish in Frameworks */ = {isa = PBXBuildFile; productRef = 6604B513259069A700D068E8 /* Windfish */; };
 		662B362A25B00FFD00C5E690 /* ProjectDocument+Sameboy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662B362925B00FFD00C5E690 /* ProjectDocument+Sameboy.swift */; };
+		662B36B425B1280300C5E690 /* ScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662B36B325B1280300C5E690 /* ScrollView.swift */; };
 		66472ED7258E7F7600A03CD4 /* CodeTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66472ED6258E7F7600A03CD4 /* CodeTextView.swift */; };
 		664833E12598558D00B955F4 /* CPUFlagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664833E02598558D00B955F4 /* CPUFlagsView.swift */; };
 		664833E9259855CC00B955F4 /* LR35902RegistersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664833E8259855CC00B955F4 /* LR35902RegistersView.swift */; };
@@ -319,6 +320,7 @@
 /* Begin PBXFileReference section */
 		66115ED3258E7E930084368B /* KoholintIsland.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KoholintIsland.entitlements; sourceTree = "<group>"; };
 		662B362925B00FFD00C5E690 /* ProjectDocument+Sameboy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProjectDocument+Sameboy.swift"; sourceTree = "<group>"; };
+		662B36B325B1280300C5E690 /* ScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollView.swift; sourceTree = "<group>"; };
 		66472ED6258E7F7600A03CD4 /* CodeTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeTextView.swift; sourceTree = "<group>"; };
 		664833E02598558D00B955F4 /* CPUFlagsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUFlagsView.swift; sourceTree = "<group>"; };
 		664833E8259855CC00B955F4 /* LR35902RegistersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LR35902RegistersView.swift; sourceTree = "<group>"; };
@@ -709,6 +711,7 @@
 				66C617E3257F24E000E372BA /* EditorTableView.swift */,
 				66ABD4A325870117007F2788 /* StatisticsView.swift */,
 				66472ED6258E7F7600A03CD4 /* CodeTextView.swift */,
+				662B36B325B1280300C5E690 /* ScrollView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1252,6 +1255,7 @@
 				66763D80257AF38200824278 /* LR35902AddressFormatter.swift in Sources */,
 				667B1BA92578563E00CE670F /* ContentViewController.swift in Sources */,
 				66C617E4257F24E000E372BA /* EditorTableView.swift in Sources */,
+				662B36B425B1280300C5E690 /* ScrollView.swift in Sources */,
 				66763D732579F26000824278 /* RegionEditorViewController.swift in Sources */,
 				66EDE9F025ACCCE2008E322F /* PPUViewController.swift in Sources */,
 				665D4F5B2575F75400C3A03B /* ProjectViewController.swift in Sources */,

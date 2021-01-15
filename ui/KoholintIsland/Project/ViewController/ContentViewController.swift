@@ -6,25 +6,6 @@ import Combine
 
 import Windfish
 
-func CreateScrollView(bounds: NSRect) -> NSScrollView {
-  let scrollView = NSScrollView()
-  scrollView.frame = bounds
-  scrollView.hasVerticalScroller = true
-  scrollView.borderType = .noBorder
-  return scrollView
-}
-
-func CreateTextView(bounds: NSRect) -> CodeTextView {
-  let textView = CodeTextView()
-  textView.isVerticallyResizable = true
-  textView.autoresizingMask = [.width]
-  textView.textContainer?.containerSize = NSSize(width: bounds.width, height: CGFloat.greatestFiniteMagnitude)
-  textView.textContainer?.widthTracksTextView = true
-  textView.focusRingType = .none
-  textView.drawsBackground = false
-  return textView
-}
-
 func DefaultCodeAttributes() -> [NSAttributedString.Key : Any] {
   return [
     .foregroundColor: NSColor.textColor,
@@ -122,7 +103,7 @@ final class ContentViewController: NSViewController {
     containerView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(containerView)
 
-    let textView = CreateTextView(bounds: view.bounds)
+    let textView = CodeTextView(frame: view.bounds)
     textView.isEditable = false
     textView.allowsUndo = false
     textView.isSelectable = true
