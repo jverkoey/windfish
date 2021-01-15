@@ -170,15 +170,16 @@ extension ProjectDocument: NSTableViewDataSource {
       if columnIndex == 0 {
         return "\(row >= 8 ? "Object" : "Background") \(row & 7)"
       }
-      let paletteData = sameboy.getDirectAccess(row >= 8 ? GB_DIRECT_ACCESS_OBP : GB_DIRECT_ACCESS_BGP, size: nil, bank: nil)
-      return withUnsafeBytes(of: paletteData) { buffer in
-        let index = columnIndex - 1 + (row & 7) * 4
-        return (buffer[(index << 1) + 1] << 8) | buffer[(index << 1)]
-      }
+      var size: Int = 0
+      let paletteData = sameboy.getDirectAccess(row >= 8 ? GB_DIRECT_ACCESS_OBP : GB_DIRECT_ACCESS_BGP, size: &size, bank: nil)!
+      let bytes = paletteData.bindMemory(to: UInt8.self, capacity: size)
+      let index = columnIndex - 1 + (row & 7) * 4
+      return UInt16(truncatingIfNeeded: bytes[(index << 1) + 1] << 8) | UInt16(truncatingIfNeeded: bytes[index << 1])
 
     case spritesTableView:
       switch columnIndex {
       case 0:
+        // C arrays are bridged as tuples in Swift, so we need to recast the tuple back to a contiguous byte buffer
         let imageData = withUnsafeMutableBytes(of: &oamInfo[row].image.0) { pointer -> Data in
           return Data(bytesNoCopy: pointer.baseAddress!, count: 64 * 4 * 2, deallocator: .none)
         }
