@@ -60,11 +60,22 @@ extension ProjectDocument {
     }
   }
 
+  @IBAction func toggleScrollingDisplay(_ sender: Any?) {
+    guard let button = sender as? NSButton else {
+      return
+    }
+    tilemapImageView?.displayScrollRect = button.state.rawValue != 0
+  }
+
   @IBAction func reloadVRAMData(_ sender: Any?) {
     guard let vramWindow = vramWindow,
           let vramTabView = vramTabView,
           let tilesetPaletteButton = tilesetPaletteButton,
-          let tilesetImageView = tilesetImageView else {
+          let tilesetImageView = tilesetImageView,
+          let tilemapPaletteButton = tilemapPaletteButton,
+          let tilemapImageView = tilemapImageView,
+          let tilemapMapButton = tilemapMapButton,
+          let tilemapSetButton = tilemapSetButton else {
       return
     }
     guard vramWindow.isVisible,
@@ -82,33 +93,28 @@ extension ProjectDocument {
       }
       tilesetImageView.image = sameboy.drawTileset(withPaletteType: paletteType, menuIndex: paletteMenuIndex)
       tilesetImageView.layer?.magnificationFilter = .nearest
+
+    case 1:  // Tilemap
+      let paletteType: GB_palette_type_t
+      let paletteMenuIndex: UInt8 = UInt8(tilemapPaletteButton.indexOfSelectedItem)
+      if paletteMenuIndex > 1 {
+        paletteType = paletteMenuIndex > 9 ? GB_PALETTE_OAM : GB_PALETTE_BACKGROUND
+      } else if paletteMenuIndex == 1 {
+        paletteType = GB_PALETTE_AUTO
+      } else {
+        paletteType = GB_PALETTE_NONE
+      }
+      tilemapImageView.scrollRect = NSRect(x: CGFloat(sameboy.readMemory(0xFF00 | UInt16(truncatingIfNeeded: GB_IO_SCX))),
+                                           y: CGFloat(sameboy.readMemory(0xFF00 | UInt16(truncatingIfNeeded: GB_IO_SCY))),
+                                           width: 160, height: 144)
+      tilemapImageView.image = sameboy.drawTilemap(withPaletteType: paletteType,
+                                                   paletteIndex: paletteMenuIndex,
+                                                   mapType: GB_map_type_t(rawValue: UInt32(tilemapMapButton.indexOfSelectedItem)),
+                                                   tilesetType: GB_tileset_type_t(rawValue: UInt32(tilemapSetButton.indexOfSelectedItem)))
+      tilemapImageView.layer?.magnificationFilter = .nearest
     default:
       break
     }
-//        case 1:
-//        /* Tilemap */
-//        {
-//            GB_palette_type_t palette_type = GB_PALETTE_NONE;
-//            NSUInteger palette_menu_index = self.tilemapPaletteButton.indexOfSelectedItem;
-//            if (palette_menu_index > 1) {
-//                palette_type = palette_menu_index > 9? GB_PALETTE_OAM : GB_PALETTE_BACKGROUND;
-//            }
-//            else if (palette_menu_index == 1) {
-//                palette_type = GB_PALETTE_AUTO;
-//            }
-//
-//            self.tilemapImageView.scrollRect = NSMakeRect([_emulator readMemory:0xFF00 | GB_IO_SCX],
-//                                                          [_emulator readMemory:0xFF00 | GB_IO_SCY],
-//                                                          160, 144);
-//            self.tilemapImageView.image =
-//                [_emulator drawTilemapWithPaletteType:palette_type
-//                                         paletteIndex:palette_menu_index
-//                                              mapType:(GB_map_type_t) self.tilemapMapButton.indexOfSelectedItem
-//                                          tilesetType:(GB_tileset_type_t) self.TilemapSetButton.indexOfSelectedItem];
-//            self.tilemapImageView.layer.magnificationFilter = kCAFilterNearest;
-//        }
-//        break;
-//
 //        case 2:
 //        /* OAM */
 //        {

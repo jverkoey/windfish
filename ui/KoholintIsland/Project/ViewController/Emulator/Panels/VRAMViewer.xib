@@ -7,9 +7,13 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ProjectDocument" customModule="KoholintIsland" customModuleProvider="target">
             <connections>
+                <outlet property="TilemapSetButton" destination="fRt-Kr-ubi" id="5dh-lM-Onb"/>
                 <outlet property="gridButton" destination="i1p-lX-mp9" id="SWm-8a-3wJ"/>
                 <outlet property="paletteTableView" destination="naY-Cs-2zW" id="B2q-pL-VWh"/>
                 <outlet property="spritesTableView" destination="tRd-1a-pBe" id="aLQ-ub-zNU"/>
+                <outlet property="tilemapImageView" destination="MwO-c7-wAU" id="sWM-Xg-E9H"/>
+                <outlet property="tilemapMapButton" destination="RR8-bE-FzJ" id="nUd-3s-S7M"/>
+                <outlet property="tilemapPaletteButton" destination="8mw-gQ-MmJ" id="nXD-IS-l2Y"/>
                 <outlet property="tilesetImageView" destination="71z-1J-j81" id="Zmb-3k-tDf"/>
                 <outlet property="tilesetPaletteButton" destination="bqr-eP-nCA" id="vSd-Y3-U3L"/>
                 <outlet property="vramTabView" destination="Nfm-Ba-ajC" id="4wl-fO-ahh"/>
@@ -113,6 +117,9 @@
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                 <font key="font" metaFont="miniSystem"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="toggleScrollingDisplay:" target="-2" id="Jop-0I-xn7"/>
+                                            </connections>
                                         </button>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MwO-c7-wAU" customClass="GBImageView">
                                             <rect key="frame" x="0.0" y="0.0" width="512" height="384"/>
@@ -192,7 +199,7 @@
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" drawsBackground="NO" id="pR9-Qa-nD0">
                                                 <rect key="frame" x="0.0" y="0.0" width="512" height="408"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="18" headerView="RAX-MU-hNh" id="tRd-1a-pBe">
                                                         <rect key="frame" x="0.0" y="0.0" width="512" height="380"/>
@@ -324,7 +331,7 @@
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="Yfd-bh-lIu">
                                                 <rect key="frame" x="0.0" y="0.0" width="512" height="408"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="18" id="naY-Cs-2zW">
                                                         <rect key="frame" x="0.0" y="0.0" width="512" height="408"/>

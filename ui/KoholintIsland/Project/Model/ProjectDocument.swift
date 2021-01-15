@@ -115,9 +115,16 @@ class ProjectDocument: NSDocument {
   @IBOutlet var vramWindow: NSPanel?
   @IBOutlet var paletteTableView: NSTableView?
   @IBOutlet var spritesTableView: NSTableView?
-  @IBOutlet var tilesetPaletteButton: NSPopUpButton?
+
   @IBOutlet var gridButton: NSButton?
+
+  @IBOutlet var tilesetPaletteButton: NSPopUpButton?
   @IBOutlet var tilesetImageView: GBImageView?
+
+  @IBOutlet var tilemapImageView: GBImageView?
+  @IBOutlet var tilemapPaletteButton: NSPopUpButton?
+  @IBOutlet var tilemapMapButton: NSPopUpButton?
+  @IBOutlet var tilemapSetButton: NSPopUpButton?
 
   lazy var lcdWindowController: NSWindowController = {
     let contentViewController = LCDViewController()
