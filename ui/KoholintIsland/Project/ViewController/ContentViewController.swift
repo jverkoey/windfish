@@ -26,17 +26,18 @@ final class ContentViewController: NSViewController {
   }
 
   // Views
-  var containerView: NSScrollView?
+  var sourceContainerView: NSScrollView?
   var sourceView: SourceView?
   var sourceRulerView: SourceRulerView?
+  let toolbar = NSSegmentedControl()
 
   override func loadView() {
     view = NSView()
 
-    let containerView = CreateScrollView(bounds: view.bounds)
-    containerView.translatesAutoresizingMaskIntoConstraints = false
-    view.addSubview(containerView)
-    self.containerView = containerView
+    let sourceContainerView = CreateScrollView(bounds: view.bounds)
+    sourceContainerView.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(sourceContainerView)
+    self.sourceContainerView = sourceContainerView
 
     let sourceView = SourceView(frame: view.bounds)
     sourceView.isEditable = false
@@ -44,24 +45,47 @@ final class ContentViewController: NSViewController {
     sourceView.isSelectable = true
     sourceView.usesFindBar = true
     sourceView.isIncrementalSearchingEnabled = true
-    containerView.documentView = sourceView
+    sourceContainerView.documentView = sourceView
     self.sourceView = sourceView
 
-    let sourceRulerView = SourceRulerView(scrollView: containerView, orientation: .verticalRuler)
+    let sourceRulerView = SourceRulerView(scrollView: sourceContainerView, orientation: .verticalRuler)
     sourceRulerView.clientView = sourceView
     sourceRulerView.delegate = self
-    containerView.hasVerticalRuler = true
-    containerView.verticalRulerView = sourceRulerView
-    containerView.rulersVisible = true
+    sourceContainerView.hasVerticalRuler = true
+    sourceContainerView.verticalRulerView = sourceRulerView
+    sourceContainerView.rulersVisible = true
     self.sourceRulerView = sourceRulerView
+
+    toolbar.translatesAutoresizingMaskIntoConstraints = false
+    toolbar.translatesAutoresizingMaskIntoConstraints = false
+    toolbar.trackingMode = .momentary
+    toolbar.segmentStyle = .texturedSquare
+    let buttonSymbolNames = [
+      "arrowshape.bounce.forward.fill",
+      "arrow.right.to.line.alt",
+      "play",
+    ]
+    toolbar.segmentCount = buttonSymbolNames.count
+    for (index, buttonSymbolName) in buttonSymbolNames.enumerated() {
+      toolbar.setImage(NSImage(systemSymbolName: buttonSymbolName, accessibilityDescription: nil)!, forSegment: index)
+      toolbar.setWidth(40, forSegment: index)
+      toolbar.setEnabled(true, forSegment: index)
+    }
+    toolbar.target = self
+    toolbar.action = #selector(performControlAction(_:))
+    view.addSubview(toolbar)
 
     let safeAreaLayoutGuide = view.safeAreaLayoutGuide
     NSLayoutConstraint.activate([
       // Text content
-      containerView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
-      containerView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
-      containerView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-      containerView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+      sourceContainerView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+      sourceContainerView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+      sourceContainerView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+
+      toolbar.topAnchor.constraint(equalTo: sourceContainerView.bottomAnchor),
+      toolbar.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+      toolbar.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+      toolbar.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
     ])
   }
 
@@ -93,6 +117,39 @@ final class ContentViewController: NSViewController {
 }
 
 extension ContentViewController {
+  @objc func performControlAction(_ sender: NSSegmentedControl) {
+    guard let document = projectDocument else {
+      return
+    }
+    if sender.selectedSegment == 0 {  // Step forward
+      guard document.sameboy.gb.pointee.debug_stopped else {
+        return // Emulation must be stopped first.
+      }
+
+      document.nextDebuggerCommand = "next"
+      document.sameboyDebuggerSemaphore.signal()
+
+    } else if sender.selectedSegment == 1 {  // Step into
+      guard document.sameboy.gb.pointee.debug_stopped else {
+        return // Emulation must be stopped first.
+      }
+
+      document.nextDebuggerCommand = "step"
+      document.sameboyDebuggerSemaphore.signal()
+
+    } else if sender.selectedSegment == 2 {  // Play
+      document.sameboy.gb.pointee.debug_stopped = !document.sameboy.gb.pointee.debug_stopped
+
+      if !document.sameboy.gb.pointee.debug_stopped {
+        // Disconnect the debugger repl.
+        document.nextDebuggerCommand = nil
+        document.sameboyDebuggerSemaphore.signal()
+      }
+    }
+  }
+}
+
+extension ContentViewController {
   fileprivate func didSetBank() {
     refreshFileContents()
     refreshBank()
@@ -108,7 +165,7 @@ extension ContentViewController {
     sourceRulerView?.needsDisplay = true
 
     if let lineNumbersRuler = sourceRulerView {
-      containerView?.contentView.contentInsets.left = lineNumbersRuler.ruleThickness
+      sourceContainerView?.contentView.contentInsets.left = lineNumbersRuler.ruleThickness
     }
   }
 
@@ -130,7 +187,7 @@ extension ContentViewController {
     if oldValue.string != textStorage.string {
       sourceView?.highlightedLine = nil
     }
-    let originalOffset = containerView?.documentVisibleRect.origin
+    let originalOffset = sourceContainerView?.documentVisibleRect.origin
     sourceView?.layoutManager?.replaceTextStorage(textStorage)
     sourceView?.linkTextAttributes = [
       .foregroundColor: NSColor.linkColor,
@@ -141,7 +198,7 @@ extension ContentViewController {
     ]
     if let originalOffset = originalOffset {
       sourceView?.layoutManager?.ensureLayout(for: sourceView!.textContainer!)
-      containerView?.documentView?.scroll(CGPoint(x: originalOffset.x, y: originalOffset.y))
+      sourceContainerView?.documentView?.scroll(CGPoint(x: originalOffset.x, y: originalOffset.y))
     }
   }
 

@@ -209,7 +209,7 @@ final class ProjectViewController: NSViewController, EmulatorViewControllerDeleg
 
     guard let analysis = self.contentViewController.lineAnalysis,
           let textView = self.contentViewController.sourceView,
-          let containerView = self.contentViewController.containerView,
+          let containerView = self.contentViewController.sourceContainerView,
           let layoutManager = textView.layoutManager,
           let textContainer = textView.textContainer,
           analysis.lineRanges.count > 0 else {
