@@ -82,7 +82,7 @@ final class MacroEditorViewController: NSViewController, TabSelectable {
     containerView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(containerView)
 
-    let textView = CodeTextView(frame: view.bounds)
+    let textView = SourceView(frame: view.bounds)
     textView.isEditable = true
     textView.allowsUndo = true
     textView.isSelectable = true

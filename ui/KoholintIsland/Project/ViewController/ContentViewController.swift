@@ -14,23 +14,21 @@ func DefaultCodeAttributes() -> [NSAttributedString.Key : Any] {
 }
 
 final class ContentViewController: NSViewController {
-  var containerView: NSScrollView?
-  var textView: CodeTextView?
-  var lineNumbersRuler: LineNumberView?
-
+  // TODO: Make this an enum of either filename or bank.
   var filename: String?
-
   var bank: Gameboy.Cartridge.Bank? { didSet { didSetBank() } }
   var textStorage = NSTextStorage() { didSet { didSetTextStorage(oldValue: oldValue) } }
-
-  private var disassembledSubscriber: AnyCancellable?
-  private var didProcessEditingSubscriber: AnyCancellable?
   var lineAnalysis: LineAnalysis? {
     didSet {
-      lineNumbersRuler?.lineAnalysis = lineAnalysis
-      textView?.lineAnalysis = lineAnalysis
+      sourceRulerView?.lineAnalysis = lineAnalysis
+      sourceView?.lineAnalysis = lineAnalysis
     }
   }
+
+  // Views
+  var containerView: NSScrollView?
+  var sourceView: SourceView?
+  var sourceRulerView: SourceRulerView?
 
   override func loadView() {
     view = NSView()
@@ -38,25 +36,24 @@ final class ContentViewController: NSViewController {
     let containerView = CreateScrollView(bounds: view.bounds)
     containerView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(containerView)
-
-    let textView = CodeTextView(frame: view.bounds)
-    textView.isEditable = false
-    textView.allowsUndo = false
-    textView.isSelectable = true
-    textView.usesFindBar = true
-    textView.isIncrementalSearchingEnabled = true
-    containerView.documentView = textView
-
     self.containerView = containerView
-    self.textView = textView
 
-    let lineNumbersRuler = LineNumberView(scrollView: containerView, orientation: .verticalRuler)
-    lineNumbersRuler.clientView = textView
-    lineNumbersRuler.delegate = self
+    let sourceView = SourceView(frame: view.bounds)
+    sourceView.isEditable = false
+    sourceView.allowsUndo = false
+    sourceView.isSelectable = true
+    sourceView.usesFindBar = true
+    sourceView.isIncrementalSearchingEnabled = true
+    containerView.documentView = sourceView
+    self.sourceView = sourceView
+
+    let sourceRulerView = SourceRulerView(scrollView: containerView, orientation: .verticalRuler)
+    sourceRulerView.clientView = sourceView
+    sourceRulerView.delegate = self
     containerView.hasVerticalRuler = true
-    containerView.verticalRulerView = lineNumbersRuler
+    containerView.verticalRulerView = sourceRulerView
     containerView.rulersVisible = true
-    self.lineNumbersRuler = lineNumbersRuler
+    self.sourceRulerView = sourceRulerView
 
     let safeAreaLayoutGuide = view.safeAreaLayoutGuide
     NSLayoutConstraint.activate([
@@ -66,8 +63,6 @@ final class ContentViewController: NSViewController {
       containerView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
       containerView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
     ])
-
-    self.bank = nil
   }
 
   override func viewWillAppear() {
@@ -77,20 +72,24 @@ final class ContentViewController: NSViewController {
         self.refreshBank()
         self.refreshFileContents()
         if let projectDocument = self.projectDocument, let cartridge = projectDocument.gameboy.cartridge {
-          self.textView!.emulationLine = projectDocument.disassemblyResults?.lineFor(address: projectDocument.gameboy.cpu.pc, bank: cartridge.selectedBank)
+          self.sourceView!.emulationLine = projectDocument.disassemblyResults?.lineFor(address: projectDocument.gameboy.cpu.pc, bank: cartridge.selectedBank)
         }
       })
 
     didProcessEditingSubscriber = NotificationCenter.default.publisher(for: NSTextStorage.didProcessEditingNotification)
       .receive(on: RunLoop.main)
       .sink(receiveValue: { notification in
-        guard notification.object as? NSTextStorage === self.textView!.textStorage else {
+        guard notification.object as? NSTextStorage === self.sourceView!.textStorage else {
           return
         }
         self.lineAnalysis = nil
-        self.lineNumbersRuler!.needsDisplay = true
+        self.sourceRulerView!.needsDisplay = true
       })
   }
+
+  // Subscribers
+  private var disassembledSubscriber: AnyCancellable?
+  private var didProcessEditingSubscriber: AnyCancellable?
 }
 
 extension ContentViewController {
@@ -102,13 +101,13 @@ extension ContentViewController {
   private func refreshBank() {
     if let bank = bank {
       let bankLines = projectDocument?.disassemblyResults?.bankLines?[bank]
-      lineNumbersRuler?.bankLines = bankLines
+      sourceRulerView?.bankLines = bankLines
     } else {
-      lineNumbersRuler?.bankLines = nil
+      sourceRulerView?.bankLines = nil
     }
-    lineNumbersRuler?.needsDisplay = true
+    sourceRulerView?.needsDisplay = true
 
-    if let lineNumbersRuler = lineNumbersRuler {
+    if let lineNumbersRuler = sourceRulerView {
       containerView?.contentView.contentInsets.left = lineNumbersRuler.ruleThickness
     }
   }
@@ -129,11 +128,11 @@ extension ContentViewController {
 
   fileprivate func didSetTextStorage(oldValue: NSTextStorage) {
     if oldValue.string != textStorage.string {
-      textView?.highlightedLine = nil
+      sourceView?.highlightedLine = nil
     }
     let originalOffset = containerView?.documentVisibleRect.origin
-    textView?.layoutManager?.replaceTextStorage(textStorage)
-    textView?.linkTextAttributes = [
+    sourceView?.layoutManager?.replaceTextStorage(textStorage)
+    sourceView?.linkTextAttributes = [
       .foregroundColor: NSColor.linkColor,
       .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .medium),
       .underlineColor: NSColor.linkColor,
@@ -141,7 +140,7 @@ extension ContentViewController {
       .cursor: NSCursor.pointingHand,
     ]
     if let originalOffset = originalOffset {
-      textView?.layoutManager?.ensureLayout(for: textView!.textContainer!)
+      sourceView?.layoutManager?.ensureLayout(for: sourceView!.textContainer!)
       containerView?.documentView?.scroll(CGPoint(x: originalOffset.x, y: originalOffset.y))
     }
   }
@@ -190,7 +189,7 @@ final class LineAnalysis {
 extension ContentViewController: LineNumberViewDelegate {
   private func updateLineInformation() {
     let lineStartCharacterIndices = NSMutableIndexSet()
-    guard let clientString = textView?.textStorage?.string else {
+    guard let clientString = sourceView?.textStorage?.string else {
       return
     }
     let nsString = NSString(string: clientString)
@@ -207,13 +206,13 @@ extension ContentViewController: LineNumberViewDelegate {
     self.lineAnalysis = LineAnalysis(lineStartCharacterIndices: buffer, lineRanges: lineRanges, numberOfLines: numberOfLines)
   }
 
-  func lineNumberViewWillDraw(_ lineNumberView: LineNumberView) {
+  func lineNumberViewWillDraw(_ lineNumberView: SourceRulerView) {
     if lineAnalysis == nil {
       updateLineInformation()
     }
   }
 
-  func lineNumberView(_ lineNumberView: LineNumberView, didActivate lineNumber: Int) {
+  func lineNumberView(_ lineNumberView: SourceRulerView, didActivate lineNumber: Int) {
 //    guard let bankLines = lineNumbersRuler?.bankLines else {
 //      return
 //    }

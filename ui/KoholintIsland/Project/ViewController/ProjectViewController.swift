@@ -184,7 +184,7 @@ final class ProjectViewController: NSViewController, EmulatorViewControllerDeleg
   func emulatorViewControllerDidStepIn(_ emulatorViewController: EmulatorViewController) {
     let address = document.address
     let bank = document.bank
-    self.contentViewController.textView?.emulationLine = self.document.disassemblyResults?.lineFor(address: address, bank: bank)
+    self.contentViewController.sourceView?.emulationLine = self.document.disassemblyResults?.lineFor(address: address, bank: bank)
     self.jumpTo(address: address, bank: bank)
   }
 
@@ -208,7 +208,7 @@ final class ProjectViewController: NSViewController, EmulatorViewControllerDeleg
     }
 
     guard let analysis = self.contentViewController.lineAnalysis,
-          let textView = self.contentViewController.textView,
+          let textView = self.contentViewController.sourceView,
           let containerView = self.contentViewController.containerView,
           let layoutManager = textView.layoutManager,
           let textContainer = textView.textContainer,
@@ -217,14 +217,14 @@ final class ProjectViewController: NSViewController, EmulatorViewControllerDeleg
     }
 
     if highlight {
-      self.contentViewController.textView?.highlightedLine = lineIndex
+      self.contentViewController.sourceView?.highlightedLine = lineIndex
     }
 
     if analysis.lineRanges.count > lineIndex {
       let lineRange = analysis.lineRanges[lineIndex]
       let glyphGraph = layoutManager.glyphRange(forCharacterRange: lineRange, actualCharacterRange: nil)
       let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphGraph, in: textContainer)
-      self.contentViewController.textView?.scroll(boundingRect.offsetBy(dx: 0, dy: -containerView.bounds.height / 2).origin)
+      self.contentViewController.sourceView?.scroll(boundingRect.offsetBy(dx: 0, dy: -containerView.bounds.height / 2).origin)
     }
   }
 

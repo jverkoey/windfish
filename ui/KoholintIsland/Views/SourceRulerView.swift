@@ -6,14 +6,14 @@ import Combine
 import Windfish
 
 protocol LineNumberViewDelegate: NSObject {
-  func lineNumberView(_ lineNumberView: LineNumberView, didActivate lineNumber: Int)
-  func lineNumberViewWillDraw(_ lineNumberView: LineNumberView)
+  func lineNumberView(_ lineNumberView: SourceRulerView, didActivate lineNumber: Int)
+  func lineNumberViewWillDraw(_ lineNumberView: SourceRulerView)
 }
 
 private let scopeColumnWidth: CGFloat = 8
 private let columnPadding: CGFloat = 4
 
-final class LineNumberView: NSRulerView {
+final class SourceRulerView: NSRulerView {
   var bankLines: [Disassembler.Line]?
   weak var delegate: LineNumberViewDelegate?
 
@@ -347,7 +347,7 @@ final class LineNumberView: NSRulerView {
 
 // MARK: - User interaction
 
-extension LineNumberView {
+extension SourceRulerView {
   private func lineNumber(at location: NSPoint) -> Int? {
     var tappedLineNumber: Int? = nil
     processLines(in: bounds, handler: { lineNumber, lineString, lineStringRect, _ in

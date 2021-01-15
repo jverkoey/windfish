@@ -2,7 +2,7 @@ import AppKit
 import Foundation
 import Cocoa
 
-final class CodeTextView: NSTextView {
+final class SourceView: NSTextView {
   override init(frame frameRect: NSRect) {
     super.init(frame: frameRect)
 
