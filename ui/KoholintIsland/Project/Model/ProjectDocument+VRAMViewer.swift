@@ -33,6 +33,33 @@ extension ProjectDocument {
     vramWindow.setFrame(windowFrame, display: true, animate: true)
   }
 
+  @IBAction func toggleTilesetGrid(_ sender: Any?) {
+    guard let button = sender as? NSButton else {
+      return
+    }
+    if (button.state.rawValue != 0) {
+      tilesetImageView?.horizontalGrids = [
+        GBImageViewGridConfiguration(color: .init(red: 0, green: 0, blue: 0, alpha: 0.25), size: 8)!,
+        GBImageViewGridConfiguration(color: .init(red: 0, green: 0, blue: 0, alpha: 0.5), size: 128)!,
+      ]
+      tilesetImageView?.verticalGrids = [
+        GBImageViewGridConfiguration(color: .init(red: 0, green: 0, blue: 0, alpha: 0.25), size: 8)!,
+        GBImageViewGridConfiguration(color: .init(red: 0, green: 0, blue: 0, alpha: 0.5), size: 64)!,
+      ]
+//      self.tilemapImageView.horizontalGrids = @[
+//      [[GBImageViewGridConfiguration alloc] initWithColor:[NSColor colorWithCalibratedRed:0 green:0 blue:0 alpha:0.25] size:8],
+//      ];
+//      self.tilemapImageView.verticalGrids = @[
+//      [[GBImageViewGridConfiguration alloc] initWithColor:[NSColor colorWithCalibratedRed:0 green:0 blue:0 alpha:0.25] size:8],
+//      ];
+    } else {
+      tilesetImageView?.horizontalGrids = nil
+      tilesetImageView?.verticalGrids = nil
+//      tilemapImageView?.horizontalGrids = nil
+//      tilemapImageView?.verticalGrids = nil
+    }
+  }
+
   @IBAction func reloadVRAMData(_ sender: Any?) {
     guard let vramWindow = vramWindow,
           let vramTabView = vramTabView,

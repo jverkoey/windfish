@@ -7,6 +7,7 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ProjectDocument" customModule="KoholintIsland" customModuleProvider="target">
             <connections>
+                <outlet property="gridButton" destination="i1p-lX-mp9" id="SWm-8a-3wJ"/>
                 <outlet property="paletteTableView" destination="naY-Cs-2zW" id="B2q-pL-VWh"/>
                 <outlet property="spritesTableView" destination="tRd-1a-pBe" id="aLQ-ub-zNU"/>
                 <outlet property="tilesetImageView" destination="71z-1J-j81" id="Zmb-3k-tDf"/>
@@ -82,6 +83,9 @@
                                                     </items>
                                                 </menu>
                                             </popUpButtonCell>
+                                            <connections>
+                                                <action selector="reloadVRAMData:" target="-2" id="l47-KA-oVE"/>
+                                            </connections>
                                         </popUpButton>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="i1p-lX-mp9">
                                             <rect key="frame" x="452" y="388" width="56" height="17"/>
@@ -90,6 +94,9 @@
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                 <font key="font" metaFont="miniSystem"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="toggleTilesetGrid:" target="-2" id="oXu-5y-bfR"/>
+                                            </connections>
                                         </button>
                                     </subviews>
                                 </view>

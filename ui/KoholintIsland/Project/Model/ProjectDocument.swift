@@ -116,6 +116,7 @@ class ProjectDocument: NSDocument {
   @IBOutlet var paletteTableView: NSTableView?
   @IBOutlet var spritesTableView: NSTableView?
   @IBOutlet var tilesetPaletteButton: NSPopUpButton?
+  @IBOutlet var gridButton: NSButton?
   @IBOutlet var tilesetImageView: GBImageView?
 
   lazy var lcdWindowController: NSWindowController = {
