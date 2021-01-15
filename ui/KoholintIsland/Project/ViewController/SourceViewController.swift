@@ -13,7 +13,7 @@ func DefaultCodeAttributes() -> [NSAttributedString.Key : Any] {
   ]
 }
 
-final class ContentViewController: NSViewController {
+final class SourceViewController: NSViewController {
   // TODO: Make this an enum of either filename or bank.
   var filename: String?
   var bank: Gameboy.Cartridge.Bank? { didSet { didSetBank() } }
@@ -29,7 +29,7 @@ final class ContentViewController: NSViewController {
   var sourceContainerView: NSScrollView?
   var sourceView: SourceView?
   var sourceRulerView: SourceRulerView?
-  let toolbar = NSSegmentedControl()
+  var toggleEmulationButton: NSButton?
 
   override func loadView() {
     view = NSView()
@@ -56,35 +56,66 @@ final class ContentViewController: NSViewController {
     sourceContainerView.rulersVisible = true
     self.sourceRulerView = sourceRulerView
 
-    toolbar.translatesAutoresizingMaskIntoConstraints = false
-    toolbar.translatesAutoresizingMaskIntoConstraints = false
-    toolbar.trackingMode = .momentary
-    toolbar.segmentStyle = .texturedSquare
-    let buttonSymbolNames = [
-      "arrowshape.bounce.forward.fill",
-      "arrow.right.to.line.alt",
-      "play",
-    ]
-    toolbar.segmentCount = buttonSymbolNames.count
-    for (index, buttonSymbolName) in buttonSymbolNames.enumerated() {
-      toolbar.setImage(NSImage(systemSymbolName: buttonSymbolName, accessibilityDescription: nil)!, forSegment: index)
-      toolbar.setWidth(40, forSegment: index)
-      toolbar.setEnabled(true, forSegment: index)
+    let toolbarHeight: CGFloat = 28  // Matches Xcode's debugger bar's height.
+    let stepOverButton = NSButton(image: NSImage(systemSymbolName: "arrowshape.bounce.forward.fill",
+                                                 accessibilityDescription: nil)!,
+                                  target: nil,
+                                  action: #selector(ProjectDocument.stepForward(_:)))
+    stepOverButton.toolTip = "Step over"
+
+    let stepIntoButton = NSButton(image: NSImage(systemSymbolName: "arrow.right.to.line.alt",
+                                                 accessibilityDescription: nil)!,
+                                  target: nil,
+                                  action: #selector(ProjectDocument.stepInto(_:)))
+    stepIntoButton.toolTip = "Step into"
+
+    let toggleEmulationButton = NSButton(image: NSImage(systemSymbolName: "play", accessibilityDescription: nil)!,
+                                  target: nil,
+                                  action: #selector(ProjectDocument.toggleEmulation(_:)))
+    toggleEmulationButton.alternateImage = NSImage(systemSymbolName: "pause", accessibilityDescription: nil)!
+    toggleEmulationButton.setButtonType(.toggle)
+    toggleEmulationButton.state = .on
+    toggleEmulationButton.toolTip = "Toggle emulation"
+    self.toggleEmulationButton = toggleEmulationButton
+
+    let buttons = [stepOverButton, stepIntoButton, toggleEmulationButton]
+    for button in buttons {
+      button.isBordered = false
+      button.translatesAutoresizingMaskIntoConstraints = false
+      NSLayoutConstraint.activate([
+        button.widthAnchor.constraint(equalToConstant: toolbarHeight)
+      ])
     }
-    toolbar.target = self
-    toolbar.action = #selector(performControlAction(_:))
+
+    let toolbarTopBorder = HorizontalLine()
+    toolbarTopBorder.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(toolbarTopBorder)
+
+    let toolbar = NSStackView(views: buttons)
+    toolbar.translatesAutoresizingMaskIntoConstraints = false
+    toolbar.orientation = .horizontal
+    toolbar.wantsLayer = true
+    toolbar.edgeInsets = NSEdgeInsets(top: 0, left: 4, bottom: 0, right: 4)
+    let toolbarBackground = NSVisualEffectView(frame: toolbar.bounds)
+    toolbarBackground.material = .windowBackground
+    toolbarBackground.autoresizingMask = [.width, .height]
+    toolbar.insertView(toolbarBackground, at: 0, in: .center)
     view.addSubview(toolbar)
 
     let safeAreaLayoutGuide = view.safeAreaLayoutGuide
     NSLayoutConstraint.activate([
-      // Text content
       sourceContainerView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
       sourceContainerView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
       sourceContainerView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
 
-      toolbar.topAnchor.constraint(equalTo: sourceContainerView.bottomAnchor),
+      toolbarTopBorder.topAnchor.constraint(equalTo: sourceContainerView.bottomAnchor),
+      toolbarTopBorder.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+      toolbarTopBorder.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+
+      toolbar.topAnchor.constraint(equalTo: toolbarTopBorder.bottomAnchor),
       toolbar.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
       toolbar.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+      toolbar.heightAnchor.constraint(equalToConstant: toolbarHeight),
       toolbar.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
     ])
   }
@@ -109,6 +140,11 @@ final class ContentViewController: NSViewController {
         self.lineAnalysis = nil
         self.sourceRulerView!.needsDisplay = true
       })
+
+    guard let document = projectDocument else {
+      return
+    }
+    self.toggleEmulationButton?.state = document.sameboy.gb.pointee.debug_stopped ? .off : .on
   }
 
   // Subscribers
@@ -116,40 +152,7 @@ final class ContentViewController: NSViewController {
   private var didProcessEditingSubscriber: AnyCancellable?
 }
 
-extension ContentViewController {
-  @objc func performControlAction(_ sender: NSSegmentedControl) {
-    guard let document = projectDocument else {
-      return
-    }
-    if sender.selectedSegment == 0 {  // Step forward
-      guard document.sameboy.gb.pointee.debug_stopped else {
-        return // Emulation must be stopped first.
-      }
-
-      document.nextDebuggerCommand = "next"
-      document.sameboyDebuggerSemaphore.signal()
-
-    } else if sender.selectedSegment == 1 {  // Step into
-      guard document.sameboy.gb.pointee.debug_stopped else {
-        return // Emulation must be stopped first.
-      }
-
-      document.nextDebuggerCommand = "step"
-      document.sameboyDebuggerSemaphore.signal()
-
-    } else if sender.selectedSegment == 2 {  // Play
-      document.sameboy.gb.pointee.debug_stopped = !document.sameboy.gb.pointee.debug_stopped
-
-      if !document.sameboy.gb.pointee.debug_stopped {
-        // Disconnect the debugger repl.
-        document.nextDebuggerCommand = nil
-        document.sameboyDebuggerSemaphore.signal()
-      }
-    }
-  }
-}
-
-extension ContentViewController {
+extension SourceViewController {
   fileprivate func didSetBank() {
     refreshFileContents()
     refreshBank()
@@ -243,7 +246,7 @@ final class LineAnalysis {
 
 }
 
-extension ContentViewController: LineNumberViewDelegate {
+extension SourceViewController: LineNumberViewDelegate {
   private func updateLineInformation() {
     let lineStartCharacterIndices = NSMutableIndexSet()
     guard let clientString = sourceView?.textStorage?.string else {

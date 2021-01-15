@@ -26,7 +26,7 @@ final class ProjectViewController: NSViewController, EmulatorViewControllerDeleg
   let splitViewController: NSSplitViewController
 
   let sidebarViewController: OutlineViewController
-  let contentViewController: ContentViewController
+  let contentViewController: SourceViewController
   let inspectorViewController: InspectorViewController
 
   private var selectedFileDidChangeSubscriber: AnyCancellable?
@@ -39,7 +39,7 @@ final class ProjectViewController: NSViewController, EmulatorViewControllerDeleg
 
     self.splitViewController = NSSplitViewController()
     self.sidebarViewController = OutlineViewController()
-    self.contentViewController = ContentViewController()
+    self.contentViewController = SourceViewController()
     self.inspectorViewController = InspectorViewController(document: document)
 
     let leadingSidebarItem = NSSplitViewItem(sidebarWithViewController: sidebarViewController)

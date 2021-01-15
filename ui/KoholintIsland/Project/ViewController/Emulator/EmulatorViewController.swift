@@ -163,7 +163,6 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
   let instructionAssemblyLabel = CreateLabel()
   let instructionBytesLabel = CreateLabel()
   let tileDataImageView = PixelImageView()
-  let fpsLabel = CreateLabel()
   let breakpointEditor = NSPredicateEditor()
   private let cpuView = LR35902RegistersView()
 
@@ -197,33 +196,6 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
     // MARK: Views
 
     let monospacedFont = NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
-
-    let controls = NSSegmentedControl()
-    controls.translatesAutoresizingMaskIntoConstraints = false
-    controls.trackingMode = .momentary
-    controls.segmentStyle = .smallSquare
-    controls.segmentCount = 5
-    controls.setImage(NSImage(systemSymbolName: "arrowshape.bounce.forward.fill", accessibilityDescription: nil)!, forSegment: 0)
-    controls.setImage(NSImage(systemSymbolName: "arrow.down.to.line.alt", accessibilityDescription: nil)!, forSegment: 1)
-    controls.setImage(NSImage(systemSymbolName: "arrow.right.to.line.alt", accessibilityDescription: nil)!, forSegment: 2)
-    controls.setImage(NSImage(systemSymbolName: "play", accessibilityDescription: nil)!, forSegment: 3)
-    controls.setImage(NSImage(systemSymbolName: "clear", accessibilityDescription: nil)!, forSegment: 4)
-    controls.setWidth(40, forSegment: 0)
-    controls.setWidth(40, forSegment: 1)
-    controls.setWidth(40, forSegment: 2)
-    controls.setWidth(40, forSegment: 3)
-    controls.setWidth(40, forSegment: 4)
-    controls.setEnabled(true, forSegment: 0)
-    controls.setEnabled(true, forSegment: 1)
-    controls.setEnabled(true, forSegment: 2)
-    controls.setEnabled(true, forSegment: 3)
-    controls.setEnabled(true, forSegment: 4)
-    controls.target = self
-    controls.action = #selector(performControlAction(_:))
-    view.addSubview(controls)
-
-    fpsLabel.translatesAutoresizingMaskIntoConstraints = false
-    view.addSubview(fpsLabel)
 
     cpuView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(cpuView)
@@ -283,14 +255,7 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
     // MARK: Layout
 
     NSLayoutConstraint.activate([
-      controls.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-      controls.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-      controls.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-
-      fpsLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
-      fpsLabel.topAnchor.constraint(equalToSystemSpacingBelow: controls.bottomAnchor, multiplier: 1),
-
-      cpuView.topAnchor.constraint(equalToSystemSpacingBelow: fpsLabel.bottomAnchor, multiplier: 1),
+      cpuView.topAnchor.constraint(equalToSystemSpacingBelow: view.safeAreaLayoutGuide.topAnchor, multiplier: 1),
       cpuView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
 
       instructionLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
@@ -338,18 +303,6 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
     self.document.breakpointPredicate = sender.predicate
   }
 
-  func emulationDidAdvance(screenImage: NSImage, tileDataImage: NSImage, fps: Double?, ips: Double?) {
-    tileDataImageView.image = document.gameboy.takeSnapshotOfTileData()
-
-    updateRegisters()
-
-    if let fps = fps, let ips = ips {
-      self.fpsLabel.stringValue = String(format: "fps: %.2f ips: %.2f", fps, ips)
-    } else {
-      self.fpsLabel.stringValue = "Not running"
-    }
-  }
-
   func emulationDidAdvance() {
     updateRegisters()
   }
@@ -368,47 +321,6 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
 //    self.writeImageHistory(to: "recording.gif")
     delegate?.emulatorViewControllerDidStepIn(self)
     self.updateInstructionAssembly()
-  }
-
-  @objc func performControlAction(_ sender: NSSegmentedControl) {
-    if sender.selectedSegment == 0 {  // Step forward
-      guard document.sameboy.gb.pointee.debug_stopped else {
-        return // Emulation must be stopped first.
-      }
-
-      document.nextDebuggerCommand = "next"
-      document.sameboyDebuggerSemaphore.signal()
-
-    } else if sender.selectedSegment == 1 {  // Step into
-      guard document.sameboy.gb.pointee.debug_stopped else {
-        return // Emulation must be stopped first.
-      }
-
-      document.nextDebuggerCommand = "step"
-      document.sameboyDebuggerSemaphore.signal()
-
-    } else if sender.selectedSegment == 2 {  // Advance one machine cycle
-
-    } else if sender.selectedSegment == 3 {  // Play
-      document.sameboy.gb.pointee.debug_stopped = !document.sameboy.gb.pointee.debug_stopped
-
-      if !document.sameboy.gb.pointee.debug_stopped {
-        // Disconnect the debugger repl.
-        document.nextDebuggerCommand = nil
-        document.sameboyDebuggerSemaphore.signal()
-      }
-
-    } else if sender.selectedSegment == 4 {  // Clear
-      for register in LR35902.Instruction.Numeric.registers8 {
-        document.gameboy.cpu.clear(register)
-      }
-      for register in LR35902.Instruction.Numeric.registers16 {
-        document.gameboy.cpu.clear(register)
-      }
-      // TODO: Reset RAM.
-
-      updateRegisters()
-    }
   }
 }
 
