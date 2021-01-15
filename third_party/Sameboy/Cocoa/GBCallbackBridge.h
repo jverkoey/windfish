@@ -2,11 +2,15 @@
 
 #include <Core/gb.h>
 
+/** GB_connect_printer can use this callback to invoke the delegate for an already connected GBCallbackBridge. */
+void GBCallbackPrintImage(GB_gameboy_t *_Nonnull gb, uint32_t *_Nonnull image, uint8_t height,
+                          uint8_t top_margin, uint8_t bottom_margin, uint8_t exposure);
+
 /**
- CallbackBridgeDelegate is implemented by objects that intend to receive events from a GB_gameboy_t using a
- CallbackBridge.
+ GBCallbackBridgeDelegate is implemented by objects that intend to receive events from a GB_gameboy_t using a
+ GBGBCallbackBridge.
  */
-@protocol CallbackBridgeDelegate <NSObject>
+@protocol GBCallbackBridgeDelegate <NSObject>
 @required
 
 /**
@@ -16,13 +20,6 @@
  */
 - (void)loadBootROM:(GB_boot_rom_t)type;
 
-/**
- Informs the receiver that a new audio sample was received.
-
- The provided sample should be appended to an audio buffer for playback.
- */
-- (void)gotNewSample:(nonnull GB_sample_t *)sample;
-
 @optional
 
 /**
@@ -31,6 +28,15 @@
  The receiver will typically use this event to swap the pixel buffer using GB_set_pixels_output.
  */
 - (void)vblank;
+
+/**
+ Informs the receiver that a new audio sample was received.
+
+ The provided sample should be appended to an audio buffer for playback.
+
+ This method is required if a sample rate is provided by GB_set_sample_rate.
+ */
+- (void)gotNewSample:(nonnull GB_sample_t *)sample;
 
 - (void)log:(nonnull const char *)log withAttributes:(GB_log_attributes)attributes;
 
@@ -59,37 +65,27 @@
 @end
 
 /**
- A CallbackBridge can be used to connect a GB_gameboy_t's callbacks to an Objective-C instance.
+ A GBCallbackBridge can be used to connect a GB_gameboy_t's callbacks to an Objective-C instance.
 
- An instance of this class is typically owned by the object that conforms to the CallbackBridgeDelegate protocol, and
+ An instance of this class is typically owned by the object that conforms to the GBCallbackBridgeDelegate protocol, and
  that same object is provided to this instance's init method as the delegate.
  */
 __attribute__((objc_subclassing_restricted))
-@interface CallbackBridge: NSObject
+@interface GBCallbackBridge: NSObject
 
-/** Sets user data on gb to self and connects all applicable callbacks to the delegate. */
-- (nonnull instancetype)initWithGB:(nonnull GB_gameboy_t *)gb delegate:(nonnull id<CallbackBridgeDelegate>)delegate;
+/** Immediately sets user data on gb to self and connects all implemented callbacks to the delegate. */
+- (nonnull instancetype)initWithGameboy:(nonnull GB_gameboy_t *)gb
+                               delegate:(nonnull id<GBCallbackBridgeDelegate>)delegate;
 - (nonnull instancetype)init NS_UNAVAILABLE;
 
-/**
- Connects gb's printer to the delegate.
-
- The delegate must implement printImage:height:topMargin:bottomMargin:exposure: or this method will assert.
- */
-- (void)connectPrinter;
-
-/**
- Connects the link cable for both gb and partnerGB to the delegate.
-
- The delegate must implement both linkCableBitStart: and linkCableBitEnd or this method will assert.
- */
-- (void)connectLinkCableWithPartner:(nonnull GB_gameboy_t *)partnerGB;
+/** The delegate must implement both linkCableBitStart: and linkCableBitEnd or this method will assert. */
+- (void)enableSerialCallbacks;
 
 /**
  The object that implements the relevant callbacks.
 
  Setting this value after initialization is not presently supported.
  */
-@property (nonatomic, nullable, weak, readonly) id<CallbackBridgeDelegate> delegate;
+@property (nonatomic, nullable, weak, readonly) id<GBCallbackBridgeDelegate> delegate;
 
 @end

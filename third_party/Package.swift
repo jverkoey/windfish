@@ -30,8 +30,6 @@ let package = Package(
       path: "Sameboy/Cocoa",
       sources: [
         "BigSurToolbar.h",
-        "CallbackBridge.h",
-        "CallbackBridge.m",
         "Document.h",
         "Document.m",
         "GBAudioClient.h",
@@ -40,6 +38,8 @@ let package = Package(
         "GBBorderView.m",
         "GBButtons.h",
         "GBButtons.m",
+        "GBCallbackBridge.h",
+        "GBCallbackBridge.m",
         "GBCheatTextFieldCell.h",
         "GBCheatTextFieldCell.m",
         "GBCheatWindowController.h",
