@@ -102,11 +102,9 @@ class ProjectDocument: NSDocument {
 
     addWindowController(lcdWindowController)
     addWindowController(vramWindowController)
-    addWindowController(ppuWindowController)
 
     toggleLCD(self)
     toggleVRAM(self)
-    togglePPU(self)
 
     window.makeKeyAndOrderFront(nil)
   }
@@ -153,21 +151,6 @@ class ProjectDocument: NSDocument {
     return NSWindowController(window: vramWindow)
   }()
 
-  lazy var ppuWindowController: NSWindowController = {
-    let contentViewController = PPUViewController()
-    let window = NSPanel(contentViewController: contentViewController)
-    window.isFloatingPanel = true
-    window.styleMask.insert(.hudWindow)
-    window.subtitle = "PPU"
-    window.contentMinSize = NSSize(width: 400, height: 400)
-    window.setFrameOrigin(.init(x: NSScreen.main!.frame.maxX - window.frame.width,
-                                y: NSScreen.main!.frame.maxY - window.frame.height - lcdWindowController.window!.frame.height))
-    window.setContentSize(window.contentMinSize)
-    let wc = NSWindowController(window: window)
-    wc.contentViewController = contentViewController
-    return wc
-  }()
-
   @objc func toggleLCD(_ sender: Any?) {
     lcdWindowController.showWindow(self)
     lcdWindowController.window?.orderFront(self)
@@ -177,11 +160,6 @@ class ProjectDocument: NSDocument {
     vramWindowController.showWindow(self)
     vramWindowController.window?.orderFront(self)
     reloadVRAMData(nil)
-  }
-
-  @objc func togglePPU(_ sender: Any?) {
-    ppuWindowController.showWindow(self)
-    ppuWindowController.window?.orderFront(self)
   }
 }
 
