@@ -110,7 +110,6 @@ class ProjectDocument: NSDocument {
     window.contentMinSize = NSSize(width: PPU.screenSize.width, height: PPU.screenSize.height)
     window.setFrameOrigin(.init(x: NSScreen.main!.frame.maxX - window.frame.width,
                                 y: NSScreen.main!.frame.maxY - window.frame.height))
-    window.aspectRatio = window.contentMinSize
     let wc = NSWindowController(window: window)
     wc.contentViewController = contentViewController
     return wc

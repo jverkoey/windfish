@@ -49,10 +49,14 @@ extension ProjectDocument: EmulatorDelegate {
   }
 
   func getDebuggerInput() -> String? {
+    emulating = false
+
     DispatchQueue.main.async {
       // Ensure that all observers execute on the main thread.
       self.emulationObservers.forEach {
         $0.emulationDidAdvance()
+      }
+      self.emulationObservers.forEach {
         $0.emulationDidStop()
       }
     }
@@ -60,6 +64,14 @@ extension ProjectDocument: EmulatorDelegate {
     sameboyDebuggerSemaphore.wait()
     let nextDebuggerCommand = self.nextDebuggerCommand
     self.nextDebuggerCommand = nil
+    emulating = true
+
+    DispatchQueue.main.async {
+      // Ensure that all observers execute on the main thread.
+      self.emulationObservers.forEach {
+        $0.emulationDidStart()
+      }
+    }
     return nextDebuggerCommand
   }
 }
