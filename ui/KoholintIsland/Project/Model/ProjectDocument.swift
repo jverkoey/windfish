@@ -74,6 +74,13 @@ class ProjectDocument: NSDocument {
     applyDefaults()
   }
 
+  var address: LR35902.Address {
+    return sameboy.gb.pointee.pc
+  }
+  var bank: Gameboy.Cartridge.Bank {
+    return Gameboy.Cartridge.Bank(truncatingIfNeeded: sameboy.gb.pointee.mbc_rom_bank)
+  }
+
   private var documentFileWrapper: FileWrapper?
 
   override func makeWindowControllers() {

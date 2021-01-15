@@ -182,8 +182,8 @@ final class ProjectViewController: NSViewController, EmulatorViewControllerDeleg
   }
 
   func emulatorViewControllerDidStepIn(_ emulatorViewController: EmulatorViewController) {
-    let address = self.document.sameboy.gb.pointee.pc
-    let bank = Gameboy.Cartridge.Bank(truncatingIfNeeded: self.document.sameboy.gb.pointee.mbc_rom_bank)
+    let address = document.address
+    let bank = document.bank
     self.contentViewController.textView?.emulationLine = self.document.disassemblyResults?.lineFor(address: address, bank: bank)
     self.jumpTo(address: address, bank: bank)
   }

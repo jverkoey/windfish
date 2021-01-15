@@ -429,36 +429,7 @@ extension EmulatorViewController: NSTextFieldDelegate {
   }
 
   private func currentInstruction() -> LR35902.Instruction? {
-    if var address = document.gameboy.cpu.machineInstruction.sourceLocation?.address() {
-      return Disassembler.fetchInstruction(at: &address, memory: document.gameboy.memory)
-    }
-
-    if let spec = document.gameboy.cpu.machineInstruction.spec {
-      if let operandWidth = LR35902.InstructionSet.widths[spec]?.operand,
-         let sourceAddress = document.gameboy.cpu.machineInstruction.sourceAddress(),
-         operandWidth > 0 {
-        switch operandWidth {
-        case 1:
-          return LR35902.Instruction(spec: spec, immediate: .imm8(document.gameboy.memory.read(from: sourceAddress + 1)))
-        case 2:
-          let lsb = UInt16(truncatingIfNeeded: document.gameboy.memory.read(from: sourceAddress + 1))
-          let msb = UInt16(truncatingIfNeeded: document.gameboy.memory.read(from: sourceAddress + 2)) << 8
-          return LR35902.Instruction(spec: spec, immediate: .imm16(lsb | msb))
-        default:
-          break
-        }
-      }
-      return LR35902.Instruction(spec: spec)
-    }
-    if let addressAndBank = document.gameboy.cpu.machineInstruction.sourceAddressAndBank() {
-      // When a machine instruction has been loaded we need to look at it source location rather than the cpu's current
-      // pc + bank as the CPU may have already incremented the pc as a result of reading the instruction's opcode.
-      return document.disassemblyResults?.disassembly?.instruction(at: addressAndBank.address, in: max(1, addressAndBank.bank))
-    }
-    if let cartridge = document.gameboy.cartridge {
-      return document.disassemblyResults?.disassembly?.instruction(at: document.gameboy.cpu.pc, in: max(1, cartridge.selectedBank))
-    }
-    return nil
+    return document.disassemblyResults?.disassembly?.instruction(at: document.address, in: max(1, document.bank))
   }
 
   private func updateInstructionAssembly() {
@@ -471,19 +442,17 @@ extension EmulatorViewController: NSTextFieldDelegate {
       return
     }
 
-    if let cartridge = document.gameboy.cartridge {
-      let context = RGBDSDisassembler.Context(
-        address: document.gameboy.cpu.pc,
-        bank: max(1, cartridge.selectedBank),
-        disassembly: disassembly,
-        argumentString: nil
-      )
-      let statement = RGBDSDisassembler.statement(for: instruction, with: context)
-      instructionAssemblyLabel.stringValue = statement.formattedString
+    let context = RGBDSDisassembler.Context(
+      address: document.address,
+      bank: max(1, document.bank),
+      disassembly: disassembly,
+      argumentString: nil
+    )
+    let statement = RGBDSDisassembler.statement(for: instruction, with: context)
+    instructionAssemblyLabel.stringValue = statement.formattedString
 
-      let bytes = LR35902.InstructionSet.opcodeBytes[instruction.spec]! + [UInt8](instruction.immediate?.asData() ?? Data())
-      instructionBytesLabel.stringValue = bytes.map { "0x" + $0.hexString }.joined(separator: " ")
-    }
+    let bytes = LR35902.InstructionSet.opcodeBytes[instruction.spec]! + [UInt8](instruction.immediate?.asData() ?? Data())
+    instructionBytesLabel.stringValue = bytes.map { "0x" + $0.hexString }.joined(separator: " ")
   }
 
   func updateRegisters() {
