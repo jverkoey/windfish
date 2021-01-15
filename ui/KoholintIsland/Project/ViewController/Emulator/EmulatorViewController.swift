@@ -162,7 +162,6 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
   let registerStateController = NSArrayController()
   let instructionAssemblyLabel = CreateLabel()
   let instructionBytesLabel = CreateLabel()
-  let tileDataImageView = PixelImageView()
   let breakpointEditor = NSPredicateEditor()
   private let cpuView = LR35902RegistersView()
 
@@ -224,9 +223,6 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
     instructionBytesLabel.lineBreakStrategy = .standard
     view.addSubview(instructionBytesLabel)
 
-    tileDataImageView.translatesAutoresizingMaskIntoConstraints = false
-    view.addSubview(tileDataImageView)
-
     breakpointEditor.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(breakpointEditor)
 
@@ -274,17 +270,10 @@ final class EmulatorViewController: NSViewController, TabSelectable, EmulationOb
       instructionBytesLabel.widthAnchor.constraint(lessThanOrEqualToConstant: 300),
       instructionBytesLabel.topAnchor.constraint(equalTo: instructionBytesLabelHeader.bottomAnchor),
 
-      tileDataImageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 4),
-      tileDataImageView.widthAnchor.constraint(equalToConstant: 128),
-      tileDataImageView.heightAnchor.constraint(equalToConstant: 192),
-      tileDataImageView.topAnchor.constraint(equalToSystemSpacingBelow: instructionBytesLabel.bottomAnchor, multiplier: 1),
-
       breakpointEditor.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
       breakpointEditor.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-      breakpointEditor.topAnchor.constraint(equalTo: tileDataImageView.bottomAnchor),
+      breakpointEditor.topAnchor.constraint(equalTo: instructionBytesLabel.bottomAnchor),
     ])
-
-    tileDataImageView.image = document.gameboy.takeSnapshotOfTileData()
 
     updateInstructionAssembly()
     updateRegisters()
