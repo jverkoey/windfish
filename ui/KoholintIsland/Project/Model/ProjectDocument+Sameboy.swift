@@ -77,4 +77,50 @@ extension ProjectDocument: EmulatorDelegate {
     }
     return nextDebuggerCommand
   }
+
+  func log(_ log: String, with attributes: GB_log_attributes) {
+    let font = NSFont.userFixedPitchFont(ofSize: 12)!
+    let underline: NSUnderlineStyle
+    if (attributes.rawValue & GB_LOG_UNDERLINE_MASK.rawValue) != 0 {
+      underline = (attributes.rawValue & GB_LOG_DASHED_UNDERLINE.rawValue) != 0 ? [.patternDot, .single] : .single
+    } else {
+      underline = []
+    }
+    let paragraphStyle = NSMutableParagraphStyle()
+    paragraphStyle.lineSpacing = 2
+    let attributedString = NSMutableAttributedString(string: log, attributes: [
+      .font: font,
+      .foregroundColor: NSColor.white,
+      .underlineStyle: underline.rawValue,
+      .paragraphStyle: paragraphStyle
+    ])
+    consoleOutputLock.lock()
+    pendingConsoleOutput.append(attributedString)
+    consoleOutputLock.unlock()
+
+    DispatchQueue.main.async {
+      self.logObservers.forEach {
+        $0.didLog()
+      }
+    }
+  }
+//    [console_output_lock lock];
+//    if (!pending_console_output) {
+//        pending_console_output = attributed;
+//    }
+//    else {
+//        [pending_console_output appendAttributedString:attributed];
+//    }
+//
+//    if (![console_output_timer isValid]) {
+//        console_output_timer = [NSTimer timerWithTimeInterval:(NSTimeInterval)0.05 target:self selector:@selector(appendPendingOutput) userInfo:nil repeats:NO];
+//        [[NSRunLoop mainRunLoop] addTimer:console_output_timer forMode:NSDefaultRunLoopMode];
+//    }
+//
+//    [console_output_lock unlock];
+//
+//    /* Make sure mouse is not hidden while debugging */
+//    self.view.mouseHidingEnabled = NO;
+//}
+
 }

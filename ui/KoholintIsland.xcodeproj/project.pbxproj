@@ -580,11 +580,11 @@
 				66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */,
 				667B1BAD2578565A00CE670F /* OutlineViewController.swift */,
 				667B1BA82578563E00CE670F /* SourceViewController.swift */,
+				662B376225B275D400C5E690 /* DebugConsoleView.xib */,
 				662B375625B2275900C5E690 /* DebuggingViewController.swift */,
 				66783F842585B69F008C34FA /* Editors */,
 				667B1C0125789BAE00CE670F /* InspectorViewController.swift */,
 				66820CA5258DB6DC009507BB /* Emulator */,
-				662B376225B275D400C5E690 /* DebugConsoleView.xib */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";

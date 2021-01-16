@@ -116,3 +116,32 @@ final class LR35902RegistersView: NSView {
     flagsView.update(with: emulator)
   }
 }
+
+final class IBLR35902RegistersView: NSView {
+  @IBOutlet var pcView: FixedWidthTextView?
+  @IBOutlet var spView: FixedWidthTextView?
+  @IBOutlet var aView: FixedWidthTextView?
+  @IBOutlet var fView: FixedWidthTextView?
+  @IBOutlet var bView: FixedWidthTextView?
+  @IBOutlet var cView: FixedWidthTextView?
+  @IBOutlet var dView: FixedWidthTextView?
+  @IBOutlet var eView: FixedWidthTextView?
+  @IBOutlet var hView: FixedWidthTextView?
+  @IBOutlet var lView: FixedWidthTextView?
+  @IBOutlet var flagsView: CPUFlagsView?
+
+  func update(with emulator: Emulator) {
+    let gb = emulator.gb.pointee
+    pcView?.integerValue = Int(truncatingIfNeeded: gb.pc)
+    spView?.integerValue = Int(truncatingIfNeeded: gb.sp)
+    aView?.integerValue  = Int(truncatingIfNeeded: gb.a)
+    fView?.integerValue  = Int(truncatingIfNeeded: gb.f)
+    bView?.integerValue  = Int(truncatingIfNeeded: gb.b)
+    cView?.integerValue  = Int(truncatingIfNeeded: gb.c)
+    dView?.integerValue  = Int(truncatingIfNeeded: gb.d)
+    eView?.integerValue  = Int(truncatingIfNeeded: gb.e)
+    hView?.integerValue  = Int(truncatingIfNeeded: gb.h)
+    lView?.integerValue  = Int(truncatingIfNeeded: gb.l)
+    flagsView?.update(with: emulator)
+  }
+}

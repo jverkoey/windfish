@@ -55,6 +55,7 @@ class ProjectDocument: NSDocument {
   var lastTileDataImage: NSImage? = nil
   var vblankHistory: [NSImage] = []
   var emulationObservers: [EmulationObservers] = []
+  var logObservers: [LogObserver] = []
   var breakpointPredicate: NSPredicate?
 
   deinit {
@@ -127,6 +128,8 @@ class ProjectDocument: NSDocument {
   var oamUpdating = false
   var oamCount: UInt8 = 0
   var oamHeight: UInt8 = 0
+  var consoleOutputLock = NSRecursiveLock()
+  var pendingConsoleOutput = NSMutableAttributedString()
 
   lazy var lcdWindowController: NSWindowController = {
     let contentViewController = LCDViewController()

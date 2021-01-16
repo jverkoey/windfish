@@ -8,3 +8,7 @@ protocol EmulationObservers {
   func emulationDidStart()
   func emulationDidStop()
 }
+
+protocol LogObserver {
+  func didLog()
+}
