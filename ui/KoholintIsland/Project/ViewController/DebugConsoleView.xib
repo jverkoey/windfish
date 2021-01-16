@@ -28,7 +28,7 @@
             <rect key="frame" x="0.0" y="0.0" width="649" height="152"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
-                <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pAq-Tw-qMm">
+                <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pAq-Tw-qMm" userLabel="Console output">
                     <rect key="frame" x="0.0" y="22" width="332" height="130"/>
                     <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HcX-qf-PZc">
                         <rect key="frame" x="0.0" y="0.0" width="332" height="130"/>
@@ -68,7 +68,7 @@
                     <rect key="frame" x="333" y="22" width="316" height="130"/>
                     <subviews>
                         <gridView xPlacement="leading" yPlacement="top" rowAlignment="none" rowSpacing="4" columnSpacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="EkK-1T-7W1">
-                            <rect key="frame" x="4" y="28" width="308" height="98"/>
+                            <rect key="frame" x="4" y="11" width="308" height="115"/>
                             <rows>
                                 <gridRow id="B07-0E-5IV"/>
                                 <gridRow id="msS-WP-nk3"/>
@@ -83,10 +83,10 @@
                             <gridCells>
                                 <gridCell row="B07-0E-5IV" column="kvt-b7-JjW" id="YeH-GV-WRj">
                                     <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="hIW-SV-s4s">
-                                        <rect key="frame" x="0.0" y="85" width="100" height="13"/>
+                                        <rect key="frame" x="0.0" y="85" width="100" height="30"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0hl-eu-IxU">
-                                                <rect key="frame" x="-2" y="0.0" width="66" height="13"/>
+                                                <rect key="frame" x="-2" y="0.0" width="66" height="30"/>
                                                 <textFieldCell key="cell" lineBreakMode="clipping" title="pc:" id="f8h-hz-pi4">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -94,7 +94,7 @@
                                                 </textFieldCell>
                                             </textField>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xGw-Ym-Oo4" customClass="FixedWidthTextView" customModule="KoholintIsland" customModuleProvider="target">
-                                                <rect key="frame" x="64" y="0.0" width="38" height="13"/>
+                                                <rect key="frame" x="64" y="17" width="38" height="13"/>
                                                 <textFieldCell key="cell" title="$0000" id="dmN-kc-oxg">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -114,10 +114,10 @@
                                 </gridCell>
                                 <gridCell row="B07-0E-5IV" column="xgH-nm-bgf" id="LG0-hS-YfR">
                                     <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="TYa-Xf-iuI">
-                                        <rect key="frame" x="104" y="85" width="100" height="13"/>
+                                        <rect key="frame" x="104" y="85" width="100" height="30"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SEi-Mc-ogP">
-                                                <rect key="frame" x="-2" y="0.0" width="80" height="13"/>
+                                                <rect key="frame" x="-2" y="0.0" width="80" height="30"/>
                                                 <textFieldCell key="cell" lineBreakMode="clipping" title="a:" id="2bq-lz-VEi">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -125,7 +125,7 @@
                                                 </textFieldCell>
                                             </textField>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="a5y-BC-jPq" customClass="FixedWidthTextView" customModule="KoholintIsland" customModuleProvider="target">
-                                                <rect key="frame" x="78" y="0.0" width="24" height="13"/>
+                                                <rect key="frame" x="78" y="17" width="24" height="13"/>
                                                 <textFieldCell key="cell" title="$00" id="1LL-e5-vYH">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -145,10 +145,10 @@
                                 </gridCell>
                                 <gridCell row="B07-0E-5IV" column="MA6-eo-zQy" id="b2D-u5-DA8">
                                     <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="7d5-yJ-2T1">
-                                        <rect key="frame" x="208" y="85" width="100" height="13"/>
+                                        <rect key="frame" x="208" y="85" width="100" height="30"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LxS-0b-wHH">
-                                                <rect key="frame" x="-2" y="0.0" width="73" height="13"/>
+                                                <rect key="frame" x="-2" y="0.0" width="73" height="30"/>
                                                 <textFieldCell key="cell" lineBreakMode="clipping" title="f:" id="xCm-2T-COh">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -156,7 +156,7 @@
                                                 </textFieldCell>
                                             </textField>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YMd-Ov-tHN" customClass="FixedWidthTextView" customModule="KoholintIsland" customModuleProvider="target">
-                                                <rect key="frame" x="71" y="0.0" width="31" height="13"/>
+                                                <rect key="frame" x="71" y="17" width="31" height="13"/>
                                                 <textFieldCell key="cell" title="----" id="DSV-pQ-XzV">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -176,10 +176,10 @@
                                 </gridCell>
                                 <gridCell row="msS-WP-nk3" column="kvt-b7-JjW" id="EeF-Lk-yMO">
                                     <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="clO-tW-Biz">
-                                        <rect key="frame" x="0.0" y="68" width="100" height="13"/>
+                                        <rect key="frame" x="0.0" y="51" width="100" height="30"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2Pn-qG-LkZ">
-                                                <rect key="frame" x="-2" y="0.0" width="66" height="13"/>
+                                                <rect key="frame" x="-2" y="0.0" width="66" height="30"/>
                                                 <textFieldCell key="cell" lineBreakMode="clipping" title="sp:" id="EJh-mV-w5d">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -187,7 +187,7 @@
                                                 </textFieldCell>
                                             </textField>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aSw-MS-un6" customClass="FixedWidthTextView" customModule="KoholintIsland" customModuleProvider="target">
-                                                <rect key="frame" x="64" y="0.0" width="38" height="13"/>
+                                                <rect key="frame" x="64" y="17" width="38" height="13"/>
                                                 <textFieldCell key="cell" title="$0000" id="1ss-g9-7kw">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -207,10 +207,10 @@
                                 </gridCell>
                                 <gridCell row="msS-WP-nk3" column="xgH-nm-bgf" id="EcP-9g-5br">
                                     <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="hi3-uJ-6FX">
-                                        <rect key="frame" x="104" y="68" width="100" height="13"/>
+                                        <rect key="frame" x="104" y="51" width="100" height="30"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cdA-Kx-ZUg">
-                                                <rect key="frame" x="-2" y="0.0" width="80" height="13"/>
+                                                <rect key="frame" x="-2" y="0.0" width="80" height="30"/>
                                                 <textFieldCell key="cell" lineBreakMode="clipping" title="b:" id="TTk-7w-t8w">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -218,7 +218,7 @@
                                                 </textFieldCell>
                                             </textField>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KNo-Kc-BT4" customClass="FixedWidthTextView" customModule="KoholintIsland" customModuleProvider="target">
-                                                <rect key="frame" x="78" y="0.0" width="24" height="13"/>
+                                                <rect key="frame" x="78" y="17" width="24" height="13"/>
                                                 <textFieldCell key="cell" title="$00" id="UFL-to-TY6">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -238,10 +238,10 @@
                                 </gridCell>
                                 <gridCell row="msS-WP-nk3" column="MA6-eo-zQy" id="vWa-yz-jfM">
                                     <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="YMY-l4-So1">
-                                        <rect key="frame" x="208" y="68" width="100" height="13"/>
+                                        <rect key="frame" x="208" y="51" width="100" height="30"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2Dw-if-QJd">
-                                                <rect key="frame" x="-2" y="0.0" width="80" height="13"/>
+                                                <rect key="frame" x="-2" y="0.0" width="80" height="30"/>
                                                 <textFieldCell key="cell" lineBreakMode="clipping" title="c:" id="YL4-aq-Y8F">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -249,7 +249,7 @@
                                                 </textFieldCell>
                                             </textField>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jMg-iI-ifk" customClass="FixedWidthTextView" customModule="KoholintIsland" customModuleProvider="target">
-                                                <rect key="frame" x="78" y="0.0" width="24" height="13"/>
+                                                <rect key="frame" x="78" y="17" width="24" height="13"/>
                                                 <textFieldCell key="cell" title="$00" id="U0S-mg-IbA">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -270,7 +270,7 @@
                                 <gridCell row="RLk-QW-Mwt" column="kvt-b7-JjW" id="vrw-kq-eFE"/>
                                 <gridCell row="RLk-QW-Mwt" column="xgH-nm-bgf" id="nQp-ae-nbC">
                                     <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="HWA-Zx-5ZI">
-                                        <rect key="frame" x="104" y="34" width="100" height="30"/>
+                                        <rect key="frame" x="104" y="17" width="100" height="30"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eF9-O5-534">
                                                 <rect key="frame" x="-2" y="0.0" width="80" height="30"/>
@@ -301,7 +301,7 @@
                                 </gridCell>
                                 <gridCell row="RLk-QW-Mwt" column="MA6-eo-zQy" id="175-8m-9kS">
                                     <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="9rC-oh-3AU">
-                                        <rect key="frame" x="208" y="34" width="100" height="30"/>
+                                        <rect key="frame" x="208" y="17" width="100" height="30"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wXU-FV-jei">
                                                 <rect key="frame" x="-2" y="0.0" width="80" height="30"/>
@@ -333,10 +333,10 @@
                                 <gridCell row="Tff-sE-w89" column="kvt-b7-JjW" id="xgc-kG-C8h"/>
                                 <gridCell row="Tff-sE-w89" column="xgH-nm-bgf" id="9mK-BT-ONz">
                                     <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="CZt-3C-z0H">
-                                        <rect key="frame" x="104" y="0.0" width="100" height="30"/>
+                                        <rect key="frame" x="104" y="0.0" width="100" height="13"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bs2-Wl-uzZ">
-                                                <rect key="frame" x="-2" y="0.0" width="80" height="30"/>
+                                                <rect key="frame" x="-2" y="0.0" width="80" height="13"/>
                                                 <textFieldCell key="cell" lineBreakMode="clipping" title="h:" id="ehl-7x-vE7">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -344,7 +344,7 @@
                                                 </textFieldCell>
                                             </textField>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4S0-JQ-4di" customClass="FixedWidthTextView" customModule="KoholintIsland" customModuleProvider="target">
-                                                <rect key="frame" x="78" y="17" width="24" height="13"/>
+                                                <rect key="frame" x="78" y="0.0" width="24" height="13"/>
                                                 <textFieldCell key="cell" title="$00" id="iav-8q-2OW">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -364,10 +364,10 @@
                                 </gridCell>
                                 <gridCell row="Tff-sE-w89" column="MA6-eo-zQy" id="j4F-z2-IdN">
                                     <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="lUp-6f-IjC">
-                                        <rect key="frame" x="208" y="0.0" width="100" height="30"/>
+                                        <rect key="frame" x="208" y="0.0" width="100" height="13"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="R6z-hJ-gNC">
-                                                <rect key="frame" x="-2" y="0.0" width="80" height="30"/>
+                                                <rect key="frame" x="-2" y="0.0" width="80" height="13"/>
                                                 <textFieldCell key="cell" lineBreakMode="clipping" title="l:" id="c0l-Nl-4eq">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -375,7 +375,7 @@
                                                 </textFieldCell>
                                             </textField>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hRp-RU-mQi" customClass="FixedWidthTextView" customModule="KoholintIsland" customModuleProvider="target">
-                                                <rect key="frame" x="78" y="17" width="24" height="13"/>
+                                                <rect key="frame" x="78" y="0.0" width="24" height="13"/>
                                                 <textFieldCell key="cell" title="$00" id="EYF-pC-jbi">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -405,7 +405,7 @@
                 <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="FQq-vR-yB4">
                     <rect key="frame" x="0.0" y="19" width="649" height="5"/>
                 </box>
-                <textField focusRingType="none" verticalHuggingPriority="750" mirrorLayoutDirectionWhenInternationalizing="never" translatesAutoresizingMaskIntoConstraints="NO" id="amH-Ua-hrr">
+                <textField focusRingType="none" verticalHuggingPriority="750" mirrorLayoutDirectionWhenInternationalizing="never" translatesAutoresizingMaskIntoConstraints="NO" id="amH-Ua-hrr" userLabel="Console input">
                     <rect key="frame" x="2" y="4" width="645" height="13"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" state="on" focusRingType="none" placeholderString="Debugger input" id="3F7-cb-Dmo" customClass="GBTerminalTextFieldCell">
                         <font key="font" metaFont="fixedUser" size="11"/>
