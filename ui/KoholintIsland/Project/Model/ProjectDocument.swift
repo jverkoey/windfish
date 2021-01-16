@@ -193,13 +193,13 @@ extension ProjectDocument: NSToolbarDelegate {
     case .leadingSidebarTrackingSeparator:
       return NSTrackingSeparatorToolbarItem(
         identifier: itemIdentifier,
-        splitView: contentViewController!.splitViewController.splitView,
+        splitView: contentViewController!.threePaneSplitViewController.splitView,
         dividerIndex: 0
       )
     case .trailingSidebarTrackingSeparator:
       return NSTrackingSeparatorToolbarItem(
         identifier: itemIdentifier,
-        splitView: contentViewController!.splitViewController.splitView,
+        splitView: contentViewController!.threePaneSplitViewController.splitView,
         dividerIndex: 1
       )
     case .disassemble:

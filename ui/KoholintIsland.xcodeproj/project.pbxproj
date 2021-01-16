@@ -13,6 +13,8 @@
 		662B36CA25B13D2100C5E690 /* ProjectDocument+Debugging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662B36C925B13D2100C5E690 /* ProjectDocument+Debugging.swift */; };
 		662B36D125B1419F00C5E690 /* VRAMViewer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 662B36D025B1419F00C5E690 /* VRAMViewer.xib */; };
 		662B36DD25B1442300C5E690 /* ProjectDocument+VRAMViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662B36DC25B1442300C5E690 /* ProjectDocument+VRAMViewer.swift */; };
+		662B375725B2275900C5E690 /* DebuggingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662B375625B2275900C5E690 /* DebuggingViewController.swift */; };
+		662B376325B275D400C5E690 /* DebugConsoleView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 662B376225B275D400C5E690 /* DebugConsoleView.xib */; };
 		66472ED7258E7F7600A03CD4 /* SourceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66472ED6258E7F7600A03CD4 /* SourceView.swift */; };
 		664833E12598558D00B955F4 /* CPUFlagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664833E02598558D00B955F4 /* CPUFlagsView.swift */; };
 		664833E9259855CC00B955F4 /* LR35902RegistersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664833E8259855CC00B955F4 /* LR35902RegistersView.swift */; };
@@ -324,6 +326,8 @@
 		662B36C925B13D2100C5E690 /* ProjectDocument+Debugging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProjectDocument+Debugging.swift"; sourceTree = "<group>"; };
 		662B36D025B1419F00C5E690 /* VRAMViewer.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VRAMViewer.xib; sourceTree = "<group>"; };
 		662B36DC25B1442300C5E690 /* ProjectDocument+VRAMViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProjectDocument+VRAMViewer.swift"; sourceTree = "<group>"; };
+		662B375625B2275900C5E690 /* DebuggingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebuggingViewController.swift; sourceTree = "<group>"; };
+		662B376225B275D400C5E690 /* DebugConsoleView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DebugConsoleView.xib; sourceTree = "<group>"; };
 		66472ED6258E7F7600A03CD4 /* SourceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceView.swift; sourceTree = "<group>"; };
 		664833E02598558D00B955F4 /* CPUFlagsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUFlagsView.swift; sourceTree = "<group>"; };
 		664833E8259855CC00B955F4 /* LR35902RegistersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LR35902RegistersView.swift; sourceTree = "<group>"; };
@@ -576,9 +580,11 @@
 				66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */,
 				667B1BAD2578565A00CE670F /* OutlineViewController.swift */,
 				667B1BA82578563E00CE670F /* SourceViewController.swift */,
+				662B375625B2275900C5E690 /* DebuggingViewController.swift */,
 				66783F842585B69F008C34FA /* Editors */,
 				667B1C0125789BAE00CE670F /* InspectorViewController.swift */,
 				66820CA5258DB6DC009507BB /* Emulator */,
+				662B376225B275D400C5E690 /* DebugConsoleView.xib */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -1181,6 +1187,7 @@
 			files = (
 				6699BA3925AEBF9B005DB9BB /* Document.xib in Resources */,
 				667B1B75257854BB00CE670F /* Assets.xcassets in Resources */,
+				662B376325B275D400C5E690 /* DebugConsoleView.xib in Resources */,
 				662B36D125B1419F00C5E690 /* VRAMViewer.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1270,6 +1277,7 @@
 				665D4F592575F75400C3A03B /* AppDelegate.swift in Sources */,
 				66763D97257C0D4900824278 /* TextView.swift in Sources */,
 				6699BA4925AEC406005DB9BB /* cgb_boot.asm in Sources */,
+				662B375725B2275900C5E690 /* DebuggingViewController.swift in Sources */,
 				66EDE9FF25ACD15A008E322F /* AddressView.swift in Sources */,
 				662B36DD25B1442300C5E690 /* ProjectDocument+VRAMViewer.swift in Sources */,
 				665198F425ABF95E0075C3FC /* DisassemblyResults.swift in Sources */,

@@ -23,10 +23,12 @@ final class ProjectViewController: NSViewController {
   let horizontalLine = HorizontalLine()
   let progressIndicator = NSProgressIndicator()
   let statisticsView = StatisticsView()
-  let splitViewController: NSSplitViewController
+  let threePaneSplitViewController: NSSplitViewController
+  let centerSplitViewController: NSSplitViewController
 
   let sidebarViewController: OutlineViewController
-  let contentViewController: SourceViewController
+  let sourceViewController: SourceViewController
+  let debuggingViewController: DebuggingViewController
   let inspectorViewController: InspectorViewController
 
   private var selectedFileDidChangeSubscriber: AnyCancellable?
@@ -37,25 +39,33 @@ final class ProjectViewController: NSViewController {
   init(document: ProjectDocument) {
     self.document = document
 
-    self.splitViewController = NSSplitViewController()
+    self.threePaneSplitViewController = NSSplitViewController()
+    self.centerSplitViewController = NSSplitViewController()
     self.sidebarViewController = OutlineViewController()
-    self.contentViewController = SourceViewController()
+    self.sourceViewController = SourceViewController()
+    self.debuggingViewController = DebuggingViewController()
     self.inspectorViewController = InspectorViewController(document: document)
 
+    // Center
+    centerSplitViewController.addSplitViewItem(NSSplitViewItem(viewController: sourceViewController))
+    let debuggingItem = NSSplitViewItem(viewController: debuggingViewController)
+    debuggingItem.canCollapse = false
+    debuggingItem.minimumThickness = 200 // TODO: This doesn't appear to actually be getting enforced.
+    centerSplitViewController.addSplitViewItem(debuggingItem)
+
+    // Three-pane
     let leadingSidebarItem = NSSplitViewItem(sidebarWithViewController: sidebarViewController)
     leadingSidebarItem.canCollapse = false
-    splitViewController.addSplitViewItem(leadingSidebarItem)
-
-    splitViewController.addSplitViewItem(NSSplitViewItem(viewController: contentViewController))
-
+    threePaneSplitViewController.addSplitViewItem(leadingSidebarItem)
+    threePaneSplitViewController.addSplitViewItem(NSSplitViewItem(viewController: centerSplitViewController))
     let trailingSidebarItem = NSSplitViewItem(sidebarWithViewController: inspectorViewController)
     trailingSidebarItem.canCollapse = false
     trailingSidebarItem.minimumThickness = 300
-    splitViewController.addSplitViewItem(trailingSidebarItem)
+    threePaneSplitViewController.addSplitViewItem(trailingSidebarItem)
 
     super.init(nibName: nil, bundle: nil)
 
-    self.addChild(self.splitViewController)
+    self.addChild(self.threePaneSplitViewController)
   }
 
   required init?(coder: NSCoder) {
@@ -80,13 +90,18 @@ final class ProjectViewController: NSViewController {
       view.addSubview(subview)
     }
 
-    splitViewController.view.translatesAutoresizingMaskIntoConstraints = false
-    containerView.addSubview(splitViewController.view)
+    threePaneSplitViewController.view.translatesAutoresizingMaskIntoConstraints = false
+    containerView.addSubview(threePaneSplitViewController.view)
 
-    splitViewController.splitView.dividerStyle = .thin
-    splitViewController.splitView.isVertical = true
-    splitViewController.splitView.autosaveName = NSSplitView.AutosaveName(splitViewResorationIdentifier)
-    splitViewController.splitView.identifier = NSUserInterfaceItemIdentifier(splitViewResorationIdentifier)
+    threePaneSplitViewController.splitView.dividerStyle = .thin
+    threePaneSplitViewController.splitView.isVertical = true
+    threePaneSplitViewController.splitView.autosaveName = NSSplitView.AutosaveName(splitViewResorationIdentifier)
+    threePaneSplitViewController.splitView.identifier = NSUserInterfaceItemIdentifier(splitViewResorationIdentifier)
+
+    centerSplitViewController.splitView.dividerStyle = .thin
+    centerSplitViewController.splitView.isVertical = false
+    centerSplitViewController.splitView.autosaveName = NSSplitView.AutosaveName(centralSplitViewResorationIdentifier)
+    centerSplitViewController.splitView.identifier = NSUserInterfaceItemIdentifier(centralSplitViewResorationIdentifier)
 
     progressIndicator.controlSize = .small
     progressIndicator.style = .spinning
@@ -120,7 +135,7 @@ final class ProjectViewController: NSViewController {
       // Statistics view
       statisticsView.leadingAnchor.constraint(equalToSystemSpacingAfter: progressIndicator.trailingAnchor, multiplier: 1),
       statisticsView.centerYAnchor.constraint(equalTo: bottomBarLayoutGuide.centerYAnchor),
-    ] + constraints(for: splitViewController.view, filling: containerView))
+    ] + constraints(for: threePaneSplitViewController.view, filling: containerView))
 
     var lastSelectedFile: String? = nil
     selectedFileDidChangeSubscriber = NotificationCenter.default.publisher(for: .selectedFileDidChange, object: document)
@@ -130,22 +145,22 @@ final class ProjectViewController: NSViewController {
           preconditionFailure()
         }
         guard let node = nodes.first else {
-          self.contentViewController.textStorage = NSTextStorage(string: "")
+          self.sourceViewController.textStorage = NSTextStorage(string: "")
           return
         }
         guard lastSelectedFile != node.title else {
           return
         }
         lastSelectedFile = node.title
-        self.contentViewController.filename = node.title
+        self.sourceViewController.filename = node.title
 
         guard let document = self.view.window?.windowController?.document as? ProjectDocument else {
           return
         }
         if let metadata = document.metadata, let bank = metadata.bankMap[node.title] {
-          self.contentViewController.bank = bank
+          self.sourceViewController.bank = bank
         } else {
-          self.contentViewController.bank = nil
+          self.sourceViewController.bank = nil
         }
       })
 
@@ -204,9 +219,9 @@ final class ProjectViewController: NSViewController {
       return
     }
 
-    guard let analysis = self.contentViewController.lineAnalysis,
-          let textView = self.contentViewController.sourceView,
-          let containerView = self.contentViewController.sourceContainerView,
+    guard let analysis = self.sourceViewController.lineAnalysis,
+          let textView = self.sourceViewController.sourceView,
+          let containerView = self.sourceViewController.sourceContainerView,
           let layoutManager = textView.layoutManager,
           let textContainer = textView.textContainer,
           analysis.lineRanges.count > 0 else {
@@ -214,14 +229,14 @@ final class ProjectViewController: NSViewController {
     }
 
     if highlight {
-      self.contentViewController.sourceView?.highlightedLine = lineIndex
+      self.sourceViewController.sourceView?.highlightedLine = lineIndex
     }
 
     if analysis.lineRanges.count > lineIndex {
       let lineRange = analysis.lineRanges[lineIndex]
       let glyphGraph = layoutManager.glyphRange(forCharacterRange: lineRange, actualCharacterRange: nil)
       let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphGraph, in: textContainer)
-      self.contentViewController.sourceView?.scroll(boundingRect.offsetBy(dx: 0, dy: -containerView.bounds.height / 2).origin)
+      self.sourceViewController.sourceView?.scroll(boundingRect.offsetBy(dx: 0, dy: -containerView.bounds.height / 2).origin)
     }
   }
 
@@ -230,6 +245,7 @@ final class ProjectViewController: NSViewController {
   }
 
   private let splitViewResorationIdentifier = "com.featherless.restorationId:SplitViewController"
+  private let centralSplitViewResorationIdentifier = "com.featherless.restorationId:CenterSplitViewController"
 }
 
 extension ProjectViewController: LabelJumper {
@@ -251,7 +267,7 @@ extension ProjectViewController: EmulationObservers {
   func emulationDidStop() {
     let address = document.address
     let bank = document.bank
-    self.contentViewController.sourceView?.emulationLine = self.document.disassemblyResults?.lineFor(address: address, bank: bank)
+    self.sourceViewController.sourceView?.emulationLine = self.document.disassemblyResults?.lineFor(address: address, bank: bank)
     self.jumpTo(address: address, bank: bank)
   }
 }

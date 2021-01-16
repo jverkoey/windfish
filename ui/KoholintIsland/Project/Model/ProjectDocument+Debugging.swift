@@ -31,4 +31,8 @@ extension ProjectDocument {
     // TODO: Signal to the UI of this state change.
 //    self.toggleEmulationButton?.state = document.sameboy.gb.pointee.debug_stopped ? .off : .on
   }
+
+  @objc func pauseEmulation(_ sender: Any?) {
+    sameboy.debuggerBreak()
+  }
 }

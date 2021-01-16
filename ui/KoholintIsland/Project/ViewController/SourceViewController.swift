@@ -96,10 +96,6 @@ final class SourceViewController: NSViewController {
     toolbar.orientation = .horizontal
     toolbar.wantsLayer = true
     toolbar.edgeInsets = NSEdgeInsets(top: 0, left: 4, bottom: 0, right: 4)
-    let toolbarBackground = NSVisualEffectView(frame: toolbar.bounds)
-    toolbarBackground.material = .windowBackground
-    toolbarBackground.autoresizingMask = [.width, .height]
-    toolbar.insertView(toolbarBackground, at: 0, in: .center)
     view.addSubview(toolbar)
 
     let safeAreaLayoutGuide = view.safeAreaLayoutGuide

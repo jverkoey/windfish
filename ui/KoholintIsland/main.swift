@@ -64,6 +64,10 @@ extension NSApplication {
     emulationMenu.submenu?.addItem(NSMenuItem(title: "LCD", action: #selector(ProjectDocument.toggleLCD(_:)), keyEquivalent: "1"))
     emulationMenu.submenu?.addItem(NSMenuItem(title: "VRAM", action: #selector(ProjectDocument.toggleVRAM(_:)), keyEquivalent: "2"))
 
+    let pauseEmulation = NSMenuItem(title: "Pause emulation", action: #selector(ProjectDocument.pauseEmulation(_:)), keyEquivalent: "c")
+    pauseEmulation.keyEquivalentModifierMask = [.control]
+    emulationMenu.submenu?.addItem(pauseEmulation)
+
     let windowMenu = NSMenuItem()
     windowMenu.submenu = NSMenu(title: "Window")
     windowMenu.submenu?.addItem(NSMenuItem(title: "Minmize", action: #selector(NSWindow.miniaturize(_:)), keyEquivalent: "m"))
