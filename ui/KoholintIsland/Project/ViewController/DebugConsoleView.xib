@@ -25,21 +25,21 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <view id="NN9-c5-PHA">
-            <rect key="frame" x="0.0" y="0.0" width="649" height="94"/>
+            <rect key="frame" x="0.0" y="0.0" width="649" height="152"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pAq-Tw-qMm">
-                    <rect key="frame" x="0.0" y="22" width="332" height="72"/>
+                    <rect key="frame" x="0.0" y="22" width="332" height="130"/>
                     <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HcX-qf-PZc">
-                        <rect key="frame" x="0.0" y="0.0" width="332" height="72"/>
+                        <rect key="frame" x="0.0" y="0.0" width="332" height="130"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textView misplaced="YES" editable="NO" drawsBackground="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" baseWritingDirection="leftToRight" findStyle="bar" allowsNonContiguousLayout="YES" spellingCorrection="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fgS-FK-ErM">
-                                <rect key="frame" x="0.0" y="0.0" width="332" height="72"/>
+                                <rect key="frame" x="0.0" y="0.0" width="332" height="130"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <color key="backgroundColor" red="0.14901960780000001" green="0.14901960780000001" blue="0.14901960780000001" alpha="1" colorSpace="calibratedRGB"/>
-                                <size key="minSize" width="332" height="72"/>
+                                <size key="minSize" width="332" height="130"/>
                                 <size key="maxSize" width="1160" height="10000000"/>
                                 <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                 <allowedInputSourceLocales>
@@ -54,21 +54,21 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                     <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="KZi-hX-Nz6">
-                        <rect key="frame" x="316" y="0.0" width="16" height="72"/>
+                        <rect key="frame" x="316" y="0.0" width="16" height="130"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                 </scrollView>
                 <box horizontalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="eoH-wM-hxE">
-                    <rect key="frame" x="330" y="22" width="5" height="72"/>
+                    <rect key="frame" x="330" y="22" width="5" height="130"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="1" id="dhK-6V-Opr"/>
                     </constraints>
                 </box>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="1v9-I4-eNp" userLabel="CPU Registers">
-                    <rect key="frame" x="333" y="22" width="316" height="72"/>
+                    <rect key="frame" x="333" y="22" width="316" height="130"/>
                     <subviews>
                         <gridView xPlacement="leading" yPlacement="top" rowAlignment="none" rowSpacing="4" columnSpacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="EkK-1T-7W1">
-                            <rect key="frame" x="4" y="-47" width="308" height="115"/>
+                            <rect key="frame" x="4" y="28" width="308" height="98"/>
                             <rows>
                                 <gridRow id="B07-0E-5IV"/>
                                 <gridRow id="msS-WP-nk3"/>
@@ -83,7 +83,7 @@
                             <gridCells>
                                 <gridCell row="B07-0E-5IV" column="kvt-b7-JjW" id="YeH-GV-WRj">
                                     <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="hIW-SV-s4s">
-                                        <rect key="frame" x="0.0" y="102" width="100" height="13"/>
+                                        <rect key="frame" x="0.0" y="85" width="100" height="13"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0hl-eu-IxU">
                                                 <rect key="frame" x="-2" y="0.0" width="66" height="13"/>
@@ -114,7 +114,7 @@
                                 </gridCell>
                                 <gridCell row="B07-0E-5IV" column="xgH-nm-bgf" id="LG0-hS-YfR">
                                     <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="TYa-Xf-iuI">
-                                        <rect key="frame" x="104" y="102" width="100" height="13"/>
+                                        <rect key="frame" x="104" y="85" width="100" height="13"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SEi-Mc-ogP">
                                                 <rect key="frame" x="-2" y="0.0" width="80" height="13"/>
@@ -145,7 +145,7 @@
                                 </gridCell>
                                 <gridCell row="B07-0E-5IV" column="MA6-eo-zQy" id="b2D-u5-DA8">
                                     <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="7d5-yJ-2T1">
-                                        <rect key="frame" x="208" y="102" width="100" height="13"/>
+                                        <rect key="frame" x="208" y="85" width="100" height="13"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LxS-0b-wHH">
                                                 <rect key="frame" x="-2" y="0.0" width="73" height="13"/>
@@ -176,10 +176,10 @@
                                 </gridCell>
                                 <gridCell row="msS-WP-nk3" column="kvt-b7-JjW" id="EeF-Lk-yMO">
                                     <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="clO-tW-Biz">
-                                        <rect key="frame" x="0.0" y="68" width="100" height="30"/>
+                                        <rect key="frame" x="0.0" y="68" width="100" height="13"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2Pn-qG-LkZ">
-                                                <rect key="frame" x="-2" y="0.0" width="66" height="30"/>
+                                                <rect key="frame" x="-2" y="0.0" width="66" height="13"/>
                                                 <textFieldCell key="cell" lineBreakMode="clipping" title="sp:" id="EJh-mV-w5d">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -187,7 +187,7 @@
                                                 </textFieldCell>
                                             </textField>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aSw-MS-un6" customClass="FixedWidthTextView" customModule="KoholintIsland" customModuleProvider="target">
-                                                <rect key="frame" x="64" y="17" width="38" height="13"/>
+                                                <rect key="frame" x="64" y="0.0" width="38" height="13"/>
                                                 <textFieldCell key="cell" title="$0000" id="1ss-g9-7kw">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -207,10 +207,10 @@
                                 </gridCell>
                                 <gridCell row="msS-WP-nk3" column="xgH-nm-bgf" id="EcP-9g-5br">
                                     <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="hi3-uJ-6FX">
-                                        <rect key="frame" x="104" y="68" width="100" height="30"/>
+                                        <rect key="frame" x="104" y="68" width="100" height="13"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cdA-Kx-ZUg">
-                                                <rect key="frame" x="-2" y="0.0" width="80" height="30"/>
+                                                <rect key="frame" x="-2" y="0.0" width="80" height="13"/>
                                                 <textFieldCell key="cell" lineBreakMode="clipping" title="b:" id="TTk-7w-t8w">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -218,7 +218,7 @@
                                                 </textFieldCell>
                                             </textField>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KNo-Kc-BT4" customClass="FixedWidthTextView" customModule="KoholintIsland" customModuleProvider="target">
-                                                <rect key="frame" x="78" y="17" width="24" height="13"/>
+                                                <rect key="frame" x="78" y="0.0" width="24" height="13"/>
                                                 <textFieldCell key="cell" title="$00" id="UFL-to-TY6">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -238,10 +238,10 @@
                                 </gridCell>
                                 <gridCell row="msS-WP-nk3" column="MA6-eo-zQy" id="vWa-yz-jfM">
                                     <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="YMY-l4-So1">
-                                        <rect key="frame" x="208" y="68" width="100" height="30"/>
+                                        <rect key="frame" x="208" y="68" width="100" height="13"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2Dw-if-QJd">
-                                                <rect key="frame" x="-2" y="0.0" width="80" height="30"/>
+                                                <rect key="frame" x="-2" y="0.0" width="80" height="13"/>
                                                 <textFieldCell key="cell" lineBreakMode="clipping" title="c:" id="YL4-aq-Y8F">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -249,7 +249,7 @@
                                                 </textFieldCell>
                                             </textField>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jMg-iI-ifk" customClass="FixedWidthTextView" customModule="KoholintIsland" customModuleProvider="target">
-                                                <rect key="frame" x="78" y="17" width="24" height="13"/>
+                                                <rect key="frame" x="78" y="0.0" width="24" height="13"/>
                                                 <textFieldCell key="cell" title="$00" id="U0S-mg-IbA">
                                                     <font key="font" metaFont="fixedUser" size="11"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -438,7 +438,7 @@
                 <constraint firstItem="amH-Ua-hrr" firstAttribute="top" secondItem="FQq-vR-yB4" secondAttribute="bottom" constant="4" id="qbJ-ft-Tu9"/>
                 <constraint firstAttribute="trailing" secondItem="amH-Ua-hrr" secondAttribute="trailing" constant="4" id="v5Y-Wp-jIv"/>
             </constraints>
-            <point key="canvasLocation" x="-440.5" y="-408.5"/>
+            <point key="canvasLocation" x="-440.5" y="-380"/>
         </view>
     </objects>
 </document>

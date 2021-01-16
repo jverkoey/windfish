@@ -91,7 +91,7 @@ extension ProjectDocument: EmulatorDelegate {
     }
     let attributedString = NSMutableAttributedString(string: log, attributes: [
       .font: font,
-      .foregroundColor: NSColor.white,
+      .foregroundColor: NSColor.textColor,
       .underlineStyle: underline.rawValue
     ])
     consoleOutputLock.lock()
