@@ -121,6 +121,7 @@ extension DebuggingViewController {
       line = textField.stringValue
     }
     document.nextDebuggerCommand = line
+    lastConsoleOutput = line
     document.sameboyDebuggerSemaphore.signal()
 
     textField.stringValue = ""

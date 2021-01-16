@@ -69,6 +69,9 @@ extension ProjectDocument: EmulatorDelegate {
     self.nextDebuggerCommand = nil
     emulating = true
 
+    // Create spacing between the last command output.
+    log("\n", with: GB_log_attributes(0))
+
     DispatchQueue.main.async {
       // Ensure that all observers execute on the main thread.
       self.emulationObservers.forEach {
@@ -86,13 +89,10 @@ extension ProjectDocument: EmulatorDelegate {
     } else {
       underline = []
     }
-    let paragraphStyle = NSMutableParagraphStyle()
-    paragraphStyle.lineSpacing = 2
     let attributedString = NSMutableAttributedString(string: log, attributes: [
       .font: font,
       .foregroundColor: NSColor.white,
-      .underlineStyle: underline.rawValue,
-      .paragraphStyle: paragraphStyle
+      .underlineStyle: underline.rawValue
     ])
     consoleOutputLock.lock()
     pendingConsoleOutput.append(attributedString)
