@@ -15,6 +15,7 @@
 		662B36DD25B1442300C5E690 /* ProjectDocument+VRAMViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662B36DC25B1442300C5E690 /* ProjectDocument+VRAMViewer.swift */; };
 		662B375725B2275900C5E690 /* DebuggingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662B375625B2275900C5E690 /* DebuggingViewController.swift */; };
 		662B376325B275D400C5E690 /* DebugConsoleView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 662B376225B275D400C5E690 /* DebugConsoleView.xib */; };
+		662B37B025B2A59D00C5E690 /* CallStackViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662B37AF25B2A59D00C5E690 /* CallStackViewController.swift */; };
 		66472ED7258E7F7600A03CD4 /* SourceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66472ED6258E7F7600A03CD4 /* SourceView.swift */; };
 		664833E12598558D00B955F4 /* CPUFlagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664833E02598558D00B955F4 /* CPUFlagsView.swift */; };
 		665198C125ABEA7F0075C3FC /* LCDViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665198C025ABEA7F0075C3FC /* LCDViewController.swift */; };
@@ -326,6 +327,7 @@
 		662B36DC25B1442300C5E690 /* ProjectDocument+VRAMViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProjectDocument+VRAMViewer.swift"; sourceTree = "<group>"; };
 		662B375625B2275900C5E690 /* DebuggingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebuggingViewController.swift; sourceTree = "<group>"; };
 		662B376225B275D400C5E690 /* DebugConsoleView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DebugConsoleView.xib; sourceTree = "<group>"; };
+		662B37AF25B2A59D00C5E690 /* CallStackViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallStackViewController.swift; sourceTree = "<group>"; };
 		66472ED6258E7F7600A03CD4 /* SourceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceView.swift; sourceTree = "<group>"; };
 		664833E02598558D00B955F4 /* CPUFlagsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUFlagsView.swift; sourceTree = "<group>"; };
 		665198C025ABEA7F0075C3FC /* LCDViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LCDViewController.swift; sourceTree = "<group>"; };
@@ -573,6 +575,7 @@
 				667B1B8A2578554600CE670F /* ProjectOutlineNode.swift */,
 				665D4F5A2575F75400C3A03B /* ProjectViewController.swift */,
 				66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */,
+				662B37AF25B2A59D00C5E690 /* CallStackViewController.swift */,
 				667B1BAD2578565A00CE670F /* OutlineViewController.swift */,
 				667B1BA82578563E00CE670F /* SourceViewController.swift */,
 				662B376225B275D400C5E690 /* DebugConsoleView.xib */,
@@ -1270,6 +1273,7 @@
 				66763D97257C0D4900824278 /* TextView.swift in Sources */,
 				6699BA4925AEC406005DB9BB /* cgb_boot.asm in Sources */,
 				662B375725B2275900C5E690 /* DebuggingViewController.swift in Sources */,
+				662B37B025B2A59D00C5E690 /* CallStackViewController.swift in Sources */,
 				66EDE9FF25ACD15A008E322F /* AddressView.swift in Sources */,
 				662B36DD25B1442300C5E690 /* ProjectDocument+VRAMViewer.swift in Sources */,
 				665198F425ABF95E0075C3FC /* DisassemblyResults.swift in Sources */,

@@ -24,9 +24,11 @@ final class ProjectViewController: NSViewController {
   let progressIndicator = NSProgressIndicator()
   let statisticsView = StatisticsView()
   let threePaneSplitViewController: NSSplitViewController
+  let leadingSplitViewController: NSSplitViewController
   let centerSplitViewController: NSSplitViewController
 
   let sidebarViewController: OutlineViewController
+  let callstackViewController = CallStackViewController()
   let sourceViewController: SourceViewController
   let debuggingViewController: DebuggingViewController
   let inspectorViewController: InspectorViewController
@@ -40,11 +42,19 @@ final class ProjectViewController: NSViewController {
     self.document = document
 
     self.threePaneSplitViewController = NSSplitViewController()
+    self.leadingSplitViewController = NSSplitViewController()
     self.centerSplitViewController = NSSplitViewController()
     self.sidebarViewController = OutlineViewController()
     self.sourceViewController = SourceViewController()
     self.debuggingViewController = DebuggingViewController()
     self.inspectorViewController = InspectorViewController(document: document)
+
+    // Leading
+    leadingSplitViewController.addSplitViewItem(NSSplitViewItem(viewController: sidebarViewController))
+    let callStackItem = NSSplitViewItem(viewController: callstackViewController)
+    callStackItem.canCollapse = false
+    callStackItem.minimumThickness = 200 // TODO: This doesn't appear to actually be getting enforced.
+    leadingSplitViewController.addSplitViewItem(callStackItem)
 
     // Center
     centerSplitViewController.addSplitViewItem(NSSplitViewItem(viewController: sourceViewController))
@@ -54,7 +64,7 @@ final class ProjectViewController: NSViewController {
     centerSplitViewController.addSplitViewItem(debuggingItem)
 
     // Three-pane
-    let leadingSidebarItem = NSSplitViewItem(sidebarWithViewController: sidebarViewController)
+    let leadingSidebarItem = NSSplitViewItem(sidebarWithViewController: leadingSplitViewController)
     leadingSidebarItem.canCollapse = false
     threePaneSplitViewController.addSplitViewItem(leadingSidebarItem)
     threePaneSplitViewController.addSplitViewItem(NSSplitViewItem(viewController: centerSplitViewController))
@@ -93,15 +103,20 @@ final class ProjectViewController: NSViewController {
     threePaneSplitViewController.view.translatesAutoresizingMaskIntoConstraints = false
     containerView.addSubview(threePaneSplitViewController.view)
 
-    threePaneSplitViewController.splitView.dividerStyle = .thin
-    threePaneSplitViewController.splitView.isVertical = true
-    threePaneSplitViewController.splitView.autosaveName = NSSplitView.AutosaveName(splitViewResorationIdentifier)
-    threePaneSplitViewController.splitView.identifier = NSUserInterfaceItemIdentifier(splitViewResorationIdentifier)
+    leadingSplitViewController.splitView.dividerStyle = .thin
+    leadingSplitViewController.splitView.isVertical = false
+    leadingSplitViewController.splitView.autosaveName = NSSplitView.AutosaveName(leadingSplitViewResorationIdentifier)
+    leadingSplitViewController.splitView.identifier = NSUserInterfaceItemIdentifier(leadingSplitViewResorationIdentifier)
 
     centerSplitViewController.splitView.dividerStyle = .thin
     centerSplitViewController.splitView.isVertical = false
     centerSplitViewController.splitView.autosaveName = NSSplitView.AutosaveName(centralSplitViewResorationIdentifier)
     centerSplitViewController.splitView.identifier = NSUserInterfaceItemIdentifier(centralSplitViewResorationIdentifier)
+
+    threePaneSplitViewController.splitView.dividerStyle = .thin
+    threePaneSplitViewController.splitView.isVertical = true
+    threePaneSplitViewController.splitView.autosaveName = NSSplitView.AutosaveName(splitViewResorationIdentifier)
+    threePaneSplitViewController.splitView.identifier = NSUserInterfaceItemIdentifier(splitViewResorationIdentifier)
 
     progressIndicator.controlSize = .small
     progressIndicator.style = .spinning
@@ -246,6 +261,7 @@ final class ProjectViewController: NSViewController {
 
   private let splitViewResorationIdentifier = "com.featherless.restorationId:SplitViewController"
   private let centralSplitViewResorationIdentifier = "com.featherless.restorationId:CenterSplitViewController"
+  private let leadingSplitViewResorationIdentifier = "com.featherless.restorationId:LeadingSplitViewController"
 }
 
 extension ProjectViewController: LabelJumper {
