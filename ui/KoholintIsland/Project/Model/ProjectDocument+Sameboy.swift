@@ -70,7 +70,7 @@ extension ProjectDocument: EmulatorDelegate {
     emulating = true
 
     // Create spacing between the last command output.
-    log("\n", with: GB_log_attributes(0))
+    log("\n> \(nextDebuggerCommand ?? "")\n", with: GB_log_attributes(0))
 
     DispatchQueue.main.async {
       // Ensure that all observers execute on the main thread.

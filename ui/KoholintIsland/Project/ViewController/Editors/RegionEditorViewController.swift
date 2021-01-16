@@ -83,6 +83,10 @@ final class RegionEditorViewController: NSViewController, TabSelectable {
       tableView.tableView?.addTableColumn(column)
     }
 
+    let contextMenu = NSMenu()
+    contextMenu.addItem(withTitle: "Set breakpoint...", action: #selector(setBreakpoint(_:)), keyEquivalent: "")
+    tableView.tableView?.menu = contextMenu
+
     let safeAreas = view.safeAreaLayoutGuide
     NSLayoutConstraint.activate([
       tableView.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
@@ -100,6 +104,15 @@ final class RegionEditorViewController: NSViewController, TabSelectable {
     tableView.tableView?.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
     tableView.tableView?.bind(.selectionIndexes, to: elementsController, withKeyPath:"selectionIndexes", options: nil)
     tableView.tableView?.bind(.sortDescriptors, to: elementsController, withKeyPath: "sortDescriptors", options: nil)
+  }
+
+  @objc func setBreakpoint(_ sender: Any?) {
+    guard let region = elementsController.selectedObjects.first as? Region else {
+      return
+    }
+
+    document.nextDebuggerCommand = "breakpoint $\(((region.address < 0x4000) ? 0 : region.bank).hexString):$\(region.address.hexString)"
+    document.sameboyDebuggerSemaphore.signal()
   }
 
   @objc func didDoubleTap(_ sender: Any?) {
