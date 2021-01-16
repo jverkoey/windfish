@@ -91,6 +91,11 @@ final class RegionEditorViewController: NSViewController, TabSelectable {
       tableView.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
     ])
 
+    elementsController.sortDescriptors = [
+      NSSortDescriptor(key: NSUserInterfaceItemIdentifier.bank.rawValue, ascending: true),
+      NSSortDescriptor(key: NSUserInterfaceItemIdentifier.address.rawValue, ascending: true),
+    ]
+
     elementsController.bind(.contentArray, to: document.configuration, withKeyPath: "regions", options: nil)
     tableView.tableView?.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
     tableView.tableView?.bind(.selectionIndexes, to: elementsController, withKeyPath:"selectionIndexes", options: nil)
@@ -98,10 +103,9 @@ final class RegionEditorViewController: NSViewController, TabSelectable {
   }
 
   @objc func didDoubleTap(_ sender: Any?) {
-    guard let clickedRow = tableView?.tableView?.clickedRow else {
+    guard let region = elementsController.selectedObjects.first as? Region else {
       return
     }
-    let region = document.configuration.regions[clickedRow]
     NotificationCenter.default.post(name: .selectedRegionDidChange, object: self.document, userInfo: ["selectedRegion": region])
   }
 }
