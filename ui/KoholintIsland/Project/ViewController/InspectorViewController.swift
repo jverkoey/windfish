@@ -11,11 +11,9 @@ final class InspectorViewController: NSViewController {
   let document: ProjectDocument
 
   let tabViewController = TabViewController()
-  let emulatorViewController: EmulatorViewController
 
   init(document: ProjectDocument) {
     self.document = document
-    self.emulatorViewController = EmulatorViewController(document: document)
 
     super.init(nibName: nil, bundle: nil)
   }
@@ -44,7 +42,6 @@ final class InspectorViewController: NSViewController {
     editorTabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: MacroEditorViewController(document: document)))
     tabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: editorTabViewController))
     tabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: RegionInspectorViewController(document: document)))
-    tabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: emulatorViewController))
 
     addChild(tabViewController)
     view.addSubview(tabViewController.view)

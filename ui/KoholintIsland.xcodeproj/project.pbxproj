@@ -17,7 +17,6 @@
 		662B376325B275D400C5E690 /* DebugConsoleView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 662B376225B275D400C5E690 /* DebugConsoleView.xib */; };
 		66472ED7258E7F7600A03CD4 /* SourceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66472ED6258E7F7600A03CD4 /* SourceView.swift */; };
 		664833E12598558D00B955F4 /* CPUFlagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664833E02598558D00B955F4 /* CPUFlagsView.swift */; };
-		664833E9259855CC00B955F4 /* LR35902RegistersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664833E8259855CC00B955F4 /* LR35902RegistersView.swift */; };
 		665198C125ABEA7F0075C3FC /* LCDViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665198C025ABEA7F0075C3FC /* LCDViewController.swift */; };
 		665198D225ABF8DC0075C3FC /* Region.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665198D125ABF8DC0075C3FC /* Region.swift */; };
 		665198DD25ABF8FC0075C3FC /* DataType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665198DC25ABF8FC0075C3FC /* DataType.swift */; };
@@ -53,7 +52,6 @@
 		667B1BA92578563E00CE670F /* SourceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1BA82578563E00CE670F /* SourceViewController.swift */; };
 		667B1BAE2578565A00CE670F /* OutlineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1BAD2578565A00CE670F /* OutlineViewController.swift */; };
 		667B1C0225789BAE00CE670F /* InspectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1C0125789BAE00CE670F /* InspectorViewController.swift */; };
-		66820CA7258DB6E8009507BB /* EmulatorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66820CA6258DB6E8009507BB /* EmulatorViewController.swift */; };
 		6699B67925AEA038005DB9BB /* CPU.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B63425AEA036005DB9BB /* CPU.png */; };
 		6699B67C25AEA038005DB9BB /* PkgInfo in Resources */ = {isa = PBXBuildFile; fileRef = 6699B63925AEA036005DB9BB /* PkgInfo */; };
 		6699B67D25AEA038005DB9BB /* Speaker.png in Resources */ = {isa = PBXBuildFile; fileRef = 6699B63C25AEA036005DB9BB /* Speaker.png */; };
@@ -330,7 +328,6 @@
 		662B376225B275D400C5E690 /* DebugConsoleView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DebugConsoleView.xib; sourceTree = "<group>"; };
 		66472ED6258E7F7600A03CD4 /* SourceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceView.swift; sourceTree = "<group>"; };
 		664833E02598558D00B955F4 /* CPUFlagsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUFlagsView.swift; sourceTree = "<group>"; };
-		664833E8259855CC00B955F4 /* LR35902RegistersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LR35902RegistersView.swift; sourceTree = "<group>"; };
 		665198C025ABEA7F0075C3FC /* LCDViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LCDViewController.swift; sourceTree = "<group>"; };
 		665198D125ABF8DC0075C3FC /* Region.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Region.swift; sourceTree = "<group>"; };
 		665198DC25ABF8FC0075C3FC /* DataType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataType.swift; sourceTree = "<group>"; };
@@ -372,7 +369,6 @@
 		667B1BA82578563E00CE670F /* SourceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceViewController.swift; sourceTree = "<group>"; };
 		667B1BAD2578565A00CE670F /* OutlineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineViewController.swift; sourceTree = "<group>"; };
 		667B1C0125789BAE00CE670F /* InspectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InspectorViewController.swift; sourceTree = "<group>"; };
-		66820CA6258DB6E8009507BB /* EmulatorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulatorViewController.swift; sourceTree = "<group>"; };
 		6699B58025AE9EF1005DB9BB /* third_party */ = {isa = PBXFileReference; lastKnownFileType = folder; name = third_party; path = ../third_party; sourceTree = "<group>"; };
 		6699B58D25AE9F85005DB9BB /* Sameboy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sameboy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6699B59A25AE9F88005DB9BB /* Sameboy.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Sameboy.entitlements; sourceTree = "<group>"; };
@@ -554,7 +550,6 @@
 			isa = PBXGroup;
 			children = (
 				664833E02598558D00B955F4 /* CPUFlagsView.swift */,
-				664833E8259855CC00B955F4 /* LR35902RegistersView.swift */,
 				66EDE9F425ACD129008E322F /* RegisterView.swift */,
 				66EDE9F925ACD13B008E322F /* FixedWidthTextView.swift */,
 				66EDE9FE25ACD15A008E322F /* AddressView.swift */,
@@ -789,7 +784,6 @@
 			children = (
 				665198BF25ABEA6D0075C3FC /* Panels */,
 				664833DF2598558000B955F4 /* Views */,
-				66820CA6258DB6E8009507BB /* EmulatorViewController.swift */,
 			);
 			path = Emulator;
 			sourceTree = "<group>";
@@ -1252,13 +1246,11 @@
 				66C617C6257F04D600E372BA /* RegionInspectorViewController.swift in Sources */,
 				66C617EC257F30C200E372BA /* GlobalEditorViewController.swift in Sources */,
 				665198DD25ABF8FC0075C3FC /* DataType.swift in Sources */,
-				66820CA7258DB6E8009507BB /* EmulatorViewController.swift in Sources */,
 				667B1B912578557D00CE670F /* URL+localizedName.swift in Sources */,
 				6699BA4525AEC406005DB9BB /* agb_boot.asm in Sources */,
 				6699BA4825AEC406005DB9BB /* cgb_boot_fast.asm in Sources */,
 				667B1B9F2578560A00CE670F /* TextTableCellView.swift in Sources */,
 				665198D225ABF8DC0075C3FC /* Region.swift in Sources */,
-				664833E9259855CC00B955F4 /* LR35902RegistersView.swift in Sources */,
 				66763D80257AF38200824278 /* LR35902AddressFormatter.swift in Sources */,
 				667B1BA92578563E00CE670F /* SourceViewController.swift in Sources */,
 				66C617E4257F24E000E372BA /* EditorTableView.swift in Sources */,
