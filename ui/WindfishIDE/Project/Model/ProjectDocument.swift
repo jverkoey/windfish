@@ -91,6 +91,7 @@ class ProjectDocument: NSDocument {
     window.setContentSize(NSSize(width: 1280, height: 768))
     window.toolbarStyle = .unifiedCompact
     window.tabbingMode = .disallowed
+    window.isRestorable = true
     let wc = NSWindowController(window: window)
     wc.window?.styleMask.insert(.fullSizeContentView)
     wc.contentViewController = contentViewController
@@ -136,6 +137,7 @@ class ProjectDocument: NSDocument {
     window.isFloatingPanel = true
     window.styleMask.insert(.hudWindow)
     window.subtitle = "LCD"
+    window.isRestorable = true
     window.setContentSize(NSSize(width: PPU.screenSize.width * 2, height: PPU.screenSize.height * 2))
     window.contentMinSize = NSSize(width: PPU.screenSize.width, height: PPU.screenSize.height)
     window.setFrameOrigin(.init(x: NSScreen.main!.frame.maxX - window.frame.width,
