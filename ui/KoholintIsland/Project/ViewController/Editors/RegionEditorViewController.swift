@@ -60,6 +60,8 @@ final class RegionEditorViewController: NSViewController, TabSelectable {
     tableView.translatesAutoresizingMaskIntoConstraints = false
     tableView.delegate = self
     tableView.tableView?.delegate = self
+    tableView.tableView?.target = self
+    tableView.tableView?.doubleAction = #selector(didDoubleTap(_:))
     view.addSubview(tableView)
     self.tableView = tableView
 
@@ -93,6 +95,14 @@ final class RegionEditorViewController: NSViewController, TabSelectable {
     tableView.tableView?.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
     tableView.tableView?.bind(.selectionIndexes, to: elementsController, withKeyPath:"selectionIndexes", options: nil)
     tableView.tableView?.bind(.sortDescriptors, to: elementsController, withKeyPath: "sortDescriptors", options: nil)
+  }
+
+  @objc func didDoubleTap(_ sender: Any?) {
+    guard let clickedRow = tableView?.tableView?.clickedRow else {
+      return
+    }
+    let region = document.configuration.regions[clickedRow]
+    NotificationCenter.default.post(name: .selectedRegionDidChange, object: self.document, userInfo: ["selectedRegion": region])
   }
 }
 
