@@ -91,7 +91,6 @@ class ProjectDocument: NSDocument {
     window.setContentSize(NSSize(width: 1280, height: 768))
     window.toolbarStyle = .unifiedCompact
     window.tabbingMode = .disallowed
-    window.setFrameOrigin(.init(x: 0, y: NSScreen.main!.frame.maxY - window.frame.height))
     let wc = NSWindowController(window: window)
     wc.window?.styleMask.insert(.fullSizeContentView)
     wc.contentViewController = contentViewController
