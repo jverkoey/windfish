@@ -59,7 +59,10 @@ final class Project: NSObject {
   var lastTileDataCounter: Int? = nil
   var lastTileDataImage: NSImage? = nil
   var vblankHistory: [NSImage] = []
-  var emulationObservers: [EmulationObservers] = []
+
+  // Observers are typically view controllers that will also hold a reference to the project, so we keep weak references
+  // to all of the observers.
+  var emulationObservers = NSHashTable<EmulationObservers>(options: [.weakMemory, .objectPersonality])
   var logObservers: [LogObserver] = []
   var breakpointPredicate: NSPredicate?
 
@@ -122,10 +125,6 @@ final class ProjectDocument: NSDocument {
                                 y: NSScreen.main!.frame.maxY - window.frame.height))
     let wc: NSWindowController = NSWindowController(window: window)
     wc.contentViewController = contentViewController
-
-    let screenSize = project.sameboy.screenSize
-    window.contentMinSize = screenSize
-    window.zoom(nil)
     return wc
   }()
 

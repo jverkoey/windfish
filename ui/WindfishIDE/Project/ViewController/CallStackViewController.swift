@@ -92,7 +92,7 @@ final class CallStackViewController: NSViewController {
   override func viewWillAppear() {
     super.viewWillAppear()
 
-    project.emulationObservers.append(self)
+    project.emulationObservers.add(self)
   }
 }
 

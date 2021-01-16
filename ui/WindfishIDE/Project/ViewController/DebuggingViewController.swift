@@ -58,7 +58,7 @@ final class DebuggingViewController: NSViewController {
     super.viewWillAppear()
 
     project.logObservers.append(self)
-    project.emulationObservers.append(self)
+    project.emulationObservers.add(self)
   }
 }
 

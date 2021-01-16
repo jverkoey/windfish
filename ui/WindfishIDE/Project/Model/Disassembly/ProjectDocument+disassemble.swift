@@ -345,7 +345,7 @@ extension ProjectDocument {
         )
 
         self.project.isDisassembling = false
-        NotificationCenter.default.post(name: .disassembled, object: self)
+        NotificationCenter.default.post(name: .disassembled, object: self.project)
 
         self.contentViewController?.stopProgressIndicator()
       }

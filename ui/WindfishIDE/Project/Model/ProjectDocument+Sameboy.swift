@@ -44,7 +44,7 @@ extension Project: EmulatorDelegate {
 
     DispatchQueue.main.async {
       // Ensure that all observers execute on the main thread.
-      self.emulationObservers.forEach { $0.emulationDidAdvance() }
+      self.emulationObservers.allObjects.forEach { $0.emulationDidAdvance() }
     }
   }
 
@@ -53,10 +53,10 @@ extension Project: EmulatorDelegate {
 
     DispatchQueue.main.async {
       // Ensure that all observers execute on the main thread.
-      self.emulationObservers.forEach {
+      self.emulationObservers.allObjects.forEach {
         $0.emulationDidAdvance()
       }
-      self.emulationObservers.forEach {
+      self.emulationObservers.allObjects.forEach {
         $0.emulationDidStop()
       }
     }
@@ -71,7 +71,7 @@ extension Project: EmulatorDelegate {
 
     DispatchQueue.main.async {
       // Ensure that all observers execute on the main thread.
-      self.emulationObservers.forEach {
+      self.emulationObservers.allObjects.forEach {
         $0.emulationDidStart()
       }
     }

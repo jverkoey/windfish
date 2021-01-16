@@ -206,7 +206,7 @@ final class ProjectViewController: NSViewController {
   override func viewWillAppear() {
     super.viewWillAppear()
 
-    project.emulationObservers.append(self)
+    project.emulationObservers.add(self)
   }
 
   func jumpTo(address: LR35902.Address, bank _bank: Gameboy.Cartridge.Bank, highlight: Bool = false) {

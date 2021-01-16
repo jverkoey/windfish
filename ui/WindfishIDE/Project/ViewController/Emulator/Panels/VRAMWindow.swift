@@ -5,7 +5,8 @@ import Windfish
 class VRAMWindowController: NSWindowController {
   var project: Project! {
     didSet {
-      project.emulationObservers.append(self)
+      oldValue?.emulationObservers.remove(self)
+      project.emulationObservers.add(self)
     }
   }
 
