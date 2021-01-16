@@ -119,7 +119,12 @@ final class OutlineViewController: NSViewController {
     outlineView.allowsColumnReordering = false
     outlineView.floatsGroupRows = false
 
-    NSLayoutConstraint.activate(constraints(for: containerView, filling: view))
+    NSLayoutConstraint.activate([
+      containerView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      containerView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      containerView.topAnchor.constraint(equalTo: view.topAnchor),
+      containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+    ])
 
     addGroupNode("Source", identifier: "disassembly")
 

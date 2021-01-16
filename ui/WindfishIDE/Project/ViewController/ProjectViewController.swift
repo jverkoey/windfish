@@ -132,6 +132,11 @@ final class ProjectViewController: NSViewController {
       containerView.topAnchor.constraint(equalTo: view.topAnchor),
       containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -29),
 
+      threePaneSplitViewController.view.leftAnchor.constraint(equalTo: containerView.leftAnchor),
+      threePaneSplitViewController.view.rightAnchor.constraint(equalTo: containerView.rightAnchor),
+      threePaneSplitViewController.view.topAnchor.constraint(equalTo: containerView.topAnchor),
+      threePaneSplitViewController.view.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+
       // Horizontal line
       horizontalLine.leftAnchor.constraint(equalTo: view.leftAnchor),
       horizontalLine.rightAnchor.constraint(equalTo: view.rightAnchor),
@@ -150,7 +155,7 @@ final class ProjectViewController: NSViewController {
       // Statistics view
       statisticsView.leadingAnchor.constraint(equalToSystemSpacingAfter: progressIndicator.trailingAnchor, multiplier: 1),
       statisticsView.centerYAnchor.constraint(equalTo: bottomBarLayoutGuide.centerYAnchor),
-    ] + constraints(for: threePaneSplitViewController.view, filling: containerView))
+    ])
 
     var lastSelectedFile: String? = nil
     selectedFileDidChangeSubscriber = NotificationCenter.default.publisher(for: .selectedFileDidChange, object: document)

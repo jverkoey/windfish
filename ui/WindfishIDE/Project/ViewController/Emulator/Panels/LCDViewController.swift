@@ -17,5 +17,7 @@ final class LCDViewController: NSViewController {
     document.sameboyView.frame = view.bounds
     document.sameboyView.autoresizingMask = [.width, .height]
     view.addSubview(document.sameboyView)
+
+    document.sameboyView.screenSizeChanged()
   }
 }

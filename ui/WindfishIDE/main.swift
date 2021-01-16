@@ -95,7 +95,7 @@ extension AppDelegate {
     guard let url = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue else {
       return
     }
-    let jumpToPrefix = "koholintisland://jumpto/"
+    let jumpToPrefix = "windfish://jumpto/"
     if url.hasPrefix(jumpToPrefix) {
       let label = url.dropFirst(jumpToPrefix.count)
       NSApplication.shared.sendAction(#selector(LabelJumper.jumpToLabel(_:)), to: nil, from: label)

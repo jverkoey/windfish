@@ -36,7 +36,7 @@ extension RGBDS.Statement {
         let lengthSoFar = accumulatedLength
         accumulatedLength += operand.count + separator.count
         if regionLookup[label] != nil {
-          return (operand, (lengthSoFar, "koholintisland://jumpto/\(label)", "Jump to \(label)"))
+          return (operand, (lengthSoFar, "windfish://jumpto/\(label)", "Jump to \(label)"))
         } else {
           return (operand, nil)
         }

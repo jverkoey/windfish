@@ -14,16 +14,18 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>File</string>
 			<key>CFBundleTypeName</key>
-			<string>Gameboy ROM disassembly</string>
+			<string>Windfish ROM disassembly</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>????</string>
 			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>com.featherless.koholintisland.project</string>
+				<string>com.featherless.windfish.project</string>
 			</array>
 			<key>LSTypeIsPackage</key>
 			<true/>
@@ -48,11 +50,13 @@
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>KoholintIsland</string>
+			<string>Windfish</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>koholintisland</string>
+				<string>windfish</string>
 			</array>
 		</dict>
 	</array>
@@ -71,8 +75,10 @@
 			</array>
 			<key>UTTypeDescription</key>
 			<string>Windfish ROM disassembly</string>
+			<key>UTTypeIcons</key>
+			<dict/>
 			<key>UTTypeIdentifier</key>
-			<string>com.featherless.koholintisland.project</string>
+			<string>com.featherless.windfish.project</string>
 			<key>UTTypeTagSpecification</key>
 			<dict>
 				<key>public.filename-extension</key>

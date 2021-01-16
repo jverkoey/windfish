@@ -36,8 +36,6 @@
 		665D4F592575F75400C3A03B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F582575F75400C3A03B /* AppDelegate.swift */; };
 		665D4F5B2575F75400C3A03B /* ProjectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F5A2575F75400C3A03B /* ProjectViewController.swift */; };
 		665D4F5D2575F75400C3A03B /* ProjectDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F5C2575F75400C3A03B /* ProjectDocument.swift */; };
-		665D4F6E2575F75700C3A03B /* KoholintTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F6D2575F75700C3A03B /* KoholintTests.swift */; };
-		665D4F792575F75700C3A03B /* KoholintIslandUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F782575F75700C3A03B /* KoholintIslandUITests.swift */; };
 		665D4F8D2575F92500C3A03B /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F8C2575F92500C3A03B /* main.swift */; };
 		665D4FAE257727CA00C3A03B /* HorizontalLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4FAD257727CA00C3A03B /* HorizontalLine.swift */; };
 		6667E4BE25ACD3A600F14435 /* LabeledView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6667E4BD25ACD3A600F14435 /* LabeledView.swift */; };
@@ -49,7 +47,6 @@
 		667B1B75257854BB00CE670F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 667B1B72257854BB00CE670F /* Assets.xcassets */; };
 		667B1B8B2578554600CE670F /* ProjectOutlineNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1B8A2578554600CE670F /* ProjectOutlineNode.swift */; };
 		667B1B912578557D00CE670F /* URL+localizedName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1B902578557D00CE670F /* URL+localizedName.swift */; };
-		667B1B9A257855AE00CE670F /* CommonConstraints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1B99257855AE00CE670F /* CommonConstraints.swift */; };
 		667B1B9F2578560A00CE670F /* TextTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1B9E2578560A00CE670F /* TextTableCellView.swift */; };
 		667B1BA92578563E00CE670F /* SourceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1BA82578563E00CE670F /* SourceViewController.swift */; };
 		667B1BAE2578565A00CE670F /* OutlineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1BAD2578565A00CE670F /* OutlineViewController.swift */; };
@@ -236,20 +233,6 @@
 /* End PBXBuildRule section */
 
 /* Begin PBXContainerItemProxy section */
-		665D4F6A2575F75700C3A03B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 665D4F4D2575F75400C3A03B /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 665D4F542575F75400C3A03B;
-			remoteInfo = gbdis;
-		};
-		665D4F752575F75700C3A03B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 665D4F4D2575F75400C3A03B /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 665D4F542575F75400C3A03B;
-			remoteInfo = gbdis;
-		};
 		6699B7D825AEA30A005DB9BB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 665D4F4D2575F75400C3A03B /* Project object */;
@@ -347,16 +330,10 @@
 		6651991225ABFA840075C3FC /* RGBDS+attributedString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RGBDS+attributedString.swift"; sourceTree = "<group>"; };
 		6651991825ABFB000075C3FC /* ProjectDocument+emulation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProjectDocument+emulation.swift"; sourceTree = "<group>"; };
 		66521DA8257C996B0088C97B /* SourceRulerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceRulerView.swift; sourceTree = "<group>"; };
-		665D4F552575F75400C3A03B /* KoholintIsland.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KoholintIsland.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		665D4F552575F75400C3A03B /* WindfishIDE.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WindfishIDE.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		665D4F582575F75400C3A03B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		665D4F5A2575F75400C3A03B /* ProjectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectViewController.swift; sourceTree = "<group>"; };
 		665D4F5C2575F75400C3A03B /* ProjectDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectDocument.swift; sourceTree = "<group>"; };
-		665D4F692575F75700C3A03B /* KoholintIslandTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KoholintIslandTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		665D4F6D2575F75700C3A03B /* KoholintTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KoholintTests.swift; sourceTree = "<group>"; };
-		665D4F6F2575F75700C3A03B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		665D4F742575F75700C3A03B /* KoholintIslandUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KoholintIslandUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		665D4F782575F75700C3A03B /* KoholintIslandUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KoholintIslandUITests.swift; sourceTree = "<group>"; };
-		665D4F7A2575F75700C3A03B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		665D4F8C2575F92500C3A03B /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		665D4FAD257727CA00C3A03B /* HorizontalLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalLine.swift; sourceTree = "<group>"; };
 		6667E4BD25ACD3A600F14435 /* LabeledView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabeledView.swift; sourceTree = "<group>"; };
@@ -369,7 +346,6 @@
 		667B1B74257854BB00CE670F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		667B1B8A2578554600CE670F /* ProjectOutlineNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectOutlineNode.swift; sourceTree = "<group>"; };
 		667B1B902578557D00CE670F /* URL+localizedName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+localizedName.swift"; sourceTree = "<group>"; };
-		667B1B99257855AE00CE670F /* CommonConstraints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonConstraints.swift; sourceTree = "<group>"; };
 		667B1B9E2578560A00CE670F /* TextTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextTableCellView.swift; sourceTree = "<group>"; };
 		667B1BA82578563E00CE670F /* SourceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceViewController.swift; sourceTree = "<group>"; };
 		667B1BAD2578565A00CE670F /* OutlineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineViewController.swift; sourceTree = "<group>"; };
@@ -493,7 +469,7 @@
 		6699B8C325AEAC55005DB9BB /* agb_boot.asm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm.asm; path = agb_boot.asm; sourceTree = "<group>"; };
 		6699B8C425AEAC55005DB9BB /* dmg_boot.asm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm.asm; path = dmg_boot.asm; sourceTree = "<group>"; };
 		6699B92D25AEB22F005DB9BB /* SameBoyLogo.pb12 */ = {isa = PBXFileReference; lastKnownFileType = file; path = SameBoyLogo.pb12; sourceTree = "<group>"; };
-		6699BA2625AEBDDF005DB9BB /* KoholintIsland-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "KoholintIsland-Bridging-Header.h"; sourceTree = "<group>"; };
+		6699BA2625AEBDDF005DB9BB /* WindfishIDE-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WindfishIDE-Bridging-Header.h"; sourceTree = "<group>"; };
 		66ABD4A325870117007F2788 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
 		66ABD4A925871479007F2788 /* OpcodeDocumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpcodeDocumentation.swift; sourceTree = "<group>"; };
 		66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegionInspectorViewController.swift; sourceTree = "<group>"; };
@@ -515,20 +491,6 @@
 				6699BA0F25AEBCE6005DB9BB /* libHexFiend.a in Frameworks */,
 				6604B514259069A700D068E8 /* Windfish in Frameworks */,
 				6699BA0725AEBB25005DB9BB /* Sameboy in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		665D4F662575F75700C3A03B /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		665D4F712575F75700C3A03B /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -644,9 +606,7 @@
 			children = (
 				6699B58025AE9EF1005DB9BB /* third_party */,
 				66C642FB2589DD1000035EC9 /* lib */,
-				665D4F572575F75400C3A03B /* KoholintIsland */,
-				665D4F6C2575F75700C3A03B /* KoholintIslandTests */,
-				665D4F772575F75700C3A03B /* KoholintIslandUITests */,
+				665D4F572575F75400C3A03B /* WindfishIDE */,
 				6699B58E25AE9F85005DB9BB /* Sameboy */,
 				6699B73A25AEA2B7005DB9BB /* HexFiend */,
 				665D4F562575F75400C3A03B /* Products */,
@@ -657,19 +617,16 @@
 		665D4F562575F75400C3A03B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				665D4F552575F75400C3A03B /* KoholintIsland.app */,
-				665D4F692575F75700C3A03B /* KoholintIslandTests.xctest */,
-				665D4F742575F75700C3A03B /* KoholintIslandUITests.xctest */,
+				665D4F552575F75400C3A03B /* WindfishIDE.app */,
 				6699B58D25AE9F85005DB9BB /* Sameboy.app */,
 				6699B73925AEA2B7005DB9BB /* libHexFiend.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		665D4F572575F75400C3A03B /* KoholintIsland */ = {
+		665D4F572575F75400C3A03B /* WindfishIDE */ = {
 			isa = PBXGroup;
 			children = (
-				667B1B982578559600CE670F /* AutoLayout */,
 				66ABD4A825871458007F2788 /* LR35902 */,
 				66763D7E257AF37900824278 /* Formatters */,
 				667B1B8F2578557100CE670F /* FoundationExtensions */,
@@ -680,27 +637,9 @@
 				667B1B622578541F00CE670F /* NotificationNames.swift */,
 				665D4F8C2575F92500C3A03B /* main.swift */,
 				667B1B7A257854BF00CE670F /* Resources */,
-				6699BA2625AEBDDF005DB9BB /* KoholintIsland-Bridging-Header.h */,
+				6699BA2625AEBDDF005DB9BB /* WindfishIDE-Bridging-Header.h */,
 			);
-			path = KoholintIsland;
-			sourceTree = "<group>";
-		};
-		665D4F6C2575F75700C3A03B /* KoholintIslandTests */ = {
-			isa = PBXGroup;
-			children = (
-				665D4F6D2575F75700C3A03B /* KoholintTests.swift */,
-				665D4F6F2575F75700C3A03B /* Info.plist */,
-			);
-			path = KoholintIslandTests;
-			sourceTree = "<group>";
-		};
-		665D4F772575F75700C3A03B /* KoholintIslandUITests */ = {
-			isa = PBXGroup;
-			children = (
-				665D4F782575F75700C3A03B /* KoholintIslandUITests.swift */,
-				665D4F7A2575F75700C3A03B /* Info.plist */,
-			);
-			path = KoholintIslandUITests;
+			path = WindfishIDE;
 			sourceTree = "<group>";
 		};
 		665D4FA12576C99000C3A03B /* Frameworks */ = {
@@ -777,14 +716,6 @@
 				667B1B902578557D00CE670F /* URL+localizedName.swift */,
 			);
 			path = FoundationExtensions;
-			sourceTree = "<group>";
-		};
-		667B1B982578559600CE670F /* AutoLayout */ = {
-			isa = PBXGroup;
-			children = (
-				667B1B99257855AE00CE670F /* CommonConstraints.swift */,
-			);
-			path = AutoLayout;
 			sourceTree = "<group>";
 		};
 		66820CA5258DB6DC009507BB /* Emulator */ = {
@@ -1028,9 +959,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		665D4F542575F75400C3A03B /* KoholintIsland */ = {
+		665D4F542575F75400C3A03B /* WindfishIDE */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 665D4F7D2575F75700C3A03B /* Build configuration list for PBXNativeTarget "KoholintIsland" */;
+			buildConfigurationList = 665D4F7D2575F75700C3A03B /* Build configuration list for PBXNativeTarget "WindfishIDE" */;
 			buildPhases = (
 				665D4F512575F75400C3A03B /* Sources */,
 				665D4F522575F75400C3A03B /* Frameworks */,
@@ -1045,50 +976,14 @@
 				6699BA0525AEBB1F005DB9BB /* PBXTargetDependency */,
 				665D4FA02576C98C00C3A03B /* PBXTargetDependency */,
 			);
-			name = KoholintIsland;
+			name = WindfishIDE;
 			packageProductDependencies = (
 				6604B513259069A700D068E8 /* Windfish */,
 				6699BA0625AEBB25005DB9BB /* Sameboy */,
 			);
 			productName = gbdis;
-			productReference = 665D4F552575F75400C3A03B /* KoholintIsland.app */;
+			productReference = 665D4F552575F75400C3A03B /* WindfishIDE.app */;
 			productType = "com.apple.product-type.application";
-		};
-		665D4F682575F75700C3A03B /* KoholintIslandTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 665D4F802575F75700C3A03B /* Build configuration list for PBXNativeTarget "KoholintIslandTests" */;
-			buildPhases = (
-				665D4F652575F75700C3A03B /* Sources */,
-				665D4F662575F75700C3A03B /* Frameworks */,
-				665D4F672575F75700C3A03B /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				665D4F6B2575F75700C3A03B /* PBXTargetDependency */,
-			);
-			name = KoholintIslandTests;
-			productName = gbdisTests;
-			productReference = 665D4F692575F75700C3A03B /* KoholintIslandTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		665D4F732575F75700C3A03B /* KoholintIslandUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 665D4F832575F75700C3A03B /* Build configuration list for PBXNativeTarget "KoholintIslandUITests" */;
-			buildPhases = (
-				665D4F702575F75700C3A03B /* Sources */,
-				665D4F712575F75700C3A03B /* Frameworks */,
-				665D4F722575F75700C3A03B /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				665D4F762575F75700C3A03B /* PBXTargetDependency */,
-			);
-			name = KoholintIslandUITests;
-			productName = gbdisUITests;
-			productReference = 665D4F742575F75700C3A03B /* KoholintIslandUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 		6699B58C25AE9F85005DB9BB /* Sameboy */ = {
 			isa = PBXNativeTarget;
@@ -1144,14 +1039,6 @@
 						CreatedOnToolsVersion = 12.2;
 						LastSwiftMigration = 1230;
 					};
-					665D4F682575F75700C3A03B = {
-						CreatedOnToolsVersion = 12.2;
-						TestTargetID = 665D4F542575F75400C3A03B;
-					};
-					665D4F732575F75700C3A03B = {
-						CreatedOnToolsVersion = 12.2;
-						TestTargetID = 665D4F542575F75400C3A03B;
-					};
 					6699B58C25AE9F85005DB9BB = {
 						CreatedOnToolsVersion = 12.3;
 					};
@@ -1160,7 +1047,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 665D4F502575F75400C3A03B /* Build configuration list for PBXProject "KoholintIsland" */;
+			buildConfigurationList = 665D4F502575F75400C3A03B /* Build configuration list for PBXProject "WindfishIDE" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -1173,9 +1060,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				665D4F542575F75400C3A03B /* KoholintIsland */,
-				665D4F682575F75700C3A03B /* KoholintIslandTests */,
-				665D4F732575F75700C3A03B /* KoholintIslandUITests */,
+				665D4F542575F75400C3A03B /* WindfishIDE */,
 				6699B58C25AE9F85005DB9BB /* Sameboy */,
 				6699B73825AEA2B7005DB9BB /* HexFiend */,
 			);
@@ -1191,20 +1076,6 @@
 				667B1B75257854BB00CE670F /* Assets.xcassets in Resources */,
 				662B376325B275D400C5E690 /* DebugConsoleView.xib in Resources */,
 				662B36D125B1419F00C5E690 /* VRAMViewer.xib in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		665D4F672575F75700C3A03B /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		665D4F722575F75700C3A03B /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1247,7 +1118,6 @@
 			files = (
 				6651990925ABF9F60075C3FC /* ProjectDocument+disassemble.swift in Sources */,
 				66C617DC257F202B00E372BA /* DataTypeEditorViewController.swift in Sources */,
-				667B1B9A257855AE00CE670F /* CommonConstraints.swift in Sources */,
 				6651990E25ABFA380075C3FC /* ProjectDocument+importSymbols.swift in Sources */,
 				6651991325ABFA840075C3FC /* RGBDS+attributedString.swift in Sources */,
 				66521DA9257C996B0088C97B /* SourceRulerView.swift in Sources */,
@@ -1305,22 +1175,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		665D4F652575F75700C3A03B /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				665D4F6E2575F75700C3A03B /* KoholintTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		665D4F702575F75700C3A03B /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				665D4F792575F75700C3A03B /* KoholintIslandUITests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		6699B58925AE9F85005DB9BB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1374,16 +1228,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		665D4F6B2575F75700C3A03B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 665D4F542575F75400C3A03B /* KoholintIsland */;
-			targetProxy = 665D4F6A2575F75700C3A03B /* PBXContainerItemProxy */;
-		};
-		665D4F762575F75700C3A03B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 665D4F542575F75400C3A03B /* KoholintIsland */;
-			targetProxy = 665D4F752575F75700C3A03B /* PBXContainerItemProxy */;
-		};
 		665D4FA02576C98C00C3A03B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = 665D4F9F2576C98C00C3A03B /* LR35902 */;
@@ -1545,7 +1389,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = KoholintIsland/Resources/KoholintIsland.entitlements;
+				CODE_SIGN_ENTITLEMENTS = WindfishIDE/Resources/WindfishIDE.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 69Y7ARDN28;
@@ -1555,7 +1399,7 @@
 					GB_INTERNAL,
 				);
 				HEADER_SEARCH_PATHS = ../third_party/Sameboy;
-				INFOPLIST_FILE = KoholintIsland/Resources/Info.plist;
+				INFOPLIST_FILE = WindfishIDE/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -1564,9 +1408,9 @@
 					"-framework",
 					PreferencePanes,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.featherless.KoholintIsland;
+				PRODUCT_BUNDLE_IDENTIFIER = com.featherless.WindfishIDE;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "KoholintIsland/KoholintIsland-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "WindfishIDE/WindfishIDE-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -1578,14 +1422,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = KoholintIsland/Resources/KoholintIsland.entitlements;
+				CODE_SIGN_ENTITLEMENTS = WindfishIDE/Resources/WindfishIDE.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 69Y7ARDN28;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = GB_INTERNAL;
 				HEADER_SEARCH_PATHS = ../third_party/Sameboy;
-				INFOPLIST_FILE = KoholintIsland/Resources/Info.plist;
+				INFOPLIST_FILE = WindfishIDE/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -1594,95 +1438,11 @@
 					"-framework",
 					PreferencePanes,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.featherless.KoholintIsland;
+				PRODUCT_BUNDLE_IDENTIFIER = com.featherless.WindfishIDE;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_DISABLE_SAFETY_CHECKS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "KoholintIsland/KoholintIsland-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "WindfishIDE/WindfishIDE-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
-			};
-			name = Release;
-		};
-		665D4F812575F75700C3A03B /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 69Y7ARDN28;
-				INFOPLIST_FILE = KoholintIslandTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.featherless.KoholintIslandTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KoholintIsland.app/Contents/MacOS/KoholintIsland";
-			};
-			name = Debug;
-		};
-		665D4F822575F75700C3A03B /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 69Y7ARDN28;
-				INFOPLIST_FILE = KoholintIslandTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.featherless.KoholintIslandTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KoholintIsland.app/Contents/MacOS/KoholintIsland";
-			};
-			name = Release;
-		};
-		665D4F842575F75700C3A03B /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 69Y7ARDN28;
-				INFOPLIST_FILE = KoholintIslandUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.featherless.KoholintIslandUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = KoholintIsland;
-			};
-			name = Debug;
-		};
-		665D4F852575F75700C3A03B /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 69Y7ARDN28;
-				INFOPLIST_FILE = KoholintIslandUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.featherless.KoholintIslandUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = KoholintIsland;
 			};
 			name = Release;
 		};
@@ -1775,7 +1535,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		665D4F502575F75400C3A03B /* Build configuration list for PBXProject "KoholintIsland" */ = {
+		665D4F502575F75400C3A03B /* Build configuration list for PBXProject "WindfishIDE" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				665D4F7B2575F75700C3A03B /* Debug */,
@@ -1784,29 +1544,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		665D4F7D2575F75700C3A03B /* Build configuration list for PBXNativeTarget "KoholintIsland" */ = {
+		665D4F7D2575F75700C3A03B /* Build configuration list for PBXNativeTarget "WindfishIDE" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				665D4F7E2575F75700C3A03B /* Debug */,
 				665D4F7F2575F75700C3A03B /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		665D4F802575F75700C3A03B /* Build configuration list for PBXNativeTarget "KoholintIslandTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				665D4F812575F75700C3A03B /* Debug */,
-				665D4F822575F75700C3A03B /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		665D4F832575F75700C3A03B /* Build configuration list for PBXNativeTarget "KoholintIslandUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				665D4F842575F75700C3A03B /* Debug */,
-				665D4F852575F75700C3A03B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

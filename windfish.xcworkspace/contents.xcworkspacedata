@@ -5,9 +5,9 @@
       location = "group:README.md">
    </FileRef>
    <FileRef
-      location = "group:ui/KoholintIsland.xcodeproj">
+      location = "group:/Users/featherless/workbench/windfish/ui/WindfishIDE.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:gbdisui.xctestplan">
+      location = "group:/Users/featherless/workbench/windfish/Windfish.xctestplan">
    </FileRef>
 </Workspace>
