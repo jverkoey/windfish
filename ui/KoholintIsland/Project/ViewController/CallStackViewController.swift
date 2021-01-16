@@ -24,7 +24,7 @@ final class CallStackViewController: NSViewController {
   let elementsController = NSArrayController()
   var tableView: NSTableView?
   let regionTypeController = NSArrayController()
-  @objc private var stackTrace: [CallStack] = [
+  @objc private dynamic var stackTrace: [CallStack] = [
     .init(address: 0xff00, bank: 0x01, label: "toc_ffff_00")
   ]
 
@@ -49,7 +49,7 @@ final class CallStackViewController: NSViewController {
     containerView.documentView = tableView
     view.addSubview(containerView)
     self.tableView = tableView
- 
+
     let columns = [
       Column(name: "Address", identifier: .address, width: 45),
       Column(name: "Bank", identifier: .bank, width: 30),
@@ -76,6 +76,50 @@ final class CallStackViewController: NSViewController {
     tableView.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
     tableView.bind(.selectionIndexes, to: elementsController, withKeyPath:"selectionIndexes", options: nil)
     tableView.bind(.sortDescriptors, to: elementsController, withKeyPath: "sortDescriptors", options: nil)
+  }
+
+  override func viewWillAppear() {
+    super.viewWillAppear()
+
+    guard let document = projectDocument else {
+      return
+    }
+    document.emulationObservers.append(self)
+  }
+}
+
+extension CallStackViewController: EmulationObservers {
+  func emulationDidAdvance() {}
+
+  func emulationDidStart() {}
+
+  func emulationDidStop() {
+    guard let document = projectDocument else {
+      return
+    }
+
+    let gb = document.sameboy.gb.pointee
+
+    let current = CallStack(address: document.address, bank: document.bank, label: "")
+    let stack = [current] + (0..<gb.backtrace_size).map { i -> CallStack in
+      var bank: UInt16 = 0
+      var address: UInt16 = 0
+      gb_get_backtrace_return(document.sameboy.gb, Int32(i), &bank, &address)
+      return CallStack(address: address, bank: Gameboy.Cartridge.Bank(truncatingIfNeeded: bank), label: "")
+    }.reversed()
+    if let disassembly = document.disassemblyResults?.disassembly {
+      stackTrace = stack.map {
+        let scopes = disassembly.labeledContiguousScopes(at: $0.address, in: max(1, $0.bank))
+        if scopes.isEmpty {
+          // Let's look for the closest label then.
+          return $0
+        }
+        let scopeNames = scopes.map { $0.label }.sorted().joined(separator: ", ")
+        return CallStack(address: $0.address, bank: $0.bank, label: scopeNames)
+      }
+    } else {
+      stackTrace = stack
+    }
   }
 }
 
