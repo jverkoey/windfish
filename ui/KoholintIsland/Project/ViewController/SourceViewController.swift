@@ -57,6 +57,13 @@ final class SourceViewController: NSViewController {
     self.sourceRulerView = sourceRulerView
 
     let toolbarHeight: CGFloat = 28  // Matches Xcode's debugger bar's height.
+
+    let undoButton = NSButton(image: NSImage(systemSymbolName: "arrow.uturn.backward",
+                                             accessibilityDescription: nil)!,
+                              target: nil,
+                              action: #selector(ProjectDocument.undoCommand(_:)))
+    undoButton.toolTip = "Undo"
+
     let stepOverButton = NSButton(image: NSImage(systemSymbolName: "arrowshape.bounce.forward.fill",
                                                  accessibilityDescription: nil)!,
                                   target: nil,
@@ -78,7 +85,7 @@ final class SourceViewController: NSViewController {
     toggleEmulationButton.toolTip = "Toggle emulation"
     self.toggleEmulationButton = toggleEmulationButton
 
-    let buttons = [stepOverButton, stepIntoButton, toggleEmulationButton]
+    let buttons = [undoButton, stepOverButton, stepIntoButton, toggleEmulationButton]
     for button in buttons {
       button.isBordered = false
       button.translatesAutoresizingMaskIntoConstraints = false

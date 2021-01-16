@@ -19,6 +19,15 @@ extension ProjectDocument {
     sameboyDebuggerSemaphore.signal()
   }
 
+  @objc func undoCommand(_ sender: Any?) {
+    guard sameboy.gb.pointee.debug_stopped else {
+      return // Emulation must be stopped first.
+    }
+
+    nextDebuggerCommand = "undo"
+    sameboyDebuggerSemaphore.signal()
+  }
+
   @objc func toggleEmulation(_ sender: Any?) {
     sameboy.gb.pointee.debug_stopped = !sameboy.gb.pointee.debug_stopped
 
