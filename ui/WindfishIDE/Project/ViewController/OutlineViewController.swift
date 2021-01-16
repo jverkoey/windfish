@@ -3,7 +3,34 @@ import Foundation
 import Cocoa
 import Combine
 
+class ProjectOutlineNode: NSObject {
+  enum NodeType: Int, Codable {
+    case container
+    case document
+    case unknown
+  }
+
+  var type: NodeType = .unknown
+  var title: String = ""
+  var identifier: String = ""
+  var url: URL?
+  @objc dynamic var children = [ProjectOutlineNode]()
+}
+
+extension ProjectOutlineNode {
+
+  @objc var count: Int {
+    children.count
+  }
+
+  @objc dynamic var isLeaf: Bool {
+    return type == .document
+  }
+}
+
+
 final class OutlineViewController: NSViewController {
+  let project: Project
   let containerView = NSScrollView()
   let outlineView = NSOutlineView()
   let treeController = NSTreeController()
@@ -12,20 +39,18 @@ final class OutlineViewController: NSViewController {
   private var disassembledSubscriber: AnyCancellable?
   private var treeControllerObserver: NSKeyValueObservation?
 
-  init() {
+  init(project: Project) {
+    self.project = project
+
     super.init(nibName: nil, bundle: nil)
   }
 
   override func viewWillAppear() {
     super.viewWillAppear()
 
-    guard let projectDocument = projectDocument else {
-      fatalError()
-    }
-
     populateFromDocument()
 
-    disassembledSubscriber = NotificationCenter.default.publisher(for: .disassembled, object: projectDocument)
+    disassembledSubscriber = NotificationCenter.default.publisher(for: .disassembled, object: project)
       .receive(on: RunLoop.main)
       .sink(receiveValue: { notification in
         let selectionIndexPaths = self.treeController.selectionIndexPaths
@@ -35,11 +60,7 @@ final class OutlineViewController: NSViewController {
   }
 
   private func populateFromDocument() {
-    guard let projectDocument = projectDocument else {
-      fatalError()
-    }
-
-    guard let disassemblyFiles = projectDocument.disassemblyResults?.files else {
+    guard let disassemblyFiles = project.disassemblyResults?.files else {
       return
     }
     let children = treeController.arrangedObjects.children![0]
@@ -146,12 +167,9 @@ final class OutlineViewController: NSViewController {
       }
       lastSelectedObjects = selectedNodes
 
-      guard let projectDocument = self.projectDocument else {
-        fatalError()
-      }
       NotificationCenter.default.post(
         name: .selectedFileDidChange,
-        object: projectDocument,
+        object: self.project,
         userInfo: ["selectedNodes": treeController.selectedObjects]
       )
     }

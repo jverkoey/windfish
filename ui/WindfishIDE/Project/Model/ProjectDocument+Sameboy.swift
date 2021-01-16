@@ -1,6 +1,6 @@
 import Cocoa
 
-extension ProjectDocument: EmulatorDelegate {
+extension Project: EmulatorDelegate {
   // MARK: - EmulatorDelegate
   func willRun() {
     sameboy.lcdOutput = sameboyView.pixels()
@@ -43,9 +43,6 @@ extension ProjectDocument: EmulatorDelegate {
     sameboy.lcdOutput = sameboyView.pixels()
 
     DispatchQueue.main.async {
-      if let vramWindow = self.vramWindow, vramWindow.isVisible {
-        self.reloadVRAMData(nil)
-      }
       // Ensure that all observers execute on the main thread.
       self.emulationObservers.forEach { $0.emulationDidAdvance() }
     }

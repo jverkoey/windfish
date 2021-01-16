@@ -6,16 +6,16 @@ import Windfish
 
 extension ProjectDocument {
   @objc func disassemble(_ sender: Any?) {
-    guard let romData = romData else {
+    guard let romData = project.romData else {
       return
     }
-    isDisassembling = true
+    project.isDisassembling = true
     self.contentViewController?.startProgressIndicator()
 
     DispatchQueue.global(qos: .userInitiated).async {
       let disassembly = Disassembler(data: romData)
 
-      for dataType in self.configuration.dataTypes {
+      for dataType in self.project.configuration.dataTypes {
         let mappingDict = dataType.mappings.reduce(into: [:]) { accumulator, mapping in
           accumulator[mapping.value] = mapping.name
         }
@@ -42,12 +42,12 @@ extension ProjectDocument {
         }
       }
 
-      for global in self.configuration.globals {
+      for global in self.project.configuration.globals {
         disassembly.createGlobal(at: global.address, named: global.name, dataType: global.dataType)
       }
 
       // Disassemble everything first
-      for region in self.configuration.regions {
+      for region in self.project.configuration.regions {
         let bank = max(1, region.bank)
         switch region.regionType {
         case Region.Kind.region:
@@ -63,7 +63,7 @@ extension ProjectDocument {
       }
 
       // And then set any explicit regions
-      for region in self.configuration.regions {
+      for region in self.project.configuration.regions {
         let bank = max(1, region.bank)
         switch region.regionType {
         case Region.Kind.label:
@@ -85,7 +85,7 @@ extension ProjectDocument {
         }
       }
 
-      for macro in self.configuration.macros {
+      for macro in self.project.configuration.macros {
         disassembly.defineMacro(named: macro.name, template: macro.source)
       }
 
@@ -332,9 +332,9 @@ extension ProjectDocument {
       }
 
       DispatchQueue.main.async {
-        self.metadata?.numberOfBanks = disassembly.numberOfBanks
-        self.metadata?.bankMap = bankMap
-        self.disassemblyResults = DisassemblyResults(
+        self.project.metadata?.numberOfBanks = disassembly.numberOfBanks
+        self.project.metadata?.bankMap = bankMap
+        self.project.disassemblyResults = DisassemblyResults(
           files: disassemblyFiles,
           bankLines: bankLines,
           bankTextStorage: bankTextStorage,
@@ -344,7 +344,7 @@ extension ProjectDocument {
           disassembly: disassembly
         )
 
-        self.isDisassembling = false
+        self.project.isDisassembling = false
         NotificationCenter.default.post(name: .disassembled, object: self)
 
         self.contentViewController?.stopProgressIndicator()

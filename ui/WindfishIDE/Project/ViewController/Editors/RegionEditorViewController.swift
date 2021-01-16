@@ -24,7 +24,7 @@ final class RegionEditorViewController: NSViewController, TabSelectable {
   let deselectedTabImage = NSImage(systemSymbolName: "book", accessibilityDescription: nil)!
   let selectedTabImage = NSImage(systemSymbolName: "book.fill", accessibilityDescription: nil)!
 
-  let document: ProjectDocument
+  let project: Project
   let elementsController = NSArrayController()
   var tableView: EditorTableView?
   let regionTypeController = NSArrayController()
@@ -35,8 +35,8 @@ final class RegionEditorViewController: NSViewController, TabSelectable {
     let width: CGFloat
   }
 
-  init(document: ProjectDocument) {
-    self.document = document
+  init(project: Project) {
+    self.project = project
 
     super.init(nibName: nil, bundle: nil)
 
@@ -100,7 +100,7 @@ final class RegionEditorViewController: NSViewController, TabSelectable {
       NSSortDescriptor(key: NSUserInterfaceItemIdentifier.address.rawValue, ascending: true),
     ]
 
-    elementsController.bind(.contentArray, to: document.configuration, withKeyPath: "regions", options: nil)
+    elementsController.bind(.contentArray, to: project.configuration, withKeyPath: "regions", options: nil)
     tableView.tableView?.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
     tableView.tableView?.bind(.selectionIndexes, to: elementsController, withKeyPath:"selectionIndexes", options: nil)
     tableView.tableView?.bind(.sortDescriptors, to: elementsController, withKeyPath: "sortDescriptors", options: nil)
@@ -110,40 +110,39 @@ final class RegionEditorViewController: NSViewController, TabSelectable {
     guard let region = elementsController.selectedObjects.first as? Region else {
       return
     }
-
-    document.nextDebuggerCommand = "breakpoint $\(((region.address < 0x4000) ? 0 : region.bank).hexString):$\(region.address.hexString)"
-    document.sameboyDebuggerSemaphore.signal()
+    project.nextDebuggerCommand = "breakpoint $\(((region.address < 0x4000) ? 0 : region.bank).hexString):$\(region.address.hexString)"
+    project.sameboyDebuggerSemaphore.signal()
   }
 
   @objc func didDoubleTap(_ sender: Any?) {
     guard let region = elementsController.selectedObjects.first as? Region else {
       return
     }
-    NotificationCenter.default.post(name: .selectedRegionDidChange, object: self.document, userInfo: ["selectedRegion": region])
+    NotificationCenter.default.post(name: .selectedRegionDidChange, object: project, userInfo: ["selectedRegion": region])
   }
 }
 
 extension RegionEditorViewController: EditorTableViewDelegate {
   func editorTableViewCreateElement(_ tableView: EditorTableView) -> String {
-    document.configuration.regions.append(
+    project.configuration.regions.append(
       Region(regionType: Region.Kind.label, name: "New region", bank: 0, address: 0, length: 0)
     )
     return "Create Region"
   }
 
   func editorTableViewDeleteSelectedElements(_ tableView: EditorTableView) -> String {
-    document.configuration.regions.removeAll { region in
+    project.configuration.regions.removeAll { region in
       elementsController.selectedObjects.contains { $0 as! Region === region }
     }
     return "Delete Region"
   }
 
   func editorTableViewStashElements(_ tableView: EditorTableView) -> Any {
-    return document.configuration.regions
+    return project.configuration.regions
   }
 
   func editorTableView(_ tableView: EditorTableView, restoreElements elements: Any) {
-    document.configuration.regions = elements as! [Region]
+    project.configuration.regions = elements as! [Region]
   }
 }
 
@@ -223,7 +222,3 @@ extension RegionEditorViewController: NSTableViewDelegate {
     }
   }
 }
-
-// TODO: Surface detected labels in the region inspector; add a new column indicating whether a region is automatic or manual.
-// TODO: Editing an automatic label turns it into a manaul label.
-// TODO: Allow sorting of the regions.

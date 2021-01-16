@@ -1,24 +1,12 @@
-//
-//  ViewController.swift
-//
-//  Created by Jeff Verkoeyen on 11/30/20.
-//
-
 import AppKit
 import Cocoa
 import Combine
 
 import Windfish
 
-extension NSViewController {
-  var projectDocument: ProjectDocument? {
-    return self.view.window?.windowController?.document as? ProjectDocument
-  }
-}
-
 final class ProjectViewController: NSViewController {
 
-  let document: ProjectDocument
+  let project: Project
   let containerView = NSView()
   let horizontalLine = HorizontalLine()
   let progressIndicator = NSProgressIndicator()
@@ -28,7 +16,7 @@ final class ProjectViewController: NSViewController {
   let centerSplitViewController: NSSplitViewController
 
   let sidebarViewController: OutlineViewController
-  let callstackViewController = CallStackViewController()
+  let callstackViewController: CallStackViewController
   let sourceViewController: SourceViewController
   let debuggingViewController: DebuggingViewController
   let inspectorViewController: InspectorViewController
@@ -38,16 +26,17 @@ final class ProjectViewController: NSViewController {
   private var didCreateRegionSubscriber: AnyCancellable?
   private var disassembledSubscriber: AnyCancellable?
 
-  init(document: ProjectDocument) {
-    self.document = document
+  init(project: Project) {
+    self.project = project
 
     self.threePaneSplitViewController = NSSplitViewController()
     self.leadingSplitViewController = NSSplitViewController()
     self.centerSplitViewController = NSSplitViewController()
-    self.sidebarViewController = OutlineViewController()
-    self.sourceViewController = SourceViewController()
-    self.debuggingViewController = DebuggingViewController()
-    self.inspectorViewController = InspectorViewController(document: document)
+    self.callstackViewController = CallStackViewController(project: project)
+    self.sidebarViewController = OutlineViewController(project: project)
+    self.sourceViewController = SourceViewController(project: project)
+    self.debuggingViewController = DebuggingViewController(project: project)
+    self.inspectorViewController = InspectorViewController(project: project)
 
     // Leading
     leadingSplitViewController.addSplitViewItem(NSSplitViewItem(viewController: sidebarViewController))
@@ -158,7 +147,7 @@ final class ProjectViewController: NSViewController {
     ])
 
     var lastSelectedFile: String? = nil
-    selectedFileDidChangeSubscriber = NotificationCenter.default.publisher(for: .selectedFileDidChange, object: document)
+    selectedFileDidChangeSubscriber = NotificationCenter.default.publisher(for: .selectedFileDidChange, object: project)
       .receive(on: RunLoop.main)
       .sink(receiveValue: { notification in
         guard let nodes = notification.userInfo?["selectedNodes"] as? [ProjectOutlineNode] else {
@@ -177,14 +166,14 @@ final class ProjectViewController: NSViewController {
         guard let document = self.view.window?.windowController?.document as? ProjectDocument else {
           return
         }
-        if let metadata = document.metadata, let bank = metadata.bankMap[node.title] {
+        if let metadata = self.project.metadata, let bank = metadata.bankMap[node.title] {
           self.sourceViewController.bank = bank
         } else {
           self.sourceViewController.bank = nil
         }
       })
 
-    selectedRegionDidChangeSubscriber = NotificationCenter.default.publisher(for: .selectedRegionDidChange, object: document)
+    selectedRegionDidChangeSubscriber = NotificationCenter.default.publisher(for: .selectedRegionDidChange, object: project)
       .receive(on: RunLoop.main)
       .sink(receiveValue: { notification in
         guard let region = notification.userInfo?["selectedRegion"] as? Region else {
@@ -193,7 +182,7 @@ final class ProjectViewController: NSViewController {
         self.showRegion(region)
       })
 
-    didCreateRegionSubscriber = NotificationCenter.default.publisher(for: .didCreateRegion, object: document)
+    didCreateRegionSubscriber = NotificationCenter.default.publisher(for: .didCreateRegion, object: project)
       .receive(on: RunLoop.main)
       .sink(receiveValue: { notification in
         guard let region = notification.userInfo?["region"] as? Region else {
@@ -203,13 +192,13 @@ final class ProjectViewController: NSViewController {
         self.inspectorViewController.regionEditorViewController.elementsController.setSelectedObjects([region])
       })
 
-    disassembledSubscriber = NotificationCenter.default.publisher(for: .disassembled, object: document)
+    disassembledSubscriber = NotificationCenter.default.publisher(for: .disassembled, object: project)
       .receive(on: RunLoop.main)
       .sink(receiveValue: { notification in
-        self.statisticsView.statistics = self.document.disassemblyResults?.statistics
+        self.statisticsView.statistics = self.project.disassemblyResults?.statistics
       })
 
-    if document.isDisassembling {
+    if project.isDisassembling {
       startProgressIndicator()
     }
   }
@@ -217,12 +206,12 @@ final class ProjectViewController: NSViewController {
   override func viewWillAppear() {
     super.viewWillAppear()
 
-    document.emulationObservers.append(self)
+    project.emulationObservers.append(self)
   }
 
   func jumpTo(address: LR35902.Address, bank _bank: Gameboy.Cartridge.Bank, highlight: Bool = false) {
     let bank = (address < 0x4000) ? 0 : _bank
-    guard let metadata = self.document.metadata else {
+    guard let metadata = project.metadata else {
       return
     }
     let fileName = metadata.bankMap.first { key, value in
@@ -235,7 +224,7 @@ final class ProjectViewController: NSViewController {
     }
     self.sidebarViewController.treeController.setSelectionIndexPath(IndexPath(indexes: [0, index]))
 
-    guard let lineIndex = self.document.disassemblyResults?.lineFor(address: address, bank: bank) else {
+    guard let lineIndex = project.disassemblyResults?.lineFor(address: address, bank: bank) else {
       return
     }
 
@@ -271,7 +260,7 @@ final class ProjectViewController: NSViewController {
 
 extension ProjectViewController: LabelJumper {
   func jumpToLabel(_ labelName: String) {
-    guard let region = document.disassemblyResults?.regionLookup?[labelName] else {
+    guard let region = project.disassemblyResults?.regionLookup?[labelName] else {
       return
     }
     showRegion(region)
@@ -286,9 +275,9 @@ extension ProjectViewController: EmulationObservers {
   }
 
   func emulationDidStop() {
-    let address = document.address
-    let bank = document.bank
-    self.sourceViewController.sourceView?.emulationLine = self.document.disassemblyResults?.lineFor(address: address, bank: bank)
+    let address = project.address
+    let bank = project.bank
+    self.sourceViewController.sourceView?.emulationLine = project.disassemblyResults?.lineFor(address: address, bank: bank)
     self.jumpTo(address: address, bank: bank)
   }
 }

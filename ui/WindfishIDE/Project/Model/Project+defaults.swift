@@ -2,7 +2,7 @@ import Foundation
 
 import Windfish
 
-extension ProjectDocument {
+extension Project {
   func applyDefaults() {
     let numberOfRestartAddresses: LR35902.Address = 8
     let restartSize: LR35902.Address = 8

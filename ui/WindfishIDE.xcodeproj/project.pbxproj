@@ -12,11 +12,11 @@
 		662B36B425B1280300C5E690 /* ScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662B36B325B1280300C5E690 /* ScrollView.swift */; };
 		662B36CA25B13D2100C5E690 /* ProjectDocument+Debugging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662B36C925B13D2100C5E690 /* ProjectDocument+Debugging.swift */; };
 		662B36D125B1419F00C5E690 /* VRAMViewer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 662B36D025B1419F00C5E690 /* VRAMViewer.xib */; };
-		662B36DD25B1442300C5E690 /* ProjectDocument+VRAMViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662B36DC25B1442300C5E690 /* ProjectDocument+VRAMViewer.swift */; };
 		662B375725B2275900C5E690 /* DebuggingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662B375625B2275900C5E690 /* DebuggingViewController.swift */; };
 		662B376325B275D400C5E690 /* DebugConsoleView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 662B376225B275D400C5E690 /* DebugConsoleView.xib */; };
 		662B37B025B2A59D00C5E690 /* CallStackViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662B37AF25B2A59D00C5E690 /* CallStackViewController.swift */; };
 		662B37C225B2ADFE00C5E690 /* SameboyBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 662B37C125B2ADFE00C5E690 /* SameboyBridge.m */; };
+		662B380A25B3668700C5E690 /* VRAMWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662B380925B3668700C5E690 /* VRAMWindow.swift */; };
 		66472ED7258E7F7600A03CD4 /* SourceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66472ED6258E7F7600A03CD4 /* SourceView.swift */; };
 		664833E12598558D00B955F4 /* CPUFlagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664833E02598558D00B955F4 /* CPUFlagsView.swift */; };
 		665198C125ABEA7F0075C3FC /* LCDViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665198C025ABEA7F0075C3FC /* LCDViewController.swift */; };
@@ -27,7 +27,7 @@
 		665198EC25ABF9300075C3FC /* ProjectConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665198EB25ABF9300075C3FC /* ProjectConfiguration.swift */; };
 		665198F425ABF95E0075C3FC /* DisassemblyResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665198F325ABF95E0075C3FC /* DisassemblyResults.swift */; };
 		665198FF25ABF97F0075C3FC /* ProjectMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665198FE25ABF97F0075C3FC /* ProjectMetadata.swift */; };
-		6651990425ABF9AB0075C3FC /* ProjectDocument+defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6651990325ABF9AB0075C3FC /* ProjectDocument+defaults.swift */; };
+		6651990425ABF9AB0075C3FC /* Project+defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6651990325ABF9AB0075C3FC /* Project+defaults.swift */; };
 		6651990925ABF9F60075C3FC /* ProjectDocument+disassemble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6651990825ABF9F60075C3FC /* ProjectDocument+disassemble.swift */; };
 		6651990E25ABFA380075C3FC /* ProjectDocument+importSymbols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6651990D25ABFA380075C3FC /* ProjectDocument+importSymbols.swift */; };
 		6651991325ABFA840075C3FC /* RGBDS+attributedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6651991225ABFA840075C3FC /* RGBDS+attributedString.swift */; };
@@ -45,7 +45,6 @@
 		66783F802585B694008C34FA /* MacroEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66783F7F2585B694008C34FA /* MacroEditorViewController.swift */; };
 		667B1B632578541F00CE670F /* NotificationNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1B622578541F00CE670F /* NotificationNames.swift */; };
 		667B1B75257854BB00CE670F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 667B1B72257854BB00CE670F /* Assets.xcassets */; };
-		667B1B8B2578554600CE670F /* ProjectOutlineNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1B8A2578554600CE670F /* ProjectOutlineNode.swift */; };
 		667B1B912578557D00CE670F /* URL+localizedName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1B902578557D00CE670F /* URL+localizedName.swift */; };
 		667B1B9F2578560A00CE670F /* TextTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1B9E2578560A00CE670F /* TextTableCellView.swift */; };
 		667B1BA92578563E00CE670F /* SourceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667B1BA82578563E00CE670F /* SourceViewController.swift */; };
@@ -308,12 +307,12 @@
 		662B36B325B1280300C5E690 /* ScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollView.swift; sourceTree = "<group>"; };
 		662B36C925B13D2100C5E690 /* ProjectDocument+Debugging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProjectDocument+Debugging.swift"; sourceTree = "<group>"; };
 		662B36D025B1419F00C5E690 /* VRAMViewer.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VRAMViewer.xib; sourceTree = "<group>"; };
-		662B36DC25B1442300C5E690 /* ProjectDocument+VRAMViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProjectDocument+VRAMViewer.swift"; sourceTree = "<group>"; };
 		662B375625B2275900C5E690 /* DebuggingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebuggingViewController.swift; sourceTree = "<group>"; };
 		662B376225B275D400C5E690 /* DebugConsoleView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DebugConsoleView.xib; sourceTree = "<group>"; };
 		662B37AF25B2A59D00C5E690 /* CallStackViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallStackViewController.swift; sourceTree = "<group>"; };
 		662B37C025B2ADFE00C5E690 /* SameboyBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SameboyBridge.h; sourceTree = "<group>"; };
 		662B37C125B2ADFE00C5E690 /* SameboyBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SameboyBridge.m; sourceTree = "<group>"; };
+		662B380925B3668700C5E690 /* VRAMWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VRAMWindow.swift; sourceTree = "<group>"; };
 		66472ED6258E7F7600A03CD4 /* SourceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceView.swift; sourceTree = "<group>"; };
 		664833E02598558D00B955F4 /* CPUFlagsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUFlagsView.swift; sourceTree = "<group>"; };
 		665198C025ABEA7F0075C3FC /* LCDViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LCDViewController.swift; sourceTree = "<group>"; };
@@ -324,7 +323,7 @@
 		665198EB25ABF9300075C3FC /* ProjectConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectConfiguration.swift; sourceTree = "<group>"; };
 		665198F325ABF95E0075C3FC /* DisassemblyResults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisassemblyResults.swift; sourceTree = "<group>"; };
 		665198FE25ABF97F0075C3FC /* ProjectMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectMetadata.swift; sourceTree = "<group>"; };
-		6651990325ABF9AB0075C3FC /* ProjectDocument+defaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProjectDocument+defaults.swift"; sourceTree = "<group>"; };
+		6651990325ABF9AB0075C3FC /* Project+defaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Project+defaults.swift"; sourceTree = "<group>"; };
 		6651990825ABF9F60075C3FC /* ProjectDocument+disassemble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProjectDocument+disassemble.swift"; sourceTree = "<group>"; };
 		6651990D25ABFA380075C3FC /* ProjectDocument+importSymbols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProjectDocument+importSymbols.swift"; sourceTree = "<group>"; };
 		6651991225ABFA840075C3FC /* RGBDS+attributedString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RGBDS+attributedString.swift"; sourceTree = "<group>"; };
@@ -344,7 +343,6 @@
 		667B1B622578541F00CE670F /* NotificationNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationNames.swift; sourceTree = "<group>"; };
 		667B1B72257854BB00CE670F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		667B1B74257854BB00CE670F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		667B1B8A2578554600CE670F /* ProjectOutlineNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectOutlineNode.swift; sourceTree = "<group>"; };
 		667B1B902578557D00CE670F /* URL+localizedName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+localizedName.swift"; sourceTree = "<group>"; };
 		667B1B9E2578560A00CE670F /* TextTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextTableCellView.swift; sourceTree = "<group>"; };
 		667B1BA82578563E00CE670F /* SourceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceViewController.swift; sourceTree = "<group>"; };
@@ -530,6 +528,7 @@
 			children = (
 				662B36D025B1419F00C5E690 /* VRAMViewer.xib */,
 				665198C025ABEA7F0075C3FC /* LCDViewController.swift */,
+				662B380925B3668700C5E690 /* VRAMWindow.swift */,
 			);
 			path = Panels;
 			sourceTree = "<group>";
@@ -537,7 +536,6 @@
 		665198CF25ABF8B00075C3FC /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
-				667B1B8A2578554600CE670F /* ProjectOutlineNode.swift */,
 				665D4F5A2575F75400C3A03B /* ProjectViewController.swift */,
 				66C617C5257F04D600E372BA /* RegionInspectorViewController.swift */,
 				662B37AF25B2A59D00C5E690 /* CallStackViewController.swift */,
@@ -561,11 +559,10 @@
 				665198F225ABF9570075C3FC /* Disassembly */,
 				665198F025ABF9450075C3FC /* Configuration */,
 				665D4F5C2575F75400C3A03B /* ProjectDocument.swift */,
-				662B36DC25B1442300C5E690 /* ProjectDocument+VRAMViewer.swift */,
 				662B36C925B13D2100C5E690 /* ProjectDocument+Debugging.swift */,
 				662B362925B00FFD00C5E690 /* ProjectDocument+Sameboy.swift */,
 				665198FE25ABF97F0075C3FC /* ProjectMetadata.swift */,
-				6651990325ABF9AB0075C3FC /* ProjectDocument+defaults.swift */,
+				6651990325ABF9AB0075C3FC /* Project+defaults.swift */,
 				6651990D25ABFA380075C3FC /* ProjectDocument+importSymbols.swift */,
 			);
 			path = Model;
@@ -1144,20 +1141,19 @@
 				66472ED7258E7F7600A03CD4 /* SourceView.swift in Sources */,
 				665198E725ABF9230075C3FC /* Macro.swift in Sources */,
 				665198EC25ABF9300075C3FC /* ProjectConfiguration.swift in Sources */,
-				667B1B8B2578554600CE670F /* ProjectOutlineNode.swift in Sources */,
 				665D4F592575F75400C3A03B /* AppDelegate.swift in Sources */,
 				66763D97257C0D4900824278 /* TextView.swift in Sources */,
 				6699BA4925AEC406005DB9BB /* cgb_boot.asm in Sources */,
 				662B375725B2275900C5E690 /* DebuggingViewController.swift in Sources */,
 				662B37B025B2A59D00C5E690 /* CallStackViewController.swift in Sources */,
 				66EDE9FF25ACD15A008E322F /* AddressView.swift in Sources */,
-				662B36DD25B1442300C5E690 /* ProjectDocument+VRAMViewer.swift in Sources */,
 				665198F425ABF95E0075C3FC /* DisassemblyResults.swift in Sources */,
 				6667E4BE25ACD3A600F14435 /* LabeledView.swift in Sources */,
 				665D4F8D2575F92500C3A03B /* main.swift in Sources */,
 				667B1BAE2578565A00CE670F /* OutlineViewController.swift in Sources */,
-				6651990425ABF9AB0075C3FC /* ProjectDocument+defaults.swift in Sources */,
+				6651990425ABF9AB0075C3FC /* Project+defaults.swift in Sources */,
 				66EDE9F525ACD129008E322F /* RegisterView.swift in Sources */,
+				662B380A25B3668700C5E690 /* VRAMWindow.swift in Sources */,
 				665D4F5D2575F75400C3A03B /* ProjectDocument.swift in Sources */,
 				6651991925ABFB000075C3FC /* ProjectDocument+emulation.swift in Sources */,
 				66ABD4AA25871479007F2788 /* OpcodeDocumentation.swift in Sources */,

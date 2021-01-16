@@ -39,10 +39,10 @@ extension ProjectDocument {
         let address = LR35902.Address(locationParts[1], radix: 16)!
 
         if Gameboy.Cartridge.location(for: address, inHumanProvided: bank) != nil {
-          self.configuration.regions.removeAll {
+          self.project.configuration.regions.removeAll {
             $0.bank == bank && $0.address == address
           }
-          self.configuration.regions.append(Region(
+          self.project.configuration.regions.append(Region(
             regionType: Region.Kind.label,
             name: String(labelName),
             bank: bank,

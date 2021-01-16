@@ -21,12 +21,23 @@ private class CallStack: NSObject {
 }
 
 final class CallStackViewController: NSViewController {
+  let project: Project
   let elementsController = NSArrayController()
   var tableView: NSTableView?
   let regionTypeController = NSArrayController()
   @objc private dynamic var stackTrace: [CallStack] = [
     .init(address: 0xff00, bank: 0x01, label: "toc_ffff_00")
   ]
+
+  init(project: Project) {
+    self.project = project
+
+    super.init(nibName: nil, bundle: nil)
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
 
   private struct Column {
     let name: String
@@ -81,10 +92,7 @@ final class CallStackViewController: NSViewController {
   override func viewWillAppear() {
     super.viewWillAppear()
 
-    guard let document = projectDocument else {
-      return
-    }
-    document.emulationObservers.append(self)
+    project.emulationObservers.append(self)
   }
 }
 
@@ -94,20 +102,16 @@ extension CallStackViewController: EmulationObservers {
   func emulationDidStart() {}
 
   func emulationDidStop() {
-    guard let document = projectDocument else {
-      return
-    }
+    let gb = project.sameboy.gb.pointee
 
-    let gb = document.sameboy.gb.pointee
-
-    let current = CallStack(address: document.address, bank: document.bank, label: "")
+    let current = CallStack(address: project.address, bank: project.bank, label: "")
     let stack = [current] + (0..<gb.backtrace_size).map { i -> CallStack in
       var bank: UInt16 = 0
       var address: UInt16 = 0
-      gb_get_backtrace_return(document.sameboy.gb, Int32(i), &bank, &address)
+      gb_get_backtrace_return(project.sameboy.gb, Int32(i), &bank, &address)
       return CallStack(address: address, bank: Gameboy.Cartridge.Bank(truncatingIfNeeded: bank), label: "")
     }.reversed()
-    if let disassembly = document.disassemblyResults?.disassembly {
+    if let disassembly = project.disassemblyResults?.disassembly {
       stackTrace = stack.map {
         let scopes = disassembly.labeledContiguousScopes(at: $0.address, in: max(1, $0.bank))
         if scopes.isEmpty {

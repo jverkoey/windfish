@@ -4,14 +4,28 @@ import Cocoa
 
 import Windfish
 
-@objc(ProjectDocument)
-class ProjectDocument: NSDocument {
-  weak var contentViewController: ProjectViewController?
+final class Project: NSObject {
+
+  override init() {
+    self.sameboy = Emulator(model: GB_MODEL_DMG_B)
+
+    super.init()
+
+    self.sameboy.setDebuggerEnabled(true)
+    self.sameboy.delegate = self
+
+    self.sameboyView.emulator = self.sameboy
+
+    applyDefaults()
+  }
 
   var sameboy: Emulator
   var sameboyView = GBView()
   var sameboyDebuggerSemaphore = DispatchSemaphore(value: 0)
   var nextDebuggerCommand: String? = nil
+
+  var consoleOutputLock = NSRecursiveLock()
+  var pendingConsoleOutput = NSMutableAttributedString()
 
   var isDisassembling = false
   var romData: Data? {
@@ -21,15 +35,6 @@ class ProjectDocument: NSDocument {
         gameboy.cpu.pc = 0x100  // Assume the boot sequence has concluded.
 
         sameboyView.screenSizeChanged()
-
-        let screenSize = sameboy.screenSize
-        if let window = self.lcdWindowController.window {
-          self.lcdWindowController.window?.contentMinSize = screenSize
-          if window.contentView!.bounds.size.width < screenSize.width ||
-              window.contentView!.bounds.size.width < screenSize.height {
-            window.zoom(nil)
-          }
-        }
 
         romData.withUnsafeBytes { buffer in
           sameboy.loadROM(fromBuffer: buffer, size: romData.count)
@@ -58,23 +63,6 @@ class ProjectDocument: NSDocument {
   var logObservers: [LogObserver] = []
   var breakpointPredicate: NSPredicate?
 
-  deinit {
-    lcdWindowController.close()
-  }
-
-  override init() {
-    self.sameboy = Emulator(model: GB_MODEL_DMG_B)
-
-    super.init()
-
-    self.sameboy.setDebuggerEnabled(true)
-    self.sameboy.delegate = self
-
-    self.sameboyView.emulator = self.sameboy
-
-    applyDefaults()
-  }
-
   var address: LR35902.Address {
     return sameboy.gb.pointee.pc
   }
@@ -82,10 +70,21 @@ class ProjectDocument: NSDocument {
     return Gameboy.Cartridge.Bank(truncatingIfNeeded: sameboy.gb.pointee.mbc_rom_bank)
   }
 
+}
+
+@objc(ProjectDocument)
+final class ProjectDocument: NSDocument {
+  var project = Project()
+  weak var contentViewController: ProjectViewController?
+
+  deinit {
+    lcdWindowController.close()
+  }
+
   private var documentFileWrapper: FileWrapper?
 
   override func makeWindowControllers() {
-    let contentViewController = ProjectViewController(document: self)
+    let contentViewController = ProjectViewController(project: project)
     self.contentViewController = contentViewController
     let window = NSWindow(contentViewController: contentViewController)
     window.setContentSize(NSSize(width: 1280, height: 768))
@@ -110,29 +109,8 @@ class ProjectDocument: NSDocument {
     window.makeKeyAndOrderFront(nil)
   }
 
-  @IBOutlet var vramTabView: NSTabView?
-  @IBOutlet var vramWindow: NSPanel?
-  @IBOutlet var paletteTableView: NSTableView?
-  @IBOutlet var spritesTableView: NSTableView?
-
-  @IBOutlet var gridButton: NSButton?
-
-  @IBOutlet var tilesetPaletteButton: NSPopUpButton?
-  @IBOutlet var tilesetImageView: GBImageView?
-
-  @IBOutlet var tilemapImageView: GBImageView?
-  @IBOutlet var tilemapPaletteButton: NSPopUpButton?
-  @IBOutlet var tilemapMapButton: NSPopUpButton?
-  @IBOutlet var tilemapSetButton: NSPopUpButton?
-  var oamInfo = ContiguousArray<GB_oam_info_t>(repeating: GB_oam_info_t(), count: 40)
-  var oamUpdating = false
-  var oamCount: UInt8 = 0
-  var oamHeight: UInt8 = 0
-  var consoleOutputLock = NSRecursiveLock()
-  var pendingConsoleOutput = NSMutableAttributedString()
-
   lazy var lcdWindowController: NSWindowController = {
-    let contentViewController = LCDViewController()
+    let contentViewController = LCDViewController(sameboyView: project.sameboyView)
     let window: NSPanel = NSPanel(contentViewController: contentViewController)
     window.isFloatingPanel = true
     window.styleMask.insert(.hudWindow)
@@ -144,15 +122,17 @@ class ProjectDocument: NSDocument {
                                 y: NSScreen.main!.frame.maxY - window.frame.height))
     let wc: NSWindowController = NSWindowController(window: window)
     wc.contentViewController = contentViewController
+
+    let screenSize = project.sameboy.screenSize
+    window.contentMinSize = screenSize
+    window.zoom(nil)
     return wc
   }()
 
   lazy var vramWindowController: NSWindowController = {
-    Bundle.main.loadNibNamed("VRAMViewer", owner: self, topLevelObjects: nil)
-    guard let vramWindow = vramWindow else {
-      fatalError()
-    }
-    return NSWindowController(window: vramWindow)
+    let windowController = VRAMWindowController(windowNibName: "VRAMViewer")
+    windowController.project = project
+    return windowController
   }()
 
   @objc func toggleLCD(_ sender: Any?) {
@@ -163,7 +143,6 @@ class ProjectDocument: NSDocument {
   @objc func toggleVRAM(_ sender: Any?) {
     vramWindowController.showWindow(self)
     vramWindowController.window?.orderFront(self)
-    reloadVRAMData(nil)
   }
 }
 
@@ -230,9 +209,9 @@ extension ProjectDocument {
       openPanel.beginSheetModal(for: window) { response in
         if response == .OK, let url = openPanel.url {
           let data = try! Data(contentsOf: url)
-          self.romData = data
+          self.project.romData = data
 
-          self.metadata = ProjectMetadata(
+          self.project.metadata = ProjectMetadata(
             romUrl: url,
             numberOfBanks: 0,
             bankMap: [:]
@@ -263,23 +242,23 @@ extension ProjectDocument {
        let encodedMetadata = metadataFileWrapper.regularFileContents {
       let decoder = PropertyListDecoder()
       let metadata = try decoder.decode(ProjectMetadata.self, from: encodedMetadata)
-      self.metadata = metadata
+      self.project.metadata = metadata
     }
 
     if let fileWrapper = fileWrappers[Filenames.configuration],
        let regularFileContents = fileWrapper.regularFileContents {
       let decoder = PropertyListDecoder()
-      self.configuration = try decoder.decode(ProjectConfiguration.self, from: regularFileContents)
+      self.project.configuration = try decoder.decode(ProjectConfiguration.self, from: regularFileContents)
     }
 
     if let fileWrapper = fileWrappers[Filenames.rom],
        let data = fileWrapper.regularFileContents {
-      self.romData = data
+      self.project.romData = data
     }
 
     if let fileWrapper = fileWrappers[Filenames.disassembly] {
       if let files = fileWrapper.fileWrappers?.mapValues({ $0.regularFileContents! }) {
-        self.disassemblyResults = DisassemblyResults(files: files, bankLines: nil)
+        self.project.disassemblyResults = DisassemblyResults(files: files, bankLines: nil)
       }
     }
 
@@ -301,7 +280,7 @@ extension ProjectDocument {
       documentFileWrapper.removeFileWrapper(metadataFileWrapper)
     }
     let encoder = PropertyListEncoder()
-    let encodedMetadata = try encoder.encode(metadata)
+    let encodedMetadata = try encoder.encode(project.metadata)
     let metadataFileWrapper = FileWrapper(regularFileWithContents: encodedMetadata)
     metadataFileWrapper.preferredFilename = Filenames.metadata
     documentFileWrapper.addFileWrapper(metadataFileWrapper)
@@ -309,12 +288,12 @@ extension ProjectDocument {
     if let fileWrapper = fileWrappers[Filenames.configuration] {
       documentFileWrapper.removeFileWrapper(fileWrapper)
     }
-    let encodedConfiguration = try encoder.encode(configuration)
+    let encodedConfiguration = try encoder.encode(project.configuration)
     let configurationFileWrapper = FileWrapper(regularFileWithContents: encodedConfiguration)
     configurationFileWrapper.preferredFilename = Filenames.configuration
     documentFileWrapper.addFileWrapper(configurationFileWrapper)
 
-    if let romData = romData {
+    if let romData = project.romData {
       if let fileWrapper = fileWrappers[Filenames.rom] {
         documentFileWrapper.removeFileWrapper(fileWrapper)
       }
@@ -324,7 +303,7 @@ extension ProjectDocument {
     }
 
     // TODO: Wait until the assembly has finished?
-    if let disassemblyResults = disassemblyResults {
+    if let disassemblyResults = project.disassemblyResults {
       let wrappers = disassemblyResults.files.mapValues { content in
         FileWrapper(regularFileWithContents: content)
       }

@@ -15,6 +15,7 @@ func DefaultCodeAttributes() -> [NSAttributedString.Key : Any] {
 
 final class SourceViewController: NSViewController {
   // TODO: Make this an enum of either filename or bank.
+  let project: Project
   var filename: String?
   var bank: Gameboy.Cartridge.Bank? { didSet { didSetBank() } }
   var textStorage = NSTextStorage() { didSet { didSetTextStorage(oldValue: oldValue) } }
@@ -23,6 +24,16 @@ final class SourceViewController: NSViewController {
       sourceRulerView?.lineAnalysis = lineAnalysis
       sourceView?.lineAnalysis = lineAnalysis
     }
+  }
+
+  init(project: Project) {
+    self.project = project
+
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
   }
 
   // Views
@@ -124,13 +135,13 @@ final class SourceViewController: NSViewController {
   }
 
   override func viewWillAppear() {
-    disassembledSubscriber = NotificationCenter.default.publisher(for: .disassembled, object: projectDocument)
+    disassembledSubscriber = NotificationCenter.default.publisher(for: .disassembled, object: project)
       .receive(on: RunLoop.main)
       .sink(receiveValue: { notification in
         self.refreshBank()
         self.refreshFileContents()
-        if let projectDocument = self.projectDocument, let cartridge = projectDocument.gameboy.cartridge {
-          self.sourceView!.emulationLine = projectDocument.disassemblyResults?.lineFor(address: projectDocument.gameboy.cpu.pc, bank: cartridge.selectedBank)
+        if let cartridge = self.project.gameboy.cartridge {
+          self.sourceView!.emulationLine = self.project.disassemblyResults?.lineFor(address: self.project.gameboy.cpu.pc, bank: cartridge.selectedBank)
         }
       })
 
@@ -144,11 +155,8 @@ final class SourceViewController: NSViewController {
         self.sourceRulerView!.needsDisplay = true
       })
 
-    guard let document = projectDocument else {
-      return
-    }
-    self.toggleEmulationButton?.state = document.sameboy.gb.pointee.debug_stopped ? .off : .on
-    document.emulationObservers.append(self)
+    self.toggleEmulationButton?.state = project.sameboy.gb.pointee.debug_stopped ? .off : .on
+    project.emulationObservers.append(self)
   }
 
   // Subscribers
@@ -177,7 +185,7 @@ extension SourceViewController {
 
   private func refreshBank() {
     if let bank = bank {
-      let bankLines = projectDocument?.disassemblyResults?.bankLines?[bank]
+      let bankLines = project.disassemblyResults?.bankLines?[bank]
       sourceRulerView?.bankLines = bankLines
     } else {
       sourceRulerView?.bankLines = nil
@@ -190,11 +198,11 @@ extension SourceViewController {
   }
 
   private func refreshFileContents() {
-    if let bank = bank, let bankTextStorage = projectDocument?.disassemblyResults?.bankTextStorage,
+    if let bank = bank, let bankTextStorage = project.disassemblyResults?.bankTextStorage,
        let bankString = bankTextStorage[bank] {
       textStorage = NSTextStorage(attributedString: bankString)
     } else if let filename = filename {
-      let string = String(data: projectDocument!.disassemblyResults!.files[filename]!, encoding: .utf8)!
+      let string = String(data: project.disassemblyResults!.files[filename]!, encoding: .utf8)!
 
       let storage = NSTextStorage(string: string, attributes: DefaultCodeAttributes())
       textStorage = storage

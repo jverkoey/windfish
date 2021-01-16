@@ -1,6 +1,8 @@
 import Foundation
 
 final class DebuggingViewController: NSViewController {
+  let project: Project
+
   @IBOutlet var debugConsoleView: NSView?
   @IBOutlet var consoleInput: NSTextField?
   @IBOutlet var consoleOutput: NSTextView?
@@ -17,6 +19,16 @@ final class DebuggingViewController: NSViewController {
   @IBOutlet var lLabel: FixedWidthTextView?
 
   var lastConsoleOutput: String?
+
+  init(project: Project) {
+    self.project = project
+
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
 
   override func loadView() {
     view = NSView()
@@ -45,11 +57,8 @@ final class DebuggingViewController: NSViewController {
   override func viewWillAppear() {
     super.viewWillAppear()
 
-    guard let document = projectDocument else {
-      return
-    }
-    document.logObservers.append(self)
-    document.emulationObservers.append(self)
+    project.logObservers.append(self)
+    project.emulationObservers.append(self)
   }
 }
 
@@ -59,19 +68,19 @@ extension DebuggingViewController: LogObserver {
   }
 
   private func appendPendingOutput() {
-    guard let document = projectDocument, let consoleOutput = consoleOutput else {
+    guard let consoleOutput = consoleOutput else {
       return
     }
 
     let pendingConsoleOutput: NSAttributedString?
-    document.consoleOutputLock.lock()
-    if document.pendingConsoleOutput.length > 0 {
-      pendingConsoleOutput = document.pendingConsoleOutput
-      document.pendingConsoleOutput = NSMutableAttributedString()
+    project.consoleOutputLock.lock()
+    if project.pendingConsoleOutput.length > 0 {
+      pendingConsoleOutput = project.pendingConsoleOutput
+      project.pendingConsoleOutput = NSMutableAttributedString()
     } else {
       pendingConsoleOutput = nil
     }
-    document.consoleOutputLock.unlock()
+    project.consoleOutputLock.unlock()
 
     if let pendingConsoleOutput = pendingConsoleOutput {
       consoleOutput.textStorage?.append(pendingConsoleOutput)
@@ -82,10 +91,7 @@ extension DebuggingViewController: LogObserver {
 
 extension DebuggingViewController: EmulationObservers {
   func emulationDidAdvance() {
-    guard let document = projectDocument else {
-      return
-    }
-    let gb = document.sameboy.gb.pointee
+    let gb = project.sameboy.gb.pointee
     pcLabel?.integerValue = Int(truncatingIfNeeded: gb.pc)
     spLabel?.integerValue = Int(truncatingIfNeeded: gb.sp)
     aLabel?.integerValue = Int(truncatingIfNeeded: gb.a)
@@ -110,9 +116,6 @@ extension DebuggingViewController {
     guard let textField = sender as? NSTextField else {
       return
     }
-    guard let document = projectDocument else {
-      return
-    }
 
     let line: String
     if textField.stringValue.isEmpty, let lastConsoleOutput = lastConsoleOutput {
@@ -120,9 +123,9 @@ extension DebuggingViewController {
     } else {
       line = textField.stringValue
     }
-    document.nextDebuggerCommand = line
+    project.nextDebuggerCommand = line
     lastConsoleOutput = line
-    document.sameboyDebuggerSemaphore.signal()
+    project.sameboyDebuggerSemaphore.signal()
 
     textField.stringValue = ""
   }

@@ -32,7 +32,17 @@ final class MacroEditorViewController: NSViewController, TabSelectable {
   let deselectedTabImage = NSImage(systemSymbolName: "chevron.left.slash.chevron.right", accessibilityDescription: nil)!
   let selectedTabImage = NSImage(systemSymbolName: "chevron.left.slash.chevron.right", accessibilityDescription: nil)!
 
-  let document: ProjectDocument
+  init(project: Project) {
+    self.project = project
+
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  let project: Project
   let elementsController = NSArrayController()
   var tableView: EditorTableView?
   private var selectionObserver: NSKeyValueObservation?
@@ -44,16 +54,6 @@ final class MacroEditorViewController: NSViewController, TabSelectable {
     let name: String
     let identifier: NSUserInterfaceItemIdentifier
     let width: CGFloat
-  }
-
-  init(document: ProjectDocument) {
-    self.document = document
-
-    super.init(nibName: nil, bundle: nil)
-  }
-
-  required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
   }
 
   override func loadView() {
@@ -105,7 +105,7 @@ final class MacroEditorViewController: NSViewController, TabSelectable {
       containerView.heightAnchor.constraint(equalToConstant: 200)
     ])
 
-    elementsController.bind(.contentArray, to: document.configuration, withKeyPath: "macros", options: nil)
+    elementsController.bind(.contentArray, to: project.configuration, withKeyPath: "macros", options: nil)
     tableView.tableView?.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
     tableView.tableView?.bind(.selectionIndexes, to: elementsController, withKeyPath:"selectionIndexes", options: nil)
     tableView.tableView?.bind(.sortDescriptors, to: elementsController, withKeyPath: "sortDescriptors", options: nil)
@@ -124,7 +124,7 @@ final class MacroEditorViewController: NSViewController, TabSelectable {
 
 extension MacroEditorViewController: EditorTableViewDelegate {
   func editorTableViewCreateElement(_ tableView: EditorTableView) -> String {
-    document.configuration.macros.append(
+    project.configuration.macros.append(
       Macro(name: "newmacro", source: """
 ; Write your macro as RGBDS assembly
 ; Macro args can be specified by replacing an
@@ -138,18 +138,18 @@ extension MacroEditorViewController: EditorTableViewDelegate {
   }
 
   func editorTableViewDeleteSelectedElements(_ tableView: EditorTableView) -> String {
-    document.configuration.macros.removeAll { dataType in
+    project.configuration.macros.removeAll { dataType in
       elementsController.selectedObjects.contains { $0 as! Macro === dataType }
     }
     return "Delete Macro"
   }
 
   func editorTableViewStashElements(_ tableView: EditorTableView) -> Any {
-    return document.configuration.macros
+    return project.configuration.macros
   }
 
   func editorTableView(_ tableView: EditorTableView, restoreElements elements: Any) {
-    document.configuration.macros = elements as! [Macro]
+    project.configuration.macros = elements as! [Macro]
   }
 }
 

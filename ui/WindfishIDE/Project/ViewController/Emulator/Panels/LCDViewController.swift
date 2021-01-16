@@ -3,6 +3,17 @@ import Foundation
 import Cocoa
 
 final class LCDViewController: NSViewController {
+  let sameboyView: GBView
+  init(sameboyView: GBView) {
+    self.sameboyView = sameboyView
+
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
   override func loadView() {
     view = NSView()
   }
@@ -10,14 +21,10 @@ final class LCDViewController: NSViewController {
   override func viewWillAppear() {
     super.viewWillAppear()
 
-    guard let document = projectDocument else {
-      fatalError()
-    }
+    sameboyView.frame = view.bounds
+    sameboyView.autoresizingMask = [.width, .height]
+    view.addSubview(sameboyView)
 
-    document.sameboyView.frame = view.bounds
-    document.sameboyView.autoresizingMask = [.width, .height]
-    view.addSubview(document.sameboyView)
-
-    document.sameboyView.screenSizeChanged()
+    sameboyView.screenSizeChanged()
   }
 }

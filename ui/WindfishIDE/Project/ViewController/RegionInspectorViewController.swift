@@ -7,7 +7,7 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
   let deselectedTabImage = NSImage(systemSymbolName: "book", accessibilityDescription: nil)!
   let selectedTabImage = NSImage(systemSymbolName: "book.fill", accessibilityDescription: nil)!
 
-  let document: ProjectDocument
+  let project: Project
   let regionController = NSArrayController()
   private var selectionObserver: NSKeyValueObservation?
   let regionTypeController = NSArrayController()
@@ -19,8 +19,8 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
     let width: CGFloat
   }
 
-  init(document: ProjectDocument) {
-    self.document = document
+  init(project: Project) {
+    self.project = project
 
     super.init(nibName: nil, bundle: nil)
 
@@ -78,7 +78,7 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
 
     selectionObserver = regionController.observe(\.selectedObjects, options: []) { (controller, change) in
       if let region = controller.selectedObjects.first as? Region {
-        NotificationCenter.default.post(name: .selectedRegionDidChange, object: self.document, userInfo: ["selectedRegion": region])
+        NotificationCenter.default.post(name: .selectedRegionDidChange, object: self.project, userInfo: ["selectedRegion": region])
       }
     }
 
@@ -87,7 +87,7 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
       NSSortDescriptor(key: NSUserInterfaceItemIdentifier.address.rawValue, ascending: true),
     ]
 
-    regionController.bind(.contentArray, to: document, withKeyPath: "disassemblyResults.regions", options: nil)
+    regionController.bind(.contentArray, to: self.project, withKeyPath: "disassemblyResults.regions", options: nil)
     tableView.bind(.content, to: regionController, withKeyPath: "arrangedObjects", options: nil)
     tableView.bind(.selectionIndexes, to: regionController, withKeyPath:"selectionIndexes", options: nil)
     tableView.bind(.sortDescriptors, to: regionController, withKeyPath: "sortDescriptors", options: nil)
@@ -99,16 +99,16 @@ extension RegionInspectorViewController: NSUserInterfaceValidations {
     guard let region = (regionController.arrangedObjects as? [Region])?[tableView.clickedRow] else {
       return
     }
-    document.configuration.regions.append(region)
+    project.configuration.regions.append(region)
 
-    NotificationCenter.default.post(name: .didCreateRegion, object: document, userInfo: ["region": region])
+    NotificationCenter.default.post(name: .didCreateRegion, object: self.project, userInfo: ["region": region])
   }
 
   func validateUserInterfaceItem(_ item: NSValidatedUserInterfaceItem) -> Bool {
     guard let region = (regionController.arrangedObjects as? [Region])?[tableView.clickedRow] else {
       return false
     }
-    guard document.configuration.regions.first(where: { existingRegion in
+    guard project.configuration.regions.first(where: { existingRegion in
       existingRegion.bank == region.bank && existingRegion.address == region.address
     }) == nil else {
       return false

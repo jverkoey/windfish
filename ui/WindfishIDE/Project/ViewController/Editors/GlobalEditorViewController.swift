@@ -12,25 +12,25 @@ final class GlobalEditorViewController: NSViewController, TabSelectable {
   let deselectedTabImage = NSImage(systemSymbolName: "character.book.closed", accessibilityDescription: nil)!
   let selectedTabImage = NSImage(systemSymbolName: "character.book.closed.fill", accessibilityDescription: nil)!
 
-  let document: ProjectDocument
+  let project: Project
   let elementsController = NSArrayController()
   var tableView: EditorTableView?
   let dataTypeController = NSArrayController()
 
-  private struct Column {
-    let name: String
-    let identifier: NSUserInterfaceItemIdentifier
-    let width: CGFloat
-  }
-
-  init(document: ProjectDocument) {
-    self.document = document
+  init(project: Project) {
+    self.project = project
 
     super.init(nibName: nil, bundle: nil)
   }
 
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+
+  private struct Column {
+    let name: String
+    let identifier: NSUserInterfaceItemIdentifier
+    let width: CGFloat
   }
 
   override func loadView() {
@@ -67,8 +67,8 @@ final class GlobalEditorViewController: NSViewController, TabSelectable {
       tableView.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
     ])
 
-    elementsController.bind(.contentArray, to: document.configuration, withKeyPath: "globals", options: nil)
-    dataTypeController.bind(.contentArray, to: document.configuration, withKeyPath: "dataTypes", options: nil)
+    elementsController.bind(.contentArray, to: project.configuration, withKeyPath: "globals", options: nil)
+    dataTypeController.bind(.contentArray, to: project.configuration, withKeyPath: "dataTypes", options: nil)
     tableView.tableView?.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
     tableView.tableView?.bind(.selectionIndexes, to: elementsController, withKeyPath:"selectionIndexes", options: nil)
     tableView.tableView?.bind(.sortDescriptors, to: elementsController, withKeyPath: "sortDescriptors", options: nil)
@@ -77,25 +77,25 @@ final class GlobalEditorViewController: NSViewController, TabSelectable {
 
 extension GlobalEditorViewController: EditorTableViewDelegate {
   func editorTableViewCreateElement(_ tableView: EditorTableView) -> String {
-    document.configuration.globals.append(
+    project.configuration.globals.append(
       Global(name: "global", address: 0x0000, dataType: "")
     )
     return "Create Global"
   }
 
   func editorTableViewDeleteSelectedElements(_ tableView: EditorTableView) -> String {
-    document.configuration.globals.removeAll { global in
+    project.configuration.globals.removeAll { global in
       elementsController.selectedObjects.contains { $0 as! Global === global }
     }
     return "Delete Global"
   }
 
   func editorTableViewStashElements(_ tableView: EditorTableView) -> Any {
-    return document.configuration.globals
+    return project.configuration.globals
   }
 
   func editorTableView(_ tableView: EditorTableView, restoreElements elements: Any) {
-    document.configuration.globals = elements as! [Global]
+    project.configuration.globals = elements as! [Global]
   }
 }
 

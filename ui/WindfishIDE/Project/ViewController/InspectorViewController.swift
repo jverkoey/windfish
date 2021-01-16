@@ -8,12 +8,11 @@ final class InspectorEditorViewController: TabViewController, TabSelectable {
 }
 
 final class InspectorViewController: NSViewController {
-  let document: ProjectDocument
-
+  let project: Project
   let tabViewController = TabViewController()
 
-  init(document: ProjectDocument) {
-    self.document = document
+  init(project: Project) {
+    self.project = project
 
     super.init(nibName: nil, bundle: nil)
   }
@@ -36,12 +35,12 @@ final class InspectorViewController: NSViewController {
     tabViewController.view.translatesAutoresizingMaskIntoConstraints = false
 
     let editorTabViewController = InspectorEditorViewController()
-    editorTabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: RegionEditorViewController(document: document)))
-    editorTabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: DataTypeEditorViewController(document: document)))
-    editorTabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: GlobalEditorViewController(document: document)))
-    editorTabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: MacroEditorViewController(document: document)))
+    editorTabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: RegionEditorViewController(project: project)))
+    editorTabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: DataTypeEditorViewController(project: project)))
+    editorTabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: GlobalEditorViewController(project: project)))
+    editorTabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: MacroEditorViewController(project: project)))
     tabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: editorTabViewController))
-    tabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: RegionInspectorViewController(document: document)))
+    tabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: RegionInspectorViewController(project: project)))
 
     addChild(tabViewController)
     view.addSubview(tabViewController.view)

@@ -1,22 +1,47 @@
-import Foundation
+import Cocoa
 
 import Windfish
 
-extension ProjectDocument {
+class VRAMWindowController: NSWindowController {
+  var project: Project! {
+    didSet {
+      project.emulationObservers.append(self)
+    }
+  }
 
+  @IBOutlet var vramTabView: NSTabView?
+  @IBOutlet var paletteTableView: NSTableView?
+  @IBOutlet var spritesTableView: NSTableView?
+
+  @IBOutlet var gridButton: NSButton?
+
+  @IBOutlet var tilesetPaletteButton: NSPopUpButton?
+  @IBOutlet var tilesetImageView: GBImageView?
+
+  @IBOutlet var tilemapImageView: GBImageView?
+  @IBOutlet var tilemapPaletteButton: NSPopUpButton?
+  @IBOutlet var tilemapMapButton: NSPopUpButton?
+  @IBOutlet var tilemapSetButton: NSPopUpButton?
+  var oamInfo = ContiguousArray<GB_oam_info_t>(repeating: GB_oam_info_t(), count: 40)
+  var oamUpdating = false
+  var oamCount: UInt8 = 0
+  var oamHeight: UInt8 = 0
+}
+
+extension VRAMWindowController {
   @IBAction func vramTabChanged(_ sender: Any?) {
     guard let segmentedControl = sender as? NSSegmentedControl else {
       return
     }
-    guard let vramWindow = vramWindow,
+    guard let vramWindow = window,
           let vramTabView = vramTabView,
           let vramWindowContentView = vramWindow.contentView else {
       return
     }
     vramTabView.selectTabViewItem(at: segmentedControl.selectedSegment)
     reloadVRAMData(nil)
-//    [self.vramTabView.selectedTabViewItem.view addSubview:self.gridButton];
-//    self.gridButton.hidden = [sender selectedSegment] >= 2;
+    //    [self.vramTabView.selectedTabViewItem.view addSubview:self.gridButton];
+    //    self.gridButton.hidden = [sender selectedSegment] >= 2;
 
     let heightDiff = vramWindow.frame.height - vramWindowContentView.bounds.height
     var windowFrame = vramWindow.frame
@@ -48,17 +73,17 @@ extension ProjectDocument {
         GBImageViewGridConfiguration(color: .init(red: 0, green: 0, blue: 0, alpha: 0.25), size: 8)!,
         GBImageViewGridConfiguration(color: .init(red: 0, green: 0, blue: 0, alpha: 0.5), size: 64)!,
       ]
-//      self.tilemapImageView.horizontalGrids = @[
-//      [[GBImageViewGridConfiguration alloc] initWithColor:[NSColor colorWithCalibratedRed:0 green:0 blue:0 alpha:0.25] size:8],
-//      ];
-//      self.tilemapImageView.verticalGrids = @[
-//      [[GBImageViewGridConfiguration alloc] initWithColor:[NSColor colorWithCalibratedRed:0 green:0 blue:0 alpha:0.25] size:8],
-//      ];
+      //      self.tilemapImageView.horizontalGrids = @[
+      //      [[GBImageViewGridConfiguration alloc] initWithColor:[NSColor colorWithCalibratedRed:0 green:0 blue:0 alpha:0.25] size:8],
+      //      ];
+      //      self.tilemapImageView.verticalGrids = @[
+      //      [[GBImageViewGridConfiguration alloc] initWithColor:[NSColor colorWithCalibratedRed:0 green:0 blue:0 alpha:0.25] size:8],
+      //      ];
     } else {
       tilesetImageView?.horizontalGrids = nil
       tilesetImageView?.verticalGrids = nil
-//      tilemapImageView?.horizontalGrids = nil
-//      tilemapImageView?.verticalGrids = nil
+      //      tilemapImageView?.horizontalGrids = nil
+      //      tilemapImageView?.verticalGrids = nil
     }
   }
 
@@ -70,7 +95,7 @@ extension ProjectDocument {
   }
 
   @IBAction func reloadVRAMData(_ sender: Any?) {
-    guard let vramWindow = vramWindow,
+    guard let vramWindow = window,
           let vramTabView = vramTabView,
           let tilesetPaletteButton = tilesetPaletteButton,
           let tilesetImageView = tilesetImageView,
@@ -93,7 +118,7 @@ extension ProjectDocument {
       } else {
         paletteType = GB_PALETTE_NONE
       }
-      tilesetImageView.image = sameboy.drawTileset(withPaletteType: paletteType, menuIndex: paletteMenuIndex)
+      tilesetImageView.image = project.sameboy.drawTileset(withPaletteType: paletteType, menuIndex: paletteMenuIndex)
       tilesetImageView.layer?.magnificationFilter = .nearest
 
     case 1:  // Tilemap
@@ -106,18 +131,20 @@ extension ProjectDocument {
       } else {
         paletteType = GB_PALETTE_NONE
       }
-      tilemapImageView.scrollRect = NSRect(x: CGFloat(sameboy.readMemory(0xFF00 | UInt16(truncatingIfNeeded: GB_IO_SCX))),
-                                           y: CGFloat(sameboy.readMemory(0xFF00 | UInt16(truncatingIfNeeded: GB_IO_SCY))),
+      tilemapImageView.scrollRect = NSRect(x: CGFloat(project.sameboy.readMemory(0xFF00 | UInt16(truncatingIfNeeded: GB_IO_SCX))),
+                                           y: CGFloat(project.sameboy.readMemory(0xFF00 | UInt16(truncatingIfNeeded: GB_IO_SCY))),
                                            width: 160, height: 144)
-      tilemapImageView.image = sameboy.drawTilemap(withPaletteType: paletteType,
-                                                   paletteIndex: paletteMenuIndex,
-                                                   mapType: GB_map_type_t(rawValue: UInt32(tilemapMapButton.indexOfSelectedItem)),
-                                                   tilesetType: GB_tileset_type_t(rawValue: UInt32(tilemapSetButton.indexOfSelectedItem)))
+      tilemapImageView.image = project.sameboy.drawTilemap(
+        withPaletteType: paletteType,
+        paletteIndex: paletteMenuIndex,
+        mapType: GB_map_type_t(rawValue: UInt32(tilemapMapButton.indexOfSelectedItem)),
+        tilesetType: GB_tileset_type_t(rawValue: UInt32(tilemapSetButton.indexOfSelectedItem))
+      )
       tilemapImageView.layer?.magnificationFilter = .nearest
 
     case 2:  // OAM
       oamInfo.withUnsafeMutableBufferPointer { buffer in
-        oamCount = sameboy.getOAMInfo(buffer.baseAddress!, spriteHeight:&oamHeight)
+        oamCount = project.sameboy.getOAMInfo(buffer.baseAddress!, spriteHeight:&oamHeight)
       }
       guard let spritesTableView = spritesTableView else {
         return
@@ -131,23 +158,33 @@ extension ProjectDocument {
     default:
       break
     }
-//        case 3:
-//        /* Palettes */
-//        {
-//            dispatch_async(dispatch_get_main_queue(), ^{
-//                [self.paletteTableView reloadData];
-//            });
-//        }
-//        break;
-//    }
+    //        case 3:
+    //        /* Palettes */
+    //        {
+    //            dispatch_async(dispatch_get_main_queue(), ^{
+    //                [self.paletteTableView reloadData];
+    //            });
+    //        }
+    //        break;
+    //    }
   }
 }
 
-extension ProjectDocument: NSTableViewDelegate {
+extension VRAMWindowController: EmulationObservers {
+  func emulationDidAdvance() {
+    if window!.isVisible {
+      self.reloadVRAMData(nil)
+    }
+  }
 
+  func emulationDidStart() {
+  }
+
+  func emulationDidStop() {
+  }
 }
 
-extension ProjectDocument: NSTableViewDataSource {
+extension VRAMWindowController: NSTableViewDataSource {
 
   func numberOfRows(in tableView: NSTableView) -> Int {
     switch tableView {
@@ -171,7 +208,7 @@ extension ProjectDocument: NSTableViewDataSource {
         return "\(row >= 8 ? "Object" : "Background") \(row & 7)"
       }
       var size: Int = 0
-      let paletteData = sameboy.getDirectAccess(row >= 8 ? GB_DIRECT_ACCESS_OBP : GB_DIRECT_ACCESS_BGP, size: &size, bank: nil)!
+      let paletteData = project.sameboy.getDirectAccess(row >= 8 ? GB_DIRECT_ACCESS_OBP : GB_DIRECT_ACCESS_BGP, size: &size, bank: nil)!
       let bytes = paletteData.bindMemory(to: UInt8.self, capacity: size)
       let index = columnIndex - 1 + (row & 7) * 4
       return UInt16(truncatingIfNeeded: bytes[(index << 1) + 1] << 8) | UInt16(truncatingIfNeeded: bytes[index << 1])

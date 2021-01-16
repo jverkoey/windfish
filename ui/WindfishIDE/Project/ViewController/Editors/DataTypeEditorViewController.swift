@@ -14,7 +14,7 @@ final class DataTypeEditorViewController: NSViewController, TabSelectable {
   let deselectedTabImage = NSImage(systemSymbolName: "number.circle", accessibilityDescription: nil)!
   let selectedTabImage = NSImage(systemSymbolName: "number.circle.fill", accessibilityDescription: nil)!
 
-  let document: ProjectDocument
+  let project: Project
   let elementsController = NSArrayController()
   var tableView: EditorTableView?
   let representationController = NSArrayController()
@@ -30,8 +30,8 @@ final class DataTypeEditorViewController: NSViewController, TabSelectable {
     let width: CGFloat
   }
 
-  init(document: ProjectDocument) {
-    self.document = document
+  init(project: Project) {
+    self.project = project
 
     super.init(nibName: nil, bundle: nil)
 
@@ -105,7 +105,6 @@ final class DataTypeEditorViewController: NSViewController, TabSelectable {
       mappingTableView.heightAnchor.constraint(equalToConstant: 200)
     ])
 
-    elementsController.bind(.contentArray, to: document.configuration, withKeyPath: "dataTypes", options: nil)
     tableView.tableView?.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
     tableView.tableView?.bind(.selectionIndexes, to: elementsController, withKeyPath:"selectionIndexes", options: nil)
     tableView.tableView?.bind(.sortDescriptors, to: elementsController, withKeyPath: "sortDescriptors", options: nil)
@@ -123,12 +122,18 @@ final class DataTypeEditorViewController: NSViewController, TabSelectable {
 
     elementsController.setSelectionIndexes(IndexSet())
   }
+
+  override func viewWillAppear() {
+    super.viewWillAppear()
+
+    elementsController.bind(.contentArray, to: self, withKeyPath: "representedObject.dataTypes", options: nil)
+  }
 }
 
 extension DataTypeEditorViewController: EditorTableViewDelegate {
   func editorTableViewCreateElement(_ tableView: EditorTableView) -> String {
     if tableView == self.tableView {
-      document.configuration.dataTypes.append(
+      project.configuration.dataTypes.append(
         DataType(name: "New data type", representation: DataType.Representation.decimal, interpretation: DataType.Interpretation.any, mappings: [])
       )
       return "Create Data Type"
@@ -144,7 +149,7 @@ extension DataTypeEditorViewController: EditorTableViewDelegate {
 
   func editorTableViewDeleteSelectedElements(_ tableView: EditorTableView) -> String {
     if tableView == self.tableView {
-      document.configuration.dataTypes.removeAll { dataType in
+      project.configuration.dataTypes.removeAll { dataType in
         elementsController.selectedObjects.contains { $0 as! DataType === dataType }
       }
       return "Delete Data Type"
@@ -162,7 +167,7 @@ extension DataTypeEditorViewController: EditorTableViewDelegate {
 
   func editorTableViewStashElements(_ tableView: EditorTableView) -> Any {
     if tableView == self.tableView {
-      return document.configuration.dataTypes
+      return project.configuration.dataTypes
     } else if tableView == self.mappingTableView {
       return self.mappingElementsController.content!
     }
@@ -171,7 +176,7 @@ extension DataTypeEditorViewController: EditorTableViewDelegate {
 
   func editorTableView(_ tableView: EditorTableView, restoreElements elements: Any) {
     if tableView == self.tableView {
-      document.configuration.dataTypes = elements as! [DataType]
+      project.configuration.dataTypes = elements as! [DataType]
       return
     } else if tableView == self.mappingTableView {
       self.mappingElementsController.content = elements
