@@ -757,7 +757,7 @@ static time_t getWorkboyTime(GB_gameboy_t *gb)
 
 - (void)log:(const char *)log
 {
-    [self log:log withAttributes:0];
+    [self log:@(log) withAttributes:0];
 }
 
 - (uint8_t) readMemory:(uint16_t)addr
