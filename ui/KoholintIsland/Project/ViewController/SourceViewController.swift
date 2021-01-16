@@ -148,11 +148,25 @@ final class SourceViewController: NSViewController {
       return
     }
     self.toggleEmulationButton?.state = document.sameboy.gb.pointee.debug_stopped ? .off : .on
+    document.emulationObservers.append(self)
   }
 
   // Subscribers
   private var disassembledSubscriber: AnyCancellable?
   private var didProcessEditingSubscriber: AnyCancellable?
+}
+
+extension SourceViewController: EmulationObservers {
+  func emulationDidAdvance() {
+  }
+
+  func emulationDidStart() {
+    toggleEmulationButton?.state = .on
+  }
+
+  func emulationDidStop() {
+    toggleEmulationButton?.state = .off
+  }
 }
 
 extension SourceViewController {
