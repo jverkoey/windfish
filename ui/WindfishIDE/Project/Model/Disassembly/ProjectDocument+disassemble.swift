@@ -2,6 +2,7 @@ import AppKit
 import Foundation
 import Cocoa
 
+import RGBDS
 import Windfish
 
 extension ProjectDocument {
@@ -152,6 +153,10 @@ extension ProjectDocument {
         .foregroundColor: NSColor.systemBrown,
         .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
       ]
+      let commentAttributes: [NSAttributedString.Key : Any] = [
+        .foregroundColor: commentColor,
+        .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
+      ]
       let operandAttributes: [NSAttributedString.Key : Any] = baseAttributes
 
       let bankTextStorage: [Gameboy.Cartridge.Bank: NSAttributedString] = disassembledSource.sources.compactMapValues {
@@ -164,10 +169,8 @@ extension ProjectDocument {
               break // Do nothing.
             case .macroComment: fallthrough
             case .preComment:
-              accumulator.append(NSAttributedString(string: line.asString(detailedComments: false), attributes: [
-                .foregroundColor: commentColor,
-                .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
-              ]))
+              accumulator.append(NSAttributedString(string: line.asString(detailedComments: false),
+                                                    attributes: commentAttributes))
             case .label: fallthrough
             case .transferOfControl:
               accumulator.append(NSAttributedString(string: line.asString(detailedComments: false), attributes: [
@@ -176,10 +179,19 @@ extension ProjectDocument {
               ]))
             case .section: fallthrough
             case .macroDefinition: fallthrough
-            case .macroTerminator: fallthrough
-            case .jumpTable:
+            case .macroTerminator:
               accumulator.append(NSAttributedString(string: line.asString(detailedComments: false),
                                                     attributes: baseAttributes))
+            case let .jumpTable(jumpLocation, index):
+              let assembly = RGBDS.Statement(opcode: "dw", operands: [jumpLocation])
+              accumulator.append(NSAttributedString(string: "    ", attributes: baseAttributes))
+              accumulator.append(assembly.attributedString(attributes: baseAttributes,
+                                                           opcodeAttributes: opcodeAttributes,
+                                                           operandAttributes: operandAttributes,
+                                                           regionLookup: regionLookup,
+                                                           scope: line.scope))
+              accumulator.append(NSAttributedString(string: " ; \(UInt8(truncatingIfNeeded: index).hexString)",
+                                                    attributes: commentAttributes))
             case let .text(assembly): fallthrough
             case let .data(assembly): fallthrough
             case let .unknown(assembly): fallthrough
