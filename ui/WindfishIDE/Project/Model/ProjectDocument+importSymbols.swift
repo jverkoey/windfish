@@ -59,7 +59,7 @@ extension ProjectDocument {
     }
   }
 
-  @objc func importSymbols(_ sender: Any?) {
+  @IBAction @objc func importSymbols(_ sender: Any?) {
     let openPanel = NSOpenPanel()
     openPanel.allowedFileTypes = ["sym"]
     openPanel.canChooseFiles = true

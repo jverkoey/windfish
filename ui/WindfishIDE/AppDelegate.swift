@@ -4,6 +4,8 @@ import Carbon
 
 class AppDelegate: NSObject, NSApplicationDelegate {
   func applicationDidFinishLaunching(_ notification: Notification) {
+    Bundle.main.loadNibNamed("MainMenu", owner: self, topLevelObjects: nil)
+
     let defaults = UserDefaults.standard
     defaults.register(defaults: [
       "GBRight": kVK_RightArrow,

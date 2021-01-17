@@ -137,12 +137,12 @@ final class ProjectDocument: NSDocument {
     return windowController
   }()
 
-  @objc func toggleLCD(_ sender: Any?) {
+  @IBAction @objc func toggleLCD(_ sender: Any?) {
     lcdWindowController.showWindow(self)
     lcdWindowController.window?.orderFront(self)
   }
 
-  @objc func toggleVRAM(_ sender: Any?) {
+  @IBAction @objc func toggleVRAM(_ sender: Any?) {
     vramWindowController.showWindow(self)
     vramWindowController.window?.orderFront(self)
   }
@@ -202,7 +202,7 @@ extension ProjectDocument: NSToolbarDelegate {
 // MARK: - Document modifications
 
 extension ProjectDocument {
-  @objc func loadRom(_ sender: Any?) {
+  @IBAction @objc func loadRom(_ sender: Any?) {
     let openPanel = NSOpenPanel()
     openPanel.allowedFileTypes = ["gb"]
     openPanel.canChooseFiles = true

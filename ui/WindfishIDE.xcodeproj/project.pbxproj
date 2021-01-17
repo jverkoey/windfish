@@ -33,6 +33,7 @@
 		6651991325ABFA840075C3FC /* RGBDS+attributedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6651991225ABFA840075C3FC /* RGBDS+attributedString.swift */; };
 		6651991925ABFB000075C3FC /* ProjectDocument+emulation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6651991825ABFB000075C3FC /* ProjectDocument+emulation.swift */; };
 		66521DA9257C996B0088C97B /* SourceRulerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66521DA8257C996B0088C97B /* SourceRulerView.swift */; };
+		6657950925B3DB89005E155D /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6657950825B3DB89005E155D /* MainMenu.xib */; };
 		665D4F592575F75400C3A03B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F582575F75400C3A03B /* AppDelegate.swift */; };
 		665D4F5B2575F75400C3A03B /* ProjectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F5A2575F75400C3A03B /* ProjectViewController.swift */; };
 		665D4F5D2575F75400C3A03B /* ProjectDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F5C2575F75400C3A03B /* ProjectDocument.swift */; };
@@ -329,6 +330,7 @@
 		6651991225ABFA840075C3FC /* RGBDS+attributedString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RGBDS+attributedString.swift"; sourceTree = "<group>"; };
 		6651991825ABFB000075C3FC /* ProjectDocument+emulation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProjectDocument+emulation.swift"; sourceTree = "<group>"; };
 		66521DA8257C996B0088C97B /* SourceRulerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceRulerView.swift; sourceTree = "<group>"; };
+		6657950825B3DB89005E155D /* MainMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
 		665D4F552575F75400C3A03B /* WindfishIDE.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WindfishIDE.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		665D4F582575F75400C3A03B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		665D4F5A2575F75400C3A03B /* ProjectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectViewController.swift; sourceTree = "<group>"; };
@@ -633,6 +635,7 @@
 				665D4F582575F75400C3A03B /* AppDelegate.swift */,
 				667B1B622578541F00CE670F /* NotificationNames.swift */,
 				665D4F8C2575F92500C3A03B /* main.swift */,
+				6657950825B3DB89005E155D /* MainMenu.xib */,
 				667B1B7A257854BF00CE670F /* Resources */,
 				6699BA2625AEBDDF005DB9BB /* WindfishIDE-Bridging-Header.h */,
 			);
@@ -1070,6 +1073,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6699BA3925AEBF9B005DB9BB /* Document.xib in Resources */,
+				6657950925B3DB89005E155D /* MainMenu.xib in Resources */,
 				667B1B75257854BB00CE670F /* Assets.xcassets in Resources */,
 				662B376325B275D400C5E690 /* DebugConsoleView.xib in Resources */,
 				662B36D125B1419F00C5E690 /* VRAMViewer.xib in Resources */,
