@@ -46,6 +46,11 @@ extension ProjectDocument {
         disassembly.createGlobal(at: global.address, named: global.name, dataType: global.dataType)
       }
 
+      // Integrate scripts before any disassembly in order to allow the scripts to modify the disassembly runs.
+      for script in self.project.configuration.scripts {
+        disassembly.defineScript(named: script.name, source: script.source)
+      }
+
       // Disassemble everything first
       for region in self.project.configuration.regions {
         let bank = max(1, region.bank)

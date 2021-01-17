@@ -40,6 +40,13 @@ extension LR35902 {
           return Data([low, high])
         }
       }
+
+      public func asInt() -> Int {
+        switch self {
+        case let .imm8(immediate):  return Int(truncatingIfNeeded: immediate)
+        case let .imm16(immediate): return Int(truncatingIfNeeded: immediate)
+        }
+      }
     }
   }
 }

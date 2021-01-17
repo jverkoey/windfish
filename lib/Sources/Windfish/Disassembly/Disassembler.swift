@@ -1,4 +1,5 @@
 import Foundation
+import JavaScriptCore
 
 import RGBDS
 
@@ -548,6 +549,31 @@ public class Disassembler {
   }
   private var preComments: [Gameboy.Cartridge.Location: String] = [:]
 
+  // MARK: - Scripts
+  public final class Script {
+    init(source: String) {
+      self.source = source
+    }
+    let source: String
+    var context: JSContext?
+    var linearSweepDidStep: JSValue?
+
+    func prepareForRun() {
+      let context = JSContext()!
+      context.evaluateScript(source)
+      context.exceptionHandler = { context, exception in
+        print(exception)
+      }
+      self.context = context
+      self.linearSweepDidStep = context.objectForKeyedSubscript("linearSweepDidStep")
+    }
+  }
+  public func defineScript(named name: String, source: String) {
+    precondition(scripts[name] == nil, "A script named \(name) already exists.")
+    scripts[name] = Script(source: source)
+  }
+  private var scripts: [String: Script] = [:]
+
   // MARK: - Macros
 
   public enum MacroLine: Hashable {
@@ -764,6 +790,24 @@ public class Disassembler {
       var runContext = (pc: Gameboy.Cartridge.addressAndBank(from: run.startAddress).address,
                         bank: run.initialBank)
 
+      let registerBankChange: @convention(block) (Int, Int, Int) -> Void = { [weak self] _desiredBank, address, bank in
+        guard let self = self else {
+          return
+        }
+        let desiredBank = Gameboy.Cartridge.Bank(truncatingIfNeeded: _desiredBank)
+        self.register(
+          bankChange: desiredBank,
+          at: LR35902.Address(truncatingIfNeeded: address),
+          in: Gameboy.Cartridge.Bank(truncatingIfNeeded: bank)
+        )
+        runContext.bank = desiredBank
+      }
+      for script in scripts.values {
+        script.prepareForRun()
+        script.context?.setObject(registerBankChange, forKeyedSubscript: "registerBankChange" as NSString)
+      }
+      let linearSweepDidSteps = scripts.values.compactMap { $0.linearSweepDidStep }
+
       let advance: (LR35902.Address) -> Void = { amount in
         let currentCartAddress = Gameboy.Cartridge.location(for: runContext.pc, in: runContext.bank)!
         run.visitedRange = run.startAddress..<(currentCartAddress + Gameboy.Cartridge.Location(amount))
@@ -863,17 +907,10 @@ public class Disassembler {
             break linear_sweep
           }
 
-        case .call(let condition, .imm16):
+        case .call(_, .imm16):
           // TODO: Allow the user to define macros like this.
           guard case let .imm16(immediate) = instruction.immediate else {
             preconditionFailure("Invalid immediate associated with instruction")
-          }
-          if condition == nil, immediate == 0x07b9,
-             let previousInstruction = previousInstruction,
-             case .ld(.a, .imm8) = previousInstruction.spec,
-             case let .imm8(previousImmediate) = previousInstruction.immediate {
-            register(bankChange: previousImmediate, at: instructionContext.pc, in: instructionContext.bank)
-            runContext.bank = previousImmediate
           }
           let jumpTo = immediate
           if jumpTo < 0x8000 {
@@ -889,6 +926,18 @@ public class Disassembler {
 
         default:
           break
+        }
+
+        if !linearSweepDidSteps.isEmpty {
+          let args: [Any] = [
+            LR35902.InstructionSet.opcodeBytes[instruction.spec]!,
+            instruction.immediate?.asInt() ?? 0,
+            instructionContext.pc,
+            instructionContext.bank
+          ]
+          for linearSweepDidStep in linearSweepDidSteps {
+            linearSweepDidStep.call(withArguments: args)
+          }
         }
 
         previousInstruction = instruction
