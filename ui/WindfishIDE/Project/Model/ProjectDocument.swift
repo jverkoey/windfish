@@ -232,6 +232,8 @@ private struct Filenames {
   static let metadata = "metadata.plist"
   static let rom = "rom.gb"
   static let disassembly = "disassembly"
+  static let configurationDir = "configuration"
+  static let scriptsDir = "scripts"
   static let configuration = "configuration.plist"
 }
 
@@ -252,6 +254,17 @@ extension ProjectDocument {
        let regularFileContents = fileWrapper.regularFileContents {
       let decoder = PropertyListDecoder()
       self.project.configuration = try decoder.decode(ProjectConfiguration.self, from: regularFileContents)
+    }
+
+    // Configuration as human-editable files
+    if let configuration = fileWrappers[Filenames.configurationDir] {
+      if let scripts = configuration.fileWrappers?[Filenames.scriptsDir] {
+        if let files = scripts.fileWrappers?.mapValues({ $0.regularFileContents! }) {
+          self.project.configuration.scripts = files.map({ key, value in
+            Script(name: key, source: String(data: value, encoding: .utf8)!)
+          })
+        }
+      }
     }
 
     if let fileWrapper = fileWrappers[Filenames.rom],
@@ -295,6 +308,21 @@ extension ProjectDocument {
     let configurationFileWrapper = FileWrapper(regularFileWithContents: encodedConfiguration)
     configurationFileWrapper.preferredFilename = Filenames.configuration
     documentFileWrapper.addFileWrapper(configurationFileWrapper)
+
+    // Configuration as human-editable files
+    if true {
+      if let configuration = fileWrappers[Filenames.configurationDir] {
+        documentFileWrapper.removeFileWrapper(configuration)
+      }
+      let scripts = FileWrapper(directoryWithFileWrappers: project.configuration.scripts.reduce(into: [:]) { accumulator, script in
+        accumulator[script.name + ".js"] = FileWrapper(regularFileWithContents: script.source.data(using: .utf8)!)
+      })
+      let configuration = FileWrapper(directoryWithFileWrappers: [
+        Filenames.scriptsDir: scripts
+      ])
+      configuration.preferredFilename = Filenames.configurationDir
+      documentFileWrapper.addFileWrapper(configuration)
+    }
 
     if let romData = project.romData {
       if let fileWrapper = fileWrappers[Filenames.rom] {

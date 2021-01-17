@@ -17,6 +17,5 @@ class ProjectConfiguration: NSObject, Codable {
     dataTypes = (try? container.decode(Array<DataType>.self, forKey: .dataTypes)) ?? []
     globals = (try? container.decode(Array<Global>.self, forKey: .globals)) ?? []
     macros = (try? container.decode(Array<Macro>.self, forKey: .macros)) ?? []
-    scripts = (try? container.decode(Array<Script>.self, forKey: .scripts)) ?? []
   }
 }
