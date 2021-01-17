@@ -17,7 +17,7 @@
                BlueprintIdentifier = "6699B58C25AE9F85005DB9BB"
                BuildableName = "Sameboy.app"
                BlueprintName = "Sameboy"
-               ReferencedContainer = "container:KoholintIsland.xcodeproj">
+               ReferencedContainer = "container:WindfishIDE.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -47,7 +47,7 @@
             BlueprintIdentifier = "6699B58C25AE9F85005DB9BB"
             BuildableName = "Sameboy.app"
             BlueprintName = "Sameboy"
-            ReferencedContainer = "container:KoholintIsland.xcodeproj">
+            ReferencedContainer = "container:WindfishIDE.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -64,7 +64,7 @@
             BlueprintIdentifier = "6699B58C25AE9F85005DB9BB"
             BuildableName = "Sameboy.app"
             BlueprintName = "Sameboy"
-            ReferencedContainer = "container:KoholintIsland.xcodeproj">
+            ReferencedContainer = "container:WindfishIDE.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
