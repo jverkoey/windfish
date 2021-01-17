@@ -39,6 +39,7 @@ final class InspectorViewController: NSViewController {
     editorTabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: DataTypeEditorViewController(project: project)))
     editorTabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: GlobalEditorViewController(project: project)))
     editorTabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: MacroEditorViewController(project: project)))
+    editorTabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: ScriptEditorViewController(project: project)))
     tabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: editorTabViewController))
     tabViewController.tabViewController.addTabViewItem(NSTabViewItem(viewController: RegionInspectorViewController(project: project)))
 
