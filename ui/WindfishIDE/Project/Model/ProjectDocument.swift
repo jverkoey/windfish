@@ -90,7 +90,8 @@ final class ProjectDocument: NSDocument {
     let contentViewController = ProjectViewController(project: project)
     self.contentViewController = contentViewController
     let window = NSWindow(contentViewController: contentViewController)
-    window.setContentSize(NSSize(width: 1280, height: 768))
+    window.setContentSize(NSSize(width: 1160, height: NSScreen.main!.frame.height))
+    window.setFrameOrigin(.init(x: 0, y: NSScreen.main!.frame.maxY - window.frame.height))
     window.toolbarStyle = .unifiedCompact
     window.tabbingMode = .disallowed
     window.isRestorable = true
@@ -131,6 +132,8 @@ final class ProjectDocument: NSDocument {
   lazy var vramWindowController: NSWindowController = {
     let windowController = VRAMWindowController(windowNibName: "VRAMViewer")
     windowController.project = project
+    windowController.window!.setFrameOrigin(.init(x: NSScreen.main!.frame.maxX - windowController.window!.frame.width,
+                                                  y: NSScreen.main!.frame.maxY - windowController.window!.frame.height - CGFloat(PPU.screenSize.height * 2)))
     return windowController
   }()
 
