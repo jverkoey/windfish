@@ -557,15 +557,26 @@ public class Disassembler {
     let source: String
     var context: JSContext?
     var linearSweepDidStep: JSValue?
+    var disassemblyWillStart: JSValue?
 
     func prepareForRun() {
+      // TODO: Provide a linearSweepDidStart method rather than blowing away the context on each run
       let context = JSContext()!
       context.evaluateScript(source)
       context.exceptionHandler = { context, exception in
         print(exception)
       }
       self.context = context
-      self.linearSweepDidStep = context.objectForKeyedSubscript("linearSweepDidStep")
+      if let linearSweepDidStep = context.objectForKeyedSubscript("linearSweepDidStep"), !linearSweepDidStep.isUndefined {
+        self.linearSweepDidStep = linearSweepDidStep
+      } else {
+        self.linearSweepDidStep = nil
+      }
+      if let disassemblyWillStart = context.objectForKeyedSubscript("disassemblyWillStart"), !disassemblyWillStart.isUndefined {
+        self.disassemblyWillStart = disassemblyWillStart
+      } else {
+        self.disassemblyWillStart = nil
+      }
     }
   }
   public func defineScript(named name: String, source: String) {
@@ -755,6 +766,56 @@ public class Disassembler {
     return LR35902.Instruction(spec: spec, immediate: nil)
   }
 
+  public func willStart() {
+    for script in scripts.values {
+      script.prepareForRun()
+    }
+
+    // Extract any scripted events.
+    let disassemblyWillStarts = scripts.values.filter { $0.disassemblyWillStart != nil }
+    guard !disassemblyWillStarts.isEmpty else {
+      return  // Nothing to do here.
+    }
+
+    // Script functions
+    let getROMData: @convention(block) (Int, Int, Int) -> [UInt8] = { [weak self] bank, startAddress, endAddress in
+      guard let self = self else {
+        return []
+      }
+      let startLocation = Gameboy.Cartridge.location(for: LR35902.Address(truncatingIfNeeded: startAddress),
+                                                     inHumanProvided: Gameboy.Cartridge.Bank(truncatingIfNeeded: bank))!
+      let endLocation = Gameboy.Cartridge.location(for: LR35902.Address(truncatingIfNeeded: endAddress),
+                                                   inHumanProvided: Gameboy.Cartridge.Bank(truncatingIfNeeded: bank))!
+      return [UInt8](self.cartridgeData[startLocation..<endLocation])
+    }
+    let registerText: @convention(block) (Int, Int, Int, Int) -> Void = { [weak self] bank, startAddress, endAddress, lineLength in
+      guard let self = self else {
+        return
+      }
+      self.setText(at: LR35902.Address(truncatingIfNeeded: startAddress)..<LR35902.Address(truncatingIfNeeded: endAddress),
+                   in: Gameboy.Cartridge.Bank(truncatingIfNeeded: bank),
+                   lineLength: lineLength)
+    }
+    let registerData: @convention(block) (Int, Int, Int) -> Void = { [weak self] bank, startAddress, endAddress in
+      guard let self = self else {
+        return
+      }
+      self.setData(at: LR35902.Address(truncatingIfNeeded: startAddress)..<LR35902.Address(truncatingIfNeeded: endAddress),
+                   in: Gameboy.Cartridge.Bank(truncatingIfNeeded: bank))
+    }
+    let log: @convention(block) (Int) -> Void = { value in
+      print(value.hexString)
+    }
+
+    for script in disassemblyWillStarts {
+      script.context?.setObject(getROMData, forKeyedSubscript: "getROMData" as NSString)
+      script.context?.setObject(registerText, forKeyedSubscript: "registerText" as NSString)
+      script.context?.setObject(registerData, forKeyedSubscript: "registerData" as NSString)
+      script.context?.setObject(log, forKeyedSubscript: "log" as NSString)
+      script.disassemblyWillStart?.call(withArguments: [])
+    }
+  }
+
   public func disassemble(range: Range<LR35902.Address>, inBank bankInitial: Gameboy.Cartridge.Bank) {
     var visitedAddresses = IndexSet()
 
@@ -790,6 +851,7 @@ public class Disassembler {
       var runContext = (pc: Gameboy.Cartridge.addressAndBank(from: run.startAddress).address,
                         bank: run.initialBank)
 
+      // Script functions
       let registerBankChange: @convention(block) (Int, Int, Int) -> Void = { [weak self] _desiredBank, address, bank in
         guard let self = self else {
           return
@@ -802,10 +864,15 @@ public class Disassembler {
         )
         runContext.bank = desiredBank
       }
+
+      // Prepare all scripts for the next run
+      // TODO: Only do this for scripts that have wired up run event hooks
       for script in scripts.values {
         script.prepareForRun()
         script.context?.setObject(registerBankChange, forKeyedSubscript: "registerBankChange" as NSString)
       }
+
+      // Extract any scripted events.
       let linearSweepDidSteps = scripts.values.compactMap { $0.linearSweepDidStep }
 
       let advance: (LR35902.Address) -> Void = { amount in
@@ -928,6 +995,7 @@ public class Disassembler {
           break
         }
 
+        // linearSweepDidStep event
         if !linearSweepDidSteps.isEmpty {
           let args: [Any] = [
             LR35902.InstructionSet.opcodeBytes[instruction.spec]!,

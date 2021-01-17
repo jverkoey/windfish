@@ -51,6 +51,8 @@ extension ProjectDocument {
         disassembly.defineScript(named: script.name, source: script.source)
       }
 
+      disassembly.willStart()
+
       // Disassemble everything first
       for region in self.project.configuration.regions {
         let bank = max(1, region.bank)
