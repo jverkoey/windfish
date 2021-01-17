@@ -562,10 +562,10 @@ public class Disassembler {
     func prepareForRun() {
       // TODO: Provide a linearSweepDidStart method rather than blowing away the context on each run
       let context = JSContext()!
-      context.evaluateScript(source)
       context.exceptionHandler = { context, exception in
         print(exception)
       }
+      context.evaluateScript(source)
       self.context = context
       if let linearSweepDidStep = context.objectForKeyedSubscript("linearSweepDidStep"), !linearSweepDidStep.isUndefined {
         self.linearSweepDidStep = linearSweepDidStep
@@ -793,7 +793,7 @@ public class Disassembler {
         return
       }
       self.setText(at: LR35902.Address(truncatingIfNeeded: startAddress)..<LR35902.Address(truncatingIfNeeded: endAddress),
-                   in: Gameboy.Cartridge.Bank(truncatingIfNeeded: bank),
+                   in: max(1, Gameboy.Cartridge.Bank(truncatingIfNeeded: bank)),
                    lineLength: lineLength)
     }
     let registerData: @convention(block) (Int, Int, Int) -> Void = { [weak self] bank, startAddress, endAddress in
@@ -801,7 +801,38 @@ public class Disassembler {
         return
       }
       self.setData(at: LR35902.Address(truncatingIfNeeded: startAddress)..<LR35902.Address(truncatingIfNeeded: endAddress),
-                   in: Gameboy.Cartridge.Bank(truncatingIfNeeded: bank))
+                   in: max(1, Gameboy.Cartridge.Bank(truncatingIfNeeded: bank)))
+    }
+    let registerJumpTable: @convention(block) (Int, Int, Int) -> Void = { [weak self] bank, startAddress, endAddress in
+      guard let self = self else {
+        return
+      }
+      self.setJumpTable(at: LR35902.Address(truncatingIfNeeded: startAddress)..<LR35902.Address(truncatingIfNeeded: endAddress),
+                        in: max(1, Gameboy.Cartridge.Bank(truncatingIfNeeded: bank)))
+    }
+    let registerTransferOfControl: @convention(block) (Int, Int, Int, Int, Int) -> Void = { [weak self] toBank, toAddress, fromBank, fromAddress, opcode in
+      guard let self = self else {
+        return
+      }
+      self.registerTransferOfControl(
+        to: LR35902.Address(truncatingIfNeeded: toAddress), in: max(1, Gameboy.Cartridge.Bank(truncatingIfNeeded: toBank)),
+        from: LR35902.Address(truncatingIfNeeded: fromAddress), in: max(1, Gameboy.Cartridge.Bank(truncatingIfNeeded: fromBank)),
+        spec: LR35902.InstructionSet.table[opcode]
+      )
+    }
+    let registerFunction: @convention(block) (Int, Int, String) -> Void = { [weak self] bank, address, name in
+      guard let self = self else {
+        return
+      }
+      self.defineFunction(startingAt: LR35902.Address(truncatingIfNeeded: address),
+                          in: max(1, Gameboy.Cartridge.Bank(truncatingIfNeeded: bank)),
+                          named: name)
+    }
+    let hex16: @convention(block) (Int) -> String = { value in
+      return UInt16(truncatingIfNeeded: value).hexString
+    }
+    let hex8: @convention(block) (Int) -> String = { value in
+      return UInt8(truncatingIfNeeded: value).hexString
     }
     let log: @convention(block) (Int) -> Void = { value in
       print(value.hexString)
@@ -811,6 +842,11 @@ public class Disassembler {
       script.context?.setObject(getROMData, forKeyedSubscript: "getROMData" as NSString)
       script.context?.setObject(registerText, forKeyedSubscript: "registerText" as NSString)
       script.context?.setObject(registerData, forKeyedSubscript: "registerData" as NSString)
+      script.context?.setObject(registerJumpTable, forKeyedSubscript: "registerJumpTable" as NSString)
+      script.context?.setObject(registerTransferOfControl, forKeyedSubscript: "registerTransferOfControl" as NSString)
+      script.context?.setObject(registerFunction, forKeyedSubscript: "registerFunction" as NSString)
+      script.context?.setObject(hex16, forKeyedSubscript: "hex16" as NSString)
+      script.context?.setObject(hex8, forKeyedSubscript: "hex8" as NSString)
       script.context?.setObject(log, forKeyedSubscript: "log" as NSString)
       script.disassemblyWillStart?.call(withArguments: [])
     }
