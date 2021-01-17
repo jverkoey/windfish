@@ -43,7 +43,19 @@ extension Project: SameboyEmulatorDelegate {
       }
     }
 
-    sameboyDebuggerSemaphore.wait()
+    if let debuggerLine = debuggerLine, let disassemblyResults = disassemblyResults {
+      let lineNumber = disassemblyResults.lineFor(address: address, bank: bank)
+      if debuggerLine != lineNumber {
+        // We've left the anchor line; let's actually pause now.
+        self.debuggerLine = nil
+      } else {
+        self.nextDebuggerCommand = "next"
+      }
+    }
+
+    if self.debuggerLine == nil || self.nextDebuggerCommand == nil {
+      sameboyDebuggerSemaphore.wait()
+    }
     let nextDebuggerCommand = self.nextDebuggerCommand
     self.nextDebuggerCommand = nil
     emulating = true
@@ -61,6 +73,9 @@ extension Project: SameboyEmulatorDelegate {
   }
 
   func log(_ log: String, with attributes: GBLogAttributes) {
+    if self.debuggerLine != nil {
+      return  // Ignore any logs while we're stepping forward from an anchored line.
+    }
     let font = NSFont.userFixedPitchFont(ofSize: 12)!
     let underline: NSUnderlineStyle
     if attributes.contains(.dashedUnderline) {

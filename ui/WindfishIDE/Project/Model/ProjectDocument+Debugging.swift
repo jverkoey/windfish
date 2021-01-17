@@ -6,6 +6,16 @@ extension ProjectDocument {
       return // Emulation must be stopped first.
     }
 
+    // If we're in a macro...
+    if let disassemblyResults = project.disassemblyResults,
+       let lineNumber = disassemblyResults.lineFor(address: project.address, bank: project.bank),
+       let line = disassemblyResults.bankLines?[(project.address < 0x4000) ? 0 : max(1, project.bank)]?[lineNumber],
+       case .macro = line.semantic {
+      project.debuggerLine = lineNumber
+    } else {
+      project.debuggerLine = nil
+    }
+
     project.nextDebuggerCommand = "next"
     project.sameboyDebuggerSemaphore.signal()
   }

@@ -23,6 +23,7 @@ final class Project: NSObject {
   var sameboyView = SameboyGBView()
   var sameboyDebuggerSemaphore = DispatchSemaphore(value: 0)
   var nextDebuggerCommand: String? = nil
+  var debuggerLine: Int? = nil
 
   var consoleOutputLock = NSRecursiveLock()
   var pendingConsoleOutput = NSMutableAttributedString()

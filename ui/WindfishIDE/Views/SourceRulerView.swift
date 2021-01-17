@@ -111,6 +111,9 @@ final class SourceRulerView: NSRulerView {
         if lineNumber == NSNotFound {
           break
         }
+        if lineNumber >= bankLines.count {
+          break  // Invalid character
+        }
         let characterRange = NSRange(location: characterIndex, length: 0)
         guard let layoutRects = layoutManager.rectArray(
           forCharacterRange: characterRange,
