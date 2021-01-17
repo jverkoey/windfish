@@ -234,6 +234,7 @@ private struct Filenames {
   static let disassembly = "disassembly"
   static let configurationDir = "configuration"
   static let scriptsDir = "scripts"
+  static let macrosDir = "macros"
   static let configuration = "configuration.plist"
 }
 
@@ -258,12 +259,17 @@ extension ProjectDocument {
 
     // Configuration as human-editable files
     if let configuration = fileWrappers[Filenames.configurationDir] {
-      if let scripts = configuration.fileWrappers?[Filenames.scriptsDir] {
-        if let files = scripts.fileWrappers?.mapValues({ $0.regularFileContents! }) {
-          self.project.configuration.scripts = files.map({ key, value in
-            Script(name: key, source: String(data: value, encoding: .utf8)!)
-          })
-        }
+      if let scripts = configuration.fileWrappers?[Filenames.scriptsDir],
+         let files = scripts.fileWrappers?.mapValues({ $0.regularFileContents! }) {
+        self.project.configuration.scripts = files.map({ key, value in
+          Script(name: NSString(string: key).deletingPathExtension, source: String(data: value, encoding: .utf8)!)
+        })
+      }
+      if let macros = configuration.fileWrappers?[Filenames.macrosDir],
+         let files = macros.fileWrappers?.mapValues({ $0.regularFileContents! }) {
+        self.project.configuration.macros = files.map({ key, value in
+          Macro(name: NSString(string: key).deletingPathExtension, source: String(data: value, encoding: .utf8)!)
+        })
       }
     }
 
@@ -314,11 +320,13 @@ extension ProjectDocument {
       if let configuration = fileWrappers[Filenames.configurationDir] {
         documentFileWrapper.removeFileWrapper(configuration)
       }
-      let scripts = FileWrapper(directoryWithFileWrappers: project.configuration.scripts.reduce(into: [:]) { accumulator, script in
-        accumulator[script.name + ".js"] = FileWrapper(regularFileWithContents: script.source.data(using: .utf8)!)
-      })
       let configuration = FileWrapper(directoryWithFileWrappers: [
-        Filenames.scriptsDir: scripts
+        Filenames.scriptsDir: FileWrapper(directoryWithFileWrappers: project.configuration.scripts.reduce(into: [:]) { accumulator, script in
+          accumulator[script.name + ".js"] = FileWrapper(regularFileWithContents: script.source.data(using: .utf8)!)
+        }),
+        Filenames.macrosDir: FileWrapper(directoryWithFileWrappers: project.configuration.macros.reduce(into: [:]) { accumulator, macro in
+          accumulator[macro.name + ".asm"] = FileWrapper(regularFileWithContents: macro.source.data(using: .utf8)!)
+        })
       ])
       configuration.preferredFilename = Filenames.configurationDir
       documentFileWrapper.addFileWrapper(configuration)

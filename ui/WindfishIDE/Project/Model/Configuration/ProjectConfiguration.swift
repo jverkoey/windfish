@@ -16,6 +16,5 @@ class ProjectConfiguration: NSObject, Codable {
     regions = (try? container.decode(Array<Region>.self, forKey: .regions)) ?? []
     dataTypes = (try? container.decode(Array<DataType>.self, forKey: .dataTypes)) ?? []
     globals = (try? container.decode(Array<Global>.self, forKey: .globals)) ?? []
-    macros = (try? container.decode(Array<Macro>.self, forKey: .macros)) ?? []
   }
 }
