@@ -23,7 +23,7 @@ class VRAMWindowController: NSWindowController {
   @IBOutlet var tilemapPaletteButton: NSPopUpButton?
   @IBOutlet var tilemapMapButton: NSPopUpButton?
   @IBOutlet var tilemapSetButton: NSPopUpButton?
-  var oamInfo = ContiguousArray<GB_oam_info_t>(repeating: GB_oam_info_t(), count: 40)
+  var oamInfo = ContiguousArray<GBOAMInfo>(repeating: GBOAMInfo(), count: 40)
   var oamUpdating = false
   var oamCount: UInt8 = 0
   var oamHeight: UInt8 = 0
@@ -112,34 +112,34 @@ extension VRAMWindowController {
     }
     switch vramTabView.tabViewItems.firstIndex(of: selectedTabViewItem) {
     case 0:  // Tileset
-      let paletteType: GB_palette_type_t
+      let paletteType: GBPaletteType
       let paletteMenuIndex: UInt = UInt(tilesetPaletteButton.indexOfSelectedItem)
       if paletteMenuIndex > 0 {
-        paletteType = paletteMenuIndex > 8 ? GB_PALETTE_OAM : GB_PALETTE_BACKGROUND
+        paletteType = paletteMenuIndex > 8 ? .OAM : .background
       } else {
-        paletteType = GB_PALETTE_NONE
+        paletteType = .none
       }
       tilesetImageView.image = project.sameboy.drawTileset(withPaletteType: paletteType, menuIndex: paletteMenuIndex)
       tilesetImageView.layer?.magnificationFilter = .nearest
 
     case 1:  // Tilemap
-      let paletteType: GB_palette_type_t
+      let paletteType: GBPaletteType
       let paletteMenuIndex: UInt8 = UInt8(tilemapPaletteButton.indexOfSelectedItem)
       if paletteMenuIndex > 1 {
-        paletteType = paletteMenuIndex > 9 ? GB_PALETTE_OAM : GB_PALETTE_BACKGROUND
+        paletteType = paletteMenuIndex > 9 ? .OAM : .background
       } else if paletteMenuIndex == 1 {
-        paletteType = GB_PALETTE_AUTO
+        paletteType = .auto
       } else {
-        paletteType = GB_PALETTE_NONE
+        paletteType = .none
       }
-      tilemapImageView.scrollRect = NSRect(x: CGFloat(project.sameboy.readMemory(0xFF00 | UInt16(truncatingIfNeeded: GB_IO_SCX))),
-                                           y: CGFloat(project.sameboy.readMemory(0xFF00 | UInt16(truncatingIfNeeded: GB_IO_SCY))),
+      tilemapImageView.scrollRect = NSRect(x: CGFloat(project.sameboy.scx),
+                                           y: CGFloat(project.sameboy.scy),
                                            width: 160, height: 144)
       tilemapImageView.image = project.sameboy.drawTilemap(
         withPaletteType: paletteType,
         paletteIndex: paletteMenuIndex,
-        mapType: GB_map_type_t(rawValue: UInt32(tilemapMapButton.indexOfSelectedItem)),
-        tilesetType: GB_tileset_type_t(rawValue: UInt32(tilemapSetButton.indexOfSelectedItem))
+        mapType: GBMapType(rawValue: tilemapMapButton.indexOfSelectedItem),
+        tilesetType: GBTilesetType(rawValue: tilemapSetButton.indexOfSelectedItem)
       )
       tilemapImageView.layer?.magnificationFilter = .nearest
 
@@ -209,7 +209,7 @@ extension VRAMWindowController: NSTableViewDataSource {
         return "\(row >= 8 ? "Object" : "Background") \(row & 7)"
       }
       var size: Int = 0
-      let paletteData = project.sameboy.getDirectAccess(row >= 8 ? GB_DIRECT_ACCESS_OBP : GB_DIRECT_ACCESS_BGP, size: &size, bank: nil)!
+      let paletteData = project.sameboy.getDirectAccess(row >= 8 ? .OBP : .BGP, size: &size, bank: nil)!
       let bytes = paletteData.bindMemory(to: UInt8.self, capacity: size)
       let index = columnIndex - 1 + (row & 7) * 4
       return UInt16(truncatingIfNeeded: bytes[(index << 1) + 1] << 8) | UInt16(truncatingIfNeeded: bytes[index << 1])
@@ -221,7 +221,7 @@ extension VRAMWindowController: NSTableViewDataSource {
         let imageData = withUnsafeMutableBytes(of: &oamInfo[row].image.0) { pointer -> Data in
           return Data(bytesNoCopy: pointer.baseAddress!, count: 64 * 4 * 2, deallocator: .none)
         }
-        return Emulator.image(from: imageData, width: 8, height: UInt(truncatingIfNeeded: oamHeight), scale: 16 / Double(oamHeight))
+        return SameboyEmulator.image(from: imageData, width: 8, height: UInt(truncatingIfNeeded: oamHeight), scale: 16 / Double(oamHeight))
       case 1: return oamInfo[row].x - 8
       case 2: return oamInfo[row].y - 16
       case 3: return "$" + oamInfo[row].tile.hexString

@@ -91,17 +91,16 @@ extension DebuggingViewController: LogObserver {
 
 extension DebuggingViewController: EmulationObservers {
   func emulationDidAdvance() {
-    let gb = project.sameboy.gb.pointee
-    pcLabel?.integerValue = Int(truncatingIfNeeded: gb.pc)
-    spLabel?.integerValue = Int(truncatingIfNeeded: gb.sp)
-    aLabel?.integerValue = Int(truncatingIfNeeded: gb.a)
-    fLabel?.integerValue = Int(truncatingIfNeeded: gb.f)
-    bLabel?.integerValue = Int(truncatingIfNeeded: gb.b)
-    cLabel?.integerValue = Int(truncatingIfNeeded: gb.c)
-    dLabel?.integerValue = Int(truncatingIfNeeded: gb.d)
-    eLabel?.integerValue = Int(truncatingIfNeeded: gb.e)
-    hLabel?.integerValue = Int(truncatingIfNeeded: gb.h)
-    lLabel?.integerValue = Int(truncatingIfNeeded: gb.l)
+    pcLabel?.integerValue = Int(truncatingIfNeeded: project.sameboy.pc)
+    spLabel?.integerValue = Int(truncatingIfNeeded: project.sameboy.sp)
+    aLabel?.integerValue  = Int(truncatingIfNeeded: project.sameboy.a)
+    fLabel?.integerValue  = Int(truncatingIfNeeded: project.sameboy.f)
+    bLabel?.integerValue  = Int(truncatingIfNeeded: project.sameboy.b)
+    cLabel?.integerValue  = Int(truncatingIfNeeded: project.sameboy.c)
+    dLabel?.integerValue  = Int(truncatingIfNeeded: project.sameboy.d)
+    eLabel?.integerValue  = Int(truncatingIfNeeded: project.sameboy.e)
+    hLabel?.integerValue  = Int(truncatingIfNeeded: project.sameboy.h)
+    lLabel?.integerValue  = Int(truncatingIfNeeded: project.sameboy.l)
   }
 
   func emulationDidStart() {}

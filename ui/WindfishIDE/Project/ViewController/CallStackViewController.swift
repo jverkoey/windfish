@@ -102,13 +102,11 @@ extension CallStackViewController: EmulationObservers {
   func emulationDidStart() {}
 
   func emulationDidStop() {
-    let gb = project.sameboy.gb.pointee
-
     let current = CallStack(address: project.address, bank: project.bank, label: "")
-    let stack = [current] + (0..<gb.backtrace_size).map { i -> CallStack in
+    let stack = [current] + (0..<project.sameboy.backtraceSize).map { i -> CallStack in
       var bank: UInt16 = 0
       var address: UInt16 = 0
-      gb_get_backtrace_return(project.sameboy.gb, Int32(i), &bank, &address)
+      project.sameboy.getBacktraceReturn(Int32(i), bank: &bank, addr: &address)
       return CallStack(address: address, bank: Gameboy.Cartridge.Bank(truncatingIfNeeded: bank), label: "")
     }.reversed()
     if let disassembly = project.disassemblyResults?.disassembly {

@@ -3,8 +3,8 @@ import Foundation
 import Cocoa
 
 final class LCDViewController: NSViewController {
-  let sameboyView: GBView
-  init(sameboyView: GBView) {
+  let sameboyView: SameboyGBView
+  init(sameboyView: SameboyGBView) {
     self.sameboyView = sameboyView
 
     super.init(nibName: nil, bundle: nil)

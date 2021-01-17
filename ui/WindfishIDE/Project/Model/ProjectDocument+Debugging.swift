@@ -2,7 +2,7 @@ import Foundation
 
 extension ProjectDocument {
   @objc func stepForward(_ sender: Any?) {
-    guard project.sameboy.gb.pointee.debug_stopped else {
+    guard project.sameboy.debugStopped else {
       return // Emulation must be stopped first.
     }
 
@@ -11,7 +11,7 @@ extension ProjectDocument {
   }
 
   @objc func stepInto(_ sender: Any?) {
-    guard project.sameboy.gb.pointee.debug_stopped else {
+    guard project.sameboy.debugStopped else {
       return // Emulation must be stopped first.
     }
 
@@ -20,7 +20,7 @@ extension ProjectDocument {
   }
 
   @objc func undoCommand(_ sender: Any?) {
-    guard project.sameboy.gb.pointee.debug_stopped else {
+    guard project.sameboy.debugStopped else {
       return // Emulation must be stopped first.
     }
 
@@ -29,9 +29,9 @@ extension ProjectDocument {
   }
 
   @objc func toggleEmulation(_ sender: Any?) {
-    project.sameboy.gb.pointee.debug_stopped = !project.sameboy.gb.pointee.debug_stopped
+    project.sameboy.debugStopped = !project.sameboy.debugStopped
 
-    if !project.sameboy.gb.pointee.debug_stopped {
+    if !project.sameboy.debugStopped {
       // Disconnect the debugger repl.
       project.nextDebuggerCommand = nil
       project.sameboyDebuggerSemaphore.signal()

@@ -21,15 +21,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       "GBSloMotion": kVK_Shift,
 
       "GBFilter": "NearestNeighbor",
-      "GBColorCorrection": GB_COLOR_CORRECTION_EMULATE_HARDWARE.rawValue,
-      "GBHighpassFilter": GB_HIGHPASS_REMOVE_DC_OFFSET.rawValue,
       "GBRewindLength": 10,
-      "GBFrameBlendingMode": GB_FRAME_BLENDING_MODE_DISABLED.rawValue,
-
-      "GBDMGModel": GB_MODEL_DMG_B.rawValue,
-      "GBCGBModel": GB_MODEL_DMG_B.rawValue,
-      "GBSGBModel": GB_MODEL_SGB2.rawValue,
-      "GBRumbleMode": GB_RUMBLE_CARTRIDGE_ONLY.rawValue,
     ])
 
     JOYController.start(on: RunLoop.current, withOptions: [

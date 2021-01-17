@@ -7,20 +7,20 @@ import Windfish
 final class Project: NSObject {
 
   override init() {
-    self.sameboy = Emulator(model: GB_MODEL_DMG_B)
+    self.sameboy = SameboyEmulator()
 
     super.init()
 
     self.sameboy.setDebuggerEnabled(true)
     self.sameboy.delegate = self
 
-    self.sameboyView.emulator = self.sameboy
+    self.sameboyView.bind(with: self.sameboy)
 
     applyDefaults()
   }
 
-  var sameboy: Emulator
-  var sameboyView = GBView()
+  var sameboy: SameboyEmulator
+  var sameboyView = SameboyGBView()
   var sameboyDebuggerSemaphore = DispatchSemaphore(value: 0)
   var nextDebuggerCommand: String? = nil
 
@@ -67,10 +67,10 @@ final class Project: NSObject {
   var breakpointPredicate: NSPredicate?
 
   var address: LR35902.Address {
-    return sameboy.gb.pointee.pc
+    return sameboy.pc
   }
   var bank: Gameboy.Cartridge.Bank {
-    return Gameboy.Cartridge.Bank(truncatingIfNeeded: sameboy.gb.pointee.mbc_rom_bank)
+    return Gameboy.Cartridge.Bank(truncatingIfNeeded: sameboy.romBank)
   }
 
 }

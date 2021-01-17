@@ -47,12 +47,10 @@ final class CPUFlagsView: NSView {
     fatalError("init(coder:) has not been implemented")
   }
 
-  func update(with emulator: Emulator) {
-    let gb = emulator.gb.pointee
-    let flags = Int(truncatingIfNeeded: gb.f)
-    zeroLabel.textColor = (flags & GB_ZERO_FLAG) != 0 ? .textColor : .disabledControlTextColor
-    subtractLabel.textColor = (flags & GB_SUBTRACT_FLAG) != 0 ? .textColor : .disabledControlTextColor
-    carryLabel.textColor = (flags & GB_CARRY_FLAG) != 0 ? .textColor : .disabledControlTextColor
-    halfcarryLabel.textColor = (flags & GB_HALF_CARRY_FLAG) != 0 ? .textColor : .disabledControlTextColor
+  func update(with emulator: SameboyEmulator) {
+    zeroLabel.textColor = emulator.fzero ? .textColor : .disabledControlTextColor
+    subtractLabel.textColor = emulator.fsubtract ? .textColor : .disabledControlTextColor
+    carryLabel.textColor = emulator.fcarry ? .textColor : .disabledControlTextColor
+    halfcarryLabel.textColor = emulator.fhalfcarry ? .textColor : .disabledControlTextColor
   }
 }

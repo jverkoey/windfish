@@ -1,9 +1,9 @@
 import Cocoa
 
-extension Project: EmulatorDelegate {
+extension Project: SameboyEmulatorDelegate {
   // MARK: - EmulatorDelegate
   func willRun() {
-    sameboy.lcdOutput = sameboyView.pixels()
+    sameboy.lcdOutput = sameboyView.pixels
   }
 
   func didRun() {
@@ -20,27 +20,9 @@ extension Project: EmulatorDelegate {
 
   // MARK: - CallbackBridgeDelegate
 
-  func loadBootROM(_ type: GB_boot_rom_t) {
-    let names: [UInt32: String] = [
-      GB_BOOT_ROM_DMG0.rawValue: "dmg0_boot",
-      GB_BOOT_ROM_DMG.rawValue: "dmg_boot",
-      GB_BOOT_ROM_MGB.rawValue: "mgb_boot",
-      GB_BOOT_ROM_SGB.rawValue: "sgb_boot",
-      GB_BOOT_ROM_SGB2.rawValue: "sgb2_boot",
-      GB_BOOT_ROM_CGB0.rawValue: "cgb0_boot",
-      GB_BOOT_ROM_CGB.rawValue: "cgb_boot",
-      GB_BOOT_ROM_AGB.rawValue: "agb_boot",
-    ]
-    sameboy.loadBootROM(Bundle.main.path(forResource: names[type.rawValue], ofType: "bin")!)
-  }
-
-  func gotNewSample(_ sample: UnsafeMutablePointer<GB_sample_t>) {
-    
-  }
-
   func vblank() {
     sameboyView.flip()
-    sameboy.lcdOutput = sameboyView.pixels()
+    sameboy.lcdOutput = sameboyView.pixels
 
     DispatchQueue.main.async {
       // Ensure that all observers execute on the main thread.
@@ -67,7 +49,7 @@ extension Project: EmulatorDelegate {
     emulating = true
 
     // Create spacing between the last command output.
-    log("\n> \(nextDebuggerCommand ?? "")\n", with: GB_log_attributes(0))
+    log("\n> \(nextDebuggerCommand ?? "")\n", with: [])
 
     DispatchQueue.main.async {
       // Ensure that all observers execute on the main thread.
@@ -78,11 +60,13 @@ extension Project: EmulatorDelegate {
     return nextDebuggerCommand
   }
 
-  func log(_ log: String, with attributes: GB_log_attributes) {
+  func log(_ log: String, with attributes: GBLogAttributes) {
     let font = NSFont.userFixedPitchFont(ofSize: 12)!
     let underline: NSUnderlineStyle
-    if (attributes.rawValue & GB_LOG_UNDERLINE_MASK.rawValue) != 0 {
-      underline = (attributes.rawValue & GB_LOG_DASHED_UNDERLINE.rawValue) != 0 ? [.patternDot, .single] : .single
+    if attributes.contains(.dashedUnderline) {
+      underline = [.patternDot, .single]
+    } else if attributes.contains(.underline) {
+      underline = .single
     } else {
       underline = []
     }

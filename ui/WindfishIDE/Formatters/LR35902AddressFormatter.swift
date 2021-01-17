@@ -7,10 +7,10 @@ final class FlagsFormatter: Formatter {
       return nil
     }
     let iflags = Int(truncatingIfNeeded: flags)
-    return (((iflags & GB_CARRY_FLAG) != 0) ? "C" : "-")
-      + (((iflags & GB_HALF_CARRY_FLAG) != 0) ? "H" : "-")
-      + (((iflags & GB_SUBTRACT_FLAG) != 0) ? "N" : "-")
-      + (((iflags & GB_ZERO_FLAG) != 0) ? "Z" : "-")
+    return (((iflags & GBFlag.carry.rawValue) != 0) ? "C" : "-")
+      + (((iflags & GBFlag.halfCarry.rawValue) != 0) ? "H" : "-")
+      + (((iflags & GBFlag.subtract.rawValue) != 0) ? "N" : "-")
+      + (((iflags & GBFlag.zero.rawValue) != 0) ? "Z" : "-")
   }
 }
 

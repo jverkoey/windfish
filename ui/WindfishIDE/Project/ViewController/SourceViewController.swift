@@ -155,7 +155,7 @@ final class SourceViewController: NSViewController {
         self.sourceRulerView!.needsDisplay = true
       })
 
-    self.toggleEmulationButton?.state = project.sameboy.gb.pointee.debug_stopped ? .off : .on
+    self.toggleEmulationButton?.state = project.sameboy.debugStopped ? .off : .on
     project.emulationObservers.add(self)
   }
 

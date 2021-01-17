@@ -116,17 +116,12 @@ final class DataTypeEditorViewController: NSViewController, TabSelectable {
         self.mappingElementsController.unbind(.contentArray)
       }
     }
+    elementsController.bind(.contentArray, to: project.configuration, withKeyPath: "dataTypes", options: nil)
     mappingTableView.tableView?.bind(.content, to: mappingElementsController, withKeyPath: "arrangedObjects", options: nil)
     mappingTableView.tableView?.bind(.selectionIndexes, to: mappingElementsController, withKeyPath:"selectionIndexes", options: nil)
     mappingTableView.tableView?.bind(.sortDescriptors, to: mappingElementsController, withKeyPath: "sortDescriptors", options: nil)
 
     elementsController.setSelectionIndexes(IndexSet())
-  }
-
-  override func viewWillAppear() {
-    super.viewWillAppear()
-
-    elementsController.bind(.contentArray, to: self, withKeyPath: "representedObject.dataTypes", options: nil)
   }
 }
 
