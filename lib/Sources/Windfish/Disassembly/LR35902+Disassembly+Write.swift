@@ -191,7 +191,7 @@ extension Disassembler {
         if detailedComments {
           return line("dw \(jumpLocation)", address: address!, addressType: "jumpTable [\(index)]", comment: "\(data!.map { "$\($0.hexString)" }.joined(separator: " "))")
         } else {
-          return line("dw \(jumpLocation)", addressType: "jumpTable [\(index)]")
+          return line("    dw \(jumpLocation) ; \(UInt8(truncatingIfNeeded: index).hexString)", comment: nil)
         }
 
       case let .image1bpp(statement):
@@ -706,10 +706,11 @@ clean:
           lineBuffer.append(contentsOf: lineGroup)
           flush()
 
+          let initialType = type(of: writeContext.pc, in: initialBank)
+
           // Accumulate bytes until the next instruction or transfer of control.
           var accumulator: [UInt8] = []
           let initialPc = writeContext.pc
-          let initialType = type(of: writeContext.pc, in: initialBank)
           var global: Global?
           repeat {
             if writeContext.pc < 0x4000 {
@@ -764,6 +765,12 @@ clean:
               chunkPc += LR35902.Address(pair.count)
             }
             break
+          case .code:
+            // This should not happen; it means that there is some overlap in interpretation of instructions causing us
+            // to parse an instruction mid-instruction. Fall through to treating this as unknown data, but log a
+            // warning.
+            print("Instruction overlap detected at \(initialBank.hexString):\(initialPc.hexString)")
+            fallthrough
           case .unknown:
             for chunk in accumulator.chunked(into: 8) {
               bankLines.append(Line(semantic: .unknown(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
@@ -786,8 +793,6 @@ clean:
               bankLines.append(Line(semantic: .image1bpp(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
               chunkPc += LR35902.Address(chunk.count)
             }
-          case .code:
-            preconditionFailure()
           case .ram:
             preconditionFailure()
           }

@@ -828,6 +828,17 @@ public class Disassembler {
                           in: max(1, Gameboy.Cartridge.Bank(truncatingIfNeeded: bank)),
                           named: name)
     }
+    let registerBankChange: @convention(block) (Int, Int, Int) -> Void = { [weak self] _desiredBank, address, bank in
+      guard let self = self else {
+        return
+      }
+      let desiredBank = Gameboy.Cartridge.Bank(truncatingIfNeeded: _desiredBank)
+      self.register(
+        bankChange: max(1, desiredBank),
+        at: LR35902.Address(truncatingIfNeeded: address),
+        in: max(1, Gameboy.Cartridge.Bank(truncatingIfNeeded: bank))
+      )
+    }
     let hex16: @convention(block) (Int) -> String = { value in
       return UInt16(truncatingIfNeeded: value).hexString
     }
@@ -845,6 +856,7 @@ public class Disassembler {
       script.context?.setObject(registerJumpTable, forKeyedSubscript: "registerJumpTable" as NSString)
       script.context?.setObject(registerTransferOfControl, forKeyedSubscript: "registerTransferOfControl" as NSString)
       script.context?.setObject(registerFunction, forKeyedSubscript: "registerFunction" as NSString)
+      script.context?.setObject(registerBankChange, forKeyedSubscript: "registerBankChange" as NSString)
       script.context?.setObject(hex16, forKeyedSubscript: "hex16" as NSString)
       script.context?.setObject(hex8, forKeyedSubscript: "hex8" as NSString)
       script.context?.setObject(log, forKeyedSubscript: "log" as NSString)
@@ -894,9 +906,9 @@ public class Disassembler {
         }
         let desiredBank = Gameboy.Cartridge.Bank(truncatingIfNeeded: _desiredBank)
         self.register(
-          bankChange: desiredBank,
+          bankChange: max(1, desiredBank),
           at: LR35902.Address(truncatingIfNeeded: address),
-          in: Gameboy.Cartridge.Bank(truncatingIfNeeded: bank)
+          in: max(1, Gameboy.Cartridge.Bank(truncatingIfNeeded: bank))
         )
         runContext.bank = desiredBank
       }
