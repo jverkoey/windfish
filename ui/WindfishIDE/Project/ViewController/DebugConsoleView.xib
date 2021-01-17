@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="DebuggingViewController" customModule="KoholintIsland" customModuleProvider="target">
+            <connections>
+                <outlet property="aLabel" destination="a5y-BC-jPq" id="ubT-bk-Vc0"/>
+                <outlet property="bLabel" destination="KNo-Kc-BT4" id="rZF-Xw-ktP"/>
+                <outlet property="cLabel" destination="jMg-iI-ifk" id="cdn-qa-dsq"/>
+                <outlet property="consoleInput" destination="amH-Ua-hrr" id="hBp-as-HSL"/>
+                <outlet property="consoleOutput" destination="fgS-FK-ErM" id="DEM-H6-Krt"/>
+                <outlet property="dLabel" destination="YP5-3a-m3t" id="VFF-GU-eL8"/>
+                <outlet property="debugConsoleView" destination="NN9-c5-PHA" id="4Ju-3S-HSk"/>
+                <outlet property="eLabel" destination="ouO-Bg-gCU" id="GgC-p5-TBz"/>
+                <outlet property="fLabel" destination="YMd-Ov-tHN" id="cPJ-Ph-CIg"/>
+                <outlet property="hLabel" destination="4S0-JQ-4di" id="nYl-hb-Yev"/>
+                <outlet property="lLabel" destination="hRp-RU-mQi" id="GT0-kv-B9R"/>
+                <outlet property="pcLabel" destination="xGw-Ym-Oo4" id="n4h-Se-5lZ"/>
+                <outlet property="spLabel" destination="aSw-MS-un6" id="TA4-DG-QP3"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <view id="NN9-c5-PHA">
+            <rect key="frame" x="0.0" y="0.0" width="649" height="152"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <subviews>
+                <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pAq-Tw-qMm" userLabel="Console output">
+                    <rect key="frame" x="0.0" y="22" width="332" height="130"/>
+                    <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HcX-qf-PZc">
+                        <rect key="frame" x="0.0" y="0.0" width="332" height="130"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textView misplaced="YES" editable="NO" drawsBackground="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" baseWritingDirection="leftToRight" findStyle="bar" allowsNonContiguousLayout="YES" spellingCorrection="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fgS-FK-ErM">
+                                <rect key="frame" x="0.0" y="0.0" width="332" height="130"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" red="0.14901960780000001" green="0.14901960780000001" blue="0.14901960780000001" alpha="1" colorSpace="calibratedRGB"/>
+                                <size key="minSize" width="332" height="130"/>
+                                <size key="maxSize" width="1160" height="10000000"/>
+                                <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                <allowedInputSourceLocales>
+                                    <string>NSAllRomanInputSourcesLocaleIdentifier</string>
+                                </allowedInputSourceLocales>
+                            </textView>
+                        </subviews>
+                        <color key="backgroundColor" red="0.1647058824" green="0.1647058824" blue="0.1647058824" alpha="1" colorSpace="calibratedRGB"/>
+                    </clipView>
+                    <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="vp7-bc-s8U">
+                        <rect key="frame" x="-100" y="-100" width="87" height="18"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                    <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="KZi-hX-Nz6">
+                        <rect key="frame" x="316" y="0.0" width="16" height="130"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                </scrollView>
+                <box horizontalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="eoH-wM-hxE">
+                    <rect key="frame" x="330" y="22" width="5" height="130"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="1" id="dhK-6V-Opr"/>
+                    </constraints>
+                </box>
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="1v9-I4-eNp" userLabel="CPU Registers">
+                    <rect key="frame" x="333" y="22" width="316" height="130"/>
+                    <subviews>
+                        <gridView xPlacement="leading" yPlacement="top" rowAlignment="none" rowSpacing="4" columnSpacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="EkK-1T-7W1">
+                            <rect key="frame" x="4" y="11" width="308" height="115"/>
+                            <rows>
+                                <gridRow id="B07-0E-5IV"/>
+                                <gridRow id="msS-WP-nk3"/>
+                                <gridRow id="RLk-QW-Mwt"/>
+                                <gridRow id="Tff-sE-w89"/>
+                            </rows>
+                            <columns>
+                                <gridColumn id="kvt-b7-JjW"/>
+                                <gridColumn id="xgH-nm-bgf"/>
+                                <gridColumn id="MA6-eo-zQy"/>
+                            </columns>
+                            <gridCells>
+                                <gridCell row="B07-0E-5IV" column="kvt-b7-JjW" id="YeH-GV-WRj">
+                                    <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="hIW-SV-s4s">
+                                        <rect key="frame" x="0.0" y="85" width="100" height="30"/>
+                                        <subviews>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0hl-eu-IxU">
+                                                <rect key="frame" x="-2" y="0.0" width="66" height="30"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="pc:" id="f8h-hz-pi4">
+                                                    <font key="font" metaFont="fixedUser" size="11"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xGw-Ym-Oo4" customClass="FixedWidthTextView" customModule="KoholintIsland" customModuleProvider="target">
+                                                <rect key="frame" x="64" y="17" width="38" height="13"/>
+                                                <textFieldCell key="cell" title="$0000" id="dmN-kc-oxg">
+                                                    <font key="font" metaFont="fixedUser" size="11"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="trailing" secondItem="xGw-Ym-Oo4" secondAttribute="trailing" id="P2a-80-Z7i"/>
+                                            <constraint firstItem="xGw-Ym-Oo4" firstAttribute="leading" secondItem="0hl-eu-IxU" secondAttribute="trailing" constant="4" id="TUb-e8-laD"/>
+                                            <constraint firstAttribute="bottom" secondItem="0hl-eu-IxU" secondAttribute="bottom" id="gSn-Zq-Aw1"/>
+                                            <constraint firstItem="0hl-eu-IxU" firstAttribute="leading" secondItem="hIW-SV-s4s" secondAttribute="leading" id="iC9-3T-uG1"/>
+                                            <constraint firstItem="0hl-eu-IxU" firstAttribute="top" secondItem="hIW-SV-s4s" secondAttribute="top" id="qBD-Bh-KUb"/>
+                                            <constraint firstItem="xGw-Ym-Oo4" firstAttribute="firstBaseline" secondItem="0hl-eu-IxU" secondAttribute="firstBaseline" id="qJc-6M-q1R"/>
+                                        </constraints>
+                                    </customView>
+                                </gridCell>
+                                <gridCell row="B07-0E-5IV" column="xgH-nm-bgf" id="LG0-hS-YfR">
+                                    <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="TYa-Xf-iuI">
+                                        <rect key="frame" x="104" y="85" width="100" height="30"/>
+                                        <subviews>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SEi-Mc-ogP">
+                                                <rect key="frame" x="-2" y="0.0" width="80" height="30"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="a:" id="2bq-lz-VEi">
+                                                    <font key="font" metaFont="fixedUser" size="11"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="a5y-BC-jPq" customClass="FixedWidthTextView" customModule="KoholintIsland" customModuleProvider="target">
+                                                <rect key="frame" x="78" y="17" width="24" height="13"/>
+                                                <textFieldCell key="cell" title="$00" id="1LL-e5-vYH">
+                                                    <font key="font" metaFont="fixedUser" size="11"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="trailing" secondItem="a5y-BC-jPq" secondAttribute="trailing" id="2mM-Xp-tH2"/>
+                                            <constraint firstItem="SEi-Mc-ogP" firstAttribute="leading" secondItem="TYa-Xf-iuI" secondAttribute="leading" id="5pE-Fv-CM8"/>
+                                            <constraint firstAttribute="bottom" secondItem="SEi-Mc-ogP" secondAttribute="bottom" id="LK8-nd-kc2"/>
+                                            <constraint firstItem="a5y-BC-jPq" firstAttribute="leading" secondItem="SEi-Mc-ogP" secondAttribute="trailing" constant="4" id="c0O-7I-f4P"/>
+                                            <constraint firstItem="SEi-Mc-ogP" firstAttribute="top" secondItem="TYa-Xf-iuI" secondAttribute="top" id="ePA-ya-8yN"/>
+                                            <constraint firstItem="a5y-BC-jPq" firstAttribute="firstBaseline" secondItem="SEi-Mc-ogP" secondAttribute="firstBaseline" id="slq-4Y-yov"/>
+                                        </constraints>
+                                    </customView>
+                                </gridCell>
+                                <gridCell row="B07-0E-5IV" column="MA6-eo-zQy" id="b2D-u5-DA8">
+                                    <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="7d5-yJ-2T1">
+                                        <rect key="frame" x="208" y="85" width="100" height="30"/>
+                                        <subviews>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LxS-0b-wHH">
+                                                <rect key="frame" x="-2" y="0.0" width="73" height="30"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="f:" id="xCm-2T-COh">
+                                                    <font key="font" metaFont="fixedUser" size="11"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YMd-Ov-tHN" customClass="FixedWidthTextView" customModule="KoholintIsland" customModuleProvider="target">
+                                                <rect key="frame" x="71" y="17" width="31" height="13"/>
+                                                <textFieldCell key="cell" title="----" id="DSV-pQ-XzV">
+                                                    <font key="font" metaFont="fixedUser" size="11"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstItem="LxS-0b-wHH" firstAttribute="leading" secondItem="7d5-yJ-2T1" secondAttribute="leading" id="H56-x1-mEb"/>
+                                            <constraint firstAttribute="bottom" secondItem="LxS-0b-wHH" secondAttribute="bottom" id="KrF-Bf-IkR"/>
+                                            <constraint firstItem="YMd-Ov-tHN" firstAttribute="leading" secondItem="LxS-0b-wHH" secondAttribute="trailing" constant="4" id="R1U-za-0n1"/>
+                                            <constraint firstAttribute="trailing" secondItem="YMd-Ov-tHN" secondAttribute="trailing" id="WjB-Rp-Snh"/>
+                                            <constraint firstItem="YMd-Ov-tHN" firstAttribute="firstBaseline" secondItem="LxS-0b-wHH" secondAttribute="firstBaseline" id="eHb-Cf-CME"/>
+                                            <constraint firstItem="LxS-0b-wHH" firstAttribute="top" secondItem="7d5-yJ-2T1" secondAttribute="top" id="zKb-37-IVE"/>
+                                        </constraints>
+                                    </customView>
+                                </gridCell>
+                                <gridCell row="msS-WP-nk3" column="kvt-b7-JjW" id="EeF-Lk-yMO">
+                                    <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="clO-tW-Biz">
+                                        <rect key="frame" x="0.0" y="51" width="100" height="30"/>
+                                        <subviews>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2Pn-qG-LkZ">
+                                                <rect key="frame" x="-2" y="0.0" width="66" height="30"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="sp:" id="EJh-mV-w5d">
+                                                    <font key="font" metaFont="fixedUser" size="11"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aSw-MS-un6" customClass="FixedWidthTextView" customModule="KoholintIsland" customModuleProvider="target">
+                                                <rect key="frame" x="64" y="17" width="38" height="13"/>
+                                                <textFieldCell key="cell" title="$0000" id="1ss-g9-7kw">
+                                                    <font key="font" metaFont="fixedUser" size="11"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstItem="2Pn-qG-LkZ" firstAttribute="leading" secondItem="clO-tW-Biz" secondAttribute="leading" id="BYN-3w-2XM"/>
+                                            <constraint firstItem="aSw-MS-un6" firstAttribute="leading" secondItem="2Pn-qG-LkZ" secondAttribute="trailing" constant="4" id="E9M-WB-nv9"/>
+                                            <constraint firstAttribute="trailing" secondItem="aSw-MS-un6" secondAttribute="trailing" id="OWH-Bx-JDM"/>
+                                            <constraint firstItem="aSw-MS-un6" firstAttribute="firstBaseline" secondItem="2Pn-qG-LkZ" secondAttribute="firstBaseline" id="Zpf-fH-d4a"/>
+                                            <constraint firstAttribute="bottom" secondItem="2Pn-qG-LkZ" secondAttribute="bottom" id="pam-J9-e6u"/>
+                                            <constraint firstItem="2Pn-qG-LkZ" firstAttribute="top" secondItem="clO-tW-Biz" secondAttribute="top" id="qPM-7t-yLs"/>
+                                        </constraints>
+                                    </customView>
+                                </gridCell>
+                                <gridCell row="msS-WP-nk3" column="xgH-nm-bgf" id="EcP-9g-5br">
+                                    <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="hi3-uJ-6FX">
+                                        <rect key="frame" x="104" y="51" width="100" height="30"/>
+                                        <subviews>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cdA-Kx-ZUg">
+                                                <rect key="frame" x="-2" y="0.0" width="80" height="30"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="b:" id="TTk-7w-t8w">
+                                                    <font key="font" metaFont="fixedUser" size="11"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KNo-Kc-BT4" customClass="FixedWidthTextView" customModule="KoholintIsland" customModuleProvider="target">
+                                                <rect key="frame" x="78" y="17" width="24" height="13"/>
+                                                <textFieldCell key="cell" title="$00" id="UFL-to-TY6">
+                                                    <font key="font" metaFont="fixedUser" size="11"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstItem="cdA-Kx-ZUg" firstAttribute="leading" secondItem="hi3-uJ-6FX" secondAttribute="leading" id="9BS-I2-dvl"/>
+                                            <constraint firstItem="KNo-Kc-BT4" firstAttribute="leading" secondItem="cdA-Kx-ZUg" secondAttribute="trailing" constant="4" id="B76-a3-nV7"/>
+                                            <constraint firstItem="cdA-Kx-ZUg" firstAttribute="top" secondItem="hi3-uJ-6FX" secondAttribute="top" id="Msm-zZ-cDN"/>
+                                            <constraint firstAttribute="trailing" secondItem="KNo-Kc-BT4" secondAttribute="trailing" id="egj-C1-wQq"/>
+                                            <constraint firstAttribute="bottom" secondItem="cdA-Kx-ZUg" secondAttribute="bottom" id="mpF-qX-tz8"/>
+                                            <constraint firstItem="KNo-Kc-BT4" firstAttribute="firstBaseline" secondItem="cdA-Kx-ZUg" secondAttribute="firstBaseline" id="ptp-ep-1M2"/>
+                                        </constraints>
+                                    </customView>
+                                </gridCell>
+                                <gridCell row="msS-WP-nk3" column="MA6-eo-zQy" id="vWa-yz-jfM">
+                                    <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="YMY-l4-So1">
+                                        <rect key="frame" x="208" y="51" width="100" height="30"/>
+                                        <subviews>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2Dw-if-QJd">
+                                                <rect key="frame" x="-2" y="0.0" width="80" height="30"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="c:" id="YL4-aq-Y8F">
+                                                    <font key="font" metaFont="fixedUser" size="11"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jMg-iI-ifk" customClass="FixedWidthTextView" customModule="KoholintIsland" customModuleProvider="target">
+                                                <rect key="frame" x="78" y="17" width="24" height="13"/>
+                                                <textFieldCell key="cell" title="$00" id="U0S-mg-IbA">
+                                                    <font key="font" metaFont="fixedUser" size="11"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="trailing" secondItem="jMg-iI-ifk" secondAttribute="trailing" id="7EL-hT-GTm"/>
+                                            <constraint firstAttribute="bottom" secondItem="2Dw-if-QJd" secondAttribute="bottom" id="IZp-9f-rIN"/>
+                                            <constraint firstItem="jMg-iI-ifk" firstAttribute="leading" secondItem="2Dw-if-QJd" secondAttribute="trailing" constant="4" id="LSK-kB-oAI"/>
+                                            <constraint firstItem="2Dw-if-QJd" firstAttribute="top" secondItem="YMY-l4-So1" secondAttribute="top" id="mK6-Zc-3oF"/>
+                                            <constraint firstItem="2Dw-if-QJd" firstAttribute="leading" secondItem="YMY-l4-So1" secondAttribute="leading" id="mt1-Ef-aX9"/>
+                                            <constraint firstItem="jMg-iI-ifk" firstAttribute="firstBaseline" secondItem="2Dw-if-QJd" secondAttribute="firstBaseline" id="u9H-sL-moZ"/>
+                                        </constraints>
+                                    </customView>
+                                </gridCell>
+                                <gridCell row="RLk-QW-Mwt" column="kvt-b7-JjW" id="vrw-kq-eFE"/>
+                                <gridCell row="RLk-QW-Mwt" column="xgH-nm-bgf" id="nQp-ae-nbC">
+                                    <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="HWA-Zx-5ZI">
+                                        <rect key="frame" x="104" y="17" width="100" height="30"/>
+                                        <subviews>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eF9-O5-534">
+                                                <rect key="frame" x="-2" y="0.0" width="80" height="30"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="d:" id="TJ1-Tq-tew">
+                                                    <font key="font" metaFont="fixedUser" size="11"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YP5-3a-m3t" customClass="FixedWidthTextView" customModule="KoholintIsland" customModuleProvider="target">
+                                                <rect key="frame" x="78" y="17" width="24" height="13"/>
+                                                <textFieldCell key="cell" title="$00" id="Xv9-xd-7fK">
+                                                    <font key="font" metaFont="fixedUser" size="11"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstItem="YP5-3a-m3t" firstAttribute="leading" secondItem="eF9-O5-534" secondAttribute="trailing" constant="4" id="Nu9-vh-hPK"/>
+                                            <constraint firstItem="eF9-O5-534" firstAttribute="top" secondItem="HWA-Zx-5ZI" secondAttribute="top" id="XsB-Hc-edm"/>
+                                            <constraint firstItem="eF9-O5-534" firstAttribute="leading" secondItem="HWA-Zx-5ZI" secondAttribute="leading" id="Xy8-Yf-rTI"/>
+                                            <constraint firstItem="YP5-3a-m3t" firstAttribute="firstBaseline" secondItem="eF9-O5-534" secondAttribute="firstBaseline" id="c7x-ej-Jxs"/>
+                                            <constraint firstAttribute="trailing" secondItem="YP5-3a-m3t" secondAttribute="trailing" id="dto-2s-hgE"/>
+                                            <constraint firstAttribute="bottom" secondItem="eF9-O5-534" secondAttribute="bottom" id="xbj-Gi-cJg"/>
+                                        </constraints>
+                                    </customView>
+                                </gridCell>
+                                <gridCell row="RLk-QW-Mwt" column="MA6-eo-zQy" id="175-8m-9kS">
+                                    <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="9rC-oh-3AU">
+                                        <rect key="frame" x="208" y="17" width="100" height="30"/>
+                                        <subviews>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wXU-FV-jei">
+                                                <rect key="frame" x="-2" y="0.0" width="80" height="30"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="e:" id="PDd-mZ-aSG">
+                                                    <font key="font" metaFont="fixedUser" size="11"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ouO-Bg-gCU" customClass="FixedWidthTextView" customModule="KoholintIsland" customModuleProvider="target">
+                                                <rect key="frame" x="78" y="17" width="24" height="13"/>
+                                                <textFieldCell key="cell" title="$00" id="TVP-my-YhM">
+                                                    <font key="font" metaFont="fixedUser" size="11"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstItem="ouO-Bg-gCU" firstAttribute="leading" secondItem="wXU-FV-jei" secondAttribute="trailing" constant="4" id="BCW-rZ-qHA"/>
+                                            <constraint firstItem="wXU-FV-jei" firstAttribute="leading" secondItem="9rC-oh-3AU" secondAttribute="leading" id="VQA-Ra-4Ie"/>
+                                            <constraint firstItem="wXU-FV-jei" firstAttribute="top" secondItem="9rC-oh-3AU" secondAttribute="top" id="WcQ-Mg-o5D"/>
+                                            <constraint firstAttribute="trailing" secondItem="ouO-Bg-gCU" secondAttribute="trailing" id="d84-Ql-K0O"/>
+                                            <constraint firstAttribute="bottom" secondItem="wXU-FV-jei" secondAttribute="bottom" id="ke8-lR-jjf"/>
+                                            <constraint firstItem="ouO-Bg-gCU" firstAttribute="firstBaseline" secondItem="wXU-FV-jei" secondAttribute="firstBaseline" id="oCi-nw-0uC"/>
+                                        </constraints>
+                                    </customView>
+                                </gridCell>
+                                <gridCell row="Tff-sE-w89" column="kvt-b7-JjW" id="xgc-kG-C8h"/>
+                                <gridCell row="Tff-sE-w89" column="xgH-nm-bgf" id="9mK-BT-ONz">
+                                    <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="CZt-3C-z0H">
+                                        <rect key="frame" x="104" y="0.0" width="100" height="13"/>
+                                        <subviews>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bs2-Wl-uzZ">
+                                                <rect key="frame" x="-2" y="0.0" width="80" height="13"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="h:" id="ehl-7x-vE7">
+                                                    <font key="font" metaFont="fixedUser" size="11"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4S0-JQ-4di" customClass="FixedWidthTextView" customModule="KoholintIsland" customModuleProvider="target">
+                                                <rect key="frame" x="78" y="0.0" width="24" height="13"/>
+                                                <textFieldCell key="cell" title="$00" id="iav-8q-2OW">
+                                                    <font key="font" metaFont="fixedUser" size="11"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="trailing" secondItem="4S0-JQ-4di" secondAttribute="trailing" id="A7t-Dm-0tI"/>
+                                            <constraint firstAttribute="bottom" secondItem="bs2-Wl-uzZ" secondAttribute="bottom" id="AHm-UJ-nhK"/>
+                                            <constraint firstItem="4S0-JQ-4di" firstAttribute="leading" secondItem="bs2-Wl-uzZ" secondAttribute="trailing" constant="4" id="OyL-9Q-8lr"/>
+                                            <constraint firstItem="4S0-JQ-4di" firstAttribute="firstBaseline" secondItem="bs2-Wl-uzZ" secondAttribute="firstBaseline" id="tJD-9B-vjq"/>
+                                            <constraint firstItem="bs2-Wl-uzZ" firstAttribute="leading" secondItem="CZt-3C-z0H" secondAttribute="leading" id="vTU-kK-Qrc"/>
+                                            <constraint firstItem="bs2-Wl-uzZ" firstAttribute="top" secondItem="CZt-3C-z0H" secondAttribute="top" id="yMJ-oE-P4R"/>
+                                        </constraints>
+                                    </customView>
+                                </gridCell>
+                                <gridCell row="Tff-sE-w89" column="MA6-eo-zQy" id="j4F-z2-IdN">
+                                    <customView key="contentView" translatesAutoresizingMaskIntoConstraints="NO" id="lUp-6f-IjC">
+                                        <rect key="frame" x="208" y="0.0" width="100" height="13"/>
+                                        <subviews>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="R6z-hJ-gNC">
+                                                <rect key="frame" x="-2" y="0.0" width="80" height="13"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" title="l:" id="c0l-Nl-4eq">
+                                                    <font key="font" metaFont="fixedUser" size="11"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hRp-RU-mQi" customClass="FixedWidthTextView" customModule="KoholintIsland" customModuleProvider="target">
+                                                <rect key="frame" x="78" y="0.0" width="24" height="13"/>
+                                                <textFieldCell key="cell" title="$00" id="EYF-pC-jbi">
+                                                    <font key="font" metaFont="fixedUser" size="11"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="trailing" secondItem="hRp-RU-mQi" secondAttribute="trailing" id="OM8-34-r4V"/>
+                                            <constraint firstItem="R6z-hJ-gNC" firstAttribute="top" secondItem="lUp-6f-IjC" secondAttribute="top" id="lFL-Vv-max"/>
+                                            <constraint firstItem="R6z-hJ-gNC" firstAttribute="leading" secondItem="lUp-6f-IjC" secondAttribute="leading" id="mEi-um-nnB"/>
+                                            <constraint firstItem="hRp-RU-mQi" firstAttribute="firstBaseline" secondItem="R6z-hJ-gNC" secondAttribute="firstBaseline" id="mhP-iC-O6e"/>
+                                            <constraint firstAttribute="bottom" secondItem="R6z-hJ-gNC" secondAttribute="bottom" id="p2S-hn-TXC"/>
+                                            <constraint firstItem="hRp-RU-mQi" firstAttribute="leading" secondItem="R6z-hJ-gNC" secondAttribute="trailing" constant="4" id="uZv-TM-gQ6"/>
+                                        </constraints>
+                                    </customView>
+                                </gridCell>
+                            </gridCells>
+                        </gridView>
+                    </subviews>
+                    <constraints>
+                        <constraint firstItem="EkK-1T-7W1" firstAttribute="leading" secondItem="1v9-I4-eNp" secondAttribute="leading" constant="4" id="4kP-2m-htQ"/>
+                        <constraint firstItem="EkK-1T-7W1" firstAttribute="top" secondItem="1v9-I4-eNp" secondAttribute="top" constant="4" id="Ivn-lR-dUN"/>
+                        <constraint firstAttribute="trailing" secondItem="EkK-1T-7W1" secondAttribute="trailing" constant="4" id="NSi-j0-Jzl"/>
+                    </constraints>
+                </customView>
+                <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="FQq-vR-yB4">
+                    <rect key="frame" x="0.0" y="19" width="649" height="5"/>
+                </box>
+                <textField focusRingType="none" verticalHuggingPriority="750" mirrorLayoutDirectionWhenInternationalizing="never" translatesAutoresizingMaskIntoConstraints="NO" id="amH-Ua-hrr" userLabel="Console input">
+                    <rect key="frame" x="2" y="4" width="645" height="13"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" state="on" focusRingType="none" placeholderString="Debugger input" id="3F7-cb-Dmo" customClass="GBTerminalTextFieldCell">
+                        <font key="font" metaFont="fixedUser" size="11"/>
+                        <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="backgroundColor" red="0.1647058824" green="0.1647058824" blue="0.1647058824" alpha="1" colorSpace="calibratedRGB"/>
+                        <allowedInputSourceLocales>
+                            <string>NSAllRomanInputSourcesLocaleIdentifier</string>
+                        </allowedInputSourceLocales>
+                    </textFieldCell>
+                    <connections>
+                        <action selector="consoleInput:" target="-2" id="Igd-DP-XYI"/>
+                    </connections>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstItem="FQq-vR-yB4" firstAttribute="top" secondItem="1v9-I4-eNp" secondAttribute="bottom" id="2jw-1e-Olh"/>
+                <constraint firstAttribute="bottom" secondItem="amH-Ua-hrr" secondAttribute="bottom" constant="4" id="9CE-hW-b5B"/>
+                <constraint firstAttribute="trailing" secondItem="FQq-vR-yB4" secondAttribute="trailing" id="A6d-Jc-NHl"/>
+                <constraint firstItem="eoH-wM-hxE" firstAttribute="top" secondItem="NN9-c5-PHA" secondAttribute="top" id="Fer-jE-xV9"/>
+                <constraint firstItem="FQq-vR-yB4" firstAttribute="leading" secondItem="NN9-c5-PHA" secondAttribute="leading" id="JZR-jR-7zH"/>
+                <constraint firstItem="1v9-I4-eNp" firstAttribute="top" secondItem="NN9-c5-PHA" secondAttribute="top" id="MtK-Zd-6ZE"/>
+                <constraint firstItem="pAq-Tw-qMm" firstAttribute="leading" secondItem="NN9-c5-PHA" secondAttribute="leading" id="V7I-FY-UsZ"/>
+                <constraint firstAttribute="trailing" secondItem="1v9-I4-eNp" secondAttribute="trailing" id="bL7-b3-w0g"/>
+                <constraint firstItem="FQq-vR-yB4" firstAttribute="top" secondItem="eoH-wM-hxE" secondAttribute="bottom" id="efb-gH-eEy"/>
+                <constraint firstItem="amH-Ua-hrr" firstAttribute="leading" secondItem="NN9-c5-PHA" secondAttribute="leading" constant="4" id="eyh-NX-Edl"/>
+                <constraint firstItem="pAq-Tw-qMm" firstAttribute="top" secondItem="NN9-c5-PHA" secondAttribute="top" id="fal-AX-Sum"/>
+                <constraint firstItem="eoH-wM-hxE" firstAttribute="trailing" secondItem="1v9-I4-eNp" secondAttribute="leading" id="mjZ-lO-1YN"/>
+                <constraint firstItem="pAq-Tw-qMm" firstAttribute="trailing" secondItem="eoH-wM-hxE" secondAttribute="leading" id="naq-JL-QD0"/>
+                <constraint firstItem="FQq-vR-yB4" firstAttribute="top" secondItem="pAq-Tw-qMm" secondAttribute="bottom" id="p8e-hi-QXf"/>
+                <constraint firstItem="amH-Ua-hrr" firstAttribute="top" secondItem="FQq-vR-yB4" secondAttribute="bottom" constant="4" id="qbJ-ft-Tu9"/>
+                <constraint firstAttribute="trailing" secondItem="amH-Ua-hrr" secondAttribute="trailing" constant="4" id="v5Y-Wp-jIv"/>
+            </constraints>
+            <point key="canvasLocation" x="-440.5" y="-380"/>
+        </view>
+    </objects>
+</document>
