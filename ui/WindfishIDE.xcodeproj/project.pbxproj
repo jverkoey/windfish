@@ -545,9 +545,10 @@
 				667B1BA82578563E00CE670F /* SourceViewController.swift */,
 				662B376225B275D400C5E690 /* DebugConsoleView.xib */,
 				662B375625B2275900C5E690 /* DebuggingViewController.swift */,
-				66783F842585B69F008C34FA /* Editors */,
 				667B1C0125789BAE00CE670F /* InspectorViewController.swift */,
-				66820CA5258DB6DC009507BB /* Emulator */,
+				66783F842585B69F008C34FA /* Editors */,
+				665198BF25ABEA6D0075C3FC /* Panels */,
+				664833DF2598558000B955F4 /* Views */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -705,15 +706,6 @@
 				667B1B74257854BB00CE670F /* Info.plist */,
 			);
 			path = Resources;
-			sourceTree = "<group>";
-		};
-		66820CA5258DB6DC009507BB /* Emulator */ = {
-			isa = PBXGroup;
-			children = (
-				665198BF25ABEA6D0075C3FC /* Panels */,
-				664833DF2598558000B955F4 /* Views */,
-			);
-			path = Emulator;
 			sourceTree = "<group>";
 		};
 		6699B58E25AE9F85005DB9BB /* Sameboy */ = {
