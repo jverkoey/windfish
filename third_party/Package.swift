@@ -17,17 +17,41 @@ let package = Package(
     .target(
       name: "Core",
       path: "Sameboy/Core",
+      exclude: ["graphics"],
       cSettings: [
         .define("GB_INTERNAL"),
       ]
     ),
     .target(
       name: "JoyKit",
-      path: "Sameboy/JoyKit"
+      path: "Sameboy/JoyKit",
+      exclude: ["ControllerConfiguration.inc"]
     ),
     .target(
       name: "Cocoa",
       path: "Sameboy/Cocoa",
+      exclude: [
+        "AppIcon.icns",
+        "AppDelegate.m",
+        "CPU.png",
+        "CPU@2x.png",
+        "Cartridge.icns",
+        "ColorCartridge.icns",
+        "Display.png",
+        "Display@2x.png",
+        "Info.plist",
+        "Joypad.png",
+        "Joypad@2x.png",
+        "Joypad~dark.png",
+        "Joypad~dark@2x.png",
+        "License.html",
+        "PkgInfo",
+        "Speaker.png",
+        "Speaker@2x.png",
+        "Speaker~dark.png",
+        "Speaker~dark@2x.png",
+        "main.m",
+      ],
       sources: [
         "BigSurToolbar.h",
         "Document.h",
