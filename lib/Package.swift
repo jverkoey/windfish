@@ -46,13 +46,6 @@ let package = Package(
       ]
     ),
     .testTarget(
-      name: "ROMTests",
-      dependencies: ["Windfish"],
-      resources: [
-        .copy("Resources"),
-      ]
-    ),
-    .testTarget(
       name: "CPUTests",
       dependencies: ["CPU"]
     ),
