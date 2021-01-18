@@ -5,15 +5,18 @@ class DisassemblerTests: XCTestCase {
 
   // MARK: - Specs
 
-  func testDisassemblyOfSpecsFromData() {
+  // The InstructionSet makes the assumption that the index of each specification in its .table corresponds to the
+  // opcode's identifier, and that creating a spec from this opcode will create the corresponding spec in the table.
+  func testInstructionSetOpcodesMatchTableIndex() {
     for (index, spec) in SimpleCPU.InstructionSet.table.enumerated() {
       if case .prefix = spec, let prefixTable = SimpleCPU.InstructionSet.prefixTables[spec] {
+        // Traverse the prefix table. Note that this only supports a single layer of traversals.
+        // TODO[https://github.com/jverkoey/windfish/issues/24]: Test 3+ byte opcodes.
         for (prefixIndex, prefixSpec) in prefixTable.enumerated() {
           let data = Data([UInt8(index), UInt8(prefixIndex)])
           let disassemblySpec = SimpleCPU.InstructionSet.spec(from: data)
           XCTAssertEqual(disassemblySpec, prefixSpec)
         }
-
       } else {
         let data = Data([UInt8(index)])
         let disassemblySpec = SimpleCPU.InstructionSet.spec(from: data)
