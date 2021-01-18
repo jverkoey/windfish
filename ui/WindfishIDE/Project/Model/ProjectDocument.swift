@@ -230,6 +230,7 @@ extension ProjectDocument {
 
 private struct Filenames {
   static let metadata = "metadata.plist"
+  static let gitignore = ".gitignore"
   static let rom = "rom.gb"
   static let disassembly = "disassembly"
   static let configurationDir = "configuration"
@@ -332,12 +333,21 @@ extension ProjectDocument {
       documentFileWrapper.addFileWrapper(configuration)
     }
 
-    if let romData = project.romData {
-      if let fileWrapper = fileWrappers[Filenames.rom] {
-        documentFileWrapper.removeFileWrapper(fileWrapper)
-      }
+    if let romData = project.romData, fileWrappers[Filenames.rom] == nil {
       let fileWrapper = FileWrapper(regularFileWithContents: romData)
       fileWrapper.preferredFilename = Filenames.rom
+      documentFileWrapper.addFileWrapper(fileWrapper)
+    }
+
+    if fileWrappers[Filenames.gitignore] == nil {
+      let fileWrapper = FileWrapper(regularFileWithContents: """
+rom.gb
+disassembly/game.gb
+disassembly/game.map
+disassembly/game.o
+disassembly/game.sym
+""".data(using: .utf8)!)
+      fileWrapper.preferredFilename = Filenames.gitignore
       documentFileWrapper.addFileWrapper(fileWrapper)
     }
 

@@ -553,20 +553,18 @@ public class Disassembler {
   public final class Script {
     init(source: String) {
       self.source = source
-    }
-    let source: String
-    var context: JSContext?
-    var linearSweepDidStep: JSValue?
-    var disassemblyWillStart: JSValue?
 
-    func prepareForRun() {
-      // TODO: Provide a linearSweepDidStart method rather than blowing away the context on each run
       let context = JSContext()!
       context.exceptionHandler = { context, exception in
         print(exception)
       }
       context.evaluateScript(source)
       self.context = context
+      if let linearSweepWillStart = context.objectForKeyedSubscript("linearSweepWillStart"), !linearSweepWillStart.isUndefined {
+        self.linearSweepWillStart = linearSweepWillStart
+      } else {
+        self.linearSweepWillStart = nil
+      }
       if let linearSweepDidStep = context.objectForKeyedSubscript("linearSweepDidStep"), !linearSweepDidStep.isUndefined {
         self.linearSweepDidStep = linearSweepDidStep
       } else {
@@ -578,6 +576,11 @@ public class Disassembler {
         self.disassemblyWillStart = nil
       }
     }
+    let source: String
+    let context: JSContext
+    let linearSweepWillStart: JSValue?
+    let linearSweepDidStep: JSValue?
+    let disassemblyWillStart: JSValue?
   }
   public func defineScript(named name: String, source: String) {
     precondition(scripts[name] == nil, "A script named \(name) already exists.")
@@ -767,16 +770,6 @@ public class Disassembler {
   }
 
   public func willStart() {
-    for script in scripts.values {
-      script.prepareForRun()
-    }
-
-    // Extract any scripted events.
-    let disassemblyWillStarts = scripts.values.filter { $0.disassemblyWillStart != nil }
-    guard !disassemblyWillStarts.isEmpty else {
-      return  // Nothing to do here.
-    }
-
     // Script functions
     let getROMData: @convention(block) (Int, Int, Int) -> [UInt8] = { [weak self] bank, startAddress, endAddress in
       guard let self = self else {
@@ -849,17 +842,26 @@ public class Disassembler {
       print(value.hexString)
     }
 
+    for script in scripts.values {
+      script.context.setObject(getROMData, forKeyedSubscript: "getROMData" as NSString)
+      script.context.setObject(registerText, forKeyedSubscript: "registerText" as NSString)
+      script.context.setObject(registerData, forKeyedSubscript: "registerData" as NSString)
+      script.context.setObject(registerJumpTable, forKeyedSubscript: "registerJumpTable" as NSString)
+      script.context.setObject(registerTransferOfControl, forKeyedSubscript: "registerTransferOfControl" as NSString)
+      script.context.setObject(registerFunction, forKeyedSubscript: "registerFunction" as NSString)
+      script.context.setObject(registerBankChange, forKeyedSubscript: "registerBankChange" as NSString)
+      script.context.setObject(hex16, forKeyedSubscript: "hex16" as NSString)
+      script.context.setObject(hex8, forKeyedSubscript: "hex8" as NSString)
+      script.context.setObject(log, forKeyedSubscript: "log" as NSString)
+    }
+
+    // Extract any scripted events.
+    let disassemblyWillStarts = scripts.values.filter { $0.disassemblyWillStart != nil }
+    guard !disassemblyWillStarts.isEmpty else {
+      return  // Nothing to do here.
+    }
+
     for script in disassemblyWillStarts {
-      script.context?.setObject(getROMData, forKeyedSubscript: "getROMData" as NSString)
-      script.context?.setObject(registerText, forKeyedSubscript: "registerText" as NSString)
-      script.context?.setObject(registerData, forKeyedSubscript: "registerData" as NSString)
-      script.context?.setObject(registerJumpTable, forKeyedSubscript: "registerJumpTable" as NSString)
-      script.context?.setObject(registerTransferOfControl, forKeyedSubscript: "registerTransferOfControl" as NSString)
-      script.context?.setObject(registerFunction, forKeyedSubscript: "registerFunction" as NSString)
-      script.context?.setObject(registerBankChange, forKeyedSubscript: "registerBankChange" as NSString)
-      script.context?.setObject(hex16, forKeyedSubscript: "hex16" as NSString)
-      script.context?.setObject(hex8, forKeyedSubscript: "hex8" as NSString)
-      script.context?.setObject(log, forKeyedSubscript: "log" as NSString)
       script.disassemblyWillStart?.call(withArguments: [])
     }
   }
@@ -887,7 +889,15 @@ public class Disassembler {
       self.registerTransferOfControl(to: toAddress, in: bank, from: fromAddress, in: bank, spec: instruction.spec)
     }
 
+    // Extract any scripted events.
+    let linearSweepDidSteps = scripts.values.filter { $0.linearSweepDidStep != nil }
+    let linearSweepWillStarts = scripts.values.filter { $0.linearSweepWillStart != nil }
+
     while !runQueue.isEmpty {
+      linearSweepWillStarts.forEach {
+        $0.linearSweepWillStart?.call(withArguments: [])
+      }
+
       let run = runQueue.dequeue()
 
       if visitedAddresses.contains(Int(run.startAddress)) {
@@ -912,16 +922,9 @@ public class Disassembler {
         )
         runContext.bank = desiredBank
       }
-
-      // Prepare all scripts for the next run
-      // TODO: Only do this for scripts that have wired up run event hooks
       for script in scripts.values {
-        script.prepareForRun()
-        script.context?.setObject(registerBankChange, forKeyedSubscript: "registerBankChange" as NSString)
+        script.context.setObject(registerBankChange, forKeyedSubscript: "registerBankChange" as NSString)
       }
-
-      // Extract any scripted events.
-      let linearSweepDidSteps = scripts.values.compactMap { $0.linearSweepDidStep }
 
       let advance: (LR35902.Address) -> Void = { amount in
         let currentCartAddress = Gameboy.Cartridge.location(for: runContext.pc, in: runContext.bank)!
@@ -1052,7 +1055,7 @@ public class Disassembler {
             instructionContext.bank
           ]
           for linearSweepDidStep in linearSweepDidSteps {
-            linearSweepDidStep.call(withArguments: args)
+            linearSweepDidStep.linearSweepDidStep?.call(withArguments: args)
           }
         }
 
