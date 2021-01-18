@@ -1,460 +1,1541 @@
 SECTION "ROM Bank 1D", ROMX[$4000], BANK[$1D]
 
-StringTable:
-    db   "Make-up! Jewels!Dresses!  I wantit a"
-    db   "ll!  Sigh...And some new    accessor"
-    db   "ies     would be nice...", $FF, "Make-up! Je"
-    db   "wels!Dresses!  I wantit all!  Sigh.."
-    db   ".And some new    accessories     wou"
-    db   "ld be nice...Oh! That Ribbon!I need "
-    db   "it!  Willyou trade for mydog food?  "
-    db   "         Yes  No!", $FE, "You exchanged ", $E1, " fo"
-    db   "r ", $E2, "! It^s fullof juicy beef!", $FF, "Lucky! "
-    db   " Thanks! Well, here^s    your ", $E2, "!", $FF, "Eh?"
-    db   "!  I can^t   believe it!  Youare the"
-    db   " worst!!", $FF, "I am Manbo,     child of th"
-    db   "e SunFish!  Have you got an Ocarina?"
-    db   "     Yes  No", $FE, "Very well...    Glub Bl"
-    db   "ub Bloop!", $FF, "Ahaha!  Then I  can teach "
-    db   "you mysong! Bloop!", $FF, "You^ve learned  M"
-    db   "anbo^s Mambo!  When you get outof th"
-    db   "e water,   play it!", $FF, "I am Manbo,     "
-    db   "child of the SunFish!  When you play"
-    db   " my Mambo,  you can warp to Manbo Po"
-    db   "nd!  Trythis tune in thedungeons, to"
-    db   "o!  Cha-cha-cha!", $FF, "Aha... You don^thav"
-    db   "e an Ocarina,so...Glub glub!", $FF, "Chicken"
-    db   "s these  days don^t have the fightin"
-    db   "g    spirit they usedto!  In the old"
-    db   " days, they couldfly, flap flap! But"
-    db   " now, see?   Cluck cluck!", $FF, "Wow!  Amaz"
-    db   "ing!  That rooster is actually flyin"
-    db   "g!It^s just like Isaid, eh?  Have yo"
-    db   "u tried to    hold him over   your h"
-    db   "ead? CluckCluck!", $FF, "Wooo!  Finally! Thi"
-    db   "s flying     rooster is the  greates"
-    db   "t!", $FF, " Here Sleeps The Flying Rooster", $FF, "E"
-    db   "nnh?  Who^s    this suspicious-looki"
-    db   "ng runt?!  Okay boys, let^sget ridda"
-    db   " him!", $FF, "You must be an  assassin sent "
-    db   "byMadam MeowMeow  to rescue the   mu"
-    db   "tt!  You came here to get me, but it"
-    db   " is I who will get you!!", $FF, "Oh, #####. "
-    db   " I   often come to   this village to"
-    db   " sing, too!  It  seems that just abo"
-    db   "ut everyone  loves my ^Balladof the "
-    db   "Wind     Fish!^  #####,  what is you"
-    db   "r    favorite song?", $FF, "Please, don^t   "
-    db   "ever forget thissong...or me...", $FF, "Than"
-    db   "k you for   everything!     #####, y"
-    db   "ou are  the kindest boy I know.  One"
-    db   " dayI made a wish tothe Wind Fish..."
-    db   "What was the    wish?  It was...No, "
-    db   "it^s secret!", $FF, "#####, some day you wil"
-    db   "l leave  this island...  I just know"
-    db   " it  in my heart...  ...Don^t ever  "
-    db   " forget me... If you do, I^ll    nev"
-    db   "er forgive   you!", $FF, "... ... ... ... It"
-    db   " seems to be  totally absorbedin Mar"
-    db   "in^s song!", $FF, "They say the    ^Ballad o"
-    db   "f the  Wind Fish^ is a song of awake"
-    db   "n- ing.  I wonder, if the Wind Fishw"
-    db   "akes up, will  he make my wish come "
-    db   "true?", $FF, "Eh?  You want meto go in there"
-    db   "? No, I think I^llwait out here...Ta"
-    db   "ke care of    yourself, #####!", $FF, "Ahhh!"
-    db   "  Ahhh, youare a bad boy,  #####!", $FF, "He"
-    db   "re^s some     bonus treatment!Behold"
-    db   "!  Your   Hearts are full!", $FF, "Ya, I am "
-    db   "Schule Donavitch!  Zee mermaid statu"
-    db   "e  by zee bay iz mymasterpiece! ...T"
-    db   "o tell you zee truth, zis werk iz no"
-    db   "t complete!Zee art, it^z...difficult"
-    db   " for   you to grasp, izit not?", $FF, "  THE"
-    db   " MOURNING       MERMAID        By SC"
-    db   "HULE   ? ...A scale is missing...", $FF, "Se"
-    db   "ashell Mansion", $FF, "Entrance to       Yar"
-    db   "na Desert ", $F3, $FF, "   Mysterious        For"
-    db   "est      (It^s a little  bit mysteri"
-    db   "ous)", $FF, "Do you want to  challenge the  "
-    db   " river rapids on a raft?  Proceedto "
-    db   "the office atonce, please!", $FF, "East ", $F3, " Uk"
-    db   "uku           Prairie  Farther East "
-    db   "     Animal Village", $FF, "Mt. Tamaranch   "
-    db   $FF, $F3, " Tail Cave     ", $F1, " Toronbo Shores", $FF, $F3, " "
-    db   "Gopongo Swamp ", $F1, " Mysterious      Fore"
-    db   "st", $FF, "Beware of floorswith cracks!  A h"
-    db   "eavy person    should not standon th"
-    db   "em!", $FF, "Telephone Booth ", $FF, "     DANGER!   "
-    db   "     Keep out!   (Except BowWow)", $FF, $F1, " G"
-    db   "O THIS WAY", $FF, $F0, " GO THIS WAY", $FF, $F3, " GO THIS W"
-    db   "AY", $FF, $F2, " GO THIS WAY", $FF, " TRY AGAIN FROM    "
-    db   "THE START", $FF, "GREAT!  YOU DID IT!  YOUR "
-    db   "REWARDIS ", $F3, " THIS WAY!", $FF, "GONE ON TOUR   "
-    db   "          MAMU", $FF, $F3, " Crazy Tracy   ", $F1, " Man"
-    db   "bo^s Pond", $FF, $F3, " Animal Village", $F1, " Martha^s"
-    db   " Bay", $FF, $F3, " Welcome to the Animal Village"
-    db   "!", $FF, $F3, " Cemetary      ", $F1, " Ukuku Prairie ", $FF, "T"
-    db   "al Tal Heights", $FF, $F3, " Tamaranch Mt. ", $F2, " Gop"
-    db   "onga Swamp ", $FF, "MUSIC, THE FISH STIRS IN"
-    db   " THE EGGYOU ARE THERE...", $FF, "THE WIND FI"
-    db   "SH INNAME ONLY, FOR  IT IS NEITHER.", $FF
-    db   "IN SOIL SLEEPS  SECRETS, BENEATHYOUR"
-    db   " SOLES...", $FF, "IN SOIL SLEEPS  SECRETS, B"
-    db   "ENEATHYOUR SOLES...", $FF, "AROUND HERE,    "
-    db   "SECRETS ARE NIGH", $FF, "SECRETS ARE LIKEWAT"
-    db   "ER WHEN IT   COMES TO BRIDGES", $FF, "NOW YO"
-    db   "U NEED    LOOK FAR FOR    A SECRET.."
-    db   ".", $FF, "THE WIND FISH   SLUMBERS LONG...TH"
-    db   "E HERO^S LIFE GONE...", $FF, "SEA BEARS FOAM"
-    db   ", SLEEP BEARS     DREAMS. BOTH ENDIN"
-    db   " THE SAME WAY CRASSSH!", $FF, "Oh?!  #####, "
-    db   "I  see ya have a   nice stick...   C"
-    db   "an I borrow it for a second?       C"
-    db   "an  Can^t", $FE, $E4, " became the    honeycomb "
-    db   $E5, "!    You^re not sure how it happene"
-    db   "d,but take it!", $FF, "Hmmm, #####, youare m"
-    db   "ean!", $FF, "Beware of Sea   Urchins!  Don^t"
-    db   " touch them with your bare hands!", $FF, "I "
-    db   "was hungry    somethin^ fierceso I w"
-    db   "ent and   got bananas at  the beach."
-    db   "..    #####, if you   want some, you"
-    db   "  should go and   get some!", $FF, "Welcome "
-    db   "to      Sale^s House O^ Bananas!  I^"
-    db   "m   Sale, this is myhouse! Actually,"
-    db   "my hobby is col-lecting rare andunus"
-    db   "ual canned  food. My brotheris an ar"
-    db   "tist, soI guess strange hobbies run "
-    db   "in  the family!", $FF, "What^s that you have"
-    db   "?!  It^s    canned food! Forheaven^s"
-    db   " sake,  man, give that ", $E2, "to ME!!  PLE"
-    db   "ASE!He^s hysterical!What do you do? "
-    db   "    Give Don^t", $FE, "Oh thank you!   I^ll "
-    db   "take that!", $FF, "I don^t suppose it would "
-    db   "do any good to beg?    Well, if you "
-    db   "   change your     mind, tell me.", $FF, "  "
-    db   "MUNCH MUNCH!! ... ... ... ... That w"
-    db   "as great! I know it^s not a fair tra"
-    db   "de,   but here^s some bananas! YUM.."
-    db   ".", $FF, "You gave him ", $E2, "  and got bananas ", $E3, " "
-    db   "in return!    Good deal!", $FF, "Thank you a"
-    db   "gain!That was yummy!", $FF, "Hey friend! Hav"
-    db   "eyou ever ridden the rapids on a raf"
-    db   "t?  You can, near Tal Tal    Heights"
-    db   "!  You   ought to try it!", $FF, "Rik^m rak^"
-    db   "m! I  ran out of      ingredients!  "
-    db   "IfI had honey, I  could make this fi"
-    db   "t for a king!", $FF, "Hi ho! Hey you! Is tha"
-    db   "t possiblya ", $E5, " you have?   I just ran"
-    db   " out! Will you swap itfor a pineappl"
-    db   "e?    Yes  No", $FE, "You exchanged ", $E5, " for ", $E6, "!"
-    db   "  It^s notas sweet, but itis delicio"
-    db   "us!   ", $FF, "That^s a crying shame, but I "
-    db   "   realize those   are a rare      d"
-    db   "elicacy!", $FF, "Hi ho! Yeah, I  know, that "
-    db   "tub  of goo is asleepright in the wa"
-    db   "yto Yarna Desert!Once he^s asleephe "
-    db   "won^t budge  for a loooooonngtime.  "
-    db   "But hey! Take Little     Marin and w"
-    db   "ake  him up with her song!  That slo"
-    db   "bwould wake up   with a jump if  he "
-    db   "heard her    sing, for sure! Heh heh"
-    db   " heh!", $FF, "My ultimate planis to open a  "
-    db   "  branch in Mabe  Village!", $FF, "HI HO!  L"
-    db   "ittle  Marin!  Welcome!... ... ... ."
-    db   ".. Oh, shucks!  Youare here too... S"
-    db   "orry...", $FF, "Oh, #####, I^m  glad you fou"
-    db   "nd  this place.     Will you stay   "
-    db   "and talk to me  for a while?        "
-    db   "Yes! No...", $FE, "Okay, I^ll just watch the"
-    db   " waves for a while...", $FF, "At the beach.."
-    db   ".  Marin  ", $DE, $FF, "I wonder where  these co"
-    db   "conut   trees come from?...Tarin say"
-    db   "s   there is nothingbeyond the sea, "
-    db   "but I believe   there must be   some"
-    db   "thing over  there...  When Idiscover"
-    db   "ed you, #####, my heart skipped a be"
-    db   "at! I thought, this person has come "
-    db   "to give us a    message...", $FF, "... ... ."
-    db   ".. ... ... ... ... ... If I was a se"
-    db   "a  gull, I would   fly as far as I c"
-    db   "ould!  I would fly to far away place"
-    db   "s and sing for many people!...If I w"
-    db   "ish to the Wind Fish,  I wonder if m"
-    db   "y  dream will come true... ... ...", $FF, "H"
-    db   "ey!  Are you   listening?      #####"
-    db   ", are you  listening to me?    Yeah "
-    db   "No...", $FE, "I want to know  everything abo"
-    db   "utyou...Err...Uhh,Ha ha ha ha!", $FF, "Hunh?"
-    db   " The walruswants me to go  to him?  "
-    db   "It     doesn^t matter, I will go wit"
-    db   "h  you to him...", $FF, "Unnnngh! Owwwww!..."
-    db   " ... ... ... I^ve sure lost  my tast"
-    db   "e for    honey!", $FF, "Humph! Your headis a"
-    db   "lways in theclouds! Will youplease l"
-    db   "isten tome next time?!", $FF, "ZZZ ZZZ ZZZ Z"
-    db   "ZZ  ... ", $DE, " ... ", $DE, " ...", $FF, "Yes, it^s that  "
-    db   "lazy walrus!    Shall we give   him "
-    db   "a little    surprise?           Yes "
-    db   " No...", $FE, "Aha ha ha!  Wow!He certainly "
-    db   "   woke with a     start!", $FF, "Hunh?  Oh,"
-    db   " he^s calling me...   It^s the same "
-    db   "asalways... Ha ha!", $FF, "You^re right, itw"
-    db   "ould be mean towake him up now!Let^s"
-    db   " let him   sleep some more!", $FF, "#####, I"
-    db   "^m goingto the Animal   Village!  Pl"
-    db   "easedrop by, okay?", $FF, "Arfh! Arfh! Arf! "
-    db   $DE, "  ", $DE, "!  ", $DE, "   ", $DE, "!  ..... ", $DD, "?? ", $FF, "It^s no us"
-    db   "e,    little buddy!  Afish took my  "
-    db   "  hook... I keep  casting my line in"
-    db   "to the water, but I haven^t   got a "
-    db   "bite... I thought this    would happ"
-    db   "en...", $FF, "Oh! What is thatyou have in yo"
-    db   "urhand?  It^s not a fishing hook, is"
-    db   " it?  You had better let me   have i"
-    db   "t.  I^ll  give you my nextcatch if y"
-    db   "ou letme have it...       Okay No", $FE, "Al"
-    db   "l right, boy, feast your eyes on a d"
-    db   "isplay of fishing skill!", $FF, "You should "
-    db   "be   more kind to me!I thought we   "
-    db   " were buddies!", $FF, "Whoooah nellie!!It^s "
-    db   "a big one!!Big! Big! Yaaah!", $FF, "The ", $E9, " be"
-    db   "came a  necklace ", $EA, "!     L-l-lucky!", $FF, "I"
-    db   " can^t wait to see what I^ll   catch"
-    db   " next!", $FF, "When I was swim-ming in the b"
-    db   "ay,the waves took avery important  n"
-    db   "ecklace from   around my neck! If yo"
-    db   "u find it, I will let you  take a sc"
-    db   "ale    from my tail!   ", $FF, "I have alrea"
-    db   "dy  looked around   here!", $FF, "Ahh!  That"
-    db   "^s it!That^s my neck- lace!  Give it"
-    db   "! Give it back!  Iwill give you a sc"
-    db   "ale as I said!    Give Keep", $FE, "Promise!"
-    db   "  You^llonly take one!", $FF, "You are heart"
-    db   "-  less and cruel!", $FF, "You returned then"
-    db   "ecklace ", $EA, " and  got a scale ", $EB, " ofthe m"
-    db   "ermaid^s   tail.  How will you use t"
-    db   "his?", $FF, "An artist once  asked me to pos"
-    db   "efor him, and he wanted a scale, too"
-    db   "...  Can the legend of the   Magnify"
-    db   "ing Lens be true...?", $FF, "Richard^s Villa"
-    db   " ", $FF, "Kanalet Castle  10 Min. ", $F3, " ", $F0, $FF, "Kanale"
-    db   "t Castle  5 Min. ", $F3, $FF, "Kanalet Castle  5"
-    db   "0 Paces ", $F0, $FF, "^BRRING! BRRING! BRRING! C"
-    db   "LICK! Yeees!  It^s theBucket Mouse! "
-    db   "  Thanks for call-ing! ...Well... CL"
-    db   "ICK!^  ??? ...You must have   dialed"
-    db   " a wrong  number...", $FF, "Oh!  It^s a big "
-    db   "one!  And it hasa Piece of      Hear"
-    db   "t, too!  Youget a 20 Rupee  prize on"
-    db   " top of that! Try again?    Yes  No", $FE
-    db   "Oh!  It^s a big one!  And it hasa Pi"
-    db   "ece of      Heart, too!  Youhave com"
-    db   "pleted  another Heart   Container!  "
-    db   "On  top of that, youget a 20 Rupee  "
-    db   "prize! Want to  try again?          "
-    db   "Yes  No", $FE, " ^How To Handle    Your Shie"
-    db   "ld     Like A Pro!^ Read this book? "
-    db   "    Read Don^t", $FE, "^If you hold theButto"
-    db   "n down, youcan defend your-self from"
-    db   " enemy attacks, and youcan fillip so"
-    db   "me enemies, too... Besides the     s"
-    db   "tandard shield there is also a mirro"
-    db   "red varietywhich can defendagainst b"
-    db   "eams!^", $FF, " ^Selecting The    Item That^"
-    db   "s    Right For You^Read this book?  "
-    db   "   Read Don^t", $FE, "^You can select your f"
-    db   "avorite   item for the A  and B Butt"
-    db   "ons onthe Sub-Screen. Using differen"
-    db   "t items, you can  fight without a sw"
-    db   "ord!  Try manydifferent thingsto fin"
-    db   "d what^s  right for you!^", $FF, " ^Auto Map"
-    db   " and  Memo Guide Book^Read this book"
-    db   "?     Read Don^t", $FE, "^You can see an isl"
-    db   "and map by   pressing the    SELECT "
-    db   "Button.  The dark parts  of the map "
-    db   "are  places you have not yet visited"
-    db   ".Move the cursor and press the A But"
-    db   "ton to get   more informationabout a"
-    db   "n area,  or to replay themessage you"
-    db   " got there...^  Ahhh!How convenient!"
-    db   $FF, " ^Secrets Of The Whirling Blade^Rea"
-    db   "d this book?     Read Don^t", $FE, "^The Whi"
-    db   "rling   Blade technique has been han"
-    db   "ded down from gener-ation to gener- "
-    db   "ation by the    family of the   hero"
-    db   ". To use it,hold down the   Sword Bu"
-    db   "tton andbuild up your   power.  When"
-    db   " youhave enough, youcan release the "
-    db   "Button!  Can youmaster this?^", $FF, "^The P"
-    db   "roperties   Of Warp Holes^Read this "
-    db   "book?     Read Don^t", $FE, "^There are some"
-    db   " Warp Holes on   Koholint Island.You"
-    db   " can warp to and fro using   these h"
-    db   "oles.  Ifyou jump into   the Warp Ho"
-    db   "le   at which you    arrived, you   "
-    db   " will go to the  next one in the seq"
-    db   "uence.  You  can only warp toa hole "
-    db   "you have seen with your  own eyes..."
-    db   "^", $FF, "^Fun With Bombs^Read this book?   "
-    db   "  Read Don^t", $FE, "^After you put aBomb do"
-    db   "wn, you  can pick it up  by pressing"
-    db   " the Button again.   You can then   "
-    db   " throw it by     pushing the     But"
-    db   "ton one more time.  Did you  know th"
-    db   "at?^", $FF, "   ^Atlas Of    Koholint Island"
-    db   "^You can move thecursor and look up "
-    db   "the name of aplace...  Do youwant to"
-    db   " look at this map?           Look Do"
-    db   "n^t", $FE, " ^Dark Secrets    And Mysteries "
-    db   "   Of Koholint^ Do you really   want"
-    db   " to read it?    Yes! N-No", $FE, "Gasp! Wha-"
-    db   "What^sthis! ... ...   You can^t read"
-    db   "  the tiny print  without the aid of"
-    db   " a magnifying glass...", $FF, "...my grave.."
-    db   ".  ...take me...   ...my grave...", $FF, ".."
-    db   ".the house...  ...take me...  ...the"
-    db   " house... ...at the bay...", $FF, "...N-N-No"
-    db   "!...   ...N-not there!", $FF, "   ...Here!.."
-    db   ".     ...enter...   ...my house...", $FF, " "
-    db   "...Nostalgia... ...unchanged... ...b"
-    db   "oo hoo...", $FF, "  ...Enough...   ...cemeta"
-    db   "ry...   ...take me...  ...my grave.."
-    db   ".", $FF, "...Thank you...  ...a jar...    .."
-    db   ".in my home......look inside.....bye"
-    db   "...bye...", $FF, "Round and round,the passag"
-    db   "eways of the Egg...   ", $F2, " ", $F2, " ", $F0, " ", $F3, " ", $F3, " ", $F0, " ", $F2, " "
-    db   $F0, " ??  ...Hmmmmmm, this book reeks of"
-    db   " secrets...", $FF, "Round and round,the pass"
-    db   "ageways of the Egg...   ", $F3, " ", $F0, " ", $F0, " ", $F3, " ", $F0, " ", $F0, " "
-    db   $F3, " ", $F0, " ??  ...Hmmmmmm, this book reeks "
-    db   "of secrets...", $FF, "Round and round,the pa"
-    db   "ssageways of the Egg...   ", $F2, " ", $F0, " ", $F3, " ", $F0, " ", $F2, " "
-    db   $F0, " ", $F3, " ", $F0, " ??  ...Hmmmmmm, this book reek"
-    db   "s of secrets...", $FF, "Round and round,the "
-    db   "passageways of the Egg...   ", $F3, " ", $F3, " ", $F3, " ", $F3, " "
-    db   $F0, " ", $F0, " ", $F0, " ", $F0, " ??  ...Hmmmmmm, this book re"
-    db   "eks of secrets...", $FF, "...You^re late! I "
-    db   "thought you^d never come back!", $FF, "...EE"
-    db   "EK!  You^rehurt!  Arrrgh!  Don^t be "
-    db   "so     reckless!", $FF, "#####! You^re   bac"
-    db   "k!  Are you  hurt?", $FF, "...You idiot!   I"
-    db   " told you this would happen... Eh?! "
-    db   " What?  I  didn^t say any- thing, re"
-    db   "ally!", $FF, "Hey buddy!  It^sserious!  Yeah"
-    db   ", really serious!!Yeah, it is!    Th"
-    db   "e Moblins cameto the village! Yeah, "
-    db   "that^s    right!  A whole gang of Mo"
-    db   "blins!Then... It^s forreal!  They al"
-    db   "l went to the     house...  Yeah, th"
-    db   "at house, and then they did   someth"
-    db   "ing at BowWow^s house!!   It was a r"
-    db   "eally bad scene, with the M-m-moblin"
-    db   "s!So, I mean, ahh!... ... ... ... .."
-    db   ". ... ... ... It might be     faster"
-    db   " to find  out for yourselfwhat happe"
-    db   "ned!", $FF, "I found a good  item washed up "
-    db   " on the beach... I^ll trade it toyou"
-    db   " for what youhave in your B  Button."
-    db   "..           Okay No", $FE, "Okay, let^s do "
-    db   " it!  When you   don^t want the  Boo"
-    db   "merang any   more, come back!", $FF, "Oh, ye"
-    db   "ah, uh... okay, whatever.", $FF, "You got th"
-    db   "e     Boomerang in    exchange for t"
-    db   "heitem you had.", $FF, "Give me back theBoom"
-    db   "erang, I begyou! I^ll returnthe item"
-    db   " you    gave to me!         Okay Not"
-    db   " Now", $FE, "The item came   back to you. Yo"
-    db   "ureturned the    Boomerang.", $FF, "Ah... Do"
-    db   "n^t giveme that item... How about so"
-    db   "me- thing else?", $FF, "Hunh?  A keyholehere"
-    db   "?  It says, ^Tale Keyhole^", $FF, "Hunh?  A "
-    db   "keyholehere?  It says, ^Slime Keyhol"
-    db   "e^", $FF, "Hunh?  A keyholehere?  It says, ^"
-    db   "Angler Keyhole^", $FF, "Hunh?  A keyholehere"
-    db   "?  It says, ^Bird Keyhole^", $FF, "Hunh?  A "
-    db   "keyholehere?  It says, ^Face Keyhole"
-    db   "^", $FF, "Somebody, HELP!", $FF, "Hey!  #####!    So"
-    db   "me monsters   put me up here! What s"
-    db   "hould I   do?!  I^m afraidof heights"
-    db   "!!", $FF, "Yow!  That was asurprise! #####,t"
-    db   "hank you!", $FF, "... ... ... ... ... ... .."
-    db   ". ... Say... #####... ", $FF, "Uhh... I don^"
-    db   "t  know how to say this... but...", $FF, "Hu"
-    db   "nh?!  Tarin??!... ... ... ... Uh... "
-    db   "Nevermind,I... I gotta go!", $FF, "MAAAAAAAR"
-    db   "INNNN!!", $FF, "^BRRING! BRRING!This is Ulri"
-    db   "ra! Oh, I heard fromgrandma that    "
-    db   "there is some-  thing hidden    behi"
-    db   "nd the fallsin the Tal Tal  Mountain"
-    db   "s.  Doesthat help?  Bye!CLICK!^", $FF, "^BRR"
-    db   "ING! BRRING!Ulrira here...  Yes, whe"
-    db   "n I was just a lad, I   recall seein"
-    db   "g a high tower in   the mountains!  "
-    db   "You should go   there!  Is that help"
-    db   "ful for you?Bye! CLICK!^", $FF, "^BRRING! BR"
-    db   "RING!Hello, this is  Ulrira speaking"
-    db   "!#####, it^s timefor you to face the"
-    db   " Egg on Mt.  Tamaranch!  Be  careful"
-    db   ", #####! Bye!  CLICK!^", $FF, "^BRRING! BRRI"
-    db   "NG!This is Ulrira! You^re lost in  t"
-    db   "he Egg?  Hmmmm.No sir, I can^t help "
-    db   "you on thatone.  How about the libra"
-    db   "ry?    And hey, don^t  stop calling "
-    db   "me because I didn^tknow one little a"
-    db   "nswer!  CLICK!^", $FF, "^BRRING! BRRING!Ulri"
-    db   "ra at your  service!  Oh?   You shou"
-    db   "ld take BowWow home now,Madam MeowMe"
-    db   "ow  would appreciateit! Bye! CLICK!^"
-    db   $FF, "^BRRING! BRRING!Yeah, this is   Ulr"
-    db   "ira!  You arestarting to liketo musi"
-    db   "c, eh?   Well, a frog    named Mamu,"
-    db   " who lives in the    Signpost Maze, "
-    db   " might know some new songs, but  he "
-    db   "charges a lotto play them!   Bye!  C"
-    db   "LICK!^", $FF, "^BRRING! BRRING!Hi, it^s Ulri"
-    db   "ra!You are doing   great!  Your    e"
-    db   "fforts will endsoon... By the  way, "
-    db   "have you   visited the Hen House on "
-    db   "the    mountain?  Thereis a cave nea"
-    db   "rbywith something  important in it.B"
-    db   "ye!  CLICK!^", $FF, "^BRRING! BRRING!Ulrira "
-    db   "speaking!Are your enemiestoo strong "
-    db   "for  you?  In that   case, you bette"
-    db   "rcollect all the Seashells...Justbel"
-    db   "ieve in your-self and do yourbest!  "
-    db   "CLICK!^", $FF, "^BRRING! BRRING!Ulrira here!"
-    db   " ...Go for it!      You^re almost   "
-    db   "there! I^m pull-ing for you!    Bye!"
-    db   "  CLICK!^", $FF, "Yarna Desert?   There^s a "
-    db   "way toget there to thesouth, but you"
-    db   "  might not be    able to get     th"
-    db   "rough if that lazy walrus is  in the"
-    db   " way!", $FF, "Ahhh... Sigh... On such a nice"
-    db   "  day, we need a  song from Marin!", $FF, "H"
-    db   "ey! Did ya knowAnimal Village  and M"
-    db   "abe Villageare sister      cities?  "
-    db   "Yes,   even though theyaren^t large "
-    db   "   enough to be    called cities...A"
-    db   "nyway, I heard from a very goodsourc"
-    db   "e that theyhave a Dream    Shrine in"
-    db   " Mabe, and that it has something goo"
-    db   "d  inside...  Is   that true?", $FF, "Lately"
-    db   " there    have been a lot of monster"
-    db   "s in  the area, so we can^t go to Ma"
-    db   "beVillage...  I   wonder how Marinis"
-    db   " doing?", $FF, "Have you heard  of the Flyin"
-    db   "g   Rooster?  They  say it lived in "
-    db   "Mabe Village a  long time ago...I wo"
-    db   "nder if it^strue...", $FF, "Aaaah, Little   "
-    db   "Marin... I want her to come backagai"
-    db   "n...Her songis the best...", $FF, "I dreamed"
-    db   " that  I turned into a carrot last  "
-    db   "   night...  What  an odd dream...", $FF, "E"
-    db   "h?  How can an animal talk?    How? "
-    db   " Hey, I^m  just a rabbit,  so I don^"
-    db   "t know!", $FF, "Ahhh!  It^s her!Little Marin"
-    db   "!!"
+    db   "Make-up! Jewels!"
+    db   "Dresses!  I want"
+    db   "it all!  Sigh..."
+    db   "And some new    "
+    db   "accessories     "
+    db   "would be nice..."
+
+    db   $FF
+
+    db   "Make-up! Jewels!"
+    db   "Dresses!  I want"
+    db   "it all!  Sigh..."
+    db   "And some new    "
+    db   "accessories     "
+    db   "would be nice..."
+    db   "Oh! That Ribbon!"
+    db   "I need it!  Will"
+    db   "you trade for my"
+    db   "dog food?       "
+    db   "    Yes  No!", $FE, "You"
+    db   " exchanged ", $E1, " for"
+    db   " ", $E2, "! It^s fullof "
+    db   "juicy beef!"
+
+    db   $FF
+
+    db   "Lucky!  Thanks! "
+    db   "Well, here^s    "
+    db   "your ", $E2, "!"
+
+    db   $FF
+
+    db   "Eh?!  I can^t   "
+    db   "believe it!  You"
+    db   "are the worst!!"
+
+    db   $FF
+
+    db   "I am Manbo,     "
+    db   "child of the Sun"
+    db   "Fish!  Have you "
+    db   "got an Ocarina? "
+    db   "    Yes  No", $FE, "Very"
+    db   " well...    Glub"
+    db   " Blub Bloop!"
+
+    db   $FF
+
+    db   "Ahaha!  Then I  "
+    db   "can teach you my"
+    db   "song! Bloop!"
+
+    db   $FF
+
+    db   "You^ve learned  "
+    db   "Manbo^s Mambo!  "
+    db   "When you get out"
+    db   "of the water,   "
+    db   "play it!"
+
+    db   $FF
+
+    db   "I am Manbo,     "
+    db   "child of the Sun"
+    db   "Fish!  When you "
+    db   "play my Mambo,  "
+    db   "you can warp to "
+    db   "Manbo Pond!  Try"
+    db   "this tune in the"
+    db   "dungeons, too!  "
+    db   "Cha-cha-cha!"
+
+    db   $FF
+
+    db   "Aha... You don^t"
+    db   "have an Ocarina,"
+    db   "so...Glub glub!"
+
+    db   $FF
+
+    db   "Chickens these  "
+    db   "days don^t have "
+    db   "the fighting    "
+    db   "spirit they used"
+    db   "to!  In the old "
+    db   "days, they could"
+    db   "fly, flap flap! "
+    db   "But now, see?   "
+    db   "Cluck cluck!"
+
+    db   $FF
+
+    db   "Wow!  Amazing!  "
+    db   "That rooster is "
+    db   "actually flying!"
+    db   "It^s just like I"
+    db   "said, eh?  Have "
+    db   "you tried to    "
+    db   "hold him over   "
+    db   "your head? Cluck"
+    db   "Cluck!"
+
+    db   $FF
+
+    db   "Wooo!  Finally! "
+    db   "This flying     "
+    db   "rooster is the  "
+    db   "greatest!"
+
+    db   $FF
+
+    db   " Here Sleeps The"
+    db   " Flying Rooster"
+
+    db   $FF
+
+    db   "Ennh?  Who^s    "
+    db   "this suspicious-"
+    db   "looking runt?!  "
+    db   "Okay boys, let^s"
+    db   "get ridda him!"
+
+    db   $FF
+
+    db   "You must be an  "
+    db   "assassin sent by"
+    db   "Madam MeowMeow  "
+    db   "to rescue the   "
+    db   "mutt!  You came "
+    db   "here to get me, "
+    db   "but it is I who "
+    db   "will get you!!"
+
+    db   $FF
+
+    db   "Oh, #####.  I   "
+    db   "often come to   "
+    db   "this village to "
+    db   "sing, too!  It  "
+    db   "seems that just "
+    db   "about everyone  "
+    db   "loves my ^Ballad"
+    db   "of the Wind     "
+    db   "Fish!^  #####,  "
+    db   "what is your    "
+    db   "favorite song?"
+
+    db   $FF
+
+    db   "Please, don^t   "
+    db   "ever forget this"
+    db   "song...or me..."
+
+    db   $FF
+
+    db   "Thank you for   "
+    db   "everything!     "
+    db   "#####, you are  "
+    db   "the kindest boy "
+    db   "I know.  One day"
+    db   "I made a wish to"
+    db   "the Wind Fish..."
+    db   "What was the    "
+    db   "wish?  It was..."
+    db   "No, it^s secret!"
+
+    db   $FF
+
+    db   "#####, some day "
+    db   "you will leave  "
+    db   "this island...  "
+    db   "I just know it  "
+    db   "in my heart...  "
+    db   "...Don^t ever   "
+    db   "forget me... If "
+    db   "you do, I^ll    "
+    db   "never forgive   "
+    db   "you!"
+
+    db   $FF
+
+    db   "... ... ... ... "
+    db   "It seems to be  "
+    db   "totally absorbed"
+    db   "in Marin^s song!"
+
+    db   $FF
+
+    db   "They say the    "
+    db   "^Ballad of the  "
+    db   "Wind Fish^ is a "
+    db   "song of awaken- "
+    db   "ing.  I wonder, "
+    db   "if the Wind Fish"
+    db   "wakes up, will  "
+    db   "he make my wish "
+    db   "come true?"
+
+    db   $FF
+
+    db   "Eh?  You want me"
+    db   "to go in there? "
+    db   "No, I think I^ll"
+    db   "wait out here..."
+    db   "Take care of    "
+    db   "yourself, #####!"
+
+    db   $FF
+
+    db   "Ahhh!  Ahhh, you"
+    db   "are a bad boy,  "
+    db   "#####!"
+
+    db   $FF
+
+    db   "Here^s some     "
+    db   "bonus treatment!"
+    db   "Behold!  Your   "
+    db   "Hearts are full!"
+
+    db   $FF
+
+    db   "Ya, I am Schule "
+    db   "Donavitch!  Zee "
+    db   "mermaid statue  "
+    db   "by zee bay iz my"
+    db   "masterpiece! ..."
+    db   "To tell you zee "
+    db   "truth, zis werk "
+    db   "iz not complete!"
+    db   "Zee art, it^z..."
+    db   "difficult for   "
+    db   "you to grasp, iz"
+    db   "it not?"
+
+    db   $FF
+
+    db   "  THE MOURNING  "
+    db   "     MERMAID    "
+    db   "    By SCHULE   "
+    db   "? ...A scale is "
+    db   "missing..."
+
+    db   $FF
+
+    db   "Seashell Mansion"
+
+    db   $FF
+
+    db   "Entrance to     "
+    db   "  Yarna Desert ", $F3
+
+    db   $FF
+
+    db   "   Mysterious   "
+    db   "     Forest     "
+    db   " (It^s a little "
+    db   " bit mysterious)"
+
+    db   $FF
+
+    db   "Do you want to  "
+    db   "challenge the   "
+    db   "river rapids on "
+    db   "a raft?  Proceed"
+    db   "to the office at"
+    db   "once, please!"
+
+    db   $FF
+
+    db   "East ", $F3, " Ukuku    "
+    db   "       Prairie  "
+    db   "Farther East    "
+    db   "  Animal Village"
+
+    db   $FF
+
+    db   "Mt. Tamaranch   "
+
+    db   $FF
+
+    db   $F3, " Tail Cave     "
+    db   $F1, " Toronbo Shores"
+
+    db   $FF
+
+    db   $F3, " Gopongo Swamp "
+    db   $F1, " Mysterious    "
+    db   "  Forest"
+
+    db   $FF
+
+    db   "Beware of floors"
+    db   "with cracks!  A "
+    db   "heavy person    "
+    db   "should not stand"
+    db   "on them!"
+
+    db   $FF
+
+    db   "Telephone Booth "
+
+    db   $FF
+
+    db   "     DANGER!    "
+    db   "    Keep out!   "
+    db   "(Except BowWow)"
+
+    db   $FF
+
+    db   $F1, " GO THIS WAY"
+
+    db   $FF
+
+    db   $F0, " GO THIS WAY"
+
+    db   $FF
+
+    db   $F3, " GO THIS WAY"
+
+    db   $FF
+
+    db   $F2, " GO THIS WAY"
+
+    db   $FF
+
+    db   " TRY AGAIN FROM "
+    db   "   THE START"
+
+    db   $FF
+
+    db   "GREAT!  YOU DID "
+    db   "IT!  YOUR REWARD"
+    db   "IS ", $F3, " THIS WAY!"
+
+    db   $FF
+
+    db   "GONE ON TOUR    "
+    db   "         MAMU"
+
+    db   $FF
+
+    db   $F3, " Crazy Tracy   "
+    db   $F1, " Manbo^s Pond"
+
+    db   $FF
+
+    db   $F3, " Animal Village"
+    db   $F1, " Martha^s Bay"
+
+    db   $FF
+
+    db   $F3, " Welcome to the"
+    db   " Animal Village!"
+
+    db   $FF
+
+    db   $F3, " Cemetary      "
+    db   $F1, " Ukuku Prairie "
+
+    db   $FF
+
+    db   "Tal Tal Heights"
+
+    db   $FF
+
+    db   $F3, " Tamaranch Mt. "
+    db   $F2, " Goponga Swamp "
+
+    db   $FF
+
+    db   "MUSIC, THE FISH "
+    db   "STIRS IN THE EGG"
+    db   "YOU ARE THERE..."
+
+    db   $FF
+
+    db   "THE WIND FISH IN"
+    db   "NAME ONLY, FOR  "
+    db   "IT IS NEITHER."
+
+    db   $FF
+
+    db   "IN SOIL SLEEPS  "
+    db   "SECRETS, BENEATH"
+    db   "YOUR SOLES..."
+
+    db   $FF
+
+    db   "IN SOIL SLEEPS  "
+    db   "SECRETS, BENEATH"
+    db   "YOUR SOLES..."
+
+    db   $FF
+
+    db   "AROUND HERE,    "
+    db   "SECRETS ARE NIGH"
+
+    db   $FF
+
+    db   "SECRETS ARE LIKE"
+    db   "WATER WHEN IT   "
+    db   "COMES TO BRIDGES"
+
+    db   $FF
+
+    db   "NOW YOU NEED    "
+    db   "LOOK FAR FOR    "
+    db   "A SECRET..."
+
+    db   $FF
+
+    db   "THE WIND FISH   "
+    db   "SLUMBERS LONG..."
+    db   "THE HERO^S LIFE "
+    db   "GONE..."
+
+    db   $FF
+
+    db   "SEA BEARS FOAM, "
+    db   "SLEEP BEARS     "
+    db   "DREAMS. BOTH END"
+    db   "IN THE SAME WAY "
+    db   "CRASSSH!"
+
+    db   $FF
+
+    db   "Oh?!  #####, I  "
+    db   "see ya have a   "
+    db   "nice stick...   "
+    db   "Can I borrow it "
+    db   "for a second?   "
+    db   "    Can  Can^t", $FE, $E4
+    db   " became the    h"
+    db   "oneycomb ", $E5, "!    Y"
+    db   "ou^re not sure h"
+    db   "ow it happened,b"
+    db   "ut take it!"
+
+    db   $FF
+
+    db   "Hmmm, #####, you"
+    db   "are mean!"
+
+    db   $FF
+
+    db   "Beware of Sea   "
+    db   "Urchins!  Don^t "
+    db   "touch them with "
+    db   "your bare hands!"
+
+    db   $FF
+
+    db   "I was hungry    "
+    db   "somethin^ fierce"
+    db   "so I went and   "
+    db   "got bananas at  "
+    db   "the beach...    "
+    db   "#####, if you   "
+    db   "want some, you  "
+    db   "should go and   "
+    db   "get some!"
+
+    db   $FF
+
+    db   "Welcome to      "
+    db   "Sale^s House O^ "
+    db   "Bananas!  I^m   "
+    db   "Sale, this is my"
+    db   "house! Actually,"
+    db   "my hobby is col-"
+    db   "lecting rare and"
+    db   "unusual canned  "
+    db   "food. My brother"
+    db   "is an artist, so"
+    db   "I guess strange "
+    db   "hobbies run in  "
+    db   "the family!"
+
+    db   $FF
+
+    db   "What^s that you "
+    db   "have?!  It^s    "
+    db   "canned food! For"
+    db   "heaven^s sake,  "
+    db   "man, give that ", $E2
+    db   "to ME!!  PLEASE!"
+    db   "He^s hysterical!"
+    db   "What do you do? "
+    db   "    Give Don^t", $FE, "O"
+    db   "h thank you!   I"
+    db   "^ll take that!"
+
+    db   $FF
+
+    db   "I don^t suppose "
+    db   "it would do any "
+    db   "good to beg?    "
+    db   "Well, if you    "
+    db   "change your     "
+    db   "mind, tell me."
+
+    db   $FF
+
+    db   "  MUNCH MUNCH!! "
+    db   "... ... ... ... "
+    db   "That was great! "
+    db   "I know it^s not "
+    db   "a fair trade,   "
+    db   "but here^s some "
+    db   "bananas! YUM..."
+
+    db   $FF
+
+    db   "You gave him ", $E2, "  "
+    db   "and got bananas "
+    db   $E3, " in return!    "
+    db   "Good deal!"
+
+    db   $FF
+
+    db   "Thank you again!"
+    db   "That was yummy!"
+
+    db   $FF
+
+    db   "Hey friend! Have"
+    db   "you ever ridden "
+    db   "the rapids on a "
+    db   "raft?  You can, "
+    db   "near Tal Tal    "
+    db   "Heights!  You   "
+    db   "ought to try it!"
+
+    db   $FF
+
+    db   "Rik^m rak^m! I  "
+    db   "ran out of      "
+    db   "ingredients!  If"
+    db   "I had honey, I  "
+    db   "could make this "
+    db   "fit for a king!"
+
+    db   $FF
+
+    db   "Hi ho! Hey you! "
+    db   "Is that possibly"
+    db   "a ", $E5, " you have?   "
+    db   "I just ran out! "
+    db   "Will you swap it"
+    db   "for a pineapple?"
+    db   "    Yes  No", $FE, "You "
+    db   "exchanged ", $E5, " for "
+    db   $E6, "!  It^s notas s"
+    db   "weet, but itis d"
+    db   "elicious!   "
+
+    db   $FF
+
+    db   "That^s a crying "
+    db   "shame, but I    "
+    db   "realize those   "
+    db   "are a rare      "
+    db   "delicacy!"
+
+    db   $FF
+
+    db   "Hi ho! Yeah, I  "
+    db   "know, that tub  "
+    db   "of goo is asleep"
+    db   "right in the way"
+    db   "to Yarna Desert!"
+    db   "Once he^s asleep"
+    db   "he won^t budge  "
+    db   "for a loooooonng"
+    db   "time.  But hey! "
+    db   "Take Little     "
+    db   "Marin and wake  "
+    db   "him up with her "
+    db   "song!  That slob"
+    db   "would wake up   "
+    db   "with a jump if  "
+    db   "he heard her    "
+    db   "sing, for sure! "
+    db   "Heh heh heh!"
+
+    db   $FF
+
+    db   "My ultimate plan"
+    db   "is to open a    "
+    db   "branch in Mabe  "
+    db   "Village!"
+
+    db   $FF
+
+    db   "HI HO!  Little  "
+    db   "Marin!  Welcome!"
+    db   "... ... ... ... "
+    db   "Oh, shucks!  You"
+    db   "are here too... "
+    db   "Sorry..."
+
+    db   $FF
+
+    db   "Oh, #####, I^m  "
+    db   "glad you found  "
+    db   "this place.     "
+    db   "Will you stay   "
+    db   "and talk to me  "
+    db   "for a while?    "
+    db   "    Yes! No...", $FE, "O"
+    db   "kay, I^ll just w"
+    db   "atch the waves f"
+    db   "or a while..."
+
+    db   $FF
+
+    db   "At the beach... "
+    db   " Marin  ", $DE
+
+    db   $FF
+
+    db   "I wonder where  "
+    db   "these coconut   "
+    db   "trees come from?"
+    db   "...Tarin says   "
+    db   "there is nothing"
+    db   "beyond the sea, "
+    db   "but I believe   "
+    db   "there must be   "
+    db   "something over  "
+    db   "there...  When I"
+    db   "discovered you, "
+    db   "#####, my heart "
+    db   "skipped a beat! "
+    db   "I thought, this "
+    db   "person has come "
+    db   "to give us a    "
+    db   "message..."
+
+    db   $FF
+
+    db   "... ... ... ... "
+    db   "... ... ... ... "
+    db   "If I was a sea  "
+    db   "gull, I would   "
+    db   "fly as far as I "
+    db   "could!  I would "
+    db   "fly to far away "
+    db   "places and sing "
+    db   "for many people!"
+    db   "...If I wish to "
+    db   "the Wind Fish,  "
+    db   "I wonder if my  "
+    db   "dream will come "
+    db   "true... ... ..."
+
+    db   $FF
+
+    db   "Hey!  Are you   "
+    db   "listening?      "
+    db   "#####, are you  "
+    db   "listening to me?"
+    db   "    Yeah No...", $FE, "I"
+    db   " want to know  e"
+    db   "verything abouty"
+    db   "ou...Err...Uhh,H"
+    db   "a ha ha ha!"
+
+    db   $FF
+
+    db   "Hunh? The walrus"
+    db   "wants me to go  "
+    db   "to him?  It     "
+    db   "doesn^t matter, "
+    db   "I will go with  "
+    db   "you to him..."
+
+    db   $FF
+
+    db   "Unnnngh! Owwwww!"
+    db   "... ... ... ... "
+    db   "I^ve sure lost  "
+    db   "my taste for    "
+    db   "honey!"
+
+    db   $FF
+
+    db   "Humph! Your head"
+    db   "is always in the"
+    db   "clouds! Will you"
+    db   "please listen to"
+    db   "me next time?!"
+
+    db   $FF
+
+    db   "ZZZ ZZZ ZZZ ZZZ "
+    db   " ... ", $DE, " ... ", $DE, " ..."
+
+    db   $FF
+
+    db   "Yes, it^s that  "
+    db   "lazy walrus!    "
+    db   "Shall we give   "
+    db   "him a little    "
+    db   "surprise?       "
+    db   "    Yes  No...", $FE, "A"
+    db   "ha ha ha!  Wow!H"
+    db   "e certainly    w"
+    db   "oke with a     s"
+    db   "tart!"
+
+    db   $FF
+
+    db   "Hunh?  Oh, he^s "
+    db   "calling me...   "
+    db   "It^s the same as"
+    db   "always... Ha ha!"
+
+    db   $FF
+
+    db   "You^re right, it"
+    db   "would be mean to"
+    db   "wake him up now!"
+    db   "Let^s let him   "
+    db   "sleep some more!"
+
+    db   $FF
+
+    db   "#####, I^m going"
+    db   "to the Animal   "
+    db   "Village!  Please"
+    db   "drop by, okay?"
+
+    db   $FF
+
+    db   "Arfh! Arfh! Arf!"
+    db   " ", $DE, "  ", $DE, "!  ", $DE, "   ", $DE, "!  "
+    db   "..... ", $DD, "?? "
+
+    db   $FF
+
+    db   "It^s no use,    "
+    db   "little buddy!  A"
+    db   "fish took my    "
+    db   "hook... I keep  "
+    db   "casting my line "
+    db   "into the water, "
+    db   "but I haven^t   "
+    db   "got a bite... I "
+    db   "thought this    "
+    db   "would happen..."
+
+    db   $FF
+
+    db   "Oh! What is that"
+    db   "you have in your"
+    db   "hand?  It^s not "
+    db   "a fishing hook, "
+    db   "is it?  You had "
+    db   "better let me   "
+    db   "have it.  I^ll  "
+    db   "give you my next"
+    db   "catch if you let"
+    db   "me have it...   "
+    db   "    Okay No", $FE, "All "
+    db   "right, boy, feas"
+    db   "t your eyes on a"
+    db   " display of fish"
+    db   "ing skill!"
+
+    db   $FF
+
+    db   "You should be   "
+    db   "more kind to me!"
+    db   "I thought we    "
+    db   "were buddies!"
+
+    db   $FF
+
+    db   "Whoooah nellie!!"
+    db   "It^s a big one!!"
+    db   "Big! Big! Yaaah!"
+
+    db   $FF
+
+    db   "The ", $E9, " became a  "
+    db   "necklace ", $EA, "!     "
+    db   "L-l-lucky!"
+
+    db   $FF
+
+    db   "I can^t wait to "
+    db   "see what I^ll   "
+    db   "catch next!"
+
+    db   $FF
+
+    db   "When I was swim-"
+    db   "ming in the bay,"
+    db   "the waves took a"
+    db   "very important  "
+    db   "necklace from   "
+    db   "around my neck! "
+    db   "If you find it, "
+    db   "I will let you  "
+    db   "take a scale    "
+    db   "from my tail!   "
+
+    db   $FF
+
+    db   "I have already  "
+    db   "looked around   "
+    db   "here!"
+
+    db   $FF
+
+    db   "Ahh!  That^s it!"
+    db   "That^s my neck- "
+    db   "lace!  Give it! "
+    db   "Give it back!  I"
+    db   "will give you a "
+    db   "scale as I said!"
+    db   "    Give Keep", $FE, "Pr"
+    db   "omise!  You^llon"
+    db   "ly take one!"
+
+    db   $FF
+
+    db   "You are heart-  "
+    db   "less and cruel!"
+
+    db   $FF
+
+    db   "You returned the"
+    db   "necklace ", $EA, " and  "
+    db   "got a scale ", $EB, " of"
+    db   "the mermaid^s   "
+    db   "tail.  How will "
+    db   "you use this?"
+
+    db   $FF
+
+    db   "An artist once  "
+    db   "asked me to pose"
+    db   "for him, and he "
+    db   "wanted a scale, "
+    db   "too...  Can the "
+    db   "legend of the   "
+    db   "Magnifying Lens "
+    db   "be true...?"
+
+    db   $FF
+
+    db   "Richard^s Villa "
+
+    db   $FF
+
+    db   "Kanalet Castle  "
+    db   "10 Min. ", $F3, " ", $F0
+
+    db   $FF
+
+    db   "Kanalet Castle  "
+    db   "5 Min. ", $F3
+
+    db   $FF
+
+    db   "Kanalet Castle  "
+    db   "50 Paces ", $F0
+
+    db   $FF
+
+    db   "^BRRING! BRRING!"
+    db   " BRRING! CLICK! "
+    db   "Yeees!  It^s the"
+    db   "Bucket Mouse!   "
+    db   "Thanks for call-"
+    db   "ing! ...Well... "
+    db   "CLICK!^  ??? ..."
+    db   "You must have   "
+    db   "dialed a wrong  "
+    db   "number..."
+
+    db   $FF
+
+    db   "Oh!  It^s a big "
+    db   "one!  And it has"
+    db   "a Piece of      "
+    db   "Heart, too!  You"
+    db   "get a 20 Rupee  "
+    db   "prize on top of "
+    db   "that! Try again?"
+    db   "    Yes  No", $FE, "Oh! "
+    db   " It^s a big one!"
+    db   "  And it hasa Pi"
+    db   "ece of      Hear"
+    db   "t, too!  Youhave"
+    db   " completed  anot"
+    db   "her Heart   Cont"
+    db   "ainer!  On  top "
+    db   "of that, youget "
+    db   "a 20 Rupee  priz"
+    db   "e! Want to  try "
+    db   "again?          "
+    db   "Yes  No", $FE, " ^How To"
+    db   " Handle    Your "
+    db   "Shield     Like "
+    db   "A Pro!^ Read thi"
+    db   "s book?     Read"
+    db   " Don^t", $FE, "^If you h"
+    db   "old theButton do"
+    db   "wn, youcan defen"
+    db   "d your-self from"
+    db   " enemy attacks, "
+    db   "and youcan filli"
+    db   "p some enemies, "
+    db   "too... Besides t"
+    db   "he     standard "
+    db   "shield there is "
+    db   "also a mirrored "
+    db   "varietywhich can"
+    db   " defendagainst b"
+    db   "eams!^"
+
+    db   $FF
+
+    db   " ^Selecting The "
+    db   "   Item That^s  "
+    db   "  Right For You^"
+    db   "Read this book? "
+    db   "    Read Don^t", $FE, "^"
+    db   "You can select y"
+    db   "our favorite   i"
+    db   "tem for the A  a"
+    db   "nd B Buttons ont"
+    db   "he Sub-Screen. U"
+    db   "sing different i"
+    db   "tems, you can  f"
+    db   "ight without a s"
+    db   "word!  Try manyd"
+    db   "ifferent thingst"
+    db   "o find what^s  r"
+    db   "ight for you!^"
+
+    db   $FF
+
+    db   " ^Auto Map and  "
+    db   "Memo Guide Book^"
+    db   "Read this book? "
+    db   "    Read Don^t", $FE, "^"
+    db   "You can see an i"
+    db   "sland map by   p"
+    db   "ressing the    S"
+    db   "ELECT Button.  T"
+    db   "he dark parts  o"
+    db   "f the map are  p"
+    db   "laces you have n"
+    db   "ot yet visited.M"
+    db   "ove the cursor a"
+    db   "nd press the A B"
+    db   "utton to get   m"
+    db   "ore informationa"
+    db   "bout an area,  o"
+    db   "r to replay them"
+    db   "essage you got t"
+    db   "here...^  Ahhh!H"
+    db   "ow convenient!"
+
+    db   $FF
+
+    db   " ^Secrets Of The"
+    db   " Whirling Blade^"
+    db   "Read this book? "
+    db   "    Read Don^t", $FE, "^"
+    db   "The Whirling   B"
+    db   "lade technique h"
+    db   "as been handed d"
+    db   "own from gener-a"
+    db   "tion to gener- a"
+    db   "tion by the    f"
+    db   "amily of the   h"
+    db   "ero. To use it,h"
+    db   "old down the   S"
+    db   "word Button andb"
+    db   "uild up your   p"
+    db   "ower.  When youh"
+    db   "ave enough, youc"
+    db   "an release the B"
+    db   "utton!  Can youm"
+    db   "aster this?^"
+
+    db   $FF
+
+    db   "^The Properties "
+    db   "  Of Warp Holes^"
+    db   "Read this book? "
+    db   "    Read Don^t", $FE, "^"
+    db   "There are some W"
+    db   "arp Holes on   K"
+    db   "oholint Island.Y"
+    db   "ou can warp to a"
+    db   "nd fro using   t"
+    db   "hese holes.  Ify"
+    db   "ou jump into   t"
+    db   "he Warp Hole   a"
+    db   "t which you    a"
+    db   "rrived, you    w"
+    db   "ill go to the  n"
+    db   "ext one in the s"
+    db   "equence.  You  c"
+    db   "an only warp toa"
+    db   " hole you have s"
+    db   "een with your  o"
+    db   "wn eyes...^"
+
+    db   $FF
+
+    db   "^Fun With Bombs^"
+    db   "Read this book? "
+    db   "    Read Don^t", $FE, "^"
+    db   "After you put aB"
+    db   "omb down, you  c"
+    db   "an pick it up  b"
+    db   "y pressing the B"
+    db   "utton again.   Y"
+    db   "ou can then    t"
+    db   "hrow it by     p"
+    db   "ushing the     B"
+    db   "utton one more t"
+    db   "ime.  Did you  k"
+    db   "now that?^"
+
+    db   $FF
+
+    db   "   ^Atlas Of    "
+    db   "Koholint Island^"
+    db   "You can move the"
+    db   "cursor and look "
+    db   "up the name of a"
+    db   "place...  Do you"
+    db   "want to look at "
+    db   "this map?       "
+    db   "    Look Don^t", $FE, " "
+    db   "^Dark Secrets   "
+    db   " And Mysteries  "
+    db   "  Of Koholint^ D"
+    db   "o you really   w"
+    db   "ant to read it? "
+    db   "   Yes! N-No", $FE, "Gas"
+    db   "p! Wha-What^sthi"
+    db   "s! ... ...   You"
+    db   " can^t read  the"
+    db   " tiny print  wit"
+    db   "hout the aid of "
+    db   "a magnifying gla"
+    db   "ss..."
+
+    db   $FF
+
+    db   "...my grave...  "
+    db   "...take me...   "
+    db   "...my grave..."
+
+    db   $FF
+
+    db   "...the house... "
+    db   " ...take me...  "
+    db   "...the house... "
+    db   "...at the bay..."
+
+    db   $FF
+
+    db   "...N-N-No!...   "
+    db   "...N-not there!"
+
+    db   $FF
+
+    db   "   ...Here!...  "
+    db   "   ...enter...  "
+    db   " ...my house..."
+
+    db   $FF
+
+    db   " ...Nostalgia..."
+    db   " ...unchanged..."
+    db   " ...boo hoo..."
+
+    db   $FF
+
+    db   "  ...Enough...  "
+    db   " ...cemetary... "
+    db   "  ...take me... "
+    db   " ...my grave..."
+
+    db   $FF
+
+    db   "...Thank you... "
+    db   " ...a jar...    "
+    db   "...in my home..."
+    db   "...look inside.."
+    db   "...bye...bye..."
+
+    db   $FF
+
+    db   "Round and round,"
+    db   "the passageways "
+    db   "of the Egg...   "
+    db   $F2, " ", $F2, " ", $F0, " ", $F3, " ", $F3, " ", $F0, " ", $F2, " ", $F0, " "
+    db   "??  ...Hmmmmmm, "
+    db   "this book reeks "
+    db   "of secrets..."
+
+    db   $FF
+
+    db   "Round and round,"
+    db   "the passageways "
+    db   "of the Egg...   "
+    db   $F3, " ", $F0, " ", $F0, " ", $F3, " ", $F0, " ", $F0, " ", $F3, " ", $F0, " "
+    db   "??  ...Hmmmmmm, "
+    db   "this book reeks "
+    db   "of secrets..."
+
+    db   $FF
+
+    db   "Round and round,"
+    db   "the passageways "
+    db   "of the Egg...   "
+    db   $F2, " ", $F0, " ", $F3, " ", $F0, " ", $F2, " ", $F0, " ", $F3, " ", $F0, " "
+    db   "??  ...Hmmmmmm, "
+    db   "this book reeks "
+    db   "of secrets..."
+
+    db   $FF
+
+    db   "Round and round,"
+    db   "the passageways "
+    db   "of the Egg...   "
+    db   $F3, " ", $F3, " ", $F3, " ", $F3, " ", $F0, " ", $F0, " ", $F0, " ", $F0, " "
+    db   "??  ...Hmmmmmm, "
+    db   "this book reeks "
+    db   "of secrets..."
+
+    db   $FF
+
+    db   "...You^re late! "
+    db   "I thought you^d "
+    db   "never come back!"
+
+    db   $FF
+
+    db   "...EEEK!  You^re"
+    db   "hurt!  Arrrgh!  "
+    db   "Don^t be so     "
+    db   "reckless!"
+
+    db   $FF
+
+    db   "#####! You^re   "
+    db   "back!  Are you  "
+    db   "hurt?"
+
+    db   $FF
+
+    db   "...You idiot!   "
+    db   "I told you this "
+    db   "would happen... "
+    db   "Eh?!  What?  I  "
+    db   "didn^t say any- "
+    db   "thing, really!"
+
+    db   $FF
+
+    db   "Hey buddy!  It^s"
+    db   "serious!  Yeah, "
+    db   "really serious!!"
+    db   "Yeah, it is!    "
+    db   "The Moblins came"
+    db   "to the village! "
+    db   "Yeah, that^s    "
+    db   "right!  A whole "
+    db   "gang of Moblins!"
+    db   "Then... It^s for"
+    db   "real!  They all "
+    db   "went to the     "
+    db   "house...  Yeah, "
+    db   "that house, and "
+    db   "then they did   "
+    db   "something at Bow"
+    db   "Wow^s house!!   "
+    db   "It was a really "
+    db   "bad scene, with "
+    db   "the M-m-moblins!"
+    db   "So, I mean, ahh!"
+    db   "... ... ... ... "
+    db   "... ... ... ... "
+    db   "It might be     "
+    db   "faster to find  "
+    db   "out for yourself"
+    db   "what happened!"
+
+    db   $FF
+
+    db   "I found a good  "
+    db   "item washed up  "
+    db   "on the beach... "
+    db   "I^ll trade it to"
+    db   "you for what you"
+    db   "have in your B  "
+    db   "Button...       "
+    db   "    Okay No", $FE, "Okay"
+    db   ", let^s do  it! "
+    db   " When you   don^"
+    db   "t want the  Boom"
+    db   "erang any   more"
+    db   ", come back!"
+
+    db   $FF
+
+    db   "Oh, yeah, uh... "
+    db   "okay, whatever."
+
+    db   $FF
+
+    db   "You got the     "
+    db   "Boomerang in    "
+    db   "exchange for the"
+    db   "item you had."
+
+    db   $FF
+
+    db   "Give me back the"
+    db   "Boomerang, I beg"
+    db   "you! I^ll return"
+    db   "the item you    "
+    db   "gave to me!     "
+    db   "    Okay Not Now"
+    db   $FE, "The item came  "
+    db   " back to you. Yo"
+    db   "ureturned the   "
+    db   " Boomerang."
+
+    db   $FF
+
+    db   "Ah... Don^t give"
+    db   "me that item... "
+    db   "How about some- "
+    db   "thing else?"
+
+    db   $FF
+
+    db   "Hunh?  A keyhole"
+    db   "here?  It says, "
+    db   "^Tale Keyhole^"
+
+    db   $FF
+
+    db   "Hunh?  A keyhole"
+    db   "here?  It says, "
+    db   "^Slime Keyhole^"
+
+    db   $FF
+
+    db   "Hunh?  A keyhole"
+    db   "here?  It says, "
+    db   "^Angler Keyhole^"
+
+    db   $FF
+
+    db   "Hunh?  A keyhole"
+    db   "here?  It says, "
+    db   "^Bird Keyhole^"
+
+    db   $FF
+
+    db   "Hunh?  A keyhole"
+    db   "here?  It says, "
+    db   "^Face Keyhole^"
+
+    db   $FF
+
+    db   "Somebody, HELP!"
+
+    db   $FF
+
+    db   "Hey!  #####!    "
+    db   "Some monsters   "
+    db   "put me up here! "
+    db   "What should I   "
+    db   "do?!  I^m afraid"
+    db   "of heights!!"
+
+    db   $FF
+
+    db   "Yow!  That was a"
+    db   "surprise! #####,"
+    db   "thank you!"
+
+    db   $FF
+
+    db   "... ... ... ... "
+    db   "... ... ... ... "
+    db   "Say... #####... "
+
+    db   $FF
+
+    db   "Uhh... I don^t  "
+    db   "know how to say "
+    db   "this... but..."
+
+    db   $FF
+
+    db   "Hunh?!  Tarin??!"
+    db   "... ... ... ... "
+    db   "Uh... Nevermind,"
+    db   "I... I gotta go!"
+
+    db   $FF
+
+    db   "MAAAAAAARINNNN!!"
+
+    db   $FF
+
+    db   "^BRRING! BRRING!"
+    db   "This is Ulrira! "
+    db   "Oh, I heard from"
+    db   "grandma that    "
+    db   "there is some-  "
+    db   "thing hidden    "
+    db   "behind the falls"
+    db   "in the Tal Tal  "
+    db   "Mountains.  Does"
+    db   "that help?  Bye!"
+    db   "CLICK!^"
+
+    db   $FF
+
+    db   "^BRRING! BRRING!"
+    db   "Ulrira here...  "
+    db   "Yes, when I was "
+    db   "just a lad, I   "
+    db   "recall seeing a "
+    db   "high tower in   "
+    db   "the mountains!  "
+    db   "You should go   "
+    db   "there!  Is that "
+    db   "helpful for you?"
+    db   "Bye! CLICK!^"
+
+    db   $FF
+
+    db   "^BRRING! BRRING!"
+    db   "Hello, this is  "
+    db   "Ulrira speaking!"
+    db   "#####, it^s time"
+    db   "for you to face "
+    db   "the Egg on Mt.  "
+    db   "Tamaranch!  Be  "
+    db   "careful, #####! "
+    db   "Bye!  CLICK!^"
+
+    db   $FF
+
+    db   "^BRRING! BRRING!"
+    db   "This is Ulrira! "
+    db   "You^re lost in  "
+    db   "the Egg?  Hmmmm."
+    db   "No sir, I can^t "
+    db   "help you on that"
+    db   "one.  How about "
+    db   "the library?    "
+    db   "And hey, don^t  "
+    db   "stop calling me "
+    db   "because I didn^t"
+    db   "know one little "
+    db   "answer!  CLICK!^"
+
+    db   $FF
+
+    db   "^BRRING! BRRING!"
+    db   "Ulrira at your  "
+    db   "service!  Oh?   "
+    db   "You should take "
+    db   "BowWow home now,"
+    db   "Madam MeowMeow  "
+    db   "would appreciate"
+    db   "it! Bye! CLICK!^"
+
+    db   $FF
+
+    db   "^BRRING! BRRING!"
+    db   "Yeah, this is   "
+    db   "Ulrira!  You are"
+    db   "starting to like"
+    db   "to music, eh?   "
+    db   "Well, a frog    "
+    db   "named Mamu, who "
+    db   "lives in the    "
+    db   "Signpost Maze,  "
+    db   "might know some "
+    db   "new songs, but  "
+    db   "he charges a lot"
+    db   "to play them!   "
+    db   "Bye!  CLICK!^"
+
+    db   $FF
+
+    db   "^BRRING! BRRING!"
+    db   "Hi, it^s Ulrira!"
+    db   "You are doing   "
+    db   "great!  Your    "
+    db   "efforts will end"
+    db   "soon... By the  "
+    db   "way, have you   "
+    db   "visited the Hen "
+    db   "House on the    "
+    db   "mountain?  There"
+    db   "is a cave nearby"
+    db   "with something  "
+    db   "important in it."
+    db   "Bye!  CLICK!^"
+
+    db   $FF
+
+    db   "^BRRING! BRRING!"
+    db   "Ulrira speaking!"
+    db   "Are your enemies"
+    db   "too strong for  "
+    db   "you?  In that   "
+    db   "case, you better"
+    db   "collect all the "
+    db   "Seashells...Just"
+    db   "believe in your-"
+    db   "self and do your"
+    db   "best!  CLICK!^"
+
+    db   $FF
+
+    db   "^BRRING! BRRING!"
+    db   "Ulrira here! ..."
+    db   "Go for it!      "
+    db   "You^re almost   "
+    db   "there! I^m pull-"
+    db   "ing for you!    "
+    db   "Bye!  CLICK!^"
+
+    db   $FF
+
+    db   "Yarna Desert?   "
+    db   "There^s a way to"
+    db   "get there to the"
+    db   "south, but you  "
+    db   "might not be    "
+    db   "able to get     "
+    db   "through if that "
+    db   "lazy walrus is  "
+    db   "in the way!"
+
+    db   $FF
+
+    db   "Ahhh... Sigh... "
+    db   "On such a nice  "
+    db   "day, we need a  "
+    db   "song from Marin!"
+
+    db   $FF
+
+    db   "Hey! Did ya know"
+    db   "Animal Village  "
+    db   "and Mabe Village"
+    db   "are sister      "
+    db   "cities?  Yes,   "
+    db   "even though they"
+    db   "aren^t large    "
+    db   "enough to be    "
+    db   "called cities..."
+    db   "Anyway, I heard "
+    db   "from a very good"
+    db   "source that they"
+    db   "have a Dream    "
+    db   "Shrine in Mabe, "
+    db   "and that it has "
+    db   "something good  "
+    db   "inside...  Is   "
+    db   "that true?"
+
+    db   $FF
+
+    db   "Lately there    "
+    db   "have been a lot "
+    db   "of monsters in  "
+    db   "the area, so we "
+    db   "can^t go to Mabe"
+    db   "Village...  I   "
+    db   "wonder how Marin"
+    db   "is doing?"
+
+    db   $FF
+
+    db   "Have you heard  "
+    db   "of the Flying   "
+    db   "Rooster?  They  "
+    db   "say it lived in "
+    db   "Mabe Village a  "
+    db   "long time ago..."
+    db   "I wonder if it^s"
+    db   "true..."
+
+    db   $FF
+
+    db   "Aaaah, Little   "
+    db   "Marin... I want "
+    db   "her to come back"
+    db   "again...Her song"
+    db   "is the best..."
+
+    db   $FF
+
+    db   "I dreamed that  "
+    db   "I turned into a "
+    db   "carrot last     "
+    db   "night...  What  "
+    db   "an odd dream..."
+
+    db   $FF
+
+    db   "Eh?  How can an "
+    db   "animal talk?    "
+    db   "How?  Hey, I^m  "
+    db   "just a rabbit,  "
+    db   "so I don^t know!"
+
+    db   $FF
+
+    db   "Ahhh!  It^s her!"
+    db   "Little Marin!!"
 
     db   $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
     db   $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF

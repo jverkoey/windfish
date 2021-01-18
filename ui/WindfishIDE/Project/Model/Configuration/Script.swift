@@ -1,6 +1,6 @@
 import Foundation
 
-final class Script: NSObject, Codable {
+final class Script: NSObject {
   internal init(name: String, source: String) {
     self.name = name
     self.source = source

@@ -1,6 +1,6 @@
 import Foundation
 
-class ProjectConfiguration: NSObject, Codable {
+class ProjectConfiguration: NSObject {
   @objc dynamic var regions: [Region] = []
   @objc dynamic var dataTypes: [DataType] = []
   @objc dynamic var globals: [Global] = []
@@ -9,10 +9,5 @@ class ProjectConfiguration: NSObject, Codable {
 
   override init() {
     super.init()
-  }
-
-  required init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: Self.CodingKeys)
-    regions = (try? container.decode(Array<Region>.self, forKey: .regions)) ?? []
   }
 }

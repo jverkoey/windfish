@@ -21,5 +21,6 @@ function extractText(bank, startAddress, endAddress) {
 }
 
 function disassemblyWillStart() {
-  extractText(0x09, 0x6700, 0x6d9f);
+  extractText(0x09, 0x6700, 0x6D9F);
+  extractText(0x1D, 0x4000, 0x7FB6);
 }

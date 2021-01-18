@@ -1,6 +1,6 @@
 import Foundation
 
-final class Macro: NSObject, Codable {
+final class Macro: NSObject {
   internal init(name: String, source: String) {
     self.name = name
     self.source = source

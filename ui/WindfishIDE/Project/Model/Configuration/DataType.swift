@@ -1,6 +1,6 @@
 import Foundation
 
-final class DataType: NSObject, Codable {
+final class DataType: NSObject {
   init(name: String, representation: String, interpretation: String, mappings: [Mapping]) {
     self.name = name
     self.representation = representation

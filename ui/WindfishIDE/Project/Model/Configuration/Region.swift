@@ -1,7 +1,7 @@
 import Foundation
 import Windfish
 
-final class Region: NSObject, Codable {
+final class Region: NSObject {
   struct Kind {
     static let region = "Region"
     static let label = "Label"

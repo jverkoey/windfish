@@ -239,7 +239,7 @@ private struct Filenames {
   static let macrosDir = "macros"
   static let globals = "globals.asm"
   static let dataTypes = "datatypes.asm"
-  static let configuration = "configuration.plist"
+  static let regions = "regions.asm"
 }
 
 extension ProjectDocument {
@@ -253,12 +253,6 @@ extension ProjectDocument {
       let decoder = PropertyListDecoder()
       let metadata = try decoder.decode(ProjectMetadata.self, from: encodedMetadata)
       self.project.metadata = metadata
-    }
-
-    if let fileWrapper = fileWrappers[Filenames.configuration],
-       let regularFileContents = fileWrapper.regularFileContents {
-      let decoder = PropertyListDecoder()
-      self.project.configuration = try decoder.decode(ProjectConfiguration.self, from: regularFileContents)
     }
 
     // Configuration as human-editable files
@@ -358,6 +352,41 @@ extension ProjectDocument {
         }
         self.project.configuration.dataTypes = dataTypes
       }
+      if let regions = configuration.fileWrappers?[Filenames.regions],
+         let content = regions.regularFileContents {
+        let regionsText = String(data: content, encoding: .utf8)!
+        var regions: [Region] = []
+        regionsText.enumerateLines { line, _ in
+          if line.isEmpty {
+            return
+          }
+          let codeAndComments = line.split(separator: ";", maxSplits: 1, omittingEmptySubsequences: false)
+          let code = codeAndComments[0].trimmed()
+          if !code.hasSuffix(":") {
+            return
+          }
+          let name = String(code.dropLast())
+          let comments = codeAndComments[1].trimmed()
+          let scanner = Scanner(string: comments)
+          _ = scanner.scanUpToString("[")
+          _ = scanner.scanString("[")
+          let regionType = scanner.scanUpToString("]")!.trimmed()
+          _ = scanner.scanUpToString("$")
+          _ = scanner.scanString("$")
+          let bank = scanner.scanUpToString(":")!.trimmed()
+          _ = scanner.scanUpToString("$")
+          _ = scanner.scanString("$")
+          let address = scanner.scanUpToString("[")!.trimmed()
+          _ = scanner.scanString("[")
+          let length = scanner.scanUpToString("]")!.trimmed()
+          regions.append(Region(regionType: regionType,
+                                name: name,
+                                bank: Gameboy.Cartridge.Bank(bank, radix: 16)!,
+                                address: LR35902.Address(address, radix: 16)!,
+                                length: LR35902.Address(length)!))
+        }
+        self.project.configuration.regions = regions
+      }
     }
 
     if let fileWrapper = fileWrappers[Filenames.rom],
@@ -394,14 +423,6 @@ extension ProjectDocument {
     metadataFileWrapper.preferredFilename = Filenames.metadata
     documentFileWrapper.addFileWrapper(metadataFileWrapper)
 
-    if let fileWrapper = fileWrappers[Filenames.configuration] {
-      documentFileWrapper.removeFileWrapper(fileWrapper)
-    }
-    let encodedConfiguration = try encoder.encode(project.configuration)
-    let configurationFileWrapper = FileWrapper(regularFileWithContents: encodedConfiguration)
-    configurationFileWrapper.preferredFilename = Filenames.configuration
-    documentFileWrapper.addFileWrapper(configurationFileWrapper)
-
     // Configuration as human-editable files
     if true {
       if let configuration = fileWrappers[Filenames.configurationDir] {
@@ -435,7 +456,12 @@ extension ProjectDocument {
                                                   fatalError()
                                                 }
                                               }).joined(separator: "\n")
-                                          }.joined(separator: "\n\n").data(using: .utf8)!)
+                                          }.joined(separator: "\n\n").data(using: .utf8)!),
+        Filenames.regions: FileWrapper(regularFileWithContents: project.configuration.regions
+                                        .sorted(by: { $0.bank < $1.bank && $0.address < $1.address })
+                                        .map { (region: Region) -> String in
+                                          "\(region.name): ; [\(region.regionType)] $\(region.bank.hexString):$\(region.address.hexString) [\(region.length)]"
+                                        }.joined(separator: "\n\n").data(using: .utf8)!),
       ])
       configuration.preferredFilename = Filenames.configurationDir
       documentFileWrapper.addFileWrapper(configuration)

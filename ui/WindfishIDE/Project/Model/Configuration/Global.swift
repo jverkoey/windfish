@@ -2,7 +2,7 @@ import Foundation
 
 import Windfish
 
-final class Global: NSObject, Codable {
+final class Global: NSObject {
   internal init(name: String, address: LR35902.Address, dataType: String) {
     self.name = name
     self.address = address
