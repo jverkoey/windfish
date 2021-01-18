@@ -695,7 +695,7 @@ toc_14_523C.else_14_52BE:
     assign [$DB97], $CC
     ld   [$DB99], a
     assign [$DB98], $0C
-    assign [$FFA1], $02
+    assign [hLinkInteractiveMotionBlocked], $02
 toc_14_523C.return_14_52FA:
     ret
 
@@ -877,9 +877,9 @@ toc_14_541B.else_14_544A:
     ld   [$D402], a
     assign [$D403], $45
     assign [$D404], $38
-    ld   [$FF98], a
+    ld   [hLinkPositionX], a
     assign [$D405], $60
-    ld   [$FF99], a
+    ld   [hLinkPositionY], a
     assign [$D416], $53
     ret
 
@@ -1103,7 +1103,7 @@ toc_14_5822.else_14_586C:
     and  e
     jp   z, .return_14_591E
 
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
     ld   hl, $C5D0
     add  hl, bc
     ld   [hl], a
@@ -1141,7 +1141,7 @@ toc_14_5822.else_14_5891:
     jr   nz, toc_14_5822.else_14_58D1
 
     push hl
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
     ld   e, a
     ld   d, b
     ld   hl, $581E
@@ -1188,7 +1188,7 @@ toc_14_5822.else_14_58EC:
     add  a, $04
     ld   e, a
 toc_14_5822.else_14_58F6:
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
     add  a, e
     ld   e, a
     ld   d, b
@@ -1237,7 +1237,7 @@ toc_14_5935:
     and  a
     jr   nz, toc_14_595A
 
-    ifEq [$FF9D], $6C, toc_14_595A
+    ifEq [hLinkAnimationState], LINK_ANIMATION_STATE_GOT_ITEM, toc_14_595A
 
     assign [$C16B], $04
     assign [$DB97], $E4
@@ -1258,35 +1258,35 @@ toc_14_5964:
     or   [hl]
     jr   nz, .return_14_599F
 
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     sub  a, $11
-    cp   $7E
+    cp   126
     jr   c, .else_14_5989
 
-    ifGte [$FF98], $50, .else_14_5982
+    ifGte [hLinkPositionX], 80, .else_14_5982
 
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     inc  a
-    ld   [$FF98], a
+    ld   [hLinkPositionX], a
     jr   .toc_14_5996
 
 toc_14_5964.else_14_5982:
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     dec  a
-    ld   [$FF98], a
+    ld   [hLinkPositionX], a
     jr   .toc_14_5996
 
 toc_14_5964.else_14_5989:
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     sub  a, $16
-    cp   $5E
+    cp   94
     jr   c, .return_14_599F
 
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     dec  a
-    ld   [$FF99], a
+    ld   [hLinkPositionY], a
 toc_14_5964.toc_14_5996:
-    assign [$FFA1], $01
+    assign [hLinkInteractiveMotionBlocked], $01
     assign [$C111], $02
 toc_14_5964.return_14_599F:
     ret

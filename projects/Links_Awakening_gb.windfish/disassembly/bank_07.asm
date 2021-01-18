@@ -135,7 +135,7 @@ JumpTable_40C1_07.else_07_4146:
     ld   hl, $C490
     add  hl, bc
     ld   [hl], b
-    copyFromTo [$FF9E], [$C15D]
+    copyFromTo [hLinkDirection], [$C15D]
     call toc_01_0891
     ld   [hl], $02
     ld   hl, $FFF3
@@ -580,13 +580,13 @@ JumpTable_4A04_07.return_07_4A38:
 
 toc_07_4A74:
     ld   e, a
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     push af
-    assign [$FF99], $10
+    assign [hLinkPositionY], $10
     ld   a, e
     call toc_01_2185
     pop  af
-    ld   [$FF99], a
+    ld   [hLinkPositionY], a
     ret
 
 
@@ -1588,7 +1588,7 @@ JumpTable_5E42_07.else_07_5E85:
     ld   hl, $C490
     add  hl, bc
     ld   [hl], b
-    copyFromTo [$FF9E], [$C15D]
+    copyFromTo [hLinkDirection], [$C15D]
     call toc_01_0891
     ld   [hl], $02
     ld   hl, $FFF3
@@ -1886,7 +1886,7 @@ JumpTable_64C0_07.else_07_64CA:
     db   $AF, $C3, $87, $3B
 
 toc_07_650E:
-    ld   a, [$FFA2]
+    ld   a, [hLinkPositionZHigh]
     and  a
     jp   z, toc_01_3BD5
 
@@ -2749,7 +2749,7 @@ toc_07_764B.else_07_7672:
     ld   hl, $C490
     add  hl, bc
     ld   [hl], b
-    copyFromTo [$FF9E], [$C15D]
+    copyFromTo [hLinkDirection], [$C15D]
     call toc_01_0891
     ld   [hl], $02
     ld   hl, $FFF3
@@ -3091,28 +3091,28 @@ toc_07_7BD0.else_07_7BF4:
 
 toc_07_7C16:
     ld   e, b
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     ld   hl, $FFEF
     sub  a, [hl]
     add  a, $14
-    cp   $38
+    cp   56
     jr   toc_07_7C23.toc_07_7C2E
 
 toc_07_7C23:
     ld   e, b
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     ld   hl, $FFEF
     sub  a, [hl]
     add  a, $14
-    cp   $28
+    cp   40
 toc_07_7C23.toc_07_7C2E:
     jr   nc, .else_07_7C74
 
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     ld   hl, $FFEE
     sub  a, [hl]
     add  a, $10
-    cp   $20
+    cp   32
     jr   nc, .else_07_7C74
 
     inc  e
@@ -3120,7 +3120,7 @@ toc_07_7C23.toc_07_7C2E:
 
     push de
     call toc_07_7D55
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
     xor  $01
     cp   e
     pop  de
@@ -3236,7 +3236,7 @@ toc_07_7CEF.return_07_7D1A:
 
 toc_07_7D35:
     ld   e, $00
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     ld   hl, $C200
     add  hl, bc
     sub  a, [hl]
@@ -3251,7 +3251,7 @@ toc_07_7D35.else_07_7D43:
 
 toc_07_7D45:
     ld   e, $02
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     ld   hl, $C210
     add  hl, bc
     sub  a, [hl]

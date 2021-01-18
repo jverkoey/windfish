@@ -16,20 +16,20 @@ JumpTable_402D_18:
     and  %00000001
     jr   z, .else_18_404A
 
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     ld   hl, $FFEF
     sub  a, [hl]
     add  a, $28
-    cp   $50
+    cp   80
     call toc_18_7D0E.toc_18_7D19
     jr   nc, .else_18_407C
 
     jp   toc_18_42B6
 
 JumpTable_402D_18.else_18_404A:
-    ifGte [$FF99], $4C, .else_18_407C
+    ifGte [hLinkPositionY], 76, .else_18_407C
 
-    assign [$FF99], $4C
+    assign [hLinkPositionY], $4C
     call toc_01_1495
     call toc_01_093B
     ld   e, $0B
@@ -68,13 +68,13 @@ JumpTable_402D_18.else_18_407C:
 
 toc_18_4088:
     ld   e, a
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     push af
-    assign [$FF99], $10
+    assign [hLinkPositionY], $10
     ld   a, e
     call toc_01_2197
     pop  af
-    ld   [$FF99], a
+    ld   [hLinkPositionY], a
     ret
 
 
@@ -283,9 +283,9 @@ JumpTable_4553_18:
 
 
 JumpTable_4553_18.else_18_4565:
-    ifLt [$FF98], $30, .else_18_457A
+    ifLt [hLinkPositionX], 48, .else_18_457A
 
-    assign [$FF98], $2F
+    assign [hLinkPositionX], $2F
     call toc_01_1495
     ld   a, $85
     call toc_01_2185
@@ -914,7 +914,7 @@ JumpTable_52D4_18:
 
     ld   a, $01
     call toc_18_59B8.toc_18_59BA
-    assign [$FF9E], $01
+    assign [hLinkDirection], $01
     push bc
     call toc_01_087C
     pop  bc
@@ -1444,7 +1444,7 @@ JumpTable_5F22_18:
     ld   hl, $C380
     add  hl, bc
     ld   [hl], e
-    ifGte [$FF98], $90, .return_18_5F3E
+    ifGte [hLinkPositionX], 144, .return_18_5F3E
 
     ld   a, $35
     call toc_01_218E
@@ -1539,7 +1539,7 @@ JumpTable_60F1_18:
 
     ld   a, $3B
     call toc_01_218E
-    assign [$FF9E], $03
+    assign [hLinkDirection], $03
     ld   a, [$C50F]
     ld   e, a
     ld   d, b
@@ -2237,9 +2237,9 @@ JumpTable_700B_18:
     db   $70, $70, $40, $40, $50, $40, $50, $40
 
 JumpTable_71DF_18:
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     push af
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     push af
     ld   a, [$D205]
     rla
@@ -2256,11 +2256,11 @@ JumpTable_71DF_18:
     ld   hl, $717F
     add  hl, de
     ld   a, [hl]
-    ld   [$FF98], a
+    ld   [hLinkPositionX], a
     ld   hl, $71AF
     add  hl, de
     ld   a, [hl]
-    ld   [$FF99], a
+    ld   [hLinkPositionY], a
     ld   a, [$FFE7]
     xor  c
     and  %00000011
@@ -2270,26 +2270,26 @@ JumpTable_71DF_18:
     call toc_01_3C25
 JumpTable_71DF_18.else_18_7211:
     ld   hl, $FFEE
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     sub  a, [hl]
     add  a, $03
-    cp   $06
+    cp   6
     jr   nc, .else_18_7230
 
     ld   hl, $FFEC
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     sub  a, [hl]
     add  a, $03
-    cp   $06
+    cp   6
     jr   nc, .else_18_7230
 
     incAddr $D201
     call JumpTable_3B8D_00
 JumpTable_71DF_18.else_18_7230:
     pop  af
-    ld   [$FF99], a
+    ld   [hLinkPositionY], a
     pop  af
-    ld   [$FF98], a
+    ld   [hLinkPositionX], a
     call toc_18_7DCD
     ld   a, [$FFE7]
     rra
@@ -2635,7 +2635,7 @@ JumpTable_7838_18.else_18_786F:
     assign [$FFF2], $08
 JumpTable_7838_18.else_18_78BA:
     call toc_18_7E4F
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
     xor  $01
     cp   e
     jr   nz, .else_18_78FE
@@ -2812,36 +2812,36 @@ JumpTable_7838_18.else_18_78FE:
 
 toc_18_7CF5:
     ld   e, b
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     ld   hl, $FFEF
     sub  a, [hl]
     add  a, $18
-    cp   $38
+    cp   56
     jr   toc_18_7D0E.toc_18_7D19
 
 toc_18_7D02:
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     ld   hl, $FFEF
     sub  a, [hl]
     add  a, $14
-    cp   $38
+    cp   56
     jr   toc_18_7D0E.toc_18_7D19
 
 toc_18_7D0E:
     ld   e, b
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     ld   hl, $FFEF
     sub  a, [hl]
     add  a, $14
-    cp   $28
+    cp   40
 toc_18_7D0E.toc_18_7D19:
     jr   nc, .else_18_7D5F
 
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     ld   hl, $FFEE
     sub  a, [hl]
     add  a, $10
-    cp   $20
+    cp   32
     jr   nc, .else_18_7D5F
 
     inc  e
@@ -2849,7 +2849,7 @@ toc_18_7D0E.toc_18_7D19:
 
     push de
     call toc_18_7E4F
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
     xor  $01
     cp   e
     pop  de
@@ -2966,7 +2966,7 @@ toc_18_7DDA.return_18_7E05:
 
 toc_18_7E20:
     ld   e, $00
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     ld   hl, $C200
     add  hl, bc
     sub  a, [hl]
@@ -2981,7 +2981,7 @@ toc_18_7E20.else_18_7E2E:
 
 toc_18_7E30:
     ld   e, $02
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     ld   hl, $C210
     add  hl, bc
     sub  a, [hl]
@@ -2996,7 +2996,7 @@ toc_18_7E30.else_18_7E3E:
 
 toc_18_7E40:
     ld   e, $02
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     ld   hl, $FFEC
     sub  a, [hl]
     bit  7, a

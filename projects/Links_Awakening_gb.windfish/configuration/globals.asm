@@ -160,6 +160,50 @@ gbPCM12 EQU $FF76 ; [hex]
 
 gbPCM34 EQU $FF77 ; [hex]
 
+hRomBank EQU $FF80 ; [hex]
+
+hTemp EQU $FF81 ; [hex]
+
+hCodeTemp EQU $FF82 ; [hex]
+
+hNeedsUpdatingBGTiles EQU $FF90 ; [UPDATE_BG_TILES]
+
+hNeedsUpdatingEnemiesTiles EQU $FF91 ; [bool]
+
+hBGTilesLoadingStage EQU $FF92 ; [hex]
+
+hEnemiesTilesLoadingStage EQU $FF93 ; [hex]
+
+hWorldTileset EQU $FF94 ; [hex]
+
+hBaseScrollX EQU $FF96 ; [decimal]
+
+hBaseScrollY EQU $FF97 ; [decimal]
+
+hLinkPositionX EQU $FF98 ; [decimal]
+
+hLinkPositionY EQU $FF99 ; [decimal]
+
+hLinkPositionXIncrement EQU $FF9A ; [decimal]
+
+hLinkPositionYIncrement EQU $FF9B ; [decimal]
+
+hLinkAnimationState EQU $FF9D ; [LINK_ANIMATION]
+
+hLinkDirection EQU $FF9E ; [DIRECTION]
+
+hLinkFinalPositionX EQU $FF9F ; [decimal]
+
+hLinkFinalPositionY EQU $FFA0 ; [decimal]
+
+hLinkInteractiveMotionBlocked EQU $FFA1 ; [INTERACTIVE_MOTION]
+
+hLinkPositionZHigh EQU $FFA2 ; [hex]
+
+hLinkPositionZLow EQU $FFA3 ; [hex]
+
+hAnimatedTilesGroup EQU $FFA4 ; [ANIMATED_TILE]
+
 hNeedsRenderingFrame EQU $FFD1 ; [bool]
 
 hIsRenderingFrame EQU $FFFD ; [bool]

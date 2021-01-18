@@ -257,7 +257,7 @@ toc_17_46A6.loop_17_46DD:
     add  hl, de
     ld   a, [hl]
     push af
-    ld   hl, $FF96
+    ld   hl, hBaseScrollX
     add  a, [hl]
     ld   [gbSCX], a
     pop  af
@@ -1042,7 +1042,7 @@ toc_17_5CC1:
     ld   [$C28D], a
     ld   [$C28E], a
     ld   [$C28F], a
-    ld   [$FF97], a
+    ld   [hBaseScrollY], a
     ld   [$D00F], a
     ld   [$D00F], a
     call toc_17_4AEB
@@ -2119,7 +2119,7 @@ toc_17_7B37:
     ld   hl, $7B05
     add  hl, de
     ld   a, [hl]
-    ld   hl, $FF97
+    ld   hl, hBaseScrollY
     sub  a, [hl]
     ld   [gbRAM], a
     assign [$C001], $97
@@ -2165,7 +2165,7 @@ toc_17_7B8F:
     ld   hl, $7B53
     add  hl, de
     ld   a, [hl]
-    ld   hl, $FF97
+    ld   hl, hBaseScrollY
     sub  a, [hl]
     ld   [gbRAM], a
     ld   e, $00

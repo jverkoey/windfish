@@ -2472,7 +2472,7 @@ toc_15_7B99.return_15_7BC4:
 
 toc_15_7BDF:
     ld   e, $00
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     ld   hl, $C200
     add  hl, bc
     sub  a, [hl]
@@ -2487,7 +2487,7 @@ toc_15_7BDF.else_15_7BED:
 
 toc_15_7BEF:
     ld   e, $02
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     ld   hl, $C210
     add  hl, bc
     sub  a, [hl]

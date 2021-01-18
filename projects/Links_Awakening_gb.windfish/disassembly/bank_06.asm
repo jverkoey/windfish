@@ -121,16 +121,16 @@ JumpTable_40EC_06:
 JumpTable_40EC_06.else_06_40FC:
     call toc_01_2185
 JumpTable_40EC_06.else_06_40FF:
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     sub  a, $78
     add  a, $02
-    cp   $04
+    cp   4
     jr   nc, .return_06_412B
 
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     sub  a, $20
     add  a, $05
-    cp   $0A
+    cp   10
     jr   nc, .return_06_412B
 
     ld   hl, $D401
@@ -460,7 +460,7 @@ JumpTable_4321_06.else_06_4339:
 JumpTable_4321_06.else_06_4358:
     dec  [hl]
 JumpTable_4321_06.else_06_4359:
-    ifEq [$FF9D], $FF, .else_06_43C6
+    ifEq [hLinkAnimationState], LINK_ANIMATION_STATE_NO_UPDATE, .else_06_43C6
 
     call toc_06_659E
     ld   hl, $C380
@@ -497,27 +497,27 @@ JumpTable_4321_06.else_06_4359:
     ld   a, [$FFD7]
     cpl
     inc  a
-    ld   [$FF9B], a
+    ld   [hLinkPositionYIncrement], a
     ld   a, [$FFD8]
     cpl
     inc  a
-    ld   [$FF9A], a
+    ld   [hLinkPositionXIncrement], a
     push bc
     call toc_01_20D6
     call toc_01_3E49
     pop  bc
     ld   hl, $FFEE
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     sub  a, [hl]
     add  a, $04
-    cp   $08
+    cp   8
     jr   nc, .else_06_43C6
 
     ld   hl, $FFEC
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     sub  a, [hl]
     add  a, $04
-    cp   $08
+    cp   8
     jr   nc, .else_06_43C6
 
     call toc_01_0891
@@ -557,8 +557,8 @@ JumpTable_43D4_06.else_06_43F1:
     ld   a, [hl]
     add  a, $08
     call toc_01_3B87
-    assign [$FF9D], $FF
-    assign [$FFA1], $02
+    assign [hLinkAnimationState], $FF
+    assign [hLinkInteractiveMotionBlocked], $02
     ret
 
 
@@ -567,7 +567,7 @@ JumpTable_43D4_06.else_06_4404:
     ld   hl, $C2B0
     add  hl, bc
     ld   [hl], b
-    clear [$FF9B]
+    clear [hLinkPositionYIncrement]
     ld   hl, $C380
     add  hl, bc
     ld   a, [hl]
@@ -577,8 +577,8 @@ JumpTable_43D4_06.else_06_4404:
 
     ld   a, $E8
 JumpTable_43D4_06.else_06_441B:
-    ld   [$FF9A], a
-    assign [$FFA3], $10
+    ld   [hLinkPositionXIncrement], a
+    assign [hLinkPositionZLow], $10
     assign [$DBC7], $20
     assign [$C146], $02
     assign [$DB94], $02
@@ -653,18 +653,18 @@ JumpTable_458F_06:
     cp   $00
     jr   nz, .else_06_45F4
 
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     push af
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     push af
     ld   hl, $C200
     add  hl, de
     ld   a, [hl]
-    ld   [$FF98], a
+    ld   [hLinkPositionX], a
     ld   hl, $C210
     add  hl, de
     ld   a, [hl]
-    ld   [$FF99], a
+    ld   [hLinkPositionY], a
     ld   a, $10
     call toc_01_3C25
     call toc_06_654B
@@ -695,9 +695,9 @@ JumpTable_458F_06:
     assign [$FFF3], $1C
 JumpTable_458F_06.else_06_45EC:
     pop  af
-    ld   [$FF99], a
+    ld   [hLinkPositionY], a
     pop  af
-    ld   [$FF98], a
+    ld   [hLinkPositionX], a
     jr   .toc_06_45F7
 
 JumpTable_458F_06.else_06_45F4:
@@ -989,7 +989,7 @@ JumpTable_4802_06.else_06_4845:
     ld   hl, $C490
     add  hl, bc
     ld   [hl], b
-    copyFromTo [$FF9E], [$C15D]
+    copyFromTo [hLinkDirection], [$C15D]
     call toc_01_0891
     ld   [hl], $02
     ld   hl, $FFF3
@@ -2070,21 +2070,21 @@ JumpTable_528C_06.else_06_5296:
     cp   $20
     jr   nz, .else_06_52CA
 
-    assign [$FF9B], $20
-    ld   a, [$FF98]
-    cp   $50
+    assign [hLinkPositionYIncrement], $20
+    ld   a, [hLinkPositionX]
+    cp   80
     ld   a, $E0
     jr   nc, .else_06_52A8
 
     ld   a, $20
 JumpTable_528C_06.else_06_52A8:
-    ld   [$FF9A], a
-    assign [$FFA3], $10
+    ld   [hLinkPositionXIncrement], a
+    assign [hLinkPositionZLow], $10
     assign [$C146], $02
     assign [$FFF2], $08
     assign [$DB94], $08
-    copyFromTo [$FFEE], [$FF98]
-    copyFromTo [$FFEF], [$FF99]
+    copyFromTo [$FFEE], [hLinkPositionX]
+    copyFromTo [$FFEF], [hLinkPositionY]
     call toc_01_088C
     ld   [hl], $50
     ret
@@ -2115,15 +2115,15 @@ JumpTable_528C_06.else_06_52CA:
     add  hl, de
     ld   a, [$FFEE]
     add  a, [hl]
-    ld   [$FF98], a
+    ld   [hLinkPositionX], a
     ld   hl, $5280
     add  hl, de
     ld   a, [hl]
-    ld   [$FFA2], a
+    ld   [hLinkPositionZHigh], a
     assign [$C146], $02
-    copyFromTo [$FFEF], [$FF99]
-    assign [$FFA1], $01
-    assign [$FF9D], $6A
+    copyFromTo [$FFEF], [hLinkPositionY]
+    assign [hLinkInteractiveMotionBlocked], $01
+    assign [hLinkAnimationState], $6A
     ld   [$C167], a
 JumpTable_528C_06.return_06_530C:
     ret
@@ -2764,18 +2764,18 @@ JumpTable_5877_06:
     jr   nz, .else_06_58AF
 
     ld   [hl], $20
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     push af
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     push af
-    assign [$FF98], $58
-    assign [$FF99], $50
+    assign [hLinkPositionX], $58
+    assign [hLinkPositionY], $50
     ld   a, $08
     call toc_01_3C25
     pop  af
-    ld   [$FF99], a
+    ld   [hLinkPositionY], a
     pop  af
-    ld   [$FF98], a
+    ld   [hLinkPositionX], a
     ld   hl, $C320
     add  hl, bc
     ld   [hl], $08
@@ -3482,11 +3482,11 @@ JumpTable_5E7F_06.toc_06_5EBC:
     dw JumpTable_6079_06 ; 04
 
 toc_06_5F74:
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     ld   hl, $FFEF
     sub  a, [hl]
     add  a, $28
-    cp   $50
+    cp   80
     call toc_06_648C.toc_06_6497
     ret
 
@@ -3661,7 +3661,7 @@ JumpTable_6079_06.else_06_6098:
     call JumpTable_3B8D_00
     ld   [hl], b
 JumpTable_6079_06.else_06_609C:
-    assign [$FFA1], $02
+    assign [hLinkInteractiveMotionBlocked], $02
     ret
 
 
@@ -3728,7 +3728,7 @@ JumpTable_6135_06.else_06_615C:
     ld   a, $08
     call toc_01_3C25
     call toc_06_654B
-    assign [$FFA1], $02
+    assign [hLinkInteractiveMotionBlocked], $02
     ld   [$C167], a
     ret
 
@@ -4000,19 +4000,19 @@ toc_06_6449.return_06_646B:
 
 toc_06_648C:
     ld   e, b
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     ld   hl, $FFEF
     sub  a, [hl]
     add  a, $14
-    cp   $28
+    cp   40
 toc_06_648C.toc_06_6497:
     jr   nc, .else_06_64DD
 
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     ld   hl, $FFEE
     sub  a, [hl]
     add  a, $10
-    cp   $20
+    cp   32
     jr   nc, .else_06_64DD
 
     inc  e
@@ -4020,7 +4020,7 @@ toc_06_648C.toc_06_6497:
 
     push de
     call toc_06_65BE
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
     xor  $01
     cp   e
     pop  de
@@ -4192,7 +4192,7 @@ toc_06_6584:
 
 toc_06_659E:
     ld   e, $00
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     ld   hl, $C200
     add  hl, bc
     sub  a, [hl]
@@ -4207,7 +4207,7 @@ toc_06_659E.else_06_65AC:
 
 toc_06_65AE:
     ld   e, $02
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     ld   hl, $C210
     add  hl, bc
     sub  a, [hl]
@@ -4449,12 +4449,12 @@ JumpTable_68E1_06:
     ifNe [$FFF6], $F2, .else_06_68FB
 
     assign [$FFB0], $1D
-    returnIfLt [$FF99], $44
+    returnIfLt [hLinkPositionY], 68
 
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     sub  a, $58
     add  a, $18
-    cp   $30
+    cp   48
     ret  nc
 
     jr   .toc_06_6902
@@ -4504,8 +4504,8 @@ JumpTable_693C_06:
     call toc_06_65BE
     ld   a, e
     xor  $01
-    ld   [$FF9E], a
-    assign [$FFA1], $02
+    ld   [hLinkDirection], a
+    assign [hLinkInteractiveMotionBlocked], $02
     assign [$C111], $05
     call JumpTable_69B1_06.else_06_69CD
     call toc_06_654B
@@ -4585,7 +4585,7 @@ JumpTable_69B1_06.else_06_69C2:
 
 
 JumpTable_69B1_06.else_06_69CD:
-    assign [$FFA1], $02
+    assign [hLinkInteractiveMotionBlocked], $02
     ld   a, [$FFE7]
     rra
     rra
@@ -5144,7 +5144,7 @@ JumpTable_706F_06:
     cp   $18
     jr   nc, .return_06_70BD
 
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
     and  a
     jr   nz, .return_06_70BD
 
@@ -5153,12 +5153,12 @@ JumpTable_706F_06:
     call JumpTable_3B8D_00
     call toc_01_0891
     ld   [hl], $A0
-    assign [$FFA2], $01
+    assign [hLinkPositionZHigh], $01
     assign [$C146], $02
-    assign [$FFA3], $12
-    assign [$FF9A], $0C
-    clear [$FF9B]
-    assign [$FF9E], $00
+    assign [hLinkPositionZLow], $12
+    assign [hLinkPositionXIncrement], $0C
+    clear [hLinkPositionYIncrement]
+    assign [hLinkDirection], $00
     assign [$C10A], $01
     assign [$D368], $1E
     clear [$C16B]
@@ -5253,11 +5253,11 @@ JumpTable_70CE_06.else_06_714C:
 JumpTable_70CE_06.toc_06_714D:
     ld   [$FFF1], a
     assign [$FFEE], $58
-    ld   [$FF98], a
+    ld   [hLinkPositionX], a
     assign [$FFEC], $44
-    ld   [$FF99], a
-    assign [$FFA1], $02
-    assign [$FF9D], $FF
+    ld   [hLinkPositionY], a
+    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkAnimationState], $FF
     ld   de, $70BE
     call toc_01_3C3B
     call toc_01_3DBA
@@ -5272,7 +5272,7 @@ JumpTable_716D_06:
     and  a
     jr   nz, .return_06_7192
 
-    clear [$FF9D]
+    clear [hLinkAnimationState]
     ld   hl, $D401
     ld   a, $01
     ldi  [hl], a
@@ -5327,16 +5327,16 @@ JumpTable_7270_06:
     clear [$D202]
     ld   a, c
     ld   [$D201], a
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     sub  a, $50
     add  a, $08
-    cp   $10
+    cp   16
     jr   nc, .return_06_7299
 
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     sub  a, $58
     add  a, $08
-    cp   $10
+    cp   16
     jr   nc, .return_06_7299
 
     call JumpTable_3B8D_00
@@ -5360,7 +5360,7 @@ JumpTable_729A_06:
 
 
 JumpTable_729A_06.else_06_72AC:
-    assign [$FFA1], $02
+    assign [hLinkInteractiveMotionBlocked], $02
     assign [$FFF2], $1A
     call toc_06_64DF
     ld   hl, $C300
@@ -5426,7 +5426,7 @@ JumpTable_7306_06:
 JumpTable_7306_06.else_06_7316:
     ld   [$D202], a
     call toc_01_3B87
-    assign [$FFA1], $02
+    assign [hLinkInteractiveMotionBlocked], $02
     ret
 
 
@@ -6650,7 +6650,7 @@ JumpTable_7E49_06.else_06_7E6A:
     and  %00000111
     sub  a, $04
     ld   e, a
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     sub  a, e
     ld   hl, $C200
     add  hl, bc
@@ -6661,12 +6661,12 @@ JumpTable_7E49_06.else_06_7E6A:
     and  %00000111
     sub  a, $04
     ld   e, a
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     sub  a, e
     ld   hl, $C210
     add  hl, bc
     ld   [hl], a
-    ld   a, [$FFA2]
+    ld   a, [hLinkPositionZHigh]
     ld   hl, $C310
     add  hl, bc
     ld   [hl], a
@@ -6732,7 +6732,7 @@ JumpTable_7EE5_06:
 
 
 JumpTable_7EE5_06.else_06_7F00:
-    assign [$FF9D], $FF
+    assign [hLinkAnimationState], $FF
     ld   hl, $C2B0
     add  hl, bc
     ld   a, [hl]
@@ -6767,10 +6767,10 @@ JumpTable_7EE5_06.else_06_7F2E:
     cp   $00
     ret  nz
 
-    copyFromTo [$FFEE], [$FF98]
-    copyFromTo [$FFEF], [$FF99]
+    copyFromTo [$FFEE], [hLinkPositionX]
+    copyFromTo [$FFEF], [hLinkPositionY]
     clear [$C146]
-    ld   [$FFA2], a
+    ld   [hLinkPositionZHigh], a
     call toc_06_7FDF
     call toc_06_7FDF
     ret

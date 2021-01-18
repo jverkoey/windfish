@@ -84,8 +84,8 @@ toc_01_007A:
 toc_01_0080:
     ld   bc, $0030
     call toc_01_28C5
-    clear [$FF90]
-    ld   [$FF92], a
+    clear [hNeedsUpdatingBGTiles]
+    ld   [hBGTilesLoadingStage], a
 toc_01_008B:
     changebank $0C
     ret
@@ -196,11 +196,11 @@ main.toc_01_01A6:
 
 main.else_01_01BE:
     ld   hl, $C156
-    ld   a, [$FF97]
+    ld   a, [hBaseScrollY]
     add  a, [hl]
 main.toc_01_01C4:
     ld   [gbSCY], a
-    ld   a, [$FF96]
+    ld   a, [hBaseScrollX]
     ld   hl, $C155
     add  a, [hl]
     ld   hl, $C1BF
@@ -393,11 +393,11 @@ main.else_01_0313:
     inc  a
 main.else_01_032D:
     push af
-    ld   hl, $FF96
+    ld   hl, hBaseScrollX
     add  a, [hl]
     ld   [gbSCX], a
     pop  af
-    ld   hl, $FF97
+    ld   hl, hBaseScrollY
     add  a, [hl]
     ld   [gbSCY], a
     jp   .loop_01_02DE
@@ -416,8 +416,8 @@ main.toc_01_0352:
     copyFromTo [$DB99], [gbOBP1]
     call toc_01_0844
     call toc_01_27FE
-    ld   a, [$FF90]
-    ld   hl, $FF91
+    ld   a, [hNeedsUpdatingBGTiles]
+    ld   hl, hNeedsUpdatingEnemiesTiles
     or   [hl]
     ld   hl, $C10E
     or   [hl]
@@ -487,7 +487,7 @@ toc_01_03E2:
     jr   toc_01_03FB
 
 toc_01_03F9:
-    ld   a, [$FF97]
+    ld   a, [hBaseScrollY]
 toc_01_03FB:
     ld   [gbSCY], a
     jp   toc_01_0452
@@ -502,7 +502,7 @@ toc_01_0400:
     ld   hl, wScrollXOffsetForSection
     add  hl, de
     ld   a, [hl]
-    ld   hl, $FF96
+    ld   hl, hBaseScrollX
     add  a, [hl]
     ld   [gbSCX], a
     ifLt [$DB96], $06, toc_01_042C
@@ -685,8 +685,8 @@ vblank.else_01_0566:
     and  a
     jr   nz, .else_01_05B6
 
-    copyFromTo [$FF90], [$FFE8]
-    ld   hl, $FF91
+    copyFromTo [hNeedsUpdatingBGTiles], [$FFE8]
+    ld   hl, hNeedsUpdatingEnemiesTiles
     or   [hl]
     ld   hl, $C10E
     or   [hl]
@@ -733,7 +733,7 @@ vblank.else_01_05B6:
 
 
 toc_01_05C0:
-    ld   a, [$FF90]
+    ld   a, [hNeedsUpdatingBGTiles]
     and  a
     jp   z, .toc_01_0688
 
@@ -757,12 +757,12 @@ toc_01_05C0:
 
     ifNot [$DBA5], .else_01_0643
 
-    ld   a, [$FF90]
-    cp   $02
+    ld   a, [hNeedsUpdatingBGTiles]
+    cp   UPDATE_BG_TILES_DUNGEON_MINIMAP
     jp   z, toc_01_07C9
 
     changebank $0D
-    ld   a, [$FF92]
+    ld   a, [hBGTilesLoadingStage]
     ld   c, a
     ld   b, $00
     sla  c
@@ -782,13 +782,13 @@ toc_01_05C0:
     push hl
     pop  de
     ld   hl, $5000
-    ld   a, [$FF94]
+    ld   a, [hWorldTileset]
     add  a, $50
     ld   h, a
     add  hl, bc
     ifNot [$FFBB], .else_01_062E
 
-    ld   a, [$FF92]
+    ld   a, [hBGTilesLoadingStage]
     dec  a
     cp   $02
     jr   c, .else_01_0634
@@ -797,14 +797,14 @@ toc_01_05C0.else_01_062E:
     ld   bc, $0040
     call toc_01_28C5
 toc_01_05C0.else_01_0634:
-    ld   a, [$FF92]
+    ld   a, [hBGTilesLoadingStage]
     inc  a
-    ld   [$FF92], a
+    ld   [hBGTilesLoadingStage], a
     cp   $04
     jr   nz, .return_01_0642
 
-    clear [$FF90]
-    ld   [$FF92], a
+    clear [hNeedsUpdatingBGTiles]
+    ld   [hBGTilesLoadingStage], a
 toc_01_05C0.return_01_0642:
     ret
 
@@ -812,7 +812,7 @@ toc_01_05C0.return_01_0642:
 toc_01_05C0.else_01_0643:
     ld   hl, $2100
     ld   [hl], $0F
-    ld   a, [$FF92]
+    ld   a, [hBGTilesLoadingStage]
     ld   c, a
     ld   b, $00
     sla  c
@@ -831,27 +831,27 @@ toc_01_05C0.else_01_0643:
     add  hl, bc
     push hl
     pop  de
-    ld   a, [$FF94]
+    ld   a, [hWorldTileset]
     add  a, $40
     ld   h, a
     ld   l, $00
     add  hl, bc
     ld   bc, $0040
     call toc_01_28C5
-    ld   a, [$FF92]
+    ld   a, [hBGTilesLoadingStage]
     inc  a
-    ld   [$FF92], a
+    ld   [hBGTilesLoadingStage], a
     cp   $08
     jr   nz, .return_01_0687
 
-    clear [$FF90]
-    ld   [$FF92], a
+    clear [hNeedsUpdatingBGTiles]
+    ld   [hBGTilesLoadingStage], a
 toc_01_05C0.return_01_0687:
     ret
 
 
 toc_01_05C0.toc_01_0688:
-    ifNot [$FF91], .else_01_06F4
+    ifNot [hNeedsUpdatingEnemiesTiles], .else_01_06F4
 
     ld   a, [$C197]
     ld   e, a
@@ -874,7 +874,7 @@ toc_01_05C0.toc_01_0688:
     add  hl, bc
     ld   a, [hl]
     ld   [$2100], a
-    ld   a, [$FF93]
+    ld   a, [hEnemiesTilesLoadingStage]
     ld   c, a
     ld   b, $00
     sla  c
@@ -903,14 +903,14 @@ toc_01_05C0.toc_01_0688:
     pop  hl
     ld   bc, $0040
     call toc_01_28C5
-    ld   a, [$FF93]
+    ld   a, [hEnemiesTilesLoadingStage]
     inc  a
-    ld   [$FF93], a
+    ld   [hEnemiesTilesLoadingStage], a
     cp   $04
     jr   nz, .return_01_06F3
 
-    clear [$FF91]
-    ld   [$FF93], a
+    clear [hNeedsUpdatingEnemiesTiles]
+    ld   [hEnemiesTilesLoadingStage], a
 toc_01_05C0.return_01_06F3:
     ret
 
@@ -1007,19 +1007,19 @@ toc_01_0783:
     changebank $0C
     ld   bc, $0040
     call toc_01_28C5
-    ifEq [$FF90], $0A, toc_01_07B5
+    ifEq [hNeedsUpdatingBGTiles], $0A, toc_01_07B5
 
     cp   $0D
     jr   z, toc_01_07B5
 
-    ld   a, [$FF90]
+    ld   a, [hNeedsUpdatingBGTiles]
     inc  a
-    ld   [$FF90], a
+    ld   [hNeedsUpdatingBGTiles], a
     ret
 
 
 toc_01_07B5:
-    clear [$FF90]
+    clear [hNeedsUpdatingBGTiles]
     ret
 
 
@@ -1038,13 +1038,13 @@ toc_01_07C0:
 
 toc_01_07C9:
     changebank $12
-    ifLt [$FF92], $08, toc_01_0813
+    ifLt [hBGTilesLoadingStage], $08, toc_01_0813
 
     jr   nz, toc_01_07E3
 
     changebank $02
     call toc_02_6BB8
-    incAddr $FF92
+    incAddr hBGTilesLoadingStage
     ret
 
 
@@ -1054,7 +1054,7 @@ toc_01_07E3:
 
     changebank $02
     call toc_02_6B92
-    incAddr $FF92
+    incAddr hBGTilesLoadingStage
     ret
 
 
@@ -1064,15 +1064,15 @@ toc_01_07F4:
 
     changebank $02
     call toc_02_6B6C
-    incAddr $FF92
+    incAddr hBGTilesLoadingStage
     ret
 
 
 toc_01_0805:
     changebank $02
     call toc_02_6B46
-    clear [$FF90]
-    ld   [$FF92], a
+    clear [hNeedsUpdatingBGTiles]
+    ld   [hBGTilesLoadingStage], a
     ret
 
 
@@ -1099,9 +1099,9 @@ toc_01_0813:
     add  hl, bc
     ld   bc, $0040
     call toc_01_28C5
-    ld   a, [$FF92]
+    ld   a, [hBGTilesLoadingStage]
     inc  a
-    ld   [$FF92], a
+    ld   [hBGTilesLoadingStage], a
     ret
 
 
@@ -1161,11 +1161,11 @@ toc_01_0891.toc_01_0894:
 toc_01_0898:
     ld   a, $AF
     call toc_01_3C01
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     ld   hl, $C200
     add  hl, de
     ld   [hl], a
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     ld   hl, $C210
     add  hl, de
     ld   [hl], a
@@ -1264,8 +1264,8 @@ toc_01_093B.toc_01_0942:
 
 
 toc_01_094A:
-    copyFromTo [$FF9F], [$FF98]
-    copyFromTo [$FFA0], [$FF99]
+    copyFromTo [hLinkFinalPositionX], [hLinkPositionX]
+    copyFromTo [hLinkFinalPositionY], [hLinkPositionY]
     ret
 
 
@@ -1342,17 +1342,17 @@ toc_01_09AA:
     inc  h
 toc_01_09AA.else_01_09C8:
     add  hl, de
-    ld   a, [$FF94]
+    ld   a, [hWorldTileset]
     ld   e, a
     ld   a, [hl]
     cp   e
     jr   z, .else_01_09DA
 
-    ld   [$FF94], a
+    ld   [hWorldTileset], a
     cp   $FF
     jr   z, .else_01_09DA
 
-    assign [$FF90], $01
+    assign [hNeedsUpdatingBGTiles], UPDATE_BG_TILES_WORLD
 toc_01_09AA.else_01_09DA:
     jr   .else_01_0A09
 
@@ -1374,7 +1374,7 @@ toc_01_09AA.else_01_09E3:
     ld   d, $00
     ld   hl, $4000
     add  hl, de
-    ld   a, [$FF94]
+    ld   a, [hWorldTileset]
     ld   e, a
     ld   a, [hl]
     cp   e
@@ -1383,8 +1383,8 @@ toc_01_09AA.else_01_09E3:
     cp   $0F
     jr   z, .else_01_0A09
 
-    ld   [$FF94], a
-    assign [$FF90], $01
+    ld   [hWorldTileset], a
+    assign [hNeedsUpdatingBGTiles], UPDATE_BG_TILES_WORLD
 toc_01_09AA.else_01_0A09:
     clear [$FFD7]
     ld   a, [$FFF6]
@@ -1462,7 +1462,7 @@ toc_01_09AA.else_01_0A7A:
     ld   [$FFD7], a
     ld   a, d
     ld   [$C197], a
-    assign [$FF91], $01
+    assign [hNeedsUpdatingEnemiesTiles], true
 toc_01_09AA.else_01_0A85:
     inc  hl
     inc  bc
@@ -1606,7 +1606,7 @@ JumpTable_0B53_00.else_01_0B80:
 
     ifNot [$C1BC], .else_01_0B9A
 
-    ld   hl, $FFA1
+    ld   hl, hLinkInteractiveMotionBlocked
     ld   [hl], $02
     dec  a
     ld   [$C1BC], a
@@ -1622,9 +1622,9 @@ JumpTable_0B53_00.else_01_0B9A:
 
     dec  [hl]
 JumpTable_0B53_00.else_01_0BA2:
-    copyFromTo [$FF98], [$FF9F]
-    copyFromTo [$FF99], [$FFA0]
-    ld   hl, $FFA2
+    copyFromTo [hLinkPositionX], [hLinkFinalPositionX]
+    copyFromTo [hLinkPositionY], [hLinkFinalPositionY]
+    ld   hl, hLinkPositionZHigh
     sub  a, [hl]
     ld   [$FFB3], a
     call $5DD5
@@ -1686,8 +1686,8 @@ JumpTable_0B53_00.toc_01_0C32:
     db   $08, $0E, $99, $28, $EC
 
 toc_01_0C40:
-    ld   a, [$FF99]
-    ld   hl, $FFA2
+    ld   a, [hLinkPositionY]
+    ld   hl, hLinkPositionZHigh
     sub  a, [hl]
     ld   [$C145], a
     ifNot [$C1A9], toc_01_0C8C
@@ -1743,9 +1743,9 @@ toc_01_0C8C:
     cp   $04
     jr   c, toc_01_0CE2
 
-    ifEq [$FFA1], $02, toc_01_0CDE
+    ifEq [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING, toc_01_0CDE
 
-    ifEq [$FF9D], $FF, toc_01_0CDE
+    ifEq [hLinkAnimationState], LINK_ANIMATION_STATE_NO_UPDATE, toc_01_0CDE
 
     ifGte [$C11C], $02, toc_01_0CDE
 
@@ -1890,7 +1890,7 @@ toc_01_0D68.toc_01_0DB4:
     ifGte [$C138], $03, .else_01_0DD9
 
 toc_01_0D68.else_01_0DD3:
-    ld   a, [$FFA1]
+    ld   a, [hLinkInteractiveMotionBlocked]
     and  a
     jp   nz, toc_01_0E7F.return_01_0ED0
 
@@ -2095,12 +2095,12 @@ toc_01_0F34:
     assign [$C15B], $01
     copyFromTo [$DB44], [$C15A]
 toc_01_0F34.toc_01_0F3F:
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
     ld   e, a
     ld   d, $00
     ld   hl, $0F24
     add  hl, de
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     add  a, [hl]
     ld   [$C140], a
     ld   hl, $0F28
@@ -2188,19 +2188,19 @@ toc_01_0FDB:
     ld   hl, $C320
     add  hl, de
     ld   [hl], d
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
     ld   c, a
     ld   b, d
     ld   hl, $0F6E
     add  hl, bc
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     add  a, [hl]
     ld   hl, $C200
     add  hl, de
     ld   [hl], a
     ld   hl, $0F72
     add  hl, bc
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     add  a, [hl]
     ld   hl, $C210
     add  hl, de
@@ -2314,7 +2314,7 @@ toc_01_10BD:
     ld   a, $06
 toc_01_10C3:
     ld   [$C1C0], a
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
     ld   c, a
     ld   b, $00
 toc_01_10CB:
@@ -2346,24 +2346,24 @@ toc_01_10EB:
 
     assign [$C19B], $0C
     push bc
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
     ld   c, a
     ld   b, $00
     ld   hl, $1059
     add  hl, bc
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     add  a, [hl]
     ld   hl, $C200
     add  hl, de
     ld   [hl], a
     ld   hl, $105D
     add  hl, bc
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     add  a, [hl]
     ld   hl, $C210
     add  hl, de
     ld   [hl], a
-    ld   a, [$FFA2]
+    ld   a, [hLinkPositionZHigh]
     inc  a
     ld   hl, $C310
     add  hl, de
@@ -2380,7 +2380,7 @@ toc_01_10EB:
     ld   hl, $C250
     add  hl, de
     ld   [hl], a
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
     ld   hl, $C3B0
     add  hl, de
     ld   [hl], a
@@ -2408,7 +2408,7 @@ toc_01_1151:
 
     ifNot [$DB4B], toc_01_116B
 
-    ld   a, [$FFA2]
+    ld   a, [hLinkPositionZHigh]
     and  a
     ret  nz
 
@@ -2449,23 +2449,23 @@ toc_01_1196:
     ld   [hl], $00
 toc_01_119E:
     push bc
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
     ld   c, a
     ld   hl, $1149
     add  hl, bc
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     add  a, [hl]
     ld   hl, $C200
     add  hl, de
     ld   [hl], a
     ld   hl, $114D
     add  hl, bc
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     add  a, [hl]
     ld   hl, $C210
     add  hl, de
     ld   [hl], a
-    ld   a, [$FFA2]
+    ld   a, [hLinkPositionZHigh]
     ld   hl, $C310
     add  hl, de
     ld   [hl], a
@@ -2499,10 +2499,10 @@ toc_01_11D1:
     ld   a, $EA
     jr   z, toc_01_11FE
 
-    ld   a, $E8
+    ld   a, 232
 toc_01_11FE:
-    ld   [$FF9B], a
-    clear [$FFA3]
+    ld   [hLinkPositionYIncrement], a
+    clear [hLinkPositionZLow]
     call toc_01_20D6
     call_changebank $02
     call toc_02_6FB1
@@ -2510,22 +2510,22 @@ toc_01_11FE:
 
 
 toc_01_120F:
-    assign [$FFA3], $20
+    assign [hLinkPositionZLow], $20
     ld   a, [$C14A]
     and  a
     ret  z
 
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
     ld   e, a
     ld   d, b
     ld   hl, $11C9
     add  hl, de
     ld   a, [hl]
-    ld   [$FF9A], a
+    ld   [hLinkPositionXIncrement], a
     ld   hl, $11CD
     add  hl, de
     ld   a, [hl]
-    ld   [$FF9B], a
+    ld   [hLinkPositionYIncrement], a
     ret
 
 
@@ -2578,7 +2578,7 @@ toc_01_1269:
 
 toc_01_1283:
     ld   a, [$FFCB]
-    and  %00001111
+    and  DIRECTION_KEEP
     ld   e, a
     ld   d, $00
     ld   hl, $48B3
@@ -2587,7 +2587,7 @@ toc_01_1283:
     cp   $0F
     jr   z, .return_01_1295
 
-    ld   [$FF9E], a
+    ld   [hLinkDirection], a
 toc_01_1283.return_01_1295:
     ret
 
@@ -2622,13 +2622,13 @@ toc_01_12B6.else_01_12C7:
     jr   .toc_01_12D6
 
 toc_01_12B6.else_01_12D4:
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
 toc_01_12B6.toc_01_12D6:
     ld   e, a
     ld   d, $00
     ld   hl, $1296
     add  hl, de
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     add  a, [hl]
     sub  a, $08
     and  %11110000
@@ -2637,7 +2637,7 @@ toc_01_12B6.toc_01_12D6:
     ld   c, a
     ld   hl, $12A2
     add  hl, de
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     add  a, [hl]
     sub  a, $10
     and  %11110000
@@ -2779,17 +2779,17 @@ toc_01_13C9:
     and  a
     ret  z
 
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
     ld   e, a
     ld   d, $00
     ld   hl, $13C1
     add  hl, de
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     add  a, [hl]
     ld   [$FFD7], a
     ld   hl, $13C5
     add  hl, de
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     add  a, [hl]
     ld   [$FFD8], a
     assign [$C502], $04
@@ -2818,7 +2818,7 @@ toc_01_140C:
     and  a
     ret  nz
 
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
     and  %00000010
     ret  nz
 
@@ -2827,7 +2827,7 @@ toc_01_140C.else_01_141A:
     and  a
     ret  nz
 
-    ld   a, [$FFA2]
+    ld   a, [hLinkPositionZHigh]
     ld   hl, $C146
     or   [hl]
     ret  nz
@@ -2845,17 +2845,17 @@ toc_01_140C.else_01_141A:
     ld   [$C14A], a
     clear [$C121]
     ld   [$C122], a
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
     ld   e, a
     ld   d, $00
     ld   hl, $1404
     add  hl, de
     ld   a, [hl]
-    ld   [$FF9A], a
+    ld   [hLinkPositionXIncrement], a
     ld   hl, $1408
     add  hl, de
     ld   a, [hl]
-    ld   [$FF9B], a
+    ld   [hLinkPositionYIncrement], a
     clear [$C1AC]
     ret
 
@@ -2863,33 +2863,33 @@ toc_01_140C.else_01_141A:
 toc_01_145D:
     ld   a, [$FFE7]
     and  %00000111
-    ld   hl, $FFA2
+    ld   hl, hLinkPositionZHigh
     or   [hl]
-    ld   hl, $FFA1
+    ld   hl, hLinkInteractiveMotionBlocked
     or   [hl]
     ld   hl, $C146
     or   [hl]
     ret  nz
 
-    copyFromTo [$FF98], [$FFD7]
+    copyFromTo [hLinkPositionX], [$FFD7]
     ifEq [$C181], $05, .else_01_1488
 
     assign [$FFF4], $07
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     add  a, $06
     ld   [$FFD8], a
     ld   a, $0B
     jp   toc_01_0953
 
 toc_01_145D.else_01_1488:
-    copyFromTo [$FF99], [$FFD8]
+    copyFromTo [hLinkPositionY], [$FFD8]
     assign [$FFF2], $0E
     ld   a, $0C
     jp   toc_01_0953
 
 toc_01_1495:
-    clear [$FF9A]
-    ld   [$FF9B], a
+    clear [hLinkPositionXIncrement]
+    ld   [hLinkPositionYIncrement], a
     ret
 
 
@@ -2907,7 +2907,7 @@ toc_01_149B.toc_01_149E:
     ld   hl, $C13B
     add  a, [hl]
     ld   [$FFD7], a
-    copyFromTo [$FF98], [$FFD8]
+    copyFromTo [hLinkPositionX], [$FFD8]
     ld   hl, $FFDA
     ld   [hl], $00
     ifLt [$C122], $28, .else_01_14CD
@@ -2920,7 +2920,7 @@ toc_01_149B.toc_01_149E:
 toc_01_149B.else_01_14CD:
     loadHL [$C139], [$C13A]
     copyFromTo [$C136], [$FFD9]
-    returnIfGte [$FF99], $88
+    returnIfGte [hLinkPositionY], 136
 
     jp   toc_01_1540
 
@@ -3022,17 +3022,17 @@ toc_01_1561:
     db   $10, $F0, $08, $08, $0C, $0C, $F0, $10
 
 toc_01_1594:
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
     ld   e, a
     ld   d, $00
     ld   hl, $158C
     add  hl, de
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     add  a, [hl]
     ld   [$C179], a
     ld   hl, $1590
     add  hl, de
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     add  a, [hl]
     ld   [$C17A], a
     assign [$C178], $02
@@ -3055,8 +3055,8 @@ JumpTable_15B3_00.else_01_15C3:
     cp   $04
     jp   nz, .return_01_172D
 
-    clear [$FF96]
-    ld   [$FF97], a
+    clear [hBaseScrollX]
+    ld   [hBaseScrollY], a
     ld   [$FFB4], a
     ld   e, $10
     ld   hl, $C280
@@ -3074,7 +3074,7 @@ JumpTable_15B3_00.loop_01_15E2:
     incAddr $DB6E
     incAddr $DB46
     assign [$D47E], $01
-    clear [$FF9D]
+    clear [hLinkAnimationState]
 JumpTable_15B3_00.else_01_1606:
     copyFromTo [$FFF9], [$FFE4]
     assign [wGameMode], GAMEMODE_WORLD
@@ -3089,11 +3089,11 @@ JumpTable_15B3_00.else_01_1606:
     ld   hl, $D416
     ld   c, $00
 JumpTable_15B3_00.loop_01_1628:
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     swap a
     and  %00001111
     ld   e, a
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     sub  a, $08
     and  %11110000
     or   e
@@ -3251,7 +3251,7 @@ JumpTable_15B3_00.return_01_172D:
 
 
 JumpTable_15B3_00.else_01_172E:
-    clear [$FF9E]
+    clear [hLinkDirection]
     ret
 
 
@@ -3457,7 +3457,7 @@ toc_01_19EF:
     sra  a
     and  %00000001
     ld   d, a
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
     sla  a
     or   d
     ld   c, a
@@ -3525,7 +3525,7 @@ toc_01_19EF.else_01_1A63:
 toc_01_19EF.toc_01_1A66:
     add  hl, bc
     ld   a, [hl]
-    ld   [$FF9D], a
+    ld   [hLinkAnimationState], a
     ret
 
 
@@ -3679,7 +3679,7 @@ toc_01_1AA9.else_01_1B66:
     inc  a
     ld   [$FFA6], a
 toc_01_1AA9.toc_01_1B6B:
-    ld   a, [$FFA4]
+    ld   a, [hAnimatedTilesGroup]
     jumptable
     dw JumpTable_1C56_00.JumpTable_1C5A_00 ; 00
     dw JumpTable_1B90_00 ; 01
@@ -3840,8 +3840,8 @@ JumpTable_1C56_00:
     jr   JumpTable_1C21_00.toc_01_1C23
 
 JumpTable_1C56_00.JumpTable_1C5A_00:
-    ld   a, [$FF9D]
-    cp   $FF
+    ld   a, [hLinkAnimationState]
+    cp   LINK_ANIMATION_STATE_NO_UPDATE
     jp   z, .toc_01_1CCC
 
     ld   hl, $1813
@@ -3910,7 +3910,7 @@ JumpTable_1C56_00.loop_01_1CC6:
     jr   nz, .loop_01_1CC6
 
 JumpTable_1C56_00.toc_01_1CCC:
-    ld   a, [$FF9D]
+    ld   a, [hLinkAnimationState]
     inc  a
     jr   z, .return_01_1D14
 
@@ -3931,7 +3931,7 @@ JumpTable_1C56_00.toc_01_1CCC:
     ldi  [hl], a
     ld   a, [$C13C]
     ld   c, a
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     add  a, c
     ldi  [hl], a
     ld   a, $00
@@ -3943,7 +3943,7 @@ JumpTable_1C56_00.toc_01_1CCC:
     ldi  [hl], a
     pop  af
     ldi  [hl], a
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     add  a, c
     add  a, $08
     ldi  [hl], a
@@ -4072,7 +4072,7 @@ toc_01_1DDB:
 toc_01_1DEE:
     ld   hl, $2100
     ld   [hl], $0C
-    ld   hl, $FFA1
+    ld   hl, hLinkInteractiveMotionBlocked
     ld   [hl], $01
     ld   hl, $D6FB
     ld   e, [hl]
@@ -4152,18 +4152,18 @@ toc_01_1E7B:
     ld   hl, $C14A
     ld   a, [$C15C]
     or   [hl]
-    ld   hl, $FFA2
+    ld   hl, hLinkPositionZHigh
     or   [hl]
     ld   hl, $C11C
     or   [hl]
     jp   nz, .return_01_20A5
 
-    ld   a, [$FF9E]
+    ld   a, [hLinkDirection]
     ld   e, a
     ld   d, $00
     ld   hl, $1E5B
     add  hl, de
-    ld   a, [$FF98]
+    ld   a, [hLinkPositionX]
     add  a, [hl]
     sub  a, $08
     and  %11110000
@@ -4172,7 +4172,7 @@ toc_01_1E7B:
     ld   c, a
     ld   hl, $1E5F
     add  hl, de
-    ld   a, [$FF99]
+    ld   a, [hLinkPositionY]
     add  a, [hl]
     sub  a, $10
     and  %11110000
@@ -4240,8 +4240,8 @@ toc_01_1E7B.else_01_1F08:
 
 toc_01_1E7B.else_01_1F10:
     ld   e, a
-    ld   a, [$FF9E]
-    cp   $02
+    ld   a, [hLinkDirection]
+    cp   DIRECTION_UP
     jp   nz, .else_01_1FFD
 
     assign [$C1AD], $02
@@ -4342,7 +4342,7 @@ toc_01_1E7B.toc_01_1FA1:
     cp   $0D
     jr   z, .else_01_1FFD
 
-    ifNe [$FF9E], $02, .else_01_1FFD
+    ifNe [hLinkDirection], DIRECTION_UP, .else_01_1FFD
 
     ld   [$C1AD], a
     ld   a, [$FFCC]
@@ -4353,7 +4353,7 @@ toc_01_1E7B.toc_01_1FA1:
     and  a
     jr   nz, .else_01_1FC8
 
-    ifNe [$FF9E], $02, .else_01_1FFD
+    ifNe [hLinkDirection], DIRECTION_UP, .else_01_1FFD
 
 toc_01_1E7B.else_01_1FC8:
     changebank $14
@@ -4406,14 +4406,14 @@ toc_01_1E7B.else_01_200B:
 toc_01_1E7B.else_01_201A:
     changebank $02
     call toc_02_4738.toc_02_485E
-    assign [$FFA1], $01
-    ld   a, [$FF9E]
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_GRAB_SLASH
+    ld   a, [hLinkDirection]
     ld   e, a
     ld   d, $00
     ld   hl, $1E63
     add  hl, de
     ld   a, [hl]
-    ld   [$FF9D], a
+    ld   [hLinkAnimationState], a
     ld   hl, $1E67
     add  hl, de
     ld   a, [$FFCB]
@@ -4428,7 +4428,7 @@ toc_01_1E7B.else_01_201A:
     add  hl, de
     ld   a, [hl]
     ld   [$C13B], a
-    incAddr $FF9D
+    incAddr hLinkAnimationState
     ld   e, $08
     ifNe [$D47C], $01, .else_01_205A
 
@@ -4473,7 +4473,7 @@ toc_01_1E7B.toc_01_2093:
     ld   e, a
     copyFromTo [$FFD7], [$FFAF]
     call toc_01_20A6
-    copyFromTo [$FF9E], [$C15D]
+    copyFromTo [hLinkDirection], [$C15D]
     call toc_01_20B1
 toc_01_1E7B.return_01_20A5:
     ret
@@ -4518,7 +4518,7 @@ toc_01_20D6.toc_01_20E0:
     ld   [$FFD7], a
 toc_01_20D6.toc_01_20E4:
     ld   b, $00
-    ld   hl, $FF9A
+    ld   hl, hLinkPositionXIncrement
     add  hl, bc
     ld   a, [hl]
     push af
@@ -4529,7 +4529,7 @@ toc_01_20D6.toc_01_20E4:
     add  a, [hl]
     ld   [hl], a
     rl   d
-    ld   hl, $FF98
+    ld   hl, hLinkPositionX
     add  hl, bc
     pop  af
     ld   e, $00
@@ -4548,7 +4548,7 @@ toc_01_20D6.else_01_2105:
 
 
 toc_01_210F:
-    ld   a, [$FFA3]
+    ld   a, [hLinkPositionZLow]
     push af
     swap a
     and  %11110000
@@ -4556,7 +4556,7 @@ toc_01_210F:
     add  a, [hl]
     ld   [hl], a
     rl   d
-    ld   hl, $FFA2
+    ld   hl, hLinkPositionZHigh
     pop  af
     ld   e, $00
     bit  7, a
@@ -4647,8 +4647,8 @@ toc_01_2197:
     ld   [wNameIndex], a
     ld   [$C112], a
     assign [$C5AB], $0F
-    ld   a, [$FF99]
-    cp   $48
+    ld   a, [hLinkPositionY]
+    cp   72
     rra
     and  %10000000
     or   $01
@@ -5647,7 +5647,7 @@ toc_01_27FE.return_01_2838:
 toc_01_2839:
     push bc
     ld   a, [$FFCD]
-    ld   hl, $FF97
+    ld   hl, hBaseScrollY
     add  a, [hl]
     and  %11111000
     srl  a
@@ -5664,7 +5664,7 @@ toc_01_2839.loop_01_2851:
 
     push hl
     ld   a, [$FFCE]
-    ld   hl, $FF96
+    ld   hl, hBaseScrollX
     add  a, [hl]
     pop  hl
     and  %11111000
@@ -5945,7 +5945,7 @@ toc_01_2980:
 
 toc_01_298A:
     ld   bc, $006D
-    ld   hl, $FF90
+    ld   hl, hNeedsUpdatingBGTiles
     call .loop_01_2999
     ld   bc, $1F00
 toc_01_298A.toc_01_2996:
@@ -6490,7 +6490,7 @@ JumpTable_2D88_00.else_01_2E38:
 
 JumpTable_2D88_00.else_01_2E42:
     ld   hl, $5000
-    ifEq [$FF94], $FF, .return_01_2E54
+    ifEq [hWorldTileset], $FF, .return_01_2E54
 
     add  a, $50
     ld   h, a
@@ -6502,7 +6502,7 @@ JumpTable_2D88_00.return_01_2E54:
 
 JumpTable_2D88_00.else_01_2E55:
     changebank $0F
-    ifEq [$FF94], $0F, .return_01_2E6B
+    ifEq [hWorldTileset], $0F, .return_01_2E6B
 
     add  a, $40
     ld   h, a
@@ -6809,7 +6809,7 @@ toc_01_2ED7.else_01_307D:
     cp   $FE
     jr   z, .else_01_30D1
 
-    ld   [$FFA4], a
+    ld   [hAnimatedTilesGroup], a
     inc  bc
     ifNot [$DBA5], .else_01_309B
 

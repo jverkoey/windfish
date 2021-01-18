@@ -142,6 +142,50 @@ gbPCM12 EQU $FF76
 
 gbPCM34 EQU $FF77
 
+hRomBank EQU $FF80
+
+hTemp EQU $FF81
+
+hCodeTemp EQU $FF82
+
+hNeedsUpdatingBGTiles EQU $FF90
+
+hNeedsUpdatingEnemiesTiles EQU $FF91
+
+hBGTilesLoadingStage EQU $FF92
+
+hEnemiesTilesLoadingStage EQU $FF93
+
+hWorldTileset EQU $FF94
+
+hBaseScrollX EQU $FF96
+
+hBaseScrollY EQU $FF97
+
+hLinkPositionX EQU $FF98
+
+hLinkPositionY EQU $FF99
+
+hLinkPositionXIncrement EQU $FF9A
+
+hLinkPositionYIncrement EQU $FF9B
+
+hLinkAnimationState EQU $FF9D
+
+hLinkDirection EQU $FF9E
+
+hLinkFinalPositionX EQU $FF9F
+
+hLinkFinalPositionY EQU $FFA0
+
+hLinkInteractiveMotionBlocked EQU $FFA1
+
+hLinkPositionZHigh EQU $FFA2
+
+hLinkPositionZLow EQU $FFA3
+
+hAnimatedTilesGroup EQU $FFA4
+
 hNeedsRenderingFrame EQU $FFD1
 
 hIsRenderingFrame EQU $FFFD
