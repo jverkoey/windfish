@@ -24,12 +24,13 @@ public enum InstructionOperandToken: Equatable {
 
   /** Creates a token from the given string. */
   public init(string: String) {
-    if string.lowercased().hasPrefix("sp+") {
+    let lowercasedString = string.lowercased()
+    if lowercasedString.hasPrefix("sp+") {
       self = .stackPointerOffset
       return
     }
 
-    if string == "[$ff00+c]" {
+    if lowercasedString == "[$ff00+c]" {
       self = .specific(string)
       return
     }
