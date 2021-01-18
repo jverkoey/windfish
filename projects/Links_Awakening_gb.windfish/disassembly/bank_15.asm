@@ -803,7 +803,7 @@ JumpTable_4F6F_15.else_15_501F:
     add  hl, bc
     xor  a
     ld   [hl], a
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -2178,7 +2178,7 @@ JumpTable_78ED_15:
 JumpTable_78ED_15.else_15_7929:
     ld   a, $01
     call toc_01_3B87
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00011111
     jr   nz, .return_15_793C
 
@@ -2221,7 +2221,7 @@ toc_15_796D.else_15_7983:
     cp   $60
     jr   c, .return_15_79A4
 
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     ld   hl, $C123
     add  a, [hl]
     and  %00000111
@@ -2263,7 +2263,7 @@ toc_15_79A5:
     and  %00010000
     jr   z, .return_15_79F4
 
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     xor  c
     and  %00000001
     jr   nz, .return_15_79F4
@@ -2304,7 +2304,7 @@ toc_15_79A5.else_15_7A06:
     ld   de, $C030
     add  hl, de
     ld   e, $00
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000100
     jr   z, .else_15_7A1A
 

@@ -185,7 +185,7 @@ JumpTable_40AC_04.else_04_4121:
     ld   [hl], $47
     assign [$FFF2], $06
 JumpTable_40AC_04.else_04_414D:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -224,7 +224,7 @@ JumpTable_415F_04.else_04_416D:
     jr   nc, .else_04_4191
 
     ld   e, $08
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000100
     jr   z, .else_04_4189
 
@@ -258,7 +258,7 @@ JumpTable_415F_04.else_04_4194:
     call toc_01_093B.toc_01_0942
     ifNe [$DB00], $03, .else_04_41C7
 
-    ld   a, [$FFCB]
+    ld   a, [hPressedButtonsMask]
     and  %00100000
     jr   nz, .else_04_41D4
 
@@ -267,7 +267,7 @@ JumpTable_415F_04.else_04_4194:
 JumpTable_415F_04.else_04_41C7:
     ifNe [$DB01], $03, .else_04_41F8
 
-    ld   a, [$FFCB]
+    ld   a, [hPressedButtonsMask]
     and  %00010000
     jr   z, .else_04_41F8
 
@@ -405,7 +405,7 @@ JumpTable_42D2_04:
 
     ld   hl, $C420
     add  hl, bc
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     ld   [hl], a
     ld   a, [$FFF0]
     jumptable
@@ -499,7 +499,7 @@ JumpTable_4371_04:
     add  hl, bc
     ld   e, [hl]
     ld   d, b
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000111
     jr   nz, .else_04_4397
 
@@ -531,7 +531,7 @@ JumpTable_4371_04.else_04_4397:
     xor  $01
     ld   [hl], a
 JumpTable_4371_04.else_04_43A8:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000001
     jr   nz, .else_04_43CE
 
@@ -557,7 +557,7 @@ JumpTable_4371_04.else_04_43A8:
     xor  $01
     ld   [hl], a
 JumpTable_4371_04.else_04_43CE:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -779,7 +779,7 @@ JumpTable_450A_04.else_04_4528:
     call toc_01_3BEB
     call toc_04_6D94
     call toc_01_3B9E
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000011
     jr   nz, .else_04_455B
 
@@ -808,7 +808,7 @@ JumpTable_450A_04.else_04_454C:
 JumpTable_450A_04.else_04_455A:
     inc  [hl]
 JumpTable_450A_04.else_04_455B:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -977,7 +977,7 @@ toc_04_4627:
 toc_04_46EC:
     ifNe [$FFF0], $05, .else_04_4706
 
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000001
     jr   nz, .else_04_4706
 
@@ -1012,7 +1012,7 @@ toc_04_46EC.else_04_4706:
     ld   a, [$FFEC]
     add  a, $10
     ld   [$FFEC], a
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -1160,7 +1160,7 @@ JumpTable_48D0_04:
     ld   de, $48C8
     call toc_01_3C3B
     call toc_04_7F1F
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -1225,7 +1225,7 @@ JumpTable_4936_04:
     ld   de, $48C8
     call toc_01_3C3B
     call toc_04_7F1F
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -1416,7 +1416,7 @@ JumpTable_4A78_04:
     jp   z, toc_04_4967
 
     ld   [hLinkInteractiveMotionBlocked], a
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000001
     jr   nz, .else_04_4A9A
 
@@ -1428,7 +1428,7 @@ JumpTable_4A78_04.else_04_4A9A:
 
 JumpTable_4A78_04.else_04_4A9F:
     call toc_04_4B4C
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -1476,7 +1476,7 @@ JumpTable_4A78_04.else_04_4AE9:
     and  a
     jr   z, .return_04_4B0B
 
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00011111
     jr   nz, .return_04_4B0B
 
@@ -1724,7 +1724,7 @@ JumpTable_4DF9_04:
 
     ld   hl, $C420
     add  hl, bc
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     ld   [hl], a
     ld   a, [$FFF0]
     jumptable
@@ -2077,7 +2077,7 @@ JumpTable_5080_04:
 
     ld   hl, $C420
     add  hl, bc
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     ld   [hl], a
     ld   hl, $C440
     add  hl, bc
@@ -2248,7 +2248,7 @@ JumpTable_5160_04.else_04_5174:
     db   $00, $FF
 
 JumpTable_51F1_04:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00111111
     jr   nz, .else_04_5203
 
@@ -2259,7 +2259,7 @@ JumpTable_51F1_04:
     call toc_01_0891
     ld   [hl], $1F
 JumpTable_51F1_04.else_04_5203:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -2643,13 +2643,13 @@ JumpTable_550B_04.else_04_5517:
     jr   nz, JumpTable_5583_04.toc_04_5594
 
     call toc_04_7F1F
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
     and  %00000001
     call toc_01_3B87
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000111
     jr   nz, .else_04_553C
 
@@ -2818,14 +2818,14 @@ toc_04_5629:
     push de
     ld   a, [$FFEF]
     sub  a, $0F
-    ld   [$FFCD], a
+    ld   [hSwordIntersectedAreaY], a
     ld   a, [$FFEE]
     sub  a, $07
-    ld   [$FFCE], a
+    ld   [hSwordIntersectedAreaX], a
     swap a
     and  %00001111
     ld   e, a
-    ld   a, [$FFCD]
+    ld   a, [hSwordIntersectedAreaY]
     and  %11110000
     or   e
     ld   e, a
@@ -3277,7 +3277,7 @@ toc_04_5A10.loop_04_5A36:
 
 JumpTable_5E29_04:
     call toc_01_3BB4
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -4011,7 +4011,7 @@ JumpTable_680A_04.else_04_6847:
 
 
 JumpTable_680A_04.else_04_6897:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -4024,14 +4024,14 @@ JumpTable_680A_04.else_04_6897:
     ld   [hLinkDirection], a
 JumpTable_680A_04.toc_04_68A7:
     call toc_04_68D0
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
     rra
     and  %00000001
     call toc_01_3B87
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00011111
     jr   nz, .return_04_68BF
 
@@ -4070,7 +4070,7 @@ toc_04_68D0.toc_04_68D3:
     push bc
     push de
     pop  bc
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     xor  c
     and  %00000001
     jr   nz, .else_04_6967
@@ -4176,7 +4176,7 @@ JumpTable_69B6_04:
     call toc_01_0891
     jr   nz, .else_04_69E8
 
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     xor  c
     and  %00000111
     jr   nz, .else_04_69C7
@@ -4204,7 +4204,7 @@ JumpTable_69B6_04.return_04_69E7:
 
 
 JumpTable_69B6_04.else_04_69E8:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000001
     jr   nz, .return_04_69E7
 
@@ -4257,7 +4257,7 @@ JumpTable_6A2E_04:
     add  hl, bc
     dec  [hl]
     dec  [hl]
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000011
     jr   nz, .else_04_6A42
 
@@ -4811,7 +4811,7 @@ JumpTable_6FC6_04.else_04_701A:
 
 
 JumpTable_7026_04:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -4819,7 +4819,7 @@ JumpTable_7026_04:
     and  %00000001
     ld   [$D200], a
     assign [$D203], $10
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00010000
     ld   [$D202], a
     ifNot [$DB73], .else_04_708C
@@ -4840,7 +4840,7 @@ JumpTable_7026_04.else_04_704F:
     push bc
     ld   a, [$C50F]
     ld   c, a
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00010000
     ld   a, $04
     jr   z, .else_04_7060
@@ -4874,7 +4874,7 @@ JumpTable_7026_04.return_04_708B:
 
 
 JumpTable_7026_04.else_04_708C:
-    ld   a, [$FFCB]
+    ld   a, [hPressedButtonsMask]
     and  %00100000
     jr   z, .return_04_70A3
 
@@ -4894,7 +4894,7 @@ JumpTable_7026_04.return_04_70A3:
 JumpTable_70A4_04:
     call toc_04_70EA
     assign [$D203], $10
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00010000
     ld   [$D202], a
     ifNot [$DB73], .else_04_70C0
@@ -4904,12 +4904,12 @@ JumpTable_70A4_04:
     jr   .toc_04_70C6
 
 JumpTable_70A4_04.else_04_70C0:
-    ld   a, [$FFCB]
+    ld   a, [hPressedButtonsMask]
     and  %00100000
     jr   z, .else_04_70D7
 
 JumpTable_70A4_04.toc_04_70C6:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000011
     jr   nz, .return_04_70E9
 
@@ -4932,7 +4932,7 @@ JumpTable_70A4_04.return_04_70E9:
 
 
 toc_04_70EA:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -4947,7 +4947,7 @@ toc_04_70EA:
 JumpTable_70FE_04:
     call toc_04_70EA
     assign [$D202], $10
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00010000
     ld   [$D203], a
     call toc_01_0887
@@ -4957,7 +4957,7 @@ JumpTable_70FE_04:
     and  a
     jr   nz, .else_04_711D
 
-    ld   a, [$FFCB]
+    ld   a, [hPressedButtonsMask]
     and  %00010000
     jr   z, .return_04_7123
 
@@ -4971,7 +4971,7 @@ JumpTable_70FE_04.return_04_7123:
 JumpTable_7124_04:
     call toc_04_70EA
     assign [$D202], $10
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00010000
     ld   [$D203], a
     ifNot [$DB73], .else_04_713B
@@ -4979,12 +4979,12 @@ JumpTable_7124_04:
     jr   .toc_04_7141
 
 JumpTable_7124_04.else_04_713B:
-    ld   a, [$FFCB]
+    ld   a, [hPressedButtonsMask]
     and  %00010000
     jr   z, .else_04_7152
 
 JumpTable_7124_04.toc_04_7141:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000011
     jr   nz, .return_04_7162
 
@@ -5006,7 +5006,7 @@ JumpTable_7124_04.return_04_7162:
 
 
 JumpTable_7163_04:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -5024,7 +5024,7 @@ JumpTable_7163_04.else_04_7181:
     and  a
     jr   nz, .return_04_71AC
 
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000011
     jr   nz, .return_04_71AC
 
@@ -5053,7 +5053,7 @@ JumpTable_7163_04.return_04_71AC:
 
 
 JumpTable_71AD_04:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -5092,13 +5092,13 @@ JumpTable_71AD_04.return_04_71E2:
 
 
 JumpTable_71E3_04:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
     and  %00000001
     ld   [$D200], a
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000011
     jr   nz, .return_04_71FF
 
@@ -5113,7 +5113,7 @@ JumpTable_71E3_04.return_04_71FF:
 
 
 JumpTable_7200_04:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -5152,7 +5152,7 @@ JumpTable_7200_04.return_04_725B:
 
 
 JumpTable_725C_04:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -5392,7 +5392,7 @@ JumpTable_74C5_04.else_04_74CF:
 JumpTable_74C5_04.else_04_74F3:
     assign [$FFF2], $09
 JumpTable_74C5_04.else_04_74F7:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000011
     jr   nz, .return_04_7508
 
@@ -6393,7 +6393,7 @@ JumpTable_7CDA_04:
     add  hl, bc
     ld   [hl], a
 JumpTable_7CDA_04.else_04_7D02:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -6426,7 +6426,7 @@ JumpTable_7D15_04.else_04_7D20:
     jr   c, .else_04_7D43
 
 JumpTable_7D15_04.else_04_7D35:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     xor  c
     and  %00000011
     jr   nz, .else_04_7D41
@@ -6482,7 +6482,7 @@ JumpTable_7DAC_04:
 
     call JumpTable_3B8D_00
 JumpTable_7DAC_04.else_04_7DB4:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -6564,7 +6564,7 @@ JumpTable_7DF7_04.else_04_7E19:
 JumpTable_7DF7_04.toc_04_7E21:
     assign [$FFF2], $09
 JumpTable_7DF7_04.toc_04_7E25:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     and  %00000001
@@ -6667,7 +6667,7 @@ JumpTable_7EC3_04:
 
 
 JumpTable_7EC3_04.else_04_7ED4:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     xor  c
     push af
     and  %00001111

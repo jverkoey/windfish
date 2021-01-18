@@ -616,7 +616,7 @@ toc_14_523C.else_14_5256:
     ld   [$C5AF], a
     jr   nz, .else_14_5267
 
-    copyFromTo [$FFBF], [$D368]
+    copyFromTo [hNextDefaultMusicTrack], [$D368]
 toc_14_523C.else_14_5267:
     ld   a, [$DBA5]
     and  a
@@ -659,7 +659,7 @@ toc_14_523C.else_14_529E:
     xor  a
 toc_14_523C.else_14_52AA:
     ld   [$C5AC], a
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00111111
     jr   nz, .else_14_52BE
 
@@ -739,7 +739,7 @@ toc_14_5326:
 toc_14_5326.else_14_535D:
     ld   a, [$C3CC]
     ld   e, a
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000011
     add  a, e
     ld   e, a
@@ -748,7 +748,7 @@ toc_14_5326.else_14_535D:
     ld   a, [hl]
     ld   [$DB97], a
     ld   [$C5AD], a
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000001
     jr   nz, .return_14_5387
 
@@ -808,7 +808,7 @@ toc_14_5388.else_14_53BA:
 
     dec  [hl]
 toc_14_5388.else_14_53C3:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000011
     jr   nz, .else_14_53CF
 
@@ -949,7 +949,7 @@ toc_14_55AA.loop_14_55AE:
 
     ld   hl, $C200
     add  hl, de
-    ld   a, [$FFCE]
+    ld   a, [hSwordIntersectedAreaX]
     add  a, $08
     sub  a, [hl]
     add  a, $08
@@ -958,7 +958,7 @@ toc_14_55AA.loop_14_55AE:
 
     ld   hl, $C210
     add  hl, de
-    ld   a, [$FFCD]
+    ld   a, [hSwordIntersectedAreaY]
     add  a, $10
     sub  a, [hl]
     add  a, $08
@@ -1325,7 +1325,7 @@ toc_14_59B0.return_14_59DD:
 toc_14_59DE:
     ld   hl, $D711
     add  hl, de
-    ifNe [$FFAF], $8E, .else_14_5A1D
+    ifNe [hObjectUnderEntity], 142, .else_14_5A1D
 
     ld   [hl], $AA
     call toc_01_2839
@@ -1371,7 +1371,7 @@ toc_14_59DE.else_14_5A24:
 
     ifNot [$FFF9], .else_14_5A6B
 
-    ifNe [$FFAF], $8A, .else_14_5A6B
+    ifNe [hObjectUnderEntity], 138, .else_14_5A6B
 
     ld   [hl], $04
     call toc_01_2839
@@ -1437,7 +1437,7 @@ toc_14_59DE.else_14_5A6B:
     jr   .toc_14_5AE4
 
 toc_14_59DE.toc_14_5A9F:
-    ifNe [$FFAF], $20, .else_14_5AB2
+    ifNe [hObjectUnderEntity], 32, .else_14_5AB2
 
     ifEq [$FFF6], $52, .else_14_5AAF
 
@@ -1540,19 +1540,19 @@ toc_14_59DE.toc_14_5B0C:
     ldi  [hl], a
     ld   [hl], $00
     assign [$FFAC], $01
-    ld   a, [$FFCD]
+    ld   a, [hSwordIntersectedAreaY]
     and  %11110000
     add  a, $10
     ld   [$FFAE], a
-    ld   a, [$FFCE]
+    ld   a, [hSwordIntersectedAreaX]
     and  %11110000
     add  a, $08
     ld   [$FFAD], a
-    ld   a, [$FFCE]
+    ld   a, [hSwordIntersectedAreaX]
     swap a
     and  %00001111
     ld   e, a
-    ld   a, [$FFCD]
+    ld   a, [hSwordIntersectedAreaY]
     and  %11110000
     or   e
     ld   [$D416], a

@@ -234,7 +234,7 @@ JumpTable_42D7_07.else_07_42F4:
     jp   toc_01_2185
 
 JumpTable_42D7_07.else_07_42F9:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00110000
     ld   e, b
     jr   z, .else_07_4301
@@ -487,7 +487,7 @@ JumpTable_48A7_07.else_07_48D4:
 
 
 JumpTable_48A7_07.else_07_48D9:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -676,7 +676,7 @@ JumpTable_4ABD_07.else_07_4B0E:
     db   $0B, $F5
 
 JumpTable_4B9A_07:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000001
     jr   nz, .else_07_4BE0
 
@@ -865,7 +865,7 @@ JumpTable_4F26_07:
     call toc_07_7BD0
     jr   nc, .else_07_4F66
 
-    ld   a, [$FFCB]
+    ld   a, [hPressedButtonsMask]
     and  %00001111
     jr   z, .else_07_4F66
 
@@ -1197,13 +1197,13 @@ JumpTable_563B_07.else_07_5689:
     ld   a, $61
     call .toc_07_5668
 JumpTable_563B_07.else_07_568E:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
     and  %00000001
     call toc_01_3B87
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00011111
     jr   nz, .return_07_56AD
 
@@ -1841,7 +1841,7 @@ JumpTable_641D_07.else_07_645F:
     db   $70, $CD, $E2, $7C, $CD, $9E, $3B
 
 toc_07_6478:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -1915,7 +1915,7 @@ JumpTable_6552_07:
     and  a
     jr   z, .else_07_6563
 
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000111
     jr   nz, .else_07_656F
 
@@ -1930,7 +1930,7 @@ JumpTable_6552_07.else_07_6563:
     add  hl, bc
     res  6, [hl]
 JumpTable_6552_07.else_07_656F:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000111
     jr   nz, .else_07_6593
 
@@ -1973,7 +1973,7 @@ JumpTable_6552_07.else_07_659B:
     and  a
     jr   z, .else_07_65AA
 
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00011111
     jr   nz, .else_07_65AA
 
@@ -2083,7 +2083,7 @@ JumpTable_66B6_07.else_07_66F0:
     db   $8D, $3B, $70, $CD, $11, $67
 
 toc_07_6706:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra

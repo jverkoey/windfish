@@ -2215,41 +2215,41 @@ toc_1F_7B17:
     db   $FF, $FF, $FF, $FF
 
 toc_1F_7F80:
-    ifNot [$FFA8], .else_1F_7F9E
+    ifNot [hMusicFadeOutTimer], .else_1F_7F9E
 
     sub  a, $01
-    ld   [$FFA8], a
+    ld   [hMusicFadeOutTimer], a
     and  %00000011
     jr   nz, .else_1F_7F9E
 
-    ifNot [$FFA9], .else_1F_7F95
+    ifNot [hVolumeRight], .else_1F_7F95
 
     dec  a
-    ld   [$FFA9], a
+    ld   [hVolumeRight], a
 toc_1F_7F80.else_1F_7F95:
-    ifNot [$FFAA], .else_1F_7F9E
+    ifNot [hVolumeLeft], .else_1F_7F9E
 
     sub  a, $10
-    ld   [$FFAA], a
+    ld   [hVolumeLeft], a
 toc_1F_7F80.else_1F_7F9E:
-    ifNot [$FFAB], .else_1F_7FBE
+    ifNot [hMusicFadeInTimer], .else_1F_7FBE
 
     sub  a, $01
-    ld   [$FFAB], a
+    ld   [hMusicFadeInTimer], a
     and  %00000001
     jr   nz, .else_1F_7FBE
 
-    ifGte [$FFA9], $07, .else_1F_7FB4
+    ifGte [hVolumeRight], $07, .else_1F_7FB4
 
     inc  a
-    ld   [$FFA9], a
+    ld   [hVolumeRight], a
 toc_1F_7F80.else_1F_7FB4:
-    ifGte [$FFAA], $70, .else_1F_7FBE
+    ifGte [hVolumeLeft], $70, .else_1F_7FBE
 
     add  a, $10
-    ld   [$FFAA], a
+    ld   [hVolumeLeft], a
 toc_1F_7F80.else_1F_7FBE:
-    ld   hl, $FFA9
+    ld   hl, hVolumeRight
     ld   a, [gbAUDVOL]
     and  %11111000
     or   [hl]

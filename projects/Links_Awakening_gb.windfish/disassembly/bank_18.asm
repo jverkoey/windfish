@@ -56,7 +56,7 @@ JumpTable_402D_18.else_18_4074:
     call toc_18_4088
     call JumpTable_3B8D_00
 JumpTable_402D_18.else_18_407C:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -291,7 +291,7 @@ JumpTable_4553_18.else_18_4565:
     call toc_01_2185
     call JumpTable_3B8D_00
 JumpTable_4553_18.else_18_457A:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -1460,7 +1460,7 @@ toc_18_5F3F:
     ret  z
 
 toc_18_5F3F.else_18_5F47:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00111111
     jr   nz, .return_18_5F53
 
@@ -1578,7 +1578,7 @@ JumpTable_60F1_18.return_18_6122:
 
 JumpTable_61B1_18:
     assign [$D368], $4D
-    ld   [$FFB0], a
+    ld   [hDefaultMusicTrack], a
     ld   [$FFBD], a
     call JumpTable_3B8D_00
     ret
@@ -1690,7 +1690,7 @@ toc_18_646E:
     sub  a, $01
     ld   [$FFDB], a
     and  %11110000
-    ld   [$FFCE], a
+    ld   [hSwordIntersectedAreaX], a
     swap a
     ld   hl, $C210
     add  hl, bc
@@ -1699,7 +1699,7 @@ toc_18_646E:
     sub  a, $07
     ld   [$FFDC], a
     and  %11110000
-    ld   [$FFCD], a
+    ld   [hSwordIntersectedAreaY], a
     or   c
     ld   c, a
     ld   b, $00
@@ -1709,7 +1709,7 @@ toc_18_646E:
     ld   h, a
     pop  bc
     ld   a, [hl]
-    ld   [$FFAF], a
+    ld   [hObjectUnderEntity], a
     ld   e, a
     ld   a, [$DBA5]
     ld   d, a
@@ -2261,7 +2261,7 @@ JumpTable_71DF_18:
     add  hl, de
     ld   a, [hl]
     ld   [hLinkPositionY], a
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     xor  c
     and  %00000011
     jr   nz, .else_18_7211
@@ -2291,7 +2291,7 @@ JumpTable_71DF_18.else_18_7230:
     pop  af
     ld   [hLinkPositionX], a
     call toc_18_7DCD
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -2520,7 +2520,7 @@ JumpTable_774B_18.else_18_7770:
 JumpTable_774B_18.else_18_7793:
     ld   hl, $7727
 JumpTable_774B_18.else_18_7796:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -2675,7 +2675,7 @@ JumpTable_7838_18.else_18_78BA:
 
 JumpTable_7838_18.else_18_78FE:
     call toc_01_3BB4
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     and  %00000011

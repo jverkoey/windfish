@@ -1216,7 +1216,7 @@ toc_1E_483C:
 
 toc_1E_484F:
     clear [$D3CE]
-    copyFromTo [$FFBF], [$D368]
+    copyFromTo [hNextDefaultMusicTrack], [$D368]
     jp   toc_1E_401E
 
 toc_1E_485B:

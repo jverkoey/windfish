@@ -186,7 +186,39 @@ hLinkPositionZLow EQU $FFA3
 
 hAnimatedTilesGroup EQU $FFA4
 
+hAnimatedTilesFrameCount EQU $FFA6
+
+hAnimatedTilesDataOffset EQU $FFA7
+
+hMusicFadeOutTimer EQU $FFA8
+
+hVolumeRight EQU $FFA9
+
+hVolumeLeft EQU $FFAA
+
+hMusicFadeInTimer EQU $FFAB
+
+hObjectUnderEntity EQU $FFAF
+
+hDefaultMusicTrack EQU $FFB0
+
+hNextMusicTrackToFadeInto EQU $FFB1
+
+hLinkWalksSlow EQU $FFB2
+
+hButtonsInactiveDelay EQU $FFB5
+
+hNextDefaultMusicTrack EQU $FFBF
+
+hPressedButtonsMask EQU $FFCB
+
+hSwordIntersectedAreaY EQU $FFCD
+
+hSwordIntersectedAreaX EQU $FFCE
+
 hNeedsRenderingFrame EQU $FFD1
+
+hFrameCounter EQU $FFE7
 
 hIsRenderingFrame EQU $FFFD
 

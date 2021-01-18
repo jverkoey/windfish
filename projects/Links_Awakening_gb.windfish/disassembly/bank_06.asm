@@ -442,7 +442,7 @@ JumpTable_4321_06.else_06_4339:
     ld   hl, $C320
     add  hl, bc
     ld   [hl], b
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000011
     jr   nz, .else_06_4359
 
@@ -761,7 +761,7 @@ JumpTable_4615_06.else_06_4651:
     call toc_06_654B
     call toc_01_3B9E
     call JumpTable_458F_06.toc_06_45F7
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00001000
     jr   z, .return_06_4662
 
@@ -1158,7 +1158,7 @@ JumpTable_496A_06.else_06_497A:
 JumpTable_496A_06.toc_06_497F:
     ld   hl, $C380
     add  hl, bc
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00001111
     jr   nz, .else_06_498E
 
@@ -1398,7 +1398,7 @@ JumpTable_4AE8_06.return_06_4AF0:
 
 
 JumpTable_4AF1_06:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     xor  c
     and  %00000011
     jr   nz, .else_06_4AFD
@@ -1425,7 +1425,7 @@ JumpTable_4AF1_06.else_06_4AFD:
 JumpTable_4AF1_06.else_06_4B1D:
     call toc_06_654B
     call toc_01_3B9E
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     and  %00000001
@@ -1626,7 +1626,7 @@ toc_06_4CAB:
     add  hl, bc
     ld   [hl], a
     sla  e
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -1639,7 +1639,7 @@ toc_06_4CAB:
     add  hl, de
     ld   a, [hl]
     call toc_01_3B87
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00001111
     jr   nz, .return_06_4D54
 
@@ -2002,7 +2002,7 @@ JumpTable_51F9_06:
 JumpTable_51F9_06.else_06_520B:
     call JumpTable_51C4_06.toc_06_51E9
     call JumpTable_51C4_06.toc_06_51E9
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00001111
     jr   nz, .return_06_521B
 
@@ -2038,7 +2038,7 @@ JumpTable_521C_06.else_06_5228:
     ld   [hl], $4F
     assign [$FFF3], $16
 JumpTable_521C_06.else_06_5253:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000111
     jr   nz, .else_06_5268
 
@@ -2785,7 +2785,7 @@ JumpTable_5877_06:
     ld   [hl], $61
     call JumpTable_3B8D_00
 JumpTable_5877_06.else_06_58AF:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -2875,7 +2875,7 @@ JumpTable_5907_06.else_06_592A:
 
     dec  [hl]
 JumpTable_5907_06.else_06_5936:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000111
     jr   nz, .else_06_595A
 
@@ -2975,7 +2975,7 @@ toc_06_59AB:
     add  hl, bc
     ld   a, [hl]
     ld   [$FFD7], a
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000001
     jr   z, toc_06_59C0
 
@@ -3019,7 +3019,7 @@ toc_06_59EB:
     ld   a, $04
     jr   nz, toc_06_5A01
 
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -3031,7 +3031,7 @@ toc_06_5A01:
     call toc_01_3C3B
 toc_06_5A09:
     ld   e, $FF
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000001
     jr   z, toc_06_5A13
 
@@ -3198,7 +3198,7 @@ JumpTable_5C01_06.else_06_5C18:
     add  hl, bc
     inc  [hl]
 JumpTable_5C01_06.else_06_5C23:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -3401,7 +3401,7 @@ toc_06_5E7B:
 
 JumpTable_5E7F_06:
     call toc_01_3BB4
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000011
     jr   nz, .else_06_5EB9
 
@@ -3691,7 +3691,7 @@ JumpTable_611D_06:
     add  hl, bc
     ld   [hl], $30
     assign [$D368], $0E
-    ld   [$FFB0], a
+    ld   [hDefaultMusicTrack], a
     ld   [$FFBD], a
 JumpTable_611D_06.toc_06_612F:
     ld   hl, $C2D0
@@ -3763,7 +3763,7 @@ JumpTable_616C_06.else_06_6199:
     ld   hl, $C320
     add  hl, bc
     ld   [hl], b
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00011111
     jr   nz, .return_06_61A7
 
@@ -4403,7 +4403,7 @@ JumpTable_679B_06.else_06_67AE:
 JumpTable_679B_06.else_06_67F2:
     ifNot [$FFF0], .else_06_67FE
 
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -4448,7 +4448,7 @@ JumpTable_679B_06.else_06_67FE:
 JumpTable_68E1_06:
     ifNe [$FFF6], $F2, .else_06_68FB
 
-    assign [$FFB0], $1D
+    assign [hDefaultMusicTrack], $1D
     returnIfLt [hLinkPositionY], 68
 
     ld   a, [hLinkPositionX]
@@ -4465,12 +4465,12 @@ JumpTable_68E1_06.else_06_68FB:
     jp   z, toc_06_65E5
 
 JumpTable_68E1_06.toc_06_6902:
-    ld   a, [$FFB0]
+    ld   a, [hDefaultMusicTrack]
     ld   hl, $C2B0
     add  hl, bc
     ld   [hl], a
     assign [$D368], $22
-    ld   [$FFB0], a
+    ld   [hDefaultMusicTrack], a
     ld   [$FFBD], a
     ifEq [$FFF6], $16, .else_06_6920
 
@@ -4525,7 +4525,7 @@ JumpTable_693C_06.else_06_695F:
     ld   [hl], $FC
     call toc_06_6584
     call toc_01_29C5
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000011
     jr   nz, .return_06_6981
 
@@ -4586,7 +4586,7 @@ JumpTable_69B1_06.else_06_69C2:
 
 JumpTable_69B1_06.else_06_69CD:
     assign [hLinkInteractiveMotionBlocked], $02
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     and  %00000010
@@ -4613,7 +4613,7 @@ JumpTable_69DB_06:
     add  hl, bc
     ld   a, [hl]
     ld   [$D368], a
-    ld   [$FFB0], a
+    ld   [hDefaultMusicTrack], a
     ifNot [$D47C], .return_06_6A0F
 
     assign [$D368], $49
@@ -4623,13 +4623,13 @@ JumpTable_69DB_06.return_06_6A0F:
 
 
 JumpTable_69DB_06.else_06_6A10:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000111
     jr   nz, .else_06_6A1A
 
     assign [$FFF4], $05
 JumpTable_69DB_06.else_06_6A1A:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000001
     jr   nz, .return_06_6A41
 
@@ -5053,7 +5053,7 @@ JumpTable_6F81_06.else_06_6FB1:
 
 
 JumpTable_6FB5_06:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000111
     jr   nz, .return_06_6FCA
 
@@ -5417,7 +5417,7 @@ JumpTable_7306_06:
     call toc_01_0891
     jp   z, toc_06_65E5
 
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000010
     ld   a, $00
     jr   z, .else_06_7316
@@ -5513,7 +5513,7 @@ JumpTable_73D7_06.else_06_73F1:
     add  hl, bc
     inc  [hl]
 JumpTable_73D7_06.else_06_73FC:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -5525,7 +5525,7 @@ JumpTable_73D7_06.else_06_73FC:
 JumpTable_7407_06:
     call toc_06_654B
     call toc_01_3B9E
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000001
     jr   nz, .else_06_7418
 
@@ -5538,7 +5538,7 @@ JumpTable_7407_06.else_06_7418:
     call JumpTable_3B8D_00
     ld   [hl], b
 JumpTable_7407_06.else_06_7421:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     and  %00000010
     call toc_01_3B87
@@ -5753,7 +5753,7 @@ JumpTable_75C4_06:
     add  hl, bc
     ld   [hl], a
 JumpTable_75C4_06.else_06_75E9:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -6145,7 +6145,7 @@ toc_06_7839:
 
 toc_06_7940:
     call toc_06_64DF
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -6279,7 +6279,7 @@ JumpTable_7ACC_06.else_06_7B2C:
 JumpTable_7ACC_06.else_06_7B33:
     call toc_06_659E
     sla  e
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -6318,7 +6318,7 @@ JumpTable_7B4B_06:
     ld   hl, $C240
     add  hl, bc
     ld   [hl], a
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -6386,7 +6386,7 @@ toc_06_7B99:
 
 
 toc_06_7BBD:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     and  %00000001

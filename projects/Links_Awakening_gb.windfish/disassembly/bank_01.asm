@@ -36,8 +36,8 @@ toc_01_40CE:
     assign [gbWX], $07
     assign [$DB9A], $80
     ld   [gbWY], a
-    assign [$FFA9], $07
-    assign [$FFAA], $70
+    assign [hVolumeRight], $07
+    assign [hVolumeLeft], $70
     ret
 
 
@@ -345,7 +345,7 @@ JumpTable_433F_01.else_01_4393:
 JumpTable_433F_01.else_01_439C:
     assign [$D6FF], $02
     call toc_01_27ED
-    ld   hl, $FFE7
+    ld   hl, hFrameCounter
     or   [hl]
     and  %00000011
     ld   [$FFB9], a
@@ -375,7 +375,7 @@ JumpTable_43B3_01.else_01_43DA:
     call toc_01_2ED7
     call toc_01_36E6
     call toc_01_5D6B
-    assign [$FFA6], $FF
+    assign [hAnimatedTilesFrameCount], 255
     ifNot [$DBA5], .else_01_4426
 
     ld   d, a
@@ -2228,7 +2228,7 @@ toc_01_5F1A:
     ld   [hBaseScrollX], a
     ld   [$D6FB], a
     ld   [$D6F8], a
-    assign [$FFB5], $18
+    assign [hButtonsInactiveDelay], 24
     ret
 
 
@@ -2763,7 +2763,7 @@ toc_01_6DB7:
     ldi  [hl], a
     ldi  [hl], a
     ld   d, $00
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000001
     jr   nz, .else_01_6DD2
 
@@ -2849,10 +2849,10 @@ toc_01_6E2D.return_01_6E39:
     db   $C6, $C2, $C0, $C2
 
 toc_01_6E3E:
-    ifNot [$FFB5], toc_01_6E48
+    ifNot [hButtonsInactiveDelay], toc_01_6E48
 
     dec  a
-    ld   [$FFB5], a
+    ld   [hButtonsInactiveDelay], a
     jr   toc_01_6EAD
 
 toc_01_6E48:
@@ -2863,7 +2863,7 @@ toc_01_6E48:
     call toc_01_27D2
     ifEq [$DB96], $0B, toc_01_6E90
 
-    assign [$FFB5], 40
+    assign [hButtonsInactiveDelay], 40
     assign [$D6FF], 17
     assign [$DB96], $0D
     clear [$C280]
@@ -3852,7 +3852,7 @@ toc_01_780F.loop_01_7A7E:
     db   $0F, $FE, $04, $38, $4D
 
 toc_01_7B11:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -3877,7 +3877,7 @@ toc_01_7B11.else_01_7B2D:
 
     ld   de, $9300
 toc_01_7B11.else_01_7B3D:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000011
     sla  a
     sla  a

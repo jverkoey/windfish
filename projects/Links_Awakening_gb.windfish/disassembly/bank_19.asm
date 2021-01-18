@@ -38,7 +38,7 @@ JumpTable_4070_19:
 
     ifNe [$DB00], $03, .else_19_40A0
 
-    ld   a, [$FFCB]
+    ld   a, [hPressedButtonsMask]
     and  %00100000
     jr   nz, .else_19_40AD
 
@@ -47,7 +47,7 @@ JumpTable_4070_19:
 JumpTable_4070_19.else_19_40A0:
     ifNe [$DB01], $03, .else_19_411C
 
-    ld   a, [$FFCB]
+    ld   a, [hPressedButtonsMask]
     and  %00010000
     jr   z, .else_19_411C
 
@@ -67,7 +67,7 @@ JumpTable_4070_19.else_19_40AD:
     ld   [hLinkAnimationState], a
     ld   hl, $1E67
     add  hl, de
-    ld   a, [$FFCB]
+    ld   a, [hPressedButtonsMask]
     and  [hl]
     jr   z, .else_19_411C
 
@@ -504,7 +504,7 @@ JumpTable_4952_19.else_19_4992:
     db   $09, $34
 
 toc_19_49B7:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -903,8 +903,8 @@ JumpTable_51AD_19:
     ld   [hl], $0C
     ld   hl, $D756
     ld   [hl], $C6
-    assign [$FFCE], $50
-    assign [$FFCD], $30
+    assign [hSwordIntersectedAreaX], $50
+    assign [hSwordIntersectedAreaY], $30
     call toc_01_2839
     ld   hl, $D601
     ld   a, [$D600]
@@ -969,8 +969,8 @@ JumpTable_51AD_19.toc_19_5242:
     ld   [hl], $91
     ld   hl, $D746
     ld   [hl], $5E
-    assign [$FFCE], $50
-    assign [$FFCD], $20
+    assign [hSwordIntersectedAreaX], $50
+    assign [hSwordIntersectedAreaY], $20
     call toc_01_2839
     ld   hl, $D601
     ld   a, [$D600]
@@ -1306,7 +1306,7 @@ JumpTable_5721_19:
 
 
 JumpTable_5721_19.else_19_5752:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000111
     jr   nz, .return_19_576D
 
@@ -2068,7 +2068,7 @@ JumpTable_65EA_19.else_19_6619:
     db   $40
 
 toc_19_6705:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000011
     jr   nz, toc_19_6742
 
@@ -2251,7 +2251,7 @@ JumpTable_69D4_19.else_19_69FB:
     ld   a, e
     call toc_01_2185
 JumpTable_69D4_19.else_19_69FF:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -2819,7 +2819,7 @@ toc_19_755F.else_19_762E:
 
     ifNe [$DB56], $01, .else_19_7647
 
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000111
     jr   z, .else_19_766F
 
@@ -2892,7 +2892,7 @@ toc_19_7697:
     and  a
     jr   nz, JumpTable_76B0_19.return_19_76CC
 
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000011
     jumptable
     dw JumpTable_76B0_19 ; 00

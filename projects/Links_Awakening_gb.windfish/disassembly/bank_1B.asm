@@ -1192,7 +1192,7 @@ toc_1B_4744:
 
 toc_1B_4757:
     clear [$D3CE]
-    copyFromTo [$FFBF], [$D368]
+    copyFromTo [hNextDefaultMusicTrack], [$D368]
     jp   toc_1B_401E
 
 toc_1B_4763:

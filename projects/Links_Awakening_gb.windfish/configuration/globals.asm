@@ -204,7 +204,39 @@ hLinkPositionZLow EQU $FFA3 ; [hex]
 
 hAnimatedTilesGroup EQU $FFA4 ; [ANIMATED_TILE]
 
+hAnimatedTilesFrameCount EQU $FFA6 ; [decimal]
+
+hAnimatedTilesDataOffset EQU $FFA7 ; [hex]
+
+hMusicFadeOutTimer EQU $FFA8 ; [decimal]
+
+hVolumeRight EQU $FFA9 ; [hex]
+
+hVolumeLeft EQU $FFAA ; [hex]
+
+hMusicFadeInTimer EQU $FFAB ; [decimal]
+
+hObjectUnderEntity EQU $FFAF ; [decimal]
+
+hDefaultMusicTrack EQU $FFB0 ; [MUSIC]
+
+hNextMusicTrackToFadeInto EQU $FFB1 ; [MUSIC]
+
+hLinkWalksSlow EQU $FFB2 ; [bool]
+
+hButtonsInactiveDelay EQU $FFB5 ; [decimal]
+
+hNextDefaultMusicTrack EQU $FFBF ; [MUSIC]
+
+hPressedButtonsMask EQU $FFCB ; [J]
+
+hSwordIntersectedAreaY EQU $FFCD ; [hex]
+
+hSwordIntersectedAreaX EQU $FFCE ; [hex]
+
 hNeedsRenderingFrame EQU $FFD1 ; [bool]
+
+hFrameCounter EQU $FFE7 ; [decimal]
 
 hIsRenderingFrame EQU $FFFD ; [bool]
 

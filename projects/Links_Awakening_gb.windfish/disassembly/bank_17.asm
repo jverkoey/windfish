@@ -196,7 +196,7 @@ text_credits:
     db   $F4
 
 toc_17_46A6:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -337,7 +337,7 @@ toc_17_482A.else_17_485D:
     dec  a
     ld   [$D008], a
 toc_17_482A.else_17_4867:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000011
     jr   nz, .else_17_4877
 
@@ -346,7 +346,7 @@ toc_17_482A.else_17_4867:
     dec  a
     ld   [$D009], a
 toc_17_482A.else_17_4877:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00001111
     jr   nz, .else_17_4887
 
@@ -2091,7 +2091,7 @@ toc_17_78B3.else_17_790A:
     db   $C9, $37, $7F
 
 toc_17_7B07:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00010000
     ret  nz
 

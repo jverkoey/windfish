@@ -724,9 +724,9 @@ JumpTable_4BA4_03.toc_03_4BA6:
     ld   a, e
 JumpTable_4BA4_03.toc_03_4BAD:
     ld   [$D368], a
-    ld   [$FFB0], a
+    ld   [hDefaultMusicTrack], a
     ld   [$FFBD], a
-    ld   [$FFBF], a
+    ld   [hNextDefaultMusicTrack], a
     ret
 
 
@@ -780,7 +780,7 @@ JumpTable_4BE6_03:
 
 
 JumpTable_4BF4_03:
-    clear [$FFB0]
+    clear [hDefaultMusicTrack]
     ret
 
 
@@ -897,8 +897,8 @@ JumpTable_4C86_03:
 
     inc  a
     ld   [$C3C8], a
-    assign [$FFB1], $2F
-    ld   [$FFB0], a
+    assign [hNextMusicTrackToFadeInto], $2F
+    ld   [hDefaultMusicTrack], a
     ld   [$FFBD], a
     call toc_01_27CA
 JumpTable_4C86_03.else_03_4CA9:
@@ -1009,7 +1009,7 @@ JumpTable_4D1E_03:
 
     jr   z, else_03_4D51
 
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -1611,7 +1611,7 @@ JumpTable_50A2_03.else_03_50B9:
     add  hl, bc
     ld   [hl], a
 JumpTable_50A2_03.else_03_50F6:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     rra
     rra
     rra
@@ -1825,14 +1825,14 @@ JumpTable_520D_03.else_03_5256:
     ld   b, $00
     ld   a, [$FFEF]
     sub  a, $0F
-    ld   [$FFCD], a
+    ld   [hSwordIntersectedAreaY], a
     ld   a, [$FFEE]
     sub  a, $07
-    ld   [$FFCE], a
+    ld   [hSwordIntersectedAreaX], a
     swap a
     and  %00001111
     ld   e, a
-    ld   a, [$FFCD]
+    ld   a, [hSwordIntersectedAreaY]
     and  %11110000
     or   e
     ld   e, a
@@ -2106,8 +2106,8 @@ toc_03_5497:
     ifNe [$C50D], $A0, .return_03_54E5
 
 toc_03_5497.else_03_54B6:
-    assign [$FFCE], $30
-    assign [$FFCD], $20
+    assign [hSwordIntersectedAreaX], $30
+    assign [hSwordIntersectedAreaY], $20
     assign [$FFDF], $19
     call toc_01_3E7D
     jp   toc_01_08EC
@@ -3018,8 +3018,8 @@ JumpTable_5BFD_03.else_03_5C0E:
     jr   nz, .else_03_5C24
 
     assign [$D368], $31
-    assign [$FFB0], $05
-    ld   [$FFBF], a
+    assign [hDefaultMusicTrack], $05
+    ld   [hNextDefaultMusicTrack], a
     call toc_01_0887
     ld   [hl], $52
     call JumpTable_3B8D_00
@@ -3207,7 +3207,7 @@ toc_03_5E70:
     cp   $19
     jr   nc, toc_03_5EC1
 
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000111
     jr   nz, toc_03_5EA2
 
@@ -3231,7 +3231,7 @@ toc_03_5E8C:
     add  hl, de
     ld   [hl], $60
 toc_03_5EA2:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000011
     ld   hl, $C2C0
     add  hl, bc
@@ -3850,7 +3850,7 @@ JumpTable_6421_03.toc_03_6425:
     clear [$D47A]
     assign [$D368], $27
     assign [$FFBD], $49
-    ld   [$FFBF], a
+    ld   [hNextDefaultMusicTrack], a
 JumpTable_6421_03.toc_03_6443:
     ld   e, $03
     ld   d, $00
@@ -3894,7 +3894,7 @@ JumpTable_6472_03:
     call JumpTable_63B7_03.toc_03_63C6
     call toc_01_0891
     ld   [hl], $A0
-    assign [$FFBF], $FF
+    assign [hNextDefaultMusicTrack], $FF
     ret
 
 
@@ -4321,7 +4321,7 @@ toc_03_6B96.else_03_6BA7:
     and  a
     jr   z, .else_03_6BC6
 
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000111
     jr   nz, .else_03_6BC6
 
@@ -4449,7 +4449,7 @@ toc_03_6BF9.else_03_6C84:
     jp   toc_01_3F7A.else_01_3FB7
 
 toc_03_6C87:
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     xor  c
     rra
     jp   nc, .else_03_6CE7
@@ -4674,11 +4674,11 @@ toc_03_6C87.else_03_6DC0:
     and  a
     jr   nz, .else_03_6DF4
 
-    ifEq [$FFB0], $22, .else_03_6DF2
+    ifEq [hDefaultMusicTrack], MUSIC_OWL, .else_03_6DF2
 
     ld   [$D368], a
 toc_03_6C87.else_03_6DF2:
-    ld   [$FFBF], a
+    ld   [hNextDefaultMusicTrack], a
 toc_03_6C87.else_03_6DF4:
     call toc_01_093B.toc_01_0942
     assign [$C13E], $10
@@ -4996,7 +4996,7 @@ toc_03_6FA8.else_03_6FCE:
     ld   a, $12
     call toc_03_7569
     ld   hl, $FFE9
-    ld   a, [$FFCB]
+    ld   a, [hPressedButtonsMask]
     and  %00001111
     ld   a, $08
     or   [hl]
@@ -5734,7 +5734,7 @@ toc_03_75A6.toc_03_75AA:
     cp   c
     jp   z, .else_03_779D
 
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     xor  e
     and  %00000001
     jp   nz, .else_03_779D
@@ -6172,7 +6172,7 @@ toc_03_7892.toc_03_78C4:
 
 toc_03_7892.toc_03_78E2:
     ld   e, $01
-    ifEq [$FFAF], $67, .else_03_7906
+    ifEq [hObjectUnderEntity], 103, .else_03_7906
 
     ld   a, [$FFDA]
     and  a
@@ -6274,7 +6274,7 @@ toc_03_7892.else_03_7972:
     sub  a, $F1
     ld   e, a
     ld   d, b
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000011
     jr   nz, .else_03_7999
 
@@ -6296,7 +6296,7 @@ toc_03_7892.else_03_7999:
     jr   .else_03_7A17
 
 toc_03_7892.else_03_799B:
-    ifEq [$FFAF], $61, .else_03_79AB
+    ifEq [hObjectUnderEntity], 97, .else_03_79AB
 
     ifEq [$FFDA], $50, .else_03_79AB
 
@@ -6317,7 +6317,7 @@ toc_03_7892.else_03_79AB:
 
     ifNe [$C11C], $06, .else_03_7A17
 
-    ifNe [$FFAF], $61, .else_03_7A17
+    ifNe [hObjectUnderEntity], 97, .else_03_7A17
 
 toc_03_7892.else_03_79CA:
     ld   hl, $C410
@@ -6333,12 +6333,12 @@ toc_03_7892.else_03_79CA:
     ld   hl, $C280
     add  hl, bc
     ld   [hl], $02
-    ld   a, [$FFCE]
+    ld   a, [hSwordIntersectedAreaX]
     add  a, $08
     ld   hl, $C4B0
     add  hl, bc
     ld   [hl], a
-    ld   a, [$FFCD]
+    ld   a, [hSwordIntersectedAreaY]
     add  a, $10
     ld   hl, $C4C0
     add  hl, bc
@@ -6395,7 +6395,7 @@ toc_03_7892.else_03_7A46:
     call toc_03_7ACC
     jr   c, .else_03_7A5C
 
-    copyFromTo [$FFAF], [$C503]
+    copyFromTo [hObjectUnderEntity], [$C503]
     ld   a, [$FFBE]
     and  a
     jr   nz, .else_03_7A5C
@@ -6420,7 +6420,7 @@ toc_03_7892.else_03_7A6D:
     call toc_03_7ACC
     jr   c, .return_03_7A83
 
-    copyFromTo [$FFAF], [$C50D]
+    copyFromTo [hObjectUnderEntity], [$C50D]
     ld   a, [$FFBE]
     and  a
     jr   nz, .return_03_7A83
@@ -6513,7 +6513,7 @@ toc_03_7ACC.toc_03_7B12:
     ld   h, a
     pop  bc
     ld   a, [hl]
-    ld   [$FFAF], a
+    ld   [hObjectUnderEntity], a
     cp   $20
     jp   z, .toc_03_7C7A
 
@@ -6653,7 +6653,7 @@ toc_03_7ACC.toc_03_7BE3:
     and  a
     jr   z, .else_03_7C74
 
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000011
     jr   z, .else_03_7C27
 
@@ -6661,7 +6661,7 @@ toc_03_7ACC.toc_03_7BE3:
     and  a
     jr   nz, .else_03_7C16
 
-    ld   a, [$FFE7]
+    ld   a, [hFrameCounter]
     and  %00000001
     jr   z, .else_03_7C27
 
@@ -6716,9 +6716,9 @@ toc_03_7ACC.else_03_7C2A:
     jp   nz, .else_03_7CA6
 
 toc_03_7ACC.else_03_7C59:
-    ifLt [$FFAF], $DB, .else_03_7C99
+    ifLt [hObjectUnderEntity], 219, .else_03_7C99
 
-    cp   $DD
+    cp   221
     jr   nc, .else_03_7C99
 
     push de
@@ -6819,7 +6819,7 @@ toc_03_7DE0:
     sub  a, $01
     ld   [$FFDB], a
     and  %11110000
-    ld   [$FFCE], a
+    ld   [hSwordIntersectedAreaX], a
     swap a
     ld   hl, $C210
     add  hl, bc
@@ -6828,7 +6828,7 @@ toc_03_7DE0:
     sub  a, $07
     ld   [$FFDC], a
     and  %11110000
-    ld   [$FFCD], a
+    ld   [hSwordIntersectedAreaY], a
     or   c
     ld   c, a
     ld   b, $00
@@ -6838,7 +6838,7 @@ toc_03_7DE0:
     ld   h, a
     pop  bc
     ld   a, [hl]
-    ld   [$FFAF], a
+    ld   [hObjectUnderEntity], a
     ld   e, a
     ld   a, [$DBA5]
     ld   d, a
