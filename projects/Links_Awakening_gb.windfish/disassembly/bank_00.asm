@@ -156,7 +156,7 @@ HeaderGlobalChecksum:
     db   $47, $B7
 
 main:
-    call toc_01_2881
+    call setupLCD
     ld   sp, $DFFF
     clear [gbBGP]
     ld   [gbOBP0], a
@@ -567,7 +567,7 @@ LoadMapData:
     ifNot [wTileMapToLoad], toc_01_04F5
 
     push af
-    call toc_01_2881
+    call setupLCD
     pop  af
     call toc_01_04B1
     jr   toc_01_0516
@@ -610,7 +610,7 @@ toc_01_04B1:
     dw JumpTable_2D39_00 ; 20
 
 toc_01_04F5:
-    call toc_01_2881
+    call setupLCD
     ld   hl, $0457
     ld   b, $00
     ld   a, [$D6FF]
@@ -5696,16 +5696,14 @@ JumpTable:
     pop  hl
     jp   hl
 
-toc_01_2881:
-    copyFromTo [gbIE], [$FFD2]
+setupLCD:
+    copyFromTo [gbIE], [hIEStash]
     res  0, a
-toc_01_2881.loop_01_2887:
-    ifNe [gbLY], 145, .loop_01_2887
+setupLCD.waitForVBlank:
+    ifNe [gbLY], 145, .waitForVBlank
 
-    ld   a, [gbLCDC]
-    and  LCDCF_BG_CHAR_8000 | LCDCF_BG_DISPLAY | LCDCF_BG_TILE_9C00 | LCDCF_OBJ_16_16 | LCDCF_OBJ_DISPLAY | LCDCF_TILEMAP_9C00 | LCDCF_WINDOW_ON
-    ld   [gbLCDC], a
-    copyFromTo [$FFD2], [gbIE]
+    mask [gbLCDC], LCDCF_BG_CHAR_8000 | LCDCF_BG_DISPLAY | LCDCF_BG_TILE_9C00 | LCDCF_OBJ_16_16 | LCDCF_OBJ_DISPLAY | LCDCF_TILEMAP_9C00 | LCDCF_WINDOW_ON
+    copyFromTo [hIEStash], [gbIE]
     ret
 
 

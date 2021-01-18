@@ -218,6 +218,8 @@ hSwordIntersectedAreaX EQU $FFCE
 
 hNeedsRenderingFrame EQU $FFD1
 
+hIEStash EQU $FFD2
+
 hFrameCounter EQU $FFE7
 
 hIsRenderingFrame EQU $FFFD

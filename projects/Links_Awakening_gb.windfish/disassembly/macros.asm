@@ -102,6 +102,14 @@ loadHL: MACRO
     ld   l, a
     ENDM
 ; Arguments:
+; - 1 type: ffimm8addr
+; - 2 type: imm8
+mask: MACRO
+    ld   a, \1
+    and  \2
+    ld   \1, a
+    ENDM
+; Arguments:
 ; - 1 type: imm16addr
 ; - 2 type: imm8
 returnIfLt: MACRO

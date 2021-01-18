@@ -48,6 +48,10 @@ LoadMapData: ; [Function] $00:$04A1 [0]
 
 vblank: ; [Function] $01:$0525 [0]
 
+waitForVBlank: ; [Label] $00:$2887 [0]
+
+setupLCD: ; [Function] $00:$2881 [0]
+
 tile_link_walking: ; [Image (2bpp)] $0C:$4000 [64]
 
 tile_sword_vert: ; [Image (2bpp)] $0C:$4040 [32]

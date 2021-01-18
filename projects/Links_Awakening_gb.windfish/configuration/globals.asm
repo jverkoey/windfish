@@ -236,6 +236,8 @@ hSwordIntersectedAreaX EQU $FFCE ; [hex]
 
 hNeedsRenderingFrame EQU $FFD1 ; [bool]
 
+hIEStash EQU $FFD2 ; [hex]
+
 hFrameCounter EQU $FFE7 ; [decimal]
 
 hIsRenderingFrame EQU $FFFD ; [bool]
