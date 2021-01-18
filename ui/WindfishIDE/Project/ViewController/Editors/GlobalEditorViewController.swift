@@ -67,6 +67,10 @@ final class GlobalEditorViewController: NSViewController, TabSelectable {
       tableView.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
     ])
 
+    elementsController.sortDescriptors = [
+      NSSortDescriptor(key: NSUserInterfaceItemIdentifier.address.rawValue, ascending: true),
+    ]
+
     elementsController.bind(.contentArray, to: project.configuration, withKeyPath: "globals", options: nil)
     dataTypeController.bind(.contentArray, to: project.configuration, withKeyPath: "dataTypes", options: nil)
     tableView.tableView?.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
