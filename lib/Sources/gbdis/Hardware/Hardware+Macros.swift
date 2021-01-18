@@ -2,7 +2,7 @@ import Foundation
 import Windfish
 import DisassemblyRequest
 
-func populateRequestWithHardwareMacros(_ request: DisassemblyRequest<LR35902.Address, Gameboy.Cartridge.Location, LR35902.Instruction>) {
+func populateRequestWithHardwareMacros(_ request: DisassemblyRequest<LR35902.Address, Cartridge.Location, LR35902.Instruction>) {
   request.createMacro(named: "ifHGte", pattern: [
     .any(.ld(.a, .ffimm8addr), argument: 1),
     .any(.cp(.imm8), argument: 2),

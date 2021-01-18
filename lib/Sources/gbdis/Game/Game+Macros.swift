@@ -2,7 +2,7 @@ import Foundation
 import Windfish
 import DisassemblyRequest
 
-func populateRequestWithGameMacros(_ request: DisassemblyRequest<LR35902.Address, Gameboy.Cartridge.Location, LR35902.Instruction>) {
+func populateRequestWithGameMacros(_ request: DisassemblyRequest<LR35902.Address, Cartridge.Location, LR35902.Instruction>) {
   request.createMacro(named: "jumpTable", pattern: [
     .instruction(.init(spec: .rst(.x00))),
     ]) /*{ args, address, bank in

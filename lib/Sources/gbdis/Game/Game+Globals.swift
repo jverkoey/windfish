@@ -2,7 +2,7 @@ import Foundation
 import Windfish
 import DisassemblyRequest
 
-func populateRequestWithGameGlobals(_ request: DisassemblyRequest<LR35902.Address, Gameboy.Cartridge.Location, LR35902.Instruction>) {
+func populateRequestWithGameGlobals(_ request: DisassemblyRequest<LR35902.Address, Cartridge.Location, LR35902.Instruction>) {
   request.addGlobals([
     0x0003: "bool DEBUG_TOOL1",
     0x0004: "bool DEBUG_TOOL2",

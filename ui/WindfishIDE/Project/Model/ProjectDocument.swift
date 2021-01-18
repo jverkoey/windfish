@@ -33,8 +33,7 @@ final class Project: NSObject {
   var romData: Data? {
     didSet {
       if let romData = romData {
-        gameboy.cartridge = .init(data: romData)
-        gameboy.cpu.pc = 0x100  // Assume the boot sequence has concluded.
+        cartridge = .init(data: romData)
 
         sameboyView.screenSizeChanged()
 
@@ -53,7 +52,7 @@ final class Project: NSObject {
   @objc dynamic var disassemblyResults: DisassemblyResults?
   var metadata: ProjectMetadata?
   var configuration = ProjectConfiguration()
-  var gameboy = Gameboy()
+  var cartridge: Cartridge?
 
   var emulating = false
   var lastVblankCounter: Int? = nil
@@ -71,8 +70,8 @@ final class Project: NSObject {
   var address: LR35902.Address {
     return sameboy.pc
   }
-  var bank: Gameboy.Cartridge.Bank {
-    return Gameboy.Cartridge.Bank(truncatingIfNeeded: sameboy.romBank)
+  var bank: Cartridge.Bank {
+    return Cartridge.Bank(truncatingIfNeeded: sameboy.romBank)
   }
 
 }
@@ -122,8 +121,8 @@ final class ProjectDocument: NSDocument {
     window.styleMask.insert(.hudWindow)
     window.subtitle = "LCD"
     window.isRestorable = true
-    window.setContentSize(NSSize(width: PPU.screenSize.width * 2, height: PPU.screenSize.height * 2))
-    window.contentMinSize = NSSize(width: PPU.screenSize.width, height: PPU.screenSize.height)
+    window.setContentSize(NSSize(width: project.sameboy.screenSize.width * 2, height: project.sameboy.screenSize.height * 2))
+    window.contentMinSize = NSSize(width: project.sameboy.screenSize.width, height: project.sameboy.screenSize.height)
     window.setFrameOrigin(.init(x: NSScreen.main!.frame.maxX - window.frame.width,
                                 y: NSScreen.main!.frame.maxY - window.frame.height))
     let wc: NSWindowController = NSWindowController(window: window)
@@ -135,7 +134,7 @@ final class ProjectDocument: NSDocument {
     let windowController = VRAMWindowController(windowNibName: "VRAMViewer")
     windowController.project = project
     windowController.window!.setFrameOrigin(.init(x: NSScreen.main!.frame.maxX - windowController.window!.frame.width,
-                                                  y: NSScreen.main!.frame.maxY - windowController.window!.frame.height - CGFloat(PPU.screenSize.height * 2)))
+                                                  y: NSScreen.main!.frame.maxY - windowController.window!.frame.height - CGFloat(project.sameboy.screenSize.height * 2)))
     return windowController
   }()
 
@@ -381,7 +380,7 @@ extension ProjectDocument {
           let length = scanner.scanUpToString("]")!.trimmed()
           regions.append(Region(regionType: regionType,
                                 name: name,
-                                bank: Gameboy.Cartridge.Bank(bank, radix: 16)!,
+                                bank: Cartridge.Bank(bank, radix: 16)!,
                                 address: LR35902.Address(address, radix: 16)!,
                                 length: LR35902.Address(length)!))
         }

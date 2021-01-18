@@ -21,7 +21,7 @@ extension Disassembler {
 //            if (0x2000..<0x4000).contains(instruction.imm16!),
 //              let srcValue: CPUState.RegisterState<UInt8> = self[src],
 //              case .value(let value) = srcValue.value {
-//              let addressAndBank = Gameboy.Cartridge.addressAndBank(from: location)
+//              let addressAndBank = Cartridge.addressAndBank(from: location)
 //              self.register(bankChange: value, at: addressAndBank.address, in: addressAndBank.bank)
 //            }
 
@@ -95,7 +95,7 @@ extension Disassembler {
     }
   }
 
-  private func inferReturns(in scope: Range<Gameboy.Cartridge.Location>) {
+  private func inferReturns(in scope: Range<Cartridge.Location>) {
     let labelLocations = self.labelLocations(in: scope)
     let returnLabelAddresses = labelLocations.filter { instructionMap[$0]?.spec.category == .ret }
     for cartLocation in returnLabelAddresses {
@@ -103,16 +103,16 @@ extension Disassembler {
     }
   }
 
-  private func inferLoops(in scope: Range<Gameboy.Cartridge.Location>) {
-    let tocs: [(destination: Gameboy.Cartridge.Location, tocs: Set<TransferOfControl>)] = scope.compactMap {
-      let (address, bank) = Gameboy.Cartridge.addressAndBank(from: $0)
+  private func inferLoops(in scope: Range<Cartridge.Location>) {
+    let tocs: [(destination: Cartridge.Location, tocs: Set<TransferOfControl>)] = scope.compactMap {
+      let (address, bank) = Cartridge.addressAndBank(from: $0)
       if let toc = transfersOfControl(at: address, in: bank) {
         return ($0, toc)
       } else {
         return nil
       }
     }
-    let backwardTocs: [(source: Gameboy.Cartridge.Location, destination: Gameboy.Cartridge.Location)] = tocs.reduce(into: [], { (accumulator, element) in
+    let backwardTocs: [(source: Cartridge.Location, destination: Cartridge.Location)] = tocs.reduce(into: [], { (accumulator, element) in
       let tocsInThisScope = element.tocs.filter {
         scope.contains($0.sourceLocation) && element.destination < $0.sourceLocation && (labels[element.destination] != nil || labelTypes[element.destination] != nil)
       }
@@ -150,16 +150,16 @@ extension Disassembler {
     }
   }
 
-  private func inferElses(in scope: Range<Gameboy.Cartridge.Location>) {
-    let tocs: [(destination: Gameboy.Cartridge.Location, tocs: Set<TransferOfControl>)] = scope.compactMap {
-      let (address, bank) = Gameboy.Cartridge.addressAndBank(from: $0)
+  private func inferElses(in scope: Range<Cartridge.Location>) {
+    let tocs: [(destination: Cartridge.Location, tocs: Set<TransferOfControl>)] = scope.compactMap {
+      let (address, bank) = Cartridge.addressAndBank(from: $0)
       if let toc = transfersOfControl(at: address, in: bank) {
         return ($0, toc)
       } else {
         return nil
       }
     }
-    let forwardTocs: [(source: Gameboy.Cartridge.Location, destination: Gameboy.Cartridge.Location)] = tocs.reduce(into: [], { (accumulator, element) in
+    let forwardTocs: [(source: Cartridge.Location, destination: Cartridge.Location)] = tocs.reduce(into: [], { (accumulator, element) in
       let tocsInThisScope = element.tocs.filter {
         scope.contains($0.sourceLocation)
           && element.destination > $0.sourceLocation

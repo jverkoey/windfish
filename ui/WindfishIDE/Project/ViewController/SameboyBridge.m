@@ -106,6 +106,10 @@ static void gb_get_backtrace_return(GB_gameboy_t *gb, int i, uint16_t *bank, uin
   _emulator.gb->debug_stopped = debugStopped;
 }
 
+- (NSSize)screenSize {
+  return _emulator.screenSize;
+}
+
 - (UInt8)a {
   return _emulator.gb->a;
 }

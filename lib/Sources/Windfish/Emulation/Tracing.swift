@@ -31,13 +31,13 @@ extension Disassembler {
    The returned dictionary is a mapping of cartridge locations to the post-execution CPU state for the instruction at
    that location.
    */
-  func trace(range: Range<Gameboy.Cartridge.Location>,
+  func trace(range: Range<Cartridge.Location>,
              cpu: LR35902 = LR35902.zeroed(),
-             step: ((LR35902.Instruction, Gameboy.Cartridge.Location, LR35902) -> Void)? = nil) {
-    let addressAndBank = Gameboy.Cartridge.addressAndBank(from: range.lowerBound)
+             step: ((LR35902.Instruction, Cartridge.Location, LR35902) -> Void)? = nil) {
+    let addressAndBank = Cartridge.addressAndBank(from: range.lowerBound)
     cpu.pc = addressAndBank.address
     let bank = addressAndBank.bank
-    let upperBoundPc = Gameboy.Cartridge.addressAndBank(from: range.upperBound).address
+    let upperBoundPc = Cartridge.addressAndBank(from: range.upperBound).address
 
     while cpu.pc < upperBoundPc {
       guard let instruction = self.instruction(at: cpu.pc, in: bank) else {
@@ -46,7 +46,7 @@ extension Disassembler {
       }
 
       let memory: AddressableMemory = TracerMemory()
-      let location = Gameboy.Cartridge.location(for: cpu.pc, in: bank)!
+      let location = Cartridge.location(for: cpu.pc, in: bank)!
       cpu.emulate(instruction: instruction, memory: memory)
       step?(instruction, location, cpu)
     }

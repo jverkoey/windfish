@@ -4,7 +4,7 @@ import Foundation
 // - https://meatfighter.com/gameboy/TheNintendoGameboy.pdf
 // - https://retrocomputing.stackexchange.com/questions/11732/how-does-the-gameboys-memory-bank-switching-work
 
-extension Gameboy.Cartridge {
+extension Cartridge {
   /** Implementation of the MBC1 memory bank controller. */
   final class MBC1: MemoryBankController {
     deinit {
@@ -27,8 +27,8 @@ extension Gameboy.Cartridge {
       ram.initializeMemory(as: UInt8.self, repeating: 0xff)
     }
 
-    private(set) var selectedBank: Gameboy.Cartridge.Bank = 0
-    private(set) var selectedRAMBank: Gameboy.Cartridge.Bank = 0
+    private(set) var selectedBank: Cartridge.Bank = 0
+    private(set) var selectedRAMBank: Cartridge.Bank = 0
     private let data: UnsafeMutableRawBufferPointer
 
     /** Whether or not RAM is enabled. */
@@ -73,7 +73,7 @@ extension Gameboy.Cartridge {
 
       // Read-only memory (ROM) bank 01-7F
       if address >= 0x4000 && address <= 0x7FFF {
-        guard let location = Gameboy.Cartridge.location(for: address, in: max(1, selectedBank)) else {
+        guard let location = Cartridge.location(for: address, in: max(1, selectedBank)) else {
           preconditionFailure("Invalid location for address 0x\(address.hexString) in bank 0x\(selectedBank.hexString)")
         }
         return data[Int(location)]
@@ -150,7 +150,7 @@ extension Gameboy.Cartridge {
     }
 
     func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
-      return .cartridge(Gameboy.Cartridge.location(for: address, in: (selectedBank == 0) ? 1 : selectedBank)!)
+      return .cartridge(Cartridge.location(for: address, in: (selectedBank == 0) ? 1 : selectedBank)!)
     }
   }
 }

@@ -100,12 +100,12 @@ extension ProjectDocument {
       //            disassembly.disassembleAsGameboyCartridge()
       let (disassembledSource, statistics) = try! disassembly.generateSource()
 
-      let bankMap: [String: Gameboy.Cartridge.Bank] = disassembledSource.sources.reduce(into: [:], { accumulator, element in
+      let bankMap: [String: Cartridge.Bank] = disassembledSource.sources.reduce(into: [:], { accumulator, element in
         if case .bank(let number, _, _) = element.value {
           accumulator[element.key] = number
         }
       })
-      let bankLines: [Gameboy.Cartridge.Bank: [Disassembler.Line]] = disassembledSource.sources.compactMapValues {
+      let bankLines: [Cartridge.Bank: [Disassembler.Line]] = disassembledSource.sources.compactMapValues {
         switch $0 {
         case .bank(_, _, let lines):
           return lines
@@ -159,7 +159,7 @@ extension ProjectDocument {
       ]
       let operandAttributes: [NSAttributedString.Key : Any] = baseAttributes
 
-      let bankTextStorage: [Gameboy.Cartridge.Bank: NSAttributedString] = disassembledSource.sources.compactMapValues {
+      let bankTextStorage: [Cartridge.Bank: NSAttributedString] = disassembledSource.sources.compactMapValues {
         switch $0 {
         case .bank(_, _, let lines):
           return lines.reduce(into: NSMutableAttributedString()) { accumulator, line in

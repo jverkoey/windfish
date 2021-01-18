@@ -82,6 +82,8 @@ typedef NS_OPTIONS(NSUInteger, GBLogAttributes) {
 - (void)loadROMFromBuffer:(nonnull const uint8_t *)buffer size:(size_t)size;
 - (void)debuggerBreak;
 
+@property(nonatomic, readonly) NSSize screenSize;
+
 - (nonnull NSImage *)drawTilesetWithPaletteType:(GBPaletteType)paletteType menuIndex:(NSUInteger)menuIndex;
 - (nonnull NSImage *)drawTilemapWithPaletteType:(GBPaletteType)paletteType
                                    paletteIndex:(uint8_t)paletteIndex

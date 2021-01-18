@@ -9,14 +9,14 @@ extension NSUserInterfaceItemIdentifier {
 }
 
 private class CallStack: NSObject {
-  internal init(address: LR35902.Address, bank: Gameboy.Cartridge.Bank, label: String) {
+  internal init(address: LR35902.Address, bank: Cartridge.Bank, label: String) {
     self.address = address
     self.bank = bank
     self.label = label
   }
 
   @objc let address: LR35902.Address
-  @objc let bank: Gameboy.Cartridge.Bank
+  @objc let bank: Cartridge.Bank
   @objc let label: String
 }
 
@@ -107,7 +107,7 @@ extension CallStackViewController: EmulationObservers {
       var bank: UInt16 = 0
       var address: UInt16 = 0
       project.sameboy.getBacktraceReturn(Int32(i), bank: &bank, addr: &address)
-      return CallStack(address: address, bank: Gameboy.Cartridge.Bank(truncatingIfNeeded: bank), label: "")
+      return CallStack(address: address, bank: Cartridge.Bank(truncatingIfNeeded: bank), label: "")
     }.reversed()
     if let disassembly = project.disassemblyResults?.disassembly {
       stackTrace = stack.map {

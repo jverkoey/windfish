@@ -209,7 +209,7 @@ final class ProjectViewController: NSViewController {
     project.emulationObservers.add(self)
   }
 
-  func jumpTo(address: LR35902.Address, bank _bank: Gameboy.Cartridge.Bank, highlight: Bool = false) {
+  func jumpTo(address: LR35902.Address, bank _bank: Cartridge.Bank, highlight: Bool = false) {
     let bank = (address < 0x4000) ? 0 : _bank
     guard let metadata = project.metadata else {
       return

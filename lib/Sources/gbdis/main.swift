@@ -7,7 +7,7 @@ import FoundationNetworking
 
 let data = try Data(contentsOf: URL(fileURLWithPath: "/Users/featherless/workbench/awakenlink/rom/LinksAwakening.gb"))
 
-var disassemblyRequest = DisassemblyRequest<LR35902.Address, Gameboy.Cartridge.Location, LR35902.Instruction>(data: data)
+var disassemblyRequest = DisassemblyRequest<LR35902.Address, Cartridge.Location, LR35902.Instruction>(data: data)
 
 populateRequestWithHardwareDefaults(disassemblyRequest)
 populateRequestWithGameData(disassemblyRequest)
@@ -18,9 +18,9 @@ let requestData = try disassemblyRequest.toWireformat()
 
 let disassembly = try Disassembler.fromRequest(requestData)
 
-func extractText(from range: Range<Gameboy.Cartridge.Location>) {
+func extractText(from range: Range<Cartridge.Location>) {
   let parts = data[range].split(separator: 0xff, maxSplits: .max, omittingEmptySubsequences: false)
-  let addressAndBank = Gameboy.Cartridge.addressAndBank(from: range.lowerBound)
+  let addressAndBank = Cartridge.addressAndBank(from: range.lowerBound)
   var offset: LR35902.Address = addressAndBank.address
   for (index, part) in parts.enumerated() {
     let textRange = offset..<(offset + LR35902.Address(part.count))
@@ -34,15 +34,15 @@ func extractText(from range: Range<Gameboy.Cartridge.Location>) {
 
 var jumpTableIndex = 0
 
-func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: Gameboy.Cartridge.Bank,
-                          selectedBank: Gameboy.Cartridge.Bank? = nil,
-                          bankTable: [UInt8: Gameboy.Cartridge.Bank]? = nil,
+func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: Cartridge.Bank,
+                          selectedBank: Cartridge.Bank? = nil,
+                          bankTable: [UInt8: Cartridge.Bank]? = nil,
                           functionNames: [UInt8: String]? = nil) {
   //  assert((range.upperBound - range.lowerBound) <= 256)
   jumpTableIndex += 1
   disassembly.setJumpTable(at: range, in: bank)
 
-  let bankSelector: (UInt8) -> Gameboy.Cartridge.Bank?
+  let bankSelector: (UInt8) -> Cartridge.Bank?
   if let selectedBank = selectedBank {
     disassembly.register(bankChange: selectedBank, at: range.lowerBound - 1, in: bank)
     bankSelector = { _ in
@@ -55,15 +55,15 @@ func disassembleJumpTable(within range: Range<LR35902.Address>, in bank: Gameboy
   } else {
     return
   }
-  let cartRange = Gameboy.Cartridge.cartridgeLocation(for: range.lowerBound, in: bank)!..<Gameboy.Cartridge.cartridgeLocation(for: range.upperBound, in: bank)!
+  let cartRange = Cartridge.cartridgeLocation(for: range.lowerBound, in: bank)!..<Cartridge.cartridgeLocation(for: range.upperBound, in: bank)!
   for location in stride(from: cartRange.lowerBound, to: cartRange.upperBound, by: 2) {
     let lowByte = data[Int(location)]
     let highByte = data[Int(location + 1)]
     let address: LR35902.Address = (LR35902.Address(highByte) << 8) | LR35902.Address(lowByte)
     if address < 0x8000 {
       let index = UInt8((location - cartRange.lowerBound) / 2)
-      let effectiveBank: Gameboy.Cartridge.Bank
-      let addressAndBank = Gameboy.Cartridge.addressAndBank(from: location)
+      let effectiveBank: Cartridge.Bank
+      let addressAndBank = Cartridge.addressAndBank(from: location)
       if address < 0x4000 {
         effectiveBank = 0
       } else {
@@ -398,13 +398,13 @@ disassembleJumpTable(within: 0x76A8..<0x76AA, in: 0x19, selectedBank: 0x19)
 
 // MARK: - Entity table.
 
-var entityJumpTableBanks: [UInt8: Gameboy.Cartridge.Bank] = [:]
+var entityJumpTableBanks: [UInt8: Cartridge.Bank] = [:]
 for (value, name) in disassembly.valuesForDatatype(named: "ENTITY")! {
   let address = 0x4000 + LR35902.Address(value)
   disassembly.setLabel(at: address, in: 0x03, named: "\(name)_bank")
   disassembly.setData(at: address, in: 0x03)
 
-  let entityBankLocation = Gameboy.Cartridge.cartridgeLocation(for: address, in: 0x03)!
+  let entityBankLocation = Cartridge.cartridgeLocation(for: address, in: 0x03)!
   let bank = data[Int(entityBankLocation)]
   entityJumpTableBanks[value] = bank
 }
@@ -458,8 +458,8 @@ disassembly.setData(at: 0x5919..<(0x5919 + 0x0010), in: 0x05)
 disassembly.setData(at: 0x5939..<(0x5939 + 0x0010), in: 0x05)
 
 // MARK: - Bank 9 (09)
-extractText(from: Gameboy.Cartridge.cartridgeLocation(for: 0x6700, in: 0x09)!..<Gameboy.Cartridge.cartridgeLocation(for: 0x6d9f, in: 0x09)!)
-extractText(from: Gameboy.Cartridge.cartridgeLocation(for: 0x7d00, in: 0x09)!..<Gameboy.Cartridge.cartridgeLocation(for: 0x7eef, in: 0x09)!)
+extractText(from: Cartridge.cartridgeLocation(for: 0x6700, in: 0x09)!..<Cartridge.cartridgeLocation(for: 0x6d9f, in: 0x09)!)
+extractText(from: Cartridge.cartridgeLocation(for: 0x7d00, in: 0x09)!..<Cartridge.cartridgeLocation(for: 0x7eef, in: 0x09)!)
 
 // MARK: - Bank 12 (0c)
 disassembly.setData(at: 0x4000..<(0x4000 + 0x0400), in: 0x0c)
@@ -467,10 +467,10 @@ disassembly.setData(at: 0x4800..<(0x4800 + 0x1000), in: 0x0c)
 disassembly.setData(at: 0x47a0..<(0x47a0 + 0x0020), in: 0x0c)
 
 // MARK: - Bank 20 (14)
-extractText(from: Gameboy.Cartridge.cartridgeLocation(for: 0x5c00, in: 0x14)!..<Gameboy.Cartridge.cartridgeLocation(for: 0x79cd, in: 0x14)!)
+extractText(from: Cartridge.cartridgeLocation(for: 0x5c00, in: 0x14)!..<Cartridge.cartridgeLocation(for: 0x79cd, in: 0x14)!)
 
 // MARK: - Bank 22 (16)
-extractText(from: Gameboy.Cartridge.cartridgeLocation(for: 0x5700, in: 0x16)!..<Gameboy.Cartridge.cartridgeLocation(for: 0x7ff0, in: 0x16)!)
+extractText(from: Cartridge.cartridgeLocation(for: 0x5700, in: 0x16)!..<Cartridge.cartridgeLocation(for: 0x7ff0, in: 0x16)!)
 
 // MARK: - Bank 23 (17)
 disassembly.setText(at: 0x4099..<0x42fd, in: 0x17)
@@ -490,10 +490,10 @@ for i in LR35902.Address(0)..<LR35902.Address(32) {
 }
 
 // MARK: - Bank 28 (1c)
-extractText(from: Gameboy.Cartridge.cartridgeLocation(for: 0x4a00, in: 0x1c)!..<Gameboy.Cartridge.cartridgeLocation(for: 0x7360, in: 0x1c)!)
+extractText(from: Cartridge.cartridgeLocation(for: 0x4a00, in: 0x1c)!..<Cartridge.cartridgeLocation(for: 0x7360, in: 0x1c)!)
 
 // MARK: - Bank 28 (1d)
-extractText(from: Gameboy.Cartridge.cartridgeLocation(for: 0x4000, in: 0x1d)!..<Gameboy.Cartridge.cartridgeLocation(for: 0x7FB6, in: 0x1d)!)
+extractText(from: Cartridge.cartridgeLocation(for: 0x4000, in: 0x1d)!..<Cartridge.cartridgeLocation(for: 0x7FB6, in: 0x1d)!)
 
 // MARK: - Bank 31 (1f)
 disassembly.defineFunction(startingAt: 0x4000, in: 0x1f, named: "EnableSound")

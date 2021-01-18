@@ -74,7 +74,7 @@ final class SourceRulerView: NSRulerView {
   func processLines(in rect: NSRect,
                     dataHandler: ((Disassembler.Line.Semantic, Data, NSRect) -> Void)? = nil,
                     scopeHandler: ((Disassembler.Line?, Disassembler.Line, Disassembler.Line?, NSRect) -> Void)? = nil,
-                    bankHandler: ((Gameboy.Cartridge.Bank, NSRect) -> Void)? = nil,
+                    bankHandler: ((Cartridge.Bank, NSRect) -> Void)? = nil,
                     handler: (Int, NSString, NSRect, Disassembler.Line.Semantic) -> Bool) {
     guard let textView = clientView as? NSTextView else {
       return

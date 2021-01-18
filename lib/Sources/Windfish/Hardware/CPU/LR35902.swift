@@ -174,18 +174,18 @@ public final class LR35902 {
     public func sourceAddress() -> LR35902.Address? {
       switch sourceLocation {
       case .cartridge(let location):
-        return Gameboy.Cartridge.addressAndBank(from: location).address
+        return Cartridge.addressAndBank(from: location).address
       case .memory(let address):
         return address
       default:
         return nil
       }
     }
-    public func sourceAddressAndBank() -> (address: LR35902.Address, bank: Gameboy.Cartridge.Bank)? {
+    public func sourceAddressAndBank() -> (address: LR35902.Address, bank: Cartridge.Bank)? {
       guard case let .cartridge(sourceLocation) = sourceLocation else {
         return nil
       }
-      return Gameboy.Cartridge.addressAndBank(from: sourceLocation)
+      return Cartridge.addressAndBank(from: sourceLocation)
     }
   }
 

@@ -31,7 +31,7 @@ final class UInt8HexFormatter: Formatter {
     } else {
       numericalValue = string
     }
-    guard let bank = Gameboy.Cartridge.Bank(numericalValue, radix: 16) else {
+    guard let bank = Cartridge.Bank(numericalValue, radix: 16) else {
       return false
     }
     obj?.pointee = bank as AnyObject
@@ -41,7 +41,7 @@ final class UInt8HexFormatter: Formatter {
 
 final class UInt8BinaryFormatter: Formatter {
   override func string(for obj: Any?) -> String? {
-    guard let address = obj as? Gameboy.Cartridge.Bank else {
+    guard let address = obj as? Cartridge.Bank else {
       return nil
     }
     return "0b\(address.binaryString)"
@@ -56,7 +56,7 @@ final class UInt8BinaryFormatter: Formatter {
     } else {
       numericalValue = string
     }
-    guard let bank = Gameboy.Cartridge.Bank(numericalValue, radix: 2) else {
+    guard let bank = Cartridge.Bank(numericalValue, radix: 2) else {
       return false
     }
     obj?.pointee = bank as AnyObject

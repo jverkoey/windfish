@@ -35,10 +35,10 @@ extension ProjectDocument {
       case .labels:
         let locationParts = parts[0].split(separator: ":")
         let labelName = parts[1]
-        let bank = Gameboy.Cartridge.Bank(locationParts[0], radix: 16)!
+        let bank = Cartridge.Bank(locationParts[0], radix: 16)!
         let address = LR35902.Address(locationParts[1], radix: 16)!
 
-        if Gameboy.Cartridge.location(for: address, inHumanProvided: bank) != nil {
+        if Cartridge.location(for: address, inHumanProvided: bank) != nil {
           self.project.configuration.regions.removeAll {
             $0.bank == bank && $0.address == address
           }

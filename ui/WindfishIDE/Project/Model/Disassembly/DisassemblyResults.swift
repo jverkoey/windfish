@@ -5,8 +5,8 @@ import Windfish
 final class DisassemblyResults: NSObject {
   internal init(
     files: [String : Data],
-    bankLines: [Gameboy.Cartridge.Bank : [Disassembler.Line]]? = nil,
-    bankTextStorage: [Gameboy.Cartridge.Bank: NSAttributedString]? = nil,
+    bankLines: [Cartridge.Bank : [Disassembler.Line]]? = nil,
+    bankTextStorage: [Cartridge.Bank: NSAttributedString]? = nil,
     regions: [Region]? = nil,
     regionLookup: [String: Region]? = nil,
     statistics: Disassembler.Statistics? = nil,
@@ -21,7 +21,7 @@ final class DisassemblyResults: NSObject {
     self.disassembly = disassembly
   }
 
-  func lineFor(address: LR35902.Address, bank _bank: Gameboy.Cartridge.Bank) -> Int? {
+  func lineFor(address: LR35902.Address, bank _bank: Cartridge.Bank) -> Int? {
     let bank = (address < 0x4000) ? 0 : _bank
     guard let bankLines = bankLines?[bank] else {
       return nil
@@ -54,8 +54,8 @@ final class DisassemblyResults: NSObject {
   }
 
   var files: [String: Data]
-  var bankLines: [Gameboy.Cartridge.Bank: [Disassembler.Line]]?
-  var bankTextStorage: [Gameboy.Cartridge.Bank: NSAttributedString]?
+  var bankLines: [Cartridge.Bank: [Disassembler.Line]]?
+  var bankTextStorage: [Cartridge.Bank: NSAttributedString]?
   @objc dynamic var regions: [Region]?
   var regionLookup: [String: Region]?
   var statistics: Disassembler.Statistics?

@@ -19,11 +19,11 @@ final class Region: NSObject {
     }
   }
   @objc dynamic var name: String
-  @objc dynamic var bank: Gameboy.Cartridge.Bank
+  @objc dynamic var bank: Cartridge.Bank
   @objc dynamic var address: LR35902.Address
   @objc dynamic var length: LR35902.Address
 
-  init(regionType: String, name: String, bank: Gameboy.Cartridge.Bank, address: LR35902.Address, length: LR35902.Address) {
+  init(regionType: String, name: String, bank: Cartridge.Bank, address: LR35902.Address, length: LR35902.Address) {
     self.regionType = regionType
     self.name = name
     self.bank = bank

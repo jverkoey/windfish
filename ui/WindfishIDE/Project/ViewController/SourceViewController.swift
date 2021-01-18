@@ -17,7 +17,7 @@ final class SourceViewController: NSViewController {
   // TODO: Make this an enum of either filename or bank.
   let project: Project
   var filename: String?
-  var bank: Gameboy.Cartridge.Bank? { didSet { didSetBank() } }
+  var bank: Cartridge.Bank? { didSet { didSetBank() } }
   var textStorage = NSTextStorage() { didSet { didSetTextStorage(oldValue: oldValue) } }
   var lineAnalysis: LineAnalysis? {
     didSet {
@@ -140,9 +140,7 @@ final class SourceViewController: NSViewController {
       .sink(receiveValue: { notification in
         self.refreshBank()
         self.refreshFileContents()
-        if let cartridge = self.project.gameboy.cartridge {
-          self.sourceView!.emulationLine = self.project.disassemblyResults?.lineFor(address: self.project.gameboy.cpu.pc, bank: cartridge.selectedBank)
-        }
+        self.sourceView!.emulationLine = self.project.disassemblyResults?.lineFor(address: self.project.address, bank: self.project.bank)
       })
 
     didProcessEditingSubscriber = NotificationCenter.default.publisher(for: NSTextStorage.didProcessEditingNotification)
