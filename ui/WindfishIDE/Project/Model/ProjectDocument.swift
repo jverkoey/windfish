@@ -2,6 +2,7 @@ import AppKit
 import Foundation
 import Cocoa
 
+import RGBDS
 import Windfish
 
 final class Project: NSObject {
@@ -237,6 +238,7 @@ private struct Filenames {
   static let scriptsDir = "scripts"
   static let macrosDir = "macros"
   static let globals = "globals.asm"
+  static let dataTypes = "datatypes.asm"
   static let configuration = "configuration.plist"
 }
 
@@ -299,10 +301,62 @@ extension ProjectDocument {
           let scanner = Scanner(string: comments)
           _ = scanner.scanUpToString("[")
           _ = scanner.scanString("[")
-          let dataType = scanner.scanUpToString("]")!
+          let dataType = scanner.scanUpToString("]")!.trimmed()
           globals.append(Global(name: name, address: address, dataType: dataType))
         }
         self.project.configuration.globals = globals
+      }
+      if let dataTypes = configuration.fileWrappers?[Filenames.dataTypes],
+         let content = dataTypes.regularFileContents {
+        let dataTypesText = String(data: content, encoding: .utf8)!
+        var dataTypes: [DataType] = []
+
+        var dataType = DataType(name: "", representation: "", interpretation: "", mappings: [])
+
+        dataTypesText.enumerateLines { line, _ in
+          let trimmedLine = line.trimmed()
+          if trimmedLine.isEmpty {
+            if !dataType.name.isEmpty {
+              dataTypes.append(dataType)
+            }
+            dataType = DataType(name: "", representation: "", interpretation: "", mappings: [])
+            return
+          }
+          if trimmedLine.starts(with: ";") {
+            // New data type definition
+            let scanner = Scanner(string: trimmedLine)
+            _ = scanner.scanString(";")
+            dataType.name = scanner.scanUpToString("[")!.trimmed()
+            _ = scanner.scanString("[")
+            dataType.interpretation = scanner.scanUpToString("]")!.trimmed()
+            _ = scanner.scanString("]")
+            _ = scanner.scanUpToString("[")
+            _ = scanner.scanString("[")
+            dataType.representation = scanner.scanUpToString("]")!.trimmed()
+            return
+          }
+          let codeAndComments = line.split(separator: ";", maxSplits: 1, omittingEmptySubsequences: false)
+          let code = codeAndComments[0]
+          if !code.contains(" EQU ") {
+            return
+          }
+          let definitionParts = code.components(separatedBy: " EQU ")
+          let name = definitionParts[0].trimmed()
+          let valueText = definitionParts[1].trimmed()
+          let value: UInt8
+          if valueText.starts(with: RGBDS.NumericPrefix.hexadecimal.rawValue) {
+            value = UInt8(valueText.dropFirst(), radix: 16)!
+          } else if valueText.starts(with: RGBDS.NumericPrefix.binary.rawValue) {
+            value = UInt8(valueText.dropFirst(), radix: 2)!
+          } else {
+            value = UInt8(valueText)!
+          }
+          dataType.mappings.append(DataType.Mapping(name: name, value: value))
+        }
+        if !dataType.name.isEmpty {
+          dataTypes.append(dataType)
+        }
+        self.project.configuration.dataTypes = dataTypes
       }
     }
 
@@ -362,9 +416,26 @@ extension ProjectDocument {
         }),
         Filenames.globals: FileWrapper(regularFileWithContents: project.configuration.globals
                                         .sorted(by: { $0.address < $1.address })
-                                        .map { (global: Global) in
+                                        .map { (global: Global) -> String in
                                           "\(global.name) EQU $\(global.address.hexString) ; [\(global.dataType)]"
-                                        }.joined(separator: "\n\n").data(using: .utf8)!)
+                                        }.joined(separator: "\n\n").data(using: .utf8)!),
+        Filenames.dataTypes: FileWrapper(regularFileWithContents: project.configuration.dataTypes
+                                          .sorted(by: { $0.name < $1.name })
+                                          .map { (dataType: DataType) -> String in
+                                            (["; \(dataType.name) [\(dataType.interpretation)] [\(dataType.representation)]"]
+                                              + dataType.mappings.map { (mapping: DataType.Mapping) -> String in
+                                                switch dataType.representation {
+                                                case DataType.Representation.binary:
+                                                  return "\(mapping.name) EQU \(RGBDS.NumericPrefix.binary.rawValue)\(mapping.value.binaryString)"
+                                                case DataType.Representation.hexadecimal:
+                                                  return "\(mapping.name) EQU \(RGBDS.NumericPrefix.hexadecimal.rawValue)\(mapping.value.hexString)"
+                                                case DataType.Representation.decimal:
+                                                  return "\(mapping.name) EQU \(mapping.value)"
+                                                default:
+                                                  fatalError()
+                                                }
+                                              }).joined(separator: "\n")
+                                          }.joined(separator: "\n\n").data(using: .utf8)!)
       ])
       configuration.preferredFilename = Filenames.configurationDir
       documentFileWrapper.addFileWrapper(configuration)

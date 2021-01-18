@@ -14,6 +14,5 @@ class ProjectConfiguration: NSObject, Codable {
   required init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: Self.CodingKeys)
     regions = (try? container.decode(Array<Region>.self, forKey: .regions)) ?? []
-    dataTypes = (try? container.decode(Array<DataType>.self, forKey: .dataTypes)) ?? []
   }
 }
