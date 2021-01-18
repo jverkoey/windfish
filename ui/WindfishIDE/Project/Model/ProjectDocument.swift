@@ -236,6 +236,7 @@ private struct Filenames {
   static let configurationDir = "configuration"
   static let scriptsDir = "scripts"
   static let macrosDir = "macros"
+  static let globals = "globals.asm"
   static let configuration = "configuration.plist"
 }
 
@@ -271,6 +272,37 @@ extension ProjectDocument {
         self.project.configuration.macros = files.map({ key, value in
           Macro(name: NSString(string: key).deletingPathExtension, source: String(data: value, encoding: .utf8)!)
         })
+      }
+      if let globals = configuration.fileWrappers?[Filenames.globals],
+         let content = globals.regularFileContents {
+        let globalText = String(data: content, encoding: .utf8)!
+        var globals: [Global] = []
+        globalText.enumerateLines { line, _ in
+          if line.isEmpty {
+            return
+          }
+          let codeAndComments = line.split(separator: ";", maxSplits: 1, omittingEmptySubsequences: false)
+          let code = codeAndComments[0]
+          if !code.contains(" EQU ") {
+            return
+          }
+          let definitionParts = code.components(separatedBy: " EQU ")
+          let name = definitionParts[0].trimmed()
+          let addressText = definitionParts[1].trimmed()
+          let address: LR35902.Address
+          if addressText.starts(with: "$") {
+            address = LR35902.Address(addressText.dropFirst(), radix: 16)!
+          } else {
+            return
+          }
+          let comments = codeAndComments[1].trimmed()
+          let scanner = Scanner(string: comments)
+          _ = scanner.scanUpToString("[")
+          _ = scanner.scanString("[")
+          let dataType = scanner.scanUpToString("]")!
+          globals.append(Global(name: name, address: address, dataType: dataType))
+        }
+        self.project.configuration.globals = globals
       }
     }
 
@@ -327,7 +359,12 @@ extension ProjectDocument {
         }),
         Filenames.macrosDir: FileWrapper(directoryWithFileWrappers: project.configuration.macros.reduce(into: [:]) { accumulator, macro in
           accumulator[macro.name + ".asm"] = FileWrapper(regularFileWithContents: macro.source.data(using: .utf8)!)
-        })
+        }),
+        Filenames.globals: FileWrapper(regularFileWithContents: project.configuration.globals
+                                        .sorted(by: { $0.address < $1.address })
+                                        .map { (global: Global) in
+                                          "\(global.name) EQU $\(global.address.hexString) ; [\(global.dataType)]"
+                                        }.joined(separator: "\n\n").data(using: .utf8)!)
       ])
       configuration.preferredFilename = Filenames.configurationDir
       documentFileWrapper.addFileWrapper(configuration)
