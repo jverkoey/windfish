@@ -163,11 +163,11 @@ main:
     ld   [gbOBP1], a
     ld   hl, gbVRAM
     ld   bc, $1800
-    call toc_01_298A.loop_01_2999
-    call JumpTable_28A8_00
-    call toc_01_298A
+    call clearBGTiles.clearRegion
+    call initializeBGDAT0
+    call clearBGTiles
     changebank $01
-    call toc_01_7D19
+    call copyDMARoutine
     call $FFC0
     call toc_01_40CE
     call JumpTable_2B6B_00
@@ -576,7 +576,7 @@ toc_01_04B1:
     dec  a
     jumptable
     dw JumpTable_2E6C_00 ; 00
-    dw JumpTable_28A8_00 ; 01
+    dw initializeBGDAT0 ; 01
     dw JumpTable_2B6B_00 ; 02
     dw JumpTable_2B9F_00 ; 03
     dw JumpTable_2C7E_00 ; 04
@@ -5716,21 +5716,21 @@ JumpTable_2898_00:
 JumpTable_28A1_00:
     ld   a, $7E
     ld   bc, $0400
-    jr   JumpTable_28A8_00.toc_01_28AD
+    jr   initializeBGDAT0.setRegion
 
-JumpTable_28A8_00:
+initializeBGDAT0:
     ld   a, $7F
     ld   bc, $0800
-JumpTable_28A8_00.toc_01_28AD:
+initializeBGDAT0.setRegion:
     ld   d, a
     ld   hl, gbBGDAT0
-JumpTable_28A8_00.loop_01_28B1:
+initializeBGDAT0.loopSetRegion:
     ld   a, d
     ldi  [hl], a
     dec  bc
     ld   a, b
     or   c
-    jr   nz, .loop_01_28B1
+    jr   nz, .loopSetRegion
 
     ret
 
@@ -5937,24 +5937,24 @@ toc_01_2948.else_01_2970:
 
 toc_01_2980:
     ld   bc, $1300
-    jr   toc_01_298A.toc_01_2996
+    jr   clearBGTiles.clearRAM
 
     db   $01, $2F, $00, $18, $03
 
-toc_01_298A:
+clearBGTiles:
     ld   bc, $006D
     ld   hl, hNeedsUpdatingBGTiles
-    call .loop_01_2999
+    call .clearRegion
     ld   bc, $1F00
-toc_01_298A.toc_01_2996:
+clearBGTiles.clearRAM:
     ld   hl, gbRAM
-toc_01_298A.loop_01_2999:
+clearBGTiles.clearRegion:
     xor  a
     ldi  [hl], a
     dec  bc
     ld   a, b
     or   c
-    jr   nz, .loop_01_2999
+    jr   nz, .clearRegion
 
     ret
 

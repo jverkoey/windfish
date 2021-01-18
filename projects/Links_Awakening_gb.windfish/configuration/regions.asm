@@ -52,6 +52,18 @@ waitForVBlank: ; [Label] $00:$2887 [0]
 
 setupLCD: ; [Function] $00:$2881 [0]
 
+clearRegion: ; [Label] $00:$2999 [0]
+
+clearBGTiles: ; [Function] $00:$298A [0]
+
+clearRAM: ; [Label] $00:$2996 [0]
+
+loopSetRegion: ; [Label] $00:$28B1 [0]
+
+setRegion: ; [Function] $00:$28AD [0]
+
+initializeBGDAT0: ; [Function] $00:$28A8 [0]
+
 tile_link_walking: ; [Image (2bpp)] $0C:$4000 [64]
 
 tile_sword_vert: ; [Image (2bpp)] $0C:$4040 [32]
@@ -71,3 +83,9 @@ tile_0D_4000: ; [Image (2bpp)] $0D:$4000 [16]
 tile_0D_4010: ; [Image (2bpp)] $0D:$4010 [16]
 
 text_credits: ; [String] $17:$4099 [612]
+
+DMARoutine: ; [Region] $01:$7D27 [10]
+
+copyDMARoutine: ; [Function] $01:$7D19 [0]
+
+copyInstructions: ; [Label] $01:$7D20 [0]
