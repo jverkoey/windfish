@@ -19,7 +19,7 @@ extension InstructionSet {
 
     if instructionWidth.operand > 0 {
       var operandBytes: [UInt8] = []
-      for _ in 0..<Int(instructionWidth.operand) {
+      for _ in 0..<Int(truncatingIfNeeded: instructionWidth.operand) {
         guard let byte = iterator.next() else {
           return nil
         }
@@ -53,10 +53,11 @@ extension InstructionSet {
     guard let byte = iterator.next() else {
       return nil
     }
-    let index = Int(byte)
+    let index = Int(truncatingIfNeeded: byte)
     guard index < table.count else {
       return nil
     }
+    // TODO[https://github.com/jverkoey/windfish/issues/24]: Loop prefix tables to support 3+ byte opcodes.
     let spec = table[index]
     if let prefixTable = Self.prefixTables[spec] {
       return self.spec(from: &iterator, table: prefixTable)
