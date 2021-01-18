@@ -444,7 +444,7 @@ public class Disassembler {
     precondition(bank > 0)
     precondition(!name.contains("."), "Labels cannot contain dots.")
     guard let cartridgeLocation = Gameboy.Cartridge.location(for: pc, inHumanProvided: bank) else {
-      preconditionFailure("Attempting to set label in non-cart addressable location.")
+      preconditionFailure("Setting a label in a non-cart addressable location is not yet supported.")
     }
     labels[cartridgeLocation] = name
   }
