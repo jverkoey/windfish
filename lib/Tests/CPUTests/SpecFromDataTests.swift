@@ -1,7 +1,7 @@
 import XCTest
 @testable import CPU
 
-class DisassemblerTests: XCTestCase {
+class SpecFromDataTests: XCTestCase {
 
   // MARK: - Specs
 

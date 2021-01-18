@@ -1,10 +1,8 @@
 import XCTest
 @testable import CPU
 
-/**
- Verify that the instructions store the appropriate values for a variety of instruction shapes.
- */
-class InstructionTests: XCTestCase {
+// Verify that the instructions store the appropriate values for a variety of instruction shapes.
+class InstructionStorageTests: XCTestCase {
   func test_nop() {
     let instruction = SimpleCPU.Instruction(spec: .nop, immediate: nil)
 
