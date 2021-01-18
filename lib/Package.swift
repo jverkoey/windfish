@@ -37,6 +37,10 @@ let package = Package(
       name: "FoundationExtensions",
       dependencies: []
     ),
+    .testTarget(
+      name: "FoundationExtensionsTests",
+      dependencies: ["FoundationExtensions"]
+    ),
 
     .testTarget(
       name: "WindfishTests",

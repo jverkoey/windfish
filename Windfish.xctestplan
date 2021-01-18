@@ -35,6 +35,14 @@
         "identifier" : "WindfishTests",
         "name" : "WindfishTests"
       }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:..\/lib",
+        "identifier" : "FoundationExtensionsTests",
+        "name" : "FoundationExtensionsTests"
+      }
     }
   ],
   "version" : 1
