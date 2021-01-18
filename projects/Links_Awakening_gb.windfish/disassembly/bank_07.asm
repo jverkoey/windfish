@@ -3156,7 +3156,7 @@ toc_07_7C23.else_07_7C74:
 toc_07_7C76:
     ifNe [$FFEA], $05, .else_07_7C96
 
-    ifEq [wGameMode], GAMEMODE_MINI_MAP, .else_07_7C96
+    ifEq [wGameMode], GAMEMODE_WORLD_MAP, .else_07_7C96
 
     ld   a, [wDialogState]
     ld   hl, $C1A8

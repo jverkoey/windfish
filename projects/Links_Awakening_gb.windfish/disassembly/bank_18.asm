@@ -2885,7 +2885,7 @@ toc_18_7D0E.else_18_7D5F:
 toc_18_7D61:
     ifNe [$FFEA], $05, .else_18_7D81
 
-    ifEq [wGameMode], GAMEMODE_MINI_MAP, .else_18_7D81
+    ifEq [wGameMode], GAMEMODE_WORLD_MAP, .else_18_7D81
 
     ld   hl, $C1A8
     ld   a, [wDialogState]

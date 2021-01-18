@@ -1474,7 +1474,7 @@ toc_01_09AA.else_01_0A85:
     jp   toc_01_07C0
 
 toc_01_0A90:
-    ifLt [wGameMode], GAMEMODE_MINI_MAP, .else_01_0ACE
+    ifLt [wGameMode], GAMEMODE_WORLD_MAP, .else_01_0ACE
 
     cp   GAMEMODE_WORLD
     jr   nz, .else_01_0AA2
@@ -1757,7 +1757,7 @@ toc_01_0C8C:
     clear [$C16B]
     ld   [$C16C], a
     ld   [$DB96], a
-    assign [wGameMode], GAMEMODE_MINI_MAP
+    assign [wGameMode], GAMEMODE_WORLD_MAP
     changebank $02
     call toc_02_77FA.else_02_781B
     call JumpTable_1C56_00.toc_01_1CCC
@@ -5211,7 +5211,7 @@ JumpTable_2521_00.else_01_2542:
 
     changebank $1C
     ld   a, [wGameMode]
-    cp   GAMEMODE_MINI_MAP
+    cp   GAMEMODE_WORLD_MAP
     jp   z, toc_01_2617
 
     ld   a, [$C173]

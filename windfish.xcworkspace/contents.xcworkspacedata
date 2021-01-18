@@ -10,4 +10,12 @@
    <FileRef
       location = "group:/Users/featherless/workbench/windfish/Windfish.xctestplan">
    </FileRef>
+   <Group
+      location = "group:projects"
+      name = "projects">
+      <FileRef
+         location = "group:Links_Awakening_gb.windfish"
+         assignedFileDataType = "public.folder">
+      </FileRef>
+   </Group>
 </Workspace>

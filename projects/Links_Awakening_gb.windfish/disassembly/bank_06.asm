@@ -4057,7 +4057,7 @@ toc_06_64DF:
     ifNe [$FFEA], $05, .else_06_64FF
 
 toc_06_64DF.toc_06_64E5:
-    ifEq [wGameMode], GAMEMODE_MINI_MAP, .else_06_64FF
+    ifEq [wGameMode], GAMEMODE_WORLD_MAP, .else_06_64FF
 
     ld   hl, $C1A8
     ld   a, [wDialogState]

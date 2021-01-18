@@ -6669,7 +6669,7 @@ toc_05_7965:
     ifNe [$FFEA], $05, .else_05_7985
 
 toc_05_7965.toc_05_796B:
-    ifEq [wGameMode], GAMEMODE_MINI_MAP, .else_05_7985
+    ifEq [wGameMode], GAMEMODE_WORLD_MAP, .else_05_7985
 
     ld   hl, $C1A8
     ld   a, [wDialogState]

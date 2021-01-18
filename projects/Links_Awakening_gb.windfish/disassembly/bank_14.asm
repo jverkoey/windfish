@@ -771,7 +771,7 @@ toc_14_5326.return_14_5387:
 toc_14_5388:
     clear [$FFBE]
     ld   [$FFF5], a
-    ifEq [wGameMode], GAMEMODE_MINI_MAP, .else_14_53E1
+    ifEq [wGameMode], GAMEMODE_WORLD_MAP, .else_14_53E1
 
     ld   a, [$C124]
     ld   hl, $C14F

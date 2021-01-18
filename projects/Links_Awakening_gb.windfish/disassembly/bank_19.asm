@@ -636,7 +636,7 @@ JumpTable_4A3D_19:
     db   $0C, $0D
 
 JumpTable_4CBF_19:
-    ifEq [wGameMode], GAMEMODE_MINI_MAP, .else_19_4CCA
+    ifEq [wGameMode], GAMEMODE_WORLD_MAP, .else_19_4CCA
 
     clear [$C5A2]
 JumpTable_4CBF_19.else_19_4CCA:
@@ -3061,7 +3061,7 @@ toc_19_784E.else_19_7899:
 toc_19_789B:
     ifNe [$FFEA], $05, .else_19_78BB
 
-    ifEq [wGameMode], GAMEMODE_MINI_MAP, .else_19_78BB
+    ifEq [wGameMode], GAMEMODE_WORLD_MAP, .else_19_78BB
 
     ld   hl, $C1A8
     ld   a, [wDialogState]

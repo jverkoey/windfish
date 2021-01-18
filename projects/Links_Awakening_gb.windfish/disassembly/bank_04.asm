@@ -6714,7 +6714,7 @@ toc_04_7F1F:
     ifNe [$FFEA], $05, .else_04_7F3F
 
 toc_04_7F1F.toc_04_7F25:
-    ifEq [wGameMode], GAMEMODE_MINI_MAP, .else_04_7F3F
+    ifEq [wGameMode], GAMEMODE_WORLD_MAP, .else_04_7F3F
 
     ld   hl, $C1A8
     ld   a, [wDialogState]
