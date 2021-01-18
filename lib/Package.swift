@@ -33,6 +33,11 @@ let package = Package(
         "FoundationExtensions",
       ]
     ),
+    .testTarget(
+      name: "RGBDSTests",
+      dependencies: ["RGBDS"]
+    ),
+
     .target(
       name: "FoundationExtensions",
       dependencies: []
@@ -52,10 +57,6 @@ let package = Package(
     .testTarget(
       name: "CPUTests",
       dependencies: ["CPU"]
-    ),
-    .testTarget(
-      name: "RGBDSTests",
-      dependencies: ["RGBDS"]
     ),
   ]
 )

@@ -72,7 +72,9 @@ func prettify(_ label: String) -> String {
 }
 
 func textLine(for bytes: [UInt8], characterMap: [UInt8: String], address: LR35902.Address) -> Disassembler.Line {
-  return Disassembler.Line(semantic: .text(RGBDS.statement(for: bytes, characterMap: characterMap)), address: address, data: Data(bytes))
+  return Disassembler.Line(semantic: .text(RGBDS.Statement(withAscii: bytes, characterMap: characterMap)),
+                           address: address,
+                           data: Data(bytes))
 }
 
 extension Disassembler {
