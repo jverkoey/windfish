@@ -150,8 +150,7 @@ extension InstructionSet {
         return computeOpcodeString(for: childInstruction)
       }
       return child.label!
-    } else {
-      return "\("\(spec)".split(separator: ".").last!)"
     }
+    return "\("\(spec)".split(separator: ".").last!)"
   }
 }
