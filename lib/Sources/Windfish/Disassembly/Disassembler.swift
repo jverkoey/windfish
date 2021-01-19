@@ -87,6 +87,9 @@ public final class Disassembler {
   /** All locations that represent text. */
   var text = IndexSet()
 
+  /** The maximum length of a line of text within a given range. */
+  var textLengths: [Range<Cartridge.Location>: Int] = [:]
+
   // MARK: - Data segments
 
   public func setJumpTable(at range: Range<LR35902.Address>, in bank: Cartridge.Bank) {
@@ -98,31 +101,6 @@ public final class Disassembler {
     registerData(at: range, in: bank)
   }
   var jumpTables = IndexSet()
-
-  // MARK: - Text segments
-
-  public func setText(at range: Range<LR35902.Address>, in bank: Cartridge.Bank, lineLength: Int? = nil) {
-    precondition(bank > 0)
-    guard let lowerBound = Cartridge.location(for: range.lowerBound, in: bank),
-          let upperBound = Cartridge.location(for: range.upperBound, in: bank) else {
-      return
-    }
-    let range = Int(truncatingIfNeeded: lowerBound)..<Int(truncatingIfNeeded: upperBound)
-    clearCode(in: range)
-    text.insert(integersIn: range)
-    data.remove(integersIn: range)
-    if let lineLength = lineLength {
-      textLengths[lowerBound..<upperBound] = lineLength
-    }
-  }
-  func lineLengthOfText(at address: LR35902.Address, in bank: Cartridge.Bank) -> Int? {
-    precondition(bank > 0)
-    let location = Cartridge.location(for: address, in: bank)!
-    return textLengths.first { pair in
-      pair.0.contains(location)
-    }?.value
-  }
-  private var textLengths: [Range<Cartridge.Location>: Int] = [:]
 
   public func mapCharacter(_ character: UInt8, to string: String) {
     characterMap[character] = string
@@ -626,7 +604,7 @@ public final class Disassembler {
       guard let self = self else {
         return
       }
-      self.setText(at: LR35902.Address(truncatingIfNeeded: startAddress)..<LR35902.Address(truncatingIfNeeded: endAddress),
+      self.registerText(at: LR35902.Address(truncatingIfNeeded: startAddress)..<LR35902.Address(truncatingIfNeeded: endAddress),
                    in: max(1, Cartridge.Bank(truncatingIfNeeded: bank)),
                    lineLength: lineLength)
     }

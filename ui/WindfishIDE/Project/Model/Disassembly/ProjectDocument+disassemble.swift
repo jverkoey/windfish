@@ -78,7 +78,7 @@ extension ProjectDocument {
           disassembly.setLabel(at: region.address, in: bank, named: region.name)
         case Region.Kind.string:
           disassembly.setLabel(at: region.address, in: bank, named: region.name)
-          disassembly.setText(at: region.address..<(region.address + region.length), in: bank, lineLength: nil)
+          disassembly.registerText(at: region.address..<(region.address + region.length), in: bank, lineLength: nil)
         case Region.Kind.image1bpp:
           disassembly.setLabel(at: region.address, in: bank, named: region.name)
           disassembly.registerData(at: region.address..<(region.address + region.length), in: bank, format: .image1bpp)
