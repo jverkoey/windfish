@@ -5,7 +5,7 @@ protocol InstructionEmulatorInitializable: class {
 }
 
 protocol InstructionEmulator: class {
-  func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.Emulation.EmulationResult
+  func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Gameboy.SourceLocation) -> LR35902.Emulation.EmulationResult
 }
 
 extension LR35902 {
@@ -288,7 +288,7 @@ extension LR35902.Emulation {
       self.spec = spec
     }
 
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.Emulation.EmulationResult {
+    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Gameboy.SourceLocation) -> LR35902.Emulation.EmulationResult {
       fatalError("Not yet implemented: \(spec)")
     }
 

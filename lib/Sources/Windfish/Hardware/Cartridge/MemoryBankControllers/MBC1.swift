@@ -149,7 +149,7 @@ extension Cartridge {
       fatalError("Invalid write address provided to the cartridge: \(address.hexString).")
     }
 
-    func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
+    func sourceLocation(from address: LR35902.Address) -> Gameboy.SourceLocation {
       return .cartridge(Cartridge.location(for: address, in: (selectedBank == 0) ? 1 : selectedBank)!)
     }
   }

@@ -32,31 +32,6 @@ public final class Disassembler {
     return pc < 0x8000 && Cartridge.location(for: pc, in: bank)! < cartridgeSize
   }
 
-  // MARK: - Representing source locations
-
-  /** A representation of the location from which an instruction was disassembled. */
-  public enum SourceLocation: Equatable {
-    /** The instruction was disassembled from a location in the cartridge data. */
-    case cartridge(Cartridge.Location)
-
-    /** The instruction was disassembled from the gameboy's memory. */
-    case memory(LR35902.Address)
-  }
-
-  /**
-   Returns a source location for the given program counter and bank.
-
-   - Parameter address: An address in the gameboy's memory.
-   - Parameter bank: The selected bank.
-   */
-  static func sourceLocation(for address: LR35902.Address, in bank: Cartridge.Bank) -> SourceLocation {
-    precondition(bank > 0)
-    if let cartridgeLocation = Cartridge.location(for: address, in: bank) {
-      return .cartridge(cartridgeLocation)
-    }
-    return .memory(address)
-  }
-
   // MARK: - Transfers of control
 
   func transfersOfControl(at pc: LR35902.Address, in bank: Cartridge.Bank) -> Set<TransferOfControl>? {

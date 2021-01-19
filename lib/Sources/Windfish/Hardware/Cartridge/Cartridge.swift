@@ -43,7 +43,7 @@ public class Cartridge: AddressableMemory {
     memoryBankController.write(byte, to: address)
   }
 
-  public func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
+  public func sourceLocation(from address: LR35902.Address) -> Gameboy.SourceLocation {
     return memoryBankController.sourceLocation(from: address)
   }
 

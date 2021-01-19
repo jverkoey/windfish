@@ -2,7 +2,7 @@ import Foundation
 
 extension LR35902.Emulation {
   final class interrupt: InstructionEmulator {
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.Emulation.EmulationResult {
+    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Gameboy.SourceLocation) -> LR35902.Emulation.EmulationResult {
       if cycle == 1 {
         interrupts = LR35902.Interrupt(rawValue: memory.read(from: LR35902.interruptFlagAddress))
         return .continueExecution

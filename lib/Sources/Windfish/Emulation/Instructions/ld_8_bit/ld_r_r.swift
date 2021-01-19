@@ -11,7 +11,7 @@ extension LR35902.Emulation {
       self.src = src
     }
 
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.Emulation.EmulationResult {
+    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Gameboy.SourceLocation) -> LR35902.Emulation.EmulationResult {
       cpu[dst] = cpu[src] as UInt8
       cpu.registerTraces[dst] = cpu.registerTraces[src]
       return .fetchNext

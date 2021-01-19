@@ -10,7 +10,7 @@ extension LR35902.Emulation {
       self.register = register
     }
 
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.Emulation.EmulationResult {
+    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Gameboy.SourceLocation) -> LR35902.Emulation.EmulationResult {
       if cpu.fcarry {
         carrysub(cpu: cpu, value: cpu[register])
       } else {

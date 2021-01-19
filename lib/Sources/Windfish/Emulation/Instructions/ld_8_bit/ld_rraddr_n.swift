@@ -10,7 +10,7 @@ extension LR35902.Emulation {
       self.dst = dst
     }
 
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.Emulation.EmulationResult {
+    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Gameboy.SourceLocation) -> LR35902.Emulation.EmulationResult {
       if cycle == 1 {
         immediate = UInt8(memory.read(from: cpu.pc))
         cpu.pc += 1

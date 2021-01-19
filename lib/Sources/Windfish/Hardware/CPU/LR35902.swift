@@ -168,7 +168,7 @@ public final class LR35902 {
         cycle = 0
       }
     }
-    public internal(set) var sourceLocation: Disassembler.SourceLocation?
+    public internal(set) var sourceLocation: Gameboy.SourceLocation?
     var cycle: Int = 0
 
     public func sourceAddress() -> LR35902.Address? {
@@ -314,7 +314,7 @@ extension LR35902 {
 extension LR35902 {
   /** Trace information for a specific register. */
   public struct RegisterTrace: Equatable {
-    public init(sourceLocation: Disassembler.SourceLocation) {
+    public init(sourceLocation: Gameboy.SourceLocation) {
       self.sourceLocation = sourceLocation
       self.loadAddress = nil
     }
@@ -322,7 +322,7 @@ extension LR35902 {
       self.sourceLocation = nil
       self.loadAddress = loadAddress
     }
-    public init(sourceLocation: Disassembler.SourceLocation, loadAddress: LR35902.Address) {
+    public init(sourceLocation: Gameboy.SourceLocation, loadAddress: LR35902.Address) {
       self.sourceLocation = sourceLocation
       self.loadAddress = loadAddress
     }
@@ -331,7 +331,7 @@ extension LR35902 {
     public let loadAddress: LR35902.Address?
 
     /** The source location from which this register's value was loaded, if known. */
-    public let sourceLocation: Disassembler.SourceLocation?
+    public let sourceLocation: Gameboy.SourceLocation?
   }
 }
 
@@ -355,7 +355,7 @@ extension LR35902: AddressableMemory {
     }
   }
 
-  public func sourceLocation(from address: Address) -> Disassembler.SourceLocation {
+  public func sourceLocation(from address: Address) -> Gameboy.SourceLocation {
     return .memory(address)
   }
 }

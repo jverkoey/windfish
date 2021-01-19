@@ -8,8 +8,8 @@ final class TracerMemory: AddressableMemory {
   func write(_ byte: UInt8, to address: LR35902.Address) {
   }
 
-  func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
-    return Disassembler.sourceLocation(for: address, in: 0x01)
+  func sourceLocation(from address: LR35902.Address) -> Gameboy.SourceLocation {
+    return Gameboy.sourceLocation(for: address, in: 0x01)
   }
 }
 

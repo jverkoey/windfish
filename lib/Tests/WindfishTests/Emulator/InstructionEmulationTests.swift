@@ -32,7 +32,7 @@ class InstructionEmulationTests: XCTestCase {
     XCTAssertEqual(memory.reads, [])
     XCTAssertEqual(memory.writes, [])
     XCTAssertEqual(cpu.registerTraces, [
-      .bc: .init(sourceLocation: Disassembler.sourceLocation(for: 0, in: 0x01))
+      .bc: .init(sourceLocation: Gameboy.sourceLocation(for: 0, in: 0x01))
     ])
   }
 
@@ -161,7 +161,7 @@ class InstructionEmulationTests: XCTestCase {
     XCTAssertEqual(memory.reads, [])
     XCTAssertEqual(memory.writes, [])
     XCTAssertEqual(cpu.registerTraces, [
-      .b: .init(sourceLocation: Disassembler.sourceLocation(for: 0, in: 0x01))
+      .b: .init(sourceLocation: Gameboy.sourceLocation(for: 0, in: 0x01))
     ])
   }
 
@@ -332,7 +332,7 @@ class InstructionEmulationTests: XCTestCase {
     XCTAssertEqual(memory.reads, [0x1234])
     XCTAssertEqual(memory.writes, [])
     XCTAssertEqual(cpu.registerTraces, [
-      .a: .init(sourceLocation: Disassembler.sourceLocation(for: 0, in: 0x01), loadAddress: 0x1234)
+      .a: .init(sourceLocation: Gameboy.sourceLocation(for: 0, in: 0x01), loadAddress: 0x1234)
     ])
   }
 
@@ -435,7 +435,7 @@ class InstructionEmulationTests: XCTestCase {
     XCTAssertEqual(memory.reads, [0xffab])
     XCTAssertEqual(memory.writes, [])
     XCTAssertEqual(cpu.registerTraces, [
-      .a: .init(sourceLocation: Disassembler.sourceLocation(for: 0, in: 0x01), loadAddress: 0xffab)
+      .a: .init(sourceLocation: Gameboy.sourceLocation(for: 0, in: 0x01), loadAddress: 0xffab)
     ])
   }
 

@@ -10,7 +10,7 @@ extension LR35902.Emulation {
       self.dst = dst
     }
 
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.Emulation.EmulationResult {
+    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Gameboy.SourceLocation) -> LR35902.Emulation.EmulationResult {
       if cycle == 1 {
         cpu.registerTraces[dst] = .init(sourceLocation: sourceLocation, loadAddress: cpu.sp)
         value = UInt16(truncatingIfNeeded: memory.read(from: cpu.sp))

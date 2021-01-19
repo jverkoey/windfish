@@ -11,7 +11,7 @@ extension LR35902.Emulation {
       self.register = register
     }
 
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Disassembler.SourceLocation) -> LR35902.Emulation.EmulationResult {
+    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Gameboy.SourceLocation) -> LR35902.Emulation.EmulationResult {
       cpu[register] = cpu[register] | (UInt8(1) << bit.rawValue)
       return .fetchNext
     }

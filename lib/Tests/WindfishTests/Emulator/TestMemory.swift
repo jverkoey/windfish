@@ -22,8 +22,8 @@ class TestMemory: AddressableMemory {
     storage[address] = byte
   }
 
-  func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
-    return Disassembler.sourceLocation(for: address, in: 0x01)
+  func sourceLocation(from address: LR35902.Address) -> Gameboy.SourceLocation {
+    return Gameboy.sourceLocation(for: address, in: 0x01)
   }
 
   var defaultReadValue: UInt8 = 0x00

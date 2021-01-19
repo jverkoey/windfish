@@ -11,7 +11,7 @@ final class GenericRAM: AddressableMemory {
     data[address] = byte
   }
 
-  func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
+  func sourceLocation(from address: LR35902.Address) -> Gameboy.SourceLocation {
     return .memory(address)
   }
 }
