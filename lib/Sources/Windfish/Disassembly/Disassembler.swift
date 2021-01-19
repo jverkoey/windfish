@@ -64,6 +64,16 @@ public final class Disassembler {
   /** Which instruction exists at a specific location. */
   var instructionMap: [Cartridge.Location: LR35902.Instruction] = [:]
 
+  /** Explicit labels at specific locations. */
+  var labelNames: [Cartridge.Location: String] = [:]
+
+  /**
+   Label types at specific locations.
+
+   There does not always need to be a corresponding name set in the labelNames dictionary.
+   */
+  var labelTypes: [Cartridge.Location: LabelType] = [:]
+
   // MARK: Data
 
   /** All locations that represent data. */
@@ -166,78 +176,10 @@ public final class Disassembler {
 
   public func defineFunction(startingAt pc: LR35902.Address, in bank: Cartridge.Bank, named name: String) {
     precondition(bank > 0)
-    setLabel(at: pc, in: bank, named: name)
+    registerLabel(at: pc, in: bank, named: name)
     let upperBound: LR35902.Address = (pc < 0x4000) ? 0x4000 : 0x8000
     disassemble(range: pc..<upperBound, inBank: bank)
   }
-
-  // MARK: - Labels
-
-  public func label(at pc: LR35902.Address, in bank: Cartridge.Bank) -> String? {
-    guard let index = Cartridge.location(for: pc, in: bank) else {
-      return nil
-    }
-    // Don't return labels that point to the middle of instructions.
-    if instructionMap[index] == nil && code.contains(Int(index)) {
-      return nil
-    }
-    // Don't return labels that point to the middle of data.
-    if dataBlocks.contains(Int(index)) {
-      return nil
-    }
-
-    let name: String
-    if let explicitName = labels[index] {
-      name = explicitName
-    } else if let labelType = labelTypes[index] {
-      let bank: Cartridge.Bank = (pc < 0x4000) ? 1 : bank
-      switch labelType {
-      case .transferOfControlType: name = "toc_\(bank.hexString)_\(pc.hexString)"
-      case .elseType:              name = "else_\(bank.hexString)_\(pc.hexString)"
-      case .loopType:              name = "loop_\(bank.hexString)_\(pc.hexString)"
-      case .returnType:            name = "return_\(bank.hexString)_\(pc.hexString)"
-      }
-    } else {
-      return nil
-    }
-
-    let scopes = contiguousScopes(at: pc, in: bank)
-    if let firstScope = scopes.filter({ scope -> Bool in
-      scope.lowerBound != index // Ignore ourself.
-    }).sorted(by: { (scope1, scope2) -> Bool in
-      scope1.lowerBound < scope2.lowerBound
-    }).first {
-      let addressAndBank = Cartridge.addressAndBank(from: firstScope.lowerBound)
-      if let firstScopeLabel = label(at: addressAndBank.address, in: addressAndBank.bank)?.components(separatedBy: ".").first {
-        return "\(firstScopeLabel).\(name)"
-      }
-    }
-
-    return name
-  }
-
-  func labelLocations(in range: Range<Cartridge.Location>) -> [Cartridge.Location] {
-    return range.filter {
-      labels[$0] != nil || labelTypes[$0] != nil
-    }
-  }
-
-  public func setLabel(at pc: LR35902.Address, in bank: Cartridge.Bank, named name: String) {
-    precondition(bank > 0)
-    precondition(!name.contains("."), "Labels cannot contain dots.")
-    guard let cartridgeLocation = Cartridge.location(for: pc, inHumanProvided: bank) else {
-      preconditionFailure("Setting a label in a non-cart addressable location is not yet supported.")
-    }
-    labels[cartridgeLocation] = name
-  }
-  public var labels: [Cartridge.Location: String] = [:]
-  enum LabelType {
-    case transferOfControlType
-    case elseType
-    case returnType
-    case loopType
-  }
-  var labelTypes: [Cartridge.Location: LabelType] = [:]
 
   // MARK: - Globals
 
@@ -252,7 +194,7 @@ public final class Disassembler {
     precondition(address < 0x4000 || address >= 0x8000, "Cannot set globals in switchable banks.")
 
     if address < 0x4000 {
-      setLabel(at: address, in: 0x01, named: name)
+      registerLabel(at: address, in: 0x01, named: name)
       registerData(at: address, in: 0x01)
     }
   }

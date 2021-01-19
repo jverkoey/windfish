@@ -111,7 +111,7 @@ extension Disassembler {
     for intLocation: Int in range.dropFirst() {
       let location = Cartridge.Location(intLocation)
       deleteInstruction(at: location)
-      labels[location] = nil
+      labelNames[location] = nil
       labelTypes[location] = nil
       transfers[location] = nil
     }

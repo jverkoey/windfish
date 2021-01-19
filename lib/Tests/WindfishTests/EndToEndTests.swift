@@ -8,7 +8,7 @@ extension Disassembler {
     let restartSize: LR35902.Address = 8
     let rstAddresses = (0..<numberOfRestartAddresses).map { ($0 * restartSize)..<($0 * restartSize + restartSize) }
     rstAddresses.forEach {
-      setLabel(at: $0.lowerBound, in: 0x01, named: "RST_\($0.lowerBound.hexString)")
+      registerLabel(at: $0.lowerBound, in: 0x01, named: "RST_\($0.lowerBound.hexString)")
       disassemble(range: $0, inBank: 0x01)
     }
 
