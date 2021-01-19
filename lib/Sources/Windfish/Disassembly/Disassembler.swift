@@ -36,41 +36,6 @@ public final class Disassembler {
 
   /** For a given location, track all of the sources that can transfer control to it. */
   var transfers: [Cartridge.Location: Set<Cartridge.Location>] = [:]
-
-  // MARK: - Instructions
-
-  public func instruction(at pc: LR35902.Address, in bank: Cartridge.Bank) -> LR35902.Instruction? {
-    precondition(bank > 0)
-    guard let location = Cartridge.location(for: pc, in: bank) else {
-      return nil
-    }
-    guard code.contains(Int(location)) else {
-      return nil
-    }
-    return instructionMap[location]
-  }
-
-  func register(instruction: LR35902.Instruction, at pc: LR35902.Address, in bank: Cartridge.Bank) {
-    precondition(bank > 0)
-    let address = Cartridge.location(for: pc, in: bank)!
-
-    // Avoid overlapping instructions.
-    if code.contains(Int(address)) && instructionMap[address] == nil {
-      return
-    }
-
-    instructionMap[address] = instruction
-    let instructionRange = Int(address)..<(Int(address) + Int(LR35902.InstructionSet.widths[instruction.spec]!.total))
-
-    // Remove any overlapping instructions.
-    let subRange = instructionRange.dropFirst()
-    for index in subRange {
-      let location = Cartridge.Location(index)
-      instructionMap[location] = nil
-    }
-
-    code.insert(integersIn: instructionRange)
-  }
   var instructionMap: [Cartridge.Location: LR35902.Instruction] = [:]
 
   // MARK: - Data segments

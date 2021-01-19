@@ -1005,10 +1005,8 @@ JumpTable_4D1E_03:
     inc  [hl]
     jr   nc, @-$31
 
-    db   $91, $08
-
-    jr   z, else_03_4D51
-
+    sub  a, c
+    ld   [$2628], sp
     ld   a, [hFrameCounter]
     rra
     rra
@@ -1062,7 +1060,7 @@ else_03_4D66:
 
 JumpTable_4D90_03:
     call toc_01_0891
-    db   $20, $26
+    jr   nz, .else_03_4DBB
 
     ld   hl, $C430
     add  hl, bc
@@ -1081,7 +1079,7 @@ JumpTable_4D90_03.else_03_4DA3:
 JumpTable_4D90_03.else_03_4DB8:
     jp   toc_01_3F7A.else_01_3FB7
 
-JumpTable_4D90_03.toc_03_4DBB:
+JumpTable_4D90_03.else_03_4DBB:
     cp   $40
     jr   c, .else_03_4DDD
 
@@ -1301,9 +1299,8 @@ JumpTable_4EBC_03.else_03_4F27:
     jr   nz, .else_03_4F3A
 
     ld   hl, $C280
-    db   $09, $36
-
-    dec  b
+    add  hl, bc
+    ld   [hl], $05
     ld   hl, $C320
     add  hl, bc
     ld   [hl], b
