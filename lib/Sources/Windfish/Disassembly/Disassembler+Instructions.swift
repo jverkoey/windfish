@@ -37,15 +37,11 @@ extension Disassembler {
       guard let existingInstruction = instructionMap[location] else {
         continue
       }
-      instructionMap[location] = nil
-
-      // Reset the code bit for the existing instruction's footprint.
-      let existingInstructionWidth: Int = Int(truncatingIfNeeded: instructionWidths[existingInstruction.spec]!.total)
-      code.remove(integersIn: index..<(index + existingInstructionWidth))
+      deleteInstruction(at: location)
     }
 
     instructionMap[location] = instruction
     // Set the code bit for the instruction's footprint.
-    code.insert(integersIn: instructionRange)
+    registerRegion(range: instructionRange, as: .code)
   }
 }

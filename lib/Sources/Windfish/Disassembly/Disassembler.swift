@@ -3,6 +3,22 @@ import JavaScriptCore
 
 import RGBDS
 
+extension Range where Bound == Cartridge.Location {
+  func asIntRange() -> Range<Int> {
+    return Int(truncatingIfNeeded: lowerBound)..<Int(truncatingIfNeeded: upperBound)
+  }
+}
+
+extension Range where Bound == LR35902.Address {
+  func asCartridgeRange(in bank: Cartridge.Bank) -> Range<Cartridge.Location>? {
+    guard let lowerBound: Cartridge.Location = Cartridge.location(for: lowerBound, in: bank),
+          let upperBound: Cartridge.Location = Cartridge.location(for: upperBound, in: bank) else {
+      return nil
+    }
+    return lowerBound..<upperBound
+  }
+}
+
 extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {
   public var category: InstructionCategory? {
     switch self {
@@ -34,72 +50,115 @@ public final class Disassembler {
 
   // MARK: - Disassembly metadata
 
-  /** For a given location, track all of the sources that can transfer control to it. */
+  /** Locations that can transfer control (jp/call) to a specific location. */
   var transfers: [Cartridge.Location: Set<Cartridge.Location>] = [:]
+
+  /** Which instruction exists at a specific location. */
   var instructionMap: [Cartridge.Location: LR35902.Instruction] = [:]
+
+  var dataFormats: [DataFormat: IndexSet] = [:]
+  var code = IndexSet()
+  var data = IndexSet()
+  var dataBlocks = IndexSet()
+  var text = IndexSet()
+
+  public enum RegionType {
+    case code
+    case data
+    case text
+  }
+  func registerRegion(range: Range<Int>, as type: RegionType) {
+    switch type {
+    case .code:
+      code.insert(integersIn: range)
+
+      clearData(in: range)
+      clearText(in: range)
+
+    case .data:
+      data.insert(integersIn: range)
+      if range.count > 1 {
+        dataBlocks.insert(integersIn: range.lowerBound + 1..<range.upperBound)
+      }
+
+      clearCode(in: range)
+      clearText(in: range)
+
+    case .text:
+      text.insert(integersIn: range)
+
+      clearCode(in: range)
+      clearData(in: range)
+    }
+  }
 
   // MARK: - Data segments
 
-  public enum DataFormat {
-    case bytes
-    case image1bpp
-    case image2bpp
-  }
-
-  public func setData(at address: LR35902.Address, in bank: Cartridge.Bank) {
-    precondition(bank > 0)
-    setData(at: address..<(address+1), in: bank)
-  }
-  public func setData(at range: Range<LR35902.Address>, in bank: Cartridge.Bank, format: DataFormat = .bytes) {
-    precondition(bank > 0)
-    let lowerBound = Cartridge.location(for: range.lowerBound, in: bank)!
-    let upperBound = Cartridge.location(for: range.upperBound, in: bank)!
-    let cartRange = lowerBound..<upperBound
-    dataBlocks.insert(integersIn: Int(lowerBound + 1)..<Int(upperBound))
-    dataFormats[cartRange] = format
-
-    let scopeBank = effectiveBank(at: range.lowerBound, in: bank)
-    precondition(scopeBank > 0)
-    // Shorten any contiguous scopes that contain this data.
-    let overlappingScopes = contiguousScopes[scopeBank, default: Set()].filter { $0.overlaps(cartRange) }
-    for scope in overlappingScopes {
-      if cartRange.lowerBound < scope.upperBound {
-        contiguousScopes[scopeBank, default: Set()].remove(scope)
-        contiguousScopes[scopeBank, default: Set()].insert(scope.lowerBound..<cartRange.lowerBound)
-      }
-    }
-
-    clearCode(in: cartRange)
-    let range = Int(lowerBound)..<Int(upperBound)
-    data.insert(integersIn: range)
+  func clearText(in range: Range<Int>) {
     text.remove(integersIn: range)
   }
-  private func clearCode(in _range: Range<Cartridge.Location>) {
-    let range = Int(_range.lowerBound)..<Int(_range.upperBound)
+
+  func clearData(in range: Range<Int>) {
+    data.remove(integersIn: range)
+    dataBlocks.remove(integersIn: range)
+    for key in dataFormats.keys {
+      dataFormats[key]?.remove(integersIn: range)
+    }
+  }
+
+  func deleteInstruction(at location: Cartridge.Location) {
+    guard let instruction = instructionMap[location] else {
+      return
+    }
+    instructionMap[location] = nil
+
+    let start: Int = Int(truncatingIfNeeded: location)
+    let width: Int = Int(truncatingIfNeeded: LR35902.InstructionSet.widths[instruction.spec]!.total)
+    clearCode(in: start..<(start + width))
+  }
+
+  func clearCode(in range: Range<Int>) {
     code.remove(integersIn: range)
+
+    // Remove any labels and instructions in this range.
     for index in range.dropFirst() {
       let location = Cartridge.Location(index)
-      if let instruction = instructionMap[location] {
-        instructionMap[location] = nil
-        let end = Int(location + Cartridge.Location(LR35902.InstructionSet.widths[instruction.spec]!.total))
-        if end > range.upperBound {
-          code.remove(integersIn: range.upperBound..<end)
-        }
-      }
+      deleteInstruction(at: location)
       labels[location] = nil
       labelTypes[location] = nil
+    }
+
+    let cartRange: Range<Cartridge.Location> =
+      Cartridge.Location(truncatingIfNeeded: range.lowerBound)..<Cartridge.Location(truncatingIfNeeded: range.upperBound)
+    let addressAndBank = Cartridge.addressAndBank(from: Cartridge.Location(truncatingIfNeeded: range.lowerBound))
+    // For any existing scope that intersects this range:
+    // 1. Shorten it if it begins before the range.
+    // 2. Delete it if it begins within the range.
+    if let overlappingScopes = contiguousScopes[addressAndBank.bank] {
+      var mutatedScopes = overlappingScopes
+      for scope in overlappingScopes {
+        guard scope.overlaps(cartRange) else {
+          continue
+        }
+        mutatedScopes.remove(scope)
+        if scope.lowerBound < cartRange.lowerBound {
+          mutatedScopes.insert(scope.lowerBound..<cartRange.lowerBound)
+        }
+      }
+      contiguousScopes[addressAndBank.bank] = mutatedScopes
     }
   }
 
   func formatOfData(at address: LR35902.Address, in bank: Cartridge.Bank) -> DataFormat? {
     precondition(bank > 0)
-    let location = Cartridge.location(for: address, in: bank)!
-    return dataFormats.first { pair in
-      pair.0.contains(location)
-    }?.value
+    guard let location = Cartridge.location(for: address, in: bank) else {
+      return nil
+    }
+    let intLocation = Int(truncatingIfNeeded: location)
+    return dataFormats.first { (key: DataFormat, value: IndexSet) -> Bool in
+      value.contains(intLocation)
+    }?.key
   }
-  private var dataBlocks = IndexSet()
-  private var dataFormats: [Range<Cartridge.Location>: DataFormat] = [:]
 
   public func setJumpTable(at range: Range<LR35902.Address>, in bank: Cartridge.Bank) {
     precondition(bank > 0)
@@ -107,7 +166,7 @@ public final class Disassembler {
     let upperBound = Cartridge.location(for: range.upperBound, in: bank)!
     jumpTables.insert(integersIn: Int(lowerBound)..<Int(upperBound))
 
-    setData(at: range, in: bank)
+    registerData(at: range, in: bank)
   }
   var jumpTables = IndexSet()
 
@@ -115,10 +174,12 @@ public final class Disassembler {
 
   public func setText(at range: Range<LR35902.Address>, in bank: Cartridge.Bank, lineLength: Int? = nil) {
     precondition(bank > 0)
-    let lowerBound = Cartridge.location(for: range.lowerBound, in: bank)!
-    let upperBound = Cartridge.location(for: range.upperBound, in: bank)!
-    clearCode(in: lowerBound..<upperBound)
-    let range = Int(lowerBound)..<Int(upperBound)
+    guard let lowerBound = Cartridge.location(for: range.lowerBound, in: bank),
+          let upperBound = Cartridge.location(for: range.upperBound, in: bank) else {
+      return
+    }
+    let range = Int(truncatingIfNeeded: lowerBound)..<Int(truncatingIfNeeded: upperBound)
+    clearCode(in: range)
     text.insert(integersIn: range)
     data.remove(integersIn: range)
     if let lineLength = lineLength {
@@ -191,10 +252,6 @@ public final class Disassembler {
     }
   }
 
-  var code = IndexSet()
-  private var data = IndexSet()
-  private var text = IndexSet()
-
   public func knownLocations() -> IndexSet {
     return code.union(data).union(text)
   }
@@ -205,7 +262,7 @@ public final class Disassembler {
   }
   var softTerminators: [Cartridge.Location: Bool] = [:]
 
-  private func effectiveBank(at pc: LR35902.Address, in bank: Cartridge.Bank) -> Cartridge.Bank {
+  func effectiveBank(at pc: LR35902.Address, in bank: Cartridge.Bank) -> Cartridge.Bank {
     if pc < 0x4000 {
       return 1
     }
@@ -326,7 +383,7 @@ public final class Disassembler {
 
     if address < 0x4000 {
       setLabel(at: address, in: 0x01, named: name)
-      setData(at: address, in: 0x01)
+      registerData(at: address, in: 0x01)
     }
   }
   final class Global {
@@ -648,7 +705,7 @@ public final class Disassembler {
       guard let self = self else {
         return
       }
-      self.setData(at: LR35902.Address(truncatingIfNeeded: startAddress)..<LR35902.Address(truncatingIfNeeded: endAddress),
+      self.registerData(at: LR35902.Address(truncatingIfNeeded: startAddress)..<LR35902.Address(truncatingIfNeeded: endAddress),
                    in: max(1, Cartridge.Bank(truncatingIfNeeded: bank)))
     }
     let registerJumpTable: @convention(block) (Int, Int, Int) -> Void = { [weak self] bank, startAddress, endAddress in

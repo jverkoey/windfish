@@ -81,13 +81,13 @@ extension ProjectDocument {
           disassembly.setText(at: region.address..<(region.address + region.length), in: bank, lineLength: nil)
         case Region.Kind.image1bpp:
           disassembly.setLabel(at: region.address, in: bank, named: region.name)
-          disassembly.setData(at: region.address..<(region.address + region.length), in: bank, format: .image1bpp)
+          disassembly.registerData(at: region.address..<(region.address + region.length), in: bank, format: .image1bpp)
         case Region.Kind.image2bpp:
           disassembly.setLabel(at: region.address, in: bank, named: region.name)
-          disassembly.setData(at: region.address..<(region.address + region.length), in: bank, format: .image2bpp)
+          disassembly.registerData(at: region.address..<(region.address + region.length), in: bank, format: .image2bpp)
         case Region.Kind.data:
           disassembly.setLabel(at: region.address, in: bank, named: region.name)
-          disassembly.setData(at: region.address..<(region.address + region.length), in: bank)
+          disassembly.registerData(at: region.address..<(region.address + region.length), in: bank)
         default:
           break
         }
