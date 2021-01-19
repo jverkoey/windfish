@@ -97,7 +97,6 @@ extension ProjectDocument {
         disassembly.defineMacro(named: macro.name, template: macro.source)
       }
 
-      //            disassembly.disassembleAsGameboyCartridge()
       let (disassembledSource, statistics) = try! disassembly.generateSource()
 
       let bankMap: [String: Cartridge.Bank] = disassembledSource.sources.reduce(into: [:], { accumulator, element in

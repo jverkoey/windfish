@@ -13,42 +13,8 @@ extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {
   }
 }
 
-private final class DisassemblerMemory: AddressableMemory {
-  init(data: Data) {
-    self.data = data
-  }
-  let data: Data
-
-  var selectedBank: Cartridge.Bank = 0
-
-  func read(from address: LR35902.Address) -> UInt8 {
-    // Read-only memory (ROM) bank 00
-    if address <= 0x3FFF {
-      return data[Int(address)]
-    }
-
-    // Read-only memory (ROM) bank 01-7F
-    if address >= 0x4000 && address <= 0x7FFF {
-      guard let location = Cartridge.location(for: address, in: max(1, selectedBank)) else {
-        preconditionFailure("Invalid location for address 0x\(address.hexString) in bank 0x\(selectedBank.hexString)")
-      }
-      return data[Int(location)]
-    }
-
-    fatalError()
-  }
-
-  func write(_ byte: UInt8, to address: LR35902.Address) {
-    fatalError()
-  }
-
-  func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
-    return .cartridge(Cartridge.location(for: address, in: (selectedBank == 0) ? 1 : selectedBank)!)
-  }
-}
-
 /// A class that owns and manages disassembly information for a given ROM.
-public class Disassembler {
+public final class Disassembler {
 
   private let memory: DisassemblerMemory
   let cartridgeData: Data
@@ -64,33 +30,6 @@ public class Disassembler {
   /** Returns true if the program counter is pointing to addressable memory. */
   func pcIsValid(pc: LR35902.Address, bank: Cartridge.Bank) -> Bool {
     return pc < 0x8000 && Cartridge.location(for: pc, in: bank)! < cartridgeSize
-  }
-
-  public func disassembleAsGameboyCartridge() {
-    // Restart addresses
-    let numberOfRestartAddresses: LR35902.Address = 8
-    let restartSize: LR35902.Address = 8
-    let rstAddresses = (0..<numberOfRestartAddresses).map { ($0 * restartSize)..<($0 * restartSize + restartSize) }
-    rstAddresses.forEach {
-      setLabel(at: $0.lowerBound, in: 0x01, named: "RST_\($0.lowerBound.hexString)")
-      disassemble(range: $0, inBank: 0x01)
-    }
-
-    disassemble(range: 0x0040..<0x0048, inBank: 0x01)
-    disassemble(range: 0x0048..<0x0050, inBank: 0x01)
-    disassemble(range: 0x0050..<0x0058, inBank: 0x01)
-    disassemble(range: 0x0058..<0x0060, inBank: 0x01)
-    disassemble(range: 0x0060..<0x0068, inBank: 0x01)
-    disassemble(range: 0x0100..<0x0104, inBank: 0x01)
-
-    setData(at: 0x0104..<0x0134, in: 0x01)
-    setText(at: 0x0134..<0x0143, in: 0x01)
-    setData(at: 0x0144..<0x0146, in: 0x01)
-    setData(at: 0x0147, in: 0x01)
-    setData(at: 0x014B, in: 0x01)
-    setData(at: 0x014C, in: 0x01)
-    setData(at: 0x014D, in: 0x01)
-    setData(at: 0x014E..<0x0150, in: 0x01)
   }
 
   // MARK: - Representing source locations
@@ -110,7 +49,7 @@ public class Disassembler {
    - Parameter address: An address in the gameboy's memory.
    - Parameter bank: The selected bank.
    */
-  public static func sourceLocation(for address: LR35902.Address, in bank: Cartridge.Bank) -> SourceLocation {
+  static func sourceLocation(for address: LR35902.Address, in bank: Cartridge.Bank) -> SourceLocation {
     precondition(bank > 0)
     if let cartridgeLocation = Cartridge.location(for: address, in: bank) {
       return .cartridge(cartridgeLocation)
@@ -729,7 +668,7 @@ public class Disassembler {
     let address: LR35902.Address
   }
 
-  public static func fetchInstructionSpec(pc: inout LR35902.Address, memory: AddressableMemory) -> LR35902.Instruction.Spec {
+  static func fetchInstructionSpec(pc: inout LR35902.Address, memory: AddressableMemory) -> LR35902.Instruction.Spec {
     // Fetch
     let instructionByte = memory.read(from: pc)
     pc += 1
@@ -747,7 +686,7 @@ public class Disassembler {
     return spec
   }
 
-  public static func fetchInstruction(at address: inout LR35902.Address, memory: AddressableMemory) -> LR35902.Instruction {
+  static func fetchInstruction(at address: inout LR35902.Address, memory: AddressableMemory) -> LR35902.Instruction {
     let spec = fetchInstructionSpec(pc: &address, memory: memory)
 
     guard let instructionWidth = LR35902.InstructionSet.widths[spec] else {

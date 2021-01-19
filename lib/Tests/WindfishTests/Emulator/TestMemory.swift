@@ -1,5 +1,5 @@
 import Foundation
-import Windfish
+@testable import Windfish
 
 class TestMemory: AddressableMemory {
   public let addressableRanges: [ClosedRange<LR35902.Address>] = [

@@ -1,14 +1,14 @@
 import Foundation
 
-public final class TracerMemory: AddressableMemory {
-  public func read(from address: LR35902.Address) -> UInt8 {
+final class TracerMemory: AddressableMemory {
+  func read(from address: LR35902.Address) -> UInt8 {
     return 0x00
   }
 
-  public func write(_ byte: UInt8, to address: LR35902.Address) {
+  func write(_ byte: UInt8, to address: LR35902.Address) {
   }
 
-  public func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
+  func sourceLocation(from address: LR35902.Address) -> Disassembler.SourceLocation {
     return Disassembler.sourceLocation(for: address, in: 0x01)
   }
 }

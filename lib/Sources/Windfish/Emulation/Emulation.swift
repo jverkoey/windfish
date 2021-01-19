@@ -7,7 +7,7 @@ extension LR35902 {
    - Parameter followControlFlow: If enabled, emulation will follow any transfers of control flow. Otherwise, control
    flow changes will be ignored and the instruction will be immediately stepped over.
    */
-  public func emulate(instruction: LR35902.Instruction, memory: AddressableMemory, followControlFlow: Bool = false) {
+  func emulate(instruction: LR35902.Instruction, memory: AddressableMemory, followControlFlow: Bool = false) {
     let registers8 = LR35902.Instruction.Numeric.registers8
     let registers16 = LR35902.Instruction.Numeric.registers16
 

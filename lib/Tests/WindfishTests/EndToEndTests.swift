@@ -1,6 +1,35 @@
 import XCTest
 @testable import Windfish
 
+extension Disassembler {
+  func disassembleAsGameboyCartridge() {
+    // Restart addresses
+    let numberOfRestartAddresses: LR35902.Address = 8
+    let restartSize: LR35902.Address = 8
+    let rstAddresses = (0..<numberOfRestartAddresses).map { ($0 * restartSize)..<($0 * restartSize + restartSize) }
+    rstAddresses.forEach {
+      setLabel(at: $0.lowerBound, in: 0x01, named: "RST_\($0.lowerBound.hexString)")
+      disassemble(range: $0, inBank: 0x01)
+    }
+
+    disassemble(range: 0x0040..<0x0048, inBank: 0x01)
+    disassemble(range: 0x0048..<0x0050, inBank: 0x01)
+    disassemble(range: 0x0050..<0x0058, inBank: 0x01)
+    disassemble(range: 0x0058..<0x0060, inBank: 0x01)
+    disassemble(range: 0x0060..<0x0068, inBank: 0x01)
+    disassemble(range: 0x0100..<0x0104, inBank: 0x01)
+
+    setData(at: 0x0104..<0x0134, in: 0x01)
+    setText(at: 0x0134..<0x0143, in: 0x01)
+    setData(at: 0x0144..<0x0146, in: 0x01)
+    setData(at: 0x0147, in: 0x01)
+    setData(at: 0x014B, in: 0x01)
+    setData(at: 0x014C, in: 0x01)
+    setData(at: 0x014D, in: 0x01)
+    setData(at: 0x014E..<0x0150, in: 0x01)
+  }
+}
+
 class EndToEndTests: XCTestCase {
 
   func testROMExists() {
@@ -42,30 +71,6 @@ class EndToEndTests: XCTestCase {
           pointer[0] = byteValue
         }
       }
-    }
-  }
-
-  func disable_testWallTimePerformance() throws {
-    let path = try XCTUnwrap(Bundle.module.path(forResource: "Resources/2048", ofType: "gb"))
-    let rom = try Data(contentsOf: URL(fileURLWithPath: path))
-
-    // ~0.255
-    measure {
-      let disassembly = Disassembler(data: rom)
-      disassembly.disassembleAsGameboyCartridge()
-      _ = try! disassembly.generateSource()
-    }
-  }
-
-  func disable_testCPUPerformance() throws {
-    let path = try XCTUnwrap(Bundle.module.path(forResource: "Resources/2048", ofType: "gb"))
-    let rom = try Data(contentsOf: URL(fileURLWithPath: path))
-
-    // 1,540,000
-    measure(metrics: [XCTCPUMetric(limitingToCurrentThread: true)]) {
-      let disassembly = Disassembler(data: rom)
-      disassembly.disassembleAsGameboyCartridge()
-      _ = try! disassembly.generateSource()
     }
   }
 
