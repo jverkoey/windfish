@@ -122,43 +122,6 @@ public final class Disassembler {
 
   // MARK: - Regions
 
-  public enum ByteType {
-    case unknown
-    case code
-    case data
-    case jumpTable
-    case text
-    case image1bpp
-    case image2bpp
-    case ram
-  }
-  public func type(of address: LR35902.Address, in bank: Cartridge.Bank) -> ByteType {
-    precondition(bank > 0)
-    guard let cartridgeLocation = Cartridge.location(for: address, in: bank) else {
-      return .ram
-    }
-    let index = Int(cartridgeLocation)
-    if code.contains(index) {
-      return .code
-    } else if jumpTables.contains(index) {
-      return .jumpTable
-    } else if data.contains(index) {
-      switch formatOfData(at: address, in: bank) {
-      case .image1bpp:
-        return .image1bpp
-      case .image2bpp:
-        return .image2bpp
-      case .bytes: fallthrough
-      default:
-        return .data
-      }
-    } else if text.contains(index) {
-      return .text
-    } else {
-      return .unknown
-    }
-  }
-
   public func knownLocations() -> IndexSet {
     return code.union(data).union(text)
   }

@@ -1,15 +1,52 @@
 import Foundation
 
 extension Disassembler {
-  public enum RegionType {
+  enum ByteType {
+    case unknown
+    case code
+    case data
+    case jumpTable
+    case text
+    case image1bpp
+    case image2bpp
+    case ram
+  }
+  /** Returns the type of information at the given location. */
+  func type(of address: LR35902.Address, in bank: Cartridge.Bank) -> ByteType {
+    precondition(bank > 0)
+    guard let cartridgeLocation: Cartridge.Location = Cartridge.location(for: address, in: bank) else {
+      return .ram
+    }
+    let index = Int(truncatingIfNeeded: cartridgeLocation)
+    if code.contains(index) {
+      return .code
+    }
+    if jumpTables.contains(index) {
+      return .jumpTable
+    }
+    if data.contains(index) {
+      switch formatOfData(at: address, in: bank) {
+      case .image1bpp:  return .image1bpp
+      case .image2bpp:  return .image2bpp
+      case .bytes: fallthrough
+      default:          return .data
+      }
+    }
+    if text.contains(index) {
+      return .text
+    }
+    return .unknown
+  }
+
+  public enum RegionCategory {
     case code
     case data
     case text
   }
 
-  /** Registers a region type to a specific range. Will clear any existing regions in the range. */
-  func registerRegion(range: Range<Int>, as type: RegionType) {
-    switch type {
+  /** Registers a range as a specific region category. Will clear any existing regions in the range. */
+  func registerRegion(range: Range<Int>, as category: RegionCategory) {
+    switch category {
     case .code:
       code.insert(integersIn: range)
 
