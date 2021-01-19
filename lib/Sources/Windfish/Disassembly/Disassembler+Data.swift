@@ -5,6 +5,7 @@ extension Disassembler {
     case bytes
     case image1bpp
     case image2bpp
+    case jumpTable
   }
 
   /** Returns the format of the data at the given location, if any is known. */

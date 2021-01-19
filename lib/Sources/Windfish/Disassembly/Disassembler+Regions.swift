@@ -21,15 +21,13 @@ extension Disassembler {
     if code.contains(index) {
       return .code
     }
-    if jumpTables.contains(index) {
-      return .jumpTable
-    }
     if data.contains(index) {
       switch formatOfData(at: address, in: bank) {
       case .image1bpp:  return .image1bpp
       case .image2bpp:  return .image2bpp
-      case .bytes: fallthrough
-      default:          return .data
+      case .jumpTable:  return .jumpTable
+      case .bytes:      return .data
+      case .none:       return .data
       }
     }
     if text.contains(index) {
@@ -93,6 +91,7 @@ extension Disassembler {
   func clearData(in range: Range<Int>) {
     data.remove(integersIn: range)
     dataBlocks.remove(integersIn: range)
+
     for key: DataFormat in dataFormats.keys {
       dataFormats[key]?.remove(integersIn: range)
     }

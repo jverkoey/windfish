@@ -58,6 +58,9 @@ public final class Disassembler {
 
   // MARK: Code
 
+  /** All locations that represent code. */
+  var code = IndexSet()
+
   /** Locations that can transfer control (jp/call) to a specific location. */
   var transfers: [Cartridge.Location: Set<Cartridge.Location>] = [:]
 
@@ -89,9 +92,6 @@ public final class Disassembler {
   /** The format of the data at specific locations. */
   var dataFormats: [DataFormat: IndexSet] = [:]
 
-  /** All locations that represent code. */
-  var code = IndexSet()
-
   // MARK: Text
 
   /** All locations that represent text. */
@@ -99,18 +99,6 @@ public final class Disassembler {
 
   /** The maximum length of a line of text within a given range. */
   var textLengths: [Range<Cartridge.Location>: Int] = [:]
-
-  // MARK: - Data segments
-
-  public func setJumpTable(at range: Range<LR35902.Address>, in bank: Cartridge.Bank) {
-    precondition(bank > 0)
-    let lowerBound = Cartridge.location(for: range.lowerBound, in: bank)!
-    let upperBound = Cartridge.location(for: range.upperBound, in: bank)!
-    jumpTables.insert(integersIn: Int(lowerBound)..<Int(upperBound))
-
-    registerData(at: range, in: bank)
-  }
-  var jumpTables = IndexSet()
 
   public func mapCharacter(_ character: UInt8, to string: String) {
     characterMap[character] = string
@@ -524,8 +512,9 @@ public final class Disassembler {
       guard let self = self else {
         return
       }
-      self.setJumpTable(at: LR35902.Address(truncatingIfNeeded: startAddress)..<LR35902.Address(truncatingIfNeeded: endAddress),
-                        in: max(1, Cartridge.Bank(truncatingIfNeeded: bank)))
+      self.registerData(at: LR35902.Address(truncatingIfNeeded: startAddress)..<LR35902.Address(truncatingIfNeeded: endAddress),
+                        in: max(1, Cartridge.Bank(truncatingIfNeeded: bank)),
+                        format: .jumpTable)
     }
     let registerTransferOfControl: @convention(block) (Int, Int, Int, Int, Int) -> Void = { [weak self] toBank, toAddress, fromBank, fromAddress, opcode in
       guard let self = self else {
