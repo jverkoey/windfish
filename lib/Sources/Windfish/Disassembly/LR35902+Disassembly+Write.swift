@@ -90,7 +90,7 @@ extension Disassembler {
       case preComment(comment: String)
       case label(labelName: String)
       case section(Cartridge.Bank)
-      case transferOfControl(Set<TransferOfControl>, String)
+      case transferOfControl(Set<Cartridge.Location>, String)
       case instruction(LR35902.Instruction, RGBDS.Statement)
       case macroInstruction(LR35902.Instruction, RGBDS.Statement)
       case macro(RGBDS.Statement)
@@ -151,10 +151,10 @@ extension Disassembler {
       case let .transferOfControl(toc, label):
         if detailedComments {
           let sources = toc
-            .sorted(by: { $0.sourceLocation < $1.sourceLocation })
+            .sorted(by: { $0 < $1 })
             .map {
-              let (address, _) = Cartridge.addressAndBank(from: $0.sourceLocation)
-              return "\(LR35902.InstructionSet.opcodeStrings[$0.sourceInstructionSpec]!) @ $\(address.hexString)"
+              let (address, _) = Cartridge.addressAndBank(from: $0)
+              return RGBDS.NumericPrefix.hexadecimal + address.hexString
             }
             .joined(separator: ", ")
           return line("\(label):", comment: "Sources: \(sources)")

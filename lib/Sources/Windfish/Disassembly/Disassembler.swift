@@ -32,34 +32,10 @@ public final class Disassembler {
     return pc < 0x8000 && Cartridge.location(for: pc, in: bank)! < cartridgeSize
   }
 
-  // MARK: - Transfers of control
+  // MARK: - Disassembly metadata
 
-  func transfersOfControl(at pc: LR35902.Address, in bank: Cartridge.Bank) -> Set<TransferOfControl>? {
-    precondition(bank > 0)
-    guard let cartridgeLocation = Cartridge.location(for: pc, in: bank) else {
-      return nil
-    }
-    return transfers[cartridgeLocation]
-  }
-  public func registerTransferOfControl(to pc: LR35902.Address, in bank: Cartridge.Bank, from fromPc: LR35902.Address, in fromBank: Cartridge.Bank, spec: LR35902.Instruction.Spec) {
-    precondition(bank > 0)
-    let index = Cartridge.location(for: pc, in: bank)!
-    let fromLocation = Cartridge.location(for: fromPc, in: fromBank)!
-    let transfer = TransferOfControl(sourceLocation: fromLocation, sourceInstructionSpec: spec)
-    transfers[index, default: Set()].insert(transfer)
-
-    // Create a label if one doesn't exist.
-    if labelTypes[index] == nil
-        // Don't create a label in the middle of an instruction.
-        && (!code.contains(Int(index)) || instruction(at: pc, in: bank) != nil) {
-      labelTypes[index] = .transferOfControlType
-    }
-  }
-  public struct TransferOfControl: Hashable {
-    public let sourceLocation: Cartridge.Location
-    public let sourceInstructionSpec: LR35902.Instruction.Spec
-  }
-  private var transfers: [Cartridge.Location: Set<TransferOfControl>] = [:]
+  /** For a given location, track all of the sources that can transfer control to it. */
+  var transfers: [Cartridge.Location: Set<Cartridge.Location>] = [:]
 
   // MARK: - Instructions
 
@@ -250,7 +226,7 @@ public final class Disassembler {
     }
   }
 
-  private var code = IndexSet()
+  var code = IndexSet()
   private var data = IndexSet()
   private var text = IndexSet()
 

@@ -71,9 +71,9 @@ extension Cartridge {
       return nil
     }
     if pc < 0x4000 {
-      return Location(pc)
+      return Location(truncatingIfNeeded: pc)
     } else {
-      return Location(bank) * Cartridge.bankSize + Location(pc - 0x4000)
+      return Location(truncatingIfNeeded: bank) * Cartridge.bankSize + Location(truncatingIfNeeded: pc - 0x4000)
     }
   }
 
