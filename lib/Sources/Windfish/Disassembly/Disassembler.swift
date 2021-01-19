@@ -3,6 +3,12 @@ import JavaScriptCore
 
 import RGBDS
 
+extension Range where Bound == Int {
+  func asCartridgeLocationRange() -> Range<Cartridge.Location> {
+    return Cartridge.Location(truncatingIfNeeded: lowerBound)..<Cartridge.Location(truncatingIfNeeded: upperBound)
+  }
+}
+
 extension Range where Bound == Cartridge.Location {
   func asIntRange() -> Range<Int> {
     return Int(truncatingIfNeeded: lowerBound)..<Int(truncatingIfNeeded: upperBound)
@@ -81,93 +87,7 @@ public final class Disassembler {
   /** All locations that represent text. */
   var text = IndexSet()
 
-  public enum RegionType {
-    case code
-    case data
-    case text
-  }
-  func registerRegion(range: Range<Int>, as type: RegionType) {
-    switch type {
-    case .code:
-      code.insert(integersIn: range)
-
-      clearData(in: range)
-      clearText(in: range)
-
-    case .data:
-      data.insert(integersIn: range)
-      if range.count > 1 {
-        dataBlocks.insert(integersIn: range.lowerBound + 1..<range.upperBound)
-      }
-
-      clearCode(in: range)
-      clearText(in: range)
-
-    case .text:
-      text.insert(integersIn: range)
-
-      clearCode(in: range)
-      clearData(in: range)
-    }
-  }
-
   // MARK: - Data segments
-
-  func clearText(in range: Range<Int>) {
-    text.remove(integersIn: range)
-  }
-
-  func clearData(in range: Range<Int>) {
-    data.remove(integersIn: range)
-    dataBlocks.remove(integersIn: range)
-    for key in dataFormats.keys {
-      dataFormats[key]?.remove(integersIn: range)
-    }
-  }
-
-  func deleteInstruction(at location: Cartridge.Location) {
-    guard let instruction = instructionMap[location] else {
-      return
-    }
-    instructionMap[location] = nil
-
-    let start: Int = Int(truncatingIfNeeded: location)
-    let width: Int = Int(truncatingIfNeeded: LR35902.InstructionSet.widths[instruction.spec]!.total)
-    clearCode(in: start..<(start + width))
-  }
-
-  func clearCode(in range: Range<Int>) {
-    code.remove(integersIn: range)
-
-    // Remove any labels, instructions, and transfers of control in this range.
-    for index in range.dropFirst() {
-      let location = Cartridge.Location(index)
-      deleteInstruction(at: location)
-      labels[location] = nil
-      labelTypes[location] = nil
-      transfers[location] = nil
-    }
-
-    let cartRange: Range<Cartridge.Location> =
-      Cartridge.Location(truncatingIfNeeded: range.lowerBound)..<Cartridge.Location(truncatingIfNeeded: range.upperBound)
-    let addressAndBank = Cartridge.addressAndBank(from: Cartridge.Location(truncatingIfNeeded: range.lowerBound))
-    // For any existing scope that intersects this range:
-    // 1. Shorten it if it begins before the range.
-    // 2. Delete it if it begins within the range.
-    if let overlappingScopes = contiguousScopes[addressAndBank.bank] {
-      var mutatedScopes = overlappingScopes
-      for scope in overlappingScopes {
-        guard scope.overlaps(cartRange) else {
-          continue
-        }
-        mutatedScopes.remove(scope)
-        if scope.lowerBound < cartRange.lowerBound {
-          mutatedScopes.insert(scope.lowerBound..<cartRange.lowerBound)
-        }
-      }
-      contiguousScopes[addressAndBank.bank] = mutatedScopes
-    }
-  }
 
   public func setJumpTable(at range: Range<LR35902.Address>, in bank: Cartridge.Bank) {
     precondition(bank > 0)
