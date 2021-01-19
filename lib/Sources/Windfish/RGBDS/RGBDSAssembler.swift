@@ -4,12 +4,21 @@ import CPU
 import FoundationExtensions
 import RGBDS
 
-/** Turns RGBDS assembly code into LR35902 instructions. */
+/**
+ Turns RGBDS assembly code into LR35902 instructions.
+
+ This is a simplified parser for RGBDS syntax. It does not support all RGBDS features because the only purpose of this
+ assembler is to support Windfish's macroing system, which only requires the ability to describe a list of instructions.
+ Mathematical expressions and other additional features of that kind are intentionally not implemented.
+ */
 final class RGBDSAssembler {
 
   /** An error that occurred during parsing of RGBDS assembly. */
   struct Error: Swift.Error, Equatable {
+    /** The line number on which the error occurred. Uses 1-based indexing. */
     let lineNumber: Int
+
+    /** A description of the error that occurred. */
     let message: String
   }
 
@@ -18,10 +27,10 @@ final class RGBDSAssembler {
 
    If any portion of the assembly fails, then errors will also be returned.
    */
-  static func assemble(assembly: String) -> (instructions: [LR35902.Instruction], errors: [Error]) {
-    var lineNumber = 1
-    var instructions: [LR35902.Instruction] = []
-    var errors: [Error] = []
+  static func assemble(assembly: String) -> (instructions: ContiguousArray<LR35902.Instruction>, errors: ContiguousArray<Error>) {
+    var lineNumber: Int = 1
+    var instructions = ContiguousArray<LR35902.Instruction>()
+    var errors = ContiguousArray<Error>()
 
     assembly.enumerateLines { (line, stop) in
       defer {

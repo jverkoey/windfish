@@ -1,7 +1,7 @@
 import XCTest
 @testable import Windfish
 
-class RGBDAssembler: XCTestCase {
+class RGBDSAssemblerTests: XCTestCase {
   func test_nop_failsWithExtraOperand() throws {
     let results = RGBDSAssembler.assemble(assembly: """
 nop nop

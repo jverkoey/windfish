@@ -537,11 +537,11 @@ clean:
               }
               lines.append(Line(semantic: .macroDefinition(macro.macro.name)))
               lines.append(contentsOf: zip(macro.macro.macroLines, instructions).map { line, instruction in
-                var macroInstruction = instruction.0
+                let macroInstruction = instruction.0
 
                 let argumentString: String?
                 switch line {
-                case let .arg(spec, argumentOrNil, argumentText):
+                case let .arg(_, argumentOrNil, argumentText):
                   if let argumentText = argumentText {
                     argumentString = argumentText
                   } else if let argument = argumentOrNil {
@@ -549,8 +549,7 @@ clean:
                   } else {
                     argumentString = nil
                   }
-                  macroInstruction.spec = spec
-                case let .any(specs, argument: argumentOrNil, argumentText: argumentText):
+                case let .any(_, argument: argumentOrNil, argumentText: argumentText):
                   if let argumentText = argumentText {
                     argumentString = argumentText
                   } else if let argument = argumentOrNil {
@@ -558,9 +557,7 @@ clean:
                   } else {
                     argumentString = nil
                   }
-                  macroInstruction.spec = specs.first!
-                case let .instruction(instruction):
-                  macroInstruction.spec = instruction.spec
+                case .instruction:
                   argumentString = nil
                 }
 

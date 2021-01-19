@@ -9,7 +9,7 @@ extension LR35902 {
       self.immediate = immediate
     }
 
-    public var spec: Spec
+    public let spec: Spec
     public let immediate: ImmediateValue?
 
     public enum ImmediateValue: CPU.InstructionImmediate {
