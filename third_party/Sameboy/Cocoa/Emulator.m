@@ -272,7 +272,7 @@ static uint32_t rgbEncode(GB_gameboy_t *gb, uint8_t r, uint8_t g, uint8_t b)
 - (bool)debuggerEvaluate:(NSString *)string
                   result:(uint16_t *)result
               resultBank:(uint16_t *)result_bank {
-    GB_debugger_evaluate(&_gb, string.UTF8String, result, result_bank);
+    return GB_debugger_evaluate(&_gb, string.UTF8String, result, result_bank);
 }
 
 - (void)setDebuggerEnabled:(BOOL)debuggerEnabled {
