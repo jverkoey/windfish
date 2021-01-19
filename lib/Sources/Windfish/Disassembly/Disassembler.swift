@@ -77,6 +77,9 @@ public final class Disassembler {
    */
   var labelTypes: [Cartridge.Location: LabelType] = [:]
 
+  /** Bank changes that occur at a specific location. */
+  var bankChanges: [Cartridge.Location: Cartridge.Bank] = [:]
+
   // MARK: Data
 
   /** All locations that represent data. */
@@ -100,23 +103,8 @@ public final class Disassembler {
   /** The maximum length of a line of text within a given range. */
   var textLengths: [Range<Cartridge.Location>: Int] = [:]
 
-  public func mapCharacter(_ character: UInt8, to string: String) {
-    characterMap[character] = string
-  }
+  /** Character codes mapped to strings. */
   var characterMap: [UInt8: String] = [:]
-
-  // MARK: - Bank changes
-
-  func bankChange(at pc: LR35902.Address, in bank: Cartridge.Bank) -> Cartridge.Bank? {
-    precondition(bank > 0)
-    return bankChanges[Cartridge.location(for: pc, in: bank)!]
-  }
-
-  public func register(bankChange: Cartridge.Bank, at pc: LR35902.Address, in bank: Cartridge.Bank) {
-    precondition(bank > 0)
-    bankChanges[Cartridge.location(for: pc, in: bank)!] = bankChange
-  }
-  private var bankChanges: [Cartridge.Location: Cartridge.Bank] = [:]
 
   // MARK: - Regions
 
@@ -539,8 +527,8 @@ public final class Disassembler {
         return
       }
       let desiredBank = Cartridge.Bank(truncatingIfNeeded: _desiredBank)
-      self.register(
-        bankChange: max(1, desiredBank),
+      self.registerBankChange(
+        to: max(1, desiredBank),
         at: LR35902.Address(truncatingIfNeeded: address),
         in: max(1, Cartridge.Bank(truncatingIfNeeded: bank))
       )
@@ -628,8 +616,8 @@ public final class Disassembler {
           return
         }
         let desiredBank = Cartridge.Bank(truncatingIfNeeded: _desiredBank)
-        self.register(
-          bankChange: max(1, desiredBank),
+        self.registerBankChange(
+          to: max(1, desiredBank),
           at: LR35902.Address(truncatingIfNeeded: address),
           in: max(1, Cartridge.Bank(truncatingIfNeeded: bank))
         )
@@ -698,7 +686,7 @@ public final class Disassembler {
             guard case let .imm8(previousImmediate) = previousInstruction.immediate else {
               preconditionFailure("Invalid immediate associated with instruction")
             }
-            register(bankChange: previousImmediate, at: instructionContext.pc, in: instructionContext.bank)
+            self.registerBankChange(to: previousImmediate, at: instructionContext.pc, in: instructionContext.bank)
 
             runContext.bank = previousImmediate
           }
@@ -707,7 +695,7 @@ public final class Disassembler {
              case let .imm16(previousImmediate) = previousInstruction?.immediate,
              case let .imm8(immediate) = instruction.immediate,
              (0x2000..<0x4000).contains(previousImmediate) {
-            register(bankChange: immediate, at: instructionContext.pc, in: instructionContext.bank)
+            self.registerBankChange(to: immediate, at: instructionContext.pc, in: instructionContext.bank)
             runContext.bank = immediate
           }
 

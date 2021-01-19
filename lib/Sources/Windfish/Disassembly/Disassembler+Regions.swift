@@ -110,9 +110,10 @@ extension Disassembler {
     for intLocation: Int in range.dropFirst() {
       let location = Cartridge.Location(intLocation)
       deleteInstruction(at: location)
+      transfers[location] = nil
       labelNames[location] = nil
       labelTypes[location] = nil
-      transfers[location] = nil
+      bankChanges[location] = nil
     }
 
     let cartRange: Range<Cartridge.Location> = range.asCartridgeLocationRange()
