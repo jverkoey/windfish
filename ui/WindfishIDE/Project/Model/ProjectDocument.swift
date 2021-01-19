@@ -337,9 +337,9 @@ extension ProjectDocument {
           let name = definitionParts[0].trimmed()
           let valueText = definitionParts[1].trimmed()
           let value: UInt8
-          if valueText.starts(with: RGBDS.NumericPrefix.hexadecimal.rawValue) {
+          if valueText.starts(with: RGBDS.NumericPrefix.hexadecimal) {
             value = UInt8(valueText.dropFirst(), radix: 16)!
-          } else if valueText.starts(with: RGBDS.NumericPrefix.binary.rawValue) {
+          } else if valueText.starts(with: RGBDS.NumericPrefix.binary) {
             value = UInt8(valueText.dropFirst(), radix: 2)!
           } else {
             value = UInt8(valueText)!
@@ -446,9 +446,9 @@ extension ProjectDocument {
                                               + dataType.mappings.map { (mapping: DataType.Mapping) -> String in
                                                 switch dataType.representation {
                                                 case DataType.Representation.binary:
-                                                  return "\(mapping.name) EQU \(RGBDS.NumericPrefix.binary.rawValue)\(mapping.value.binaryString)"
+                                                  return "\(mapping.name) EQU \(RGBDS.NumericPrefix.binary)\(mapping.value.binaryString)"
                                                 case DataType.Representation.hexadecimal:
-                                                  return "\(mapping.name) EQU \(RGBDS.NumericPrefix.hexadecimal.rawValue)\(mapping.value.hexString)"
+                                                  return "\(mapping.name) EQU \(RGBDS.NumericPrefix.hexadecimal)\(mapping.value.hexString)"
                                                 case DataType.Representation.decimal:
                                                   return "\(mapping.name) EQU \(mapping.value)"
                                                 default:

@@ -107,7 +107,7 @@ extension RGBDSDisassembler {
     case let address as LR35902.Instruction.RestartAddress:
       // Restart addresses use an x prefix because dollar signs can't be represented in Swift enum case names, but the
       // addresses are technically hexadecimal.
-      return ["\(address)".replacingOccurrences(of: "x", with: RGBDS.NumericPrefix.hexadecimal.rawValue)]
+      return ["\(address)".replacingOccurrences(of: "x", with: RGBDS.NumericPrefix.hexadecimal)]
 
     case let tuple as (LR35902.Instruction.Condition?, LR35902.Instruction.Numeric):
       let numericOperand = operand(for: instruction, operand: tuple.1, with: context)

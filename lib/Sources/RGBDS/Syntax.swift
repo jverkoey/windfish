@@ -5,12 +5,23 @@ import Foundation
 
  Defined at https://rgbds.gbdev.io/docs/v0.4.2/rgbasm.5#Numeric_Formats
  */
-public enum NumericPrefix: String {
-  case hexadecimal = "$"
-  case octal = "&"
-  case binary = "%"
-  case placeholder = "#"
-  case gameboyGraphics = "`"
+public struct NumericPrefix {
+  public static let hexadecimal: String = "$"
+  public static let octal: String = "&"
+  public static let binary: String = "%"
+  public static let placeholder: String = "#"
+  public static let gameboyGraphics: String = "`"
+}
+
+public struct Symbol {
+  /** The quote character used in RGBDS assembly. */
+  public static let quoteCharacter = "\""
+
+  /** The opcode used for representing data in RGBDS assembly. */
+  public static let dataOpcode = "db"
+
+  /** In mathematical expressions, represents the current program counter. */
+  public static let pc = "@"
 }
 
 /** Returns the given immediate as a decimal representation in RGBDS assembly. */
@@ -20,21 +31,15 @@ public func asDecimalString<T: FixedWidthInteger>(_ imm: T) -> String {
 
 /** Returns the given immediate as a binary representation in RGBDS assembly. */
 public func asBinaryString<T: FixedWidthInteger>(_ imm: T) -> String {
-  return NumericPrefix.binary.rawValue + imm.binaryString
+  return NumericPrefix.binary + imm.binaryString
 }
 
 /** Returns the given immediate as a hexadecimal representation in RGBDS assembly. */
 public func asHexString<T: FixedWidthInteger>(_ imm: T) -> String {
-  return NumericPrefix.hexadecimal.rawValue + imm.hexString
+  return NumericPrefix.hexadecimal + imm.hexString
 }
 
 /** Returns the given immediate as a hexadecimal address representation in RGBDS assembly. */
 public func asHexAddressString<T: FixedWidthInteger>(_ imm: T) -> String {
   return "[" + asHexString(imm) + "]"
 }
-
-/** The quote character used in RGBDS assembly. */
-let quoteCharacter = "\""
-
-/** The opcode used for representing data in RGBDS assembly. */
-let dataOpcode = "db"

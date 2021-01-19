@@ -85,11 +85,11 @@ public protocol InstructionOperandTokenizable {
  */
 private func isNumber(_ string: String) -> Bool {
   return
-    string.hasPrefix(NumericPrefix.hexadecimal.rawValue)
-    || string.hasPrefix(NumericPrefix.octal.rawValue)
-    || string.hasPrefix(NumericPrefix.binary.rawValue)
-    || string.hasPrefix(NumericPrefix.placeholder.rawValue)
-    || string.hasPrefix(NumericPrefix.gameboyGraphics.rawValue)
+    string.hasPrefix(NumericPrefix.hexadecimal)
+    || string.hasPrefix(NumericPrefix.octal)
+    || string.hasPrefix(NumericPrefix.binary)
+    || string.hasPrefix(NumericPrefix.placeholder)
+    || string.hasPrefix(NumericPrefix.gameboyGraphics)
     || (string.hasPrefix("-") && isNumber(String(string.dropFirst())))
     || Int(string) != nil
     || (string.contains(".") && Float(string) != nil)
@@ -125,13 +125,13 @@ public func integer(from string: String) -> UInt16? {
 
   var numericPart: String
   var radix: Int
-  if value.starts(with: NumericPrefix.hexadecimal.rawValue) {
+  if value.starts(with: NumericPrefix.hexadecimal) {
     numericPart = String(value.dropFirst())
     radix = 16
-  } else if value.starts(with: NumericPrefix.octal.rawValue) {
+  } else if value.starts(with: NumericPrefix.octal) {
     numericPart = String(value.dropFirst())
     radix = 8
-  } else if value.starts(with: NumericPrefix.binary.rawValue) {
+  } else if value.starts(with: NumericPrefix.binary) {
     numericPart = String(value.dropFirst())
     radix = 2
   } else {
@@ -167,13 +167,13 @@ public func integer(from string: String) -> UInt8? {
 
   var numericPart: String
   var radix: Int
-  if value.starts(with: NumericPrefix.hexadecimal.rawValue) {
+  if value.starts(with: NumericPrefix.hexadecimal) {
     numericPart = String(value.dropFirst())
     radix = 16
-  } else if value.starts(with: NumericPrefix.octal.rawValue) {
+  } else if value.starts(with: NumericPrefix.octal) {
     numericPart = String(value.dropFirst())
     radix = 8
-  } else if value.starts(with: NumericPrefix.binary.rawValue) {
+  } else if value.starts(with: NumericPrefix.binary) {
     numericPart = String(value.dropFirst())
     radix = 2
   } else {

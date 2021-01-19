@@ -5,7 +5,7 @@ import FoundationExtensions
 public let maxOpcodeNameLength = 4
 
 /** A concrete representation of a single executable statement of RGBDS assembly. */
-public struct Statement {
+public final class Statement {
   // BEGIN ORDER MATTERS DUE TO MIRROR DESCENDANT ASSUMPTIONS
   /** The statement's instruction code. */
   public let opcode: String
@@ -15,13 +15,17 @@ public struct Statement {
   // END ORDER MATTERS DUE TO MIRROR DESCENDANT ASSUMPTIONS
 
   /** A concise, formatted RGBDS assembly string representation of this statement. */
-  public let formattedString: String
+  public private(set) lazy var formattedString: String = {
+    Statement.createFormattedString(opcode: opcode, formattedOpcode: formattedOpcode, operands: operands)
+  }()
 
   /** The statement's instruction code padded for presentation. */
   public let formattedOpcode: String
 
   /** A tokenized representation of this statement that can be used for generalized lookups. */
-  public let tokenizedString: String
+  public private(set) lazy var tokenizedString: String = {
+    Statement.createTokenizedString(opcode: opcode, operands: operands)
+  }()
 
   /** Optional context that may be associated with this statement, typically an instruction specification.*/
   public var context: Any?
@@ -42,12 +46,12 @@ public struct Statement {
   }
 
   /** Initializes the statement as a data representation of the given bytes. */
-  public init(representingBytes bytes: [UInt8]) {
+  public convenience init(representingBytes bytes: [UInt8]) {
     self.init(opcode: "db", operands: bytes.map { "$\($0.hexString)" })
   }
 
   /** Initializes the statement as a data representation using a named constant. */
-  public init(representingBytesWithConstant constant: String) {
+  public convenience init(representingBytesWithConstant constant: String) {
     self.init(opcode: "db", operands: [constant])
   }
 
@@ -57,11 +61,10 @@ public struct Statement {
     let opcodeAndOperands = codeAndComments[0].trimmed().split(separator: " ", maxSplits: 1, omittingEmptySubsequences: false)
 
     let opcode = opcodeAndOperands[0].trimmed().lowercased()
-    if opcode.count > 0 {
-      self.opcode = opcode
-    } else {
+    guard !opcode.isEmpty else {
       return nil
     }
+    self.opcode = opcode
     let formattedOpcode: String
     if opcode.count < maxOpcodeNameLength {
       formattedOpcode = opcode.padding(toLength: maxOpcodeNameLength, withPad: " ", startingAt: 0)
@@ -71,7 +74,7 @@ public struct Statement {
     self.formattedOpcode = formattedOpcode
 
     if opcodeAndOperands.count > 1 {
-      let quote = "\""
+      let quote: String = "\""
       self.operands = opcodeAndOperands[1].components(separatedBy: ",").map {
         // Only strip non-quoted whitespace from the operand.
         $0.components(separatedBy: quote)
@@ -82,8 +85,6 @@ public struct Statement {
     } else {
       self.operands = []
     }
-    self.tokenizedString = Statement.createTokenizedString(opcode: opcode, operands: operands)
-    self.formattedString = Statement.createFormattedString(opcode: opcode, formattedOpcode: formattedOpcode, operands: operands)
   }
 }
 

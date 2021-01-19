@@ -1,4 +1,5 @@
 import XCTest
+
 @testable import Windfish
 
 class RGBDSAssemblerTests: XCTestCase {
