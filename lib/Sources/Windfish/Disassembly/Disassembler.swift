@@ -149,17 +149,6 @@ public final class Disassembler {
     }
   }
 
-  func formatOfData(at address: LR35902.Address, in bank: Cartridge.Bank) -> DataFormat? {
-    precondition(bank > 0)
-    guard let location = Cartridge.location(for: address, in: bank) else {
-      return nil
-    }
-    let intLocation = Int(truncatingIfNeeded: location)
-    return dataFormats.first { (key: DataFormat, value: IndexSet) -> Bool in
-      value.contains(intLocation)
-    }?.key
-  }
-
   public func setJumpTable(at range: Range<LR35902.Address>, in bank: Cartridge.Bank) {
     precondition(bank > 0)
     let lowerBound = Cartridge.location(for: range.lowerBound, in: bank)!

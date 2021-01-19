@@ -7,8 +7,20 @@ extension Disassembler {
     case image2bpp
   }
 
+  /** Returns the format of the data at the given location, if any is known. */
+  func formatOfData(at address: LR35902.Address, in bank: Cartridge.Bank) -> DataFormat? {
+    precondition(bank > 0)
+    guard let location = Cartridge.location(for: address, in: bank) else {
+      return nil
+    }
+    let intLocation = Int(truncatingIfNeeded: location)
+    return dataFormats.first { (key: DataFormat, value: IndexSet) -> Bool in
+      value.contains(intLocation)
+    }?.key
+  }
+
   /** Registers that a specific location contains data. */
-  public func registerData(at address: LR35902.Address, in bank: Cartridge.Bank) {
+  func registerData(at address: LR35902.Address, in bank: Cartridge.Bank) {
     precondition(bank > 0)
     registerData(at: address..<(address+1), in: bank)
   }
