@@ -50,16 +50,35 @@ public final class Disassembler {
 
   // MARK: - Disassembly metadata
 
+  // MARK: Code
+
   /** Locations that can transfer control (jp/call) to a specific location. */
   var transfers: [Cartridge.Location: Set<Cartridge.Location>] = [:]
 
   /** Which instruction exists at a specific location. */
   var instructionMap: [Cartridge.Location: LR35902.Instruction] = [:]
 
-  var dataFormats: [DataFormat: IndexSet] = [:]
-  var code = IndexSet()
+  // MARK: Data
+
+  /** All locations that represent data. */
   var data = IndexSet()
+
+  /**
+   We never want to show labels in the middle of a contiguous block of data, so when registering data regions we remove
+   the first byte of the data region and then register that range to this index set. When determining whether a label
+   can be shown at a given location we consult this "swiss cheese" index set rather than the data index set.
+   */
   var dataBlocks = IndexSet()
+
+  /** The format of the data at specific locations. */
+  var dataFormats: [DataFormat: IndexSet] = [:]
+
+  /** All locations that represent code. */
+  var code = IndexSet()
+
+  // MARK: Text
+
+  /** All locations that represent text. */
   var text = IndexSet()
 
   public enum RegionType {
@@ -120,12 +139,13 @@ public final class Disassembler {
   func clearCode(in range: Range<Int>) {
     code.remove(integersIn: range)
 
-    // Remove any labels and instructions in this range.
+    // Remove any labels, instructions, and transfers of control in this range.
     for index in range.dropFirst() {
       let location = Cartridge.Location(index)
       deleteInstruction(at: location)
       labels[location] = nil
       labelTypes[location] = nil
+      transfers[location] = nil
     }
 
     let cartRange: Range<Cartridge.Location> =
