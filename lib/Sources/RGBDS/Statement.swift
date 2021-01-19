@@ -42,7 +42,8 @@ public final class Statement {
     }
     self.formattedOpcode = formattedOpcode
     self.tokenizedString = Statement.createTokenizedString(opcode: opcode, operands: operands)
-    self.formattedString = Statement.createFormattedString(opcode: opcode, formattedOpcode: formattedOpcode, operands: operands)
+    self.formattedString = Statement.createFormattedString(opcode: opcode, formattedOpcode: formattedOpcode,
+                                                           operands: operands)
   }
 
   /** Initializes the statement as a data representation of the given bytes. */
@@ -58,7 +59,8 @@ public final class Statement {
   /** Extracts a statement from the given line, if a statement exists. */
   public init?(fromLine line: String) {
     let codeAndComments = line.split(separator: ";", maxSplits: 1, omittingEmptySubsequences: false)
-    let opcodeAndOperands = codeAndComments[0].trimmed().split(separator: " ", maxSplits: 1, omittingEmptySubsequences: false)
+    let opcodeAndOperands = codeAndComments[0].trimmed().split(separator: " ", maxSplits: 1,
+                                                               omittingEmptySubsequences: false)
 
     let opcode = opcodeAndOperands[0].trimmed().lowercased()
     guard !opcode.isEmpty else {

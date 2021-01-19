@@ -23,13 +23,17 @@ extension Statement {
         continue
       }
       if !buffer.isEmpty {
-        operands.append(Symbol.quoteCharacter + asciiString(for: buffer, characterMap: characterMap) + Symbol.quoteCharacter)
+        operands.append(Symbol.quoteCharacter
+                          + asciiString(for: buffer, characterMap: characterMap)
+                          + Symbol.quoteCharacter)
         buffer.removeAll(keepingCapacity: true)
       }
       operands.append(RGBDS.asHexString(byte))
     }
     if !buffer.isEmpty {
-      operands.append(Symbol.quoteCharacter + asciiString(for: buffer, characterMap: characterMap) + Symbol.quoteCharacter)
+      operands.append(Symbol.quoteCharacter
+                        + asciiString(for: buffer, characterMap: characterMap)
+                        + Symbol.quoteCharacter)
     }
     self.init(opcode: Symbol.dataOpcode, operands: operands)
   }

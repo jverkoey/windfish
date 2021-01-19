@@ -9,8 +9,10 @@ extension Disassembler {
     let initialBank: Cartridge.Bank
 
     // TODO: Accept a Cartridge.Location here instead.
-    init(from startAddress: LR35902.Address, initialBank _initialBank: Cartridge.Bank, upTo endAddress: LR35902.Address? = nil) {
-      let initialBank = _initialBank == 0 ? 1 : _initialBank
+    init(from startAddress: LR35902.Address,
+         initialBank unsafeInitialBank: Cartridge.Bank,
+         upTo endAddress: LR35902.Address? = nil) {
+      let initialBank = unsafeInitialBank == 0 ? 1 : unsafeInitialBank
       self.startAddress = Cartridge.location(for: startAddress, inHumanProvided: initialBank)!
       if let endAddress = endAddress, endAddress > 0 {
         self.endAddress = Cartridge.location(for: endAddress - 1, inHumanProvided: initialBank)!

@@ -72,7 +72,7 @@ extension LR35902.InstructionSet {
   private static func computeAllTokenStrings() -> [SpecType: String] {
     return allSpecs().reduce(into: [:]) { accumulator, spec in
       var operands: [String] = []
-      try! spec.visit { operand, _ in
+      try? spec.visit { operand, _ in
         guard let operand = operand else {
           return
         }

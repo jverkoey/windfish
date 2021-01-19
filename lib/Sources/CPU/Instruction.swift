@@ -104,7 +104,7 @@ extension InstructionSpec {
   /** Computes the operand width by adding up the width of any immediate operands. */
   public var operandWidth: WidthType {
     var width: WidthType = 0
-    try! visit { operand, _ in
+    try? visit { operand, _ in
       if let numeric = operand?.value as? InstructionOperandWithBinaryFootprint {
         width += WidthType(numeric.width)
       }

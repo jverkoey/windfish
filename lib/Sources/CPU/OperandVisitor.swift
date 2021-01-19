@@ -35,6 +35,7 @@ extension InstructionSpec {
     }
     var index = 0
     for child in children {
+      // swiftlint:disable syntactic_sugar
       // Any isn't nullable, even though it might represent a null value (e.g. a .jr(nil, .imm8) spec with an
       // optional first argument), so we need to use Optional<Any>.none to represent an optional argument in this case.
       if case Optional<Any>.none = child.value {
@@ -45,6 +46,7 @@ extension InstructionSpec {
       guard case Optional<Any>.some(let value) = child.value else {
         return
       }
+      // swiftlint:enable syntactic_sugar
 
       try visitor((value: value, index: index), &shouldStop)
       if shouldStop {

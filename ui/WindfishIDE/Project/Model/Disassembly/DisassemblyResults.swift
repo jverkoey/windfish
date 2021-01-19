@@ -4,8 +4,8 @@ import Windfish
 
 final class DisassemblyResults: NSObject {
   internal init(
-    files: [String : Data],
-    bankLines: [Cartridge.Bank : [Disassembler.Line]]? = nil,
+    files: [String: Data],
+    bankLines: [Cartridge.Bank: [Disassembler.Line]]? = nil,
     bankTextStorage: [Cartridge.Bank: NSAttributedString]? = nil,
     regions: [Region]? = nil,
     regionLookup: [String: Region]? = nil,
@@ -21,8 +21,8 @@ final class DisassemblyResults: NSObject {
     self.disassembly = disassembly
   }
 
-  func lineFor(address: LR35902.Address, bank _bank: Cartridge.Bank) -> Int? {
-    let bank = (address < 0x4000) ? 0 : _bank
+  func lineFor(address: LR35902.Address, bank unsafeBank: Cartridge.Bank) -> Int? {
+    let bank = (address < 0x4000) ? 0 : unsafeBank
     guard let bankLines = bankLines?[bank] else {
       return nil
     }
@@ -46,7 +46,8 @@ final class DisassemblyResults: NSObject {
     guard let foundLineIndex = lineIndex else {
       return nil
     }
-    if let lineAddress = bankLines[foundLineIndex].address, lineAddress > address, let previousLineIndex = previousLineIndex {
+    if let lineAddress = bankLines[foundLineIndex].address, lineAddress > address,
+       let previousLineIndex = previousLineIndex {
       // In between lines, so return the previous line.
       return previousLineIndex
     }
