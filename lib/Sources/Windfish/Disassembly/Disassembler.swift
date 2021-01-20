@@ -134,12 +134,6 @@ public final class Disassembler {
   /** Character codes mapped to strings. */
   var characterMap: [UInt8: String] = [:]
 
-  // MARK: - Regions
-
-  public func knownLocations() -> IndexSet {
-    return code.union(data).union(text)
-  }
-
   func effectiveBank(at pc: LR35902.Address, in bank: Cartridge.Bank) -> Cartridge.Bank {
     if pc < 0x4000 {
       return 1
@@ -147,31 +141,26 @@ public final class Disassembler {
     return bank
   }
 
-  private struct DisassemblyIntent: Hashable {
-    let bank: Cartridge.Bank
-    let address: LR35902.Address
-  }
-
-  static func fetchInstructionSpec(pc: inout LR35902.Address, memory: AddressableMemory) -> LR35902.Instruction.Spec {
+  static func disassembleInstructionSpec(at pc: inout LR35902.Address, memory: AddressableMemory) -> LR35902.Instruction.Spec {
     // Fetch
     let instructionByte = memory.read(from: pc)
     pc += 1
 
     // Decode
-    let spec = LR35902.InstructionSet.table[Int(instructionByte)]
+    let spec = LR35902.InstructionSet.table[Int(truncatingIfNeeded: instructionByte)]
     if let prefixTable = LR35902.InstructionSet.prefixTables[spec] {
       // Fetch
       let cbInstructionByte = memory.read(from: pc)
       pc += 1
 
       // Decode
-      return prefixTable[Int(cbInstructionByte)]
+      return prefixTable[Int(truncatingIfNeeded: cbInstructionByte)]
     }
     return spec
   }
 
-  static func fetchInstruction(at address: inout LR35902.Address, memory: AddressableMemory) -> LR35902.Instruction {
-    let spec = fetchInstructionSpec(pc: &address, memory: memory)
+  static func disassembleInstruction(at address: inout LR35902.Address, memory: AddressableMemory) -> LR35902.Instruction {
+    let spec = disassembleInstructionSpec(at: &address, memory: memory)
 
     guard let instructionWidth = LR35902.InstructionSet.widths[spec] else {
       preconditionFailure("\(spec) is missing its width, implying a misconfiguration of the instruction set."
@@ -375,7 +364,7 @@ public final class Disassembler {
         // Don't commit the fetch to the context pc yet in case the instruction was invalid.
         var instructionPc = runContext.pc
         memory.selectedBank = runContext.bank
-        let instruction = Disassembler.fetchInstruction(at: &instructionPc, memory: memory)
+        let instruction = Disassembler.disassembleInstruction(at: &instructionPc, memory: memory)
 
         // STOP must be followed by 0
         if case .stop = instruction.spec, case let .imm8(immediate) = instruction.immediate, immediate != 0 {

@@ -819,7 +819,7 @@ clean:
 
     sources["game.asm"] = .game(content: gameAsm)
 
-    let disassembledLocations = knownLocations()
+    let disassembledLocations = self.disassembledLocations()
     let bankPercents: [Cartridge.Bank: Double] = (0..<numberOfBanks).reduce(into: [:]) { accumulator, bank in
       let disassembledBankLocations = disassembledLocations.intersection(
         IndexSet(integersIn: (Int(bank) * Int(Cartridge.bankSize))..<(Int(bank + 1) * Int(Cartridge.bankSize)))

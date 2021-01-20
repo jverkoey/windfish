@@ -11,6 +11,12 @@ extension Disassembler {
     case image2bpp
     case ram
   }
+
+  /** Returns all disassembled locations. */
+  func disassembledLocations() -> IndexSet {
+    return code.union(data).union(text)
+  }
+
   /** Returns the type of information at the given location. */
   func type(of address: LR35902.Address, in bank: Cartridge.Bank) -> ByteType {
     precondition(bank > 0)
