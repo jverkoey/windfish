@@ -1027,7 +1027,7 @@ JumpTable_4D1E_03:
     ret
 
 
-else_03_4D51:
+toc_03_4D51:
     ifNe [$FFEB], $1F, else_03_4D66
 
 toc_03_4D57:

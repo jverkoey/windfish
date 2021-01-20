@@ -37,7 +37,7 @@ class TypeInferenceTests: XCTestCase {
       0b0000_0000: "STATF_HB"
     ])
     disassembly.registerGlobal(at: 0xff41, named: "gbSTAT", dataType: "STATF")
-    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
+    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     let (source, _) = try! disassembly.generateSource()
     let bank00Source = source.sources["bank_00.asm"]
@@ -79,7 +79,7 @@ ld   a, [#1]
 and  a
 jr   z, #2
 """)
-    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
+    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     let tree = Disassembler.MacroNode(
       children: [
@@ -164,7 +164,7 @@ inc  [hl]
 ld hl, #1
 inc [hl]
 """)
-    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
+    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(disassembly.macroTree, Disassembler.MacroNode(
       children: [
@@ -211,7 +211,7 @@ nop
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
 
     let disassembly = Disassembler(data: data)
-    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
+    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     let (source, _) = try! disassembly.generateSource()
     let bank00Source = source.sources["bank_00.asm"]
@@ -234,7 +234,7 @@ ld [$abcd], a
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
 
     let disassembly = Disassembler(data: data)
-    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
+    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     let (source, _) = try! disassembly.generateSource()
     let bank00Source = source.sources["bank_00.asm"]
@@ -258,7 +258,7 @@ jr @-$01
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
 
     let disassembly = Disassembler(data: data)
-    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
+    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     let (source, _) = try! disassembly.generateSource()
     let bank00Source = source.sources["bank_00.asm"]
@@ -294,7 +294,7 @@ call #1
 """, validArgumentValues: [
   1: IndexSet(integersIn: 0x4000..<0x8000)
 ])
-    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
+    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(disassembly.macroTree, Disassembler.MacroNode(
       children: [

@@ -8,16 +8,17 @@ extension Disassembler {
     let restartSize: LR35902.Address = 8
     let rstAddresses = (0..<numberOfRestartAddresses).map { ($0 * restartSize)..<($0 * restartSize + restartSize) }
     rstAddresses.forEach {
-      registerLabel(at: $0.lowerBound, in: 0x01, named: "RST_\($0.lowerBound.hexString)")
-      disassemble(range: $0, inBank: 0x01)
+      registerExecutableRegion(at: $0, in: 0x01, named: "RST_\($0.lowerBound.hexString)")
     }
 
-    disassemble(range: 0x0040..<0x0048, inBank: 0x01)
-    disassemble(range: 0x0048..<0x0050, inBank: 0x01)
-    disassemble(range: 0x0050..<0x0058, inBank: 0x01)
-    disassemble(range: 0x0058..<0x0060, inBank: 0x01)
-    disassemble(range: 0x0060..<0x0068, inBank: 0x01)
-    disassemble(range: 0x0100..<0x0104, inBank: 0x01)
+    registerExecutableRegion(at: 0x0040..<0x0048, in: 0x01)
+    registerExecutableRegion(at: 0x0048..<0x0050, in: 0x01)
+    registerExecutableRegion(at: 0x0050..<0x0058, in: 0x01)
+    registerExecutableRegion(at: 0x0058..<0x0060, in: 0x01)
+    registerExecutableRegion(at: 0x0060..<0x0068, in: 0x01)
+    registerExecutableRegion(at: 0x0100..<0x0104, in: 0x01)
+
+    disassemble()
 
     registerData(at: 0x0104..<0x0134, in: 0x01)
     registerText(at: 0x0134..<0x0143, in: 0x01)

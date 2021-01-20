@@ -55,6 +55,9 @@ public final class Disassembler {
 
   // MARK: - Pre-disassembly hints and configurations
 
+  /** Ranges of executable regions that should be disassembled. */
+  var executableRegions = Set<Range<Cartridge.Location>>()
+
   /** Explicit labels at specific locations. */
   var labelNames: [Cartridge.Location: String] = [:]
 
@@ -141,46 +144,6 @@ public final class Disassembler {
     return bank
   }
 
-  static func disassembleInstructionSpec(at pc: inout LR35902.Address, memory: AddressableMemory) -> LR35902.Instruction.Spec {
-    // Fetch
-    let instructionByte = memory.read(from: pc)
-    pc += 1
-
-    // Decode
-    let spec = LR35902.InstructionSet.table[Int(truncatingIfNeeded: instructionByte)]
-    if let prefixTable = LR35902.InstructionSet.prefixTables[spec] {
-      // Fetch
-      let cbInstructionByte = memory.read(from: pc)
-      pc += 1
-
-      // Decode
-      return prefixTable[Int(truncatingIfNeeded: cbInstructionByte)]
-    }
-    return spec
-  }
-
-  static func disassembleInstruction(at address: inout LR35902.Address, memory: AddressableMemory) -> LR35902.Instruction {
-    let spec = disassembleInstructionSpec(at: &address, memory: memory)
-
-    guard let instructionWidth = LR35902.InstructionSet.widths[spec] else {
-      preconditionFailure("\(spec) is missing its width, implying a misconfiguration of the instruction set."
-                            + " Verify that all specifications are computing and storing a corresponding width in the"
-                            + " instruction set's width table.")
-    }
-
-    if instructionWidth.operand > 0 {
-      var operandBytes: [UInt8] = []
-      for _ in 0..<Int(instructionWidth.operand) {
-        let byte = memory.read(from: address)
-        address += 1
-        operandBytes.append(byte)
-      }
-      return LR35902.Instruction(spec: spec, immediate: LR35902.Instruction.ImmediateValue(data: Data(operandBytes)))
-    }
-
-    return LR35902.Instruction(spec: spec, immediate: nil)
-  }
-
   public func willStart() {
     // Script functions
     let getROMData: @convention(block) (Int, Int, Int) -> [UInt8] = { [weak self] bank, startAddress, endAddress in
@@ -188,9 +151,9 @@ public final class Disassembler {
         return []
       }
       let startLocation = Cartridge.location(for: LR35902.Address(truncatingIfNeeded: startAddress),
-                                                     inHumanProvided: Cartridge.Bank(truncatingIfNeeded: bank))!
+                                             inHumanProvided: Cartridge.Bank(truncatingIfNeeded: bank))!
       let endLocation = Cartridge.location(for: LR35902.Address(truncatingIfNeeded: endAddress),
-                                                   inHumanProvided: Cartridge.Bank(truncatingIfNeeded: bank))!
+                                           inHumanProvided: Cartridge.Bank(truncatingIfNeeded: bank))!
       return [UInt8](self.cartridgeData[startLocation..<endLocation])
     }
     let registerText: @convention(block) (Int, Int, Int, Int) -> Void = { [weak self] bank, startAddress, endAddress, lineLength in
@@ -198,15 +161,15 @@ public final class Disassembler {
         return
       }
       self.registerText(at: LR35902.Address(truncatingIfNeeded: startAddress)..<LR35902.Address(truncatingIfNeeded: endAddress),
-                   in: max(1, Cartridge.Bank(truncatingIfNeeded: bank)),
-                   lineLength: lineLength)
+                        in: max(1, Cartridge.Bank(truncatingIfNeeded: bank)),
+                        lineLength: lineLength)
     }
     let registerData: @convention(block) (Int, Int, Int) -> Void = { [weak self] bank, startAddress, endAddress in
       guard let self = self else {
         return
       }
       self.registerData(at: LR35902.Address(truncatingIfNeeded: startAddress)..<LR35902.Address(truncatingIfNeeded: endAddress),
-                   in: max(1, Cartridge.Bank(truncatingIfNeeded: bank)))
+                        in: max(1, Cartridge.Bank(truncatingIfNeeded: bank)))
     }
     let registerJumpTable: @convention(block) (Int, Int, Int) -> Void = { [weak self] bank, startAddress, endAddress in
       guard let self = self else {
@@ -231,8 +194,8 @@ public final class Disassembler {
         return
       }
       self.registerFunction(startingAt: LR35902.Address(truncatingIfNeeded: address),
-                          in: max(1, Cartridge.Bank(truncatingIfNeeded: bank)),
-                          named: name)
+                            in: max(1, Cartridge.Bank(truncatingIfNeeded: bank)),
+                            named: name)
     }
     let registerBankChange: @convention(block) (Int, Int, Int) -> Void = { [weak self] _desiredBank, address, bank in
       guard let self = self else {
@@ -279,7 +242,57 @@ public final class Disassembler {
     }
   }
 
-  public func disassemble(range: Range<LR35902.Address>, inBank bankInitial: Cartridge.Bank) {
+  public func disassemble() {
+    for executableRegion in executableRegions.sorted(by: { (a: Range<Cartridge.Location>, b: Range<Cartridge.Location>) -> Bool in
+      a.lowerBound < b.lowerBound
+    }) {
+      let lowerBound: (address: LR35902.Address, bank: Cartridge.Bank) = Cartridge.addressAndBank(from: executableRegion.lowerBound)
+      let upperBound: (address: LR35902.Address, bank: Cartridge.Bank) = Cartridge.addressAndBank(from: executableRegion.upperBound - 1)
+      disassemble(range: lowerBound.address..<(upperBound.address + 1), inBank: lowerBound.bank)
+    }
+  }
+
+  private static func disassembleInstructionSpec(at pc: inout LR35902.Address, memory: AddressableMemory) -> LR35902.Instruction.Spec {
+    // Fetch
+    let instructionByte = memory.read(from: pc)
+    pc += 1
+
+    // Decode
+    let spec = LR35902.InstructionSet.table[Int(truncatingIfNeeded: instructionByte)]
+    if let prefixTable = LR35902.InstructionSet.prefixTables[spec] {
+      // Fetch
+      let cbInstructionByte = memory.read(from: pc)
+      pc += 1
+
+      // Decode
+      return prefixTable[Int(truncatingIfNeeded: cbInstructionByte)]
+    }
+    return spec
+  }
+
+  private static func disassembleInstruction(at address: inout LR35902.Address, memory: AddressableMemory) -> LR35902.Instruction {
+    let spec = disassembleInstructionSpec(at: &address, memory: memory)
+
+    guard let instructionWidth = LR35902.InstructionSet.widths[spec] else {
+      preconditionFailure("\(spec) is missing its width, implying a misconfiguration of the instruction set."
+                            + " Verify that all specifications are computing and storing a corresponding width in the"
+                            + " instruction set's width table.")
+    }
+
+    if instructionWidth.operand > 0 {
+      var operandBytes: [UInt8] = []
+      for _ in 0..<Int(instructionWidth.operand) {
+        let byte = memory.read(from: address)
+        address += 1
+        operandBytes.append(byte)
+      }
+      return LR35902.Instruction(spec: spec, immediate: LR35902.Instruction.ImmediateValue(data: Data(operandBytes)))
+    }
+
+    return LR35902.Instruction(spec: spec, immediate: nil)
+  }
+
+  private func disassemble(range: Range<LR35902.Address>, inBank bankInitial: Cartridge.Bank) {
     var visitedAddresses = IndexSet()
 
     var runQueue = Queue<Disassembler.Run>()

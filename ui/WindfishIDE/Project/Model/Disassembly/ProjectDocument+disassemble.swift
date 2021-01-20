@@ -16,6 +16,13 @@ extension ProjectDocument {
     DispatchQueue.global(qos: .userInitiated).async {
       let disassembly = Disassembler(data: romData)
 
+      // Integrate scripts before any disassembly in order to allow the scripts to modify the disassembly runs.
+      for script in self.project.configuration.scripts {
+        disassembly.registerScript(named: script.name, source: script.source)
+      }
+
+      disassembly.willStart()
+
       for dataType in self.project.configuration.dataTypes {
         let mappingDict = dataType.mappings.reduce(into: [:]) { accumulator, mapping in
           accumulator[mapping.value] = mapping.name
@@ -47,28 +54,20 @@ extension ProjectDocument {
         disassembly.registerGlobal(at: global.address, named: global.name, dataType: global.dataType)
       }
 
-      // Integrate scripts before any disassembly in order to allow the scripts to modify the disassembly runs.
-      for script in self.project.configuration.scripts {
-        disassembly.registerScript(named: script.name, source: script.source)
-      }
-
-      disassembly.willStart()
-
       // Disassemble everything first
       for region in self.project.configuration.regions {
         let bank = max(1, region.bank)
         switch region.regionType {
         case Region.Kind.region:
-          disassembly.registerLabel(at: region.address, in: bank, named: region.name)
-          if region.length > 0 {
-            disassembly.disassemble(range: region.address..<(region.address + region.length), inBank: bank)
-          }
+          disassembly.registerExecutableRegion(at: region.address..<(region.address + region.length), in: bank, named: region.name)
         case Region.Kind.function:
           disassembly.registerFunction(startingAt: region.address, in: bank, named: region.name)
         default:
           break
         }
       }
+
+      disassembly.disassemble()
 
       // And then set any explicit regions
       for region in self.project.configuration.regions {

@@ -6,7 +6,8 @@ func disassemblyInitialized(with assembly: String) -> Disassembler {
 
   let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
   let disassembly = Disassembler(data: data)
-  disassembly.disassemble(range: 0..<LR35902.Address(data.count), inBank: 0x00)
+  disassembly.registerExecutableRegion(at: 0..<LR35902.Address(data.count), in: 0x01, named: "main")
+  disassembly.disassemble()
   return disassembly
 }
 
