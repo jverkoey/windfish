@@ -54,7 +54,24 @@ public final class Disassembler {
     return pc < 0x8000 && Cartridge.location(for: pc, in: bank)! < cartridgeSize
   }
 
-  // MARK: - Disassembly metadata
+  // MARK: - Pre-disassembly hints and configurations
+
+  /** Explicit labels at specific locations. */
+  var labelNames: [Cartridge.Location: String] = [:]
+
+  /** When a soft terminator is encountered during linear sweep the sweep will immediately end. */
+  var softTerminators: [Cartridge.Location: Bool] = [:]
+
+  /** Hints to the disassembler that a given location should be represented by a specific data type. */
+  var typeAtLocation: [Cartridge.Location: String] = [:]
+
+  /** Registered data types. */
+  var dataTypes: [String: Datatype] = [:]
+
+  /** Named regions of memory that can be read as data. */
+  var globals: [LR35902.Address: Global] = [:]
+
+  // MARK: - Disassembly results
 
   // MARK: Code
 
@@ -66,12 +83,6 @@ public final class Disassembler {
 
   /** Which instruction exists at a specific location. */
   var instructionMap: [Cartridge.Location: LR35902.Instruction] = [:]
-
-  /** Explicit labels at specific locations. */
-  var labelNames: [Cartridge.Location: String] = [:]
-
-  /** When a soft terminator is encountered during linear sweep the sweep will immediately end. */
-  var softTerminators: [Cartridge.Location: Bool] = [:]
 
   /** Each bank tracks ranges of code that represent contiguous scopes of instructions. */
   var contiguousScopes: [Cartridge.Bank: Set<Range<Cartridge.Location>>] = [:]
@@ -100,9 +111,6 @@ public final class Disassembler {
 
   /** The format of the data at specific locations. */
   var dataFormats: [DataFormat: IndexSet] = [:]
-
-  /** Named regions of memory that can be read as data. */
-  var globals: [LR35902.Address: Global] = [:]
 
   // MARK: Text
 
@@ -137,53 +145,6 @@ public final class Disassembler {
     // functions as a starting point for a run.
     disassemble(range: pc..<upperBound, inBank: bank)
   }
-
-  // MARK: - Globals
-
-  public struct Datatype: Equatable {
-    public let namedValues: [UInt8: String]
-    public let interpretation: Interpretation
-    public let representation: Representation
-
-    public enum Interpretation {
-      case any
-      case enumerated
-      case bitmask
-    }
-
-    public enum Representation: Int, Codable {
-      case decimal
-      case hexadecimal
-      case binary
-    }
-  }
-  public func createDatatype(named name: String, enumeration: [UInt8: String], representation: Datatype.Representation = .hexadecimal) {
-    precondition(!name.isEmpty, "Data type has invalid name.")
-    precondition(dataTypes[name] == nil, "Data type \(name) already exists.")
-    assert(Set(enumeration.values).count == enumeration.count, "There exist duplicate enumeration names.")
-    dataTypes[name] = Datatype(namedValues: enumeration, interpretation: .enumerated, representation: representation)
-  }
-  public func createDatatype(named name: String, bitmask: [UInt8: String], representation: Datatype.Representation = .binary) {
-    precondition(!name.isEmpty, "Data type has invalid name.")
-    precondition(dataTypes[name] == nil, "Data type \(name) already exists.")
-    dataTypes[name] = Datatype(namedValues: bitmask, interpretation: .bitmask, representation: representation)
-  }
-  public func createDatatype(named name: String, representation: Datatype.Representation) {
-    precondition(!name.isEmpty, "Data type has invalid name.")
-    precondition(dataTypes[name] == nil, "Data type \(name) already exists.")
-    dataTypes[name] = Datatype(namedValues: [:], interpretation: .any, representation: representation)
-  }
-  public func valuesForDatatype(named name: String) -> [UInt8: String]? {
-    return dataTypes[name]?.namedValues
-  }
-  var dataTypes: [String: Datatype] = [:]
-
-  public func setType(at address: LR35902.Address, in bank: Cartridge.Bank, to type: String) {
-    precondition(!type.isEmpty, "Invalid type provided.")
-    precondition(dataTypes[type] != nil, "\(type) is not a known type.")
-    typeAtLocation[Cartridge.location(for: address, in: bank)!] = type
-  }
-  var typeAtLocation: [Cartridge.Location: String] = [:]
 
   // MARK: - Comments
 

@@ -33,7 +33,7 @@ extension ProjectDocument {
         }
         switch dataType.interpretation {
         case DataType.Interpretation.any:
-          disassembly.createDatatype(named: dataType.name, representation: representation)
+          disassembly.registerDatatype(named: dataType.name, representation: representation)
         case DataType.Interpretation.bitmask:
           disassembly.createDatatype(named: dataType.name, bitmask: mappingDict, representation: representation)
         case DataType.Interpretation.enumerated:
