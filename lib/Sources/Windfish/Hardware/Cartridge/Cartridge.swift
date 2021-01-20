@@ -1,55 +1,12 @@
 import Foundation
 
-protocol MemoryBankController: AddressableMemory {
-  var selectedBank: Cartridge.Bank { get }
-}
-
 /** A representation of a Gameboy cartridge as addressable memory at a given moment. */
-public class Cartridge: AddressableMemory {
-  static let romBankRegion: ClosedRange<LR35902.Address> = 0x0000...0x7FFF
-  static let ramBankRegion: ClosedRange<LR35902.Address> = 0xA000...0xBFFF
-
+public class Cartridge {
   public typealias Bank = UInt8
 
   // TODO: Add conversion types for casting Location to banked address representations.
   public typealias Location = UInt32
   public typealias Length = UInt32
-
-  /**
-   Initializes the cartridge with the given data.
-
-   The data in the cartridge defines how the cartridge handles access to it.
-   */
-  public init(data: Data) {
-    // TODO: Read the data to determine which memory bank controller needs to be instantiated.
-    self.memoryBankController = MBC1(data: data)
-
-    self.size = Length(data.count)
-    self.numberOfBanks = Cartridge.Bank((self.size + Cartridge.bankSize - 1) / Cartridge.bankSize)
-  }
-
-  /** The total number of banks in this cartridge. */
-  public let numberOfBanks: Cartridge.Bank
-  public let size: Length
-  public var selectedBank: Cartridge.Bank {
-    return memoryBankController.selectedBank
-  }
-
-  // MARK: - AddressableMemory
-
-  public func read(from address: LR35902.Address) -> UInt8 {
-    return memoryBankController.read(from: address)
-  }
-
-  public func write(_ byte: UInt8, to address: LR35902.Address) {
-    memoryBankController.write(byte, to: address)
-  }
-
-  public func sourceLocation(from address: LR35902.Address) -> Gameboy.SourceLocation {
-    return memoryBankController.sourceLocation(from: address)
-  }
-
-  private var memoryBankController: MemoryBankController
 }
 
 // MARK: - Standard constants

@@ -33,7 +33,6 @@ final class Project: NSObject {
   var romData: Data? {
     didSet {
       if let romData = romData {
-        cartridge = .init(data: romData)
 
         sameboyView.screenSizeChanged()
 
@@ -52,7 +51,6 @@ final class Project: NSObject {
   @objc dynamic var disassemblyResults: DisassemblyResults?
   var metadata: ProjectMetadata?
   var configuration = ProjectConfiguration()
-  var cartridge: Cartridge?
 
   var emulating = false
   var lastVblankCounter: Int? = nil
