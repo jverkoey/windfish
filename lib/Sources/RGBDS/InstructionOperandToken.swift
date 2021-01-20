@@ -45,7 +45,7 @@ public enum InstructionOperandToken: Equatable {
       return
     }
 
-    if isNumber(string) {
+    if isNumber(string) || (string.hasPrefix("bank(") && string.hasSuffix(")")) {
       self = .numeric
       return
     }

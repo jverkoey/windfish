@@ -1,5 +1,4 @@
 import Foundation
-import JavaScriptCore
 
 import RGBDS
 
@@ -71,6 +70,18 @@ public final class Disassembler {
   /** Named regions of memory that can be read as data. */
   var globals: [LR35902.Address: Global] = [:]
 
+  /** Comments that should be placed immediately before the given location. */
+  var preComments: [Cartridge.Location: String] = [:]
+
+  /** Scripts that should be executed alongside the disassembler. */
+  var scripts: [String: Script] = [:]
+
+  /**
+   Macros are stored in a tree, where each edge is a representation of an instruction and the leaf nodes are the macro
+   implementation.
+   */
+  let macroTree = MacroNode()
+
   // MARK: - Disassembly results
 
   // MARK: Code
@@ -135,207 +146,6 @@ public final class Disassembler {
     }
     return bank
   }
-
-  public func defineFunction(startingAt pc: LR35902.Address, in bank: Cartridge.Bank, named name: String) {
-    precondition(bank > 0)
-    registerLabel(at: pc, in: bank, named: name)
-    let upperBound: LR35902.Address = (pc < 0x4000) ? 0x4000 : 0x8000
-
-    // TODO: Just register the fact that a function exists at this location. When disassembly begins use each of these
-    // functions as a starting point for a run.
-    disassemble(range: pc..<upperBound, inBank: bank)
-  }
-
-  // MARK: - Comments
-
-  public func preComment(at address: LR35902.Address, in bank: Cartridge.Bank) -> String? {
-    guard let cartridgeLocation = Cartridge.location(for: address, in: bank) else {
-      return nil
-    }
-    return preComments[cartridgeLocation]
-  }
-  public func setPreComment(at address: LR35902.Address, in bank: Cartridge.Bank, text: String) {
-    guard let cartridgeLocation = Cartridge.location(for: address, in: bank) else {
-      preconditionFailure("Attempting to set pre-comment in non-cart addressable location.")
-    }
-    preComments[cartridgeLocation] = text
-  }
-  private var preComments: [Cartridge.Location: String] = [:]
-
-  // MARK: - Scripts
-  public final class Script {
-    init(source: String) {
-      self.source = source
-
-      let context = JSContext()!
-      context.exceptionHandler = { context, exception in
-        print(exception)
-      }
-      context.evaluateScript(source)
-      self.context = context
-      if let linearSweepWillStart = context.objectForKeyedSubscript("linearSweepWillStart"), !linearSweepWillStart.isUndefined {
-        self.linearSweepWillStart = linearSweepWillStart
-      } else {
-        self.linearSweepWillStart = nil
-      }
-      if let linearSweepDidStep = context.objectForKeyedSubscript("linearSweepDidStep"), !linearSweepDidStep.isUndefined {
-        self.linearSweepDidStep = linearSweepDidStep
-      } else {
-        self.linearSweepDidStep = nil
-      }
-      if let disassemblyWillStart = context.objectForKeyedSubscript("disassemblyWillStart"), !disassemblyWillStart.isUndefined {
-        self.disassemblyWillStart = disassemblyWillStart
-      } else {
-        self.disassemblyWillStart = nil
-      }
-    }
-    let source: String
-    let context: JSContext
-    let linearSweepWillStart: JSValue?
-    let linearSweepDidStep: JSValue?
-    let disassemblyWillStart: JSValue?
-  }
-  public func defineScript(named name: String, source: String) {
-    precondition(scripts[name] == nil, "A script named \(name) already exists.")
-    scripts[name] = Script(source: source)
-  }
-  private var scripts: [String: Script] = [:]
-
-  // MARK: - Macros
-
-  public enum MacroLine: Hashable {
-    case any([LR35902.Instruction.Spec], argument: UInt64? = nil, argumentText: String? = nil)
-    case arg(LR35902.Instruction.Spec, argument: UInt64? = nil, argumentText: String? = nil)
-    case instruction(LR35902.Instruction)
-
-    func asEdges() -> [MacroTreeEdge] {
-      switch self {
-      case .any(let specs, _, _):         return specs.map { .arg($0) }
-      case .arg(let spec, _, _):          return [.arg(spec)]
-      case .instruction(let instruction): return [.instruction(instruction)]
-      }
-    }
-    func specs() -> [LR35902.Instruction.Spec] {
-      switch self {
-      case .any(let specs, _, _):         return specs
-      case .arg(let spec, _, _):          return [spec]
-      case .instruction(let instruction): return [instruction.spec]
-      }
-    }
-  }
-  enum MacroTreeEdge: Hashable {
-    case arg(LR35902.Instruction.Spec)
-    case instruction(LR35902.Instruction)
-
-    func resolve(into line: MacroLine) -> MacroLine {
-      switch line {
-      case let .any(_, argument, argumentText):
-        guard case let .arg(spec) = self else {
-          preconditionFailure("Mismatched types")
-        }
-        return .arg(spec, argument: argument, argumentText: argumentText)
-      case let .arg(spec, argument, argumentText):
-        return .arg(spec, argument: argument, argumentText: argumentText)
-      case let .instruction(instruction):
-        return .instruction(instruction)
-      }
-    }
-  }
-  // TODO: Verify that each instruction actually exists in the instruction table.
-  public func defineMacro(named name: String,
-                          instructions: [MacroLine],
-                          validArgumentValues: [Int: IndexSet]? = nil,
-                          action: (([Int: String], LR35902.Address, Cartridge.Bank) -> Void)? = nil) {
-    precondition(!macroNames.contains(name))
-    macroNames.insert(name)
-
-    let macro = Macro(name: name, macroLines: instructions, validArgumentValues: validArgumentValues, action: action)
-    walkTree(lines: instructions, node: macroTree, macro: macro)
-  }
-  private func walkTree(lines: [MacroLine], node: MacroNode, macro: Macro, lineHistory: [MacroLine] = []) {
-    guard let line = lines.first else {
-      node.macros.append(Macro(name: macro.name,
-                               macroLines: lineHistory,
-                               validArgumentValues: macro.validArgumentValues,
-                               action: macro.action))
-      return
-    }
-    for edge in line.asEdges() {
-      let child: MacroNode
-      if let existingChild = node.children[edge] {
-        child = existingChild
-      } else {
-        child = MacroNode()
-        node.children[edge] = child
-      }
-      walkTree(lines: Array<MacroLine>(lines.dropFirst()),
-               node: child,
-               macro: macro,
-               lineHistory: lineHistory + [edge.resolve(into: line)])
-    }
-  }
-  public func defineMacro(named name: String, template: String) {
-    var lines: [MacroLine] = []
-    template.enumerateLines { line, _ in
-      guard let statement = RGBDS.Statement(fromLine: line) else {
-        return
-      }
-      let specs = LR35902.InstructionSet.specs(for: statement)
-
-      guard !specs.isEmpty else {
-        preconditionFailure("No instruction specification found matching this statement: \(line).")
-      }
-
-      if let argumentNumber = statement.operands.first(where: { $0.contains("#") }) {
-        let scanner = Scanner(string: argumentNumber)
-        _ = scanner.scanUpToString("#")
-        _ = scanner.scanCharacter()
-        let argument = scanner.scanUInt64()
-        if specs.count > 1 {
-          lines.append(.any(specs, argument: argument, argumentText: nil))
-        } else {
-          lines.append(.arg(specs.first!, argument: argument, argumentText: nil))
-        }
-      } else {
-        let potentialInstructions: [LR35902.Instruction] = try! specs.compactMap { spec in
-          try RGBDSAssembler.instruction(from: statement, using: spec)
-        }
-        guard potentialInstructions.count > 0 else {
-          preconditionFailure("No instruction was able to represent \(statement.formattedString)")
-        }
-        let shortestInstruction = potentialInstructions.sorted(by: { pair1, pair2 in
-          LR35902.InstructionSet.widths[pair1.spec]!.total < LR35902.InstructionSet.widths[pair2.spec]!.total
-        })[0]
-        lines.append(.instruction(shortestInstruction))
-      }
-    }
-    defineMacro(named: name, instructions: lines)
-  }
-  private var macroNames = Set<String>()
-
-  public final class Macro {
-    let name: String
-    let macroLines: [MacroLine]
-    let validArgumentValues: [Int: IndexSet]?
-    let action: (([Int: String], LR35902.Address, Cartridge.Bank) -> Void)?
-
-    init(name: String, macroLines: [MacroLine], validArgumentValues: [Int: IndexSet]?, action: (([Int: String], LR35902.Address, Cartridge.Bank) -> Void)?) {
-      self.name = name
-      self.macroLines = macroLines
-      self.validArgumentValues = validArgumentValues
-      self.action = action
-    }
-  }
-  final class MacroNode {
-    init(children: [MacroTreeEdge : MacroNode] = [:], macros: [Macro] = []) {
-      self.children = children
-      self.macros = macros
-    }
-
-    var children: [MacroTreeEdge: MacroNode] = [:]
-    var macros: [Macro] = []
-  }
-  let macroTree = MacroNode()
 
   private struct DisassemblyIntent: Hashable {
     let bank: Cartridge.Bank
@@ -431,7 +241,7 @@ public final class Disassembler {
       guard let self = self else {
         return
       }
-      self.defineFunction(startingAt: LR35902.Address(truncatingIfNeeded: address),
+      self.registerFunction(startingAt: LR35902.Address(truncatingIfNeeded: address),
                           in: max(1, Cartridge.Bank(truncatingIfNeeded: bank)),
                           named: name)
     }

@@ -596,10 +596,6 @@ clean:
                                                    bank: bank,
                                                    scope: macroScopes.sorted().joined(separator: ", "),
                                                    data: bytes)])
-
-            if let action = macro.macro.action {
-              action(macro.arguments, lineBufferAddress, bank)
-            }
             lineBufferAddress = writeContext.pc
           } else {
             flush()

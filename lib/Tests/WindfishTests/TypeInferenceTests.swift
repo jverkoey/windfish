@@ -74,7 +74,7 @@ jr   z, @-$03
 
     let disassembly = Disassembler(data: data)
 
-    disassembly.defineMacro(named: "macro", template: """
+    disassembly.registerMacro(named: "macro", template: """
 ld   a, [#1]
 and  a
 jr   z, #2
@@ -93,12 +93,11 @@ jr   z, #2
                     .init(
                       name: "macro",
                       macroLines: [
-                        .arg(.ld(.a, .imm16addr), argument: 1),
+                        .arg(spec: .ld(.a, .imm16addr), argument: 1),
                         .instruction(.init(spec: .and(.a))),
-                        .arg(.jr(.z, .simm8), argument: 2),
+                        .arg(spec: .jr(.z, .simm8), argument: 2),
                       ],
-                      validArgumentValues: nil,
-                      action: nil
+                      validArgumentValues: nil
                     )
                   ]
                 )
@@ -118,12 +117,11 @@ jr   z, #2
                     .init(
                       name: "macro",
                       macroLines: [
-                        .arg(.ld(.a, .ffimm8addr), argument: 1),
+                        .arg(spec: .ld(.a, .ffimm8addr), argument: 1),
                         .instruction(.init(spec: .and(.a))),
-                        .arg(.jr(.z, .simm8), argument: 2),
+                        .arg(spec: .jr(.z, .simm8), argument: 2),
                       ],
-                      validArgumentValues: nil,
-                      action: nil
+                      validArgumentValues: nil
                     )
                   ]
                 )
@@ -162,7 +160,7 @@ inc  [hl]
 
     let disassembly = Disassembler(data: data)
 
-    disassembly.defineMacro(named: "plusPlusHL", template: """
+    disassembly.registerMacro(named: "plusPlusHL", template: """
 ld hl, #1
 inc [hl]
 """)
@@ -178,11 +176,10 @@ inc [hl]
                 .init(
                   name: "plusPlusHL",
                   macroLines: [
-                    .arg(.ld(.hl, .imm16), argument: 1),
+                    .arg(spec: .ld(.hl, .imm16), argument: 1),
                     .instruction(.init(spec: .inc(.hladdr)))
                   ],
-                  validArgumentValues: nil,
-                  action: nil
+                  validArgumentValues: nil
                 )
               ]
             )
@@ -290,13 +287,13 @@ call $4100
 
     let disassembly = Disassembler(data: data)
 
-    disassembly.defineMacro(named: "callcb", instructions: [
-      .arg(.ld(.a, .imm8), argumentText: "bank(\\1)"),
-      .instruction(.init(spec: .ld(.imm16addr, .a), immediate: .imm16(0x2100))),
-      .arg(.call(nil, .imm16), argument: 1)
-    ], validArgumentValues: [
-      1: IndexSet(integersIn: 0x4000..<0x8000)
-    ])
+    disassembly.registerMacro(named: "callcb", template: """
+ld a, bank(#1)
+ld [$2100], a
+call #1
+""", validArgumentValues: [
+  1: IndexSet(integersIn: 0x4000..<0x8000)
+])
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     XCTAssertEqual(disassembly.macroTree, Disassembler.MacroNode(
@@ -311,14 +308,13 @@ call $4100
                     .init(
                       name: "callcb",
                       macroLines: [
-                        .arg(.ld(.a, .imm8), argumentText: "bank(\\1)"),
+                        .arg(spec: .ld(.a, .imm8), argumentText: "bank(\\1)"),
                         .instruction(.init(spec: .ld(.imm16addr, .a), immediate: .imm16(0x2100))),
-                        .arg(.call(nil, .imm16), argument: 1)
+                        .arg(spec: .call(nil, .imm16), argument: 1)
                       ],
                       validArgumentValues: [
                         1: IndexSet(integersIn: 0x4000..<0x8000)
-                      ],
-                      action: nil
+                      ]
                     )
                   ]
                 )

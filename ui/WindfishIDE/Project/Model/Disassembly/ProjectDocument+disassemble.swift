@@ -49,7 +49,7 @@ extension ProjectDocument {
 
       // Integrate scripts before any disassembly in order to allow the scripts to modify the disassembly runs.
       for script in self.project.configuration.scripts {
-        disassembly.defineScript(named: script.name, source: script.source)
+        disassembly.registerScript(named: script.name, source: script.source)
       }
 
       disassembly.willStart()
@@ -64,7 +64,7 @@ extension ProjectDocument {
             disassembly.disassemble(range: region.address..<(region.address + region.length), inBank: bank)
           }
         case Region.Kind.function:
-          disassembly.defineFunction(startingAt: region.address, in: bank, named: region.name)
+          disassembly.registerFunction(startingAt: region.address, in: bank, named: region.name)
         default:
           break
         }
@@ -94,7 +94,7 @@ extension ProjectDocument {
       }
 
       for macro in self.project.configuration.macros {
-        disassembly.defineMacro(named: macro.name, template: macro.source)
+        disassembly.registerMacro(named: macro.name, template: macro.source)
       }
 
       let (disassembledSource, statistics) = try! disassembly.generateSource()
