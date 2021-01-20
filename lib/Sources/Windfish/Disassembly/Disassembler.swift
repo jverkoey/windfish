@@ -295,7 +295,7 @@ public final class Disassembler {
   private func disassemble(range: Range<LR35902.Address>, inBank bankInitial: Cartridge.Bank) {
     var visitedAddresses = IndexSet()
 
-    var runQueue = Queue<Disassembler.Run>()
+    let runQueue = Queue<Disassembler.Run>()
     let firstRun = Run(from: range.lowerBound, initialBank: bankInitial, upTo: range.upperBound)
     runQueue.add(firstRun)
 

@@ -1,14 +1,11 @@
 import Foundation
 
-public struct Queue<T> {
-  public init() {
-  }
-
-  public mutating func add(_ run: T) {
+public final class Queue<T> {
+  public func add(_ run: T) {
     queue.append(run)
   }
 
-  public mutating func dequeue() -> T {
+  public func dequeue() -> T {
     return queue.removeFirst()
   }
 
