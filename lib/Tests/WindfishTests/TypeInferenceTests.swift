@@ -36,7 +36,7 @@ class TypeInferenceTests: XCTestCase {
       0b0000_0001: "STATF_VB",
       0b0000_0000: "STATF_HB"
     ])
-    disassembly.createGlobal(at: 0xff41, named: "gbSTAT", dataType: "STATF")
+    disassembly.registerGlobal(at: 0xff41, named: "gbSTAT", dataType: "STATF")
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x00)
 
     let (source, _) = try! disassembly.generateSource()

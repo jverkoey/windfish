@@ -44,7 +44,7 @@ extension ProjectDocument {
       }
 
       for global in self.project.configuration.globals {
-        disassembly.createGlobal(at: global.address, named: global.name, dataType: global.dataType)
+        disassembly.registerGlobal(at: global.address, named: global.name, dataType: global.dataType)
       }
 
       // Integrate scripts before any disassembly in order to allow the scripts to modify the disassembly runs.

@@ -101,6 +101,9 @@ public final class Disassembler {
   /** The format of the data at specific locations. */
   var dataFormats: [DataFormat: IndexSet] = [:]
 
+  /** Named regions of memory that can be read as data. */
+  var globals: [LR35902.Address: Global] = [:]
+
   // MARK: Text
 
   /** All locations that represent text. */
@@ -136,35 +139,6 @@ public final class Disassembler {
   }
 
   // MARK: - Globals
-
-  // TODO: Allow defining variable types, e.g. enums with well-understood values.
-  public func createGlobal(at address: LR35902.Address, named name: String, dataType: String? = nil) {
-    precondition(globals[address] == nil, "Global already exists at \(address).")
-    if let dataType = dataType, !dataType.isEmpty {
-      precondition(dataTypes[dataType] != nil, "Data type is not registered.")
-    }
-    globals[address] = Global(name: name, dataType: dataType)
-
-    precondition(address < 0x4000 || address >= 0x8000, "Cannot set globals in switchable banks.")
-
-    if address < 0x4000 {
-      registerLabel(at: address, in: 0x01, named: name)
-      registerData(at: address, in: 0x01)
-    }
-  }
-  final class Global {
-    let name: String
-    let dataType: String?
-    init(name: String, dataType: String? = nil) {
-      self.name = name
-      if let dataType = dataType, !dataType.isEmpty {
-        self.dataType = dataType
-      } else {
-        self.dataType = nil
-      }
-    }
-  }
-  var globals: [LR35902.Address: Global] = [:]
 
   public struct Datatype: Equatable {
     public let namedValues: [UInt8: String]
