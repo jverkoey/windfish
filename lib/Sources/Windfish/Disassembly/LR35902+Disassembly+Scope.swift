@@ -86,7 +86,7 @@ extension Disassembler {
       guard let contiguousScope = runGroup.firstContiguousScopeRange else {
         continue
       }
-      addContiguousScope(range: contiguousScope)
+      registerContiguousScope(range: contiguousScope)
 
       let contiguousScopeWithoutFirstInstruction = contiguousScope.dropFirst()
       inferLoops(in: contiguousScopeWithoutFirstInstruction)

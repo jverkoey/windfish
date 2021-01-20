@@ -10,6 +10,8 @@ public class Cartridge: AddressableMemory {
   static let ramBankRegion: ClosedRange<LR35902.Address> = 0xA000...0xBFFF
 
   public typealias Bank = UInt8
+
+  // TODO: Add conversion types for casting Location to banked address representations.
   public typealias Location = UInt32
   public typealias Length = UInt32
 

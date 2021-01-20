@@ -70,6 +70,12 @@ public final class Disassembler {
   /** Explicit labels at specific locations. */
   var labelNames: [Cartridge.Location: String] = [:]
 
+  /** When a soft terminator is encountered during linear sweep the sweep will immediately end. */
+  var softTerminators: [Cartridge.Location: Bool] = [:]
+
+  /** Each bank tracks ranges of code that represent contiguous scopes of instructions. */
+  var contiguousScopes: [Cartridge.Bank: Set<Range<Cartridge.Location>>] = [:]
+
   /**
    Label types at specific locations.
 
@@ -112,12 +118,6 @@ public final class Disassembler {
     return code.union(data).union(text)
   }
 
-  public func setSoftTerminator(at pc: LR35902.Address, in bank: Cartridge.Bank) {
-    precondition(bank > 0)
-    softTerminators[Cartridge.location(for: pc, in: bank)!] = true
-  }
-  var softTerminators: [Cartridge.Location: Bool] = [:]
-
   func effectiveBank(at pc: LR35902.Address, in bank: Cartridge.Bank) -> Cartridge.Bank {
     if pc < 0x4000 {
       return 1
@@ -125,35 +125,13 @@ public final class Disassembler {
     return bank
   }
 
-  public func contiguousScopes(at pc: LR35902.Address, in bank: Cartridge.Bank) -> Set<Range<Cartridge.Location>> {
-    precondition(bank > 0)
-    guard let cartridgeLocation = Cartridge.location(for: pc, in: bank) else {
-      return Set()
-    }
-    return contiguousScopes[effectiveBank(at: pc, in: bank), default: Set()].filter { scope in scope.contains(cartridgeLocation) }
-  }
-  public func labeledContiguousScopes(at pc: LR35902.Address, in bank: Cartridge.Bank) -> [(label: String, scope: Range<Cartridge.Location>)] {
-    precondition(bank > 0)
-    return contiguousScopes(at: pc, in: bank).compactMap {
-      let addressAndBank = Cartridge.addressAndBank(from: $0.lowerBound)
-      guard let label = label(at: addressAndBank.address, in: addressAndBank.bank) else {
-        return nil
-      }
-      return (label, $0)
-    }
-  }
-  func addContiguousScope(range: Range<Cartridge.Location>) {
-    let bankAndAddress = Cartridge.addressAndBank(from: range.lowerBound)
-    let bankAndAddress2 = Cartridge.addressAndBank(from: range.upperBound - 1)
-    precondition(bankAndAddress.bank == bankAndAddress2.bank, "Scopes can't cross banks")
-    contiguousScopes[effectiveBank(at: bankAndAddress.address, in: bankAndAddress.bank), default: Set()].insert(range)
-  }
-  var contiguousScopes: [Cartridge.Bank: Set<Range<Cartridge.Location>>] = [:]
-
   public func defineFunction(startingAt pc: LR35902.Address, in bank: Cartridge.Bank, named name: String) {
     precondition(bank > 0)
     registerLabel(at: pc, in: bank, named: name)
     let upperBound: LR35902.Address = (pc < 0x4000) ? 0x4000 : 0x8000
+
+    // TODO: Just register the fact that a function exists at this location. When disassembly begins use each of these
+    // functions as a starting point for a run.
     disassemble(range: pc..<upperBound, inBank: bank)
   }
 
