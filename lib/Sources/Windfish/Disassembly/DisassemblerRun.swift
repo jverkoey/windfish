@@ -4,8 +4,8 @@ extension Disassembler {
   public final class Run {
     typealias SpecT = LR35902.Instruction.SpecType
 
-    let startAddress: Cartridge.Location
-    let endAddress: Cartridge.Location?
+    let startAddress: Cartridge._Location
+    let endAddress: Cartridge._Location?
     let initialBank: Cartridge.Bank
 
     // TODO: Accept a Cartridge.Location here instead.
@@ -22,7 +22,7 @@ extension Disassembler {
       self.initialBank = initialBank
     }
 
-    var visitedRange: Range<Cartridge.Location>?
+    var visitedRange: Range<Cartridge._Location>?
 
     var children: [Run] = []
 

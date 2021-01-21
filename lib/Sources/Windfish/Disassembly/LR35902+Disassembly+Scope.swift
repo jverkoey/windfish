@@ -95,7 +95,7 @@ extension Disassembler {
     }
   }
 
-  private func inferReturns(in scope: Range<Cartridge.Location>) {
+  private func inferReturns(in scope: Range<Cartridge._Location>) {
     let labelLocations = self.labelLocations(in: scope)
     let returnLabelAddresses = labelLocations.filter { instructionMap[$0]?.spec.category == .ret }
     for cartLocation in returnLabelAddresses {
@@ -103,8 +103,8 @@ extension Disassembler {
     }
   }
 
-  private func inferLoops(in scope: Range<Cartridge.Location>) {
-    let tocs: [(destination: Cartridge.Location, tocs: Set<Cartridge.Location>)] = scope.compactMap {
+  private func inferLoops(in scope: Range<Cartridge._Location>) {
+    let tocs: [(destination: Cartridge._Location, tocs: Set<Cartridge._Location>)] = scope.compactMap {
       let (address, bank) = Cartridge.addressAndBank(from: $0)
       if let toc = transfersOfControl(at: address, in: bank) {
         return ($0, toc)
@@ -112,7 +112,7 @@ extension Disassembler {
         return nil
       }
     }
-    let backwardTocs: [(source: Cartridge.Location, destination: Cartridge.Location)] = tocs.reduce(into: [], { (accumulator, element) in
+    let backwardTocs: [(source: Cartridge._Location, destination: Cartridge._Location)] = tocs.reduce(into: [], { (accumulator, element) in
       let tocsInThisScope = element.tocs.filter {
         scope.contains($0) && element.destination < $0 && (labelNames[element.destination] != nil || labelTypes[element.destination] != nil)
       }
@@ -150,8 +150,8 @@ extension Disassembler {
     }
   }
 
-  private func inferElses(in scope: Range<Cartridge.Location>) {
-    let tocs: [(destination: Cartridge.Location, tocs: Set<Cartridge.Location>)] = scope.compactMap {
+  private func inferElses(in scope: Range<Cartridge._Location>) {
+    let tocs: [(destination: Cartridge._Location, tocs: Set<Cartridge._Location>)] = scope.compactMap {
       let (address, bank) = Cartridge.addressAndBank(from: $0)
       if let toc = transfersOfControl(at: address, in: bank) {
         return ($0, toc)
@@ -159,7 +159,7 @@ extension Disassembler {
         return nil
       }
     }
-    let forwardTocs: [(source: Cartridge.Location, destination: Cartridge.Location)] = tocs.reduce(into: [], { (accumulator, element) in
+    let forwardTocs: [(source: Cartridge._Location, destination: Cartridge._Location)] = tocs.reduce(into: [], { (accumulator, element) in
       let tocsInThisScope = element.tocs.filter {
         scope.contains($0)
           && element.destination > $0

@@ -3,21 +3,21 @@ import Foundation
 import RGBDS
 
 extension Range where Bound == Int {
-  func asCartridgeLocationRange() -> Range<Cartridge.Location> {
-    return Cartridge.Location(truncatingIfNeeded: lowerBound)..<Cartridge.Location(truncatingIfNeeded: upperBound)
+  func asCartridgeLocationRange() -> Range<Cartridge._Location> {
+    return Cartridge._Location(truncatingIfNeeded: lowerBound)..<Cartridge._Location(truncatingIfNeeded: upperBound)
   }
 }
 
-extension Range where Bound == Cartridge.Location {
+extension Range where Bound == Cartridge._Location {
   func asIntRange() -> Range<Int> {
     return Int(truncatingIfNeeded: lowerBound)..<Int(truncatingIfNeeded: upperBound)
   }
 }
 
 extension Range where Bound == LR35902.Address {
-  func asCartridgeRange(in bank: Cartridge.Bank) -> Range<Cartridge.Location>? {
-    guard let lowerBound: Cartridge.Location = Cartridge.location(for: lowerBound, in: bank),
-          let upperBound: Cartridge.Location = Cartridge.location(for: upperBound, in: bank) else {
+  func asCartridgeRange(in bank: Cartridge.Bank) -> Range<Cartridge._Location>? {
+    guard let lowerBound: Cartridge._Location = Cartridge.location(for: lowerBound, in: bank),
+          let upperBound: Cartridge._Location = Cartridge.location(for: upperBound, in: bank) else {
       return nil
     }
     return lowerBound..<upperBound
@@ -56,16 +56,16 @@ public final class Disassembler {
   // MARK: - Pre-disassembly hints and configurations
 
   /** Ranges of executable regions that should be disassembled. */
-  var executableRegions = Set<Range<Cartridge.Location>>()
+  var executableRegions = Set<Range<Cartridge._Location>>()
 
   /** Explicit labels at specific locations. */
-  var labelNames: [Cartridge.Location: String] = [:]
+  var labelNames: [Cartridge._Location: String] = [:]
 
   /** When a soft terminator is encountered during linear sweep the sweep will immediately end. */
-  var softTerminators: [Cartridge.Location: Bool] = [:]
+  var softTerminators: [Cartridge._Location: Bool] = [:]
 
   /** Hints to the disassembler that a given location should be represented by a specific data type. */
-  var typeAtLocation: [Cartridge.Location: String] = [:]
+  var typeAtLocation: [Cartridge._Location: String] = [:]
 
   /** Registered data types. */
   var dataTypes: [String: Datatype] = [:]
@@ -74,7 +74,7 @@ public final class Disassembler {
   var globals: [LR35902.Address: Global] = [:]
 
   /** Comments that should be placed immediately before the given location. */
-  var preComments: [Cartridge.Location: String] = [:]
+  var preComments: [Cartridge._Location: String] = [:]
 
   /** Scripts that should be executed alongside the disassembler. */
   var scripts: [String: Script] = [:]
@@ -93,23 +93,23 @@ public final class Disassembler {
   var code = IndexSet()
 
   /** Locations that can transfer control (jp/call) to a specific location. */
-  var transfers: [Cartridge.Location: Set<Cartridge.Location>] = [:]
+  var transfers: [Cartridge._Location: Set<Cartridge._Location>] = [:]
 
   /** Which instruction exists at a specific location. */
-  var instructionMap: [Cartridge.Location: LR35902.Instruction] = [:]
+  var instructionMap: [Cartridge._Location: LR35902.Instruction] = [:]
 
   /** Each bank tracks ranges of code that represent contiguous scopes of instructions. */
-  var contiguousScopes: [Cartridge.Bank: Set<Range<Cartridge.Location>>] = [:]
+  var contiguousScopes: [Cartridge.Bank: Set<Range<Cartridge._Location>>] = [:]
 
   /**
    Label types at specific locations.
 
    There does not always need to be a corresponding name set in the labelNames dictionary.
    */
-  var labelTypes: [Cartridge.Location: LabelType] = [:]
+  var labelTypes: [Cartridge._Location: LabelType] = [:]
 
   /** Bank changes that occur at a specific location. */
-  var bankChanges: [Cartridge.Location: Cartridge.Bank] = [:]
+  var bankChanges: [Cartridge._Location: Cartridge.Bank] = [:]
 
   // MARK: Data
 
@@ -132,7 +132,7 @@ public final class Disassembler {
   var text = IndexSet()
 
   /** The maximum length of a line of text within a given range. */
-  var textLengths: [Range<Cartridge.Location>: Int] = [:]
+  var textLengths: [Range<Cartridge._Location>: Int] = [:]
 
   /** Character codes mapped to strings. */
   var characterMap: [UInt8: String] = [:]
@@ -243,7 +243,7 @@ public final class Disassembler {
   }
 
   public func disassemble() {
-    for executableRegion in executableRegions.sorted(by: { (a: Range<Cartridge.Location>, b: Range<Cartridge.Location>) -> Bool in
+    for executableRegion in executableRegions.sorted(by: { (a: Range<Cartridge._Location>, b: Range<Cartridge._Location>) -> Bool in
       a.lowerBound < b.lowerBound
     }) {
       let lowerBound: (address: LR35902.Address, bank: Cartridge.Bank) = Cartridge.addressAndBank(from: executableRegion.lowerBound)
@@ -354,9 +354,9 @@ public final class Disassembler {
 
       let advance: (LR35902.Address) -> Void = { amount in
         let currentCartAddress = Cartridge.location(for: runContext.pc, in: runContext.bank)!
-        run.visitedRange = run.startAddress..<(currentCartAddress + Cartridge.Location(amount))
+        run.visitedRange = run.startAddress..<(currentCartAddress + Cartridge._Location(amount))
 
-        visitedAddresses.insert(integersIn: Int(currentCartAddress)..<Int(currentCartAddress + Cartridge.Location(amount)))
+        visitedAddresses.insert(integersIn: Int(currentCartAddress)..<Int(currentCartAddress + Cartridge._Location(amount)))
 
         runContext.pc += amount
       }

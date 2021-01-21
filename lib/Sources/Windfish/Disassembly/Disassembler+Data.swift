@@ -29,7 +29,7 @@ extension Disassembler {
   /** Registers that a specific range contains data. */
   public func registerData(at range: Range<LR35902.Address>, in bank: Cartridge.Bank, format: DataFormat = .bytes) {
     precondition(bank > 0)
-    guard let cartRange: Range<Cartridge.Location> = range.asCartridgeRange(in: bank) else {
+    guard let cartRange: Range<Cartridge._Location> = range.asCartridgeRange(in: bank) else {
       return
     }
     let intRange = cartRange.asIntRange()

@@ -31,7 +31,7 @@ public final class RunGroup: Sequence {
   /**
    The run group's starting address.
    */
-  public lazy var startAddress: Cartridge.Location? = {
+  public lazy var startAddress: Cartridge._Location? = {
     guard let firstRun = runs.first else {
       return nil
     }
@@ -52,13 +52,13 @@ public final class RunGroup: Sequence {
     }
   }()
 
-  public lazy var firstContiguousScopeRange: Range<Cartridge.Location>? = {
+  public lazy var firstContiguousScopeRange: Range<Cartridge._Location>? = {
     if let startAddress = startAddress {
       if let range = scope.rangeView.first(where: { $0.lowerBound == Int(startAddress) }) {
-        return Range<Cartridge.Location>(uncheckedBounds: (Cartridge.Location(range.lowerBound),
-                                                                   Cartridge.Location(range.upperBound)))
+        return Range<Cartridge._Location>(uncheckedBounds: (Cartridge._Location(range.lowerBound),
+                                                                   Cartridge._Location(range.upperBound)))
       } else if let range = scope.rangeView.first(where: { $0.contains(Int(startAddress)) }) {
-        return Range<Cartridge.Location>(uncheckedBounds: (startAddress, Cartridge.Location(range.upperBound)))
+        return Range<Cartridge._Location>(uncheckedBounds: (startAddress, Cartridge._Location(range.upperBound)))
       }
     }
     return nil

@@ -10,7 +10,7 @@ extension Disassembler {
 
   /** Returns the label at the given location, if any. */
   func label(at pc: LR35902.Address, in bank: Cartridge.Bank) -> String? {
-    guard let location: Cartridge.Location = Cartridge.location(for: pc, in: bank) else {
+    guard let location: Cartridge._Location = Cartridge.location(for: pc, in: bank) else {
       return nil
     }
     guard canShowLabel(at: location) else {
@@ -32,10 +32,10 @@ extension Disassembler {
       return nil
     }
 
-    let scopes: Set<Range<Cartridge.Location>> = contiguousScopes(at: pc, in: bank)
-    if let firstScope: Range<Cartridge.Location> = scopes.filter({ (scope: Range<Cartridge.Location>) -> Bool in
+    let scopes: Set<Range<Cartridge._Location>> = contiguousScopes(at: pc, in: bank)
+    if let firstScope: Range<Cartridge._Location> = scopes.filter({ (scope: Range<Cartridge._Location>) -> Bool in
       scope.lowerBound != location // Ignore ourself.
-    }).min(by: { (scope1: Range<Cartridge.Location>, scope2: Range<Cartridge.Location>) -> Bool in
+    }).min(by: { (scope1: Range<Cartridge._Location>, scope2: Range<Cartridge._Location>) -> Bool in
       scope1.lowerBound < scope2.lowerBound
     }) {
       let addressAndBank: (address: LR35902.Address, bank: Cartridge.Bank) =
@@ -49,8 +49,8 @@ extension Disassembler {
   }
 
   /** Returns the locations of any labels within the given range. */
-  func labelLocations(in range: Range<Cartridge.Location>) -> [Cartridge.Location] {
-    return range.filter { (location: Cartridge.Location) -> Bool in
+  func labelLocations(in range: Range<Cartridge._Location>) -> [Cartridge._Location] {
+    return range.filter { (location: Cartridge._Location) -> Bool in
       guard labelNames[location] != nil || labelTypes[location] != nil else {
         return false
       }
@@ -62,14 +62,14 @@ extension Disassembler {
   public func registerLabel(at pc: LR35902.Address, in bank: Cartridge.Bank, named name: String) {
     // TODO: Make this throw an exception that can be presented to the user.
     precondition(!name.contains("."), "Labels cannot contain dots.")
-    guard let cartridgeLocation: Cartridge.Location = Cartridge.location(for: pc, inHumanProvided: bank) else {
+    guard let cartridgeLocation: Cartridge._Location = Cartridge.location(for: pc, inHumanProvided: bank) else {
       preconditionFailure("Setting a label in a non-cart addressable location is not yet supported.")
     }
     labelNames[cartridgeLocation] = name
   }
 
   /** Returns false if the location should not be able to show a label. */
-  private func canShowLabel(at location: Cartridge.Location) -> Bool {
+  private func canShowLabel(at location: Cartridge._Location) -> Bool {
     let intLocation: Int = Int(truncatingIfNeeded: location)
     // Don't return labels that point to the middle of instructions.
     if instructionMap[location] == nil && code.contains(intLocation) {

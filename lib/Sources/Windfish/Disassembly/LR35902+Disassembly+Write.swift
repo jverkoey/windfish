@@ -90,7 +90,7 @@ extension Disassembler {
       case preComment(comment: String)
       case label(labelName: String)
       case section(Cartridge.Bank)
-      case transferOfControl(Set<Cartridge.Location>, String)
+      case transferOfControl(Set<Cartridge._Location>, String)
       case instruction(LR35902.Instruction, RGBDS.Statement)
       case macroInstruction(LR35902.Instruction, RGBDS.Statement)
       case macro(RGBDS.Statement)
@@ -635,7 +635,7 @@ clean:
           // Write the instruction as assembly.
           let index = Cartridge.location(for: writeContext.pc, in: initialBank)!
           let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!.total
-          let bytes = cartridgeData[index..<(index + Cartridge.Location(instructionWidth))]
+          let bytes = cartridgeData[index..<(index + Cartridge._Location(instructionWidth))]
           let instructionScope = labeledContiguousScopes(at: writeContext.pc, in: initialBank).map { $0.label }
           let context = RGBDSDisassembler.Context(
             address: writeContext.pc,

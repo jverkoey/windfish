@@ -20,7 +20,7 @@ extension Disassembler {
   /** Returns the type of information at the given location. */
   func type(of address: LR35902.Address, in bank: Cartridge.Bank) -> ByteType {
     precondition(bank > 0)
-    guard let cartridgeLocation: Cartridge.Location = Cartridge.location(for: address, in: bank) else {
+    guard let cartridgeLocation: Cartridge._Location = Cartridge.location(for: address, in: bank) else {
       return .ram
     }
     let index = Int(truncatingIfNeeded: cartridgeLocation)
@@ -75,7 +75,7 @@ extension Disassembler {
   }
 
   /** Deletes an instruction from a specific location and clears any code-related information in its footprint. */
-  func deleteInstruction(at location: Cartridge.Location) {
+  func deleteInstruction(at location: Cartridge._Location) {
     guard let instruction: LR35902.Instruction = instructionMap[location] else {
       return
     }
@@ -114,7 +114,7 @@ extension Disassembler {
 
     // Remove any labels, instructions, and transfers of control in this range.
     for intLocation: Int in range.dropFirst() {
-      let location = Cartridge.Location(intLocation)
+      let location = Cartridge._Location(intLocation)
       deleteInstruction(at: location)
       transfers[location] = nil
       labelNames[location] = nil
@@ -122,14 +122,14 @@ extension Disassembler {
       bankChanges[location] = nil
     }
 
-    let cartRange: Range<Cartridge.Location> = range.asCartridgeLocationRange()
+    let cartRange: Range<Cartridge._Location> = range.asCartridgeLocationRange()
     let addressAndBank = Cartridge.addressAndBank(from: cartRange.lowerBound)
     // For any existing scope that intersects this range:
     // 1. Shorten it if it begins before the range.
     // 2. Delete it if it begins within the range.
-    if let overlappingScopes: Set<Range<Cartridge.Location>> = contiguousScopes[addressAndBank.bank] {
-      var mutatedScopes: Set<Range<Cartridge.Location>> = overlappingScopes
-      for scope: Range<Cartridge.Location> in overlappingScopes {
+    if let overlappingScopes: Set<Range<Cartridge._Location>> = contiguousScopes[addressAndBank.bank] {
+      var mutatedScopes: Set<Range<Cartridge._Location>> = overlappingScopes
+      for scope: Range<Cartridge._Location> in overlappingScopes {
         guard scope.overlaps(cartRange) else {
           continue
         }

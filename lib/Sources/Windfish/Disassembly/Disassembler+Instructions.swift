@@ -6,7 +6,7 @@ extension Disassembler {
   /** Get the instruction at the given location, if one exists. */
   public func instruction(at pc: LR35902.Address, in bank: Cartridge.Bank) -> LR35902.Instruction? {
     precondition(bank > 0)
-    guard let location: Cartridge.Location = Cartridge.location(for: pc, in: bank) else {
+    guard let location: Cartridge._Location = Cartridge.location(for: pc, in: bank) else {
       return nil
     }
     guard code.contains(Int(truncatingIfNeeded: location)) else {
@@ -33,7 +33,7 @@ extension Disassembler {
     let instructionWidth: Int = Int(truncatingIfNeeded: instructionWidths[instruction.spec]!.total)
     let instructionRange: Range<Int> = intLocation..<(intLocation + instructionWidth)
     for index in instructionRange.dropFirst() {
-      let location = Cartridge.Location(truncatingIfNeeded: index)
+      let location = Cartridge._Location(truncatingIfNeeded: index)
       guard let existingInstruction = instructionMap[location] else {
         continue
       }
