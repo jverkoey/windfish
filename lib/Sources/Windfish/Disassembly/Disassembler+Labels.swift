@@ -14,13 +14,13 @@ extension Disassembler {
       return nil
     }
 
-    guard let location: Cartridge._Location = Cartridge.location(for: pc, in: bank) else {
+    guard let _location: Cartridge._Location = Cartridge.location(for: pc, in: bank) else {
       return nil
     }
     let name: String
-    if let explicitName: String = labelNames[location] {
+    if let explicitName: String = labelNames[_location] {
       name = explicitName
-    } else if let labelType: LabelType = labelTypes[location] {
+    } else if let labelType: LabelType = labelTypes[_location] {
       let bank: Cartridge.Bank = effectiveBank(at: pc, in: bank)
       switch labelType {
       case .transferOfControlType: name = "toc_\(bank.hexString)_\(pc.hexString)"
@@ -34,7 +34,7 @@ extension Disassembler {
 
     let scopes: Set<Range<Cartridge._Location>> = contiguousScopes(at: Cartridge.Location(address: pc, bank: bank))
     if let firstScope: Range<Cartridge._Location> = scopes.filter({ (scope: Range<Cartridge._Location>) -> Bool in
-      scope.lowerBound != location // Ignore ourself.
+      scope.lowerBound != _location // Ignore ourself.
     }).min(by: { (scope1: Range<Cartridge._Location>, scope2: Range<Cartridge._Location>) -> Bool in
       scope1.lowerBound < scope2.lowerBound
     }) {
@@ -66,6 +66,10 @@ extension Disassembler {
 
   /** Returns false if the location should not be able to show a label. */
   private func canShowLabel(at location: Cartridge.Location) -> Bool {
+    guard location.address < 0x8000 else {
+      return false  // Only show labels in cartridge data.
+    }
+
     let index: Int = location.index
     // Don't return labels that point to the middle of instructions.
     if instructionMap[Cartridge._Location(truncatingIfNeeded: location.index)] == nil && code.contains(index) {
