@@ -62,7 +62,7 @@ public final class Disassembler {
   var labelNames: [Cartridge._Location: String] = [:]
 
   /** When a soft terminator is encountered during linear sweep the sweep will immediately end. */
-  var softTerminators: [Cartridge._Location: Bool] = [:]
+  var softTerminators: [Cartridge.Location: Bool] = [:]
 
   /** Hints to the disassembler that a given location should be represented by a specific data type. */
   var typeAtLocation: [Cartridge._Location: String] = [:]
@@ -365,11 +365,12 @@ public final class Disassembler {
 
       var previousInstruction: LR35902.Instruction? = nil
       linear_sweep: while !run.hasReachedEnd(pc: runContext.pc) && pcIsValid(pc: runContext.pc, bank: runContext.bank) {
-        let location = Cartridge.location(for: runContext.pc, in: runContext.bank)!
+        let location = Cartridge.Location(address: runContext.pc, bank: runContext.bank)
         if softTerminators[location] != nil {
           break
         }
-        if data.contains(Int(location)) || text.contains(Int(location)) {
+        let _location = Cartridge.location(for: runContext.pc, in: runContext.bank)!
+        if data.contains(Int(_location)) || text.contains(Int(_location)) {
           advance(1)
           continue
         }
