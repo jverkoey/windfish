@@ -702,7 +702,7 @@ clean:
           lineBuffer.append(contentsOf: lineGroup)
           flush()
 
-          let initialType = type(of: writeContext.pc, in: initialBank)
+          let initialType = type(at: Cartridge.Location(address: writeContext.pc, bank: initialBank))
 
           // Accumulate bytes until the next instruction or transfer of control.
           var accumulator: [UInt8] = []
@@ -717,7 +717,7 @@ clean:
           } while writeContext.pc < end
             && instruction(at: writeContext.pc, in: initialBank) == nil
             && label(at: writeContext.pc, in: initialBank) == nil
-            && type(of: writeContext.pc, in: initialBank) == initialType
+            && type(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) == initialType
             && global == nil
 
           let globalValue: String?

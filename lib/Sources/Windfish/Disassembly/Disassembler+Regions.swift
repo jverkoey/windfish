@@ -18,17 +18,16 @@ extension Disassembler {
   }
 
   /** Returns the type of information at the given location. */
-  func type(of address: LR35902.Address, in bank: Cartridge.Bank) -> ByteType {
-    precondition(bank > 0)
-    guard let cartridgeLocation: Cartridge._Location = Cartridge.location(for: address, in: bank) else {
+  func type(at location: Cartridge.Location) -> ByteType {
+    guard location.address < 0x8000 else {
       return .ram
     }
-    let index = Int(truncatingIfNeeded: cartridgeLocation)
+    let index = location.index
     if code.contains(index) {
       return .code
     }
     if data.contains(index) {
-      switch formatOfData(at: Cartridge.Location(address: address, bank: bank)) {
+      switch formatOfData(at: location) {
       case .image1bpp:  return .image1bpp
       case .image2bpp:  return .image2bpp
       case .jumpTable:  return .jumpTable
