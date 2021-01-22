@@ -38,9 +38,8 @@ extension Disassembler {
     }).min(by: { (scope1: Range<Cartridge._Location>, scope2: Range<Cartridge._Location>) -> Bool in
       scope1.lowerBound < scope2.lowerBound
     }) {
-      let addressAndBank: (address: LR35902.Address, bank: Cartridge.Bank) =
-        Cartridge.addressAndBank(from: firstScope.lowerBound)
-      if let firstScopeLabel: String = label(at: addressAndBank.address, in: addressAndBank.bank)?.components(separatedBy: ".").first {
+      let scopeLocation: Cartridge.Location = Cartridge.Location(location: firstScope.lowerBound)
+      if let firstScopeLabel: String = label(at: scopeLocation.address, in: scopeLocation.bank)?.components(separatedBy: ".").first {
         return firstScopeLabel + "." + name
       }
     }
