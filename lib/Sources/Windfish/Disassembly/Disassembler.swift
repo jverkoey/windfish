@@ -132,7 +132,7 @@ public final class Disassembler {
   var text = IndexSet()
 
   /** The maximum length of a line of text within a given range. */
-  var textLengths: [Range<Cartridge._Location>: Int] = [:]
+  var textLengths: [Range<Cartridge.Location>: Int] = [:]
 
   /** Character codes mapped to strings. */
   var characterMap: [UInt8: String] = [:]
