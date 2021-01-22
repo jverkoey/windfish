@@ -115,7 +115,7 @@ extension Disassembler {
     let backwardTocs: [(source: Cartridge._Location, destination: Cartridge._Location)] = tocs.reduce(into: [], { (accumulator, element) in
       let tocsInThisScope = element.tocs.filter {
         scope.contains(Cartridge._Location(truncatingIfNeeded: $0.index)) && element.destination < Cartridge._Location(truncatingIfNeeded: $0.index)
-          && (labelNames[element.destination] != nil || labelTypes[Cartridge.Location(location: element.destination)] != nil)
+          && (labelNames[Cartridge.Location(location: element.destination)] != nil || labelTypes[Cartridge.Location(location: element.destination)] != nil)
       }
       for toc in tocsInThisScope {
         let _toc = Cartridge._Location(truncatingIfNeeded: toc.index)
@@ -167,7 +167,7 @@ extension Disassembler {
       let tocsInThisScope = element.tocs.filter {
         scope.contains(Cartridge._Location(truncatingIfNeeded: $0.index))
           && element.destination > Cartridge._Location(truncatingIfNeeded: $0.index)
-          && (labelNames[element.destination] != nil || labelTypes[Cartridge.Location(location: element.destination)] != nil)
+          && (labelNames[Cartridge.Location(location: element.destination)] != nil || labelTypes[Cartridge.Location(location: element.destination)] != nil)
       }
       for toc in tocsInThisScope {
         let _toc = Cartridge._Location(truncatingIfNeeded: toc.index)

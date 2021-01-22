@@ -115,10 +115,9 @@ extension Disassembler {
 
     // Remove any labels, instructions, and transfers of control in this range.
     for location: Cartridge.Location in range.dropFirst() {
-      let _location = Cartridge._Location(truncatingIfNeeded: location.index)
       deleteInstruction(at: location)
       transfers[location] = nil
-      labelNames[_location] = nil
+      labelNames[location] = nil
       labelTypes[location] = nil
       bankChanges[location] = nil
     }

@@ -59,7 +59,7 @@ public final class Disassembler {
   var executableRegions = Set<Range<Cartridge._Location>>()
 
   /** Explicit labels at specific locations. */
-  var labelNames: [Cartridge._Location: String] = [:]
+  var labelNames: [Cartridge.Location: String] = [:]
 
   /** When a soft terminator is encountered during linear sweep the sweep will immediately end. */
   var softTerminators: [Cartridge.Location: Bool] = [:]
