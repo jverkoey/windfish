@@ -56,7 +56,7 @@ public final class Disassembler {
   // MARK: - Pre-disassembly hints and configurations
 
   /** Ranges of executable regions that should be disassembled. */
-  var executableRegions = Set<Range<Cartridge._Location>>()
+  var executableRegions = Set<Range<Cartridge.Location>>()
 
   /** Explicit labels at specific locations. */
   var labelNames: [Cartridge.Location: String] = [:]
@@ -240,12 +240,10 @@ public final class Disassembler {
   }
 
   public func disassemble() {
-    for executableRegion in executableRegions.sorted(by: { (a: Range<Cartridge._Location>, b: Range<Cartridge._Location>) -> Bool in
+    for executableRegion in executableRegions.sorted(by: { (a: Range<Cartridge.Location>, b: Range<Cartridge.Location>) -> Bool in
       a.lowerBound < b.lowerBound
     }) {
-      let lowerBound: (address: LR35902.Address, bank: Cartridge.Bank) = Cartridge.addressAndBank(from: executableRegion.lowerBound)
-      let upperBound: (address: LR35902.Address, bank: Cartridge.Bank) = Cartridge.addressAndBank(from: executableRegion.upperBound - 1)
-      disassemble(range: Cartridge.Location(address: lowerBound.address, bank: lowerBound.bank)..<Cartridge.Location(address: upperBound.address + 1, bank: upperBound.bank))
+      disassemble(range: executableRegion)
     }
   }
 

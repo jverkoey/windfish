@@ -4,7 +4,7 @@ import XCTest
 extension Disassembler {
   // Short-hand notation for disassembling a region
   func disassemble(range: Range<LR35902.Address>, inBank bank: Cartridge.Bank) {
-    registerExecutableRegion(at: range, in: bank)
+    registerExecutableRegion(at: Cartridge.Location(address: range.lowerBound, bank: bank)..<Cartridge.Location(address: range.upperBound, bank: bank))
     disassemble()
   }
 }

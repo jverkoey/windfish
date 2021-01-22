@@ -56,12 +56,12 @@ extension ProjectDocument {
 
       // Disassemble everything first
       for region in self.project.configuration.regions {
-        let bank = max(1, region.bank)
+        let location = Cartridge.Location(address: region.address, bank: region.bank)
         switch region.regionType {
         case Region.Kind.region:
-          disassembly.registerExecutableRegion(at: region.address..<(region.address + region.length), in: bank, named: region.name)
+          disassembly.registerExecutableRegion(at: location..<(location + region.length), named: region.name)
         case Region.Kind.function:
-          disassembly.registerFunction(startingAt: Cartridge.Location(address: region.address, bank: bank), named: region.name)
+          disassembly.registerFunction(startingAt: location, named: region.name)
         default:
           break
         }
