@@ -185,8 +185,8 @@ public final class Disassembler {
         return
       }
       self.registerTransferOfControl(
-        to: LR35902.Address(truncatingIfNeeded: toAddress), in: max(1, Cartridge.Bank(truncatingIfNeeded: toBank)),
-        from: LR35902.Address(truncatingIfNeeded: fromAddress), in: max(1, Cartridge.Bank(truncatingIfNeeded: fromBank)),
+        to: Cartridge.Location(address: toAddress, bank: toBank),
+        from: Cartridge.Location(address: fromAddress, bank: fromBank),
         spec: LR35902.InstructionSet.table[opcode]
       )
     }
@@ -309,7 +309,9 @@ public final class Disassembler {
 
       fromRun.children.append(run)
 
-      self.registerTransferOfControl(to: toAddress, in: bank, from: fromAddress, in: bank, spec: instruction.spec)
+      self.registerTransferOfControl(to: Cartridge.Location(address: toAddress, bank: bank),
+                                     from: Cartridge.Location(address: fromAddress, bank: bank),
+                                     spec: instruction.spec)
     }
 
     // Extract any scripted events.

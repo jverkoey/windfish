@@ -7,13 +7,9 @@ extension Disassembler {
   }
 
   /** Register a new transfer of control to a given location from another location. */
-  public func registerTransferOfControl(to pc: LR35902.Address,
-                                        in bank: Cartridge.Bank,
-                                        from fromPc: LR35902.Address,
-                                        in fromBank: Cartridge.Bank,
+  public func registerTransferOfControl(to toLocation: Cartridge.Location,
+                                        from fromLocation: Cartridge.Location,
                                         spec: LR35902.Instruction.Spec) {
-    let toLocation = Cartridge.Location(address: pc, bank: bank)
-    let fromLocation = Cartridge.Location(address: fromPc, bank: fromBank)
     transfers[toLocation, default: Set()].insert(fromLocation)
 
     // Tag the label type at this address
