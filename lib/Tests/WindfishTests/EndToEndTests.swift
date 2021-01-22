@@ -21,7 +21,7 @@ extension Disassembler {
     disassemble()
 
     registerData(at: Cartridge.Location(address: 0x0104, bank: 0x01)..<Cartridge.Location(address: 0x0134, bank: 0x01))
-    registerText(at: 0x0134..<0x0143, in: 0x01)
+    registerText(at: Cartridge.Location(address: 0x0134, bank: 0x01)..<Cartridge.Location(address: 0x0143, bank: 0x01))
     registerData(at: Cartridge.Location(address: 0x0144, bank: 0x01)..<Cartridge.Location(address: 0x0146, bank: 0x01))
     registerData(at: Cartridge.Location(address: 0x0147, bank: 0x01))
     registerData(at: Cartridge.Location(address: 0x014B, bank: 0x01))

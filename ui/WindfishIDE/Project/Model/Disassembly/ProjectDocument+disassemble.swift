@@ -77,7 +77,8 @@ extension ProjectDocument {
           disassembly.registerLabel(at: location, named: region.name)
         case Region.Kind.string:
           disassembly.registerLabel(at: location, named: region.name)
-          disassembly.registerText(at: region.address..<(region.address + region.length), in: location.bank, lineLength: nil)
+          let startLocation = Cartridge.Location(address: region.address, bank: region.bank)
+          disassembly.registerText(at: startLocation..<(startLocation + region.length), lineLength: nil)
         case Region.Kind.image1bpp:
           disassembly.registerLabel(at: location, named: region.name)
           let startLocation = Cartridge.Location(address: region.address, bank: location.bank)

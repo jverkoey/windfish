@@ -9,16 +9,11 @@ extension Disassembler {
   }
 
   /** Registers that a specific location contains text. */
-  public func registerText(at range: Range<LR35902.Address>, in bank: Cartridge.Bank, lineLength: Int? = nil) {
-    precondition(bank > 0)
-    guard let cartRange = range.asCartridgeRange(in: bank) else {
-      return
-    }
+  public func registerText(at range: Range<Cartridge.Location>, lineLength: Int? = nil) {
     if let lineLength = lineLength {
-      textLengths[cartRange] = lineLength
+      textLengths[Cartridge._Location(truncatingIfNeeded: range.lowerBound.index)..<Cartridge._Location(truncatingIfNeeded: range.upperBound.index)] = lineLength
     }
-    registerRegion(range: Cartridge.Location(address: range.lowerBound, bank: bank)..<Cartridge.Location(address: range.upperBound, bank: bank),
-                   as: .text)
+    registerRegion(range: range, as: .text)
   }
 
   /** Maps a character to a specific string. */

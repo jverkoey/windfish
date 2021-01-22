@@ -160,28 +160,23 @@ public final class Disassembler {
       guard let self = self else {
         return
       }
-      self.registerText(at: LR35902.Address(truncatingIfNeeded: startAddress)..<LR35902.Address(truncatingIfNeeded: endAddress),
-                        in: max(1, Cartridge.Bank(truncatingIfNeeded: bank)),
+      self.registerText(at: Cartridge.Location(address: startAddress, bank: bank)..<Cartridge.Location(address: endAddress, bank: bank),
                         lineLength: lineLength)
     }
     let registerData: @convention(block) (Int, Int, Int) -> Void = { [weak self] bank, startAddress, endAddress in
       guard let self = self else {
         return
       }
-      let castedBank = Cartridge.Bank(truncatingIfNeeded: bank)
       self.registerData(
-        at:Cartridge.Location(address: LR35902.Address(truncatingIfNeeded: startAddress), bank: castedBank)
-          ..< Cartridge.Location(address: LR35902.Address(truncatingIfNeeded: endAddress), bank: castedBank)
+        at: Cartridge.Location(address: startAddress, bank: bank)..<Cartridge.Location(address: endAddress, bank: bank)
       )
     }
     let registerJumpTable: @convention(block) (Int, Int, Int) -> Void = { [weak self] bank, startAddress, endAddress in
       guard let self = self else {
         return
       }
-      let castedBank = Cartridge.Bank(truncatingIfNeeded: bank)
       self.registerData(
-        at:Cartridge.Location(address: LR35902.Address(truncatingIfNeeded: startAddress), bank: castedBank)
-          ..< Cartridge.Location(address: LR35902.Address(truncatingIfNeeded: endAddress), bank: castedBank),
+        at: Cartridge.Location(address: startAddress, bank: bank)..<Cartridge.Location(address: endAddress, bank: bank),
         format: .jumpTable
       )
     }
