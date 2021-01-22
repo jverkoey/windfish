@@ -245,7 +245,7 @@ public final class Disassembler {
     }) {
       let lowerBound: (address: LR35902.Address, bank: Cartridge.Bank) = Cartridge.addressAndBank(from: executableRegion.lowerBound)
       let upperBound: (address: LR35902.Address, bank: Cartridge.Bank) = Cartridge.addressAndBank(from: executableRegion.upperBound - 1)
-      disassemble(range: lowerBound.address..<(upperBound.address + 1), inBank: lowerBound.bank)
+      disassemble(range: Cartridge.Location(address: lowerBound.address, bank: lowerBound.bank)..<Cartridge.Location(address: upperBound.address + 1, bank: upperBound.bank))
     }
   }
 
@@ -289,11 +289,11 @@ public final class Disassembler {
     return LR35902.Instruction(spec: spec, immediate: nil)
   }
 
-  private func disassemble(range: Range<LR35902.Address>, inBank bankInitial: Cartridge.Bank) {
+  private func disassemble(range: Range<Cartridge.Location>) {
     var visitedAddresses = IndexSet()
 
     let runQueue = Queue<Disassembler.Run>()
-    let firstRun = Run(from: range.lowerBound, initialBank: bankInitial, upTo: range.upperBound)
+    let firstRun = Run(from: range.lowerBound.address, initialBank: range.lowerBound.bank, upTo: range.upperBound.address)
     runQueue.add(firstRun)
 
     let queueRun: (Run, LR35902.Address, LR35902.Address, Cartridge.Bank, LR35902.Instruction) -> Void = { fromRun, fromAddress, toAddress, bank, instruction in
