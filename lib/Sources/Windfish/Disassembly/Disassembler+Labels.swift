@@ -10,13 +10,13 @@ extension Disassembler {
 
   /** Returns the label at the given location, if any. */
   func label(at pc: LR35902.Address, in bank: Cartridge.Bank) -> String? {
-    guard let location: Cartridge._Location = Cartridge.location(for: pc, in: bank) else {
-      return nil
-    }
-    guard canShowLabel(at: location) else {
+    guard canShowLabel(at: Cartridge.Location(address: pc, bank: bank)) else {
       return nil
     }
 
+    guard let location: Cartridge._Location = Cartridge.location(for: pc, in: bank) else {
+      return nil
+    }
     let name: String
     if let explicitName: String = labelNames[location] {
       name = explicitName
@@ -54,7 +54,7 @@ extension Disassembler {
       guard labelNames[location] != nil || labelTypes[location] != nil else {
         return false
       }
-      return canShowLabel(at: location)
+      return canShowLabel(at: Cartridge.Location(location: location))
     }
   }
 
@@ -69,14 +69,14 @@ extension Disassembler {
   }
 
   /** Returns false if the location should not be able to show a label. */
-  private func canShowLabel(at location: Cartridge._Location) -> Bool {
-    let intLocation: Int = Int(truncatingIfNeeded: location)
+  private func canShowLabel(at location: Cartridge.Location) -> Bool {
+    let index: Int = location.index
     // Don't return labels that point to the middle of instructions.
-    if instructionMap[location] == nil && code.contains(intLocation) {
+    if instructionMap[Cartridge._Location(truncatingIfNeeded: location.index)] == nil && code.contains(index) {
       return false
     }
     // Don't return labels that point to the middle of data.
-    if dataBlocks.contains(intLocation) {
+    if dataBlocks.contains(index) {
       return false
     }
     return true
