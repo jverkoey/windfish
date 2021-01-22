@@ -91,15 +91,15 @@ extension Disassembler {
       let contiguousScopeWithoutFirstInstruction = contiguousScope.dropFirst()
       inferLoops(in: contiguousScopeWithoutFirstInstruction)
       inferElses(in: contiguousScopeWithoutFirstInstruction)
-      inferReturns(in: contiguousScopeWithoutFirstInstruction)
+      inferReturns(in: Cartridge.Location(location: contiguousScopeWithoutFirstInstruction.lowerBound)..<Cartridge.Location(location: contiguousScopeWithoutFirstInstruction.upperBound))
     }
   }
 
-  private func inferReturns(in scope: Range<Cartridge._Location>) {
+  private func inferReturns(in scope: Range<Cartridge.Location>) {
     let labelLocations = self.labelLocations(in: scope)
-    let returnLabelAddresses = labelLocations.filter { instructionMap[$0]?.spec.category == .ret }
+    let returnLabelAddresses = labelLocations.filter { instructionMap[Cartridge._Location(truncatingIfNeeded: $0.index)]?.spec.category == .ret }
     for cartLocation in returnLabelAddresses {
-      labelTypes[cartLocation] = .returnType
+      labelTypes[Cartridge._Location(truncatingIfNeeded: cartLocation.index)] = .returnType
     }
   }
 

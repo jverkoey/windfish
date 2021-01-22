@@ -49,12 +49,13 @@ extension Disassembler {
   }
 
   /** Returns the locations of any labels within the given range. */
-  func labelLocations(in range: Range<Cartridge._Location>) -> [Cartridge._Location] {
-    return range.filter { (location: Cartridge._Location) -> Bool in
-      guard labelNames[location] != nil || labelTypes[location] != nil else {
+  func labelLocations(in range: Range<Cartridge.Location>) -> [Cartridge.Location] {
+    return range.filter { (location: Cartridge.Location) -> Bool in
+      let _location = Cartridge._Location(truncatingIfNeeded: location.index)
+      guard labelNames[_location] != nil || labelTypes[_location] != nil else {
         return false
       }
-      return canShowLabel(at: Cartridge.Location(location: location))
+      return canShowLabel(at: location)
     }
   }
 
