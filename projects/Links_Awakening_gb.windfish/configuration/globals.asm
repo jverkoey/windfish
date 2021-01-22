@@ -228,7 +228,7 @@ hButtonsInactiveDelay EQU $FFB5 ; [decimal]
 
 hNextDefaultMusicTrack EQU $FFBF ; [MUSIC]
 
-hPressedButtonsMask EQU $FFCB ; [J]
+hPressedButtonsMask EQU $FFCB ; [BUTTON]
 
 hSwordIntersectedAreaY EQU $FFCD ; [hex]
 
