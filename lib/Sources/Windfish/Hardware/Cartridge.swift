@@ -82,8 +82,9 @@ extension Cartridge {
       self.init(address: LR35902.Address(truncatingIfNeeded: address), bank: Cartridge.Bank(truncatingIfNeeded: bank))
     }
 
-    public init(location: Cartridge._Location) {
-      (self.address, self.bank) = Cartridge.addressAndBank(from: location)
+    public convenience init(location: Cartridge._Location) {
+      let (address, bank) = Cartridge.addressAndBank(from: location)
+      self.init(address: address, bank: bank)
     }
 
     public static func + (lhs: Cartridge.Location, rhs: Int) -> Cartridge.Location {
