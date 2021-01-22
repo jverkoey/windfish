@@ -22,14 +22,10 @@ extension Disassembler {
 
     // Clear any existing instructions in this instruction's footprint.
     let instructionWidths: [LR35902.Instruction.Spec: CPU.InstructionWidth<UInt16>] = LR35902.InstructionSet.widths
-    let instructionWidth: Int = Int(truncatingIfNeeded: instructionWidths[instruction.spec]!.total)
-    let instructionRange: Range<Int> = index..<(index + instructionWidth)
-    for index in instructionRange.dropFirst() {
-      let location = Cartridge._Location(truncatingIfNeeded: index)
-      guard let existingInstruction = instructionMap[location] else {
-        continue
-      }
-      deleteInstruction(at: location)
+    let instructionRange: Range<Cartridge.Location> = location..<(location + instructionWidths[instruction.spec]!.total)
+    for clearLocation in instructionRange.dropFirst() {
+      let _location = Cartridge._Location(truncatingIfNeeded: clearLocation.index)
+      deleteInstruction(at: _location)
     }
 
     instructionMap[Cartridge._Location(truncatingIfNeeded: index)] = instruction

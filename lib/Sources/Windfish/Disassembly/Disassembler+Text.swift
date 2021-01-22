@@ -14,11 +14,11 @@ extension Disassembler {
     guard let cartRange = range.asCartridgeRange(in: bank) else {
       return
     }
-    let range: Range<Int> = cartRange.asIntRange()
     if let lineLength = lineLength {
       textLengths[cartRange] = lineLength
     }
-    registerRegion(range: range, as: .text)
+    registerRegion(range: Cartridge.Location(address: range.lowerBound, bank: bank)..<Cartridge.Location(address: range.upperBound, bank: bank),
+                   as: .text)
   }
 
   /** Maps a character to a specific string. */

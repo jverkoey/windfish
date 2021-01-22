@@ -48,28 +48,29 @@ extension Disassembler {
   }
 
   /** Registers a range as a specific region category. Will clear any existing regions in the range. */
-  func registerRegion(range: Range<Int>, as category: RegionCategory) {
+  func registerRegion(range: Range<Cartridge.Location>, as category: RegionCategory) {
+    let intRange = range.asIntRange()
     switch category {
     case .code:
-      code.insert(integersIn: range)
+      code.insert(integersIn: intRange)
 
-      clearData(in: range)
-      clearText(in: range)
+      clearData(in: intRange)
+      clearText(in: intRange)
 
     case .data:
-      data.insert(integersIn: range)
+      data.insert(integersIn: intRange)
       if range.count > 1 {
-        dataBlocks.insert(integersIn: (range.lowerBound + 1)..<range.upperBound)
+        dataBlocks.insert(integersIn: intRange.dropFirst())
       }
 
-      clearCode(in: range)
-      clearText(in: range)
+      clearCode(in: intRange)
+      clearText(in: intRange)
 
     case .text:
-      text.insert(integersIn: range)
+      text.insert(integersIn: intRange)
 
-      clearCode(in: range)
-      clearData(in: range)
+      clearCode(in: intRange)
+      clearData(in: intRange)
     }
   }
 

@@ -28,6 +28,6 @@ extension Disassembler {
       dataFormats[key]?.remove(integersIn: intRange)
     }
     dataFormats[format, default: IndexSet()].insert(integersIn: intRange)
-    registerRegion(range: intRange, as: .data)
+    registerRegion(range: range, as: .data)
   }
 }
