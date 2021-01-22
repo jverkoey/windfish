@@ -20,8 +20,8 @@ extension Disassembler {
   }
 
   /** Registers a function at the given location. */
-  public func registerFunction(startingAt pc: LR35902.Address, in bank: Cartridge.Bank, named name: String) {
-    let upperBound: LR35902.Address = (pc < 0x4000) ? 0x4000 : 0x8000
-    registerExecutableRegion(at: pc..<upperBound, in: bank, named: name)
+  public func registerFunction(startingAt location: Cartridge.Location, named name: String) {
+    let upperBound: LR35902.Address = (location.address < 0x4000) ? 0x4000 : 0x8000
+    registerExecutableRegion(at: location.address..<upperBound, in: location.bank, named: name)
   }
 }

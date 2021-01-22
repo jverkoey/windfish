@@ -199,9 +199,7 @@ public final class Disassembler {
       guard let self = self else {
         return
       }
-      self.registerFunction(startingAt: LR35902.Address(truncatingIfNeeded: address),
-                            in: max(1, Cartridge.Bank(truncatingIfNeeded: bank)),
-                            named: name)
+      self.registerFunction(startingAt: Cartridge.Location(address: address, bank: bank), named: name)
     }
     let registerBankChange: @convention(block) (Int, Int, Int) -> Void = { [weak self] _desiredBank, address, bank in
       guard let self = self else {

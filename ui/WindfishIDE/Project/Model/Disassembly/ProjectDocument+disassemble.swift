@@ -61,7 +61,7 @@ extension ProjectDocument {
         case Region.Kind.region:
           disassembly.registerExecutableRegion(at: region.address..<(region.address + region.length), in: bank, named: region.name)
         case Region.Kind.function:
-          disassembly.registerFunction(startingAt: region.address, in: bank, named: region.name)
+          disassembly.registerFunction(startingAt: Cartridge.Location(address: region.address, bank: bank), named: region.name)
         default:
           break
         }
