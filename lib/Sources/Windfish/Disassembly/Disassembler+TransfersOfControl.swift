@@ -2,12 +2,8 @@ import Foundation
 
 extension Disassembler {
   /** Get all of the transfers of control to the given location. */
-  func transfersOfControl(at pc: LR35902.Address, in bank: Cartridge.Bank) -> Set<Cartridge._Location>? {
-    precondition(bank > 0)
-    guard let cartridgeLocation: Cartridge._Location = Cartridge.location(for: pc, in: bank) else {
-      return nil
-    }
-    return transfers[cartridgeLocation]
+  func transfersOfControl(at location: Cartridge.Location) -> Set<Cartridge._Location>? {
+    return transfers[Cartridge._Location(truncatingIfNeeded: location.index)]
   }
 
   /** Register a new transfer of control to a given location from another location. */

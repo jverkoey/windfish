@@ -26,7 +26,7 @@ extension RGBDSDisassembler {
       guard case let .imm16(immediate) = instruction.immediate else {
         preconditionFailure("Invalid immediate associated with instruction")
       }
-      guard context.disassembly.transfersOfControl(at: immediate, in: context.bank) != nil else {
+      guard context.disassembly.transfersOfControl(at: Cartridge.Location(address: immediate, bank: context.bank)) != nil else {
         break // Fall through to the default handler.
       }
       let addressLabel = self.addressLabel(context, address: immediate) ?? RGBDS.asHexString(immediate)
@@ -170,7 +170,7 @@ extension RGBDSDisassembler {
       }
       if let context = context {
         let jumpAddress = (context.address + LR35902.InstructionSet.widths[instruction.spec]!.total).advanced(by: Int(Int8(bitPattern: immediate)))
-        if context.disassembly.transfersOfControl(at: jumpAddress, in: context.bank) != nil {
+        if context.disassembly.transfersOfControl(at: Cartridge.Location(address: jumpAddress, bank: context.bank)) != nil {
           if let label = addressLabel(context, address: jumpAddress) {
             return label
           }

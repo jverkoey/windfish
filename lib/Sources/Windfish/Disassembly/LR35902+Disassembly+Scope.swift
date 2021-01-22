@@ -106,7 +106,7 @@ extension Disassembler {
   private func inferLoops(in scope: Range<Cartridge._Location>) {
     let tocs: [(destination: Cartridge._Location, tocs: Set<Cartridge._Location>)] = scope.compactMap {
       let (address, bank) = Cartridge.addressAndBank(from: $0)
-      if let toc = transfersOfControl(at: address, in: bank) {
+      if let toc = transfersOfControl(at: Cartridge.Location(address: address, bank: bank)) {
         return ($0, toc)
       } else {
         return nil
@@ -154,7 +154,7 @@ extension Disassembler {
   private func inferElses(in scope: Range<Cartridge._Location>) {
     let tocs: [(destination: Cartridge._Location, tocs: Set<Cartridge._Location>)] = scope.compactMap {
       let (address, bank) = Cartridge.addressAndBank(from: $0)
-      if let toc = transfersOfControl(at: address, in: bank) {
+      if let toc = transfersOfControl(at: Cartridge.Location(address: address, bank: bank)) {
         return ($0, toc)
       } else {
         return nil

@@ -614,7 +614,7 @@ clean:
           lineGroup.append(Line(semantic: .preComment(comment: preComment)))
         }
         if let label = label(at: Cartridge.Location(address:writeContext.pc, bank: initialBank)) {
-          if let transfersOfControl = transfersOfControl(at: writeContext.pc, in: initialBank) {
+          if let transfersOfControl = transfersOfControl(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) {
             lineGroup.append(Line(semantic: .transferOfControl(transfersOfControl, label), address: writeContext.pc, bank: writeContext.bank))
           } else {
             let instructionScope = labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)).map { $0.label }
