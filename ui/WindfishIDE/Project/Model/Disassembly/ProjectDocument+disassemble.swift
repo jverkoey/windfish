@@ -80,13 +80,16 @@ extension ProjectDocument {
           disassembly.registerText(at: region.address..<(region.address + region.length), in: bank, lineLength: nil)
         case Region.Kind.image1bpp:
           disassembly.registerLabel(at: region.address, in: bank, named: region.name)
-          disassembly.registerData(at: region.address..<(region.address + region.length), in: bank, format: .image1bpp)
+          let startLocation = Cartridge.Location(address: region.address, bank: bank)
+          disassembly.registerData(at: startLocation..<(startLocation + region.length), format: .image1bpp)
         case Region.Kind.image2bpp:
           disassembly.registerLabel(at: region.address, in: bank, named: region.name)
-          disassembly.registerData(at: region.address..<(region.address + region.length), in: bank, format: .image2bpp)
+          let startLocation = Cartridge.Location(address: region.address, bank: bank)
+          disassembly.registerData(at: startLocation..<(startLocation + region.length), format: .image2bpp)
         case Region.Kind.data:
           disassembly.registerLabel(at: region.address, in: bank, named: region.name)
-          disassembly.registerData(at: region.address..<(region.address + region.length), in: bank)
+          let startLocation = Cartridge.Location(address: region.address, bank: bank)
+          disassembly.registerData(at: startLocation..<(startLocation + region.length))
         default:
           break
         }

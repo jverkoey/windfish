@@ -9,34 +9,25 @@ extension Disassembler {
   }
 
   /** Returns the format of the data at the given location, if any is known. */
-  func formatOfData(at address: LR35902.Address, in bank: Cartridge.Bank) -> DataFormat? {
-    precondition(bank > 0)
-    guard let location = Cartridge.location(for: address, in: bank) else {
-      return nil
-    }
-    let intLocation = Int(truncatingIfNeeded: location)
+  func formatOfData(at location: Cartridge.Location) -> DataFormat? {
+    let index = location.index
     return dataFormats.first { (key: DataFormat, value: IndexSet) -> Bool in
-      value.contains(intLocation)
+      value.contains(index)
     }?.key
   }
 
   /** Registers that a specific location contains data. */
-  func registerData(at address: LR35902.Address, in bank: Cartridge.Bank) {
-    precondition(bank > 0)
-    registerData(at: address..<(address+1), in: bank)
+  func registerData(at location: Cartridge.Location) {
+    registerData(at: location..<(location + 1))
   }
 
   /** Registers that a specific range contains data. */
-  public func registerData(at range: Range<LR35902.Address>, in bank: Cartridge.Bank, format: DataFormat = .bytes) {
-    precondition(bank > 0)
-    guard let cartRange: Range<Cartridge._Location> = range.asCartridgeRange(in: bank) else {
-      return
-    }
-    let intRange = cartRange.asIntRange()
+  public func registerData(at range: Range<Cartridge.Location>, format: DataFormat = .bytes) {
+    let intRange = range.asIntRange()
     for key in dataFormats.keys {
       dataFormats[key]?.remove(integersIn: intRange)
     }
     dataFormats[format, default: IndexSet()].insert(integersIn: intRange)
-    registerRegion(range: cartRange.asIntRange(), as: .data)
+    registerRegion(range: intRange, as: .data)
   }
 }

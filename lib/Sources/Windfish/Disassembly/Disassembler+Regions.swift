@@ -28,7 +28,7 @@ extension Disassembler {
       return .code
     }
     if data.contains(index) {
-      switch formatOfData(at: address, in: bank) {
+      switch formatOfData(at: Cartridge.Location(address: address, bank: bank)) {
       case .image1bpp:  return .image1bpp
       case .image2bpp:  return .image2bpp
       case .jumpTable:  return .jumpTable

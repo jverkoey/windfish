@@ -24,7 +24,7 @@ extension Disassembler {
 
     if address < 0x4000 {
       registerLabel(at: address, in: 0x01, named: name)
-      registerData(at: address, in: 0x01)
+      registerData(at: Cartridge.Location(address: address, bank: 0x01))
     }
   }
 }

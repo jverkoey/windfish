@@ -20,14 +20,14 @@ extension Disassembler {
 
     disassemble()
 
-    registerData(at: 0x0104..<0x0134, in: 0x01)
+    registerData(at: Cartridge.Location(address: 0x0104, bank: 0x01)..<Cartridge.Location(address: 0x0134, bank: 0x01))
     registerText(at: 0x0134..<0x0143, in: 0x01)
-    registerData(at: 0x0144..<0x0146, in: 0x01)
-    registerData(at: 0x0147, in: 0x01)
-    registerData(at: 0x014B, in: 0x01)
-    registerData(at: 0x014C, in: 0x01)
-    registerData(at: 0x014D, in: 0x01)
-    registerData(at: 0x014E..<0x0150, in: 0x01)
+    registerData(at: Cartridge.Location(address: 0x0144, bank: 0x01)..<Cartridge.Location(address: 0x0146, bank: 0x01))
+    registerData(at: Cartridge.Location(address: 0x0147, bank: 0x01))
+    registerData(at: Cartridge.Location(address: 0x014B, bank: 0x01))
+    registerData(at: Cartridge.Location(address: 0x014C, bank: 0x01))
+    registerData(at: Cartridge.Location(address: 0x014D, bank: 0x01))
+    registerData(at: Cartridge.Location(address: 0x014E, bank: 0x01)..<Cartridge.Location(address: 0x0150, bank: 0x01))
   }
 }
 
