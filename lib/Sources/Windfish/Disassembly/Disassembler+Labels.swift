@@ -59,13 +59,10 @@ extension Disassembler {
   }
 
   /** Registers a label name at a specific location. */
-  public func registerLabel(at pc: LR35902.Address, in bank: Cartridge.Bank, named name: String) {
+  public func registerLabel(at location: Cartridge.Location, named name: String) {
     // TODO: Make this throw an exception that can be presented to the user.
     precondition(!name.contains("."), "Labels cannot contain dots.")
-    guard let cartridgeLocation: Cartridge._Location = Cartridge.location(for: pc, inHumanProvided: bank) else {
-      preconditionFailure("Setting a label in a non-cart addressable location is not yet supported.")
-    }
-    labelNames[cartridgeLocation] = name
+    labelNames[Cartridge._Location(truncatingIfNeeded: location.index)] = name
   }
 
   /** Returns false if the location should not be able to show a label. */

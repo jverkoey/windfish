@@ -71,24 +71,24 @@ extension ProjectDocument {
 
       // And then set any explicit regions
       for region in self.project.configuration.regions {
-        let bank = max(1, region.bank)
+        let location = Cartridge.Location(address: region.address, bank: region.bank)
         switch region.regionType {
         case Region.Kind.label:
-          disassembly.registerLabel(at: region.address, in: bank, named: region.name)
+          disassembly.registerLabel(at: location, named: region.name)
         case Region.Kind.string:
-          disassembly.registerLabel(at: region.address, in: bank, named: region.name)
-          disassembly.registerText(at: region.address..<(region.address + region.length), in: bank, lineLength: nil)
+          disassembly.registerLabel(at: location, named: region.name)
+          disassembly.registerText(at: region.address..<(region.address + region.length), in: location.bank, lineLength: nil)
         case Region.Kind.image1bpp:
-          disassembly.registerLabel(at: region.address, in: bank, named: region.name)
-          let startLocation = Cartridge.Location(address: region.address, bank: bank)
+          disassembly.registerLabel(at: location, named: region.name)
+          let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
           disassembly.registerData(at: startLocation..<(startLocation + region.length), format: .image1bpp)
         case Region.Kind.image2bpp:
-          disassembly.registerLabel(at: region.address, in: bank, named: region.name)
-          let startLocation = Cartridge.Location(address: region.address, bank: bank)
+          disassembly.registerLabel(at: location, named: region.name)
+          let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
           disassembly.registerData(at: startLocation..<(startLocation + region.length), format: .image2bpp)
         case Region.Kind.data:
-          disassembly.registerLabel(at: region.address, in: bank, named: region.name)
-          let startLocation = Cartridge.Location(address: region.address, bank: bank)
+          disassembly.registerLabel(at: location, named: region.name)
+          let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
           disassembly.registerData(at: startLocation..<(startLocation + region.length))
         default:
           break

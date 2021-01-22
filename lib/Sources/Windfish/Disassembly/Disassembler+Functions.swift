@@ -9,7 +9,7 @@ extension Disassembler {
     }
     precondition(bank > 0)
     if let name = name {
-      registerLabel(at: range.lowerBound, in: bank, named: name)
+      registerLabel(at: Cartridge.Location(address: range.lowerBound, bank: bank), named: name)
     }
 
     guard let startLocation = Cartridge.location(for: range.lowerBound, in: bank),

@@ -64,8 +64,8 @@ extension Cartridge {
 extension Cartridge {
   /** A location in a Gameboy ROM, as expressed by a banked address. */
   public final class Location {
-    let address: LR35902.Address
-    let bank: Cartridge.Bank
+    public let address: LR35902.Address
+    public let bank: Cartridge.Bank
 
     lazy var index: Int = {
       (address < 0x4000)
