@@ -323,13 +323,13 @@ public final class Disassembler {
 
       let run = runQueue.dequeue()
 
-      if visitedAddresses.contains(Int(run.startAddress)) {
+      if visitedAddresses.contains(Int(run.startLocation)) {
         // We've already visited this instruction, so we can skip it.
         continue
       }
 
       // Initialize the run's program counter
-      var runContext = (pc: Cartridge.addressAndBank(from: run.startAddress).address,
+      var runContext = (pc: Cartridge.addressAndBank(from: run.startLocation).address,
                         bank: run.initialBank)
 
       // Script functions
@@ -349,7 +349,7 @@ public final class Disassembler {
 
       let advance: (LR35902.Address) -> Void = { amount in
         let currentCartAddress = Cartridge.location(for: runContext.pc, in: runContext.bank)!
-        run.visitedRange = run.startAddress..<(currentCartAddress + Cartridge._Location(amount))
+        run.visitedRange = run.startLocation..<(currentCartAddress + Cartridge._Location(amount))
 
         visitedAddresses.insert(integersIn: Int(currentCartAddress)..<Int(currentCartAddress + Cartridge._Location(amount)))
 
