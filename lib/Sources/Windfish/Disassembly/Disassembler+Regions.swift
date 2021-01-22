@@ -54,7 +54,7 @@ extension Disassembler {
     case .code:
       code.insert(integersIn: intRange)
 
-      clearData(in: intRange)
+      clearData(in: range)
       clearText(in: range)
 
     case .data:
@@ -70,7 +70,7 @@ extension Disassembler {
       text.insert(integersIn: intRange)
 
       clearCode(in: intRange)
-      clearData(in: intRange)
+      clearData(in: range)
     }
   }
 
@@ -94,12 +94,13 @@ extension Disassembler {
   }
 
   /** Removes all data-related information from the given range. */
-  func clearData(in range: Range<Int>) {
-    data.remove(integersIn: range)
-    dataBlocks.remove(integersIn: range)
+  private func clearData(in range: Range<Cartridge.Location>) {
+    let intRange = range.asIntRange()
+    data.remove(integersIn: intRange)
+    dataBlocks.remove(integersIn: intRange)
 
     for key: DataFormat in dataFormats.keys {
-      dataFormats[key]?.remove(integersIn: range)
+      dataFormats[key]?.remove(integersIn: intRange)
     }
   }
 
