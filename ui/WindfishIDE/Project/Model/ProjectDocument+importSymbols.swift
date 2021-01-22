@@ -38,7 +38,7 @@ extension ProjectDocument {
         let bank = Cartridge.Bank(locationParts[0], radix: 16)!
         let address = LR35902.Address(locationParts[1], radix: 16)!
 
-        if Cartridge.location(for: address, inHumanProvided: bank) != nil {
+        if address < 0x8000 {
           self.project.configuration.regions.removeAll {
             $0.bank == bank && $0.address == address
           }

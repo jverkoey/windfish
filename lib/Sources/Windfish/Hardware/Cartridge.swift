@@ -35,20 +35,7 @@ extension Cartridge {
       return _Location(truncatingIfNeeded: bank) * Cartridge.bankSize + _Location(truncatingIfNeeded: pc - 0x4000)
     }
   }
-
-  /**
-   Returns a cartridge location for the given program counter and bank, adjusting for common mistakes made when
-   specifying banks.
-
-   Specifically, if bank is provided as 0 then 1 is assumed.
-
-   - Parameter pc: The program counter's location.
-   - Parameter bank: The current bank.
-   */
-  public static func location(for pc: LR35902.Address, inHumanProvided bank: Cartridge.Bank) -> _Location? {
-    return location(for: pc, in: max(1, bank))
-  }
-
+  
   /**
    Returns a cartridge address for the given program counter and bank.
    - Parameter pc: The program counter's location.
