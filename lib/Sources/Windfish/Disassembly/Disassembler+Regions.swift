@@ -124,10 +124,11 @@ extension Disassembler {
 
     let cartRange: Range<Cartridge._Location> = range.asCartridgeLocationRange()
     let addressAndBank = Cartridge.addressAndBank(from: cartRange.lowerBound)
+    let effectiveBank = self.effectiveBank(at: addressAndBank.address, in: addressAndBank.bank)
     // For any existing scope that intersects this range:
     // 1. Shorten it if it begins before the range.
     // 2. Delete it if it begins within the range.
-    if let overlappingScopes: Set<Range<Cartridge._Location>> = contiguousScopes[addressAndBank.bank] {
+    if let overlappingScopes: Set<Range<Cartridge._Location>> = contiguousScopes[effectiveBank] {
       var mutatedScopes: Set<Range<Cartridge._Location>> = overlappingScopes
       for scope: Range<Cartridge._Location> in overlappingScopes {
         guard scope.overlaps(cartRange) else {
