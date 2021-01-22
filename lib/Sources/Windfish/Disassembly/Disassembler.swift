@@ -74,7 +74,7 @@ public final class Disassembler {
   var globals: [LR35902.Address: Global] = [:]
 
   /** Comments that should be placed immediately before the given location. */
-  var preComments: [Cartridge._Location: String] = [:]
+  var preComments: [Cartridge.Location: String] = [:]
 
   /** Scripts that should be executed alongside the disassembler. */
   var scripts: [String: Script] = [:]
