@@ -1549,8 +1549,10 @@ toc_01_0B1A:
     pop  af
     jp   toc_01_07B9
 
-    db   $3E, $03, $EA, $00, $21, $3E, $01, $18
-    db   $EF
+toc_01_0B22:
+    changebank $03
+    ld   a, $01
+    jr   toc_01_0B1A
 
 toc_01_0B2B:
     changebank $03
@@ -5939,10 +5941,13 @@ toc_01_2980:
     ld   bc, $1300
     jr   clearBGTiles.clearRAM
 
-    db   $01, $2F, $00, $18, $03
+toc_01_2985:
+    ld   bc, $002F
+    jr   clearBGTiles.toc_01_298D
 
 clearBGTiles:
     ld   bc, $006D
+clearBGTiles.toc_01_298D:
     ld   hl, hNeedsUpdatingBGTiles
     call .clearRegion
     ld   bc, $1F00

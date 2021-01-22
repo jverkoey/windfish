@@ -3,33 +3,86 @@ SECTION "ROM Bank 01", ROMX[$4000], BANK[$01]
 toc_01_4000:
     ld   a, [$DB96]
     jumptable
-    db   $10, $40, $41, $40, $4D, $40, $65, $40
-    db   $73, $40, $FD, $55, $CD, $CC, $1C, $CD
-    db   $22, $0B, $CD, $76, $17, $FA, $6B, $C1
-    db   $FE, $04, $20, $20, $3E, $03, $E0, $A9
-    db   $3E, $30, $E0, $AA, $CD, $45, $44, $AF
-    db   $EA, $BF, $C1, $EA, $4F, $C1, $EA, $B8
-    db   $C1, $EA, $B9, $C1, $EA, $B5, $C1, $3E
-    db   $0F, $EA, $FE, $D6, $C9, $3E, $0D, $EA
-    db   $FE, $D6, $AF, $EA, $3F, $C1, $C3, $45
-    db   $44, $3E, $0D, $EA, $FF, $D6, $3E, $FF
-    db   $EA, $9A, $DB, $AF, $E0, $96, $E0, $97
-    db   $EA, $6B, $C1, $EA, $6C, $C1, $C3, $45
-    db   $44, $CD, $C3, $17, $FA, $6B, $C1, $FE
-    db   $04, $20, $03, $CD, $45, $44, $C9, $CD
-    db   $EB, $40, $F0, $CC, $E6, $B0, $28, $6C
-    db   $3E, $13, $E0, $F2, $FA, $3F, $C1, $FE
-    db   $01, $28, $3B, $CD, $45, $44, $AF, $EA
-    db   $6B, $C1, $EA, $6C, $C1, $FA, $A5, $DB
-    db   $A7, $28, $07, $AF, $EA, $0A, $C5, $EA
-    db   $16, $C1, $C9, $AF, $EA, $98, $DB, $EA
-    db   $99, $DB, $E0, $48, $E0, $49, $EA, $97
-    db   $DB, $E0, $47, $F0, $98, $EA, $9D, $DB
-    db   $F0, $99, $EA, $9E, $DB, $CD, $2A, $51
-    db   $3E, $80, $EA, $C7, $DB, $C9, $CD, $D2
-    db   $27, $CD, $94, $5B, $CD, $85, $29, $CD
-    db   $1A, $5F
+    dw JumpTable_4010_01 ; 00
+    dw JumpTable_4041_01 ; 01
+    dw JumpTable_404D_01 ; 02
+    dw JumpTable_4065_01 ; 03
+    dw JumpTable_4073_01 ; 04
+    dw JumpTable_55FD_01 ; 05
 
+JumpTable_4010_01:
+    call JumpTable_1C56_00.toc_01_1CCC
+    call toc_01_0B22
+    call toc_01_1776
+    ifNe [$C16B], $04, .return_01_4040
+
+    assign [hVolumeRight], $03
+    assign [hVolumeLeft], $30
+    call JumpTable_4434_01.toc_01_4445
+    clear [$C1BF]
+    ld   [$C14F], a
+    ld   [$C1B8], a
+    ld   [$C1B9], a
+    ld   [$C1B5], a
+    assign [wTileMapToLoad], $0F
+JumpTable_4010_01.return_01_4040:
+    ret
+
+
+JumpTable_4041_01:
+    assign [wTileMapToLoad], $0D
+    clear [$C13F]
+    jp   JumpTable_4434_01.toc_01_4445
+
+JumpTable_404D_01:
+    assign [$D6FF], $0D
+    assign [$DB9A], $FF
+    clear [hBaseScrollX]
+    ld   [hBaseScrollY], a
+    ld   [$C16B], a
+    ld   [$C16C], a
+    jp   JumpTable_4434_01.toc_01_4445
+
+JumpTable_4065_01:
+    call toc_01_17C3
+    ifNe [$C16B], $04, .return_01_4072
+
+    call JumpTable_4434_01.toc_01_4445
+JumpTable_4065_01.return_01_4072:
+    ret
+
+
+JumpTable_4073_01:
+    call toc_01_40EB
+    ld   a, [$FFCC]
+    and  %10110000
+    jr   z, toc_01_40CE.toc_01_40E8
+
+    assign [$FFF2], $13
+    ifEq [$C13F], $01, toc_01_40C2
+
+    call JumpTable_4434_01.toc_01_4445
+    clear [$C16B]
+    ld   [$C16C], a
+    ifNot [$DBA5], .return_01_409E
+
+    clear [$C50A]
+    ld   [$C116], a
+JumpTable_4073_01.return_01_409E:
+    ret
+
+
+    db   $AF, $EA, $98, $DB, $EA, $99, $DB, $E0
+    db   $48, $E0, $49, $EA, $97, $DB, $E0, $47
+    db   $F0, $98, $EA, $9D, $DB, $F0, $99, $EA
+    db   $9E, $DB, $CD, $2A, $51, $3E, $80, $EA
+    db   $C7, $DB, $C9
+
+toc_01_40C2:
+    call toc_01_27D2
+    call toc_01_5B94
+    call toc_01_2985
+    call toc_01_5F1A
 toc_01_40CE:
     assign [gbLCDC], LCDCF_BG_DISPLAY | LCDCF_OBJ_16_16 | LCDCF_OBJ_DISPLAY | LCDCF_ON | LCDCF_TILEMAP_9C00
     ld   [$D6FD], a
@@ -38,14 +91,39 @@ toc_01_40CE:
     ld   [gbWY], a
     assign [hVolumeRight], $07
     assign [hVolumeLeft], $70
+toc_01_40CE.toc_01_40E8:
     ret
 
 
-    db   $48, $58, $21, $3F, $C1, $CD, $2D, $6E
-    db   $F0, $CC, $E6, $4C, $28, $05, $7E, $3C
-    db   $E6, $01, $77, $5E, $16, $00, $21, $E9
-    db   $40, $19, $7E, $21, $18, $C0, $22, $3E
-    db   $24, $22, $3E, $BE, $22, $36, $00, $C9
+    db   $48, $58
+
+toc_01_40EB:
+    ld   hl, $C13F
+    call toc_01_6E2D
+    ld   a, [$FFCC]
+    and  %01001100
+    jr   z, .else_01_40FC
+
+    ld   a, [hl]
+    inc  a
+    and  %00000001
+    ld   [hl], a
+toc_01_40EB.else_01_40FC:
+    ld   e, [hl]
+    ld   d, $00
+    ld   hl, $40E9
+    add  hl, de
+    ld   a, [hl]
+    ld   hl, $C018
+    ldi  [hl], a
+    ld   a, $24
+    ldi  [hl], a
+    ld   a, $BE
+    ldi  [hl], a
+    ld   [hl], $00
+    ret
+
+
     db   $F0, $B7, $A7, $C2, $7D, $41, $1E, $70
     db   $3E, $00, $E0, $47, $00, $00, $00, $00
     db   $00, $00, $00, $00, $00, $00, $00, $00
@@ -457,7 +535,7 @@ JumpTable_446F_01:
 
 
 JumpTable_4476_01:
-    call toc_01_5643
+    call JumpTable_55FD_01.toc_01_5643
     ld   a, [gbLCDC]
     or   $20
     ld   [$D6FD], a
@@ -1436,22 +1514,46 @@ toc_01_546E:
     db   $02, $1E, $60, $F0, $CC, $A3, $28, $0A
     db   $AF, $EA, $6B, $C1, $EA, $6C, $C1, $CD
     db   $45, $44, $CD, $56, $56, $CD, $1F, $58
-    db   $CD, $F7, $59, $C9, $CD, $50, $67, $CD
-    db   $76, $17, $FA, $6B, $C1, $FE, $04, $20
-    db   $4E, $AF, $EA, $0A, $C5, $EA, $16, $C1
-    db   $E0, $96, $E0, $97, $EA, $67, $C1, $3E
-    db   $07, $E0, $A9, $3E, $70, $E0, $AA, $3E
-    db   $0B, $EA, $95, $DB, $E0, $BC, $3E, $02
-    db   $EA, $96, $DB, $FA, $A5, $DB, $A7, $3E
-    db   $06, $20, $02, $3E, $07, $EA, $FE, $D6
-    db   $21, $24, $C1, $1E, $00, $AF, $22, $1C
-    db   $7B, $FE, $0C, $20, $F8
+    db   $CD, $F7, $59, $C9, $CD, $50, $67
 
-toc_01_5643:
+JumpTable_55FD_01:
+    call toc_01_1776
+    ifNe [$C16B], $04, .return_01_5655
+
+    clear [$C50A]
+    ld   [$C116], a
+    ld   [hBaseScrollX], a
+    ld   [hBaseScrollY], a
+    ld   [$C167], a
+    assign [hVolumeRight], $07
+    assign [hVolumeLeft], $70
+    assign [wGameMode], GAMEMODE_WORLD
+    ld   [$FFBC], a
+    assign [$DB96], $02
+    ld   a, [$DBA5]
+    and  a
+    ld   a, $06
+    jr   nz, .else_01_5633
+
+    ld   a, $07
+JumpTable_55FD_01.else_01_5633:
+    ld   [wTileMapToLoad], a
+    ld   hl, $C124
+    ld   e, $00
+JumpTable_55FD_01.loop_01_563B:
+    xor  a
+    ldi  [hl], a
+    inc  e
+    ld   a, e
+    cp   $0C
+    jr   nz, .loop_01_563B
+
+JumpTable_55FD_01.toc_01_5643:
     assign [$DB9A], $80
     assign [gbWX], $06
     assign [$C150], $08
     clear [$C14F]
+JumpTable_55FD_01.return_01_5655:
     ret
 
 
