@@ -16,22 +16,18 @@ extension Disassembler {
   }
 
   /** Register an instruction at the given location. */
-  func register(instruction: LR35902.Instruction, at pc: LR35902.Address, in bank: Cartridge.Bank) {
-    precondition(bank > 0)
-    guard let location = Cartridge.location(for: pc, in: bank) else {
-      return
-    }
-    let intLocation = Int(truncatingIfNeeded: location)
+  func register(instruction: LR35902.Instruction, at location: Cartridge.Location) {
+    let index = location.index
 
     // Don't register instructions in the middle of existing instructions.
-    if code.contains(intLocation) && instructionMap[location] == nil {
+    if code.contains(index) && instructionMap[Cartridge._Location(truncatingIfNeeded: index)] == nil {
       return
     }
 
     // Clear any existing instructions in this instruction's footprint.
     let instructionWidths: [LR35902.Instruction.Spec: CPU.InstructionWidth<UInt16>] = LR35902.InstructionSet.widths
     let instructionWidth: Int = Int(truncatingIfNeeded: instructionWidths[instruction.spec]!.total)
-    let instructionRange: Range<Int> = intLocation..<(intLocation + instructionWidth)
+    let instructionRange: Range<Int> = index..<(index + instructionWidth)
     for index in instructionRange.dropFirst() {
       let location = Cartridge._Location(truncatingIfNeeded: index)
       guard let existingInstruction = instructionMap[location] else {
@@ -40,7 +36,7 @@ extension Disassembler {
       deleteInstruction(at: location)
     }
 
-    instructionMap[location] = instruction
+    instructionMap[Cartridge._Location(truncatingIfNeeded: index)] = instruction
     // Set the code bit for the instruction's footprint.
     registerRegion(range: instructionRange, as: .code)
   }

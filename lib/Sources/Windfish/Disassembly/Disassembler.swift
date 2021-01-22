@@ -395,7 +395,7 @@ public final class Disassembler {
           continue
         }
 
-        register(instruction: instruction, at: instructionContext.pc, in: instructionContext.bank)
+        register(instruction: instruction, at: Cartridge.Location(address: instructionContext.pc, bank: instructionContext.bank))
 
         if let bankChange = bankChange(at: Cartridge.Location(address: instructionContext.pc,
                                                               bank: instructionContext.bank)) {
