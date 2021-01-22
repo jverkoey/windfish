@@ -56,7 +56,7 @@ public final class RunGroup: Sequence {
     if let startAddress = startAddress {
       if let range = scope.rangeView.first(where: { $0.lowerBound == Int(startAddress) }) {
         return Range<Cartridge._Location>(uncheckedBounds: (Cartridge._Location(range.lowerBound),
-                                                                   Cartridge._Location(range.upperBound)))
+                                                            Cartridge._Location(range.upperBound)))
       } else if let range = scope.rangeView.first(where: { $0.contains(Int(startAddress)) }) {
         return Range<Cartridge._Location>(uncheckedBounds: (startAddress, Cartridge._Location(range.upperBound)))
       }
