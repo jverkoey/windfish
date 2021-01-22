@@ -21,11 +21,8 @@ extension Disassembler {
   }
 
   /** Registers a new contiguous scope at the given range. */
-  func registerContiguousScope(range: Range<Cartridge._Location>) {
-    let bankAndAddress: (address: LR35902.Address, bank: Cartridge.Bank) = Cartridge.addressAndBank(from: range.lowerBound)
-    let bankAndAddress2: (address: LR35902.Address, bank: Cartridge.Bank) = Cartridge.addressAndBank(from: range.upperBound - 1)
-    precondition(bankAndAddress.bank == bankAndAddress2.bank, "Scopes can't cross banks")
-    let effectiveBank: Cartridge.Bank = self.effectiveBank(at: bankAndAddress.address, in: bankAndAddress.bank)
-    contiguousScopes[effectiveBank, default: Set()].insert(range)
+  func registerContiguousScope(range: Range<Cartridge.Location>) {
+    contiguousScopes[range.lowerBound.bank, default: Set()]
+      .insert(Cartridge._Location(truncatingIfNeeded: range.lowerBound.index)..<Cartridge._Location(truncatingIfNeeded: range.upperBound.index))
   }
 }

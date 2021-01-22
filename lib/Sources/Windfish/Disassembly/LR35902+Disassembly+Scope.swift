@@ -86,12 +86,12 @@ extension Disassembler {
       guard let contiguousScope = runGroup.firstContiguousScopeRange else {
         continue
       }
-      registerContiguousScope(range: contiguousScope)
+      registerContiguousScope(range: Cartridge.Location(location: contiguousScope.lowerBound)..<Cartridge.Location(location: contiguousScope.upperBound))
 
-      let contiguousScopeWithoutFirstInstruction = contiguousScope.dropFirst()
-      inferLoops(in: contiguousScopeWithoutFirstInstruction)
-      inferElses(in: contiguousScopeWithoutFirstInstruction)
-      inferReturns(in: Cartridge.Location(location: contiguousScopeWithoutFirstInstruction.lowerBound)..<Cartridge.Location(location: contiguousScopeWithoutFirstInstruction.upperBound))
+      let headlessContiguousScope = contiguousScope.dropFirst()
+      inferLoops(in: headlessContiguousScope)
+      inferElses(in: headlessContiguousScope)
+      inferReturns(in: Cartridge.Location(location: headlessContiguousScope.lowerBound)..<Cartridge.Location(location: headlessContiguousScope.upperBound))
     }
   }
 
