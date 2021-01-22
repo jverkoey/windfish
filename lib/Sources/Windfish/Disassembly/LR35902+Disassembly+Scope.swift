@@ -99,7 +99,7 @@ extension Disassembler {
     let labelLocations = self.labelLocations(in: scope)
     let returnLabelAddresses = labelLocations.filter { instructionMap[Cartridge._Location(truncatingIfNeeded: $0.index)]?.spec.category == .ret }
     for cartLocation in returnLabelAddresses {
-      labelTypes[Cartridge._Location(truncatingIfNeeded: cartLocation.index)] = .returnType
+      labelTypes[cartLocation] = .returnType
     }
   }
 
@@ -114,7 +114,8 @@ extension Disassembler {
     }
     let backwardTocs: [(source: Cartridge._Location, destination: Cartridge._Location)] = tocs.reduce(into: [], { (accumulator, element) in
       let tocsInThisScope = element.tocs.filter {
-        scope.contains($0) && element.destination < $0 && (labelNames[element.destination] != nil || labelTypes[element.destination] != nil)
+        scope.contains($0) && element.destination < $0
+          && (labelNames[element.destination] != nil || labelTypes[Cartridge.Location(location: element.destination)] != nil)
       }
       for toc in tocsInThisScope {
         if case .jr(let condition, _) = instructionMap[toc]?.spec,
@@ -146,7 +147,7 @@ extension Disassembler {
     }
     let destinations = Set(loops.map { $0.destination })
     for cartLocation in destinations {
-      labelTypes[cartLocation] = .loopType
+      labelTypes[Cartridge.Location(location: cartLocation)] = .loopType
     }
   }
 
@@ -163,7 +164,7 @@ extension Disassembler {
       let tocsInThisScope = element.tocs.filter {
         scope.contains($0)
           && element.destination > $0
-          && (labelNames[element.destination] != nil || labelTypes[element.destination] != nil)
+          && (labelNames[element.destination] != nil || labelTypes[Cartridge.Location(location: element.destination)] != nil)
       }
       for toc in tocsInThisScope {
         if case .jr(let condition, _) = instructionMap[toc]?.spec,
@@ -177,8 +178,7 @@ extension Disassembler {
     }
     let destinations = Set(forwardTocs.map { $0.destination })
     for cartLocation in destinations {
-      labelTypes[cartLocation] = .elseType
+      labelTypes[Cartridge.Location(location: cartLocation)] = .elseType
     }
   }
-
 }

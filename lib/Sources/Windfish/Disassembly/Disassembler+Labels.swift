@@ -20,7 +20,7 @@ extension Disassembler {
     let name: String
     if let explicitName: String = labelNames[_location] {
       name = explicitName
-    } else if let labelType: LabelType = labelTypes[_location] {
+    } else if let labelType: LabelType = labelTypes[location] {
       let bank: Cartridge.Bank = effectiveBank(at: location.address, in: location.bank)
       switch labelType {
       case .transferOfControlType: name = "toc_\(bank.hexString)_\(location.address.hexString)"
@@ -50,7 +50,7 @@ extension Disassembler {
   func labelLocations(in range: Range<Cartridge.Location>) -> [Cartridge.Location] {
     return range.filter { (location: Cartridge.Location) -> Bool in
       let _location = Cartridge._Location(truncatingIfNeeded: location.index)
-      guard labelNames[_location] != nil || labelTypes[_location] != nil else {
+      guard labelNames[_location] != nil || labelTypes[location] != nil else {
         return false
       }
       return canShowLabel(at: location)

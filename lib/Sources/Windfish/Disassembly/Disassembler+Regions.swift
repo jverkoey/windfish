@@ -119,7 +119,7 @@ extension Disassembler {
       deleteInstruction(at: location)
       transfers[_location] = nil
       labelNames[_location] = nil
-      labelTypes[_location] = nil
+      labelTypes[location] = nil
       bankChanges[location] = nil
     }
 

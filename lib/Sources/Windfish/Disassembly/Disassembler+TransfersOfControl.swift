@@ -17,16 +17,17 @@ extension Disassembler {
                                         in fromBank: Cartridge.Bank,
                                         spec: LR35902.Instruction.Spec) {
     precondition(bank > 0)
-    guard let toLocation: Cartridge._Location = Cartridge.location(for: pc, in: bank),
-          let fromLocation: Cartridge._Location = Cartridge.location(for: fromPc, in: fromBank) else {
+    guard let _toLocation: Cartridge._Location = Cartridge.location(for: pc, in: bank),
+          let _fromLocation: Cartridge._Location = Cartridge.location(for: fromPc, in: fromBank) else {
       return
     }
-    transfers[toLocation, default: Set()].insert(fromLocation)
+    let toLocation = Cartridge.Location(address: pc, bank: bank)
+    transfers[_toLocation, default: Set()].insert(_fromLocation)
 
     // Tag the label type at this address
     if labelTypes[toLocation] == nil
         // Don't create a label in the middle of an instruction.
-        && (!code.contains(Int(truncatingIfNeeded: toLocation)) || instruction(at: Cartridge.Location(address: pc, bank: bank)) != nil) {
+        && (!code.contains(Int(truncatingIfNeeded: _toLocation)) || instruction(at: toLocation) != nil) {
       labelTypes[toLocation] = .transferOfControlType
     }
   }

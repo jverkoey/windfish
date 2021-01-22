@@ -106,7 +106,7 @@ public final class Disassembler {
 
    There does not always need to be a corresponding name set in the labelNames dictionary.
    */
-  var labelTypes: [Cartridge._Location: LabelType] = [:]
+  var labelTypes: [Cartridge.Location: LabelType] = [:]
 
   /** Bank changes that occur at a specific location. */
   var bankChanges: [Cartridge.Location: Cartridge.Bank] = [:]
