@@ -32,7 +32,7 @@ extension Disassembler {
       return nil
     }
 
-    let scopes: Set<Range<Cartridge._Location>> = contiguousScopes(at: pc, in: bank)
+    let scopes: Set<Range<Cartridge._Location>> = contiguousScopes(at: Cartridge.Location(address: pc, bank: bank))
     if let firstScope: Range<Cartridge._Location> = scopes.filter({ (scope: Range<Cartridge._Location>) -> Bool in
       scope.lowerBound != location // Ignore ourself.
     }).min(by: { (scope1: Range<Cartridge._Location>, scope2: Range<Cartridge._Location>) -> Bool in
