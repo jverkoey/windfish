@@ -31,13 +31,12 @@ extension Disassembler {
    The returned dictionary is a mapping of cartridge locations to the post-execution CPU state for the instruction at
    that location.
    */
-  func trace(range: Range<Cartridge._Location>,
+  func trace(range: Range<Cartridge.Location>,
              cpu: LR35902 = LR35902.zeroed(),
              step: ((LR35902.Instruction, Cartridge.Location, LR35902) -> Void)? = nil) {
-    let addressAndBank = Cartridge.addressAndBank(from: range.lowerBound)
-    cpu.pc = addressAndBank.address
-    let bank = addressAndBank.bank
-    let upperBoundPc = Cartridge.addressAndBank(from: range.upperBound).address
+    cpu.pc = range.lowerBound.address
+    let bank = range.lowerBound.bank
+    let upperBoundPc = range.upperBound.address
 
     while cpu.pc < upperBoundPc {
       guard let instruction = self.instruction(at: Cartridge.Location(address: cpu.pc, bank: bank)) else {

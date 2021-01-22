@@ -31,7 +31,7 @@ public final class RunGroup: Sequence {
   /**
    The run group's starting address.
    */
-  public lazy var startLocation: Cartridge._Location? = {
+  public lazy var startLocation: Cartridge.Location? = {
     guard let firstRun = runs.first else {
       return nil
     }
@@ -48,18 +48,19 @@ public final class RunGroup: Sequence {
    */
   public lazy var scope: IndexSet = {
     return runs.compactMap { $0.visitedRange }.reduce(into: IndexSet()) { (accumulator, visitedRange) in
-      accumulator.insert(integersIn: Int(visitedRange.lowerBound)..<Int(visitedRange.upperBound))
+      accumulator.insert(integersIn: visitedRange.asIntRange())
     }
   }()
 
-  public lazy var firstContiguousScopeRange: Range<Cartridge._Location>? = {
-    if let startAddress = startLocation {
-      if let range = scope.rangeView.first(where: { $0.lowerBound == Int(startAddress) }) {
-        return Range<Cartridge._Location>(uncheckedBounds: (Cartridge._Location(range.lowerBound),
-                                                            Cartridge._Location(range.upperBound)))
-      } else if let range = scope.rangeView.first(where: { $0.contains(Int(startAddress)) }) {
-        return Range<Cartridge._Location>(uncheckedBounds: (startAddress, Cartridge._Location(range.upperBound)))
-      }
+  public lazy var firstContiguousScopeRange: Range<Cartridge.Location>? = {
+    guard let startLocation = startLocation else {
+      return nil
+    }
+    if let range = scope.rangeView.first(where: { $0.lowerBound == startLocation.index }) {
+      return Cartridge.Location(location: Cartridge._Location(truncatingIfNeeded: range.lowerBound))..<Cartridge.Location(location: Cartridge._Location(truncatingIfNeeded: range.upperBound))
+    }
+    if let range = scope.rangeView.first(where: { $0.contains(startLocation.index) }) {
+      return startLocation..<Cartridge.Location(location: Cartridge._Location(truncatingIfNeeded: range.upperBound))
     }
     return nil
   }()

@@ -7,7 +7,7 @@ class LoadAffectsRegisterTests: XCTestCase {
 ld   a, 1
 """)
     let cpu = LR35902.zeroed()
-    disassembly.trace(range: 0..<disassembly.cartridgeSize, cpu: cpu)
+    disassembly.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.cartridgeSize), bank: 1), cpu: cpu)
 
     assertEqual(cpu, LR35902(a: 1, pc: 0x0002))
   }
@@ -17,7 +17,7 @@ ld   a, 1
 ld   b, 1
 """)
     let cpu = LR35902.zeroed()
-    disassembly.trace(range: 0..<disassembly.cartridgeSize, cpu: cpu)
+    disassembly.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.cartridgeSize), bank: 1), cpu: cpu)
 
     assertEqual(cpu, LR35902(b: 1, pc: 0x0002))
   }
@@ -27,7 +27,7 @@ ld   b, 1
 ld   c, 1
 """)
     let cpu = LR35902.zeroed()
-    disassembly.trace(range: 0..<disassembly.cartridgeSize, cpu: cpu)
+    disassembly.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.cartridgeSize), bank: 1), cpu: cpu)
 
     assertEqual(cpu, LR35902(c: 1, pc: 0x0002))
   }
@@ -37,7 +37,7 @@ ld   c, 1
 ld   d, 1
 """)
     let cpu = LR35902.zeroed()
-    disassembly.trace(range: 0..<disassembly.cartridgeSize, cpu: cpu)
+    disassembly.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.cartridgeSize), bank: 1), cpu: cpu)
 
     assertEqual(cpu, LR35902(d: 1, pc: 0x0002))
   }
@@ -47,7 +47,7 @@ ld   d, 1
 ld   e, 1
 """)
     let cpu = LR35902.zeroed()
-    disassembly.trace(range: 0..<disassembly.cartridgeSize, cpu: cpu)
+    disassembly.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.cartridgeSize), bank: 1), cpu: cpu)
 
     assertEqual(cpu, LR35902(e: 1, pc: 0x0002))
   }
@@ -57,7 +57,7 @@ ld   e, 1
 ld   h, 1
 """)
     let cpu = LR35902.zeroed()
-    disassembly.trace(range: 0..<disassembly.cartridgeSize, cpu: cpu)
+    disassembly.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.cartridgeSize), bank: 1), cpu: cpu)
 
     assertEqual(cpu, LR35902(h: 1, pc: 0x0002))
   }
@@ -67,7 +67,7 @@ ld   h, 1
 ld   l, 1
 """)
     let cpu = LR35902.zeroed()
-    disassembly.trace(range: 0..<disassembly.cartridgeSize, cpu: cpu)
+    disassembly.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.cartridgeSize), bank: 1), cpu: cpu)
 
     assertEqual(cpu, LR35902(l: 1, pc: 0x0002))
   }

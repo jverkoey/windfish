@@ -4,34 +4,34 @@ extension Disassembler {
   public final class Run {
     typealias SpecT = LR35902.Instruction.SpecType
 
-    let startLocation: Cartridge._Location
-    let endLocation: Cartridge._Location?
+    let startLocation: Cartridge.Location
+    let endLocation: Cartridge.Location?
     let initialBank: Cartridge.Bank
 
     init(from startAddress: LR35902.Address,
          initialBank unsafeInitialBank: Cartridge.Bank,
          upTo endAddress: LR35902.Address? = nil) {
       let initialBank = max(1, unsafeInitialBank)
-      self.startLocation = Cartridge.location(for: startAddress, inHumanProvided: initialBank)!
+      self.startLocation = Cartridge.Location(address: startAddress, bank: initialBank)
       if let endAddress = endAddress, endAddress > 0 {
-        self.endLocation = Cartridge.location(for: endAddress - 1, inHumanProvided: initialBank)!
+        self.endLocation = Cartridge.Location(address: endAddress - 1, bank: initialBank)
       } else {
         self.endLocation = nil
       }
       self.initialBank = initialBank
     }
 
-    var visitedRange: Range<Cartridge._Location>?
+    var visitedRange: Range<Cartridge.Location>?
 
     var children: [Run] = []
 
     var invocationInstruction: LR35902.Instruction?
 
     func hasReachedEnd(pc: LR35902.Address) -> Bool {
-      if let endAddress = endLocation {
-        return pc > Cartridge.addressAndBank(from: endAddress).address
+      guard let endLocation = endLocation else {
+        return false
       }
-      return false
+      return pc > endLocation.address
     }
   }
 }
