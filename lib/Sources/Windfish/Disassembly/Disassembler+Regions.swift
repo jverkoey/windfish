@@ -77,10 +77,10 @@ extension Disassembler {
   /** Deletes an instruction from a specific location and clears any code-related information in its footprint. */
   func deleteInstruction(at location: Cartridge.Location) {
     let _location = Cartridge._Location(truncatingIfNeeded: location.index)
-    guard let instruction: LR35902.Instruction = instructionMap[_location] else {
+    guard let instruction: LR35902.Instruction = instructionMap[location] else {
       return
     }
-    instructionMap[_location] = nil
+    instructionMap[location] = nil
 
     clearCode(in: location..<(location + LR35902.InstructionSet.widths[instruction.spec]!.total))
   }

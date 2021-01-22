@@ -42,8 +42,8 @@ nop
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .nop),
-      0x0001: LR35902.Instruction(spec: .nop)
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .nop),
+      Cartridge.Location(address: 0x0001, bank: 1): LR35902.Instruction(spec: .nop)
     ])
   }
 
@@ -57,7 +57,7 @@ nop
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [0x0000: LR35902.Instruction(spec: .nop)])
+    XCTAssertEqual(disassembly.instructionMap, [Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .nop)])
   }
 
   func test_nop_2() throws {
@@ -71,8 +71,8 @@ nop
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .nop),
-      0x0001: LR35902.Instruction(spec: .nop)
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .nop),
+      Cartridge.Location(address: 0x0001, bank: 1): LR35902.Instruction(spec: .nop)
     ])
   }
 
@@ -86,7 +86,7 @@ ld bc, $1234
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(0x1234))
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(0x1234))
     ])
   }
 
@@ -113,7 +113,7 @@ ld bc, 1234
     XCTAssertTrue(results.errors.isEmpty)
 
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(1234))
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(1234))
     ])
   }
 
@@ -128,7 +128,7 @@ ld bc, -1234
     XCTAssertEqual(results.errors, [])
 
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(UInt16(bitPattern: -1234)))
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(UInt16(bitPattern: -1234)))
     ])
   }
 
@@ -143,8 +143,8 @@ ld bc, $1234
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(0x1234)),
-      0x0003: LR35902.Instruction(spec: .nop)
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(0x1234)),
+      Cartridge.Location(address: 0x0003, bank: 1): LR35902.Instruction(spec: .nop)
     ])
   }
 
@@ -182,7 +182,7 @@ ld [bc], a
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.bcaddr, .a)),
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.bcaddr, .a)),
     ])
   }
 
@@ -196,7 +196,7 @@ inc bc
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .inc(.bc)),
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .inc(.bc)),
     ])
   }
 
@@ -210,7 +210,7 @@ ld b, 255
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.b, .imm8), immediate: .imm8(255)),
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.b, .imm8), immediate: .imm8(255)),
     ])
   }
 
@@ -236,7 +236,7 @@ ld [$1234], sp
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.imm16addr, .sp), immediate: .imm16(0x1234)),
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.imm16addr, .sp), immediate: .imm16(0x1234)),
     ])
   }
 
@@ -250,7 +250,7 @@ ld a, [bc]
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.a, .bcaddr)),
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.a, .bcaddr)),
     ])
   }
 
@@ -264,7 +264,7 @@ rrca
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .rrca),
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .rrca),
     ])
   }
 
@@ -278,7 +278,7 @@ jr 5
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .jr(nil, .simm8), immediate: .imm8(5)),
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .jr(nil, .simm8), immediate: .imm8(5)),
     ])
   }
 
@@ -292,7 +292,7 @@ ld [$FFA0], a
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.ffimm8addr, .a), immediate: .imm8(0xA0)),
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.ffimm8addr, .a), immediate: .imm8(0xA0)),
     ])
   }
 
@@ -306,7 +306,7 @@ ld [$FAA0], a
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.imm16addr, .a), immediate: .imm16(0xFAA0)),
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.imm16addr, .a), immediate: .imm16(0xFAA0)),
     ])
   }
 
@@ -320,7 +320,7 @@ ret z
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ret(.z)),
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ret(.z)),
     ])
   }
 
@@ -334,7 +334,7 @@ sub a, 5
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .sub(.a, .imm8), immediate: .imm8(5)),
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .sub(.a, .imm8), immediate: .imm8(5)),
     ])
   }
 
@@ -348,7 +348,7 @@ rst $38
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .rst(.x38)),
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .rst(.x38)),
     ])
   }
 
@@ -362,7 +362,7 @@ rlc b
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .cb(.rlc(.b))),
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .cb(.rlc(.b))),
     ])
   }
 
@@ -376,7 +376,7 @@ bit 2, b
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .cb(.bit(.b2, .b))),
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .cb(.bit(.b2, .b))),
     ])
   }
 
@@ -390,7 +390,7 @@ set 6, [hl]
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .cb(.set(.b6, .hladdr))),
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .cb(.set(.b6, .hladdr))),
     ])
   }
 
@@ -404,7 +404,7 @@ jr nz, 3
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .jr(.nz, .simm8), immediate: .imm8(3)),
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .jr(.nz, .simm8), immediate: .imm8(3)),
     ])
   }
 
@@ -418,7 +418,7 @@ ld hl, sp+$05
 
     XCTAssertEqual(results.errors, [])
     XCTAssertEqual(disassembly.instructionMap, [
-      0x0000: LR35902.Instruction(spec: .ld(.hl, .sp_plus_simm8), immediate: .imm8(0x05)),
+      Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.hl, .sp_plus_simm8), immediate: .imm8(0x05)),
     ])
   }
 
@@ -450,7 +450,7 @@ ld hl, sp+$05
       disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
       XCTAssertEqual(results.errors, [], "Spec: \(spec)")
-      XCTAssertEqual(disassembly.instructionMap[0x0000]?.spec, spec)
+      XCTAssertEqual(disassembly.instructionMap[Cartridge.Location(address: 0, bank: 0)]?.spec, spec)
     }
   }
 }

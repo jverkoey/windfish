@@ -68,7 +68,7 @@ extension Disassembler {
 
     let index: Int = location.index
     // Don't return labels that point to the middle of instructions.
-    if instructionMap[Cartridge._Location(truncatingIfNeeded: location.index)] == nil && code.contains(index) {
+    if instructionMap[location] == nil && code.contains(index) {
       return false
     }
     // Don't return labels that point to the middle of data.

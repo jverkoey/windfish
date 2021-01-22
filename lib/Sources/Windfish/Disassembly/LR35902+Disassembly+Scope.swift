@@ -97,7 +97,7 @@ extension Disassembler {
 
   private func inferReturns(in scope: Range<Cartridge.Location>) {
     let labelLocations = self.labelLocations(in: scope)
-    let returnLabelAddresses = labelLocations.filter { instructionMap[Cartridge._Location(truncatingIfNeeded: $0.index)]?.spec.category == .ret }
+    let returnLabelAddresses = labelLocations.filter { instructionMap[$0]?.spec.category == .ret }
     for cartLocation in returnLabelAddresses {
       labelTypes[cartLocation] = .returnType
     }
@@ -119,7 +119,7 @@ extension Disassembler {
       }
       for toc in tocsInThisScope {
         let _toc = Cartridge._Location(truncatingIfNeeded: toc.index)
-        if case .jr(let condition, _) = instructionMap[_toc]?.spec,
+        if case .jr(let condition, _) = instructionMap[toc]?.spec,
           condition != nil {
           accumulator.append((_toc, element.destination))
         }
@@ -134,7 +134,7 @@ extension Disassembler {
       let tocsWithinLoop: [LR35902.Instruction] = tocs.flatMap {
         $0.tocs
           .filter { loopRange.contains(Cartridge._Location(truncatingIfNeeded: $0.index)) }
-          .compactMap { instructionMap[Cartridge._Location(truncatingIfNeeded: $0.index)] }
+          .compactMap { instructionMap[$0] }
       }
       return !tocsWithinLoop.contains {
         switch $0.spec {
@@ -171,7 +171,7 @@ extension Disassembler {
       }
       for toc in tocsInThisScope {
         let _toc = Cartridge._Location(truncatingIfNeeded: toc.index)
-        if case .jr(let condition, _) = instructionMap[_toc]?.spec,
+        if case .jr(let condition, _) = instructionMap[toc]?.spec,
           condition != nil {
           accumulator.append((_toc, element.destination))
         }

@@ -96,7 +96,7 @@ public final class Disassembler {
   var transfers: [Cartridge.Location: Set<Cartridge.Location>] = [:]
 
   /** Which instruction exists at a specific location. */
-  var instructionMap: [Cartridge._Location: LR35902.Instruction] = [:]
+  var instructionMap: [Cartridge.Location: LR35902.Instruction] = [:]
 
   /** Each bank tracks ranges of code that represent contiguous scopes of instructions. */
   var contiguousScopes: [Cartridge.Bank: Set<Range<Cartridge.Location>>] = [:]

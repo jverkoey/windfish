@@ -8,15 +8,13 @@ extension Disassembler {
     guard code.contains(location.index) else {
       return nil
     }
-    return instructionMap[Cartridge._Location(truncatingIfNeeded: location.index)]
+    return instructionMap[location]
   }
 
   /** Register an instruction at the given location. */
   func register(instruction: LR35902.Instruction, at location: Cartridge.Location) {
-    let index = location.index
-
     // Don't register instructions in the middle of existing instructions.
-    if code.contains(index) && instructionMap[Cartridge._Location(truncatingIfNeeded: index)] == nil {
+    if code.contains(location.index) && instructionMap[location] == nil {
       return
     }
 
@@ -27,7 +25,7 @@ extension Disassembler {
       deleteInstruction(at: clearLocation)
     }
 
-    instructionMap[Cartridge._Location(truncatingIfNeeded: index)] = instruction
+    instructionMap[location] = instruction
     // Set the code bit for the instruction's footprint.
     registerRegion(range: instructionRange, as: .code)
   }
