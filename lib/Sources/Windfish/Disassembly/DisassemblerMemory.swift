@@ -16,10 +16,8 @@ final class DisassemblerMemory: AddressableMemory {
 
     // Read-only memory (ROM) bank 01-7F
     if address >= 0x4000 && address <= 0x7FFF {
-      guard let location = Cartridge.location(for: address, in: max(1, selectedBank)) else {
-        preconditionFailure("Invalid location for address 0x\(address.hexString) in bank 0x\(selectedBank.hexString)")
-      }
-      return data[Int(location)]
+      let location = Cartridge.Location(address: address, bank: selectedBank)
+      return data[location.index]
     }
 
     fatalError()

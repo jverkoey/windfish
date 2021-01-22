@@ -2,28 +2,6 @@ import Foundation
 
 import RGBDS
 
-extension Range where Bound == Int {
-  func asCartridgeLocationRange() -> Range<Cartridge._Location> {
-    return Cartridge._Location(truncatingIfNeeded: lowerBound)..<Cartridge._Location(truncatingIfNeeded: upperBound)
-  }
-}
-
-extension Range where Bound == Cartridge._Location {
-  func asIntRange() -> Range<Int> {
-    return Int(truncatingIfNeeded: lowerBound)..<Int(truncatingIfNeeded: upperBound)
-  }
-}
-
-extension Range where Bound == LR35902.Address {
-  func asCartridgeRange(in bank: Cartridge.Bank) -> Range<Cartridge._Location>? {
-    guard let lowerBound: Cartridge._Location = Cartridge.location(for: lowerBound, in: bank),
-          let upperBound: Cartridge._Location = Cartridge.location(for: upperBound, in: bank) else {
-      return nil
-    }
-    return lowerBound..<upperBound
-  }
-}
-
 extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {
   public var category: InstructionCategory? {
     switch self {
@@ -50,7 +28,7 @@ public final class Disassembler {
 
   /** Returns true if the program counter is pointing to addressable memory. */
   func pcIsValid(pc: LR35902.Address, bank: Cartridge.Bank) -> Bool {
-    return pc < 0x8000 && Cartridge.location(for: pc, in: bank)! < cartridgeSize
+    return pc < 0x8000 && Cartridge.Location(address: pc, bank: bank).index < cartridgeSize
   }
 
   // MARK: - Pre-disassembly hints and configurations
@@ -293,11 +271,8 @@ public final class Disassembler {
     runQueue.add(firstRun)
 
     let queueRun: (Run, LR35902.Address, LR35902.Address, Cartridge.Bank, LR35902.Instruction) -> Void = { fromRun, fromAddress, toAddress, bank, instruction in
-      if toAddress > 0x8000 {
+      guard toAddress < 0x8000 else {
         return // We can't disassemble in-memory regions.
-      }
-      guard Cartridge.location(for: toAddress, in: bank) != nil else {
-        return // We aren't sure which bank we're in, so we can't safely disassemble it.
       }
       let run = Run(from: toAddress, initialBank: bank)
       run.invocationInstruction = instruction
@@ -359,8 +334,7 @@ public final class Disassembler {
         if softTerminators[location] != nil {
           break
         }
-        let _location = Cartridge.location(for: runContext.pc, in: runContext.bank)!
-        if data.contains(Int(_location)) || text.contains(Int(_location)) {
+        if data.contains(location.index) || text.contains(location.index) {
           advance(1)
           continue
         }

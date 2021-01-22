@@ -571,9 +571,9 @@ clean:
               macrosAsm?.append(linesAsString(lines))
             }
 
-            let lowerBound = Cartridge.location(for: lineBufferAddress, in: writeContext.bank)!
-            let upperBound = Cartridge.location(for: lastAddress, in: writeContext.bank)!
-            let bytes = self.cartridgeData[lowerBound..<upperBound]
+            let lowerBound = Cartridge.Location(address: lineBufferAddress, bank: writeContext.bank)
+            let upperBound = Cartridge.Location(address: lastAddress, bank: writeContext.bank)
+            let bytes = self.cartridgeData[lowerBound.index..<upperBound.index]
 
             let macroArgs = macro.arguments.keys.sorted().map { macro.arguments[$0]! }
 
@@ -630,9 +630,9 @@ clean:
           }
 
           // Write the instruction as assembly.
-          let index = Cartridge.location(for: writeContext.pc, in: initialBank)!
+          let index = Cartridge.Location(address: writeContext.pc, bank: initialBank)
           let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!.total
-          let bytes = cartridgeData[index..<(index + Cartridge._Location(instructionWidth))]
+          let bytes = cartridgeData[index.index..<(index + instructionWidth).index]
           let instructionScope = labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)).map { $0.label }
           let context = RGBDSDisassembler.Context(
             address: writeContext.pc,
@@ -708,7 +708,7 @@ clean:
             if writeContext.pc < 0x4000 {
               global = globals[writeContext.pc]
             }
-            accumulator.append(cartridgeData[Int(Cartridge.location(for: writeContext.pc, in: initialBank)!)])
+            accumulator.append(cartridgeData[Cartridge.Location(address: writeContext.pc, bank: initialBank).index])
             writeContext.pc += 1
           } while writeContext.pc < end
             && instruction(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) == nil
@@ -752,7 +752,7 @@ clean:
               } else {
                 jumpLocation = "$\(address.hexString)"
               }
-              let bytes = cartridgeData[Cartridge.location(for: chunkPc, in: initialBank)!..<(Cartridge.location(for: chunkPc, in: initialBank)! + 2)]
+              let bytes = cartridgeData[Cartridge.Location(address: chunkPc, bank: initialBank).index..<(Cartridge.Location(address: chunkPc, bank: initialBank) + 2).index]
               bankLines.append(Line(semantic: .jumpTable(jumpLocation, index), address: chunkPc, data: bytes))
               chunkPc += LR35902.Address(pair.count)
             }

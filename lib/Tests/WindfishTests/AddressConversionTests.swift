@@ -27,12 +27,6 @@ class AddressConversionTests: XCTestCase {
     XCTAssertEqual(location.bank, bank)
   }
 
-  func testUnselectedBankGivesNilCartAddressAbove0x8FFF() throws {
-    XCTAssertEqual(Cartridge.location(for: 0x4000, in: 0x01), 0x4000)
-    XCTAssertEqual(Cartridge.location(for: 0x6000, in: 0x01), 0x6000)
-    XCTAssertNil(Cartridge.location(for: 0x9000, in: 0x01))
-  }
-
   func testBeginningOfBank1() throws {
     let bank: Cartridge.Bank = 0x01
     let address: LR35902.Address = 0x4000
