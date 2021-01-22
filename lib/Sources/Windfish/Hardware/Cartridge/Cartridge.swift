@@ -62,6 +62,7 @@ extension Cartridge {
 }
 
 extension Cartridge {
+  /** A location in a Gameboy ROM, as expressed by a banked address. */
   public final class Location {
     let address: LR35902.Address
     let bank: Cartridge.Bank
@@ -77,6 +78,10 @@ extension Cartridge {
       self.bank = max(1, bank)
     }
 
+    public init(location: Cartridge._Location) {
+      (self.address, self.bank) = Cartridge.addressAndBank(from: location)
+    }
+
     public static func + (lhs: Cartridge.Location, rhs: Int) -> Cartridge.Location {
       return lhs + LR35902.Address(truncatingIfNeeded: rhs)
     }
@@ -89,8 +94,7 @@ extension Cartridge {
 
 extension Cartridge.Location: Hashable {
   public func hash(into hasher: inout Hasher) {
-    hasher.combine(bank)
-    hasher.combine(address)
+    hasher.combine(index)
   }
 }
 

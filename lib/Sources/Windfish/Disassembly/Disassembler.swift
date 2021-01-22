@@ -109,7 +109,7 @@ public final class Disassembler {
   var labelTypes: [Cartridge._Location: LabelType] = [:]
 
   /** Bank changes that occur at a specific location. */
-  var bankChanges: [Cartridge._Location: Cartridge.Bank] = [:]
+  var bankChanges: [Cartridge.Location: Cartridge.Bank] = [:]
 
   // MARK: Data
 
@@ -202,11 +202,9 @@ public final class Disassembler {
         return
       }
       let desiredBank = Cartridge.Bank(truncatingIfNeeded: _desiredBank)
-      self.registerBankChange(
-        to: max(1, desiredBank),
-        at: LR35902.Address(truncatingIfNeeded: address),
-        in: max(1, Cartridge.Bank(truncatingIfNeeded: bank))
-      )
+      let location = Cartridge.Location(address: LR35902.Address(truncatingIfNeeded: address),
+                                        bank: Cartridge.Bank(truncatingIfNeeded: bank))
+      self.registerBankChange(to: max(1, desiredBank), at: location)
     }
     let hex16: @convention(block) (Int) -> String = { value in
       return UInt16(truncatingIfNeeded: value).hexString
@@ -341,11 +339,9 @@ public final class Disassembler {
           return
         }
         let desiredBank = Cartridge.Bank(truncatingIfNeeded: _desiredBank)
-        self.registerBankChange(
-          to: max(1, desiredBank),
-          at: LR35902.Address(truncatingIfNeeded: address),
-          in: max(1, Cartridge.Bank(truncatingIfNeeded: bank))
-        )
+        let location = Cartridge.Location(address: LR35902.Address(truncatingIfNeeded: address),
+                                          bank: Cartridge.Bank(truncatingIfNeeded: bank))
+        self.registerBankChange(to: max(1, desiredBank), at: location)
         runContext.bank = desiredBank
       }
       for script in scripts.values {
@@ -394,13 +390,15 @@ public final class Disassembler {
 
         register(instruction: instruction, at: instructionContext.pc, in: instructionContext.bank)
 
-        if let bankChange = bankChange(at: instructionContext.pc, in: instructionContext.bank) {
+        if let bankChange = bankChange(at: Cartridge.Location(address: instructionContext.pc,
+                                                              bank: instructionContext.bank)) {
           runContext.bank = bankChange
         }
 
         let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!
         advance(instructionWidth.total)
 
+        let instructionContextLocation = Cartridge.Location(address: instructionContext.pc, bank: instructionContext.bank)
         switch instruction.spec {
         // TODO: Rewrite these with a macro dector during disassembly time.
         case .ld(.imm16addr, .a):
@@ -411,7 +409,7 @@ public final class Disassembler {
             guard case let .imm8(previousImmediate) = previousInstruction.immediate else {
               preconditionFailure("Invalid immediate associated with instruction")
             }
-            self.registerBankChange(to: previousImmediate, at: instructionContext.pc, in: instructionContext.bank)
+            self.registerBankChange(to: previousImmediate, at: instructionContextLocation)
 
             runContext.bank = previousImmediate
           }
@@ -420,7 +418,7 @@ public final class Disassembler {
              case let .imm16(previousImmediate) = previousInstruction?.immediate,
              case let .imm8(immediate) = instruction.immediate,
              (0x2000..<0x4000).contains(previousImmediate) {
-            self.registerBankChange(to: immediate, at: instructionContext.pc, in: instructionContext.bank)
+            self.registerBankChange(to: immediate, at: instructionContextLocation)
             runContext.bank = immediate
           }
 

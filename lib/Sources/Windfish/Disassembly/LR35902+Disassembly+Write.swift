@@ -628,7 +628,8 @@ clean:
         if let instruction = instruction(at: writeContext.pc, in: initialBank) {
           instructionsDecoded += 1
 
-          if let bankChange = bankChange(at: writeContext.pc, in: writeContext.bank) {
+          if let bankChange = bankChange(at: Cartridge.Location(address: writeContext.pc,
+                                                                bank: writeContext.bank)) {
             writeContext.bank = bankChange
           }
 
@@ -745,7 +746,7 @@ clean:
               let address = (LR35902.Address(pair[1]) << 8) | LR35902.Address(pair[0])
               let jumpLocation: String
               let effectiveBank: Cartridge.Bank
-              if let changedBank = bankChange(at: chunkPc, in: initialBank) {
+              if let changedBank = bankChange(at: Cartridge.Location(address: chunkPc, bank: initialBank)) {
                 effectiveBank = changedBank
               } else {
                 effectiveBank = writeContext.bank

@@ -119,7 +119,7 @@ extension Disassembler {
       transfers[location] = nil
       labelNames[location] = nil
       labelTypes[location] = nil
-      bankChanges[location] = nil
+      bankChanges[Cartridge.Location(location: location)] = nil
     }
 
     let cartRange: Range<Cartridge._Location> = range.asCartridgeLocationRange()
