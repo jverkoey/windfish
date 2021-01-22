@@ -588,7 +588,7 @@ clean:
             } else {
               bank = writeContext.bank
             }
-            let macroScopes = self.labeledContiguousScopes(at: lineBufferAddress, in: bank).map { $0.label }
+            let macroScopes = self.labeledContiguousScopes(at: Cartridge.Location(address: lineBufferAddress, bank: bank)).map { $0.label }
             let statement = RGBDS.Statement(opcode: macro.macro.name, operands: macroArgs)
             lineBuffer.replaceSubrange(firstInstruction...lastInstruction,
                                        with: [Line(semantic: .macro(statement),
@@ -617,7 +617,7 @@ clean:
           if let transfersOfControl = transfersOfControl(at: writeContext.pc, in: initialBank) {
             lineGroup.append(Line(semantic: .transferOfControl(transfersOfControl, label), address: writeContext.pc, bank: writeContext.bank))
           } else {
-            let instructionScope = labeledContiguousScopes(at: writeContext.pc, in: initialBank).map { $0.label }
+            let instructionScope = labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)).map { $0.label }
             let scope = instructionScope.sorted().joined(separator: ", ")
             lineGroup.append(Line(semantic: .empty, address: writeContext.pc, bank: writeContext.bank, scope: scope))
             lineGroup.append(Line(semantic: .label(labelName: label), address: writeContext.pc, bank: writeContext.bank, scope: scope))
@@ -637,7 +637,7 @@ clean:
           let index = Cartridge.location(for: writeContext.pc, in: initialBank)!
           let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!.total
           let bytes = cartridgeData[index..<(index + Cartridge._Location(instructionWidth))]
-          let instructionScope = labeledContiguousScopes(at: writeContext.pc, in: initialBank).map { $0.label }
+          let instructionScope = labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)).map { $0.label }
           let context = RGBDSDisassembler.Context(
             address: writeContext.pc,
             bank: writeContext.bank,
@@ -668,7 +668,7 @@ clean:
           // Handle context changes.
           switch instruction.spec {
           case .jp(let condition, _), .jr(let condition, _):
-            let instructionScope = labeledContiguousScopes(at: writeContext.pc, in: initialBank).map { $0.label }
+            let instructionScope = labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)).map { $0.label }
             let scope = instructionScope.sorted().joined(separator: ", ")
             lineGroup.append(Line(semantic: .empty, scope: scope))
             if condition == nil {

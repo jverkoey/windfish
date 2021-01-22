@@ -307,9 +307,10 @@ extension RGBDSDisassembler {
     }
 
     if let label = context.disassembly.label(at: immediate, in: context.bank) {
-      if let scope = context.disassembly.labeledContiguousScopes(at: context.address, in: context.bank).first(where: { labeledScope in
-        label.starts(with: "\(labeledScope.label).")
-      })?.label {
+      if let scope = context.disassembly.labeledContiguousScopes(at: Cartridge.Location(address: context.address, bank: context.bank))
+          .first(where: { labeledScope in
+            label.starts(with: "\(labeledScope.label).")
+          })?.label {
         return label.replacingOccurrences(of: "\(scope).", with: ".")
       }
 
