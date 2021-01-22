@@ -39,18 +39,23 @@ class TabViewController: NSViewController {
     view.addSubview(tabPickerView)
     view.addSubview(tabViewController.view)
 
-    let safeAreaLayoutGuide = view.safeAreaLayoutGuide
+    let safeAreas: ViewOrLayoutGuide
+    if #available(OSX 11.0, *) {
+      safeAreas = view.safeAreaLayoutGuide
+    } else {
+      safeAreas = view
+    }
 
     NSLayoutConstraint.activate([
-      tabPickerView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
-      tabPickerView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-      tabPickerView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+      tabPickerView.topAnchor.constraint(equalTo: safeAreas.topAnchor),
+      tabPickerView.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
+      tabPickerView.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
       tabPickerView.heightAnchor.constraint(equalToConstant: 28),
 
       tabViewController.view.topAnchor.constraint(equalTo: tabPickerView.bottomAnchor),
-      tabViewController.view.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
-      tabViewController.view.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-      tabViewController.view.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+      tabViewController.view.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
+      tabViewController.view.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
+      tabViewController.view.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
     ])
   }
 

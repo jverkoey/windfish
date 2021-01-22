@@ -9,8 +9,8 @@ extension NSUserInterfaceItemIdentifier {
 }
 
 final class GlobalEditorViewController: NSViewController, TabSelectable {
-  let deselectedTabImage = NSImage(systemSymbolName: "character.book.closed", accessibilityDescription: nil)!
-  let selectedTabImage = NSImage(systemSymbolName: "character.book.closed.fill", accessibilityDescription: nil)!
+  let deselectedTabImage = NSImage(systemSymbolNameOrImageName: "character.book.closed", accessibilityDescription: "Globals")!
+  let selectedTabImage = NSImage(systemSymbolNameOrImageName: "character.book.closed.fill", accessibilityDescription: "Globals")!
 
   let project: Project
   let elementsController = NSArrayController()
@@ -59,7 +59,13 @@ final class GlobalEditorViewController: NSViewController, TabSelectable {
       tableView.tableView?.addTableColumn(column)
     }
 
-    let safeAreas = view.safeAreaLayoutGuide
+    
+    let safeAreas: ViewOrLayoutGuide
+    if #available(OSX 11.0, *) {
+      safeAreas = view.safeAreaLayoutGuide
+    } else {
+      safeAreas = view
+    }
     NSLayoutConstraint.activate([
       tableView.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
       tableView.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),

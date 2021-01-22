@@ -5,8 +5,8 @@ import Cocoa
 import Windfish
 
 final class ScriptEditorViewController: NSViewController, TabSelectable {
-  let deselectedTabImage = NSImage(systemSymbolName: "curlybraces.square", accessibilityDescription: nil)!
-  let selectedTabImage = NSImage(systemSymbolName: "curlybraces.square.fill", accessibilityDescription: nil)!
+  let deselectedTabImage = NSImage(systemSymbolNameOrImageName: "curlybraces.square", accessibilityDescription: "Scripts")!
+  let selectedTabImage = NSImage(systemSymbolNameOrImageName: "curlybraces.square.fill", accessibilityDescription: "Scripts")!
 
   init(project: Project) {
     self.project = project
@@ -67,7 +67,13 @@ final class ScriptEditorViewController: NSViewController, TabSelectable {
     self.sourceContainerView = containerView
     self.sourceTextView = textView
 
-    let safeAreas = view.safeAreaLayoutGuide
+    
+    let safeAreas: ViewOrLayoutGuide
+    if #available(OSX 11.0, *) {
+      safeAreas = view.safeAreaLayoutGuide
+    } else {
+      safeAreas = view
+    }
     NSLayoutConstraint.activate([
       tableView.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
       tableView.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),

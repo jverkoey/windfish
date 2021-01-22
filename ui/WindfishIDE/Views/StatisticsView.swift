@@ -34,16 +34,22 @@ final class StatisticsView: NSView {
     addSubview(instructionsDecodedLabel)
     addSubview(percentDecodedLabel)
 
+    let safeAreas: ViewOrLayoutGuide
+    if #available(OSX 11.0, *) {
+      safeAreas = safeAreaLayoutGuide
+    } else {
+      safeAreas = self
+    }
     NSLayoutConstraint.activate([
-      instructionsDecodedLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-      instructionsDecodedLabel.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
-      instructionsDecodedLabel.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
+      instructionsDecodedLabel.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
+      instructionsDecodedLabel.topAnchor.constraint(equalTo: safeAreas.topAnchor),
+      instructionsDecodedLabel.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
 
-      percentDecodedLabel.leadingAnchor.constraint(equalToSystemSpacingAfter: instructionsDecodedLabel.trailingAnchor, multiplier: 1),
+      percentDecodedLabel.leadingAnchor.constraint(equalToSystemOrDefaultSpacingAfter: instructionsDecodedLabel.trailingAnchor, multiplier: 1),
 
-      percentDecodedLabel.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
-      percentDecodedLabel.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
-      safeAreaLayoutGuide.trailingAnchor.constraint(equalTo: percentDecodedLabel.trailingAnchor),
+      percentDecodedLabel.topAnchor.constraint(equalTo: safeAreas.topAnchor),
+      percentDecodedLabel.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
+      percentDecodedLabel.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
     ])
 
     resetLabels()

@@ -3,8 +3,8 @@ import Foundation
 import Cocoa
 
 final class InspectorEditorViewController: TabViewController, TabSelectable {
-  let deselectedTabImage = NSImage(systemSymbolName: "pencil.circle", accessibilityDescription: nil)!
-  let selectedTabImage = NSImage(systemSymbolName: "pencil.circle.fill", accessibilityDescription: nil)!
+  let deselectedTabImage = NSImage(systemSymbolNameOrImageName: "pencil.circle", accessibilityDescription: "Inspector")!
+  let selectedTabImage = NSImage(systemSymbolNameOrImageName: "pencil.circle.fill", accessibilityDescription: "Inspector")!
 }
 
 final class InspectorViewController: NSViewController {
@@ -49,12 +49,18 @@ final class InspectorViewController: NSViewController {
     tabViewController.setUp()
     editorTabViewController.setUp()
 
-    let safeAreaLayoutGuide = view.safeAreaLayoutGuide
+    let safeAreas: ViewOrLayoutGuide
+    if #available(OSX 11.0, *) {
+      safeAreas = view.safeAreaLayoutGuide
+    } else {
+      safeAreas = view
+    }
+
     NSLayoutConstraint.activate([
-      tabViewController.view.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
-      tabViewController.view.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
-      tabViewController.view.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-      tabViewController.view.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+      tabViewController.view.topAnchor.constraint(equalTo: safeAreas.topAnchor),
+      tabViewController.view.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
+      tabViewController.view.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
+      tabViewController.view.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
     ])
   }
 }

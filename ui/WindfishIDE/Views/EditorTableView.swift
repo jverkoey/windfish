@@ -28,7 +28,9 @@ final class EditorTableView: NSView {
 
     let tableView = NSTableView()
     tableView.translatesAutoresizingMaskIntoConstraints = false
-    tableView.style = .fullWidth
+    if #available(OSX 11.0, *) {
+      tableView.style = .fullWidth
+    }
     tableView.selectionHighlightStyle = .regular
     containerView.documentView = tableView
     addSubview(containerView)
@@ -49,15 +51,21 @@ final class EditorTableView: NSView {
     tableControls.action = #selector(performTableControlAction(_:))
     addSubview(tableControls)
 
+    let safeAreas: ViewOrLayoutGuide
+    if #available(OSX 11.0, *) {
+      safeAreas = safeAreaLayoutGuide
+    } else {
+      safeAreas = self
+    }
     NSLayoutConstraint.activate([
-      containerView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-      containerView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
-      containerView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+      containerView.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
+      containerView.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
+      containerView.topAnchor.constraint(equalTo: safeAreas.topAnchor),
       containerView.bottomAnchor.constraint(equalTo: tableControls.topAnchor),
 
-      tableControls.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-      tableControls.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
-      tableControls.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
+      tableControls.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
+      tableControls.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
+      tableControls.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
     ])
 
     selectionObserver = elementsController.observe(\.selectedObjects, options: []) { (controller, change) in

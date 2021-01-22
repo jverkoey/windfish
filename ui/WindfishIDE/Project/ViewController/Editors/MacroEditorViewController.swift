@@ -29,8 +29,8 @@ final class TextViewStringTransformer: ValueTransformer {
 }
 
 final class MacroEditorViewController: NSViewController, TabSelectable {
-  let deselectedTabImage = NSImage(systemSymbolName: "chevron.left.slash.chevron.right", accessibilityDescription: nil)!
-  let selectedTabImage = NSImage(systemSymbolName: "chevron.left.slash.chevron.right", accessibilityDescription: nil)!
+  let deselectedTabImage = NSImage(systemSymbolNameOrImageName: "chevron.left.slash.chevron.right", accessibilityDescription: "Macros")!
+  let selectedTabImage = NSImage(systemSymbolNameOrImageName: "chevron.left.slash.chevron.right", accessibilityDescription: "Macros")!
 
   init(project: Project) {
     self.project = project
@@ -91,7 +91,12 @@ final class MacroEditorViewController: NSViewController, TabSelectable {
     self.sourceContainerView = containerView
     self.sourceTextView = textView
 
-    let safeAreas = view.safeAreaLayoutGuide
+    let safeAreas: ViewOrLayoutGuide
+    if #available(OSX 11.0, *) {
+      safeAreas = view.safeAreaLayoutGuide
+    } else {
+      safeAreas = view
+    }
     NSLayoutConstraint.activate([
       tableView.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
       tableView.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),

@@ -21,8 +21,8 @@ extension NSUserInterfaceItemIdentifier {
 }
 
 final class RegionEditorViewController: NSViewController, TabSelectable {
-  let deselectedTabImage = NSImage(systemSymbolName: "book", accessibilityDescription: nil)!
-  let selectedTabImage = NSImage(systemSymbolName: "book.fill", accessibilityDescription: nil)!
+  let deselectedTabImage = NSImage(systemSymbolNameOrImageName: "book", accessibilityDescription: "Region editor")!
+  let selectedTabImage = NSImage(systemSymbolNameOrImageName: "book.fill", accessibilityDescription: "Region editor")!
 
   let project: Project
   let elementsController = NSArrayController()
@@ -87,7 +87,13 @@ final class RegionEditorViewController: NSViewController, TabSelectable {
     contextMenu.addItem(withTitle: "Set breakpoint...", action: #selector(setBreakpoint(_:)), keyEquivalent: "")
     tableView.tableView?.menu = contextMenu
 
-    let safeAreas = view.safeAreaLayoutGuide
+    
+    let safeAreas: ViewOrLayoutGuide
+    if #available(OSX 11.0, *) {
+      safeAreas = view.safeAreaLayoutGuide
+    } else {
+      safeAreas = view
+    }
     NSLayoutConstraint.activate([
       tableView.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
       tableView.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),

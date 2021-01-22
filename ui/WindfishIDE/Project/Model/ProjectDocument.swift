@@ -91,7 +91,9 @@ final class ProjectDocument: NSDocument {
     let window = NSWindow(contentViewController: contentViewController)
     window.setContentSize(NSSize(width: 1160, height: NSScreen.main!.frame.height))
     window.setFrameOrigin(.init(x: 0, y: NSScreen.main!.frame.maxY - window.frame.height))
-    window.toolbarStyle = .unifiedCompact
+    if #available(OSX 11.0, *) {
+      window.toolbarStyle = .unifiedCompact
+    }
     window.tabbingMode = .disallowed
     window.isRestorable = true
     let wc = NSWindowController(window: window)
@@ -117,7 +119,11 @@ final class ProjectDocument: NSDocument {
     let window: NSPanel = NSPanel(contentViewController: contentViewController)
     window.isFloatingPanel = true
     window.styleMask.insert(.hudWindow)
-    window.subtitle = "LCD"
+    if #available(OSX 11.0, *) {
+      window.subtitle = "LCD"
+    } else {
+      window.title = "LCD"
+    }
     window.isRestorable = true
     window.setContentSize(NSSize(width: project.sameboy.screenSize.width * 2, height: project.sameboy.screenSize.height * 2))
     window.contentMinSize = NSSize(width: project.sameboy.screenSize.width, height: project.sameboy.screenSize.height)
@@ -173,24 +179,30 @@ extension ProjectDocument: NSToolbarDelegate {
   }
 
   func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier, willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
+    if #available(OSX 11.0, *) {
+      switch itemIdentifier {
+      case .leadingSidebarTrackingSeparator:
+        return NSTrackingSeparatorToolbarItem(
+          identifier: itemIdentifier,
+          splitView: contentViewController!.threePaneSplitViewController.splitView,
+          dividerIndex: 0
+        )
+      case .trailingSidebarTrackingSeparator:
+        return NSTrackingSeparatorToolbarItem(
+          identifier: itemIdentifier,
+          splitView: contentViewController!.threePaneSplitViewController.splitView,
+          dividerIndex: 1
+        )
+      default:
+        break
+      }
+    }
     switch itemIdentifier {
-    case .leadingSidebarTrackingSeparator:
-      return NSTrackingSeparatorToolbarItem(
-        identifier: itemIdentifier,
-        splitView: contentViewController!.threePaneSplitViewController.splitView,
-        dividerIndex: 0
-      )
-    case .trailingSidebarTrackingSeparator:
-      return NSTrackingSeparatorToolbarItem(
-        identifier: itemIdentifier,
-        splitView: contentViewController!.threePaneSplitViewController.splitView,
-        dividerIndex: 1
-      )
     case .disassemble:
       let item = NSToolbarItem(itemIdentifier: itemIdentifier)
       item.target = self
       item.action = #selector(disassemble(_:))
-      item.image = NSImage(systemSymbolName: "chevron.left.slash.chevron.right", accessibilityDescription: "Disassemble the rom")
+      item.image = NSImage(systemSymbolNameOrImageName: "chevron.left.slash.chevron.right", accessibilityDescription: "Disassemble the rom")
       return item
     default:
       return NSToolbarItem(itemIdentifier: itemIdentifier)

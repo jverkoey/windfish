@@ -54,7 +54,9 @@ final class CallStackViewController: NSViewController {
 
     let tableView = NSTableView()
     tableView.translatesAutoresizingMaskIntoConstraints = false
-    tableView.style = .fullWidth
+    if #available(OSX 11.0, *) {
+      tableView.style = .fullWidth
+    }
     tableView.selectionHighlightStyle = .regular
     tableView.delegate = self
     containerView.documentView = tableView
@@ -75,7 +77,13 @@ final class CallStackViewController: NSViewController {
       tableView.addTableColumn(column)
     }
 
-    let safeAreas = view.safeAreaLayoutGuide
+    
+    let safeAreas: ViewOrLayoutGuide
+    if #available(OSX 11.0, *) {
+      safeAreas = view.safeAreaLayoutGuide
+    } else {
+      safeAreas = view
+    }
     NSLayoutConstraint.activate([
       containerView.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
       containerView.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),

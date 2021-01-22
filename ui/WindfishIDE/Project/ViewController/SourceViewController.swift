@@ -69,28 +69,30 @@ final class SourceViewController: NSViewController {
 
     let toolbarHeight: CGFloat = 28  // Matches Xcode's debugger bar's height.
 
-    let undoButton = NSButton(image: NSImage(systemSymbolName: "arrow.uturn.backward",
-                                             accessibilityDescription: nil)!,
+    let undoButton = NSButton(image: NSImage(systemSymbolNameOrImageName: "arrow.uturn.backward",
+                                             accessibilityDescription: "Undo")!,
                               target: nil,
                               action: #selector(ProjectDocument.undoCommand(_:)))
     undoButton.toolTip = "Undo"
 
-    let stepOverButton = NSButton(image: NSImage(systemSymbolName: "arrowshape.bounce.forward.fill",
-                                                 accessibilityDescription: nil)!,
+    let stepOverButton = NSButton(image: NSImage(systemSymbolNameOrImageName: "arrowshape.bounce.forward.fill",
+                                                 accessibilityDescription: "Step over")!,
                                   target: nil,
                                   action: #selector(ProjectDocument.stepForward(_:)))
     stepOverButton.toolTip = "Step over"
 
-    let stepIntoButton = NSButton(image: NSImage(systemSymbolName: "arrow.right.to.line.alt",
-                                                 accessibilityDescription: nil)!,
+    let stepIntoButton = NSButton(image: NSImage(systemSymbolNameOrImageName: "arrow.right.to.line.alt",
+                                                 accessibilityDescription: "Step into")!,
                                   target: nil,
                                   action: #selector(ProjectDocument.stepInto(_:)))
     stepIntoButton.toolTip = "Step into"
 
-    let toggleEmulationButton = NSButton(image: NSImage(systemSymbolName: "play", accessibilityDescription: nil)!,
+    let toggleEmulationButton = NSButton(image: NSImage(systemSymbolNameOrImageName: "play",
+                                                        accessibilityDescription: "Play")!,
                                   target: nil,
                                   action: #selector(ProjectDocument.toggleEmulation(_:)))
-    toggleEmulationButton.alternateImage = NSImage(systemSymbolName: "pause", accessibilityDescription: nil)!
+    toggleEmulationButton.alternateImage = NSImage(systemSymbolNameOrImageName: "pause",
+                                                   accessibilityDescription: "Pause")!
     toggleEmulationButton.setButtonType(.toggle)
     toggleEmulationButton.state = .on
     toggleEmulationButton.toolTip = "Toggle emulation"
@@ -116,21 +118,26 @@ final class SourceViewController: NSViewController {
     toolbar.edgeInsets = NSEdgeInsets(top: 0, left: 4, bottom: 0, right: 4)
     view.addSubview(toolbar)
 
-    let safeAreaLayoutGuide = view.safeAreaLayoutGuide
+    let safeAreas: ViewOrLayoutGuide
+    if #available(OSX 11.0, *) {
+      safeAreas = view.safeAreaLayoutGuide
+    } else {
+      safeAreas = view
+    }
     NSLayoutConstraint.activate([
-      sourceContainerView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
-      sourceContainerView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-      sourceContainerView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+      sourceContainerView.topAnchor.constraint(equalTo: safeAreas.topAnchor),
+      sourceContainerView.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
+      sourceContainerView.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
 
       toolbarTopBorder.topAnchor.constraint(equalTo: sourceContainerView.bottomAnchor),
-      toolbarTopBorder.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-      toolbarTopBorder.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+      toolbarTopBorder.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
+      toolbarTopBorder.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
 
       toolbar.topAnchor.constraint(equalTo: toolbarTopBorder.bottomAnchor),
-      toolbar.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-      toolbar.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+      toolbar.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
+      toolbar.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),
       toolbar.heightAnchor.constraint(equalToConstant: toolbarHeight),
-      toolbar.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
+      toolbar.bottomAnchor.constraint(equalTo: safeAreas.bottomAnchor),
     ])
   }
 

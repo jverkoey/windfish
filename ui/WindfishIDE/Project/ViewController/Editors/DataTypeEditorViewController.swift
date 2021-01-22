@@ -11,8 +11,8 @@ extension NSUserInterfaceItemIdentifier {
 }
 
 final class DataTypeEditorViewController: NSViewController, TabSelectable {
-  let deselectedTabImage = NSImage(systemSymbolName: "number.circle", accessibilityDescription: nil)!
-  let selectedTabImage = NSImage(systemSymbolName: "number.circle.fill", accessibilityDescription: nil)!
+  let deselectedTabImage = NSImage(systemSymbolNameOrImageName: "number.circle", accessibilityDescription: "Data types")!
+  let selectedTabImage = NSImage(systemSymbolNameOrImageName: "number.circle.fill", accessibilityDescription: "Data types")!
 
   let project: Project
   let elementsController = NSArrayController()
@@ -91,7 +91,13 @@ final class DataTypeEditorViewController: NSViewController, TabSelectable {
       mappingTableView.tableView?.addTableColumn(column)
     }
 
-    let safeAreas = view.safeAreaLayoutGuide
+    
+    let safeAreas: ViewOrLayoutGuide
+    if #available(OSX 11.0, *) {
+      safeAreas = view.safeAreaLayoutGuide
+    } else {
+      safeAreas = view
+    }
     NSLayoutConstraint.activate([
       tableView.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),
       tableView.trailingAnchor.constraint(equalTo: safeAreas.trailingAnchor),

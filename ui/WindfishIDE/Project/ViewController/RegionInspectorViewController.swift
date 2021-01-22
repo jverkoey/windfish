@@ -4,8 +4,8 @@ import Cocoa
 import Windfish
 
 final class RegionInspectorViewController: NSViewController, TabSelectable {
-  let deselectedTabImage = NSImage(systemSymbolName: "book", accessibilityDescription: nil)!
-  let selectedTabImage = NSImage(systemSymbolName: "book.fill", accessibilityDescription: nil)!
+  let deselectedTabImage = NSImage(systemSymbolNameOrImageName: "book", accessibilityDescription: "Regions")!
+  let selectedTabImage = NSImage(systemSymbolNameOrImageName: "book.fill", accessibilityDescription: "Regions")!
 
   let project: Project
   let regionController = NSArrayController()
@@ -41,7 +41,9 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
     containerView.hasVerticalScroller = true
 
     tableView.translatesAutoresizingMaskIntoConstraints = false
-    tableView.style = .fullWidth
+    if #available(OSX 11.0, *) {
+      tableView.style = .fullWidth
+    }
     tableView.selectionHighlightStyle = .regular
     tableView.delegate = self
     containerView.documentView = tableView
@@ -51,7 +53,12 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
     contextMenu.addItem(withTitle: "Define label...", action: #selector(createRegion(_:)), keyEquivalent: "")
     tableView.menu = contextMenu
 
-    let safeAreas = view.safeAreaLayoutGuide
+    let safeAreas: ViewOrLayoutGuide
+    if #available(OSX 11.0, *) {
+      safeAreas = view.safeAreaLayoutGuide
+    } else {
+      safeAreas = view
+    }
 
     NSLayoutConstraint.activate([
       containerView.leadingAnchor.constraint(equalTo: safeAreas.leadingAnchor),

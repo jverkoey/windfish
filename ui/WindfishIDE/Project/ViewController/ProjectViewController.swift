@@ -138,11 +138,11 @@ final class ProjectViewController: NSViewController {
       bottomBarLayoutGuide.bottomAnchor.constraint(equalTo: view.bottomAnchor),
 
       // Progress indicator
-      progressIndicator.leadingAnchor.constraint(equalToSystemSpacingAfter: bottomBarLayoutGuide.leadingAnchor, multiplier: 1),
+      progressIndicator.leadingAnchor.constraint(equalToSystemOrDefaultSpacingAfter: bottomBarLayoutGuide.leadingAnchor, multiplier: 1),
       progressIndicator.bottomAnchor.constraint(equalTo: bottomBarLayoutGuide.bottomAnchor, constant: -7),
 
       // Statistics view
-      statisticsView.leadingAnchor.constraint(equalToSystemSpacingAfter: progressIndicator.trailingAnchor, multiplier: 1),
+      statisticsView.leadingAnchor.constraint(equalToSystemOrDefaultSpacingAfter: progressIndicator.trailingAnchor, multiplier: 1),
       statisticsView.centerYAnchor.constraint(equalTo: bottomBarLayoutGuide.centerYAnchor),
     ])
 

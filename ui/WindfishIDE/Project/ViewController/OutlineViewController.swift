@@ -124,7 +124,9 @@ final class OutlineViewController: NSViewController {
 
     outlineView.delegate = self
     outlineView.backgroundColor = .clear
-    outlineView.style = .plain
+    if #available(OSX 11.0, *) {
+      outlineView.style = .plain
+    }
 //    outlineView.selectionHighlightStyle = .sourceList
     outlineView.columnAutoresizingStyle = .lastColumnOnlyAutoresizingStyle
     outlineView.allowsMultipleSelection = false

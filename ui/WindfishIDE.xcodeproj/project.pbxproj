@@ -36,6 +36,7 @@
 		6651991925ABFB000075C3FC /* ProjectDocument+emulation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6651991825ABFB000075C3FC /* ProjectDocument+emulation.swift */; };
 		66521DA9257C996B0088C97B /* SourceRulerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66521DA8257C996B0088C97B /* SourceRulerView.swift */; };
 		6657950925B3DB89005E155D /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6657950825B3DB89005E155D /* MainMenu.xib */; };
+		66579C2825BA49F000ED894F /* macOS10Compatibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66579C2725BA49F000ED894F /* macOS10Compatibility.swift */; };
 		665D4F592575F75400C3A03B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F582575F75400C3A03B /* AppDelegate.swift */; };
 		665D4F5B2575F75400C3A03B /* ProjectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F5A2575F75400C3A03B /* ProjectViewController.swift */; };
 		665D4F5D2575F75400C3A03B /* ProjectDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F5C2575F75400C3A03B /* ProjectDocument.swift */; };
@@ -334,6 +335,7 @@
 		6651991825ABFB000075C3FC /* ProjectDocument+emulation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProjectDocument+emulation.swift"; sourceTree = "<group>"; };
 		66521DA8257C996B0088C97B /* SourceRulerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceRulerView.swift; sourceTree = "<group>"; };
 		6657950825B3DB89005E155D /* MainMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
+		66579C2725BA49F000ED894F /* macOS10Compatibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = macOS10Compatibility.swift; sourceTree = "<group>"; };
 		665D4F552575F75400C3A03B /* WindfishIDE.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WindfishIDE.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		665D4F582575F75400C3A03B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		665D4F5A2575F75400C3A03B /* ProjectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectViewController.swift; sourceTree = "<group>"; };
@@ -641,6 +643,7 @@
 				6657950825B3DB89005E155D /* MainMenu.xib */,
 				667B1B7A257854BF00CE670F /* Resources */,
 				6699BA2625AEBDDF005DB9BB /* WindfishIDE-Bridging-Header.h */,
+				66579C2725BA49F000ED894F /* macOS10Compatibility.swift */,
 			);
 			path = WindfishIDE;
 			sourceTree = "<group>";
@@ -1122,6 +1125,7 @@
 				66C617E4257F24E000E372BA /* EditorTableView.swift in Sources */,
 				662B36B425B1280300C5E690 /* ScrollView.swift in Sources */,
 				66763D732579F26000824278 /* RegionEditorViewController.swift in Sources */,
+				66579C2825BA49F000ED894F /* macOS10Compatibility.swift in Sources */,
 				665D4F5B2575F75400C3A03B /* ProjectViewController.swift in Sources */,
 				667B1B632578541F00CE670F /* NotificationNames.swift in Sources */,
 				665198E225ABF9070075C3FC /* Global.swift in Sources */,
@@ -1294,7 +1298,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1358,7 +1362,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "-Xfrontend -warn-long-function-bodies=100 -Xfrontend -warn-long-expression-type-checking=100";
