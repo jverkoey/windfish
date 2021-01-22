@@ -63,13 +63,13 @@ extension Disassembler {
         dataBlocks.insert(integersIn: intRange.dropFirst())
       }
 
-      clearCode(in: intRange)
+      clearCode(in: range)
       clearText(in: range)
 
     case .text:
       text.insert(integersIn: intRange)
 
-      clearCode(in: intRange)
+      clearCode(in: range)
       clearData(in: range)
     }
   }
@@ -82,8 +82,7 @@ extension Disassembler {
     }
     instructionMap[_location] = nil
 
-    let width: Int = Int(truncatingIfNeeded: LR35902.InstructionSet.widths[instruction.spec]!.total)
-    clearCode(in: location.index..<(location.index + width))
+    clearCode(in: location..<(location + LR35902.InstructionSet.widths[instruction.spec]!.total))
   }
 
   // MARK: Clearing regions
@@ -110,13 +109,13 @@ extension Disassembler {
    Note that if an instruction footprint overlaps with the end of the given range then it is possible for some
    additional code to be cleared beyond the range.
    */
-  func clearCode(in range: Range<Int>) {
-    code.remove(integersIn: range)
+  private func clearCode(in range: Range<Cartridge.Location>) {
+    let intRange = range.asIntRange()
+    code.remove(integersIn: intRange)
 
     // Remove any labels, instructions, and transfers of control in this range.
-    for intLocation: Int in range.dropFirst() {
-      let _location = Cartridge._Location(intLocation)
-      let location = Cartridge.Location(location: _location)
+    for location: Cartridge.Location in range.dropFirst() {
+      let _location = Cartridge._Location(truncatingIfNeeded: location.index)
       deleteInstruction(at: location)
       transfers[location] = nil
       labelNames[_location] = nil
@@ -124,25 +123,21 @@ extension Disassembler {
       bankChanges[location] = nil
     }
 
-    let cartRange: Range<Cartridge._Location> = range.asCartridgeLocationRange()
-    let locationRange: Range<Cartridge.Location> = Cartridge.Location(location: cartRange.lowerBound)..<Cartridge.Location(location: cartRange.upperBound)
-    let addressAndBank = Cartridge.addressAndBank(from: cartRange.lowerBound)
-    let effectiveBank = self.effectiveBank(at: addressAndBank.address, in: addressAndBank.bank)
     // For any existing scope that intersects this range:
     // 1. Shorten it if it begins before the range.
     // 2. Delete it if it begins within the range.
-    if let overlappingScopes: Set<Range<Cartridge.Location>> = contiguousScopes[effectiveBank] {
+    if let overlappingScopes: Set<Range<Cartridge.Location>> = contiguousScopes[range.lowerBound.bank] {
       var mutatedScopes: Set<Range<Cartridge.Location>> = overlappingScopes
       for scope: Range<Cartridge.Location> in overlappingScopes {
-        guard scope.overlaps(locationRange) else {
+        guard scope.overlaps(range) else {
           continue
         }
         mutatedScopes.remove(scope)
-        if scope.lowerBound < locationRange.lowerBound {
-          mutatedScopes.insert(scope.lowerBound..<locationRange.lowerBound)
+        if scope.lowerBound < range.lowerBound {
+          mutatedScopes.insert(scope.lowerBound..<range.lowerBound)
         }
       }
-      contiguousScopes[addressAndBank.bank] = mutatedScopes
+      contiguousScopes[range.lowerBound.bank] = mutatedScopes
     }
   }
 }
