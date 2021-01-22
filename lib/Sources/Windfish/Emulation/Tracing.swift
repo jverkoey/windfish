@@ -40,7 +40,7 @@ extension Disassembler {
     let upperBoundPc = Cartridge.addressAndBank(from: range.upperBound).address
 
     while cpu.pc < upperBoundPc {
-      guard let instruction = self.instruction(at: cpu.pc, in: bank) else {
+      guard let instruction = self.instruction(at: Cartridge.Location(address: cpu.pc, bank: bank)) else {
         cpu.pc += 1
         continue
       }

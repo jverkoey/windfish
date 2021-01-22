@@ -4,15 +4,11 @@ import CPU
 
 extension Disassembler {
   /** Get the instruction at the given location, if one exists. */
-  public func instruction(at pc: LR35902.Address, in bank: Cartridge.Bank) -> LR35902.Instruction? {
-    precondition(bank > 0)
-    guard let location: Cartridge._Location = Cartridge.location(for: pc, in: bank) else {
+  public func instruction(at location: Cartridge.Location) -> LR35902.Instruction? {
+    guard code.contains(location.index) else {
       return nil
     }
-    guard code.contains(Int(truncatingIfNeeded: location)) else {
-      return nil
-    }
-    return instructionMap[location]
+    return instructionMap[Cartridge._Location(truncatingIfNeeded: location.index)]
   }
 
   /** Register an instruction at the given location. */

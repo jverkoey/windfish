@@ -26,7 +26,7 @@ extension Disassembler {
     // Tag the label type at this address
     if labelTypes[toLocation] == nil
         // Don't create a label in the middle of an instruction.
-        && (!code.contains(Int(truncatingIfNeeded: toLocation)) || instruction(at: pc, in: bank) != nil) {
+        && (!code.contains(Int(truncatingIfNeeded: toLocation)) || instruction(at: Cartridge.Location(address: pc, bank: bank)) != nil) {
       labelTypes[toLocation] = .transferOfControlType
     }
   }

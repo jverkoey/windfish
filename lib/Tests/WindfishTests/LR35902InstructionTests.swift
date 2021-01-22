@@ -16,7 +16,7 @@ final class LR35902InstructionTests: XCTestCase {
     let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
-    let instruction = disassembly.instruction(at: 0x0000, in: 0x01)!
+    let instruction = disassembly.instruction(at: Cartridge.Location(address: 0x0000, bank: 0x01))!
     XCTAssertEqual(instruction, LR35902.Instruction(spec: .nop))
   }
 
@@ -25,7 +25,7 @@ final class LR35902InstructionTests: XCTestCase {
     let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
-    let instruction = disassembly.instruction(at: 0x0000, in: 0x01)!
+    let instruction = disassembly.instruction(at: Cartridge.Location(address: 0x0000, bank: 0x01))!
     XCTAssertEqual(instruction, LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(0x3412)))
   }
 
@@ -34,7 +34,7 @@ final class LR35902InstructionTests: XCTestCase {
     let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
-    let instruction = disassembly.instruction(at: 0x0000, in: 0x01)!
+    let instruction = disassembly.instruction(at: Cartridge.Location(address: 0x0000, bank: 0x01))!
     XCTAssertEqual(instruction, LR35902.Instruction(spec: .ld(.bcaddr, .a)))
   }
 
@@ -43,7 +43,7 @@ final class LR35902InstructionTests: XCTestCase {
     let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
-    let instruction = disassembly.instruction(at: 0x0000, in: 0x01)!
+    let instruction = disassembly.instruction(at: Cartridge.Location(address: 0x0000, bank: 0x01))!
     XCTAssertEqual(instruction, LR35902.Instruction(spec: .inc(.bc)))
   }
 
@@ -52,7 +52,7 @@ final class LR35902InstructionTests: XCTestCase {
     let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
-    let instruction = disassembly.instruction(at: 0x0000, in: 0x01)!
+    let instruction = disassembly.instruction(at: Cartridge.Location(address: 0x0000, bank: 0x01))!
     XCTAssertEqual(instruction, LR35902.Instruction(spec: .inc(.b)))
   }
 
@@ -61,8 +61,7 @@ final class LR35902InstructionTests: XCTestCase {
     let disassembly = Disassembler(data: data)
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
-    let instruction = disassembly.instruction(at: 0x0000, in: 0x01)!
+    let instruction = disassembly.instruction(at: Cartridge.Location(address: 0x0000, bank: 0x01))!
     XCTAssertEqual(instruction, LR35902.Instruction(spec: .dec(.b)))
   }
 }
-

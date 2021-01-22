@@ -625,11 +625,10 @@ clean:
           isLabeled = true
         }
 
-        if let instruction = instruction(at: writeContext.pc, in: initialBank) {
+        if let instruction = instruction(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) {
           instructionsDecoded += 1
 
-          if let bankChange = bankChange(at: Cartridge.Location(address: writeContext.pc,
-                                                                bank: writeContext.bank)) {
+          if let bankChange = bankChange(at: Cartridge.Location(address: writeContext.pc, bank: writeContext.bank)) {
             writeContext.bank = bankChange
           }
 
@@ -715,7 +714,7 @@ clean:
             accumulator.append(cartridgeData[Int(Cartridge.location(for: writeContext.pc, in: initialBank)!)])
             writeContext.pc += 1
           } while writeContext.pc < end
-            && instruction(at: writeContext.pc, in: initialBank) == nil
+            && instruction(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) == nil
             && label(at: writeContext.pc, in: initialBank) == nil
             && type(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) == initialType
             && global == nil
