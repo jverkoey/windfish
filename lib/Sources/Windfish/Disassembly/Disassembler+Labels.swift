@@ -33,14 +33,13 @@ extension Disassembler {
       return nil
     }
 
-    let scopes: Set<Range<Cartridge._Location>> = contiguousScopes(at: location)
-    if let firstScope: Range<Cartridge._Location> = scopes.filter({ (scope: Range<Cartridge._Location>) -> Bool in
-      scope.lowerBound != _location // Ignore ourself.
-    }).min(by: { (scope1: Range<Cartridge._Location>, scope2: Range<Cartridge._Location>) -> Bool in
+    let scopes: Set<Range<Cartridge.Location>> = contiguousScopes(at: location)
+    if let firstScope: Range<Cartridge.Location> = scopes.filter({ (scope: Range<Cartridge.Location>) -> Bool in
+      scope.lowerBound != location // Ignore ourself.
+    }).min(by: { (scope1: Range<Cartridge.Location>, scope2: Range<Cartridge.Location>) -> Bool in
       scope1.lowerBound < scope2.lowerBound
     }) {
-      let scopeLocation: Cartridge.Location = Cartridge.Location(location: firstScope.lowerBound)
-      if let firstScopeLabel: String = label(at: scopeLocation.address, in: scopeLocation.bank)?.components(separatedBy: ".").first {
+      if let firstScopeLabel: String = label(at: firstScope.lowerBound.address, in: firstScope.lowerBound.bank)?.components(separatedBy: ".").first {
         return firstScopeLabel + "." + name
       }
     }

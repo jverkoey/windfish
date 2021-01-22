@@ -99,7 +99,7 @@ public final class Disassembler {
   var instructionMap: [Cartridge._Location: LR35902.Instruction] = [:]
 
   /** Each bank tracks ranges of code that represent contiguous scopes of instructions. */
-  var contiguousScopes: [Cartridge.Bank: Set<Range<Cartridge._Location>>] = [:]
+  var contiguousScopes: [Cartridge.Bank: Set<Range<Cartridge.Location>>] = [:]
 
   /**
    Label types at specific locations.
