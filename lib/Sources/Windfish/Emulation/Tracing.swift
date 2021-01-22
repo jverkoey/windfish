@@ -33,7 +33,7 @@ extension Disassembler {
    */
   func trace(range: Range<Cartridge._Location>,
              cpu: LR35902 = LR35902.zeroed(),
-             step: ((LR35902.Instruction, Cartridge._Location, LR35902) -> Void)? = nil) {
+             step: ((LR35902.Instruction, Cartridge.Location, LR35902) -> Void)? = nil) {
     let addressAndBank = Cartridge.addressAndBank(from: range.lowerBound)
     cpu.pc = addressAndBank.address
     let bank = addressAndBank.bank
@@ -46,7 +46,7 @@ extension Disassembler {
       }
 
       let memory: AddressableMemory = TracerMemory()
-      let location = Cartridge.location(for: cpu.pc, in: bank)!
+      let location = Cartridge.Location(address: cpu.pc, bank: bank)
       cpu.emulate(instruction: instruction, memory: memory)
       step?(instruction, location, cpu)
     }

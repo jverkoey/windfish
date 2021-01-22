@@ -54,6 +54,6 @@ extension Disassembler {
     guard !type.isEmpty else {
       return
     }
-    typeAtLocation[Cartridge._Location(truncatingIfNeeded: location.index)] = type
+    typeAtLocation[location] = type
   }
 }

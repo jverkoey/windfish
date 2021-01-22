@@ -65,7 +65,7 @@ public final class Disassembler {
   var softTerminators: [Cartridge.Location: Bool] = [:]
 
   /** Hints to the disassembler that a given location should be represented by a specific data type. */
-  var typeAtLocation: [Cartridge._Location: String] = [:]
+  var typeAtLocation: [Cartridge.Location: String] = [:]
 
   /** Registered data types. */
   var dataTypes: [String: Datatype] = [:]

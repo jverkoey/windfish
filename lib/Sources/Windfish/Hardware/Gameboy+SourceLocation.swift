@@ -4,7 +4,7 @@ public final class Gameboy {
   /** A representation of a specific address either in the cartridge ROM or in memory. */
   public enum SourceLocation: Equatable {
     /** An address in the cartridge's ROM data. */
-    case cartridge(Cartridge._Location)
+    case cartridge(Cartridge.Location)
 
     /** An address in the Gameboy's memory. */
     case memory(LR35902.Address)
@@ -17,9 +17,8 @@ public final class Gameboy {
    - Parameter bank: The selected bank.
    */
   static func sourceLocation(for address: LR35902.Address, in bank: Cartridge.Bank) -> SourceLocation {
-    precondition(bank > 0)
-    if let cartridgeLocation = Cartridge.location(for: address, in: bank) {
-      return .cartridge(cartridgeLocation)
+    if address < 0x8000 {
+      return .cartridge(Cartridge.Location(address: address, bank: bank))
     }
     return .memory(address)
   }

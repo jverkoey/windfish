@@ -30,6 +30,6 @@ final class DisassemblerMemory: AddressableMemory {
   }
 
   func sourceLocation(from address: LR35902.Address) -> Gameboy.SourceLocation {
-    return .cartridge(Cartridge.location(for: address, in: (selectedBank == 0) ? 1 : selectedBank)!)
+    return .cartridge(Cartridge.Location(address: address, bank: selectedBank))
   }
 }
