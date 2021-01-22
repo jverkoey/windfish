@@ -2,13 +2,9 @@ import Foundation
 
 extension Disassembler {
   /** Returns the maximum length of a line of text at the given location, if known. */
-  func lineLengthOfText(at address: LR35902.Address, in bank: Cartridge.Bank) -> Int? {
-    precondition(bank > 0)
-    guard let location: Cartridge._Location = Cartridge.location(for: address, in: bank) else {
-      return nil
-    }
+  func lineLengthOfText(at location: Cartridge.Location) -> Int? {
     return textLengths.first { (key: Range<Cartridge._Location>, value: Int) -> Bool in
-      key.contains(location)
+      key.contains(Cartridge._Location(truncatingIfNeeded: location.index))
     }?.value
   }
 
