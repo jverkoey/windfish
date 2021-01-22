@@ -75,7 +75,7 @@ extension Cartridge {
 
     public init(address: LR35902.Address, bank: Cartridge.Bank) {
       self.address = address
-      self.bank = max(1, bank)
+      self.bank = address < 0x4000 ? 1 : max(1, bank)
     }
 
     public convenience init(address: Int, bank: Int) {

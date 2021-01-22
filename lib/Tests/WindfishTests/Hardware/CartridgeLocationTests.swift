@@ -29,7 +29,7 @@ class CartridgeLocationTests: XCTestCase {
   func testZeroBank2() throws {
     let location = Cartridge.Location(address: 0, bank: 2)
     XCTAssertEqual(location.address, 0)
-    XCTAssertEqual(location.bank, 2)
+    XCTAssertEqual(location.bank, 1)
     XCTAssertEqual(location.index, 0)
   }
 
@@ -113,11 +113,11 @@ class CartridgeLocationTests: XCTestCase {
   // MARK: - Striding
 
   func testStridingDoesNotChangeBanks() throws {
-    let location = Cartridge.Location(address: 0, bank: 2)
+    let location = Cartridge.Location(address: 0, bank: 1)
     XCTAssertEqual(location.advanced(by: 0x8000).address, 0x8000)
-    XCTAssertEqual(location.advanced(by: 0x8000).bank, 2)
+    XCTAssertEqual(location.advanced(by: 0x8000).bank, 1)
     XCTAssertEqual(location.advanced(by: 0x9000).address, 0x9000)
-    XCTAssertEqual(location.advanced(by: 0x9000).bank, 2)
+    XCTAssertEqual(location.advanced(by: 0x9000).bank, 1)
   }
 
   func testDistanceCrossesBanks() throws {

@@ -21,7 +21,7 @@ extension Disassembler {
     if let explicitName: String = labelNames[location] {
       name = explicitName
     } else if let labelType: LabelType = labelTypes[location] {
-      let bank: Cartridge.Bank = (pc < 0x4000) ? 1 : bank
+      let bank: Cartridge.Bank = effectiveBank(at: pc, in: bank)
       switch labelType {
       case .transferOfControlType: name = "toc_\(bank.hexString)_\(pc.hexString)"
       case .elseType:              name = "else_\(bank.hexString)_\(pc.hexString)"
