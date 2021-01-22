@@ -75,15 +75,15 @@ extension Disassembler {
   }
 
   /** Deletes an instruction from a specific location and clears any code-related information in its footprint. */
-  func deleteInstruction(at location: Cartridge._Location) {
-    guard let instruction: LR35902.Instruction = instructionMap[location] else {
+  func deleteInstruction(at location: Cartridge.Location) {
+    let _location = Cartridge._Location(truncatingIfNeeded: location.index)
+    guard let instruction: LR35902.Instruction = instructionMap[_location] else {
       return
     }
-    instructionMap[location] = nil
+    instructionMap[_location] = nil
 
-    let start: Int = Int(truncatingIfNeeded: location)
     let width: Int = Int(truncatingIfNeeded: LR35902.InstructionSet.widths[instruction.spec]!.total)
-    clearCode(in: start..<(start + width))
+    clearCode(in: location.index..<(location.index + width))
   }
 
   // MARK: Clearing regions
@@ -114,12 +114,13 @@ extension Disassembler {
 
     // Remove any labels, instructions, and transfers of control in this range.
     for intLocation: Int in range.dropFirst() {
-      let location = Cartridge._Location(intLocation)
+      let _location = Cartridge._Location(intLocation)
+      let location = Cartridge.Location(location: _location)
       deleteInstruction(at: location)
-      transfers[location] = nil
-      labelNames[location] = nil
-      labelTypes[location] = nil
-      bankChanges[Cartridge.Location(location: location)] = nil
+      transfers[_location] = nil
+      labelNames[_location] = nil
+      labelTypes[_location] = nil
+      bankChanges[location] = nil
     }
 
     let cartRange: Range<Cartridge._Location> = range.asCartridgeLocationRange()
