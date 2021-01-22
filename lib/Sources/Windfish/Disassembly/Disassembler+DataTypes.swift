@@ -50,10 +50,10 @@ extension Disassembler {
   }
 
   /** Registers that a given instruction should use the given data type. */
-  func registerDataType(at address: LR35902.Address, in bank: Cartridge.Bank, to type: String) {
+  func registerDataType(at location: Cartridge.Location, to type: String) {
     guard !type.isEmpty else {
       return
     }
-    typeAtLocation[Cartridge.location(for: address, in: bank)!] = type
+    typeAtLocation[Cartridge._Location(truncatingIfNeeded: location.index)] = type
   }
 }
