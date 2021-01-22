@@ -45,7 +45,7 @@ public final class Disassembler {
     self.cartridgeData = data
     self.memory = DisassemblerMemory(data: data)
     self.cartridgeSize = Cartridge.Length(data.count)
-    self.numberOfBanks = Cartridge.Bank((cartridgeSize + Cartridge.bankSize - 1) / Cartridge.bankSize)
+    self.numberOfBanks = Cartridge.Bank(truncatingIfNeeded: (cartridgeSize + 0x4000 - 1) / 0x4000)
   }
 
   /** Returns true if the program counter is pointing to addressable memory. */

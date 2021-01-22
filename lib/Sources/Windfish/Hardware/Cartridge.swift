@@ -13,7 +13,7 @@ public class Cartridge {
 
 extension Cartridge {
   /** The size of a bank within the cartridge. */
-  static let bankSize: Length = 0x4000
+  static let bankSize: Int = 0x4000
 }
 
 // MARK: - Cartridge location translation
@@ -32,19 +32,8 @@ extension Cartridge {
     if pc < 0x4000 {
       return _Location(truncatingIfNeeded: pc)
     } else {
-      return _Location(truncatingIfNeeded: bank) * Cartridge.bankSize + _Location(truncatingIfNeeded: pc - 0x4000)
+      return _Location(truncatingIfNeeded: bank) * 0x4000 + _Location(truncatingIfNeeded: pc - 0x4000)
     }
-  }
-  
-  /**
-   Returns a cartridge address for the given program counter and bank.
-   - Parameter pc: The program counter's location.
-   - Parameter bank: The current bank.
-   */
-  public static func addressAndBank(from cartridgeLocation: _Location) -> (address: LR35902.Address, bank: Cartridge.Bank) {
-    let bank = Cartridge.Bank(cartridgeLocation / Cartridge.bankSize)
-    let address = LR35902.Address(cartridgeLocation % Cartridge.bankSize + _Location((bank > 0) ? 0x4000 : 0x0000))
-    return (address: address, bank: max(1, bank))
   }
 }
 
@@ -69,8 +58,9 @@ extension Cartridge {
       self.init(address: LR35902.Address(truncatingIfNeeded: address), bank: Cartridge.Bank(truncatingIfNeeded: bank))
     }
 
-    public convenience init(location: Cartridge._Location) {
-      let (address, bank) = Cartridge.addressAndBank(from: location)
+    public convenience init(index: Int) {
+      let bank = Cartridge.Bank(truncatingIfNeeded: index / Cartridge.bankSize)
+      let address = LR35902.Address(index % Cartridge.bankSize + ((bank > 0) ? 0x4000 : 0))
       self.init(address: address, bank: bank)
     }
 

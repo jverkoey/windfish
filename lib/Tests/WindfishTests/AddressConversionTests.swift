@@ -6,28 +6,25 @@ class AddressConversionTests: XCTestCase {
   func testZero() throws {
     let bank: Cartridge.Bank = 0x01
     let address: LR35902.Address = 0
-    let cartridgeLocation = Cartridge.location(for: address, in: bank)!
-    let addressAndBank = Cartridge.addressAndBank(from: cartridgeLocation)
-    XCTAssertEqual(addressAndBank.address, address)
-    XCTAssertEqual(addressAndBank.bank, bank)
+    let location = Cartridge.Location(address: address, bank: bank)
+    XCTAssertEqual(location.address, address)
+    XCTAssertEqual(location.bank, bank)
   }
 
   func testMiddleOfBank0() throws {
     let bank: Cartridge.Bank = 0x01
     let address: LR35902.Address = 0x2000
-    let cartridgeLocation = Cartridge.location(for: address, in: bank)!
-    let addressAndBank = Cartridge.addressAndBank(from: cartridgeLocation)
-    XCTAssertEqual(addressAndBank.address, address)
-    XCTAssertEqual(addressAndBank.bank, bank)
+    let location = Cartridge.Location(address: address, bank: bank)
+    XCTAssertEqual(location.address, address)
+    XCTAssertEqual(location.bank, bank)
   }
 
   func testEndOfBank0() throws {
     let bank: Cartridge.Bank = 0x01
     let address: LR35902.Address = 0x3FFF
-    let cartridgeLocation = Cartridge.location(for: address, in: bank)!
-    let addressAndBank = Cartridge.addressAndBank(from: cartridgeLocation)
-    XCTAssertEqual(addressAndBank.address, address)
-    XCTAssertEqual(addressAndBank.bank, bank)
+    let location = Cartridge.Location(address: address, bank: bank)
+    XCTAssertEqual(location.address, address)
+    XCTAssertEqual(location.bank, bank)
   }
 
   func testUnselectedBankGivesNilCartAddressAbove0x8FFF() throws {
@@ -39,48 +36,45 @@ class AddressConversionTests: XCTestCase {
   func testBeginningOfBank1() throws {
     let bank: Cartridge.Bank = 0x01
     let address: LR35902.Address = 0x4000
-    let cartridgeLocation = Cartridge.location(for: address, in: bank)!
-    let addressAndBank = Cartridge.addressAndBank(from: cartridgeLocation)
-    XCTAssertEqual(addressAndBank.address, address)
-    XCTAssertEqual(addressAndBank.bank, bank)
-    XCTAssertEqual(cartridgeLocation, 0x4000)
+    let location = Cartridge.Location(address: address, bank: bank)
+    XCTAssertEqual(location.address, address)
+    XCTAssertEqual(location.bank, bank)
+    XCTAssertEqual(location.index, 0x4000)
   }
 
   func testBeginningOfBank2() throws {
     let bank: Cartridge.Bank = 2
     let address: LR35902.Address = 0x4000
-    let cartridgeLocation = Cartridge.location(for: address, in: bank)!
-    let addressAndBank = Cartridge.addressAndBank(from: cartridgeLocation)
-    XCTAssertEqual(addressAndBank.address, address)
-    XCTAssertEqual(addressAndBank.bank, bank)
-    XCTAssertEqual(cartridgeLocation, 0x8000)
+    let location = Cartridge.Location(address: address, bank: bank)
+    XCTAssertEqual(location.address, address)
+    XCTAssertEqual(location.bank, bank)
+    XCTAssertEqual(location.index, 0x8000)
   }
 
   func testBank0WithBank1Selected() throws {
     let bank: Cartridge.Bank = 0x01
     let address: LR35902.Address = 0x2000
-    let cartridgeLocation = Cartridge.location(for: address, in: bank)!
-    let addressAndBank = Cartridge.addressAndBank(from: cartridgeLocation)
-    XCTAssertEqual(addressAndBank.address, address)
-    XCTAssertEqual(addressAndBank.bank, 0x01)
-    XCTAssertEqual(cartridgeLocation, 0x2000)
+    let location = Cartridge.Location(address: address, bank: bank)
+    XCTAssertEqual(location.address, address)
+    XCTAssertEqual(location.bank, 0x01)
+    XCTAssertEqual(location.index, 0x2000)
   }
 
   func testAddressAndBankEndOfBank0() throws {
-    let addressAndBank = Cartridge.addressAndBank(from: 0x3FFF)
-    XCTAssertEqual(addressAndBank.address, 0x3FFF)
-    XCTAssertEqual(addressAndBank.bank, 0x01)
+    let location = Cartridge.Location(index: 0x3FFF)
+    XCTAssertEqual(location.address, 0x3FFF)
+    XCTAssertEqual(location.bank, 0x01)
   }
 
   func testAddressAndBankBeginningOfBank1() throws {
-    let addressAndBank = Cartridge.addressAndBank(from: 0x4000)
-    XCTAssertEqual(addressAndBank.address, 0x4000)
-    XCTAssertEqual(addressAndBank.bank, 1)
+    let location = Cartridge.Location(index: 0x4000)
+    XCTAssertEqual(location.address, 0x4000)
+    XCTAssertEqual(location.bank, 1)
   }
 
   func testAddressAndBankBeginningOfBank2() throws {
-    let addressAndBank = Cartridge.addressAndBank(from: 0x8000)
-    XCTAssertEqual(addressAndBank.address, 0x4000)
-    XCTAssertEqual(addressAndBank.bank, 2)
+    let location = Cartridge.Location(index: 0x8000)
+    XCTAssertEqual(location.address, 0x4000)
+    XCTAssertEqual(location.bank, 2)
   }
 }

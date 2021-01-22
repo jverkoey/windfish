@@ -57,10 +57,10 @@ public final class RunGroup: Sequence {
       return nil
     }
     if let range = scope.rangeView.first(where: { $0.lowerBound == startLocation.index }) {
-      return Cartridge.Location(location: Cartridge._Location(truncatingIfNeeded: range.lowerBound))..<Cartridge.Location(location: Cartridge._Location(truncatingIfNeeded: range.upperBound))
+      return Cartridge.Location(index: range.lowerBound)..<Cartridge.Location(index: range.upperBound)
     }
     if let range = scope.rangeView.first(where: { $0.contains(startLocation.index) }) {
-      return startLocation..<Cartridge.Location(location: Cartridge._Location(truncatingIfNeeded: range.upperBound))
+      return startLocation..<Cartridge.Location(index: range.upperBound)
     }
     return nil
   }()
