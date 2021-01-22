@@ -10,7 +10,8 @@ extension Disassembler {
 
   /** Returns the label at the given location, if any. */
   func label(at pc: LR35902.Address, in bank: Cartridge.Bank) -> String? {
-    guard canShowLabel(at: Cartridge.Location(address: pc, bank: bank)) else {
+    let location: Cartridge.Location = Cartridge.Location(address: pc, bank: bank)
+    guard canShowLabel(at: location) else {
       return nil
     }
 
@@ -21,18 +22,18 @@ extension Disassembler {
     if let explicitName: String = labelNames[_location] {
       name = explicitName
     } else if let labelType: LabelType = labelTypes[_location] {
-      let bank: Cartridge.Bank = effectiveBank(at: pc, in: bank)
+      let bank: Cartridge.Bank = effectiveBank(at: location.address, in: location.bank)
       switch labelType {
-      case .transferOfControlType: name = "toc_\(bank.hexString)_\(pc.hexString)"
-      case .elseType:              name = "else_\(bank.hexString)_\(pc.hexString)"
-      case .loopType:              name = "loop_\(bank.hexString)_\(pc.hexString)"
-      case .returnType:            name = "return_\(bank.hexString)_\(pc.hexString)"
+      case .transferOfControlType: name = "toc_\(bank.hexString)_\(location.address.hexString)"
+      case .elseType:              name = "else_\(bank.hexString)_\(location.address.hexString)"
+      case .loopType:              name = "loop_\(bank.hexString)_\(location.address.hexString)"
+      case .returnType:            name = "return_\(bank.hexString)_\(location.address.hexString)"
       }
     } else {
       return nil
     }
 
-    let scopes: Set<Range<Cartridge._Location>> = contiguousScopes(at: Cartridge.Location(address: pc, bank: bank))
+    let scopes: Set<Range<Cartridge._Location>> = contiguousScopes(at: location)
     if let firstScope: Range<Cartridge._Location> = scopes.filter({ (scope: Range<Cartridge._Location>) -> Bool in
       scope.lowerBound != _location // Ignore ourself.
     }).min(by: { (scope1: Range<Cartridge._Location>, scope2: Range<Cartridge._Location>) -> Bool in
