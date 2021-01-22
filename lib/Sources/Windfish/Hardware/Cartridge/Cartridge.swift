@@ -78,6 +78,10 @@ extension Cartridge {
       self.bank = max(1, bank)
     }
 
+    public convenience init(address: Int, bank: Int) {
+      self.init(address: LR35902.Address(truncatingIfNeeded: address), bank: Cartridge.Bank(truncatingIfNeeded: bank))
+    }
+
     public init(location: Cartridge._Location) {
       (self.address, self.bank) = Cartridge.addressAndBank(from: location)
     }
