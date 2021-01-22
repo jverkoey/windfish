@@ -613,7 +613,7 @@ clean:
           lineGroup.append(Line(semantic: .empty))
           lineGroup.append(Line(semantic: .preComment(comment: preComment)))
         }
-        if let label = label(at: writeContext.pc, in: initialBank) {
+        if let label = label(at: Cartridge.Location(address:writeContext.pc, bank: initialBank)) {
           if let transfersOfControl = transfersOfControl(at: writeContext.pc, in: initialBank) {
             lineGroup.append(Line(semantic: .transferOfControl(transfersOfControl, label), address: writeContext.pc, bank: writeContext.bank))
           } else {
@@ -715,7 +715,7 @@ clean:
             writeContext.pc += 1
           } while writeContext.pc < end
             && instruction(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) == nil
-            && label(at: writeContext.pc, in: initialBank) == nil
+            && label(at: Cartridge.Location(address:writeContext.pc, bank: initialBank)) == nil
             && type(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) == initialType
             && global == nil
 
@@ -750,7 +750,7 @@ clean:
               } else {
                 effectiveBank = writeContext.bank
               }
-              if let label = label(at: address, in: effectiveBank) {
+              if let label = label(at: Cartridge.Location(address:address, bank: effectiveBank)) {
                 jumpLocation = label
               } else {
                 jumpLocation = "$\(address.hexString)"

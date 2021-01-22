@@ -9,13 +9,12 @@ extension Disassembler {
   }
 
   /** Returns the label at the given location, if any. */
-  func label(at pc: LR35902.Address, in bank: Cartridge.Bank) -> String? {
-    let location: Cartridge.Location = Cartridge.Location(address: pc, bank: bank)
+  func label(at location: Cartridge.Location) -> String? {
     guard canShowLabel(at: location) else {
       return nil
     }
 
-    guard let _location: Cartridge._Location = Cartridge.location(for: pc, in: bank) else {
+    guard let _location: Cartridge._Location = Cartridge.location(for: location.address, in: location.bank) else {
       return nil
     }
     let name: String
@@ -39,7 +38,7 @@ extension Disassembler {
     }).min(by: { (scope1: Range<Cartridge.Location>, scope2: Range<Cartridge.Location>) -> Bool in
       scope1.lowerBound < scope2.lowerBound
     }) {
-      if let firstScopeLabel: String = label(at: firstScope.lowerBound.address, in: firstScope.lowerBound.bank)?.components(separatedBy: ".").first {
+      if let firstScopeLabel: String = label(at: firstScope.lowerBound)?.components(separatedBy: ".").first {
         return firstScopeLabel + "." + name
       }
     }

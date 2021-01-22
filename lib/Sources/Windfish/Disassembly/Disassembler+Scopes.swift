@@ -11,7 +11,7 @@ extension Disassembler {
   /** Returns all labeled scopes that intersect with the given location. */
   public func labeledContiguousScopes(at location: Cartridge.Location) -> [(label: String, scope: Range<Cartridge.Location>)] {
     return contiguousScopes(at: location).compactMap { (range: Range<Cartridge.Location>) -> (label: String, scope: Range<Cartridge.Location>)? in
-      guard let label: String = label(at: range.lowerBound.address, in: range.lowerBound.bank) else {
+      guard let label: String = label(at: range.lowerBound) else {
         return nil
       }
       return (label, range)

@@ -291,7 +291,7 @@ extension RGBDSDisassembler {
 extension RGBDSDisassembler {
   /** Returns one of a label, a global, or a hexadecimal representation of a given imm16 value. */
   private static func prettify(imm16: UInt16, with context: Context) -> String {
-    if let label = context.disassembly.label(at: imm16, in: context.bank) {
+    if let label = context.disassembly.label(at: Cartridge.Location(address:imm16, bank: context.bank)) {
       return label
     } else if let global = context.disassembly.globals[imm16] {
       return global.name
@@ -306,7 +306,7 @@ extension RGBDSDisassembler {
       return argumentString
     }
 
-    if let label = context.disassembly.label(at: immediate, in: context.bank) {
+    if let label = context.disassembly.label(at: Cartridge.Location(address:immediate, bank: context.bank)) {
       if let scope = context.disassembly.labeledContiguousScopes(at: Cartridge.Location(address: context.address, bank: context.bank))
           .first(where: { labeledScope in
             label.starts(with: "\(labeledScope.label).")
