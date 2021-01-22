@@ -104,7 +104,7 @@ extension Disassembler {
   }
 
   private func inferLoops(in scope: Range<Cartridge._Location>) {
-    let tocs: [(destination: Cartridge._Location, tocs: Set<Cartridge._Location>)] = scope.compactMap {
+    let tocs: [(destination: Cartridge._Location, tocs: Set<Cartridge.Location>)] = scope.compactMap {
       let (address, bank) = Cartridge.addressAndBank(from: $0)
       if let toc = transfersOfControl(at: Cartridge.Location(address: address, bank: bank)) {
         return ($0, toc)
@@ -114,13 +114,14 @@ extension Disassembler {
     }
     let backwardTocs: [(source: Cartridge._Location, destination: Cartridge._Location)] = tocs.reduce(into: [], { (accumulator, element) in
       let tocsInThisScope = element.tocs.filter {
-        scope.contains($0) && element.destination < $0
+        scope.contains(Cartridge._Location(truncatingIfNeeded: $0.index)) && element.destination < Cartridge._Location(truncatingIfNeeded: $0.index)
           && (labelNames[element.destination] != nil || labelTypes[Cartridge.Location(location: element.destination)] != nil)
       }
       for toc in tocsInThisScope {
-        if case .jr(let condition, _) = instructionMap[toc]?.spec,
+        let _toc = Cartridge._Location(truncatingIfNeeded: toc.index)
+        if case .jr(let condition, _) = instructionMap[_toc]?.spec,
           condition != nil {
-          accumulator.append((toc, element.destination))
+          accumulator.append((_toc, element.destination))
         }
       }
     })
@@ -131,7 +132,9 @@ extension Disassembler {
     let loops = backwardTocs.filter {
       let loopRange = ($0.destination..<$0.source)
       let tocsWithinLoop: [LR35902.Instruction] = tocs.flatMap {
-        $0.tocs.filter { loopRange.contains($0) }.compactMap { instructionMap[$0] }
+        $0.tocs
+          .filter { loopRange.contains(Cartridge._Location(truncatingIfNeeded: $0.index)) }
+          .compactMap { instructionMap[Cartridge._Location(truncatingIfNeeded: $0.index)] }
       }
       return !tocsWithinLoop.contains {
         switch $0.spec {
@@ -152,7 +155,7 @@ extension Disassembler {
   }
 
   private func inferElses(in scope: Range<Cartridge._Location>) {
-    let tocs: [(destination: Cartridge._Location, tocs: Set<Cartridge._Location>)] = scope.compactMap {
+    let tocs: [(destination: Cartridge._Location, tocs: Set<Cartridge.Location>)] = scope.compactMap {
       let (address, bank) = Cartridge.addressAndBank(from: $0)
       if let toc = transfersOfControl(at: Cartridge.Location(address: address, bank: bank)) {
         return ($0, toc)
@@ -162,14 +165,15 @@ extension Disassembler {
     }
     let forwardTocs: [(source: Cartridge._Location, destination: Cartridge._Location)] = tocs.reduce(into: [], { (accumulator, element) in
       let tocsInThisScope = element.tocs.filter {
-        scope.contains($0)
-          && element.destination > $0
+        scope.contains(Cartridge._Location(truncatingIfNeeded: $0.index))
+          && element.destination > Cartridge._Location(truncatingIfNeeded: $0.index)
           && (labelNames[element.destination] != nil || labelTypes[Cartridge.Location(location: element.destination)] != nil)
       }
       for toc in tocsInThisScope {
-        if case .jr(let condition, _) = instructionMap[toc]?.spec,
+        let _toc = Cartridge._Location(truncatingIfNeeded: toc.index)
+        if case .jr(let condition, _) = instructionMap[_toc]?.spec,
           condition != nil {
-          accumulator.append((toc, element.destination))
+          accumulator.append((_toc, element.destination))
         }
       }
     })

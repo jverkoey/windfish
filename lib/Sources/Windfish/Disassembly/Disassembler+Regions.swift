@@ -117,7 +117,7 @@ extension Disassembler {
       let _location = Cartridge._Location(intLocation)
       let location = Cartridge.Location(location: _location)
       deleteInstruction(at: location)
-      transfers[_location] = nil
+      transfers[location] = nil
       labelNames[_location] = nil
       labelTypes[location] = nil
       bankChanges[location] = nil

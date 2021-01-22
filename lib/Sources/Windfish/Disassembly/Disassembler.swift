@@ -93,7 +93,7 @@ public final class Disassembler {
   var code = IndexSet()
 
   /** Locations that can transfer control (jp/call) to a specific location. */
-  var transfers: [Cartridge._Location: Set<Cartridge._Location>] = [:]
+  var transfers: [Cartridge.Location: Set<Cartridge.Location>] = [:]
 
   /** Which instruction exists at a specific location. */
   var instructionMap: [Cartridge._Location: LR35902.Instruction] = [:]
