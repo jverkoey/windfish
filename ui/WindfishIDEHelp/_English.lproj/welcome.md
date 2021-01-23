@@ -36,3 +36,22 @@ The edit tab includes:
 The inspect tab includes:
 
 - The Region inspector.
+
+## Disassembling your first ROM
+
+Windfish is a project-based disassembler that relies on your input to guide it toward an ideal disassembly.
+
+To create a new project, open Windfish and click File > New Project.
+This will create an empty project.
+You can now load a ROM for disassembly into the project by clicking File > Load ROM....
+
+Once the ROM is loaded, Windfish will immediately begin disassembling it.
+Once complete, the UI will show you the list of ROM banks in the Navigator.
+
+Clicking any of the files in the Navigator will open a read-only view of that file in the Editor.
+
+By default, Windfish will populate the project with several regions that are standard for Gameboy ROMs.
+
+![Default regions](default-regions.png)
+
+These defaults provide a solid starting point for inspecting and understanding the ROM's behavior.
