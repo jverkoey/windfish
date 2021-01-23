@@ -52,6 +52,20 @@ Clicking any of the files in the Navigator will open a read-only view of that fi
 
 By default, Windfish will populate the project with several regions that are standard for Gameboy ROMs.
 
-![Default regions](default-regions.png)
+- `$00:$0040: region`: VBlankInterrupt, length: 8 bytes
+- `$00:$0048: region`: LCDCInterrupt, length: 8 bytes
+- `$00:$0050: region`: TimerOverflowInterrupt, length: 8 bytes
+- `$00:$0058: region`: SerialTransferCompleteInterrupt, length: 8 bytes
+- `$00:$0060: region`: JoypadTransitionInterrupt, length: 8 bytes
+- `$00:$0100: region`: Boot, length: 4 bytes
+- `$00:$0104: image1bpp`: HeaderLogo, length: 48 bytes
+- `$00:$0134: string`: HeaderTitle, length: 15 bytes
+- `$00:$0144: label`: HeaderNewLicenseeCode, length: 0 bytes
+- `$00:$014B: label`: HeaderOldLicenseeCode, length: 0 bytes
+- `$00:$014C: label`: HeaderMaskROMVersion, length: 0 bytes
+- `$00:$014D: label`: HeaderComplementCheck, length: 0 bytes
+- `$00:$014E: label`: HeaderGlobalChecksum, length: 0 bytes
 
 These defaults provide a solid starting point for inspecting and understanding the ROM's behavior.
+
+The standard Gameboy register addresses and some common data types are also registered by default.
