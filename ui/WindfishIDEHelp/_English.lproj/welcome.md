@@ -46,12 +46,22 @@ This will create an empty project.
 You can now load a ROM for disassembly into the project by clicking File > Load ROM....
 
 Once the ROM is loaded, Windfish will immediately begin disassembling it.
-Once complete, the UI will show you the list of ROM banks in the Navigator.
+You can tell if Windfish is disassembling if the activity indicator at the bottom of the UI is spinning.
+Once complete, the UI will show you the list of ROM banks in the Navigator as well as a disassembly report in the bottom status bar.
+Hovering over the disassembly report will give you a detailed breakdown of how much of each ROM bank was able to be disassembled.
 
 Clicking any of the files in the Navigator will open a read-only view of that file in the Editor.
 
 By default, Windfish will populate the project with several regions that are standard for Gameboy ROMs.
 
+- `$00:$0000: region`: RST_0000, length: 8 bytes
+- `$00:$0008: region`: RST_0008, length: 8 bytes
+- `$00:$0010: region`: RST_0010, length: 8 bytes
+- `$00:$0018: region`: RST_0018, length: 8 bytes
+- `$00:$0020: region`: RST_0020, length: 8 bytes
+- `$00:$0028: region`: RST_0028, length: 8 bytes
+- `$00:$0030: region`: RST_0030, length: 8 bytes
+- `$00:$0038: region`: RST_0038, length: 8 bytes
 - `$00:$0040: region`: VBlankInterrupt, length: 8 bytes
 - `$00:$0048: region`: LCDCInterrupt, length: 8 bytes
 - `$00:$0050: region`: TimerOverflowInterrupt, length: 8 bytes
@@ -67,5 +77,6 @@ By default, Windfish will populate the project with several regions that are sta
 - `$00:$014E: label`: HeaderGlobalChecksum, length: 0 bytes
 
 These defaults provide a solid starting point for inspecting and understanding the ROM's behavior.
-
 The standard Gameboy register addresses and some common data types are also registered by default.
+
+To save your project and the generated assembly code, click File > Save and select a name and location for the project.
