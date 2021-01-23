@@ -1,24 +1,9 @@
-# Site settings
 apple_help: true  # Flag for conditional markup, if needed.
-
-# Build settings
 markdown: kramdown
 
 # Localization collections for Help topics. Add more languages as needed.
 collections:
   English.lproj:
-    output: true
-  Japanese.lproj:
-    output: true
-  Dutch.lproj:
-    output: true
-  French.lproj:
-    output: true
-  Italian.lproj:
-    output: true
-  German.lproj:
-    output: true
-  Spanish.lproj:
     output: true
 
 defaults:

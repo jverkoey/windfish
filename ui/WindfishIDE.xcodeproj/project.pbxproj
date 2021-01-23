@@ -491,34 +491,7 @@
 		66C617EB257F30C200E372BA /* GlobalEditorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalEditorViewController.swift; sourceTree = "<group>"; };
 		66C642FB2589DD1000035EC9 /* lib */ = {isa = PBXFileReference; lastKnownFileType = folder; name = lib; path = ../lib; sourceTree = "<group>"; };
 		66D038D325BC6FAB00EC532C /* WindfishIDEHelp.help */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WindfishIDEHelp.help; sourceTree = BUILT_PRODUCTS_DIR; };
-		66D038DF25BC6FF200EC532C /* head.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = head.html; sourceTree = "<group>"; };
-		66D038E025BC6FF200EC532C /* footer.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = footer.html; sourceTree = "<group>"; };
-		66D038E125BC6FF200EC532C /* header.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = header.html; sourceTree = "<group>"; };
-		66D038E325BC6FF200EC532C /* main.scss */ = {isa = PBXFileReference; lastKnownFileType = text; path = main.scss; sourceTree = "<group>"; };
-		66D038E425BC6FF200EC532C /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
-		66D038E625BC6FF200EC532C /* default.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = default.html; sourceTree = "<group>"; };
-		66D038E725BC6FF200EC532C /* help-page.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = "help-page.html"; sourceTree = "<group>"; };
-		66D038E825BC6FF200EC532C /* title-page.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = "title-page.html"; sourceTree = "<group>"; };
-		66D038EA25BC6FF200EC532C /* _English */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = _English; path = "_English.lproj/topic-3.md"; sourceTree = "<group>"; };
-		66D038EC25BC6FF200EC532C /* _English */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = _English; path = _English.lproj/overview.md; sourceTree = "<group>"; };
-		66D038EE25BC6FF200EC532C /* _English */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = _English; path = _English.lproj/overview.svg; sourceTree = "<group>"; };
-		66D038F025BC6FF200EC532C /* _English */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = _English; path = "_English.lproj/topic-2.md"; sourceTree = "<group>"; };
-		66D038F225BC6FF200EC532C /* _English */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = _English; path = _English.lproj/keyboard.md; sourceTree = "<group>"; };
-		66D038F425BC6FF200EC532C /* _English */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = _English; path = _English.lproj/overview.png; sourceTree = "<group>"; };
-		66D038F625BC6FF200EC532C /* _English */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = _English; path = _English.lproj/screenshot.png; sourceTree = "<group>"; };
-		66D038F825BC6FF200EC532C /* _English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = _English; path = _English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		66D038FA25BC6FF200EC532C /* _English */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = _English; path = _English.lproj/index.md; sourceTree = "<group>"; };
-		66D038FC25BC6FF200EC532C /* _English */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = _English; path = "_English.lproj/topic-1.md"; sourceTree = "<group>"; };
-		66D038FE25BC6FF200EC532C /* page-rel-root.rb */ = {isa = PBXFileReference; lastKnownFileType = text.script.ruby; path = "page-rel-root.rb"; sourceTree = "<group>"; };
-		66D038FF25BC6FF200EC532C /* help-filters.rb */ = {isa = PBXFileReference; lastKnownFileType = text.script.ruby; path = "help-filters.rb"; sourceTree = "<group>"; };
-		66D0390025BC6FF200EC532C /* _config.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = _config.yml; sourceTree = "<group>"; };
-		66D0390125BC6FF200EC532C /* jekyll-server.command */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "jekyll-server.command"; sourceTree = "<group>"; };
-		66D0390325BC6FF200EC532C /* _syntax-highlighting.scss */ = {isa = PBXFileReference; lastKnownFileType = text; path = "_syntax-highlighting.scss"; sourceTree = "<group>"; };
-		66D0390425BC6FF200EC532C /* _apple-help.scss */ = {isa = PBXFileReference; lastKnownFileType = text; path = "_apple-help.scss"; sourceTree = "<group>"; };
-		66D0390525BC6FF300EC532C /* _base.scss */ = {isa = PBXFileReference; lastKnownFileType = text; path = _base.scss; sourceTree = "<group>"; };
-		66D0390625BC6FF300EC532C /* nav.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = nav.js; sourceTree = "<group>"; };
-		66D0390725BC6FF300EC532C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		66D0390825BC6FF300EC532C /* book-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "book-icon.png"; sourceTree = "<group>"; };
+		66D0394E25BC89BC00EC532C /* WindfishIDEHelp */ = {isa = PBXFileReference; lastKnownFileType = folder; path = WindfishIDEHelp; sourceTree = "<group>"; };
 		66EDE9F425ACD129008E322F /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
 		66EDE9F925ACD13B008E322F /* FixedWidthTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedWidthTextView.swift; sourceTree = "<group>"; };
 		66EDE9FE25ACD15A008E322F /* AddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressView.swift; sourceTree = "<group>"; };
@@ -656,9 +629,9 @@
 				6699B58025AE9EF1005DB9BB /* third_party */,
 				66C642FB2589DD1000035EC9 /* lib */,
 				665D4F572575F75400C3A03B /* WindfishIDE */,
+				66D0394E25BC89BC00EC532C /* WindfishIDEHelp */,
 				6699B58E25AE9F85005DB9BB /* Sameboy */,
 				6699B73A25AEA2B7005DB9BB /* HexFiend */,
-				66D038DD25BC6FF200EC532C /* WindfishIDEHelp */,
 				665D4F562575F75400C3A03B /* Products */,
 				665D4FA12576C99000C3A03B /* Frameworks */,
 			);
@@ -946,81 +919,6 @@
 			path = ViewControllers;
 			sourceTree = "<group>";
 		};
-		66D038DD25BC6FF200EC532C /* WindfishIDEHelp */ = {
-			isa = PBXGroup;
-			children = (
-				66D038DE25BC6FF200EC532C /* _includes */,
-				66D038E225BC6FF200EC532C /* css */,
-				66D038E425BC6FF200EC532C /* Makefile */,
-				66D038E525BC6FF200EC532C /* _layouts */,
-				66D038E925BC6FF200EC532C /* topic-3.md */,
-				66D038EB25BC6FF200EC532C /* overview.md */,
-				66D038ED25BC6FF200EC532C /* overview.svg */,
-				66D038EF25BC6FF200EC532C /* topic-2.md */,
-				66D038F125BC6FF200EC532C /* keyboard.md */,
-				66D038F325BC6FF200EC532C /* overview.png */,
-				66D038F525BC6FF200EC532C /* screenshot.png */,
-				66D038F725BC6FF200EC532C /* InfoPlist.strings */,
-				66D038F925BC6FF200EC532C /* index.md */,
-				66D038FB25BC6FF200EC532C /* topic-1.md */,
-				66D038FD25BC6FF200EC532C /* _plugins */,
-				66D0390025BC6FF200EC532C /* _config.yml */,
-				66D0390125BC6FF200EC532C /* jekyll-server.command */,
-				66D0390225BC6FF200EC532C /* _sass */,
-				66D0390625BC6FF300EC532C /* nav.js */,
-				66D0390725BC6FF300EC532C /* Info.plist */,
-				66D0390825BC6FF300EC532C /* book-icon.png */,
-			);
-			path = WindfishIDEHelp;
-			sourceTree = SOURCE_ROOT;
-		};
-		66D038DE25BC6FF200EC532C /* _includes */ = {
-			isa = PBXGroup;
-			children = (
-				66D038DF25BC6FF200EC532C /* head.html */,
-				66D038E025BC6FF200EC532C /* footer.html */,
-				66D038E125BC6FF200EC532C /* header.html */,
-			);
-			path = _includes;
-			sourceTree = "<group>";
-		};
-		66D038E225BC6FF200EC532C /* css */ = {
-			isa = PBXGroup;
-			children = (
-				66D038E325BC6FF200EC532C /* main.scss */,
-			);
-			path = css;
-			sourceTree = "<group>";
-		};
-		66D038E525BC6FF200EC532C /* _layouts */ = {
-			isa = PBXGroup;
-			children = (
-				66D038E625BC6FF200EC532C /* default.html */,
-				66D038E725BC6FF200EC532C /* help-page.html */,
-				66D038E825BC6FF200EC532C /* title-page.html */,
-			);
-			path = _layouts;
-			sourceTree = "<group>";
-		};
-		66D038FD25BC6FF200EC532C /* _plugins */ = {
-			isa = PBXGroup;
-			children = (
-				66D038FE25BC6FF200EC532C /* page-rel-root.rb */,
-				66D038FF25BC6FF200EC532C /* help-filters.rb */,
-			);
-			path = _plugins;
-			sourceTree = "<group>";
-		};
-		66D0390225BC6FF200EC532C /* _sass */ = {
-			isa = PBXGroup;
-			children = (
-				66D0390325BC6FF200EC532C /* _syntax-highlighting.scss */,
-				66D0390425BC6FF200EC532C /* _apple-help.scss */,
-				66D0390525BC6FF300EC532C /* _base.scss */,
-			);
-			path = _sass;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -1265,6 +1163,7 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/*",
 			);
 			outputFileListPaths = (
 			);
@@ -1429,89 +1328,6 @@
 			targetProxy = 66D0391C25BC811E00EC532C /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		66D038E925BC6FF200EC532C /* topic-3.md */ = {
-			isa = PBXVariantGroup;
-			children = (
-				66D038EA25BC6FF200EC532C /* _English */,
-			);
-			name = "topic-3.md";
-			sourceTree = "<group>";
-		};
-		66D038EB25BC6FF200EC532C /* overview.md */ = {
-			isa = PBXVariantGroup;
-			children = (
-				66D038EC25BC6FF200EC532C /* _English */,
-			);
-			name = overview.md;
-			sourceTree = "<group>";
-		};
-		66D038ED25BC6FF200EC532C /* overview.svg */ = {
-			isa = PBXVariantGroup;
-			children = (
-				66D038EE25BC6FF200EC532C /* _English */,
-			);
-			name = overview.svg;
-			sourceTree = "<group>";
-		};
-		66D038EF25BC6FF200EC532C /* topic-2.md */ = {
-			isa = PBXVariantGroup;
-			children = (
-				66D038F025BC6FF200EC532C /* _English */,
-			);
-			name = "topic-2.md";
-			sourceTree = "<group>";
-		};
-		66D038F125BC6FF200EC532C /* keyboard.md */ = {
-			isa = PBXVariantGroup;
-			children = (
-				66D038F225BC6FF200EC532C /* _English */,
-			);
-			name = keyboard.md;
-			sourceTree = "<group>";
-		};
-		66D038F325BC6FF200EC532C /* overview.png */ = {
-			isa = PBXVariantGroup;
-			children = (
-				66D038F425BC6FF200EC532C /* _English */,
-			);
-			name = overview.png;
-			sourceTree = "<group>";
-		};
-		66D038F525BC6FF200EC532C /* screenshot.png */ = {
-			isa = PBXVariantGroup;
-			children = (
-				66D038F625BC6FF200EC532C /* _English */,
-			);
-			name = screenshot.png;
-			sourceTree = "<group>";
-		};
-		66D038F725BC6FF200EC532C /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				66D038F825BC6FF200EC532C /* _English */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		66D038F925BC6FF200EC532C /* index.md */ = {
-			isa = PBXVariantGroup;
-			children = (
-				66D038FA25BC6FF200EC532C /* _English */,
-			);
-			name = index.md;
-			sourceTree = "<group>";
-		};
-		66D038FB25BC6FF200EC532C /* topic-1.md */ = {
-			isa = PBXVariantGroup;
-			children = (
-				66D038FC25BC6FF200EC532C /* _English */,
-			);
-			name = "topic-1.md";
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		665D4F7B2575F75700C3A03B /* Debug */ = {
