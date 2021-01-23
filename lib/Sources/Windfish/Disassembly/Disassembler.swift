@@ -267,14 +267,14 @@ public final class Disassembler {
     var visitedAddresses = IndexSet()
 
     let runQueue = Queue<Disassembler.Run>()
-    let firstRun = Run(from: range.lowerBound.address, initialBank: range.lowerBound.bank, upTo: range.upperBound.address)
+    let firstRun = Run(from: range.lowerBound.address, selectedBank: range.lowerBound.bank, upTo: range.upperBound.address)
     runQueue.add(firstRun)
 
     let queueRun: (Run, LR35902.Address, LR35902.Address, Cartridge.Bank, LR35902.Instruction) -> Void = { fromRun, fromAddress, toAddress, bank, instruction in
       guard toAddress < 0x8000 else {
         return // We can't disassemble in-memory regions.
       }
-      let run = Run(from: toAddress, initialBank: bank)
+      let run = Run(from: toAddress, selectedBank: bank)
       run.invocationInstruction = instruction
       runQueue.add(run)
 
@@ -302,7 +302,7 @@ public final class Disassembler {
       }
 
       // Initialize the run's program counter
-      var runContext = (pc: run.startLocation.address, bank: run.initialBank)
+      var runContext = (pc: run.startLocation.address, bank: run.selectedBank)
 
       // Script functions
       let registerBankChange: @convention(block) (Int, Int, Int) -> Void = { [weak self] _desiredBank, address, bank in
