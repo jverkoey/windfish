@@ -154,7 +154,7 @@ public final class LR35902 {
 
   /** Trace information for a given register. */
   // TODO: Allow the CPU to be wrapped in a tracing emulator that intercepts certain types of instructions to log tracer information.
-  public var registerTraces: [LR35902.Instruction.Numeric: RegisterTrace] = [:]
+  var registerTraces: [LR35902.Instruction.Numeric: RegisterTrace] = [:]
 
   var nextAction: LR35902.Emulation.EmulationResult = .fetchNext
   var specIndex: Int = 0
@@ -311,25 +311,25 @@ extension LR35902 {
 
 extension LR35902 {
   /** Trace information for a specific register. */
-  public struct RegisterTrace: Equatable {
-    public init(sourceLocation: Gameboy.SourceLocation) {
+  struct RegisterTrace: Equatable {
+    init(sourceLocation: Gameboy.SourceLocation) {
       self.sourceLocation = sourceLocation
       self.loadAddress = nil
     }
-    public init(loadAddress: LR35902.Address) {
+    init(loadAddress: LR35902.Address) {
       self.sourceLocation = nil
       self.loadAddress = loadAddress
     }
-    public init(sourceLocation: Gameboy.SourceLocation, loadAddress: LR35902.Address) {
+    init(sourceLocation: Gameboy.SourceLocation, loadAddress: LR35902.Address) {
       self.sourceLocation = sourceLocation
       self.loadAddress = loadAddress
     }
 
     /** The address from which the value was loaded, if known. */
-    public let loadAddress: LR35902.Address?
+    let loadAddress: LR35902.Address?
 
     /** The source location from which this register's value was loaded, if known. */
-    public let sourceLocation: Gameboy.SourceLocation?
+    let sourceLocation: Gameboy.SourceLocation?
   }
 }
 
@@ -337,7 +337,7 @@ extension LR35902: AddressableMemory {
   static let interruptEnableAddress: LR35902.Address = 0xFFFF
   static let interruptFlagAddress: LR35902.Address = 0xFF0F
 
-  public func read(from address: Address) -> UInt8 {
+  func read(from address: Address) -> UInt8 {
     switch address {
     case LR35902.interruptEnableAddress: return interruptEnable.rawValue
     case LR35902.interruptFlagAddress:   return interruptFlag.rawValue
@@ -345,7 +345,7 @@ extension LR35902: AddressableMemory {
     }
   }
 
-  public func write(_ byte: UInt8, to address: Address) {
+  func write(_ byte: UInt8, to address: Address) {
     switch address {
     case LR35902.interruptEnableAddress: interruptEnable = LR35902.Interrupt(rawValue: byte)
     case LR35902.interruptFlagAddress:   interruptFlag = LR35902.Interrupt(rawValue: byte)
@@ -353,7 +353,7 @@ extension LR35902: AddressableMemory {
     }
   }
 
-  public func sourceLocation(from address: Address) -> Gameboy.SourceLocation {
+  func sourceLocation(from address: Address) -> Gameboy.SourceLocation {
     return .memory(address)
   }
 }
