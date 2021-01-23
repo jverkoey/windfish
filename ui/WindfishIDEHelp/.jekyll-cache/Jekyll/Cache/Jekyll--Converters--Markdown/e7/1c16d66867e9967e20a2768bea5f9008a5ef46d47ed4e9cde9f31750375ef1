@@ -1,0 +1,15 @@
+I"I<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Action</th>
+      <th style="text-align: left">Shortcut</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">Quit application</td>
+      <td style="text-align: left">Command (⌘)-Q or apply hammer to CPU</td>
+    </tr>
+  </tbody>
+</table>
+:ET

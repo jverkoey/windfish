@@ -1,0 +1,84 @@
+I"q	<p>This is the Jekyll Apple Help template. This overview has some markdown samples.</p>
+
+<h2 id="images">Images</h2>
+
+<p><img src="overview.png" alt="JekyllHelp Overview" /></p>
+
+<h2 id="links">Links</h2>
+
+<ul>
+  <li><a href="topic-1.html">Normal Link to topic-1, “Do Something”</a></li>
+  <li><a href="help:anchor=title-page+">Help anchor-link to the index page anchor, “title-page”</a></li>
+  <li><a href="help:openbook=com.apple.machelp">Help openbook-link to Apple’s Mac Help</a></li>
+  <li>
+    <!-- Note use of + for space. Alternatively use %20 -->
+    <p><a href="help:anchor=cpsh003+bookID=com.apple.safari.help">Help anchor-link to Safari’s keyboard shortcuts</a></p>
+  </li>
+</ul>
+
+<h2 id="lists">Lists</h2>
+
+<ul>
+  <li>Red</li>
+  <li>Green</li>
+  <li>Blue</li>
+</ul>
+
+<ol>
+  <li>Red</li>
+  <li>Green</li>
+  <li>Blue</li>
+</ol>
+
+<h2 id="inline-styles">Inline Styles</h2>
+
+<ul>
+  <li><em>Emphasis</em></li>
+  <li><strong>Strong</strong></li>
+  <li><code class="language-plaintext highlighter-rouge">inline code</code></li>
+</ul>
+
+<h2 id="code">Code</h2>
+
+<p>Plain Code:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tell application "Foo"
+    beep
+end tell
+</code></pre></div></div>
+
+<p>Jekyll Highlighted Code:</p>
+
+<figure class="highlight"><pre><code class="language-applescript" data-lang="applescript"><span class="k">tell</span><span class="w"> </span><span class="nb">application</span><span class="w"> </span><span class="s2">"Foo"</span><span class="w">
+    </span><span class="nb">beep</span><span class="w">
+</span><span class="k">end</span><span class="w"> </span><span class="k">tell</span></code></pre></figure>
+
+<h2 id="blockquotes">Blockquotes</h2>
+
+<blockquote>
+  <p>This is a blockquote. Lorem ipsum dolor sit amet,
+consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.
+Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.</p>
+</blockquote>
+
+<h2 id="table">Table</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Column 1 Header</th>
+      <th style="text-align: left">Column 2 Header</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">Cell 1</td>
+      <td style="text-align: left">Cell 2</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Cell 3</td>
+      <td style="text-align: left">Cell 4</td>
+    </tr>
+  </tbody>
+</table>
+:ET
