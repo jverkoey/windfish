@@ -250,6 +250,13 @@
 			remoteGlobalIDString = 6699B73825AEA2B7005DB9BB;
 			remoteInfo = HexFiend;
 		};
+		66D0391C25BC811E00EC532C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 665D4F4D2575F75400C3A03B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 66D038D225BC6FAB00EC532C;
+			remoteInfo = WindfishIDEHelp;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1076,6 +1083,7 @@
 				6699BA4F25AEC414005DB9BB /* PBXBuildRule */,
 			);
 			dependencies = (
+				66D0391D25BC811E00EC532C /* PBXTargetDependency */,
 				6699BA0E25AEBCE1005DB9BB /* PBXTargetDependency */,
 				6699BA0525AEBB1F005DB9BB /* PBXTargetDependency */,
 				665D4FA02576C98C00C3A03B /* PBXTargetDependency */,
@@ -1414,6 +1422,11 @@
 			isa = PBXTargetDependency;
 			target = 6699B73825AEA2B7005DB9BB /* HexFiend */;
 			targetProxy = 6699BA0D25AEBCE1005DB9BB /* PBXContainerItemProxy */;
+		};
+		66D0391D25BC811E00EC532C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 66D038D225BC6FAB00EC532C /* WindfishIDEHelp */;
+			targetProxy = 66D0391C25BC811E00EC532C /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
