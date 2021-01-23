@@ -32,6 +32,7 @@ final class TypeTableCellView: NSTableCellView {
   override init(frame frameRect: NSRect) {
     super.init(frame: frameRect)
 
+    popupButton.isBordered = false
     popupButton.translatesAutoresizingMaskIntoConstraints = false
     addSubview(popupButton)
 
