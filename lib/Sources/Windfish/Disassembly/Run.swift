@@ -1,37 +1,37 @@
 import Foundation
 import CPU
 
-public enum InstructionCategory {
+enum InstructionCategory {
   case call
   case ret
 }
 
-public protocol InstructionSpecDisassemblyInfo {
+protocol InstructionSpecDisassemblyInfo {
   /**
    The category this instruction's opcode falls under, if any.
    */
   var category: InstructionCategory? { get }
 }
 
-public final class RunGroup: Sequence {
+final class RunGroup: Sequence {
   init(runs: [Disassembler.Run]) {
     self.runs = runs
   }
 
   fileprivate let runs: [Disassembler.Run]
 
-  public func makeIterator() -> IndexingIterator<[Disassembler.Run]> {
+  func makeIterator() -> IndexingIterator<[Disassembler.Run]> {
     return runs.makeIterator()
   }
 
-  public var first: Disassembler.Run? {
+  var first: Disassembler.Run? {
     return runs.first
   }
 
   /**
    The run group's starting address.
    */
-  public lazy var startLocation: Cartridge.Location? = {
+  lazy var startLocation: Cartridge.Location? = {
     guard let firstRun = runs.first else {
       return nil
     }
@@ -46,13 +46,13 @@ public final class RunGroup: Sequence {
    a given instruction, all of the reachable transfers of control. This graph could then reasonably be walked each time
    we want to calculate scope.
    */
-  public lazy var scope: IndexSet = {
+  lazy var scope: IndexSet = {
     return runs.compactMap { $0.visitedRange }.reduce(into: IndexSet()) { (accumulator, visitedRange) in
       accumulator.insert(integersIn: visitedRange.asIntRange())
     }
   }()
 
-  public lazy var firstContiguousScopeRange: Range<Cartridge.Location>? = {
+  lazy var firstContiguousScopeRange: Range<Cartridge.Location>? = {
     guard let startLocation = startLocation else {
       return nil
     }
@@ -72,7 +72,7 @@ extension Disassembler.Run {
 
    - Returns: a collection of arrays of Runs, where each array of Runs is part of a single call invocation.
    */
-  public func runGroups() -> [RunGroup] {
+  func runGroups() -> [RunGroup] {
     var runGroups: [RunGroup] = []
 
     var sanityCheckSeenRuns = 0

@@ -1,7 +1,7 @@
 import Foundation
 
 extension Disassembler {
-  public final class Run {
+  final class Run {
     let startLocation: Cartridge.Location
     let endLocation: Cartridge.Location?
     let selectedBank: Cartridge.Bank

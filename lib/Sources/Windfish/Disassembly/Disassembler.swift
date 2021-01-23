@@ -3,7 +3,7 @@ import Foundation
 import RGBDS
 
 extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {
-  public var category: InstructionCategory? {
+  var category: InstructionCategory? {
     switch self {
     case .call: return .call
     case .ret, .reti: return .ret
