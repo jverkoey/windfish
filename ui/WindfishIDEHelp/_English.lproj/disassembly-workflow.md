@@ -1,6 +1,7 @@
 ---
 title: Disassembly workflow
 group: General guidance
+order: 1
 ---
 
 The typical Windfish disassembly workflow involves the following three steps performed in a loop:
