@@ -14,17 +14,17 @@ Windfish is primarily intended for performing archaeological explorations of exi
 
 The Windfish app provides a project-based workflow for disassembling ROMs.
 
-The leading pane is called the Navigator.
-At the top, the Navigator shows all of the files that have been generated from the project's ROM.
-At the bottom, the Navigator shows the call stack of the current debugging session.
+The leading column contains the Navigator pane and the Call Stack pane.
+On top is the Navigator, which shows all of the files that have been generated from the project's ROM.
+On the bottom is the Call Stack, which shows current stack of calls for the current debugging session.
 
-The center pane consists of the Editor and Console.
-The Editor provides a read-only view of the generated assembly for the ROM.
-The Console provides a read-evaluate-print-loop (REPL) interface to the Sameboy emulator.
+The center column consists of the Editor pane and Console pane.
+On the top, the Source pane provides a read-only view of the generated assembly for the ROM.
+On the bottom, the Console pane provides a read-evaluate-print-loop (REPL) interface to the Sameboy emulator.
 See [Sameboy's Textual Debugger Documentation](https://sameboy.github.io/debugger/) for full details on working with the debugger.
 
-The trailing pane is called the Inspector.
-The Inspector pane has nested tabs that allow you to edit and inspect the Windfish project's configuration.
+The trailing column contains the Inspector pane.
+The Inspector pane has nested tabs that allow you to edit and inspect your project's configuration.
 The edit tab includes:
 
 - The Region editor.
@@ -80,3 +80,5 @@ These defaults provide a solid starting point for inspecting and understanding t
 The standard Gameboy register addresses and some common data types are also registered by default.
 
 To save your project and the generated assembly code, click File > Save and select a name and location for the project.
+
+You're now ready to start editing your project!
