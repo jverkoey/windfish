@@ -750,7 +750,7 @@ toc_02_46F0:
     jp   c, toc_02_4738.toc_02_485E
 
     ld   a, [hLinkPositionX]
-    add  a, $08
+    add  a, 8
     ld   [$C140], a
     assign [$C141], $18
     ld   [$C143], a
@@ -1870,14 +1870,14 @@ toc_02_5300:
     ld   hl, $FFAD
     ld   a, [hLinkPositionX]
     sub  a, [hl]
-    add  a, $06
+    add  a, 6
     cp   12
     jr   nc, toc_02_532D
 
     ld   hl, $FFAE
     ld   a, [hLinkPositionY]
     sub  a, [hl]
-    add  a, $06
+    add  a, 6
     cp   12
     jr   c, toc_02_5332
 
@@ -1897,14 +1897,14 @@ toc_02_5333:
     ld   hl, $FFAD
     ld   a, [hLinkPositionX]
     sub  a, [hl]
-    add  a, $05
+    add  a, 5
     cp   10
     jr   nc, toc_02_535C
 
     ld   hl, $FFAE
     ld   a, [hLinkPositionY]
     sub  a, [hl]
-    add  a, $05
+    add  a, 5
     cp   10
     jr   nc, toc_02_535C
 
@@ -3181,13 +3181,13 @@ JumpTable_5C69_02:
     assign [$FFD7], $88
     ld   a, [hLinkPositionY]
     sub  a, $30
-    add  a, $08
+    add  a, 8
     cp   16
     jr   nc, .else_02_5C88
 
     ld   a, [hLinkPositionX]
     sub  a, $88
-    add  a, $10
+    add  a, 16
     cp   32
     jr   nc, .else_02_5C88
 
@@ -3206,13 +3206,13 @@ JumpTable_5C69_02.toc_02_5C8A:
 toc_02_5C92:
     ld   a, [hLinkPositionY]
     sub  a, $30
-    add  a, $08
+    add  a, 8
     cp   16
     jr   nc, .else_02_5CAA
 
     ld   a, [hLinkPositionX]
     sub  a, $88
-    add  a, $10
+    add  a, 16
     cp   32
     jr   nc, .else_02_5CAA
 
@@ -5243,7 +5243,7 @@ toc_02_6BEF.else_02_6BFF:
     ifEq [$FF9C], $02, .return_02_6C1B
 
     ld   a, [hLinkPositionYIncrement]
-    add  a, $03
+    add  a, 3
     ld   [hLinkPositionYIncrement], a
 toc_02_6BEF.return_02_6C1B:
     ret
@@ -5423,7 +5423,7 @@ JumpTable_6D3A_02:
 
     ld   a, [hLinkPositionX]
     sub  a, $46
-    add  a, $04
+    add  a, 4
     cp   8
     jr   nc, .else_02_6D5D
 
@@ -5697,7 +5697,7 @@ toc_02_6E9F.else_02_6F11:
     clear [hLinkPositionYIncrement]
     ld   a, [hLinkPositionY]
     and  %11110000
-    add  a, $00
+    add  a, 0
     ld   [hLinkPositionY], a
 toc_02_6E9F.else_02_6F24:
     ld   a, [$C133]
@@ -5986,7 +5986,7 @@ toc_02_6FB1.else_02_70FA:
     jr   z, .else_02_7146
 
     dec  a
-    add  a, $02
+    add  a, J_LEFT
     cp   e
     jr   nz, .else_02_7146
 
@@ -6094,7 +6094,7 @@ toc_02_71E6:
 toc_02_71E6.toc_02_71EA:
     ld   a, [hLinkPositionX]
     and  %11110000
-    add  a, $08
+    add  a, 8
     ld   [hLinkPositionX], a
 toc_02_71E6.toc_02_71F2:
     assign [$C11C], $02
@@ -7078,13 +7078,13 @@ toc_02_77FA.else_02_7847:
 
     ld   hl, gbRAM
     ld   a, [hLinkPositionY]
-    add  a, $0B
+    add  a, 11
     cp   136
     jr   nc, .return_02_7871
 
     ldi  [hl], a
     ld   a, [hLinkPositionX]
-    add  a, $04
+    add  a, 4
     ldi  [hl], a
     ld   a, $26
     ldi  [hl], a
@@ -7224,20 +7224,20 @@ toc_02_77FA.else_02_7947:
     ld   [hl], a
     ld   a, [hLinkPositionX]
     sub  a, $08
-    add  a, $02
+    add  a, 2
     and  %00001111
     cp   4
     jr   nc, .return_02_797F
 
     ld   a, [hLinkPositionY]
     sub  a, $10
-    add  a, $02
+    add  a, 2
     and  %00001111
     cp   4
     jr   nc, .return_02_797F
 
     ld   a, [hLinkPositionY]
-    add  a, $03
+    add  a, 3
     ld   [hLinkPositionY], a
 toc_02_77FA.toc_02_796A:
     assign [$C11C], $06
@@ -7288,7 +7288,7 @@ toc_02_77FA.else_02_79B4:
     jr   z, .return_02_7A0F
 
     ld   a, [hLinkPositionY]
-    add  a, $FE
+    add  a, 254
     call toc_02_571B.toc_02_571D
     ifEq [hObjectUnderEntity], 6, .else_02_79D9
 
@@ -7301,7 +7301,7 @@ toc_02_77FA.else_02_79D9:
     assign [$C11C], $08
     copyFromTo [hObjectUnderEntity], [$FF9C]
     ld   a, [hLinkPositionY]
-    add  a, $02
+    add  a, 2
     ld   [hLinkPositionY], a
     assign [$C167], $01
     ret
@@ -7334,10 +7334,10 @@ toc_02_77FA.else_02_7A10:
     jr   nz, .else_02_7A5C
 
     ld   a, [hLinkPositionY]
-    add  a, $0C
+    add  a, 12
     ldi  [hl], a
     ld   a, [hLinkPositionX]
-    add  a, $00
+    add  a, 0
     ldi  [hl], a
     ld   a, $1C
     ldi  [hl], a
@@ -7348,10 +7348,10 @@ toc_02_77FA.else_02_7A10:
     push af
     ldi  [hl], a
     ld   a, [hLinkPositionY]
-    add  a, $0C
+    add  a, 12
     ldi  [hl], a
     ld   a, [hLinkPositionX]
-    add  a, $08
+    add  a, 8
     ldi  [hl], a
     ld   a, $1C
     ldi  [hl], a
@@ -7484,10 +7484,10 @@ toc_02_77FA.return_02_7B28:
 
 toc_02_7B37:
     ld   a, [hLinkPositionY]
-    add  a, $08
+    add  a, 8
     ldi  [hl], a
     ld   a, [hLinkPositionX]
-    add  a, $FF
+    add  a, 255
     ldi  [hl], a
     ld   a, $1A
     ldi  [hl], a
@@ -7498,10 +7498,10 @@ toc_02_7B37:
     push af
     ldi  [hl], a
     ld   a, [hLinkPositionY]
-    add  a, $08
+    add  a, 8
     ldi  [hl], a
     ld   a, [hLinkPositionX]
-    add  a, $07
+    add  a, 7
     ldi  [hl], a
     ld   a, $1A
     ldi  [hl], a

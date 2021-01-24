@@ -79,13 +79,13 @@ JumpTable_40E9_05:
 JumpTable_40E9_05.else_05_40FD:
     ld   a, [hLinkPositionY]
     sub  a, $40
-    add  a, $10
+    add  a, 16
     cp   32
     jr   nc, .else_05_412A
 
     ld   a, [hLinkPositionX]
     sub  a, $88
-    add  a, $10
+    add  a, 16
     cp   32
     jr   nc, .else_05_412A
 
@@ -355,7 +355,7 @@ toc_05_42A0.loop_05_42C2:
     add  hl, de
     ld   a, [hLinkPositionX]
     sub  a, [hl]
-    add  a, $2F
+    add  a, 47
     cp   94
     jr   nc, .else_05_432C
 
@@ -363,7 +363,7 @@ toc_05_42A0.loop_05_42C2:
     add  hl, de
     ld   a, [hLinkPositionY]
     sub  a, [hl]
-    add  a, $2F
+    add  a, 47
     cp   94
     jr   nc, .else_05_432C
 
@@ -1242,7 +1242,7 @@ JumpTable_4B32_05.else_05_4B3F:
     jr   nz, .else_05_4B50
 
     call toc_05_7A44
-    add  a, $08
+    add  a, 8
     call toc_01_3B87
 JumpTable_4B32_05.else_05_4B50:
     ld   hl, $C2B0
@@ -2185,7 +2185,7 @@ JumpTable_53D6_05:
     ld   a, [hLinkPositionY]
     ld   hl, $C210
     add  hl, bc
-    add  a, $05
+    add  a, 5
     ld   [hl], a
     ld   hl, $C310
     add  hl, bc
@@ -2230,14 +2230,14 @@ toc_05_544C:
     ld   a, [hLinkPositionY]
     ld   hl, $FFEF
     sub  a, [hl]
-    add  a, $14
+    add  a, 20
     cp   40
     jr   nc, .else_05_549D
 
     ld   a, [hLinkPositionX]
     ld   hl, $FFEE
     sub  a, [hl]
-    add  a, $10
+    add  a, 16
     cp   32
     jr   nc, .else_05_549D
 
@@ -4429,7 +4429,7 @@ JumpTable_6488_05.else_05_64C1:
     rra
     rra
     and  %00000001
-    add  a, $03
+    add  a, 3
     call toc_01_3B87
     ret
 
@@ -5756,14 +5756,14 @@ JumpTable_700B_05.toc_05_71A3:
     ld   a, [hLinkPositionX]
     ld   hl, $FFEE
     sub  a, [hl]
-    add  a, $08
+    add  a, 8
     cp   16
     jr   nc, .return_05_71E9
 
     ld   a, [hLinkPositionY]
     ld   hl, $FFEC
     sub  a, [hl]
-    add  a, $08
+    add  a, 8
     cp   16
     jr   nc, .return_05_71E9
 
@@ -6094,7 +6094,7 @@ JumpTable_73D5_05.else_05_73E9:
     ld   a, [hLinkPositionY]
     ld   hl, $FFEC
     sub  a, [hl]
-    add  a, $03
+    add  a, 3
     cp   6
     jr   nc, .else_05_7431
 

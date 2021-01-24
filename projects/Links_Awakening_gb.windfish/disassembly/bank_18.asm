@@ -19,7 +19,7 @@ JumpTable_402D_18:
     ld   a, [hLinkPositionY]
     ld   hl, $FFEF
     sub  a, [hl]
-    add  a, $28
+    add  a, 40
     cp   80
     call toc_18_7D0E.toc_18_7D19
     jr   nc, .else_18_407C
@@ -2272,14 +2272,14 @@ JumpTable_71DF_18.else_18_7211:
     ld   hl, $FFEE
     ld   a, [hLinkPositionX]
     sub  a, [hl]
-    add  a, $03
+    add  a, 3
     cp   6
     jr   nc, .else_18_7230
 
     ld   hl, $FFEC
     ld   a, [hLinkPositionY]
     sub  a, [hl]
-    add  a, $03
+    add  a, 3
     cp   6
     jr   nc, .else_18_7230
 
@@ -2815,7 +2815,7 @@ toc_18_7CF5:
     ld   a, [hLinkPositionY]
     ld   hl, $FFEF
     sub  a, [hl]
-    add  a, $18
+    add  a, 24
     cp   56
     jr   toc_18_7D0E.toc_18_7D19
 
@@ -2823,7 +2823,7 @@ toc_18_7D02:
     ld   a, [hLinkPositionY]
     ld   hl, $FFEF
     sub  a, [hl]
-    add  a, $14
+    add  a, 20
     cp   56
     jr   toc_18_7D0E.toc_18_7D19
 
@@ -2832,7 +2832,7 @@ toc_18_7D0E:
     ld   a, [hLinkPositionY]
     ld   hl, $FFEF
     sub  a, [hl]
-    add  a, $14
+    add  a, 20
     cp   40
 toc_18_7D0E.toc_18_7D19:
     jr   nc, .else_18_7D5F
@@ -2840,7 +2840,7 @@ toc_18_7D0E.toc_18_7D19:
     ld   a, [hLinkPositionX]
     ld   hl, $FFEE
     sub  a, [hl]
-    add  a, $10
+    add  a, 16
     cp   32
     jr   nc, .else_18_7D5F
 

@@ -2248,12 +2248,12 @@ toc_01_5D6B.else_01_5EAF:
     ld   a, [hLinkPositionX]
     ld   hl, $C200
     add  hl, de
-    add  a, $20
+    add  a, 32
     ld   [hl], a
     ld   a, [hLinkPositionY]
     ld   hl, $C210
     add  hl, de
-    add  a, $10
+    add  a, 16
     ld   [hl], a
 toc_01_5D6B.return_01_5ECF:
     ret

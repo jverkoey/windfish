@@ -333,7 +333,7 @@ JumpTable_4624_19:
     ld   a, [hLinkPositionY]
     ld   hl, $FFEF
     sub  a, [hl]
-    add  a, $26
+    add  a, 38
     cp   76
     call toc_19_784E.toc_19_7859
     ret  nc
@@ -1370,7 +1370,7 @@ JumpTable_5829_19.else_19_583B:
     jr   nz, .else_19_585C
 
     call toc_19_796A
-    add  a, $08
+    add  a, 8
     bit  7, a
     jr   z, .else_19_585C
 
@@ -3011,7 +3011,7 @@ toc_19_784E:
     ld   a, [hLinkPositionY]
     ld   hl, $FFEF
     sub  a, [hl]
-    add  a, $14
+    add  a, 20
     cp   40
 toc_19_784E.toc_19_7859:
     jr   nc, .else_19_7899
@@ -3019,7 +3019,7 @@ toc_19_784E.toc_19_7859:
     ld   a, [hLinkPositionX]
     ld   hl, $FFEE
     sub  a, [hl]
-    add  a, $10
+    add  a, 16
     cp   32
     jr   nc, .else_19_7899
 

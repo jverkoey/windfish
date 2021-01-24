@@ -814,7 +814,7 @@ JumpTable_450A_04.else_04_455B:
     rra
     rra
     and  %00000001
-    add  a, $02
+    add  a, 2
     jp   toc_01_3B87
 
 JumpTable_4568_04:
@@ -3294,12 +3294,12 @@ JumpTable_5E29_04.else_04_5E42:
     jr   nc, .return_04_5E6A
 
     call toc_04_6DFF
-    add  a, $20
+    add  a, 32
     cp   64
     jr   nc, .return_04_5E6A
 
     call toc_04_6E0F
-    add  a, $20
+    add  a, 32
     cp   64
     jr   nc, .return_04_5E6A
 
@@ -5786,7 +5786,7 @@ JumpTable_7830_04.else_04_7855:
     ifNot [$C509], .else_04_7888
 
     ld   a, [hLinkPositionX]
-    add  a, $00
+    add  a, 0
     swap a
     and  %00001111
     ld   e, a
@@ -5802,7 +5802,7 @@ JumpTable_7830_04.else_04_7855:
 
 JumpTable_7830_04.else_04_7888:
     ld   a, [hLinkPositionX]
-    add  a, $00
+    add  a, 0
     swap a
     and  %00001111
     ld   e, a
@@ -6248,14 +6248,14 @@ toc_04_7B77:
     ld   a, [hLinkPositionX]
     ld   hl, $FFEE
     sub  a, [hl]
-    add  a, $20
+    add  a, 32
     cp   48
     jr   nc, .else_04_7BBA
 
     ld   a, [hLinkPositionY]
     ld   hl, $FFEF
     sub  a, [hl]
-    add  a, $10
+    add  a, 16
     cp   32
     jr   nc, .else_04_7BBA
 
@@ -6304,14 +6304,14 @@ toc_04_7BBC:
     ld   a, [hLinkPositionX]
     ld   hl, $FFEE
     sub  a, [hl]
-    add  a, $10
+    add  a, 16
     cp   32
     jr   nc, .else_04_7C03
 
     ld   a, [hLinkPositionY]
     ld   hl, $FFEF
     sub  a, [hl]
-    add  a, $14
+    add  a, 20
     cp   40
     jr   nc, .else_04_7C03
 

@@ -3094,7 +3094,7 @@ toc_07_7C16:
     ld   a, [hLinkPositionY]
     ld   hl, $FFEF
     sub  a, [hl]
-    add  a, $14
+    add  a, 20
     cp   56
     jr   toc_07_7C23.toc_07_7C2E
 
@@ -3103,7 +3103,7 @@ toc_07_7C23:
     ld   a, [hLinkPositionY]
     ld   hl, $FFEF
     sub  a, [hl]
-    add  a, $14
+    add  a, 20
     cp   40
 toc_07_7C23.toc_07_7C2E:
     jr   nc, .else_07_7C74
@@ -3111,7 +3111,7 @@ toc_07_7C23.toc_07_7C2E:
     ld   a, [hLinkPositionX]
     ld   hl, $FFEE
     sub  a, [hl]
-    add  a, $10
+    add  a, 16
     cp   32
     jr   nc, .else_07_7C74
 

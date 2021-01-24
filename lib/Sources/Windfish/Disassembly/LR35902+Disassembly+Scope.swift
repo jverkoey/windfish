@@ -13,8 +13,13 @@ extension Disassembler {
           continue
         }
 
-        trace(range: visitedRange) { instruction, location, cpu in
+        // TODO: Make all registers on the LR35902 optional and AddressableMemory able to return nil in case memory is unknown.
+        // We should only be registering traces when we're confident of the value of a register or the value in memory.
+
+        trace(range: visitedRange) { instruction, currentLocation, cpu in
           switch instruction.spec {
+          // MARK: Backward type propagation
+
           // When we load a register into a global with a type, treat the location where the register was originally
           // set as the global's type.
           case .ld(.imm16addr, let register) where registers8.contains(register):
@@ -37,13 +42,15 @@ extension Disassembler {
               self.typeAtLocation[sourceLocation] = dataType
             }
 
+            // MARK: Forward type propagation
+
             // When comparing against a, set the type of this instruction to the type of the global that was loaded into
             // a.
           case .cp(.imm8):
             if let loadAddress = cpu.registerTraces[.a]?.loadAddress,
               let global = self.globals[loadAddress],
               let dataType = global.dataType {
-              self.typeAtLocation[location] = dataType
+              self.typeAtLocation[currentLocation] = dataType
             }
           case .or(.imm8), .xor(.imm8), .and(.imm8):
             if let address = cpu.registerTraces[.a]?.loadAddress,
@@ -51,11 +58,18 @@ extension Disassembler {
               let dataType = global.dataType,
               let type = self.dataTypes[dataType],
               (!type.namedValues.isEmpty || type.representation == .hexadecimal) {
-              self.typeAtLocation[location] = dataType
+              self.typeAtLocation[currentLocation] = dataType
 
               // Default to a binary representation for bit operations.
-            } else if self.typeAtLocation[location] == nil {
-              self.typeAtLocation[location] = "binary"
+            } else if self.typeAtLocation[currentLocation] == nil {
+              self.typeAtLocation[currentLocation] = "binary"
+            }
+
+          case .add(.a, .imm8):
+            if let loadAddress = cpu.registerTraces[.a]?.loadAddress,
+               let global = self.globals[loadAddress],
+               let dataType = global.dataType {
+              self.typeAtLocation[currentLocation] = dataType
             }
 
           default:

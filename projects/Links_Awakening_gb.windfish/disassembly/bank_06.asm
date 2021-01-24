@@ -123,13 +123,13 @@ JumpTable_40EC_06.else_06_40FC:
 JumpTable_40EC_06.else_06_40FF:
     ld   a, [hLinkPositionX]
     sub  a, $78
-    add  a, $02
+    add  a, 2
     cp   4
     jr   nc, .return_06_412B
 
     ld   a, [hLinkPositionY]
     sub  a, $20
-    add  a, $05
+    add  a, 5
     cp   10
     jr   nc, .return_06_412B
 
@@ -509,14 +509,14 @@ JumpTable_4321_06.else_06_4359:
     ld   hl, $FFEE
     ld   a, [hLinkPositionX]
     sub  a, [hl]
-    add  a, $04
+    add  a, 4
     cp   8
     jr   nc, .else_06_43C6
 
     ld   hl, $FFEC
     ld   a, [hLinkPositionY]
     sub  a, [hl]
-    add  a, $04
+    add  a, 4
     cp   8
     jr   nc, .else_06_43C6
 
@@ -2791,7 +2791,7 @@ JumpTable_5877_06.else_06_58AF:
     rra
     rra
     and  %00000001
-    add  a, $05
+    add  a, 5
     call toc_01_3B87
     ret
 
@@ -3024,7 +3024,7 @@ toc_06_59EB:
     rra
     rra
     and  %00000001
-    add  a, $07
+    add  a, 7
 toc_06_5A01:
     ld   [$FFF1], a
     ld   de, $5972
@@ -3485,7 +3485,7 @@ toc_06_5F74:
     ld   a, [hLinkPositionY]
     ld   hl, $FFEF
     sub  a, [hl]
-    add  a, $28
+    add  a, 40
     cp   80
     call toc_06_648C.toc_06_6497
     ret
@@ -4003,7 +4003,7 @@ toc_06_648C:
     ld   a, [hLinkPositionY]
     ld   hl, $FFEF
     sub  a, [hl]
-    add  a, $14
+    add  a, 20
     cp   40
 toc_06_648C.toc_06_6497:
     jr   nc, .else_06_64DD
@@ -4011,7 +4011,7 @@ toc_06_648C.toc_06_6497:
     ld   a, [hLinkPositionX]
     ld   hl, $FFEE
     sub  a, [hl]
-    add  a, $10
+    add  a, 16
     cp   32
     jr   nc, .else_06_64DD
 
@@ -4453,7 +4453,7 @@ JumpTable_68E1_06:
 
     ld   a, [hLinkPositionX]
     sub  a, $58
-    add  a, $18
+    add  a, 24
     cp   48
     ret  nc
 
@@ -5329,13 +5329,13 @@ JumpTable_7270_06:
     ld   [$D201], a
     ld   a, [hLinkPositionX]
     sub  a, $50
-    add  a, $08
+    add  a, 8
     cp   16
     jr   nc, .return_06_7299
 
     ld   a, [hLinkPositionY]
     sub  a, $58
-    add  a, $08
+    add  a, 8
     cp   16
     jr   nc, .return_06_7299
 
@@ -6324,7 +6324,7 @@ JumpTable_7B4B_06:
     rra
     rra
     and  %00000001
-    add  a, $04
+    add  a, 4
     ld   hl, $C3B0
     add  hl, bc
     ld   [hl], a

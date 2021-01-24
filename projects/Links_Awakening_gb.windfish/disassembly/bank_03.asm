@@ -3789,7 +3789,7 @@ JumpTable_63B7_03:
 JumpTable_63B7_03.toc_03_63C6:
     ld   a, [hLinkPositionX]
     push af
-    add  a, $04
+    add  a, 4
     ld   [hLinkPositionX], a
     call JumpTable_6421_03.toc_03_6443
     pop  af
@@ -4371,14 +4371,14 @@ toc_03_6BF9:
     ld   hl, $FFEE
     ld   a, [hLinkPositionX]
     sub  a, [hl]
-    add  a, $06
+    add  a, 6
     cp   12
     jr   nc, .return_03_6C76
 
     ld   hl, $FFEC
     ld   a, [hLinkPositionY]
     sub  a, [hl]
-    add  a, $06
+    add  a, 6
     cp   12
     jr   nc, .return_03_6C76
 

@@ -537,7 +537,7 @@ toc_01_043A:
     copyFromTo [wIntroBGYOffset], [gbSCY]
     cpl
     inc  a
-    add  a, $60
+    add  a, 96
     ld   [gbLYC], a
 toc_01_044D:
     jr   toc_01_0452
@@ -2878,7 +2878,7 @@ toc_01_145D:
 
     assign [$FFF4], $07
     ld   a, [hLinkPositionY]
-    add  a, $06
+    add  a, 6
     ld   [$FFD8], a
     ld   a, $0B
     jp   toc_01_0953
@@ -3947,7 +3947,7 @@ JumpTable_1C56_00.toc_01_1CCC:
     ldi  [hl], a
     ld   a, [hLinkPositionX]
     add  a, c
-    add  a, $08
+    add  a, 8
     ldi  [hl], a
     ld   a, $02
     ldi  [hl], a
@@ -4678,7 +4678,7 @@ toc_01_21DF:
     jr   z, .else_01_21EA
 
     and  %01111111
-    add  a, $03
+    add  a, %00000011
 toc_01_21DF.else_01_21EA:
     ld   e, a
     ld   d, $00
@@ -7224,12 +7224,12 @@ toc_01_32AA:
     assign [$FFAC], $01
     ld   a, [bc]
     and  IE_PIN1013TRANSITION | %11100000
-    add  a, $10
+    add  a, IE_PIN1013TRANSITION
     ld   [$FFAE], a
     ld   a, [bc]
     swap a
     and  IE_PIN1013TRANSITION | %11100000
-    add  a, $08
+    add  a, IE_SERIALIO
     ld   [$FFAD], a
     inc  bc
     jp   toc_01_32FB
@@ -7339,7 +7339,7 @@ toc_01_332D:
 JumpTable_3338_00:
     dec  bc
     ld   a, [bc]
-    add  a, $11
+    add  a, IE_PIN1013TRANSITION | IE_VBLANK
     ld   e, a
     and  IE_LCDC | IE_SERIALIO | IE_TIMEROVERFLOW | IE_VBLANK
     jr   nz, .else_01_3345
