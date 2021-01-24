@@ -691,7 +691,7 @@ JumpTable_46BC_05.else_05_46DF:
     ld   hl, $C380
     add  hl, bc
     ld   a, e
-    xor  $01
+    xor  %00000001
     ld   [hl], a
     ld   hl, $C2B0
     add  hl, bc
@@ -989,7 +989,7 @@ JumpTable_49C2_05:
     clear [$C19B]
     call toc_05_7A44
     ld   a, e
-    xor  $01
+    xor  %00000001
     ld   [hLinkDirection], a
     push bc
     call toc_01_087C
@@ -1058,7 +1058,7 @@ JumpTable_49C2_05.else_05_49F1:
     ld   hl, $D800
     add  hl, de
     ld   a, [hl]
-    or   $10
+    or   %00010000
     ld   [hl], a
     assign [$DB48], $01
     ret
@@ -1727,7 +1727,7 @@ JumpTable_4FBD_05:
 JumpTable_4FBD_05.else_05_4FEB:
     call toc_05_7A44
     ld   a, e
-    xor  $01
+    xor  %00000001
     ld   [hLinkDirection], a
     ld   a, [$D210]
     add  a, $01
@@ -2247,7 +2247,7 @@ toc_05_544C:
     push de
     call toc_05_7A44
     ld   a, [hLinkDirection]
-    xor  $01
+    xor  DIRECTION_LEFT
     cp   e
     pop  de
     jr   nz, .else_05_549D
@@ -2537,7 +2537,7 @@ JumpTable_562F_05.else_05_5649:
     jr   nz, .else_05_5660
 
     ld   a, e
-    xor  $01
+    xor  %00000001
     ld   hl, $C380
     add  hl, bc
     ld   [hl], a
@@ -3118,7 +3118,7 @@ JumpTable_5B2E_05:
     ld   hl, $C380
     add  hl, bc
     ld   a, [hl]
-    xor  $04
+    xor  %00000100
     ld   [hl], a
     ld   hl, $C2C0
     add  hl, bc
@@ -3572,7 +3572,7 @@ JumpTable_5D84_05.else_05_5DF7:
     ld   hl, $C3B0
     add  hl, de
     ld   a, c
-    xor  $01
+    xor  %00000001
     ld   [hl], a
     ld   hl, $C380
     add  hl, de
@@ -6997,7 +6997,7 @@ JumpTable_7B72_05.else_05_7C09:
     ld   hl, $C240
     add  hl, bc
     ld   a, [hl]
-    xor  $F0
+    xor  %11110000
     ld   [hl], a
     jp   .else_05_7C61
 
@@ -7005,7 +7005,7 @@ JumpTable_7B72_05.else_05_7C22:
     ld   hl, $C2B0
     add  hl, bc
     ld   a, [hl]
-    xor  $01
+    xor  %00000001
     ld   [hl], a
 JumpTable_7B72_05.else_05_7C2A:
     call toc_01_088C

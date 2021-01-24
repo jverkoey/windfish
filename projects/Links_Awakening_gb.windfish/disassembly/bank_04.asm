@@ -528,7 +528,7 @@ JumpTable_4371_04.else_04_4397:
     ld   hl, $C380
     add  hl, bc
     ld   a, [hl]
-    xor  $01
+    xor  %00000001
     ld   [hl], a
 JumpTable_4371_04.else_04_43A8:
     ld   a, [hFrameCounter]
@@ -554,7 +554,7 @@ JumpTable_4371_04.else_04_43A8:
     ld   hl, $C2C0
     add  hl, bc
     ld   a, [hl]
-    xor  $01
+    xor  %00000001
     ld   [hl], a
 JumpTable_4371_04.else_04_43CE:
     ld   a, [hFrameCounter]
@@ -2117,7 +2117,7 @@ JumpTable_50A7_04.loop_04_50AF:
     add  hl, de
     ld   a, [hl]
     and  %11110000
-    or   $02
+    or   %00000010
     ld   [hl], a
 JumpTable_50A7_04.else_04_50D7:
     dec  e
@@ -5353,7 +5353,7 @@ JumpTable_7487_04:
 JumpTable_74BA_04:
     call toc_04_6E1F
     ld   a, e
-    xor  $01
+    xor  %00000001
     ld   e, a
     call JumpTable_7163_04.toc_04_719F
     ret
@@ -6261,7 +6261,7 @@ toc_04_7B77:
 
     call toc_04_6E1F
     ld   a, [hLinkDirection]
-    xor  $01
+    xor  DIRECTION_LEFT
     cp   e
     jr   nz, .else_04_7BBA
 
@@ -6317,7 +6317,7 @@ toc_04_7BBC:
 
     call toc_04_6E1F
     ld   a, [hLinkDirection]
-    xor  $01
+    xor  DIRECTION_LEFT
     cp   e
     jr   nz, .else_04_7C03
 

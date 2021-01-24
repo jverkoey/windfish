@@ -1553,7 +1553,7 @@ JumpTable_5B45_19:
     call JumpTable_3B8D_00
     call toc_01_27ED
     and  %00011111
-    or   $10
+    or   %00010000
     ld   hl, $C320
     add  hl, bc
     ld   [hl], a
@@ -3027,7 +3027,7 @@ toc_19_784E.toc_19_7859:
     push de
     call toc_19_7989
     ld   a, [hLinkDirection]
-    xor  $01
+    xor  DIRECTION_LEFT
     cp   e
     pop  de
     jr   nz, .else_19_7899
@@ -3252,7 +3252,7 @@ toc_19_7A62:
 toc_19_7A62.else_19_7A77:
     add  hl, de
     ld   a, [hl]
-    or   $20
+    or   %00100000
     ld   [hl], a
     ld   [$FFF8], a
     ret

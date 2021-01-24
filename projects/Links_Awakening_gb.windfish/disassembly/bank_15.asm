@@ -748,7 +748,7 @@ JumpTable_4F6F_15.else_15_4FC3:
     ld   hl, $C250
     add  hl, bc
     ld   a, [hl]
-    xor  $F0
+    xor  %11110000
     ld   [hl], a
     jr   .else_15_4FE3
 
@@ -756,7 +756,7 @@ JumpTable_4F6F_15.else_15_4FDB:
     ld   hl, $C240
     add  hl, bc
     ld   a, [hl]
-    xor  $F0
+    xor  %11110000
     ld   [hl], a
 JumpTable_4F6F_15.else_15_4FE3:
     ld   hl, $C290
@@ -2185,7 +2185,7 @@ JumpTable_78ED_15.else_15_7929:
     ld   hl, $C380
     add  hl, bc
     ld   a, [hl]
-    xor  $04
+    xor  %00000100
     ld   [hl], a
 JumpTable_78ED_15.return_15_793C:
     ret
@@ -2328,7 +2328,7 @@ toc_15_79A5.else_15_7A1A:
     ld   a, $1C
     ldi  [hl], a
     ld   a, e
-    or   $20
+    or   %00100000
     ldi  [hl], a
     ld   a, $02
     call toc_15_796D.toc_15_7974

@@ -1006,7 +1006,7 @@ toc_1B_4481.toc_1B_463D:
     ld   [$ff00+c], a
     inc  c
     ld   a, [hl]
-    or   $80
+    or   %10000000
     ld   [$ff00+c], a
 toc_1B_4481.else_1B_464B:
     pop  hl
@@ -1185,7 +1185,7 @@ toc_1B_4744:
     inc  c
     inc  c
     ld   a, [de]
-    or   $80
+    or   %10000000
     ld   [$ff00+c], a
     ret
 

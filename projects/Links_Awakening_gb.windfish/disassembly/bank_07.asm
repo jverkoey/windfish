@@ -146,7 +146,7 @@ JumpTable_40C1_07.else_07_4146:
     ld   hl, $C440
     add  hl, bc
     ld   a, [hl]
-    xor  $01
+    xor  %00000001
     call toc_01_3B87
     ld   a, $BB
     call toc_01_3C01
@@ -699,7 +699,7 @@ JumpTable_4B9A_07:
     ld   hl, $C2B0
     add  hl, bc
     ld   a, [hl]
-    xor  $01
+    xor  %00000001
     ld   [hl], a
 JumpTable_4B9A_07.else_07_4BC0:
     ld   hl, $C2C0
@@ -721,7 +721,7 @@ JumpTable_4B9A_07.else_07_4BC0:
     ld   hl, $C2C0
     add  hl, bc
     ld   a, [hl]
-    xor  $01
+    xor  %00000001
     ld   [hl], a
 JumpTable_4B9A_07.else_07_4BE0:
     call toc_07_7CE2
@@ -883,7 +883,7 @@ JumpTable_4F26_07:
     ld   hl, $C380
     add  hl, bc
     ld   a, e
-    xor  $01
+    xor  %00000001
     ld   e, a
     ld   [hl], e
     ld   d, b
@@ -1214,7 +1214,7 @@ JumpTable_563B_07.else_07_568E:
     ld   hl, $C380
     add  hl, bc
     ld   a, [hl]
-    xor  $01
+    xor  %00000001
     ld   [hl], a
 JumpTable_563B_07.return_07_56AD:
     ret
@@ -2900,7 +2900,7 @@ JumpTable_789D_07:
     ld   hl, $C380
     add  hl, bc
     ld   a, [hl]
-    xor  $01
+    xor  %00000001
     ld   [hl], a
     ld   e, a
     ld   d, b
@@ -3121,7 +3121,7 @@ toc_07_7C23.toc_07_7C2E:
     push de
     call toc_07_7D55
     ld   a, [hLinkDirection]
-    xor  $01
+    xor  DIRECTION_LEFT
     cp   e
     pop  de
     jr   nz, .else_07_7C74

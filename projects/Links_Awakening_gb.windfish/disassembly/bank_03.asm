@@ -1267,7 +1267,7 @@ JumpTable_4EBC_03.else_03_4EEA:
     ld   a, [hl]
     push hl
     push af
-    or   $80
+    or   %10000000
     ld   [hl], a
     call toc_03_6C87.toc_03_6C8E
     rl   e
@@ -1388,7 +1388,7 @@ JumpTable_4F99_03.else_03_4FA3:
     call toc_03_5897.toc_03_5958
     pop  hl
     ld   a, [hl]
-    xor  $01
+    xor  IE_VBLANK
     ld   [hl], a
     ret
 
@@ -1424,7 +1424,7 @@ toc_03_4FCA.else_03_4FDC:
     ld   hl, $C430
     add  hl, bc
     ld   a, [hl]
-    or   $11
+    or   %00010001
     ld   [hl], a
     ret
 
@@ -1751,7 +1751,7 @@ JumpTable_5123_03.else_03_51D3:
 JumpTable_5123_03.toc_03_51D8:
     call toc_03_51E2
     ld   a, [hl]
-    or   $10
+    or   %00010000
     ld   [hl], a
     ld   [$FFF8], a
     ret
@@ -2623,7 +2623,7 @@ toc_03_5897.else_03_58E8:
 toc_03_5897.else_03_58F2:
     call toc_01_27ED
     and  %00011111
-    or   $20
+    or   %00100000
     ld   [hl], a
     ld   hl, $C290
     add  hl, bc
@@ -2677,7 +2677,7 @@ toc_03_5897.else_03_5933:
 toc_03_5897.else_03_5941:
     call toc_01_27ED
     and  %00001111
-    or   $10
+    or   %00010000
     ld   [hl], a
     ld   hl, $C290
     add  hl, bc
@@ -3299,11 +3299,11 @@ JumpTable_5F01_03:
     ld   hl, $DB65
     add  hl, de
     ld   a, [hl]
-    or   $02
+    or   %00000010
     ld   [hl], a
     call toc_03_51E2
     ld   a, [hl]
-    or   $10
+    or   %00010000
     ld   [hl], a
     xor  a
 JumpTable_5F01_03.else_03_5F2A:
@@ -5558,7 +5558,7 @@ JumpTable_702D_03.else_03_7342:
     add  hl, bc
     ld   a, [hl]
     and  %11110000
-    or   $04
+    or   %00000100
     ld   [hl], a
 JumpTable_702D_03.else_03_7365:
     ld   hl, $C3A0
@@ -5902,7 +5902,7 @@ toc_03_75A6.else_03_76B0:
     ld   hl, $C380
     add  hl, de
     ld   a, [hl]
-    xor  $01
+    xor  %00000001
     ld   hl, $C380
     add  hl, bc
     cp   [hl]

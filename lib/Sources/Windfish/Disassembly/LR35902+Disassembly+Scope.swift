@@ -15,56 +15,37 @@ extension Disassembler {
 
         trace(range: visitedRange) { instruction, location, cpu in
           switch instruction.spec {
-            // TODO: This only works if we're simulating the run as part of the linear sweep.
-            // TODO: Fold the simulation logic into the linear sweep somehow.
-//          case .ld(.imm16addr, let src) where registers8.contains(src):
-//            if (0x2000..<0x4000).contains(instruction.imm16!),
-//              let srcValue: CPUState.RegisterState<UInt8> = self[src],
-//              case .value(let value) = srcValue.value {
-//              let addressAndBank = Cartridge.addressAndBank(from: location)
-//              self.register(bankChange: value, at: addressAndBank.address, in: addressAndBank.bank)
-//            }
-
-          case .ld(.imm16addr, let numeric) where registers8.contains(numeric):
-            guard case let .imm16(immediate) = instruction.immediate else {
+          // When we load a register into a global with a type, treat the location where the register was originally
+          // set as the global's type.
+          case .ld(.imm16addr, let register) where registers8.contains(register):
+            guard case let .imm16(address) = instruction.immediate else {
               preconditionFailure("Invalid immediate associated with instruction")
             }
-            if let global = self.globals[immediate],
-              let dataType = global.dataType,
-              case let .cartridge(sourceLocation) = cpu.registerTraces[.a]?.sourceLocation {
-              self.typeAtLocation[sourceLocation] = dataType
-            }
-
-          case .ld(.ffimm8addr, let numeric) where registers8.contains(numeric):
-            guard case let .imm8(immediate) = instruction.immediate else {
-              preconditionFailure("Invalid immediate associated with instruction")
-            }
-            let address = 0xFF00 | LR35902.Address(immediate)
             if let global = self.globals[address],
               let dataType = global.dataType,
-              case let .cartridge(sourceLocation) = cpu.registerTraces[.a]?.sourceLocation {
+              case let .cartridge(sourceLocation) = cpu.registerTraces[register]?.sourceLocation {
+              self.typeAtLocation[sourceLocation] = dataType
+            }
+          case .ld(.ffimm8addr, let register) where registers8.contains(register):
+            guard case let .imm8(addressLowByte) = instruction.immediate else {
+              preconditionFailure("Invalid immediate associated with instruction")
+            }
+            let address = 0xFF00 | LR35902.Address(addressLowByte)
+            if let global = self.globals[address],
+              let dataType = global.dataType,
+              case let .cartridge(sourceLocation) = cpu.registerTraces[register]?.sourceLocation {
               self.typeAtLocation[sourceLocation] = dataType
             }
 
-          case .cp(_):
-            if let address = cpu.registerTraces[.a]?.loadAddress,
-              let global = self.globals[address],
+            // When comparing against a, set the type of this instruction to the type of the global that was loaded into
+            // a.
+          case .cp(.imm8):
+            if let loadAddress = cpu.registerTraces[.a]?.loadAddress,
+              let global = self.globals[loadAddress],
               let dataType = global.dataType {
               self.typeAtLocation[location] = dataType
             }
-
-          case .ld(.ffimm8addr, let src) where registers8.contains(src):
-            guard case let .imm8(immediate) = instruction.immediate else {
-              preconditionFailure("Invalid immediate associated with instruction")
-            }
-            let address = 0xFF00 | LR35902.Address(immediate)
-            if let global = self.globals[address],
-              let dataType = global.dataType,
-              case let .cartridge(sourceLocation) = cpu.registerTraces[src]?.sourceLocation {
-              self.typeAtLocation[sourceLocation] = dataType
-            }
-
-          case .and(.imm8):
+          case .or(.imm8), .xor(.imm8), .and(.imm8):
             if let address = cpu.registerTraces[.a]?.loadAddress,
               let global = self.globals[address],
               let dataType = global.dataType,
@@ -72,6 +53,7 @@ extension Disassembler {
               (!type.namedValues.isEmpty || type.representation == .hexadecimal) {
               self.typeAtLocation[location] = dataType
 
+              // Default to a binary representation for bit operations.
             } else if self.typeAtLocation[location] == nil {
               self.typeAtLocation[location] = "binary"
             }

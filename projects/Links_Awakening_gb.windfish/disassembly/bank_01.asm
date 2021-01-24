@@ -537,7 +537,7 @@ JumpTable_446F_01:
 JumpTable_4476_01:
     call JumpTable_55FD_01.toc_01_5643
     ld   a, [gbLCDC]
-    or   $20
+    or   LCDCF_WINDOW_ON
     ld   [$D6FD], a
     ld   [gbLCDC], a
     call JumpTable_4434_01.toc_01_4445

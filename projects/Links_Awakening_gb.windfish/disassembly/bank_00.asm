@@ -337,7 +337,7 @@ main.else_01_02BC:
     ifNe [$C17F], $03, .else_01_02D4
 
     ld   a, e
-    xor  $E0
+    xor  %11100000
     ld   e, a
 main.else_01_02D4:
     ld   a, e
@@ -439,12 +439,12 @@ main.else_01_038A:
     jr   z, .else_01_03A4
 
     ld   a, [$D6FC]
-    xor  $01
+    xor  %00000001
     ld   [$D6FC], a
     jr   nz, .else_01_03BD
 
     ld   a, [$C17B]
-    xor  $10
+    xor  %00010000
     ld   [$C17B], a
     jr   .else_01_03BD
 
@@ -4085,7 +4085,7 @@ toc_01_1DEE:
 
     push af
     ld   a, [$D6FB]
-    xor  $02
+    xor  %00000010
     ld   [$D6FB], a
     pop  af
 toc_01_1DEE.else_01_1E0D:
@@ -4599,7 +4599,7 @@ toc_01_2133.else_01_2144:
 
 toc_01_2133.else_01_2153:
     and  %00001111
-    or   $10
+    or   %00010000
 toc_01_2133.else_01_2157:
     ld   [$C171], a
     ld   a, e
@@ -4653,7 +4653,7 @@ toc_01_2197:
     cp   72
     rra
     and  %10000000
-    or   $01
+    or   %00000001
     ld   [wDialogState], a
     ret
 
@@ -4805,7 +4805,7 @@ JumpTable_2295_00.toc_01_22A1:
     clear [$C16F]
     ld   a, [wDialogState]
     and  %11110000
-    or   $0E
+    or   %00001110
     ld   [wDialogState], a
 JumpTable_2295_00.return_01_22AF:
     ret
@@ -5027,7 +5027,7 @@ JumpTable_2359_00.JumpTable_23B5_00:
 JumpTable_2359_00.toc_01_2421:
     ld   a, [wDialogState]
     and  %11110000
-    or   $0D
+    or   %00001101
     ld   [wDialogState], a
 JumpTable_2359_00.toc_01_242B:
     assign [$FFF2], $15
@@ -5043,7 +5043,7 @@ JumpTable_2359_00.else_01_2430:
 JumpTable_2359_00.toc_01_2439:
     ld   a, [wDialogState]
     and  %11110000
-    or   $0C
+    or   %00001100
     ld   [wDialogState], a
     ret
 
@@ -5172,7 +5172,7 @@ toc_01_24EF:
 toc_01_250A:
     ld   a, [wDialogState]
     and  %11110000
-    or   $06
+    or   %00000110
     ld   [wDialogState], a
     assign [$C172], $00
     ret
@@ -5414,7 +5414,7 @@ toc_01_2686.else_01_2692:
     rl   d
     ld   [$D619], a
     ld   a, [$C126]
-    or   $98
+    or   %10011000
     ld   [$D601], a
     rr   d
     adc  $00
@@ -6692,7 +6692,7 @@ toc_01_2ED7.else_01_2FAE:
     ld   a, [hl]
     jr   nz, .else_01_2FB8
 
-    or   $80
+    or   %10000000
     ld   [hl], a
 toc_01_2ED7.else_01_2FB8:
     ld   [$FFF8], a
@@ -7645,7 +7645,7 @@ JumpTable_3555_00:
     ld   e, $04
     call toc_01_3627
     ld   a, [$C18A]
-    or   $01
+    or   %00000001
     ld   [$C18A], a
     ld   [$C18B], a
     jp   JumpTable_35A3_00
@@ -7654,7 +7654,7 @@ JumpTable_3568_00:
     ld   e, $05
     call toc_01_3627
     ld   a, [$C18A]
-    or   $02
+    or   %00000010
     ld   [$C18A], a
     ld   [$C18B], a
     jp   JumpTable_35D2_00
@@ -7663,7 +7663,7 @@ JumpTable_357B_00:
     ld   e, $06
     call toc_01_3627
     ld   a, [$C18A]
-    or   $04
+    or   %00000100
     ld   [$C18A], a
     ld   [$C18B], a
     jp   JumpTable_35E6_00
@@ -7672,7 +7672,7 @@ JumpTable_358E_00:
     ld   e, $07
     call toc_01_3627
     ld   a, [$C18A]
-    or   $08
+    or   %00001000
     ld   [$C18A], a
     ld   [$C18B], a
     jp   JumpTable_35FA_00
@@ -8472,7 +8472,7 @@ toc_01_3C3B.else_01_3C83:
     ld   c, a
     ld   a, [$FFED]
     and  %00100000
-    xor  $20
+    xor  %00100000
     rra
     rra
     ld   hl, $FFEE

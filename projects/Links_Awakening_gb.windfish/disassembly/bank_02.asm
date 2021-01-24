@@ -1109,7 +1109,7 @@ toc_02_49C5.else_02_4A80:
 
     clear [$C5A4]
     ld   a, [$C5A5]
-    xor  $01
+    xor  %00000001
     ld   [$C5A5], a
 toc_02_49C5.else_02_4A97:
     ld   a, [$C5A5]
@@ -1729,7 +1729,7 @@ toc_02_51EB:
     call toc_02_525B
     call toc_02_5987
     ld   a, [hl]
-    or   $40
+    or   %01000000
     ld   [hl], a
     ld   [$FFF8], a
     ld   a, [$FFDB]
@@ -3022,7 +3022,7 @@ JumpTable_5B3F_02.loop_02_5B46:
     add  hl, bc
     ld   a, [hl]
     and  %11110000
-    or   $02
+    or   %00000010
     ld   [hl], a
     assign [$FFF4], $13
 JumpTable_5B3F_02.else_02_5B6E:
@@ -3077,7 +3077,7 @@ JumpTable_5BAF_02.toc_02_5BBC:
     call toc_01_0953
     call toc_02_5987
     ld   a, [hl]
-    or   $10
+    or   %00010000
     ld   [hl], a
     ld   [$FFF8], a
 JumpTable_5BAF_02.return_02_5BC8:
@@ -3090,7 +3090,7 @@ JumpTable_5BC9_02:
 
     call toc_02_5987
     ld   a, [hl]
-    or   $10
+    or   %00010000
     ld   [hl], a
     ld   [$FFF8], a
 JumpTable_5BC9_02.else_02_5BDB:
@@ -3125,7 +3125,7 @@ JumpTable_5BDF_02.else_02_5BF6:
     ld   hl, $DB65
     add  hl, de
     ld   a, [hl]
-    or   $01
+    or   %00000001
     ld   [hl], a
     ld   d, $00
     ld   a, [$FFF6]
@@ -5692,7 +5692,7 @@ toc_02_6E9F.else_02_6F0A:
 
 toc_02_6E9F.else_02_6F11:
     ld   a, [$C133]
-    or   $08
+    or   %00001000
     ld   [$C133], a
     clear [hLinkPositionYIncrement]
     ld   a, [hLinkPositionY]
@@ -6330,7 +6330,7 @@ toc_02_726A.toc_02_736A:
     ld   d, $00
     add  hl, de
     ld   a, [hl]
-    or   $10
+    or   %00010000
     ld   [hl], a
     ld   [$FFF8], a
 toc_02_726A.toc_02_7379:
@@ -7356,7 +7356,7 @@ toc_02_77FA.else_02_7A10:
     ld   a, $1C
     ldi  [hl], a
     pop  af
-    or   $20
+    or   %00100000
     ld   [hl], a
     assign [$C11F], $03
     ld   a, [hFrameCounter]
@@ -7506,7 +7506,7 @@ toc_02_7B37:
     ld   a, $1A
     ldi  [hl], a
     pop  af
-    xor  $20
+    xor  %00100000
     ld   [hl], a
     assign [$C11F], $03
     ret

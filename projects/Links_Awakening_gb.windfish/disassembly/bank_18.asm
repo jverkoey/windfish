@@ -497,7 +497,7 @@ JumpTable_4A0C_18.else_18_4A37:
     call toc_01_0891
     call toc_01_27ED
     and  %01111111
-    or   $40
+    or   %01000000
     ld   [hl], a
     jp   JumpTable_3B8D_00
 
@@ -2636,7 +2636,7 @@ JumpTable_7838_18.else_18_786F:
 JumpTable_7838_18.else_18_78BA:
     call toc_18_7E4F
     ld   a, [hLinkDirection]
-    xor  $01
+    xor  DIRECTION_LEFT
     cp   e
     jr   nz, .else_18_78FE
 
@@ -2850,7 +2850,7 @@ toc_18_7D0E.toc_18_7D19:
     push de
     call toc_18_7E4F
     ld   a, [hLinkDirection]
-    xor  $01
+    xor  DIRECTION_LEFT
     cp   e
     pop  de
     jr   nz, .else_18_7D5F

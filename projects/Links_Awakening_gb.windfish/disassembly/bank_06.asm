@@ -48,7 +48,7 @@ JumpTable_4068_06.else_06_4078:
 
 JumpTable_4068_06.else_06_4084:
     ld   a, [$FFF8]
-    or   $10
+    or   %00010000
     ld   [$FFF8], a
     ld   [$DAC7], a
     ld   a, $3A
@@ -529,7 +529,7 @@ JumpTable_4321_06.else_06_43C6:
     ld   a, [hl]
     rla
     and  %00000110
-    or   $01
+    or   %00000001
     call toc_01_3B87
     ret
 
@@ -836,7 +836,7 @@ JumpTable_4683_06.toc_06_46D1:
     add  hl, bc
     ld   a, [hl]
     and  %00000001
-    or   $02
+    or   %00000010
     call toc_01_3B87
     ret
 
@@ -1720,7 +1720,7 @@ JumpTable_4D55_06:
     ld   hl, $C390
     add  hl, bc
     ld   a, [hl]
-    xor  $02
+    xor  %00000010
     ld   hl, $C380
     add  hl, bc
     ld   [hl], a
@@ -1918,7 +1918,7 @@ JumpTable_514F_06.else_06_5187:
     call toc_01_0891
     call toc_01_27ED
     and  %00011111
-    or   $20
+    or   %00100000
     ld   [hl], a
     call JumpTable_3B8D_00
     ld   [hl], b
@@ -1969,7 +1969,7 @@ JumpTable_51C4_06:
 JumpTable_51C4_06.else_06_51D5:
     call toc_01_27ED
     and  %00001111
-    or   $10
+    or   %00010000
     ld   [hl], a
     call JumpTable_3B8D_00
     call toc_01_3DAF
@@ -4021,7 +4021,7 @@ toc_06_648C.toc_06_6497:
     push de
     call toc_06_65BE
     ld   a, [hLinkDirection]
-    xor  $01
+    xor  DIRECTION_LEFT
     cp   e
     pop  de
     jr   nz, .else_06_64DD
@@ -4503,7 +4503,7 @@ JumpTable_68E1_06.else_06_6926:
 JumpTable_693C_06:
     call toc_06_65BE
     ld   a, e
-    xor  $01
+    xor  %00000001
     ld   [hLinkDirection], a
     assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     assign [$C111], $05
@@ -6799,7 +6799,7 @@ toc_06_7F77:
     ld   hl, $C250
     add  hl, bc
     ld   a, [hl]
-    xor  $F0
+    xor  %11110000
     ld   [hl], a
     jr   toc_06_7F9D
 
@@ -6807,7 +6807,7 @@ toc_06_7F95:
     ld   hl, $C240
     add  hl, bc
     ld   a, [hl]
-    xor  $F0
+    xor  %11110000
     ld   [hl], a
 toc_06_7F9D:
     ld   hl, $C290
