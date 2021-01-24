@@ -207,7 +207,7 @@ toc_1E_4163.toc_1E_418E:
     ld   [$D3CA], a
     ld   b, a
     ld   hl, $407F
-    and  %01111111
+    and  IE_LCDC | IE_PIN1013TRANSITION | IE_SERIALIO | IE_TIMEROVERFLOW | IE_VBLANK | %01100000
     call toc_1E_40FF
     call toc_1E_43BB
     jp   toc_1E_4354
@@ -797,7 +797,7 @@ toc_1E_457C.toc_1E_45A0:
     inc  l
     inc  l
     ld   a, [hl]
-    and  %11110000
+    and  $F0
     jr   nz, .else_1E_4609
 
     ld   a, d

@@ -695,7 +695,7 @@ toc_14_523C.else_14_52BE:
     assign [$DB97], $CC
     ld   [$DB99], a
     assign [$DB98], $0C
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
 toc_14_523C.return_14_52FA:
     ret
 
@@ -876,9 +876,9 @@ toc_14_541B.else_14_544A:
     clear [$D401]
     ld   [$D402], a
     assign [$D403], $45
-    assign [$D404], $38
+    assign [$D404], 56
     ld   [hLinkPositionX], a
-    assign [$D405], $60
+    assign [$D405], 96
     ld   [hLinkPositionY], a
     assign [$D416], $53
     ret
@@ -1286,7 +1286,7 @@ toc_14_5964.else_14_5989:
     dec  a
     ld   [hLinkPositionY], a
 toc_14_5964.toc_14_5996:
-    assign [hLinkInteractiveMotionBlocked], $01
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_GRAB_SLASH
     assign [$C111], $02
 toc_14_5964.return_14_599F:
     ret
@@ -1541,19 +1541,19 @@ toc_14_59DE.toc_14_5B0C:
     ld   [hl], $00
     assign [$FFAC], $01
     ld   a, [hSwordIntersectedAreaY]
-    and  %11110000
+    and  $F0
     add  a, $10
     ld   [$FFAE], a
     ld   a, [hSwordIntersectedAreaX]
-    and  %11110000
+    and  $F0
     add  a, $08
     ld   [$FFAD], a
     ld   a, [hSwordIntersectedAreaX]
     swap a
-    and  %00001111
+    and  $0F
     ld   e, a
     ld   a, [hSwordIntersectedAreaY]
-    and  %11110000
+    and  $F0
     or   e
     ld   [$D416], a
     assign [$FFF2], $02

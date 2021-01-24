@@ -2251,10 +2251,10 @@ toc_1F_7F80.else_1F_7FB4:
 toc_1F_7F80.else_1F_7FBE:
     ld   hl, hVolumeRight
     ld   a, [gbAUDVOL]
-    and  %11111000
+    and  $F8
     or   [hl]
     inc  hl
-    and  %10001111
+    and  $8F
     or   [hl]
     ld   [gbAUDVOL], a
     ifNot [$FFF2], .else_1F_7FD7

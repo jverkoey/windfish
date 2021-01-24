@@ -379,7 +379,7 @@ toc_05_42A0.loop_05_42C2:
     add  hl, de
     ld   a, [hl]
     ld   [hLinkPositionX], a
-    ld   a, $30
+    ld   a, 48
     call toc_01_3C25
     pop  af
     ld   [hLinkPositionX], a
@@ -879,7 +879,7 @@ JumpTable_4863_05:
     jr   nz, .else_05_4879
 
     copyFromTo [hDefaultMusicTrack], [$D368]
-    assign [$C10B], $01
+    assign [$C10B], INTERACTIVE_MOTION_LOCKED_GRAB_SLASH
 JumpTable_4863_05.else_05_4879:
     ld   [hLinkInteractiveMotionBlocked], a
     ld   hl, $C3D0
@@ -985,7 +985,7 @@ JumpTable_4990_05.else_05_49B7:
     db   $00, $04, $05, $06, $07, $01
 
 JumpTable_49C2_05:
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     clear [$C19B]
     call toc_05_7A44
     ld   a, e
@@ -1339,7 +1339,7 @@ JumpTable_4C48_05:
     ld   d, $04
     call toc_05_5261
     assign [$DB44], $01
-    assign [hLinkAnimationState], $22
+    assign [hLinkAnimationState], LINK_ANIMATION_STATE_STANDING_SHIELD_DOWN
     ld   a, $91
     call toc_01_2197
     jp   JumpTable_3B8D_00
@@ -1353,9 +1353,9 @@ JumpTable_4C48_05.else_05_4C66:
     ld   de, $4C46
     call toc_01_3CD0
     call toc_01_3DBA
-    assign [hLinkAnimationState], $6C
-    assign [hLinkInteractiveMotionBlocked], $02
-    assign [hLinkDirection], $03
+    assign [hLinkAnimationState], LINK_ANIMATION_STATE_GOT_ITEM
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
+    assign [hLinkDirection], DIRECTION_DOWN
     ret
 
 
@@ -1706,7 +1706,7 @@ JumpTable_4F84_05.else_05_4FB8:
 
 
 JumpTable_4FBD_05:
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     push bc
     call toc_01_087C
     pop  bc
@@ -1768,9 +1768,9 @@ JumpTable_4FBD_05.else_05_5033:
     cp   $1D
     ret  c
 
-    assign [hLinkAnimationState], $00
+    assign [hLinkAnimationState], LINK_ANIMATION_STATE_STANDING_DOWN
     ld   a, [hFrameCounter]
-    ld   e, $75
+    ld   e, LINK_ANIMATION_STATE_UNKNOWN_75
     and  %01000000
     jr   z, .else_05_5043
 
@@ -1888,8 +1888,8 @@ JumpTable_50B8_05.else_05_50E5:
     ld   a, $13
     call toc_01_2197
 JumpTable_50B8_05.else_05_50EF:
-    assign [hLinkAnimationState], $6C
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkAnimationState], LINK_ANIMATION_STATE_GOT_ITEM
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     copyFromTo [hLinkPositionX], [$FFEE]
     ld   a, [hLinkPositionY]
     sub  a, $0C
@@ -1962,12 +1962,12 @@ JumpTable_51DE_05.else_05_51EE:
     ld   a, [hl]
 JumpTable_51DE_05.toc_05_51F9:
     ld   [$FFF1], a
-    assign [$FFEE], $38
+    assign [$FFEE], 56
     ld   [hLinkPositionX], a
-    assign [$FFEC], $34
+    assign [$FFEC], 52
     ld   [hLinkPositionY], a
-    assign [hLinkInteractiveMotionBlocked], $02
-    assign [hLinkAnimationState], $FF
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
+    assign [hLinkAnimationState], LINK_ANIMATION_STATE_NO_UPDATE
     ld   de, $51AA
     call toc_01_3C3B
     call toc_01_3DBA
@@ -1983,16 +1983,16 @@ JumpTable_5219_05:
     jr   nz, .return_05_524F
 
     ld   a, [hPressedButtonsMask]
-    and  %00001111
+    and  J_DOWN | J_LEFT | J_RIGHT | J_UP
     jr   z, .return_05_524F
 
     call JumpTable_3B8D_00
     assign [hLinkPositionZHigh], $01
     assign [$C146], $02
     assign [hLinkPositionZLow], $12
-    assign [hLinkPositionXIncrement], $0C
+    assign [hLinkPositionXIncrement], 12
     clear [hLinkPositionYIncrement]
-    assign [hLinkDirection], $00
+    assign [hLinkDirection], INTERACTIVE_MOTION_ENABLED
     ld   [hLinkInteractiveMotionBlocked], a
     assign [$C10A], $01
 JumpTable_5219_05.return_05_524F:
@@ -2160,7 +2160,7 @@ JumpTable_53B2_05:
     ld   [hl], $01
     clear [$D477]
 JumpTable_53B2_05.toc_05_53C9:
-    assign [hLinkWalksSlow], $01
+    assign [hLinkWalksSlow], true
 JumpTable_53B2_05.toc_05_53CD:
     call toc_01_3DBA
     ld   de, $531A
@@ -2934,7 +2934,7 @@ JumpTable_59D7_05.loop_05_59E2:
 JumpTable_5A16_05:
     call toc_05_5A99
     call toc_05_7965
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     call toc_01_0891
     and  a
     jr   z, .else_05_5A3A
@@ -2944,8 +2944,8 @@ JumpTable_5A16_05:
 
     ld   a, [hLinkPositionY]
     push af
-    assign [hLinkPositionY], $10
-    ld   a, $BA
+    assign [hLinkPositionY], 16
+    ld   a, 186
     call toc_01_2197
     pop  af
     ld   [hLinkPositionY], a
@@ -3175,7 +3175,7 @@ JumpTable_5B74_05.return_05_5B9E:
 
 
 JumpTable_5B9F_05:
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     call toc_01_0891
     jr   nz, .else_05_5BBF
 
@@ -3201,7 +3201,7 @@ JumpTable_5B9F_05.else_05_5BCC:
 
 
 JumpTable_5BD0_05:
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     call toc_01_0891
     jr   nz, .else_05_5BEB
 
@@ -3216,7 +3216,7 @@ JumpTable_5BD0_05.else_05_5BEB:
     db   $01, $02, $03, $02
 
 JumpTable_5BF2_05:
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     call toc_01_0891
     jr   nz, .else_05_5BFE
 
@@ -3729,7 +3729,7 @@ JumpTable_5EF1_05:
     add  hl, de
     ld   a, [hl]
     ld   [hLinkPositionXIncrement], a
-    assign [hLinkPositionYIncrement], $F0
+    assign [hLinkPositionYIncrement], 240
     ld   hl, hLinkPositionY
     dec  [hl]
 JumpTable_5EF1_05.return_05_5F32:
@@ -3941,7 +3941,7 @@ toc_05_613F.loop_05_6193:
     db   $7C, $00, $7C, $20, $7C, $40, $7C, $60
 
 JumpTable_61A3_05:
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     ld   de, $619B
     call toc_01_3C3B
     call toc_05_7965
@@ -5885,7 +5885,7 @@ JumpTable_7285_05.else_05_72A9:
 
 JumpTable_7285_05.else_05_72B7:
     ld   a, [hLinkDirection]
-    and  %00000010
+    and  DIRECTION_UP
     jp   z, .return_05_7347
 
     ld   a, [$C1A6]

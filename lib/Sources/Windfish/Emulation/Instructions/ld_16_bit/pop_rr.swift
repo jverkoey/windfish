@@ -13,9 +13,9 @@ extension LR35902.Emulation {
     func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
       cpu.registerTraces[dst] = .init(sourceLocation: sourceLocation, loadAddress: cpu.sp)
       value = UInt16(truncatingIfNeeded: memory.read(from: cpu.sp))
-      cpu.sp += 1
+      cpu.sp &+= 1
       value |= UInt16(truncatingIfNeeded: memory.read(from: cpu.sp)) << 8
-      cpu.sp += 1
+      cpu.sp &+= 1
       cpu[dst] = value
     }
 

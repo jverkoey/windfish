@@ -132,10 +132,10 @@ JumpTable_40AC_04.else_04_40D0:
 JumpTable_40AC_04.else_04_40E8:
     ld   a, [hLinkPositionX]
     push af
-    assign [hLinkPositionX], $50
+    assign [hLinkPositionX], 80
     ld   a, [hLinkPositionY]
     push af
-    assign [hLinkPositionY], $48
+    assign [hLinkPositionY], 72
     ld   a, $08
     call toc_01_3C25
     ld   a, [$FFEE]
@@ -259,7 +259,7 @@ JumpTable_415F_04.else_04_4194:
     ifNe [$DB00], $03, .else_04_41C7
 
     ld   a, [hPressedButtonsMask]
-    and  %00100000
+    and  J_B
     jr   nz, .else_04_41D4
 
     jr   .else_04_41F8
@@ -268,7 +268,7 @@ JumpTable_415F_04.else_04_41C7:
     ifNe [$DB01], $03, .else_04_41F8
 
     ld   a, [hPressedButtonsMask]
-    and  %00010000
+    and  J_A
     jr   z, .else_04_41F8
 
 JumpTable_415F_04.else_04_41D4:
@@ -894,10 +894,10 @@ JumpTable_4568_04.return_04_45E3:
 JumpTable_4568_04.else_04_45E4:
     ld   a, [hLinkPositionX]
     push af
-    assign [hLinkPositionX], $50
+    assign [hLinkPositionX], 80
     ld   a, [hLinkPositionY]
     push af
-    assign [hLinkPositionY], $48
+    assign [hLinkPositionY], 72
     ld   a, $20
     call toc_01_3C30
     ld   a, [$FFD8]
@@ -906,7 +906,7 @@ JumpTable_4568_04.else_04_45E4:
     push af
     ld   a, [$FFD7]
     push af
-    ld   a, $04
+    ld   a, 4
     call toc_01_3C30
     ld   hl, $FFD8
     pop  af
@@ -2826,7 +2826,7 @@ toc_04_5629:
     and  %00001111
     ld   e, a
     ld   a, [hSwordIntersectedAreaY]
-    and  %11110000
+    and  $F0
     or   e
     ld   e, a
     ld   d, $00
@@ -3285,7 +3285,7 @@ JumpTable_5E29_04:
     and  %00000001
     call toc_01_3B87
     call toc_01_0891
-    cp   $18
+    cp   24
     jr   nz, .else_04_5E42
 
     call toc_04_5EC0
@@ -3295,12 +3295,12 @@ JumpTable_5E29_04.else_04_5E42:
 
     call toc_04_6DFF
     add  a, $20
-    cp   $40
+    cp   64
     jr   nc, .return_04_5E6A
 
     call toc_04_6E0F
     add  a, $20
-    cp   $40
+    cp   64
     jr   nc, .return_04_5E6A
 
     ld   hl, $C420
@@ -3530,7 +3530,7 @@ JumpTable_6016_04.return_04_6022:
     db   $30
 
 JumpTable_60A2_04:
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     ld   hl, $C2C0
     add  hl, bc
     ld   a, [hl]
@@ -4702,7 +4702,7 @@ JumpTable_6F69_04:
 
     ld   hl, $DAA0
     set  4, [hl]
-    assign [hLinkPositionX], $6B
+    assign [hLinkPositionX], 107
     jr   .toc_04_6F8A
 
 JumpTable_6F69_04.else_04_6F85:
@@ -4755,7 +4755,7 @@ JumpTable_6F69_04.return_04_6FC5:
 
 
 JumpTable_6FC6_04:
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     ld   a, [wDialogState]
     and  a
     jr   nz, .return_04_7002
@@ -4875,7 +4875,7 @@ JumpTable_7026_04.return_04_708B:
 
 JumpTable_7026_04.else_04_708C:
     ld   a, [hPressedButtonsMask]
-    and  %00100000
+    and  J_B
     jr   z, .return_04_70A3
 
     ifLt [hLinkPositionX], 32, .return_04_70A3
@@ -4905,7 +4905,7 @@ JumpTable_70A4_04:
 
 JumpTable_70A4_04.else_04_70C0:
     ld   a, [hPressedButtonsMask]
-    and  %00100000
+    and  J_B
     jr   z, .else_04_70D7
 
 JumpTable_70A4_04.toc_04_70C6:
@@ -4939,8 +4939,8 @@ toc_04_70EA:
     rra
     and  %00000001
     ld   [$D200], a
-    assign [hLinkInteractiveMotionBlocked], $01
-    assign [hLinkDirection], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_GRAB_SLASH
+    assign [hLinkDirection], DIRECTION_UP
     ret
 
 
@@ -4958,7 +4958,7 @@ JumpTable_70FE_04:
     jr   nz, .else_04_711D
 
     ld   a, [hPressedButtonsMask]
-    and  %00010000
+    and  J_A
     jr   z, .return_04_7123
 
 JumpTable_70FE_04.else_04_711D:
@@ -4980,7 +4980,7 @@ JumpTable_7124_04:
 
 JumpTable_7124_04.else_04_713B:
     ld   a, [hPressedButtonsMask]
-    and  %00010000
+    and  J_A
     jr   z, .else_04_7152
 
 JumpTable_7124_04.toc_04_7141:
@@ -5037,7 +5037,7 @@ JumpTable_7163_04.else_04_7181:
     call toc_01_0891
     ld   [hl], $FF
     call JumpTable_3B8D_00
-    ld   e, $00
+    ld   e, DIRECTION_RIGHT
 JumpTable_7163_04.toc_04_719F:
     ld   a, [$DB73]
     and  a
@@ -5060,19 +5060,19 @@ JumpTable_71AD_04:
     and  %00000001
     ld   [$D200], a
     call toc_01_0891
-    cp   $C8
+    cp   200
     jr   nz, .else_04_71C3
 
     ld   hl, $D206
     ld   [hl], $10
 JumpTable_71AD_04.else_04_71C3:
-    cp   $A0
+    cp   160
     jr   nz, .else_04_71CC
 
     ld   hl, $D201
     ld   [hl], $03
 JumpTable_71AD_04.else_04_71CC:
-    cp   $50
+    cp   80
     jr   nz, .else_04_71D9
 
     ld   hl, $D201
@@ -5123,8 +5123,8 @@ JumpTable_7200_04:
     push af
     ld   a, [hLinkPositionY]
     push af
-    assign [hLinkPositionY], $16
-    assign [hLinkPositionX], $18
+    assign [hLinkPositionY], 22
+    assign [hLinkPositionX], 24
     copyFromTo [$D204], [$C201]
     copyFromTo [$D205], [$C211]
     push bc
@@ -5159,7 +5159,7 @@ JumpTable_725C_04:
     and  %00000001
     ld   [$D200], a
     call toc_01_0891
-    cp   $60
+    cp   96
     jr   nz, .else_04_7292
 
     ld   hl, $D201
@@ -5362,7 +5362,7 @@ JumpTable_74BA_04:
 JumpTable_74C5_04:
     ifNot [$DB73], .else_04_74CF
 
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
 JumpTable_74C5_04.else_04_74CF:
     call toc_04_6DCD
     ld   hl, $C320
@@ -5423,7 +5423,7 @@ JumpTable_74C5_04.else_04_7509:
 JumpTable_751C_04:
     ifNot [$DB73], .else_04_7526
 
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
 JumpTable_751C_04.else_04_7526:
     call toc_04_6DCD
     ld   hl, $C320
@@ -5554,7 +5554,7 @@ JumpTable_751C_04.return_04_75E1:
 
 
 JumpTable_75E2_04:
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     ld   [$C167], a
     ld   a, [$C1AD]
     and  a
@@ -5565,7 +5565,7 @@ JumpTable_75E2_04:
     jp   JumpTable_3B8D_00
 
 JumpTable_75F9_04:
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     ld   [$C167], a
     ret
 
@@ -5657,7 +5657,7 @@ JumpTable_7786_04:
     ld   hl, $C380
     add  hl, bc
     ld   [hl], $03
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     ld   [$C167], a
     ifNe [$C16B], $04, .return_04_77C6
 
@@ -6186,7 +6186,7 @@ JumpTable_7A70_04.return_04_7AAA:
 
 
 JumpTable_7AAB_04:
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     call toc_01_0891
     jr   nz, .return_04_7AC3
 

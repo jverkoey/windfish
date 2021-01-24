@@ -582,7 +582,7 @@ toc_07_4A74:
     ld   e, a
     ld   a, [hLinkPositionY]
     push af
-    assign [hLinkPositionY], $10
+    assign [hLinkPositionY], 16
     ld   a, e
     call toc_01_2185
     pop  af
@@ -866,7 +866,7 @@ JumpTable_4F26_07:
     jr   nc, .else_07_4F66
 
     ld   a, [hPressedButtonsMask]
-    and  %00001111
+    and  J_DOWN | J_LEFT | J_RIGHT | J_UP
     jr   z, .else_07_4F66
 
     assign [$C144], $01

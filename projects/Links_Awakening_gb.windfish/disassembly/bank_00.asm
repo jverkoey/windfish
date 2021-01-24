@@ -349,7 +349,7 @@ main.else_01_02D4:
     ldi  [hl], a
 main.loop_01_02DE:
     ld   a, [gbSTAT]
-    and  %00000011
+    and  STATF_OAM | STATF_VB
     jr   nz, .loop_01_02DE
 
     ld   d, $00
@@ -430,7 +430,7 @@ main.toc_01_0352:
     jr   nz, .else_01_038A
 
     ld   a, [hPressedButtonsMask]
-    and  %00001111
+    and  J_DOWN | J_LEFT | J_RIGHT | J_UP
     jr   z, .else_01_03A4
 
 main.else_01_038A:
@@ -462,7 +462,7 @@ main.else_01_03AA:
 main.else_01_03BD:
     changebank $1F
     call toc_1F_7F80
-    changebank $0C
+    changebank 12
     clear [hIsRenderingFrame]
     halt
 main.loop_01_03CE:
@@ -513,7 +513,7 @@ toc_01_0400:
     ld   [gbLYC], a
     ld   a, e
     inc  a
-    and  3
+    and  %00000011
     ld   [wLCDSectionIndex], a
     jr   toc_01_0452
 
@@ -649,10 +649,10 @@ vblank:
     and  %01111111
     jr   z, .else_01_0566
 
-    cp   $01
+    cp   %00000001
     jr   z, .else_01_0566
 
-    cp   $05
+    cp   %00000101
     jr   nc, .else_01_0548
 
     call toc_01_21DF
@@ -1732,11 +1732,11 @@ toc_01_0C40.else_01_0C7A:
 
 toc_01_0C8C:
     ld   a, [hPressedButtonsMask]
-    and  %10110000
+    and  J_A | J_B | J_START
     jr   nz, toc_01_0CDE
 
     ld   a, [hPressedButtonsMask]
-    and  %01000000
+    and  J_SELECT
     jr   z, toc_01_0CDE
 
     ld   a, [$D45F]
@@ -1900,7 +1900,7 @@ toc_01_0D68.else_01_0DD9:
     ifNe [$DB00], $08, .else_01_0DEF
 
     ld   a, [hPressedButtonsMask]
-    and  %00100000
+    and  J_B
     jr   z, .else_01_0DEB
 
     call toc_01_140C
@@ -1912,7 +1912,7 @@ toc_01_0D68.else_01_0DEF:
     ifNe [$DB01], $08, .else_01_0E05
 
     ld   a, [hPressedButtonsMask]
-    and  %00010000
+    and  J_A
     jr   z, .else_01_0E01
 
     call toc_01_140C
@@ -1925,7 +1925,7 @@ toc_01_0D68.else_01_0E05:
 
     copyFromTo [$DB44], [$C15A]
     ld   a, [hPressedButtonsMask]
-    and  %00010000
+    and  J_A
     jr   z, .else_01_0E26
 
     ifEq [$C1AD], $01, .else_01_0E26
@@ -1939,7 +1939,7 @@ toc_01_0D68.else_01_0E26:
 
     copyFromTo [$DB44], [$C15A]
     ld   a, [hPressedButtonsMask]
-    and  %00100000
+    and  J_B
     jr   z, .else_01_0E3C
 
     call toc_01_0F34
@@ -1966,14 +1966,14 @@ toc_01_0D68.else_01_0E4F:
     call toc_01_0E7F
 toc_01_0D68.else_01_0E66:
     ld   a, [hPressedButtonsMask]
-    and  %00100000
+    and  J_B
     jr   z, .else_01_0E72
 
     ld   a, [$DB00]
     call toc_01_0F05
 toc_01_0D68.else_01_0E72:
     ld   a, [hPressedButtonsMask]
-    and  %00010000
+    and  J_A
     jr   z, .return_01_0E7E
 
     ld   a, [$DB01]
@@ -2245,7 +2245,7 @@ toc_01_102A:
     jr   c, toc_01_1058
 
     ld   a, [hPressedButtonsMask]
-    and  %00000011
+    and  J_LEFT | J_RIGHT
     ld   c, a
     ld   b, $00
     ld   hl, $1007
@@ -2257,7 +2257,7 @@ toc_01_102A:
     ld   a, [hPressedButtonsMask]
     srl  a
     srl  a
-    and  %00000011
+    and  J_LEFT | J_RIGHT
     ld   c, a
     ld   b, $00
     ld   hl, $100A
@@ -2497,11 +2497,11 @@ toc_01_11D1:
 
     call toc_01_120F
     ld   a, [hPressedButtonsMask]
-    and  %00000011
+    and  J_LEFT | J_RIGHT
     ld   a, $EA
     jr   z, toc_01_11FE
 
-    ld   a, 232
+    ld   a, $E8
 toc_01_11FE:
     ld   [hLinkPositionYIncrement], a
     clear [hLinkPositionZLow]
@@ -2580,7 +2580,7 @@ toc_01_1269:
 
 toc_01_1283:
     ld   a, [hPressedButtonsMask]
-    and  DIRECTION_KEEP
+    and  J_DOWN | J_LEFT | J_RIGHT | J_UP
     ld   e, a
     ld   d, $00
     ld   hl, $48B3
@@ -2633,7 +2633,7 @@ toc_01_12B6.toc_01_12D6:
     ld   a, [hLinkPositionX]
     add  a, [hl]
     sub  a, $08
-    and  $F0
+    and  %11110000
     ld   [hSwordIntersectedAreaX], a
     swap a
     ld   c, a
@@ -2642,7 +2642,7 @@ toc_01_12B6.toc_01_12D6:
     ld   a, [hLinkPositionY]
     add  a, [hl]
     sub  a, $10
-    and  $F0
+    and  %11110000
     ld   [hSwordIntersectedAreaY], a
     or   c
     ld   e, a
@@ -2821,7 +2821,7 @@ toc_01_140C:
     ret  nz
 
     ld   a, [hLinkDirection]
-    and  %00000010
+    and  DIRECTION_UP
     ret  nz
 
 toc_01_140C.else_01_141A:
@@ -3075,7 +3075,7 @@ JumpTable_15B3_00.loop_01_15E2:
     call toc_04_79E3
     incAddr $DB6E
     incAddr $DB46
-    assign [$D47E], $01
+    assign [$D47E], LINK_ANIMATION_STATE_WALKING_DOWN
     clear [hLinkAnimationState]
 JumpTable_15B3_00.else_01_1606:
     copyFromTo [$FFF9], [$FFE4]
@@ -3543,7 +3543,7 @@ toc_01_1A6B:
     and  %00001111
     jr   z, toc_01_1A87
 
-    cp   $08
+    cp   8
     ret  nz
 
     ld   l, $40
@@ -3577,7 +3577,7 @@ toc_01_1AA9:
 
     ld   a, [hFrameCounter]
     and  %00001111
-    cp   $04
+    cp   4
     jr   c, .return_01_1ADE
 
     changebank $10
@@ -4168,7 +4168,7 @@ toc_01_1E7B:
     ld   a, [hLinkPositionX]
     add  a, [hl]
     sub  a, $08
-    and  $F0
+    and  %11110000
     ld   [hSwordIntersectedAreaX], a
     swap a
     ld   c, a
@@ -4177,7 +4177,7 @@ toc_01_1E7B:
     ld   a, [hLinkPositionY]
     add  a, [hl]
     sub  a, $10
-    and  $F0
+    and  %11110000
     ld   [hSwordIntersectedAreaY], a
     or   c
     ld   e, a
@@ -4315,10 +4315,10 @@ toc_01_1E7B.else_01_1F78:
 
     ld   a, [hSwordIntersectedAreaX]
     swap a
-    and  %00001111
+    and  $0F
     ld   e, a
     ld   a, [hSwordIntersectedAreaY]
-    and  %11110000
+    and  $F0
     or   e
     ld   [$D473], a
     jp   .else_01_1FFD
@@ -4390,7 +4390,7 @@ toc_01_1E7B.else_01_1FFD:
     ifNe [$DB00], $03, .else_01_200B
 
     ld   a, [hPressedButtonsMask]
-    and  %00100000
+    and  J_B
     jr   nz, .else_01_201A
 
     ret
@@ -4402,7 +4402,7 @@ toc_01_1E7B.else_01_200B:
     jp   nz, .return_01_20A5
 
     ld   a, [hPressedButtonsMask]
-    and  %00010000
+    and  J_A
     jp   z, .return_01_20A5
 
 toc_01_1E7B.else_01_201A:
@@ -4553,7 +4553,7 @@ toc_01_210F:
     ld   a, [hLinkPositionZLow]
     push af
     swap a
-    and  %11110000
+    and  $F0
     ld   hl, $C149
     add  a, [hl]
     ld   [hl], a
@@ -4567,7 +4567,7 @@ toc_01_210F:
     ld   e, $F0
 toc_01_210F.else_01_2129:
     swap a
-    and  %00001111
+    and  $0F
     or   e
     rr   d
     adc  [hl]
@@ -5632,7 +5632,7 @@ toc_01_27FE:
     ld   a, [gbP1]
     swap a
     cpl
-    and  J_A | J_B | J_SELECT | J_START
+    and  JOYPAD_BUTTONS | JOYPAD_DIRECTIONS | %11000000
     or   b
     ld   c, a
     ld   a, [hPressedButtonsMask]
@@ -5651,7 +5651,7 @@ toc_01_2839:
     ld   a, [hSwordIntersectedAreaY]
     ld   hl, hBaseScrollY
     add  a, [hl]
-    and  %11111000
+    and  $F8
     srl  a
     srl  a
     srl  a
@@ -5669,7 +5669,7 @@ toc_01_2839.loop_01_2851:
     ld   hl, hBaseScrollX
     add  a, [hl]
     pop  hl
-    and  %11111000
+    and  $F8
     srl  a
     srl  a
     srl  a
@@ -7223,12 +7223,12 @@ toc_01_32AA:
     dec  bc
     assign [$FFAC], $01
     ld   a, [bc]
-    and  %11110000
+    and  IE_PIN1013TRANSITION | %11100000
     add  a, $10
     ld   [$FFAE], a
     ld   a, [bc]
     swap a
-    and  %11110000
+    and  IE_PIN1013TRANSITION | %11100000
     add  a, $08
     ld   [$FFAD], a
     inc  bc
@@ -7341,7 +7341,7 @@ JumpTable_3338_00:
     ld   a, [bc]
     add  a, $11
     ld   e, a
-    and  %00001111
+    and  IE_LCDC | IE_SERIALIO | IE_TIMEROVERFLOW | IE_VBLANK
     jr   nz, .else_01_3345
 
     ld   a, e
@@ -7438,13 +7438,13 @@ toc_01_33A7:
     add  hl, de
     pop  de
     ld   a, [de]
-    cp   $E1
+    cp   IE_VBLANK | %11100000
     jr   z, toc_01_33BC
 
-    cp   $E2
+    cp   IE_LCDC | %11100000
     jr   z, toc_01_33BC
 
-    cp   $E3
+    cp   IE_LCDC | IE_VBLANK | %11100000
     jr   nz, toc_01_33D6
 
 toc_01_33BC:
@@ -7766,13 +7766,13 @@ toc_01_3627:
     ld   a, [bc]
     ld   [hl], a
     push af
-    and  %11110000
+    and  IE_PIN1013TRANSITION | %11100000
     ld   hl, $C1E0
     add  hl, de
     ld   [hl], a
     pop  af
     swap a
-    and  %11110000
+    and  IE_PIN1013TRANSITION | %11100000
     ld   hl, $C1D0
     add  hl, de
     ld   [hl], a
@@ -8486,8 +8486,8 @@ toc_01_3C3B.else_01_3C83:
     ldi  a, [hl]
     add  a, c
     ld   [de], a
-    and  %00001111
-    cp   $0F
+    and  IE_LCDC | IE_SERIALIO | IE_TIMEROVERFLOW | IE_VBLANK
+    cp   IE_LCDC | IE_SERIALIO | IE_TIMEROVERFLOW | IE_VBLANK
     jr   nz, .else_01_3CB5
 
     dec  de

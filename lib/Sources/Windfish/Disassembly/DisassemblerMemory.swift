@@ -9,9 +9,14 @@ final class DisassemblerMemory: AddressableMemory {
   var selectedBank: Cartridge.Bank = 0
 
   func read(from address: LR35902.Address) -> UInt8 {
+    let intAddress = Int(truncatingIfNeeded: address)
+    guard intAddress < data.count else {
+      return 0xff
+    }
+
     // Read-only memory (ROM) bank 00
     if address <= 0x3FFF {
-      return data[Int(address)]
+      return data[intAddress]
     }
 
     // Read-only memory (ROM) bank 01-7F
@@ -20,11 +25,11 @@ final class DisassemblerMemory: AddressableMemory {
       return data[location.index]
     }
 
-    fatalError()
+    return 0xff
   }
 
   func write(_ byte: UInt8, to address: LR35902.Address) {
-    fatalError()
+    // Ignore writes.
   }
 
   func sourceLocation(from address: LR35902.Address) -> Gameboy.SourceLocation {

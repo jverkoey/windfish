@@ -107,7 +107,7 @@ toc_02_4146.toc_02_4191:
 toc_02_4146.else_02_41A6:
     ifNot [$D47C], .return_02_41B9
 
-    assign [$D368], $49
+    assign [$D368], MUSIC_ACTIVE_POWER_UP
     ld   [$FFBD], a
     ld   [hNextDefaultMusicTrack], a
     clear [$C1CF]
@@ -125,13 +125,13 @@ toc_02_41BA:
     add  hl, de
     dec  [hl]
     ld   a, [hSwordIntersectedAreaX]
-    and  %11110000
+    and  $F0
     add  a, $08
     ld   hl, $C200
     add  hl, de
     ld   [hl], a
     ld   a, [hSwordIntersectedAreaY]
-    and  %11110000
+    and  $F0
     add  a, $10
     ld   hl, $C210
     add  hl, de
@@ -314,7 +314,7 @@ toc_02_431F:
     ifLt [$C15C], $02, .return_02_432C
 
     ld   [hLinkAnimationState], a
-    assign [hLinkInteractiveMotionBlocked], $01
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_GRAB_SLASH
 toc_02_431F.return_02_432C:
     ret
 
@@ -406,7 +406,7 @@ toc_02_4353.else_02_43A9:
     ld   e, $10
 toc_02_4353.else_02_43BA:
     ld   a, [hPressedButtonsMask]
-    and  %00001111
+    and  J_DOWN | J_LEFT | J_RIGHT | J_UP
     or   e
     ld   e, a
     ld   d, $00
@@ -426,7 +426,7 @@ toc_02_4353.else_02_43BA:
     sla  [hl]
 toc_02_4353.else_02_43E0:
     ld   a, e
-    and  %00001111
+    and  J_DOWN | J_LEFT | J_RIGHT | J_UP
     ld   e, a
     jr   z, .else_02_43FF
 
@@ -572,7 +572,7 @@ toc_02_4497.else_02_44C8:
 
 toc_02_4497.else_02_44CD:
     ld   a, [hPressedButtonsMask]
-    and  %00000011
+    and  J_LEFT | J_RIGHT
     jr   z, .else_02_44EC
 
     ld   e, a
@@ -596,7 +596,7 @@ toc_02_4497.else_02_44EC:
     ld   a, [hPressedButtonsMask]
     rra
     rra
-    and  %00000011
+    and  J_LEFT | J_RIGHT
     jr   z, .else_02_450D
 
     ld   e, a
@@ -619,7 +619,7 @@ toc_02_4497.else_02_4508:
 toc_02_4497.else_02_450D:
     ifNot [hLinkPositionZHigh], .else_02_4516
 
-    and  %10000000
+    and  $80
     jr   z, .return_02_4556
 
 toc_02_4497.else_02_4516:
@@ -772,7 +772,7 @@ toc_02_4716:
     and  a
     jr   nz, toc_02_472C
 
-    assign [hLinkInteractiveMotionBlocked], $01
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_GRAB_SLASH
 toc_02_472C:
     assign [$C137], $03
     jp   toc_02_4738.toc_02_47D4
@@ -810,7 +810,7 @@ toc_02_4738.else_02_474F:
     ld   a, [hLinkDirection]
     rla
     rla
-    and  %00001100
+    and  $0C
     ld   c, a
     ld   b, $00
     ifGte [$C152], $03, .else_02_478C
@@ -850,7 +850,7 @@ toc_02_4738.else_02_478C:
     and  a
     jr   nz, .else_02_47B6
 
-    assign [hLinkInteractiveMotionBlocked], $01
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_GRAB_SLASH
 toc_02_4738.else_02_47B6:
     ld   a, [$C138]
     and  a
@@ -1113,7 +1113,7 @@ toc_02_49C5.else_02_4A80:
     ld   [$C5A5], a
 toc_02_49C5.else_02_4A97:
     ld   a, [$C5A5]
-    ld   e, $75
+    ld   e, LINK_ANIMATION_STATE_UNKNOWN_75
     and  a
     jr   nz, .else_02_4AA0
 
@@ -1824,7 +1824,7 @@ toc_02_529A:
     ld   [$C134], a
 toc_02_529A.else_02_52AB:
     ld   a, [hPressedButtonsMask]
-    and  %00100000
+    and  J_B
     jr   z, toc_02_52ED
 
     ld   a, [$FFCC]
@@ -2035,7 +2035,7 @@ JumpTable_5402_02.loop_02_5414:
     db   $7E, $1F, $0C, $1F
 
 JumpTable_543D_02:
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     ld   [$C167], a
     clear [$C155]
     ifGte [$FFD7], $02, .else_02_5452
@@ -2465,7 +2465,7 @@ toc_02_5731:
     ifNot [$C188], .else_02_575E
 
     cp   $02
-    assign [hLinkInteractiveMotionBlocked], $01
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_GRAB_SLASH
     jr   z, .else_02_575A
 
     call toc_02_5871
@@ -3228,7 +3228,7 @@ toc_02_5C92.toc_02_5CAC:
     and  %00001111
     ld   e, a
     ld   a, [hSwordIntersectedAreaY]
-    and  %11110000
+    and  $F0
     or   e
     ld   e, a
     ld   d, $00
@@ -3289,7 +3289,7 @@ toc_02_5D00:
     and  %00001111
     ld   e, a
     ld   a, [hSwordIntersectedAreaY]
-    and  %11110000
+    and  $F0
     or   e
     ld   e, a
     ld   d, $00
@@ -3454,7 +3454,7 @@ toc_02_5DD5:
     jp   nz, .toc_02_5E83
 
     ld   a, [hPressedButtonsMask]
-    and  %01000000
+    and  J_SELECT
     jp   nz, .toc_02_5EC8
 
     ld   a, [$FFCC]
@@ -3508,7 +3508,7 @@ toc_02_5DD5.toc_02_5E3C:
     jr   nc, .else_02_5E76
 
     call toc_02_6A9B
-    ld   a, $02
+    ld   a, UPDATE_BG_TILES_DUNGEON_MINIMAP
 toc_02_5DD5.else_02_5E76:
     ld   [hNeedsUpdatingBGTiles], a
     ret
@@ -3578,10 +3578,10 @@ toc_02_5DD5.else_02_5EDC:
     and  %01111111
     jr   z, .else_02_5EEB
 
-    cp   $0C
+    cp   %00001100
     jr   z, .else_02_5EEB
 
-    cp   $0D
+    cp   %00001101
     jr   nz, .return_02_5EF1
 
 toc_02_5DD5.else_02_5EEB:
@@ -4544,7 +4544,7 @@ toc_02_6505.else_02_655B:
     ld   [$DBA3], a
 toc_02_6505.else_02_655E:
     ld   a, [hPressedButtonsMask]
-    and  %00001111
+    and  J_DOWN | J_LEFT | J_RIGHT | J_UP
     jr   z, .else_02_656E
 
     ld   a, [$C1B5]
@@ -5288,7 +5288,7 @@ JumpTable_6C48_02.else_02_6C63:
     jr   nz, .else_02_6CA6
 
     ld   a, [hPressedButtonsMask]
-    and  %00001111
+    and  J_DOWN | J_LEFT | J_RIGHT | J_UP
     ld   e, a
     ld   d, $00
     ld   hl, $6C25
@@ -5321,7 +5321,7 @@ JumpTable_6C48_02.else_02_6C94:
 JumpTable_6C48_02.else_02_6CA6:
     incAddr $C120
     ld   a, [hPressedButtonsMask]
-    and  %00000011
+    and  J_LEFT | J_RIGHT
     jr   z, .else_02_6CBA
 
     ld   e, a
@@ -5360,7 +5360,7 @@ JumpTable_6CDA_02:
     ld   [$C153], a
     ld   [$C152], a
     ld   a, [hPressedButtonsMask]
-    and  %00000011
+    and  J_LEFT | J_RIGHT
     ld   e, a
     ld   d, $00
     ld   hl, $6BE3
@@ -5370,15 +5370,15 @@ JumpTable_6CDA_02:
     ld   a, [hPressedButtonsMask]
     rra
     rra
-    and  %00000011
+    and  J_LEFT | J_RIGHT
     ld   e, a
     ld   hl, $6BE6
     add  hl, de
     ld   a, [hl]
     ld   [hLinkPositionYIncrement], a
-    assign [hLinkDirection], $02
+    assign [hLinkDirection], DIRECTION_UP
     ld   a, [hPressedButtonsMask]
-    and  %00001111
+    and  J_DOWN | J_LEFT | J_RIGHT | J_UP
     jr   z, .else_02_6D10
 
     incAddr $C120
@@ -5473,7 +5473,7 @@ JumpTable_6D3A_02.else_02_6D9D:
     ld   [hLinkDirection], a
 JumpTable_6D3A_02.else_02_6DAC:
     ld   a, [hPressedButtonsMask]
-    and  %00000011
+    and  J_LEFT | J_RIGHT
     jr   z, .else_02_6DCB
 
     ld   e, a
@@ -5506,7 +5506,7 @@ JumpTable_6D3A_02.else_02_6DCD:
     ld   [$C153], a
 JumpTable_6D3A_02.else_02_6DE3:
     ld   a, [hPressedButtonsMask]
-    and  %00000011
+    and  J_LEFT | J_RIGHT
     ld   e, a
     ld   d, $00
     ld   hl, $6BE9
@@ -5549,13 +5549,13 @@ JumpTable_6D3A_02.else_02_6E1F:
     call toc_01_20D6
     ld   hl, hLinkDirection
     ld   a, [hPressedButtonsMask]
-    and  %00001111
-    cp   $04
+    and  J_DOWN | J_LEFT | J_RIGHT | J_UP
+    cp   J_UP
     jr   nz, .else_02_6E2F
 
     ld   [hl], $02
 JumpTable_6D3A_02.else_02_6E2F:
-    cp   $08
+    cp   J_DOWN
     jr   nz, .else_02_6E35
 
     ld   [hl], $03
@@ -5581,7 +5581,7 @@ JumpTable_6D3A_02.else_02_6E35:
     ld   a, $02
     call toc_02_571B
 JumpTable_6D3A_02.else_02_6E58:
-    assign [hLinkPositionYIncrement], $04
+    assign [hLinkPositionYIncrement], 4
     clear [hLinkPositionXIncrement]
 JumpTable_6D3A_02.else_02_6E5F:
     ld   a, $02
@@ -5589,7 +5589,7 @@ JumpTable_6D3A_02.else_02_6E5F:
 
 JumpTable_6D3A_02.else_02_6E63:
     ld   a, [hPressedButtonsMask]
-    and  %00001100
+    and  J_DOWN | J_UP
     jr   z, .else_02_6E6D
 
     ld   a, $01
@@ -5669,7 +5669,7 @@ toc_02_6E9F.else_02_6EE5:
     jr   nz, .else_02_6F0A
 
     ld   a, [hPressedButtonsMask]
-    and  %00001000
+    and  J_DOWN
     jr   nz, .else_02_6F0A
 
     ld   a, [$FFE9]
@@ -5720,12 +5720,12 @@ toc_02_6E9F.else_02_6F2F:
     sra  a
     sra  a
     ld   [hLinkPositionXIncrement], a
-    assign [hLinkPositionYIncrement], $E8
+    assign [hLinkPositionYIncrement], 232
     call toc_01_20D6
     call toc_02_6FB1
     assign [$C157], $20
     ld   a, [hLinkDirection]
-    and  %00000010
+    and  DIRECTION_UP
     sla  a
     ld   [$C158], a
     assign [$FFF2], $0B
@@ -5968,10 +5968,10 @@ toc_02_6FB1.else_02_70D0:
     jr   nz, .else_02_7108
 
     ld   a, [hPressedButtonsMask]
-    and  %00001111
+    and  J_DOWN | J_LEFT | J_RIGHT | J_UP
     jr   z, .else_02_7146
 
-    and  %00000011
+    and  J_LEFT | J_RIGHT
     jr   z, .else_02_70FA
 
     dec  a
@@ -5982,7 +5982,7 @@ toc_02_6FB1.else_02_70FA:
     ld   a, [hPressedButtonsMask]
     rra
     rra
-    and  %00000011
+    and  J_LEFT | J_RIGHT
     jr   z, .else_02_7146
 
     dec  a
@@ -6974,7 +6974,7 @@ toc_02_7769.else_02_7788:
     assign [$C146], $02
     assign [$C157], $20
     ld   a, [hLinkDirection]
-    and  %00000010
+    and  DIRECTION_UP
     sla  a
     ld   [$C158], a
     assign [$FFF2], $0B
@@ -7123,7 +7123,7 @@ toc_02_77FA.else_02_7899:
     ld   a, [hLinkPositionY]
     dec  a
     and  %00001111
-    cp   $0C
+    cp   12
     jr   nc, .else_02_78B5
 
 toc_02_77FA.else_02_78A7:
@@ -7132,7 +7132,7 @@ toc_02_77FA.else_02_78A7:
     and  a
     jp   z, .else_02_7A5C
 
-    cp   $E0
+    cp   224
     jr   nz, .else_02_78F5
 
 toc_02_77FA.else_02_78B5:
@@ -7226,14 +7226,14 @@ toc_02_77FA.else_02_7947:
     sub  a, $08
     add  a, $02
     and  %00001111
-    cp   $04
+    cp   4
     jr   nc, .return_02_797F
 
     ld   a, [hLinkPositionY]
     sub  a, $10
     add  a, $02
     and  %00001111
-    cp   $04
+    cp   4
     jr   nc, .return_02_797F
 
     ld   a, [hLinkPositionY]
@@ -7364,7 +7364,7 @@ toc_02_77FA.else_02_7A10:
     jr   nz, .else_02_7A54
 
     ld   a, [hPressedButtonsMask]
-    and  %00001111
+    and  J_DOWN | J_LEFT | J_RIGHT | J_UP
     jr   z, .else_02_7A54
 
     assign [$FFF2], $0E
@@ -7467,7 +7467,7 @@ toc_02_77FA.else_02_7AF6:
 
     inc  [hl]
     ld   a, [hl]
-    cp   %00101000
+    cp   $28
     jr   c, .return_02_7B28
 
     assign [$FFF4], $2B
@@ -7570,7 +7570,7 @@ toc_02_7B74.else_02_7BC9:
     copyFromTo [hLinkPositionY], [$DBB2]
     ifNe [$C125], $03, .else_02_7C06
 
-    assign [hLinkPositionYIncrement], $01
+    assign [hLinkPositionYIncrement], 1
     call toc_02_7180
     ifEq [hObjectUnderEntity], 219, .else_02_7C06
 
@@ -7595,7 +7595,7 @@ toc_02_7B74.else_02_7C06:
     clear [$C169]
 toc_02_7B74.else_02_7C12:
     call toc_01_3819
-    assign [hAnimatedTilesFrameCount], $FF
+    assign [hAnimatedTilesFrameCount], 255
     ld   a, [$DBA5]
     and  a
     ret  z
@@ -7759,7 +7759,7 @@ JumpTable_7C7E_02.else_02_7D25:
     ld   a, [hDefaultMusicTrack]
     jr   z, .else_02_7D45
 
-    ld   a, $49
+    ld   a, MUSIC_ACTIVE_POWER_UP
 JumpTable_7C7E_02.else_02_7D45:
     ld   [hNextMusicTrackToFadeInto], a
     call toc_01_27CA
@@ -7799,7 +7799,7 @@ JumpTable_7C7E_02.else_02_7D77:
     ifEq [$FFBD], $49, .else_02_7D96
 
     call .else_02_7D90
-    assign [hNextMusicTrackToFadeInto], $49
+    assign [hNextMusicTrackToFadeInto], MUSIC_ACTIVE_POWER_UP
     ld   [$FFBD], a
     ret
 

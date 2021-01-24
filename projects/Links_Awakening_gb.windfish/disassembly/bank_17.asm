@@ -225,7 +225,7 @@ toc_17_46A6:
     ldi  [hl], a
 toc_17_46A6.loop_17_46D5:
     ld   a, [gbSTAT]
-    and  %00000011
+    and  STATF_OAM | STATF_VB
     jr   nz, .loop_17_46D5
 
     ld   d, $00

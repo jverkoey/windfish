@@ -36,7 +36,7 @@ JumpTable_4041_01:
 
 JumpTable_404D_01:
     assign [$D6FF], $0D
-    assign [$DB9A], $FF
+    assign [$DB9A], 255
     clear [hBaseScrollX]
     ld   [hBaseScrollY], a
     ld   [$C16B], a
@@ -196,7 +196,7 @@ JumpTable_41C5_01.else_01_4219:
     rra
     rra
     rra
-    and  LINK_ANIMATION_STATE_WALKING_LIFTING_RIGHT
+    and  %00111111
     ld   e, a
     ld   d, $00
     ld   hl, $4191
@@ -228,7 +228,7 @@ JumpTable_4249_01:
 JumpTable_4253_01:
     assign [$DB97], $E4
     assign [$D6FF], $0A
-    assign [$DB9A], $FF
+    assign [$DB9A], 255
     clear [hBaseScrollX]
     ld   [hBaseScrollY], a
     incAddr $FF9C
@@ -335,7 +335,7 @@ toc_01_42E6.else_01_4309:
     ld   a, [hl]
     ld   hl, $C018
     ldi  [hl], a
-    ld   a, 36
+    ld   a, $24
     ldi  [hl], a
     ld   a, $BE
     ldi  [hl], a
@@ -482,7 +482,7 @@ JumpTable_43B3_01.else_01_4415:
     ifNot [$DBCD], .else_01_4426
 
     ld   a, [$FFF8]
-    and  $10
+    and  %00010000
     jr   nz, .else_01_4426
 
     assign [$D462], $0C
@@ -499,7 +499,7 @@ JumpTable_43B3_01.else_01_4430:
 
 
 JumpTable_4434_01:
-    assign [hWorldTileset], $0F
+    assign [hWorldTileset], 15
     call toc_01_09AA
     clear [hNeedsUpdatingBGTiles]
     ld   [hNeedsUpdatingEnemiesTiles], a
@@ -612,7 +612,7 @@ toc_01_44BC:
     copyFromTo [$AB66], [$DC04]
     call toc_01_27B5
     copyFromTo [$AB67], [$DC05]
-    assign [wGameMode], GAMEMODE_FILE_SELECT
+    assign [wGameMode], 2
     clear [$DB96]
     clear [hBaseScrollY]
     ld   [hBaseScrollX], a
@@ -1214,7 +1214,7 @@ toc_01_512A.else_01_51DD:
     assign [$DBA5], $01
     assign [$FFF7], $10
     assign [$DB9D], $50
-    assign [$DB9E], 96
+    assign [$DB9E], LINK_ANIMATION_STATE_JUMPING_3
     clear [hLinkAnimationState]
     assign [hLinkDirection], DIRECTION_DOWN
     assign [$DB6F], $16
@@ -2895,7 +2895,7 @@ toc_01_6DB7.loop_01_6DE6:
 
 toc_01_6DB7.loop_01_6DEC:
     ld   a, [gbSTAT]
-    and  %00000011
+    and  STATF_OAM | STATF_VB
     jr   nz, .loop_01_6DEC
 
 toc_01_6DB7.loop_01_6DF2:
@@ -2942,7 +2942,7 @@ toc_01_6E2D:
     jr   z, .return_01_6E39
 
     push af
-    assign [$FFF2], 10
+    assign [$FFF2], $0A
     pop  af
 toc_01_6E2D.return_01_6E39:
     ret
@@ -2966,7 +2966,7 @@ toc_01_6E48:
     ifEq [$DB96], $0B, toc_01_6E90
 
     assign [hButtonsInactiveDelay], 40
-    assign [$D6FF], 17
+    assign [$D6FF], $11
     assign [$DB96], $0D
     clear [$C280]
     ld   [$C281], a
@@ -3959,7 +3959,7 @@ toc_01_7B11:
     rra
     rra
     rra
-    and  $07
+    and  %00000111
     ld   e, a
     ld   d, $00
     ld   hl, $7AB4
@@ -4339,7 +4339,7 @@ toc_01_7EE8.toc_01_7EEE:
     ld   hl, $D800
     add  hl, bc
     ld   a, [hl]
-    and  $80
+    and  %10000000
     ld   a, $2C
     jr   z, .else_01_7F0B
 

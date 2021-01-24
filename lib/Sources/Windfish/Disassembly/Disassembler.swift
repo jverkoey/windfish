@@ -15,7 +15,7 @@ extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {
 /// A class that owns and manages disassembly information for a given ROM.
 public final class Disassembler {
 
-  private let memory: DisassemblerMemory
+  let memory: DisassemblerMemory
   let cartridgeData: Data
   let cartridgeSize: Cartridge.Length
   public let numberOfBanks: Cartridge.Bank

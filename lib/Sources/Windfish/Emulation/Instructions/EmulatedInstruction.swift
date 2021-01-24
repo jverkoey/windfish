@@ -218,6 +218,7 @@ extension LR35902.Emulation {
     ret_cnd.self,
     reti.self,
     rst_n.self,
+    stop.self,
 
     // Interrupts
     di.self,

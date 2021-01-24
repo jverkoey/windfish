@@ -1,16 +1,14 @@
 import Foundation
 
 extension LR35902.Emulation {
-  final class ldd_hladdr_a: InstructionEmulator, InstructionEmulatorInitializable {
+  final class stop: InstructionEmulator, InstructionEmulatorInitializable {
     init?(spec: LR35902.Instruction.Spec) {
-      guard case .ldd(.hladdr, .a) = spec else {
+      guard case .stop = spec else {
         return nil
       }
     }
 
     func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
-      memory.write(cpu.a, to: cpu.hl)
-      cpu.hl &-= 1
     }
   }
 }

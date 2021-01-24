@@ -85,11 +85,11 @@ ld   e, a
     let cpu = LR35902.zeroed()
     disassembly.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.cartridgeSize), bank: 1), cpu: cpu)
 
-    XCTAssertEqual(cpu.a, 0)
+    XCTAssertEqual(cpu.a, 0x7f)
     XCTAssertEqual(cpu.b, 0)
     XCTAssertEqual(cpu.c, 0)
     XCTAssertEqual(cpu.d, 0)
-    XCTAssertEqual(cpu.e, 0)
+    XCTAssertEqual(cpu.e, 0x7f)
     XCTAssertEqual(cpu.h, 0)
     XCTAssertEqual(cpu.l, 0)
     XCTAssertEqual(cpu.pc, 0x0006)

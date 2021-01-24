@@ -11,9 +11,9 @@ extension LR35902.Emulation {
     }
 
     func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
-      cpu.sp -= 1
+      cpu.sp &-= 1
       memory.write(UInt8(truncatingIfNeeded: ((cpu[src] as UInt16) & 0xFF00) >> 8), to: cpu.sp)
-      cpu.sp -= 1
+      cpu.sp &-= 1
       memory.write(UInt8(truncatingIfNeeded:(cpu[src] as UInt16) & 0x00FF), to: cpu.sp)
     }
 

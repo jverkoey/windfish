@@ -1,18 +1,5 @@
 import Foundation
 
-final class TracerMemory: AddressableMemory {
-  func read(from address: LR35902.Address) -> UInt8 {
-    return 0x00
-  }
-
-  func write(_ byte: UInt8, to address: LR35902.Address) {
-  }
-
-  func sourceLocation(from address: LR35902.Address) -> Gameboy.SourceLocation {
-    return Gameboy.sourceLocation(for: address, in: 0x01)
-  }
-}
-
 extension Disassembler {
   // TODO: Extract this engine into a generic emulator so that the following code can be debugged in an interactive session:
   /*
@@ -34,20 +21,32 @@ extension Disassembler {
   func trace(range: Range<Cartridge.Location>,
              cpu: LR35902 = LR35902.zeroed(),
              step: ((LR35902.Instruction, Cartridge.Location, LR35902) -> Void)? = nil) {
+    let bank: Cartridge.Bank = range.lowerBound.bank
+    let upperBoundPc: LR35902.Address = range.upperBound.address
+
     cpu.pc = range.lowerBound.address
-    let bank = range.lowerBound.bank
-    let upperBoundPc = range.upperBound.address
+    memory.selectedBank = bank
 
     while cpu.pc < upperBoundPc {
-      guard let instruction = self.instruction(at: Cartridge.Location(address: cpu.pc, bank: bank)) else {
+      guard let instruction: LR35902.Instruction = self.instruction(at: Cartridge.Location(address: cpu.pc, bank: bank)) else {
         cpu.pc += 1
         continue
       }
 
-      let memory: AddressableMemory = TracerMemory()
-      let location = Cartridge.Location(address: cpu.pc, bank: bank)
-      cpu.emulate(instruction: instruction, memory: memory)
+      let initialPc: LR35902.Address = cpu.pc
+
+      let location: Cartridge.Location = Cartridge.Location(address: cpu.pc, bank: bank)
+      let sourceLocation: Gameboy.SourceLocation = Gameboy.SourceLocation.cartridge(location)
+      let opCodeBytes = LR35902.InstructionSet.opcodeBytes[instruction.spec]!
+      let opcodeIndex = opCodeBytes.count > 1 ? (256 + Int(truncatingIfNeeded: opCodeBytes[1])) : Int(truncatingIfNeeded: opCodeBytes[0])
+      let emulator = LR35902.Emulation.instructionEmulators[opcodeIndex]
+
+      cpu.pc += LR35902.Address(truncatingIfNeeded: opCodeBytes.count)
+
+      emulator.emulate(cpu: cpu, memory: memory, sourceLocation: sourceLocation)
       step?(instruction, location, cpu)
+
+      cpu.pc = initialPc + LR35902.Address(truncatingIfNeeded: LR35902.InstructionSet.data(representing: instruction).count)
     }
   }
 }

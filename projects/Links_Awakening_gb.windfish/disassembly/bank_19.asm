@@ -39,7 +39,7 @@ JumpTable_4070_19:
     ifNe [$DB00], $03, .else_19_40A0
 
     ld   a, [hPressedButtonsMask]
-    and  %00100000
+    and  J_B
     jr   nz, .else_19_40AD
 
     jr   .else_19_411C
@@ -48,7 +48,7 @@ JumpTable_4070_19.else_19_40A0:
     ifNe [$DB01], $03, .else_19_411C
 
     ld   a, [hPressedButtonsMask]
-    and  %00010000
+    and  J_A
     jr   z, .else_19_411C
 
 JumpTable_4070_19.else_19_40AD:
@@ -56,7 +56,7 @@ JumpTable_4070_19.else_19_40AD:
     and  a
     jr   nz, .else_19_411C
 
-    assign [hLinkInteractiveMotionBlocked], $01
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_GRAB_SLASH
     ld   [$C3CF], a
     ld   a, [hLinkDirection]
     ld   e, a
@@ -956,7 +956,7 @@ JumpTable_51AD_19.else_19_523C:
 
 JumpTable_51AD_19.toc_19_5242:
     call toc_19_789B
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     ld   [$C167], a
     ld   hl, $517A
     ld   c, $04
@@ -1119,7 +1119,7 @@ JumpTable_54E3_19:
     sra  a
     sra  a
     ld   [hLinkPositionXIncrement], a
-    assign [hLinkPositionYIncrement], $E8
+    assign [hLinkPositionYIncrement], 232
     call toc_01_0891
     ld   [hl], $20
     ld   a, $01
@@ -1379,7 +1379,7 @@ JumpTable_5829_19.else_19_583B:
     ld   a, [hl]
     sub  a, $10
     ld   [hLinkPositionY], a
-    assign [hLinkPositionYIncrement], $02
+    assign [hLinkPositionYIncrement], 2
     assign [$C147], $01
 JumpTable_5829_19.else_19_585C:
     call toc_19_795A
@@ -1456,7 +1456,7 @@ toc_19_58D7:
     ld   a, $10
     jr   z, .else_19_58F0
 
-    ld   a, $F0
+    ld   a, 240
 toc_19_58D7.else_19_58F0:
     ld   [hLinkPositionXIncrement], a
     ret
@@ -1626,7 +1626,7 @@ JumpTable_5B45_19.else_19_5B7E:
     db   $00, $00
 
 toc_19_5CA9:
-    assign [hLinkInteractiveMotionBlocked], $01
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_GRAB_SLASH
     ld   [$C167], a
     call toc_01_1495
     ld   a, [$FF9C]
@@ -2507,7 +2507,7 @@ JumpTable_6E61_19.return_19_6E75:
     db   $A7, $72, $C1, $72, $3B, $73
 
 JumpTable_70DD_19:
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     ld   [$C167], a
     call toc_01_0891
     jr   z, .else_19_70FC

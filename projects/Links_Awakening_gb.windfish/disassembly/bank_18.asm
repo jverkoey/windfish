@@ -29,7 +29,7 @@ JumpTable_402D_18:
 JumpTable_402D_18.else_18_404A:
     ifGte [hLinkPositionY], 76, .else_18_407C
 
-    assign [hLinkPositionY], $4C
+    assign [hLinkPositionY], 76
     call toc_01_1495
     call toc_01_093B
     ld   e, $0B
@@ -70,7 +70,7 @@ toc_18_4088:
     ld   e, a
     ld   a, [hLinkPositionY]
     push af
-    assign [hLinkPositionY], $10
+    assign [hLinkPositionY], 16
     ld   a, e
     call toc_01_2197
     pop  af
@@ -285,7 +285,7 @@ JumpTable_4553_18:
 JumpTable_4553_18.else_18_4565:
     ifLt [hLinkPositionX], 48, .else_18_457A
 
-    assign [hLinkPositionX], $2F
+    assign [hLinkPositionX], 47
     call toc_01_1495
     ld   a, $85
     call toc_01_2185
@@ -914,7 +914,7 @@ JumpTable_52D4_18:
 
     ld   a, $01
     call toc_18_59B8.toc_18_59BA
-    assign [hLinkDirection], $01
+    assign [hLinkDirection], DIRECTION_LEFT
     push bc
     call toc_01_087C
     pop  bc
@@ -1539,7 +1539,7 @@ JumpTable_60F1_18:
 
     ld   a, $3B
     call toc_01_218E
-    assign [hLinkDirection], $03
+    assign [hLinkDirection], DIRECTION_DOWN
     ld   a, [$C50F]
     ld   e, a
     ld   d, b
@@ -1577,7 +1577,7 @@ JumpTable_60F1_18.return_18_6122:
     db   $3D, $62, $52, $62
 
 JumpTable_61B1_18:
-    assign [$D368], $4D
+    assign [$D368], MUSIC_MARIN_BEACH_TRANSITION
     ld   [hDefaultMusicTrack], a
     ld   [$FFBD], a
     call JumpTable_3B8D_00

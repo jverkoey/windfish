@@ -714,7 +714,7 @@ JumpTable_4BA0_03:
     jr   JumpTable_4BA4_03.toc_03_4BA6
 
 JumpTable_4BA4_03:
-    ld   a, $40
+    ld   a, MUSIC_RICHARD_MANSION
 JumpTable_4BA4_03.toc_03_4BA6:
     ld   e, a
     ld   a, [$DB4E]
@@ -897,7 +897,7 @@ JumpTable_4C86_03:
 
     inc  a
     ld   [$C3C8], a
-    assign [hNextMusicTrackToFadeInto], $2F
+    assign [hNextMusicTrackToFadeInto], MUSIC_MARIN_SINGING
     ld   [hDefaultMusicTrack], a
     ld   [$FFBD], a
     call toc_01_27CA
@@ -913,7 +913,7 @@ JumpTable_4C86_03.else_03_4CA9:
     jr   nz, .else_03_4CC4
 
     ld   [$DB96], a
-    assign [wGameMode], $01
+    assign [wGameMode], GAMEMODE_CREDITS
     ret
 
 
@@ -986,7 +986,7 @@ JumpTable_4D09_03.JumpTable_4D13_03:
 
 
 JumpTable_4D14_03:
-    assign [gbIE], $03
+    assign [gbIE], IE_LCDC | IE_VBLANK
     ret
 
 
@@ -1830,7 +1830,7 @@ JumpTable_520D_03.else_03_5256:
     and  %00001111
     ld   e, a
     ld   a, [hSwordIntersectedAreaY]
-    and  %11110000
+    and  $F0
     or   e
     ld   e, a
     ld   d, $00
@@ -1899,7 +1899,7 @@ toc_03_52BE.else_03_52DF:
     jr   nz, .else_03_52EF
 
 toc_03_52BE.else_03_52EB:
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
 toc_03_52BE.else_03_52EF:
     ld   hl, $C3D0
     add  hl, bc
@@ -2832,8 +2832,8 @@ toc_03_5A62:
     ld   hl, $C310
     add  hl, bc
     ld   [hl], a
-    assign [hLinkAnimationState], $6C
-    assign [hLinkDirection], $03
+    assign [hLinkAnimationState], LINK_ANIMATION_STATE_GOT_ITEM
+    assign [hLinkDirection], DIRECTION_DOWN
     clear [$C137]
     ld   [$C16A], a
     ld   [$C122], a
@@ -2841,7 +2841,7 @@ toc_03_5A62:
     ld   hl, $C470
     add  hl, bc
     ld   [hl], a
-    assign [hLinkInteractiveMotionBlocked], $02
+    assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     ret
 
 
@@ -3015,7 +3015,7 @@ JumpTable_5BFD_03.else_03_5C0E:
     jr   nz, .else_03_5C24
 
     assign [$D368], $31
-    assign [hDefaultMusicTrack], $05
+    assign [hDefaultMusicTrack], MUSIC_OVERWORLD
     ld   [hNextDefaultMusicTrack], a
     call toc_01_0887
     ld   [hl], $52
@@ -3053,7 +3053,7 @@ JumpTable_5C46_03.return_03_5C55:
 
 JumpTable_5C56_03:
     call toc_03_5A62
-    assign [hLinkAnimationState], $6B
+    assign [hLinkAnimationState], LINK_ANIMATION_STATE_UNKNOWN_6B
     ld   hl, $C200
     add  hl, bc
     ld   a, [hLinkPositionX]
@@ -3140,7 +3140,7 @@ JumpTable_5C56_03.return_03_5C8D:
 
 JumpTable_5E20_03:
     call toc_01_3EA0
-    assign [$C167], $01
+    assign [$C167], LINK_ANIMATION_STATE_WALKING_DOWN
     call toc_01_0887
     jr   nz, toc_03_5E70
 
@@ -3846,7 +3846,7 @@ JumpTable_6421_03.toc_03_6425:
     ld   [$C111], a
     clear [$D47A]
     assign [$D368], $27
-    assign [$FFBD], $49
+    assign [$FFBD], MUSIC_ACTIVE_POWER_UP
     ld   [hNextDefaultMusicTrack], a
 JumpTable_6421_03.toc_03_6443:
     ld   e, $03
@@ -3891,7 +3891,7 @@ JumpTable_6472_03:
     call JumpTable_63B7_03.toc_03_63C6
     call toc_01_0891
     ld   [hl], $A0
-    assign [hNextDefaultMusicTrack], $FF
+    assign [hNextDefaultMusicTrack], MUSIC_SILENCE
     ret
 
 
@@ -4544,7 +4544,7 @@ toc_03_6C87.toc_03_6CF1:
     call JumpTable_3B8D_00
     ld   [hl], $05
     assign [$C146], $02
-    assign [hLinkPositionYIncrement], $F0
+    assign [hLinkPositionYIncrement], 240
     call toc_01_3DAF
     assign [$FFF3], $0E
     ret
@@ -4590,7 +4590,7 @@ toc_03_6C87.else_03_6D37:
 
 
 toc_03_6C87.else_03_6D54:
-    assign [hLinkPositionYIncrement], $F0
+    assign [hLinkPositionYIncrement], 240
     ret
 
 
@@ -4718,7 +4718,7 @@ toc_03_6E23:
     add  hl, de
     ld   a, [hl]
     ld   [hLinkPositionXIncrement], a
-    assign [hLinkPositionYIncrement], $F4
+    assign [hLinkPositionYIncrement], 244
     clear [$FF9C]
     scf
     ret
@@ -4829,7 +4829,7 @@ toc_03_6E3D.else_03_6EA3:
     cp   DIRECTION_UP
     ret  nz
 
-    assign [hLinkPositionYIncrement], $04
+    assign [hLinkPositionYIncrement], 4
     assign [$C13E], $08
     jp   JumpTable_3B8D_00
 
@@ -4941,7 +4941,7 @@ toc_03_6F82:
 
 toc_03_6F8A:
     ld   a, [hLinkDirection]
-    and  %00000010
+    and  DIRECTION_UP
     jr   nz, toc_03_6F96
 
     ld   hl, $C240
@@ -4971,7 +4971,7 @@ toc_03_6FA8:
     assign [$C13E], $0C
     ifNe [$FFEB], $82, .else_03_6FCE
 
-    ld   e, $10
+    ld   e, 16
 toc_03_6FA8.toc_03_6FBC:
     push de
     call toc_03_7EAB
@@ -4994,7 +4994,7 @@ toc_03_6FA8.else_03_6FCE:
     call toc_03_7569
     ld   hl, $FFE9
     ld   a, [hPressedButtonsMask]
-    and  %00001111
+    and  J_DOWN | J_LEFT | J_RIGHT | J_UP
     ld   a, $08
     or   [hl]
     jr   z, .else_03_6FE1
@@ -5533,7 +5533,7 @@ JumpTable_702D_03.else_03_7329:
 JumpTable_702D_03.else_03_7334:
     ld   a, [hLinkPositionY]
     push af
-    assign [hLinkPositionY], $10
+    assign [hLinkPositionY], 16
     ld   a, e
     call toc_01_2197
     pop  af
