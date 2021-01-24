@@ -7,7 +7,6 @@ import XCTest
 class InstructionEmulatorTests: XCTestCase {
   static var testedSpecs = Set<LR35902.Instruction.Spec>()
 
-  // 2 specs to go.
   static override func tearDown() {
     let ignoredSpecs = Set<LR35902.Instruction.Spec>([
       .invalid,
