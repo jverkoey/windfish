@@ -1,12 +1,12 @@
 ---
-title: Understanding source line context
-group: General guidance
-order: 2
+title: The context area
+group: UI walkthrough
+order: 1
 ---
 
 On the leading edge of each line of assembly in the Source pane is what's called the *context area*.
 
-![Breakpoint at $0100](understanding-source-line-context-1.png)
+![Breakpoint at $0100](context-area-1.png)
 
 This area includes five important pieces of information, in order from left to right:
 
