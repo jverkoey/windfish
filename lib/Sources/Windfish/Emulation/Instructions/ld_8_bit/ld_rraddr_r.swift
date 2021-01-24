@@ -12,12 +12,8 @@ extension LR35902.Emulation {
       self.src = src
     }
 
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Gameboy.SourceLocation) -> LR35902.Emulation.EmulationResult {
-      if cycle == 1 {
-        memory.write(cpu[src], to: cpu[dst])
-        return .continueExecution
-      }
-      return .fetchNext
+    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
+      memory.write(cpu[src], to: cpu[dst])
     }
 
     private let dst: LR35902.Instruction.Numeric

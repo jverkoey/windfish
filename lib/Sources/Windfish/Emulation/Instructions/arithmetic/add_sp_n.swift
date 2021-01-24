@@ -11,26 +11,16 @@ extension LR35902.Emulation {
       }
     }
 
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Gameboy.SourceLocation) -> LR35902.Emulation.EmulationResult {
-      if cycle == 1 {
-        immediate = Int8(bitPattern: memory.read(from: cpu.pc))
-        cpu.pc += 1
-        return .continueExecution
-      }
-      if cycle == 2 {
-        cpu.fzero = false
-        cpu.fsubtract = false
-        let wideImm = UInt16(bitPattern: Int16(truncatingIfNeeded: immediate))
-        cpu.fcarry = (cpu.sp & 0xff) &+ (wideImm & 0xff) > 0xff
-        cpu.fhalfcarry = (cpu.sp & 0xf) &+ (wideImm & 0xf) > 0xf
-        wz = cpu.sp &+ wideImm
-        return .continueExecution
-      }
-      if cycle == 3 {
-        cpu.sp = wz
-        return .continueExecution
-      }
-      return .fetchNext
+    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
+      immediate = Int8(bitPattern: memory.read(from: cpu.pc))
+      cpu.pc += 1
+      cpu.fzero = false
+      cpu.fsubtract = false
+      let wideImm = UInt16(bitPattern: Int16(truncatingIfNeeded: immediate))
+      cpu.fcarry = (cpu.sp & 0xff) &+ (wideImm & 0xff) > 0xff
+      cpu.fhalfcarry = (cpu.sp & 0xf) &+ (wideImm & 0xf) > 0xf
+      wz = cpu.sp &+ wideImm
+      cpu.sp = wz
     }
 
     private var immediate: Int8 = 0

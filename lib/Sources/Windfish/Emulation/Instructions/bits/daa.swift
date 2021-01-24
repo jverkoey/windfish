@@ -8,7 +8,7 @@ extension LR35902.Emulation {
       }
     }
 
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Gameboy.SourceLocation) -> LR35902.Emulation.EmulationResult {
+    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
       var result: UInt16 = UInt16(truncatingIfNeeded: cpu.a)
       if cpu.fsubtract {
         if cpu.fhalfcarry {
@@ -31,7 +31,6 @@ extension LR35902.Emulation {
       }
       cpu.a = UInt8(truncatingIfNeeded: result & 0xff)
       cpu.fzero = cpu.a == 0
-      return .fetchNext
     }
   }
 }

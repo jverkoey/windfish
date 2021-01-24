@@ -25,13 +25,8 @@ extension InstructionEmulatorTests {
         cpu.sp = 2
         let mutations = cpu.copy()
 
-        var cycle = 0
-        repeat {
-          cycle += 1
-        } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
+        emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
 
-        InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
-        XCTAssertEqual(cycle, 4, "Test case: \(name)")
         mutations.pc = testCase.result.pc[address]!
         mutations.sp = 0
         assertEqual(cpu, mutations, message: "Test case: \(name)")

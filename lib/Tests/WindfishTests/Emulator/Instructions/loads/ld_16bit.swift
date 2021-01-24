@@ -11,14 +11,8 @@ extension InstructionEmulatorTests {
       let cpu = LR35902.zeroed()
       cpu.sp = 0xabcd
       let mutations = cpu.copy()
+      emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
 
-      var cycle = 0
-      repeat {
-        cycle += 1
-      } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
-
-      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
-      XCTAssertEqual(cycle, 5)
       mutations.pc += 2
       assertEqual(cpu, mutations)
       XCTAssertEqual(memory.reads, [0, 1], "\(spec)")
@@ -37,14 +31,8 @@ extension InstructionEmulatorTests {
 
       let cpu = LR35902.zeroed()
       let mutations = cpu.copy()
+      emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
 
-      var cycle = 0
-      repeat {
-        cycle += 1
-      } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
-
-      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
-      XCTAssertEqual(cycle, 3)
       mutations.pc += 2
       mutations[dst] = 0x1212 as UInt16
       assertEqual(cpu, mutations)
@@ -61,15 +49,10 @@ extension InstructionEmulatorTests {
       cpu.hl = 0x1234
       let mutations = cpu.copy()
       mutations.sp = 0x1234
+      emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
 
-      var cycle = 0
-      repeat {
-        cycle += 1
-      } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
-
-      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
-      XCTAssertEqual(cycle, 2)
       assertEqual(cpu, mutations)
     }
   }
 }
+

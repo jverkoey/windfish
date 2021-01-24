@@ -8,12 +8,11 @@ extension LR35902.Emulation {
       }
     }
 
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Gameboy.SourceLocation) -> LR35902.Emulation.EmulationResult {
+    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
       // cpu.fzero is not affected
       cpu.fsubtract = false
       cpu.fhalfcarry = false
       cpu.fcarry = !cpu.fcarry
-      return .fetchNext
     }
   }
 }

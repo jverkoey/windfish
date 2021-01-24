@@ -33,13 +33,8 @@ extension InstructionEmulatorTests {
         cpu.sp = testCase.sp
         let mutations = cpu.copy()
 
-        var cycle = 0
-        repeat {
-          cycle += 1
-        } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
+        emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
 
-        InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
-        XCTAssertEqual(cycle, 4, "Test case: \(name)")
         mutations.pc += 1
         mutations.sp = testCase.result.sp
         mutations.fcarry = testCase.result.fc

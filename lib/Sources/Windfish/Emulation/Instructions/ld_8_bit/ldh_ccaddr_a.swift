@@ -8,13 +8,9 @@ extension LR35902.Emulation {
       }
     }
 
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Gameboy.SourceLocation) -> LR35902.Emulation.EmulationResult {
-      if cycle == 1 {
-        let address = UInt16(0xFF00) | UInt16(truncatingIfNeeded: cpu.c)
-        memory.write(cpu.a, to: address)
-        return .continueExecution
-      }
-      return .fetchNext
+    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
+      let address = UInt16(0xFF00) | UInt16(truncatingIfNeeded: cpu.c)
+      memory.write(cpu.a, to: address)
     }
   }
 }

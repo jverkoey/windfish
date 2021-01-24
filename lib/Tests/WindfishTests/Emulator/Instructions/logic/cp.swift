@@ -41,13 +41,8 @@ extension InstructionEmulatorTests {
         cpu.a = testCase.a
         let mutations = cpu.copy()
 
-        var cycle = 0
-        repeat {
-          cycle += 1
-        } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
+        emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
 
-        InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
-        XCTAssertEqual(cycle, 1, "Test case: \(name) \(spec)")
         mutations.fsubtract = true
         mutations.fhalfcarry = testCase.result.fh
         mutations.fcarry = testCase.result.fc
@@ -71,13 +66,8 @@ extension InstructionEmulatorTests {
         cpu.a = testCase.a
         let mutations = cpu.copy()
 
-        var cycle = 0
-        repeat {
-          cycle += 1
-        } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
+        emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
 
-        InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
-        XCTAssertEqual(cycle, 2, "Test case: \(name) \(spec)")
         mutations.fsubtract = true
         mutations.fhalfcarry = testCase.result.fh
         mutations.fcarry = testCase.result.fc
@@ -101,13 +91,8 @@ extension InstructionEmulatorTests {
         cpu.a = testCase.a
         let mutations = cpu.copy()
 
-        var cycle = 0
-        repeat {
-          cycle += 1
-        } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
+        emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
 
-        InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
-        XCTAssertEqual(cycle, 2, "Test case: \(name) \(spec)")
         mutations.pc += 1
         mutations.fsubtract = true
         mutations.fhalfcarry = testCase.result.fh
@@ -133,13 +118,8 @@ extension InstructionEmulatorTests {
         cpu[register] = testCase.value
         let mutations = cpu.copy()
 
-        var cycle = 0
-        repeat {
-          cycle += 1
-        } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
+        emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
 
-        InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
-        XCTAssertEqual(cycle, 1, "Test case: \(name) \(spec)")
         mutations.fsubtract = true
         mutations.fhalfcarry = testCase.result.fh
         mutations.fcarry = testCase.result.fc

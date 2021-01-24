@@ -31,13 +31,8 @@ extension InstructionEmulatorTests {
         cpu[register] = testCase.value
         let mutations = cpu.copy()
 
-        var cycle = 0
-        repeat {
-          cycle += 1
-        } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
+        emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
 
-        InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
-        XCTAssertEqual(cycle, 1, "Test case: \(name)")
         mutations.fsubtract = false
         mutations.fzero = testCase.result.fz
         mutations.fhalfcarry = testCase.result.fh
@@ -57,13 +52,8 @@ extension InstructionEmulatorTests {
         cpu.fsubtract = true
         let mutations = cpu.copy()
 
-        var cycle = 0
-        repeat {
-          cycle += 1
-        } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
+        emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
 
-        InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
-        XCTAssertEqual(cycle, 3, "Test case: \(name)")
         mutations.fsubtract = false
         mutations.fzero = testCase.result.fz
         mutations.fhalfcarry = testCase.result.fh

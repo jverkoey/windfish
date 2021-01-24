@@ -36,13 +36,8 @@ extension InstructionEmulatorTests {
         mutations.fhalfcarry = testCase.result.fh
         mutations.pc += 1
 
-        var cycle = 0
-        repeat {
-          cycle += 1
-        } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
+        emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
 
-        InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
-        XCTAssertEqual(cycle, 3, name)
         assertEqual(cpu, mutations, message: name)
       }
     }

@@ -5,7 +5,7 @@ protocol InstructionEmulatorInitializable: class {
 }
 
 protocol InstructionEmulator: class {
-  func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Gameboy.SourceLocation) -> LR35902.Emulation.EmulationResult
+  func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation)
 }
 
 extension LR35902 {
@@ -13,13 +13,13 @@ extension LR35902 {
 }
 
 extension InstructionEmulator {
-  func checkConditional(cnd: LR35902.Instruction.Condition?, cpu: LR35902) -> LR35902.Emulation.EmulationResult {
+  func passesCondition(cnd: LR35902.Instruction.Condition?, cpu: LR35902) -> Bool {
     switch cnd {
-    case .none:      return .continueExecution
-    case .some(.c):  return  cpu.fcarry ? .continueExecution : .fetchNext
-    case .some(.nc): return !cpu.fcarry ? .continueExecution : .fetchNext
-    case .some(.z):  return  cpu.fzero ? .continueExecution : .fetchNext
-    case .some(.nz): return !cpu.fzero ? .continueExecution : .fetchNext
+    case .none:      return true
+    case .some(.c):  return  cpu.fcarry
+    case .some(.nc): return !cpu.fcarry
+    case .some(.z):  return  cpu.fzero
+    case .some(.nz): return !cpu.fzero
     }
   }
 
@@ -145,7 +145,6 @@ extension InstructionEmulator {
     cpu.fcarry = carry
     value = result
   }
-
 }
 
 extension LR35902.Emulation {
@@ -288,7 +287,7 @@ extension LR35902.Emulation {
       self.spec = spec
     }
 
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Gameboy.SourceLocation) -> LR35902.Emulation.EmulationResult {
+    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
       fatalError("Not yet implemented: \(spec)")
     }
 

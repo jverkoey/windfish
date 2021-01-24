@@ -13,14 +13,8 @@ extension InstructionEmulatorTests {
       let mutations = cpu.copy()
       mutations.sp = 0xfffe
       mutations[register] = 0x1212 as UInt16
+emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
 
-      var cycle = 0
-      repeat {
-        cycle += 1
-      } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
-
-      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
-      XCTAssertEqual(cycle, 3)
       assertEqual(cpu, mutations, message: "\(spec)")
       XCTAssertEqual(memory.reads, [0xfffc, 0xfffd], "\(spec)")
       XCTAssertEqual(memory.writes, [], "\(spec)")

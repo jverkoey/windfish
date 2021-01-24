@@ -8,24 +8,14 @@ extension LR35902.Emulation {
       }
     }
 
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Gameboy.SourceLocation) -> LR35902.Emulation.EmulationResult {
-      if cycle == 1 {
-        immediate = UInt16(truncatingIfNeeded: memory.read(from: cpu.pc))
-        cpu.pc += 1
-        return .continueExecution
-      }
-      if cycle == 2 {
-        immediate |= UInt16(truncatingIfNeeded: memory.read(from: cpu.pc)) << 8
-        cpu.pc += 1
-        return .continueExecution
-      }
-      if cycle == 3 {
-        value = memory.read(from: immediate)
-        return .continueExecution
-      }
+    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
+      immediate = UInt16(truncatingIfNeeded: memory.read(from: cpu.pc))
+      cpu.pc += 1
+      immediate |= UInt16(truncatingIfNeeded: memory.read(from: cpu.pc)) << 8
+      cpu.pc += 1
+      value = memory.read(from: immediate)
       cpu.a = value
       cpu.registerTraces[.a] = .init(sourceLocation: sourceLocation, loadAddress: immediate)
-      return .fetchNext
     }
 
     private var immediate: UInt16 = 0

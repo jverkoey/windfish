@@ -9,32 +9,18 @@ extension LR35902.Emulation {
       self.cnd = cnd
     }
 
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Gameboy.SourceLocation) -> LR35902.Emulation.EmulationResult {
-      if cycle == 1 {
-        immediate = UInt16(truncatingIfNeeded: memory.read(from: cpu.pc))
-        cpu.pc += 1
-        return .continueExecution
-      }
-      if cycle == 2 {
-        immediate |= UInt16(truncatingIfNeeded: memory.read(from: cpu.pc)) << 8
-        cpu.pc += 1
-        return .continueExecution
-      }
-      if cycle == 3 {
-        return checkConditional(cnd: cnd, cpu: cpu)
-      }
-      if cycle == 4 {
+    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
+      immediate = UInt16(truncatingIfNeeded: memory.read(from: cpu.pc))
+      cpu.pc += 1
+      immediate |= UInt16(truncatingIfNeeded: memory.read(from: cpu.pc)) << 8
+      cpu.pc += 1
+      if passesCondition(cnd: cnd, cpu: cpu) {
         cpu.sp &-= 1
         memory.write(UInt8(truncatingIfNeeded: (cpu.pc & 0xFF00) >> 8), to: cpu.sp)
-        return .continueExecution
-      }
-      if cycle == 5 {
         cpu.sp &-= 1
         memory.write(UInt8(truncatingIfNeeded: cpu.pc & 0x00FF), to: cpu.sp)
-        return .continueExecution
+        cpu.pc = immediate
       }
-      cpu.pc = immediate
-      return .fetchNext
     }
 
     private let cnd: LR35902.Instruction.Condition?

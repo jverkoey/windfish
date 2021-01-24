@@ -10,20 +10,13 @@ extension LR35902.Emulation {
       self.dst = dst
     }
 
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Gameboy.SourceLocation) -> LR35902.Emulation.EmulationResult {
-      if cycle == 1 {
-        cpu.registerTraces[dst] = .init(sourceLocation: sourceLocation, loadAddress: cpu.sp)
-        value = UInt16(truncatingIfNeeded: memory.read(from: cpu.sp))
-        cpu.sp += 1
-        return .continueExecution
-      }
-      if cycle == 2 {
-        value |= UInt16(truncatingIfNeeded: memory.read(from: cpu.sp)) << 8
-        cpu.sp += 1
-        return .continueExecution
-      }
+    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
+      cpu.registerTraces[dst] = .init(sourceLocation: sourceLocation, loadAddress: cpu.sp)
+      value = UInt16(truncatingIfNeeded: memory.read(from: cpu.sp))
+      cpu.sp += 1
+      value |= UInt16(truncatingIfNeeded: memory.read(from: cpu.sp)) << 8
+      cpu.sp += 1
       cpu[dst] = value
-      return .fetchNext
     }
 
     private let dst: LR35902.Instruction.Numeric

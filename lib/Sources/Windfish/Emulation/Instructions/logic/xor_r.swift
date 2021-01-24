@@ -10,13 +10,12 @@ extension LR35902.Emulation {
       self.register = register
     }
 
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Gameboy.SourceLocation) -> LR35902.Emulation.EmulationResult {
+    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
       cpu.a ^= cpu[register]
       cpu.fzero = cpu.a == 0
       cpu.fsubtract = false
       cpu.fcarry = false
       cpu.fhalfcarry = false
-      return .fetchNext
     }
 
     private let register: LR35902.Instruction.Numeric

@@ -8,7 +8,7 @@ extension LR35902.Emulation {
       }
     }
 
-    func advance(cpu: LR35902, memory: AddressableMemory, cycle: Int, sourceLocation: Gameboy.SourceLocation) -> LR35902.Emulation.EmulationResult {
+    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
       cpu.fzero = false
       cpu.fsubtract = false
       cpu.fhalfcarry = false
@@ -17,7 +17,6 @@ extension LR35902.Emulation {
       let result = (cpu.a &<< 1) | (carry ? 0x01 : 0)
       cpu.fcarry = carry
       cpu.a = result
-      return .fetchNext
     }
   }
 }

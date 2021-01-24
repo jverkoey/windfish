@@ -12,14 +12,8 @@ extension InstructionEmulatorTests {
 
       let mutations = cpu.copy()
       mutations.imeToggleDelay = 2
+emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
 
-      var cycle = 0
-      repeat {
-        cycle += 1
-      } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
-
-      InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
-      XCTAssertEqual(cycle, 1)
       assertEqual(cpu, mutations)
     }
   }

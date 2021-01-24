@@ -28,13 +28,8 @@ extension InstructionEmulatorTests {
         cpu.fsubtract = true
         let mutations = cpu.copy()
 
-        var cycle = 0
-        repeat {
-          cycle += 1
-        } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
+        emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
 
-        InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
-        XCTAssertEqual(cycle, 1, "Test case: \(name) \(bit)")
         mutations[register] = testCase.result.value[bit]!
         assertEqual(cpu, mutations, message: "Test case: \(name) \(bit)")
       }
@@ -53,13 +48,8 @@ extension InstructionEmulatorTests {
         cpu.fsubtract = true
         let mutations = cpu.copy()
 
-        var cycle = 0
-        repeat {
-          cycle += 1
-        } while emulator.advance(cpu: cpu, memory: memory, cycle: cycle, sourceLocation: .memory(0)) == .continueExecution
+        emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
 
-        InstructionEmulatorTests.timings[spec, default: Set()].insert(cycle)
-        XCTAssertEqual(cycle, 3, "Test case: \(name) \(bit)")
         XCTAssertEqual(memory.writes, [
           .init(byte: testCase.result.value[bit]!, address: 0)
         ])
