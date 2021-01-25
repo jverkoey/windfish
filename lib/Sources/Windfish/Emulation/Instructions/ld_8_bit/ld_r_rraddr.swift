@@ -12,15 +12,18 @@ extension LR35902.Emulation {
       self.src = src
     }
 
-    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
-      let address = cpu[src] as UInt16
-      value = memory.read(from: address)
-      cpu.registerTraces[dst] = .init(sourceLocation: sourceLocation, loadAddress: address)
-      cpu[dst] = value
+    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
+      guard let address: UInt16 = cpu[src] else {
+        cpu.registerTraces[dst] = []
+        cpu.set(numeric8: dst, to: nil)
+        return
+      }
+      cpu.registerTraces[dst] = [.loadFromAddress(address)]
+
+      cpu[dst] = memory.read(from: address)
     }
 
     private let dst: LR35902.Instruction.Numeric
     private let src: LR35902.Instruction.Numeric
-    private var value: UInt8 = 0
   }
 }

@@ -770,7 +770,7 @@ toc_1B_4481.toc_1B_44A3:
     inc  l
     inc  l
     ld   a, [hl]
-    and  $F0
+    and  %11110000
     jr   nz, .else_1B_450C
 
     ld   a, d

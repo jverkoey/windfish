@@ -8,8 +8,10 @@ extension LR35902.Emulation {
       }
     }
 
-    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
-      cpu.ime = false
+    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
+      // No trace needed.
+
+      // Not traced.
     }
   }
 }

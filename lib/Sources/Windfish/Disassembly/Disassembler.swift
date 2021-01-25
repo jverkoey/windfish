@@ -223,7 +223,7 @@ public final class Disassembler {
     }
   }
 
-  private static func disassembleInstructionSpec(at pc: inout LR35902.Address, memory: AddressableMemory) -> LR35902.Instruction.Spec {
+  private static func disassembleInstructionSpec(at pc: inout LR35902.Address, memory: DisassemblerMemory) -> LR35902.Instruction.Spec {
     // Fetch
     let instructionByte = memory.read(from: pc)
     pc += 1
@@ -241,7 +241,7 @@ public final class Disassembler {
     return spec
   }
 
-  private static func disassembleInstruction(at address: inout LR35902.Address, memory: AddressableMemory) -> LR35902.Instruction {
+  private static func disassembleInstruction(at address: inout LR35902.Address, memory: DisassemblerMemory) -> LR35902.Instruction {
     let spec = disassembleInstructionSpec(at: &address, memory: memory)
 
     guard let instructionWidth = LR35902.InstructionSet.widths[spec] else {

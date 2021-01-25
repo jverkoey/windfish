@@ -1377,7 +1377,7 @@ JumpTable_5829_19.else_19_583B:
     ld   hl, $C210
     add  hl, bc
     ld   a, [hl]
-    sub  a, $10
+    sub  a, 16
     ld   [hLinkPositionY], a
     assign [hLinkPositionYIncrement], 2
     assign [$C147], $01

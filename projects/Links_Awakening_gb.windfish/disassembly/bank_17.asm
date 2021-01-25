@@ -207,7 +207,7 @@ toc_17_46A6:
     ld   hl, $4696
     add  hl, de
     ld   a, [hl]
-    sub  a, $05
+    sub  a, 5
     ld   [gbSCY], a
     ld   [$FFE8], a
     ld   a, [$C17F]

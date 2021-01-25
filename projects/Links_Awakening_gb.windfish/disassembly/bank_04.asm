@@ -148,8 +148,8 @@ JumpTable_40AC_04.else_04_40E8:
     ld   a, [$FFEF]
     ld   hl, hLinkPositionY
     sub  a, [hl]
-    add  a, $02
-    cp   $04
+    add  a, 2
+    cp   4
     jr   nc, .else_04_4118
 
     ld   hl, $C2D0
@@ -697,7 +697,7 @@ JumpTable_4492_04:
     ld   hl, $C210
     add  hl, de
     ld   a, [hl]
-    sub  a, $20
+    sub  a, 32
     ld   [hLinkPositionY], a
     ld   a, $10
     call toc_01_3C25
@@ -712,8 +712,8 @@ JumpTable_4492_04:
     ld   hl, hLinkPositionY
     ld   a, [$FFEC]
     sub  a, [hl]
-    add  a, $03
-    cp   $06
+    add  a, 3
+    cp   6
     jr   nc, .else_04_44D5
 
     call toc_01_0891
@@ -1412,7 +1412,7 @@ JumpTable_4A78_04:
     and  a
     jr   z, .else_04_4A9F
 
-    cp   $01
+    cp   INTERACTIVE_MOTION_LOCKED_GRAB_SLASH
     jp   z, toc_04_4967
 
     ld   [hLinkInteractiveMotionBlocked], a
@@ -2826,7 +2826,7 @@ toc_04_5629:
     and  %00001111
     ld   e, a
     ld   a, [hSwordIntersectedAreaY]
-    and  $F0
+    and  %11110000
     or   e
     ld   e, a
     ld   d, $00
@@ -3908,7 +3908,7 @@ toc_04_67C1:
     and  %00001111
     ld   e, a
     ld   a, [hLinkPositionY]
-    sub  a, $08
+    sub  a, 8
     and  %11110000
     or   e
     ld   [$D416], a
@@ -4129,8 +4129,8 @@ toc_04_68D0.else_04_692C:
     ld   a, [$FFEC]
     ld   hl, hLinkPositionY
     sub  a, [hl]
-    add  a, $02
-    cp   $04
+    add  a, 2
+    cp   4
     jr   nc, .else_04_6955
 
     call toc_04_6D44
@@ -5662,7 +5662,7 @@ JumpTable_7786_04:
     ifNe [$C16B], $04, .return_04_77C6
 
     ld   a, [hLinkPositionY]
-    sub  a, $01
+    sub  a, 1
     ld   [hLinkPositionY], a
     cp   116
     jr   nz, .return_04_77C6
@@ -5769,7 +5769,7 @@ JumpTable_7830_04:
 
     ifLt [hLinkPositionY], 123, .else_04_7855
 
-    sub  a, $02
+    sub  a, 2
     ld   [hLinkPositionY], a
     ld   a, $2F
     jp   toc_01_2197

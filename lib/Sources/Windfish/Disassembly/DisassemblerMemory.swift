@@ -1,6 +1,6 @@
 import Foundation
 
-final class DisassemblerMemory: AddressableMemory {
+final class DisassemblerMemory {
   init(data: Data) {
     self.data = data
   }
@@ -9,14 +9,9 @@ final class DisassemblerMemory: AddressableMemory {
   var selectedBank: Cartridge.Bank = 0
 
   func read(from address: LR35902.Address) -> UInt8 {
-    let intAddress = Int(truncatingIfNeeded: address)
-    guard intAddress < data.count else {
-      return 0xff
-    }
-
     // Read-only memory (ROM) bank 00
     if address <= 0x3FFF {
-      return data[intAddress]
+      return data[Int(truncatingIfNeeded: address)]
     }
 
     // Read-only memory (ROM) bank 01-7F
@@ -25,14 +20,6 @@ final class DisassemblerMemory: AddressableMemory {
       return data[location.index]
     }
 
-    return 0xff
-  }
-
-  func write(_ byte: UInt8, to address: LR35902.Address) {
-    // Ignore writes.
-  }
-
-  func sourceLocation(from address: LR35902.Address) -> Gameboy.SourceLocation {
-    return .cartridge(Cartridge.Location(address: address, bank: selectedBank))
+    fatalError()
   }
 }

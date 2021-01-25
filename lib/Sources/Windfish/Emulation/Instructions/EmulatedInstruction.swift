@@ -5,7 +5,7 @@ protocol InstructionEmulatorInitializable: class {
 }
 
 protocol InstructionEmulator: class {
-  func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation)
+  func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation)
 }
 
 extension LR35902 {
@@ -13,137 +13,140 @@ extension LR35902 {
 }
 
 extension InstructionEmulator {
-  func passesCondition(cnd: LR35902.Instruction.Condition?, cpu: LR35902) -> Bool {
+  func read(address: LR35902.Address?, from memory: TraceableMemory) -> UInt8? {
+    guard let address: LR35902.Address = address else {
+      return nil
+    }
+    return memory.read(from: address)
+  }
+
+  func passesCondition(cnd: LR35902.Instruction.Condition?, cpu: LR35902) -> Bool? {
     switch cnd {
     case .none:      return true
+
     case .some(.c):  return  cpu.fcarry
-    case .some(.nc): return !cpu.fcarry
+    case .some(.nc):
+      guard let fcarry = cpu.fcarry else {
+        return nil
+      }
+      return !fcarry
+
     case .some(.z):  return  cpu.fzero
-    case .some(.nz): return !cpu.fzero
+    case .some(.nz):
+      guard let fzero = cpu.fzero else {
+        return nil
+      }
+      return !fzero
+    }
+  }
+}
+
+// MARK: - Additions
+
+extension InstructionEmulator {
+  /** Adds 8-bit value to cpu.a. */
+  func addConsideringCarry(cpu: LR35902, value: UInt8?) {
+    cpu.fsubtract = false
+    guard let fcarry = cpu.fcarry else {
+      cpu.a = nil
+      cpu.fzero = nil
+      cpu.fcarry = nil
+      cpu.fhalfcarry = nil
+      return
+    }
+    if fcarry {
+      add(cpu: cpu, value: value, carry: 1)
+    } else {
+      add(cpu: cpu, value: value, carry: 0)
     }
   }
 
   /** Adds 8-bit value to cpu.a. */
-  func add(cpu: LR35902, value: UInt8) {
+  func addNoCarry(cpu: LR35902, value: UInt8?) {
     cpu.fsubtract = false
-
-    let wideA = UInt16(truncatingIfNeeded: cpu.a)
-    let wideVal = UInt16(truncatingIfNeeded: value)
-
-    let halfResult: UInt16 = (wideA & 0xf) + (wideVal & 0xf)
-    let fullResult: UInt16 = wideA + wideVal
-
-    cpu.a = UInt8(truncatingIfNeeded: fullResult)
-    cpu.fzero = cpu.a == 0
-    cpu.fcarry = fullResult > 0xff
-    cpu.fhalfcarry = halfResult > 0xf
+    add(cpu: cpu, value: value, carry: 0)
   }
 
   /** Adds 8-bit value and a carry to cpu.a. */
-  func carryadd(cpu: LR35902, value: UInt8) {
+  private func addWithCarry(cpu: LR35902, value: UInt8?) {
     cpu.fsubtract = false
+    add(cpu: cpu, value: value, carry: 1)
+  }
 
-    let wideA = UInt16(truncatingIfNeeded: cpu.a)
+  private func add(cpu: LR35902, value: UInt8?, carry: UInt16) {
+    guard let a = cpu.a,
+          let value = value else {
+      cpu.a = nil
+      cpu.fzero = nil
+      cpu.fcarry = nil
+      cpu.fhalfcarry = nil
+      return
+    }
+    let wideA = UInt16(truncatingIfNeeded: a)
     let wideVal = UInt16(truncatingIfNeeded: value)
 
-    let halfResult: UInt16 = (wideA & 0xf) + (wideVal & 0xf) + 1
-    let fullResult: UInt16 = wideA + wideVal + 1
+    let halfResult: UInt16 = (wideA & 0xf) + (wideVal & 0xf) + carry
+    let fullResult: UInt16 = wideA + wideVal + carry
 
     cpu.a = UInt8(truncatingIfNeeded: fullResult)
     cpu.fzero = cpu.a == 0
     cpu.fcarry = fullResult > 0xff
     cpu.fhalfcarry = halfResult > 0xf
   }
+}
 
-  /** Adds 16-bit value to cpu.hl. */
-  func add(cpu: LR35902, value: UInt16) {
-    cpu.fsubtract = false
-    // Intentionally no modification of cpu.fzero
+// MARK: - Subtractions
 
-    let wideHL = UInt32(truncatingIfNeeded: cpu.hl)
-    let wideVal = UInt32(truncatingIfNeeded: value)
-
-    let halfResult: UInt32 = (wideHL & 0xfff) + (wideVal & 0xfff)
-    let fullResult: UInt32 = wideHL + wideVal
-
-    cpu.hl = UInt16(truncatingIfNeeded: fullResult)
-    cpu.fcarry = fullResult > 0xffff
-    cpu.fhalfcarry = halfResult > 0xfff
+extension InstructionEmulator {
+  /** Subtracts an 8-bit value from cpu.a. */
+  func subConsideringCarry(cpu: LR35902, value: UInt8?) {
+    cpu.fsubtract = true
+    guard let fcarry = cpu.fcarry else {
+      cpu.a = nil
+      cpu.fzero = nil
+      cpu.fcarry = nil
+      cpu.fhalfcarry = nil
+      return
+    }
+    if fcarry {
+      sub(cpu: cpu, value: value, carry: 1)
+    } else {
+      sub(cpu: cpu, value: value, carry: 0)
+    }
   }
 
-  /** Subtracts 8-bit value from cpu.a. */
-  func sub(cpu: LR35902, value: UInt8) {
+  /** Subtracts an 8-bit value from cpu.a. */
+  func subNoCarry(cpu: LR35902, value: UInt8?) {
     cpu.fsubtract = true
+    sub(cpu: cpu, value: value, carry: 0)
+  }
 
-    let wideA = UInt16(truncatingIfNeeded: cpu.a)
+  /** Subtracts an 8-bit value and a carry from cpu.a. */
+  private func subWithCarry(cpu: LR35902, value: UInt8?) {
+    cpu.fsubtract = true
+    sub(cpu: cpu, value: value, carry: 1)
+  }
+
+  private func sub(cpu: LR35902, value: UInt8?, carry: UInt16) {
+    guard let a = cpu.a,
+          let value = value else {
+      cpu.a = nil
+      cpu.fzero = nil
+      cpu.fcarry = nil
+      cpu.fhalfcarry = nil
+      return
+    }
+
+    let wideA = UInt16(truncatingIfNeeded: a)
     let wideVal = UInt16(truncatingIfNeeded: value)
 
-    let halfResult: UInt16 = (wideA & 0xf) &- (wideVal & 0xf)
-    let fullResult: UInt16 = wideA &- wideVal
+    let halfResult: UInt16 = (wideA & 0xf) &- (wideVal & 0xf) &- carry
+    let fullResult: UInt16 = wideA &- wideVal &- carry
 
     cpu.a = UInt8(truncatingIfNeeded: fullResult)
     cpu.fzero = cpu.a == 0
     cpu.fcarry = fullResult > 0xff
     cpu.fhalfcarry = halfResult > 0xf
-  }
-
-  /** Compares 8-bit value with cpu.a. */
-  func cp(cpu: LR35902, value: UInt8) {
-    cpu.fsubtract = true
-
-    let wideA = UInt16(truncatingIfNeeded: cpu.a)
-    let wideVal = UInt16(truncatingIfNeeded: value)
-
-    let halfResult: UInt16 = (wideA & 0xf) &- (wideVal & 0xf)
-    let fullResult: UInt16 = wideA &- wideVal
-
-    let result = UInt8(truncatingIfNeeded: fullResult)
-    cpu.fzero = result == 0
-    cpu.fcarry = fullResult > 0xff
-    cpu.fhalfcarry = halfResult > 0xf
-  }
-
-  /** Subtracts 8-bit value and a carry from cpu.a. */
-  func carrysub(cpu: LR35902, value: UInt8) {
-    cpu.fsubtract = true
-
-    let wideA = UInt16(truncatingIfNeeded: cpu.a)
-    let wideVal = UInt16(truncatingIfNeeded: value)
-
-    let halfResult: UInt16 = (wideA & 0xf) &- (wideVal & 0xf) &- 1
-    let fullResult: UInt16 = wideA &- wideVal &- 1
-
-    cpu.a = UInt8(truncatingIfNeeded: fullResult)
-    cpu.fzero = cpu.a == 0
-    cpu.fcarry = fullResult > 0xff
-    cpu.fhalfcarry = halfResult > 0xf
-  }
-
-  func bit(cpu: LR35902, bit: LR35902.Instruction.Bit, value: UInt8) {
-    cpu.fsubtract = false
-    cpu.fhalfcarry = true
-    cpu.fzero = (value & (UInt8(1) << bit.rawValue)) == 0
-  }
-
-  func sra(cpu: LR35902, value: inout UInt8) {
-    cpu.fsubtract = false
-    cpu.fhalfcarry = false
-    let carry = (value & 1) != 0
-    // msb does not change, so we use int8 to ensure the msb stays set
-    let result = UInt8(bitPattern: Int8(bitPattern: value) &>> 1)
-    value = result
-    cpu.fzero = result == 0
-    cpu.fcarry = carry
-  }
-
-  func rrc(cpu: LR35902, value: inout UInt8) {
-    cpu.fsubtract = false
-    cpu.fhalfcarry = false
-    let carry = (value & 0x01) != 0
-    let result = (value &>> 1) | (carry ? 0b1000_0000 : 0)
-    cpu.fzero = result == 0
-    cpu.fcarry = carry
-    value = result
   }
 }
 
@@ -288,7 +291,7 @@ extension LR35902.Emulation {
       self.spec = spec
     }
 
-    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
+    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
       fatalError("Not yet implemented: \(spec)")
     }
 

@@ -11,8 +11,13 @@ extension LR35902.Emulation {
       self.register = register
     }
 
-    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
-      cpu[register] = cpu[register] | (UInt8(1) << bit.rawValue)
+    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
+      // No trace needed.
+
+      guard let value: UInt8 = cpu[register] else {
+        return
+      }
+      cpu[register] = value | (UInt8(1) << bit.rawValue)
     }
 
     private let register: LR35902.Instruction.Numeric

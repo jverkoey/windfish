@@ -1259,7 +1259,7 @@ toc_14_5964:
     jr   nz, .return_14_599F
 
     ld   a, [hLinkPositionX]
-    sub  a, $11
+    sub  a, 17
     cp   126
     jr   c, .else_14_5989
 
@@ -1278,7 +1278,7 @@ toc_14_5964.else_14_5982:
 
 toc_14_5964.else_14_5989:
     ld   a, [hLinkPositionY]
-    sub  a, $16
+    sub  a, 22
     cp   94
     jr   c, .return_14_599F
 
@@ -1541,19 +1541,19 @@ toc_14_59DE.toc_14_5B0C:
     ld   [hl], $00
     assign [$FFAC], $01
     ld   a, [hSwordIntersectedAreaY]
-    and  $F0
+    and  %11110000
     add  a, $10
     ld   [$FFAE], a
     ld   a, [hSwordIntersectedAreaX]
-    and  $F0
+    and  %11110000
     add  a, $08
     ld   [$FFAD], a
     ld   a, [hSwordIntersectedAreaX]
     swap a
-    and  $0F
+    and  %00001111
     ld   e, a
     ld   a, [hSwordIntersectedAreaY]
-    and  $F0
+    and  %11110000
     or   e
     ld   [$D416], a
     assign [$FFF2], $02

@@ -9,12 +9,18 @@ extension LR35902.Emulation {
       self.address = address
     }
 
-    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
-      cpu.sp &-= 1
-      memory.write(UInt8(truncatingIfNeeded: (cpu.pc & 0xFF00) >> 8), to: cpu.sp)
-      cpu.sp &-= 1
-      memory.write(UInt8(truncatingIfNeeded: cpu.pc & 0x00FF), to: cpu.sp)
-      cpu.pc = LR35902.Address(address.rawValue)
+    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
+      // No trace needed.
+
+      guard var sp = cpu.sp else {
+        return
+      }
+      sp &-= 1
+      memory.write(UInt8(truncatingIfNeeded: (cpu.pc & 0xFF00) >> 8), to: sp)
+      sp &-= 1
+      memory.write(UInt8(truncatingIfNeeded: cpu.pc & 0x00FF), to: sp)
+      cpu.sp = sp
+      cpu.pc = LR35902.Address(truncatingIfNeeded: address.rawValue)
     }
 
     private let address: LR35902.Instruction.RestartAddress

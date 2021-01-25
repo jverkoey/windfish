@@ -36,7 +36,7 @@ JumpTable_4041_01:
 
 JumpTable_404D_01:
     assign [$D6FF], $0D
-    assign [$DB9A], 255
+    assign [$DB9A], $FF
     clear [hBaseScrollX]
     ld   [hBaseScrollY], a
     ld   [$C16B], a
@@ -228,7 +228,7 @@ JumpTable_4249_01:
 JumpTable_4253_01:
     assign [$DB97], $E4
     assign [$D6FF], $0A
-    assign [$DB9A], 255
+    assign [$DB9A], $FF
     clear [hBaseScrollX]
     ld   [hBaseScrollY], a
     incAddr $FF9C
@@ -499,7 +499,7 @@ JumpTable_43B3_01.else_01_4430:
 
 
 JumpTable_4434_01:
-    assign [hWorldTileset], 15
+    assign [hWorldTileset], $0F
     call toc_01_09AA
     clear [hNeedsUpdatingBGTiles]
     ld   [hNeedsUpdatingEnemiesTiles], a
@@ -612,7 +612,7 @@ toc_01_44BC:
     copyFromTo [$AB66], [$DC04]
     call toc_01_27B5
     copyFromTo [$AB67], [$DC05]
-    assign [wGameMode], 2
+    assign [wGameMode], GAMEMODE_FILE_SELECT
     clear [$DB96]
     clear [hBaseScrollY]
     ld   [hBaseScrollX], a
@@ -1214,7 +1214,7 @@ toc_01_512A.else_01_51DD:
     assign [$DBA5], $01
     assign [$FFF7], $10
     assign [$DB9D], $50
-    assign [$DB9E], LINK_ANIMATION_STATE_JUMPING_3
+    assign [$DB9E], $60
     clear [hLinkAnimationState]
     assign [hLinkDirection], DIRECTION_DOWN
     assign [$DB6F], $16

@@ -83,6 +83,26 @@ extension LR35902.Instruction {
 
     case zeroimm8  // Used solely as a placeholder for stop's extra null byte
 
+    var lowRegister: Numeric? {
+      switch self {
+      case .af: return nil
+      case .bc: return .c
+      case .de: return .e
+      case .hl: return .l
+      default: return nil
+      }
+    }
+
+    var highRegister: Numeric? {
+      switch self {
+      case .af: return .a
+      case .bc: return .b
+      case .de: return .d
+      case .hl: return .h
+      default: return nil
+      }
+    }
+
     public static let registers8: Set<LR35902.Instruction.Numeric> = Set([
       .a,
       .b, .c,

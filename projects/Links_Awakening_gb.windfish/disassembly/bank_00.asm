@@ -236,7 +236,7 @@ main.else_01_01FB:
 
 main.else_01_0209:
     ld   a, [$D6FD]
-    and  %01111111
+    and  LCDCF_BG_CHAR_8000 | LCDCF_BG_DISPLAY | LCDCF_BG_TILE_9C00 | LCDCF_OBJ_16_16 | LCDCF_OBJ_DISPLAY | LCDCF_TILEMAP_9C00 | LCDCF_WINDOW_ON
     ld   e, a
     ld   a, [gbLCDC]
     and  LCDCF_ON
@@ -462,7 +462,7 @@ main.else_01_03AA:
 main.else_01_03BD:
     changebank $1F
     call toc_1F_7F80
-    changebank 12
+    changebank $0C
     clear [hIsRenderingFrame]
     halt
 main.loop_01_03CE:
@@ -2501,7 +2501,7 @@ toc_01_11D1:
     ld   a, $EA
     jr   z, toc_01_11FE
 
-    ld   a, $E8
+    ld   a, 232
 toc_01_11FE:
     ld   [hLinkPositionYIncrement], a
     clear [hLinkPositionZLow]
@@ -2586,7 +2586,7 @@ toc_01_1283:
     ld   hl, $48B3
     add  hl, de
     ld   a, [hl]
-    cp   $0F
+    cp   DIRECTION_KEEP
     jr   z, .return_01_1295
 
     ld   [hLinkDirection], a
@@ -2632,7 +2632,7 @@ toc_01_12B6.toc_01_12D6:
     add  hl, de
     ld   a, [hLinkPositionX]
     add  a, [hl]
-    sub  a, $08
+    sub  a, 8
     and  %11110000
     ld   [hSwordIntersectedAreaX], a
     swap a
@@ -2641,7 +2641,7 @@ toc_01_12B6.toc_01_12D6:
     add  hl, de
     ld   a, [hLinkPositionY]
     add  a, [hl]
-    sub  a, $10
+    sub  a, 16
     and  %11110000
     ld   [hSwordIntersectedAreaY], a
     or   c
@@ -3075,7 +3075,7 @@ JumpTable_15B3_00.loop_01_15E2:
     call toc_04_79E3
     incAddr $DB6E
     incAddr $DB46
-    assign [$D47E], LINK_ANIMATION_STATE_WALKING_DOWN
+    assign [$D47E], $01
     clear [hLinkAnimationState]
 JumpTable_15B3_00.else_01_1606:
     copyFromTo [$FFF9], [$FFE4]
@@ -3096,7 +3096,7 @@ JumpTable_15B3_00.loop_01_1628:
     and  %00001111
     ld   e, a
     ld   a, [hLinkPositionY]
-    sub  a, $08
+    sub  a, 8
     and  %11110000
     or   e
     cp   [hl]
@@ -4167,7 +4167,7 @@ toc_01_1E7B:
     add  hl, de
     ld   a, [hLinkPositionX]
     add  a, [hl]
-    sub  a, $08
+    sub  a, 8
     and  %11110000
     ld   [hSwordIntersectedAreaX], a
     swap a
@@ -4176,7 +4176,7 @@ toc_01_1E7B:
     add  hl, de
     ld   a, [hLinkPositionY]
     add  a, [hl]
-    sub  a, $10
+    sub  a, 16
     and  %11110000
     ld   [hSwordIntersectedAreaY], a
     or   c
@@ -4315,10 +4315,10 @@ toc_01_1E7B.else_01_1F78:
 
     ld   a, [hSwordIntersectedAreaX]
     swap a
-    and  $0F
+    and  %00001111
     ld   e, a
     ld   a, [hSwordIntersectedAreaY]
-    and  $F0
+    and  %11110000
     or   e
     ld   [$D473], a
     jp   .else_01_1FFD
@@ -4553,7 +4553,7 @@ toc_01_210F:
     ld   a, [hLinkPositionZLow]
     push af
     swap a
-    and  $F0
+    and  %11110000
     ld   hl, $C149
     add  a, [hl]
     ld   [hl], a
@@ -4567,7 +4567,7 @@ toc_01_210F:
     ld   e, $F0
 toc_01_210F.else_01_2129:
     swap a
-    and  $0F
+    and  %00001111
     or   e
     rr   d
     adc  [hl]
@@ -5651,7 +5651,7 @@ toc_01_2839:
     ld   a, [hSwordIntersectedAreaY]
     ld   hl, hBaseScrollY
     add  a, [hl]
-    and  $F8
+    and  %11111000
     srl  a
     srl  a
     srl  a
@@ -5669,7 +5669,7 @@ toc_01_2839.loop_01_2851:
     ld   hl, hBaseScrollX
     add  a, [hl]
     pop  hl
-    and  $F8
+    and  %11111000
     srl  a
     srl  a
     srl  a
@@ -7223,13 +7223,13 @@ toc_01_32AA:
     dec  bc
     assign [$FFAC], $01
     ld   a, [bc]
-    and  IE_PIN1013TRANSITION | %11100000
-    add  a, IE_PIN1013TRANSITION
+    and  %11110000
+    add  a, $10
     ld   [$FFAE], a
     ld   a, [bc]
     swap a
-    and  IE_PIN1013TRANSITION | %11100000
-    add  a, IE_SERIALIO
+    and  %11110000
+    add  a, $08
     ld   [$FFAD], a
     inc  bc
     jp   toc_01_32FB
@@ -7339,9 +7339,9 @@ toc_01_332D:
 JumpTable_3338_00:
     dec  bc
     ld   a, [bc]
-    add  a, IE_PIN1013TRANSITION | IE_VBLANK
+    add  a, $11
     ld   e, a
-    and  IE_LCDC | IE_SERIALIO | IE_TIMEROVERFLOW | IE_VBLANK
+    and  %00001111
     jr   nz, .else_01_3345
 
     ld   a, e
@@ -7438,13 +7438,13 @@ toc_01_33A7:
     add  hl, de
     pop  de
     ld   a, [de]
-    cp   IE_VBLANK | %11100000
+    cp   $E1
     jr   z, toc_01_33BC
 
-    cp   IE_LCDC | %11100000
+    cp   $E2
     jr   z, toc_01_33BC
 
-    cp   IE_LCDC | IE_VBLANK | %11100000
+    cp   $E3
     jr   nz, toc_01_33D6
 
 toc_01_33BC:
@@ -7766,13 +7766,13 @@ toc_01_3627:
     ld   a, [bc]
     ld   [hl], a
     push af
-    and  IE_PIN1013TRANSITION | %11100000
+    and  %11110000
     ld   hl, $C1E0
     add  hl, de
     ld   [hl], a
     pop  af
     swap a
-    and  IE_PIN1013TRANSITION | %11100000
+    and  %11110000
     ld   hl, $C1D0
     add  hl, de
     ld   [hl], a
@@ -8486,8 +8486,8 @@ toc_01_3C3B.else_01_3C83:
     ldi  a, [hl]
     add  a, c
     ld   [de], a
-    and  IE_LCDC | IE_SERIALIO | IE_TIMEROVERFLOW | IE_VBLANK
-    cp   IE_LCDC | IE_SERIALIO | IE_TIMEROVERFLOW | IE_VBLANK
+    and  %00001111
+    cp   $0F
     jr   nz, .else_01_3CB5
 
     dec  de

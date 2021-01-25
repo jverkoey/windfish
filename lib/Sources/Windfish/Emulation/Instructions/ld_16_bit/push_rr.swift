@@ -10,11 +10,27 @@ extension LR35902.Emulation {
       self.src = src
     }
 
-    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
-      cpu.sp &-= 1
-      memory.write(UInt8(truncatingIfNeeded: ((cpu[src] as UInt16) & 0xFF00) >> 8), to: cpu.sp)
-      cpu.sp &-= 1
-      memory.write(UInt8(truncatingIfNeeded:(cpu[src] as UInt16) & 0x00FF), to: cpu.sp)
+    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
+      guard let sp = cpu.sp else {
+        return
+      }
+      cpu.registerTraces[src, default: []].append(.storeToAddress(sp &- 2))
+      if let lowRegister: LR35902.Instruction.Numeric = src.lowRegister {
+        cpu.registerTraces[lowRegister, default: []].append(.storeToAddress(sp &- 2))
+      }
+      if let highRegister: LR35902.Instruction.Numeric = src.highRegister {
+        cpu.registerTraces[highRegister, default: []].append(.storeToAddress(sp &- 1))
+      }
+
+      cpu.sp = sp &- 2
+
+      guard let imm16: UInt16 = cpu[src] else {
+        memory.write(nil, to: sp)
+        memory.write(nil, to: sp)
+        return
+      }
+      memory.write(UInt8(truncatingIfNeeded: (imm16 & 0xFF00) >> 8), to: sp &- 1)
+      memory.write(UInt8(truncatingIfNeeded: imm16 & 0x00FF), to: sp &- 2)
     }
 
     private let src: LR35902.Instruction.Numeric

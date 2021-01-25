@@ -2217,7 +2217,7 @@ toc_1F_7B17:
 toc_1F_7F80:
     ifNot [hMusicFadeOutTimer], .else_1F_7F9E
 
-    sub  a, $01
+    sub  a, 1
     ld   [hMusicFadeOutTimer], a
     and  %00000011
     jr   nz, .else_1F_7F9E
@@ -2234,7 +2234,7 @@ toc_1F_7F80.else_1F_7F95:
 toc_1F_7F80.else_1F_7F9E:
     ifNot [hMusicFadeInTimer], .else_1F_7FBE
 
-    sub  a, $01
+    sub  a, 1
     ld   [hMusicFadeInTimer], a
     and  %00000001
     jr   nz, .else_1F_7FBE
@@ -2251,10 +2251,10 @@ toc_1F_7F80.else_1F_7FB4:
 toc_1F_7F80.else_1F_7FBE:
     ld   hl, hVolumeRight
     ld   a, [gbAUDVOL]
-    and  $F8
+    and  %11111000
     or   [hl]
     inc  hl
-    and  $8F
+    and  %10001111
     or   [hl]
     ld   [gbAUDVOL], a
     ifNot [$FFF2], .else_1F_7FD7

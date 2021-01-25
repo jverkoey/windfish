@@ -7,9 +7,12 @@ class LoadAffectsRegisterTests: XCTestCase {
 ld   a, 1
 """)
     let cpu = LR35902.zeroed()
+    let mutated = cpu.copy()
     disassembly.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.cartridgeSize), bank: 1), cpu: cpu)
 
-    assertEqual(cpu, LR35902(a: 1, pc: 0x0002))
+    mutated.a = 1
+    mutated.pc = 0x0002
+    assertEqual(cpu, mutated)
   }
 
   func test_ld_b() throws {
@@ -17,9 +20,12 @@ ld   a, 1
 ld   b, 1
 """)
     let cpu = LR35902.zeroed()
+    let mutated = cpu.copy()
     disassembly.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.cartridgeSize), bank: 1), cpu: cpu)
 
-    assertEqual(cpu, LR35902(b: 1, pc: 0x0002))
+    mutated.b = 1
+    mutated.pc = 0x0002
+    assertEqual(cpu, mutated)
   }
 
   func test_ld_c() throws {
@@ -27,9 +33,12 @@ ld   b, 1
 ld   c, 1
 """)
     let cpu = LR35902.zeroed()
+    let mutated = cpu.copy()
     disassembly.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.cartridgeSize), bank: 1), cpu: cpu)
 
-    assertEqual(cpu, LR35902(c: 1, pc: 0x0002))
+    mutated.c = 1
+    mutated.pc = 0x0002
+    assertEqual(cpu, mutated)
   }
 
   func test_ld_d() throws {
@@ -37,9 +46,12 @@ ld   c, 1
 ld   d, 1
 """)
     let cpu = LR35902.zeroed()
+    let mutated = cpu.copy()
     disassembly.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.cartridgeSize), bank: 1), cpu: cpu)
 
-    assertEqual(cpu, LR35902(d: 1, pc: 0x0002))
+    mutated.d = 1
+    mutated.pc = 0x0002
+    assertEqual(cpu, mutated)
   }
 
   func test_ld_e() throws {
@@ -47,9 +59,12 @@ ld   d, 1
 ld   e, 1
 """)
     let cpu = LR35902.zeroed()
+    let mutated = cpu.copy()
     disassembly.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.cartridgeSize), bank: 1), cpu: cpu)
 
-    assertEqual(cpu, LR35902(e: 1, pc: 0x0002))
+    mutated.e = 1
+    mutated.pc = 0x0002
+    assertEqual(cpu, mutated)
   }
 
   func test_ld_h() throws {
@@ -57,9 +72,12 @@ ld   e, 1
 ld   h, 1
 """)
     let cpu = LR35902.zeroed()
+    let mutated = cpu.copy()
     disassembly.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.cartridgeSize), bank: 1), cpu: cpu)
 
-    assertEqual(cpu, LR35902(h: 1, pc: 0x0002))
+    mutated.h = 1
+    mutated.pc = 0x0002
+    assertEqual(cpu, mutated)
   }
 
   func test_ld_l() throws {
@@ -67,8 +85,11 @@ ld   h, 1
 ld   l, 1
 """)
     let cpu = LR35902.zeroed()
+    let mutated = cpu.copy()
     disassembly.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.cartridgeSize), bank: 1), cpu: cpu)
 
-    assertEqual(cpu, LR35902(l: 1, pc: 0x0002))
+    mutated.l = 1
+    mutated.pc = 0x0002
+    assertEqual(cpu, mutated)
   }
 }

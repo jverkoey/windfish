@@ -10,13 +10,22 @@ extension LR35902.Emulation {
       self.dst = dst
     }
 
-    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
-      immediate = UInt8(memory.read(from: cpu.pc))
-      cpu.pc += 1
-      memory.write(immediate, to: cpu[dst])
+    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
+      defer {
+        cpu.pc &+= 1
+      }
+      guard let address: UInt16 = cpu[dst] else {
+        return
+      }
+      // No trace; just storing a constant in memory.
+
+      guard let imm8: UInt8 = memory.read(from: cpu.pc) else {
+        memory.write(nil, to: address)
+        return
+      }
+      memory.write(imm8, to: address)
     }
 
     private let dst: LR35902.Instruction.Numeric
-    private var immediate: UInt8 = 0
   }
 }

@@ -122,13 +122,13 @@ JumpTable_40EC_06.else_06_40FC:
     call toc_01_2185
 JumpTable_40EC_06.else_06_40FF:
     ld   a, [hLinkPositionX]
-    sub  a, $78
+    sub  a, 120
     add  a, 2
     cp   4
     jr   nc, .return_06_412B
 
     ld   a, [hLinkPositionY]
-    sub  a, $20
+    sub  a, 32
     add  a, 5
     cp   10
     jr   nc, .return_06_412B
@@ -4452,7 +4452,7 @@ JumpTable_68E1_06:
     returnIfLt [hLinkPositionY], 68
 
     ld   a, [hLinkPositionX]
-    sub  a, $58
+    sub  a, 88
     add  a, 24
     cp   48
     ret  nc
@@ -4503,7 +4503,7 @@ JumpTable_68E1_06.else_06_6926:
 JumpTable_693C_06:
     call toc_06_65BE
     ld   a, e
-    xor  %00000001
+    xor  DIRECTION_LEFT
     ld   [hLinkDirection], a
     assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     assign [$C111], $05
@@ -5328,13 +5328,13 @@ JumpTable_7270_06:
     ld   a, c
     ld   [$D201], a
     ld   a, [hLinkPositionX]
-    sub  a, $50
+    sub  a, 80
     add  a, 8
     cp   16
     jr   nc, .return_06_7299
 
     ld   a, [hLinkPositionY]
-    sub  a, $58
+    sub  a, 88
     add  a, 8
     cp   16
     jr   nc, .return_06_7299
@@ -6659,7 +6659,7 @@ JumpTable_7E49_06.else_06_7E6A:
     rra
     rra
     and  %00000111
-    sub  a, $04
+    sub  a, 4
     ld   e, a
     ld   a, [hLinkPositionY]
     sub  a, e

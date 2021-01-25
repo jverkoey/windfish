@@ -8,12 +8,11 @@ extension LR35902.Emulation {
       }
     }
 
-    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
-      immediate = UInt8(memory.read(from: cpu.pc))
-      cpu.pc += 1
-      sub(cpu: cpu, value: immediate)
-    }
+    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
+      cpu.registerTraces[.a, default: []].append(.mutationWithImmediateAtSourceLocation(sourceLocation))
 
-    private var immediate: UInt8 = 0
+      subNoCarry(cpu: cpu, value: memory.read(from: cpu.pc))
+      cpu.pc &+= 1
+    }
   }
 }

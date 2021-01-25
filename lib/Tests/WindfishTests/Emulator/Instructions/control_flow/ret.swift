@@ -48,14 +48,12 @@ extension InstructionEmulatorTests {
 
         let cpu = LR35902.zeroed()
         cpu.sp = testCase.sp
-        cpu.ime = false
         let mutations = cpu.copy()
 
         emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
 
         mutations.pc = 0x1212
         mutations.sp = testCase.result.sp
-        mutations.ime = true
         assertEqual(cpu, mutations, message: "Test case: \(name)")
         XCTAssertEqual(memory.reads, [testCase.result.spaddr.l, testCase.result.spaddr.h], "Test case: \(name)")
         XCTAssertEqual(memory.writes, [], "Test case: \(name)")

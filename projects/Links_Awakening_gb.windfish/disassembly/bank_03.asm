@@ -1388,7 +1388,7 @@ JumpTable_4F99_03.else_03_4FA3:
     call toc_03_5897.toc_03_5958
     pop  hl
     ld   a, [hl]
-    xor  IE_VBLANK
+    xor  %00000001
     ld   [hl], a
     ret
 
@@ -1830,7 +1830,7 @@ JumpTable_520D_03.else_03_5256:
     and  %00001111
     ld   e, a
     ld   a, [hSwordIntersectedAreaY]
-    and  $F0
+    and  %11110000
     or   e
     ld   e, a
     ld   d, $00
@@ -2826,7 +2826,7 @@ toc_03_5A62:
     ld   a, [hLinkPositionY]
     ld   hl, $C210
     add  hl, bc
-    sub  a, $0C
+    sub  a, 12
     ld   [hl], a
     ld   a, [hLinkPositionZHigh]
     ld   hl, $C310
@@ -3057,7 +3057,7 @@ JumpTable_5C56_03:
     ld   hl, $C200
     add  hl, bc
     ld   a, [hLinkPositionX]
-    sub  a, $04
+    sub  a, 4
     ld   [hl], a
     call toc_01_0891
     jr   nz, .else_03_5C7E
@@ -3140,7 +3140,7 @@ JumpTable_5C56_03.return_03_5C8D:
 
 JumpTable_5E20_03:
     call toc_01_3EA0
-    assign [$C167], LINK_ANIMATION_STATE_WALKING_DOWN
+    assign [$C167], $01
     call toc_01_0887
     jr   nz, toc_03_5E70
 
@@ -4529,7 +4529,7 @@ toc_03_6C87.else_03_6CE7:
 
 toc_03_6C87.else_03_6CE9:
     ld   a, [hLinkAnimationState]
-    sub  a, $4E
+    sub  a, LINK_ANIMATION_STATE_HOLD_SWIMMING_2
     cp   LINK_ANIMATION_STATE_UNKNOWN_02
     jr   c, .loop_03_6CE5
 
@@ -4564,7 +4564,7 @@ toc_03_6C87.else_03_6D15:
     jr   nz, .else_03_6D31
 
     ld   a, [hLinkPositionZLow]
-    xor  $80
+    xor  %10000000
     jr   .toc_03_6D33
 
 toc_03_6C87.else_03_6D31:
@@ -6719,7 +6719,7 @@ toc_03_7ACC.else_03_7C59:
     jr   nc, .else_03_7C99
 
     push de
-    sub  a, $DB
+    sub  a, 219
     ld   e, a
     ld   d, $00
     ld   hl, $7CA8

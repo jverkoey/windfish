@@ -234,8 +234,15 @@ extension RGBDSDisassembler {
   /** Returns an immediate 8 bit value represented as the inferred type at the context's execution location. */
   private static func typedOperand(for imm8: UInt8, with context: Context) -> String? {
     let location = Cartridge.Location(address: context.address, bank: context.bank)
+
     guard let type = context.disassembly.typeAtLocation[location],
           let dataType = context.disassembly.dataTypes[type] else {
+      if let instruction = context.disassembly.instruction(at: location),
+         instruction.spec == .and(.imm8) || instruction.spec == .xor(.imm8) || instruction.spec == .or(.imm8) {
+        // Default to treating bit arithmetic as a binary type.
+        return literal(for: imm8, using: .binary, with: context)
+      }
+
       return nil  // No known data type.
     }
 
@@ -260,10 +267,10 @@ extension RGBDSDisassembler {
       // Sort the named values for readability.
       var parts = bitmaskValues.sorted()
 
-      // If there are any remaining bits in the mask, binary or those as well.
+      // If there are any remaining bits in the mask, binary 'or' those as well.
       if namedValues != imm8 || parts.isEmpty {
         let remainingBits = imm8 & ~(namedValues)
-        parts.append(literal(for: remainingBits, using: dataType.representation))
+        parts.append(literal(for: remainingBits, using: dataType.representation, with: context))
       }
 
       return parts.joined(separator: " | ")
@@ -282,7 +289,7 @@ extension RGBDSDisassembler {
     }
 
     // Fall-through case represents the immediate as a literal numeric value.
-    return literal(for: imm8, using: dataType.representation)
+    return literal(for: imm8, using: dataType.representation, with: context)
   }
 }
 
@@ -320,14 +327,21 @@ extension RGBDSDisassembler {
   }
 
   /** Returns the immediate formatted with the given representation. */
-  private static func literal(for imm8: UInt8, using representation: Disassembler.Datatype.Representation) -> String {
-    switch representation {
-    case .binary:
-      return RGBDS.asBinaryString(imm8)
-    case .decimal:
-      return RGBDS.asDecimalString(imm8)
-    case .hexadecimal:
-      return RGBDS.asHexString(imm8)
+  private static func literal(for imm8: UInt8, using representation: Disassembler.Datatype.Representation, with context: Context) -> String {
+    let location = Cartridge.Location(address: context.address, bank: context.bank)
+    let forcedRepresentation: Disassembler.Datatype.Representation
+    if let instruction = context.disassembly.instruction(at: location),
+       instruction.spec == .and(.imm8) || instruction.spec == .xor(.imm8) || instruction.spec == .or(.imm8) {
+      // Always treat bit arithmetic as a bitmask, regardless of the type.
+      forcedRepresentation = .binary
+    } else {
+      forcedRepresentation = representation
+    }
+
+    switch forcedRepresentation {
+    case .binary:      return RGBDS.asBinaryString(imm8)
+    case .decimal:     return RGBDS.asDecimalString(imm8)
+    case .hexadecimal: return RGBDS.asHexString(imm8)
     }
   }
 }

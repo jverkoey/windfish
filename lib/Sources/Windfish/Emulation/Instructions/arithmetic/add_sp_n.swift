@@ -11,19 +11,28 @@ extension LR35902.Emulation {
       }
     }
 
-    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
-      immediate = Int8(bitPattern: memory.read(from: cpu.pc))
-      cpu.pc += 1
+    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
+      cpu.registerTraces[.sp, default: []].append(.mutationWithImmediateAtSourceLocation(sourceLocation))
+
       cpu.fzero = false
       cpu.fsubtract = false
-      let wideImm = UInt16(bitPattern: Int16(truncatingIfNeeded: immediate))
-      cpu.fcarry = (cpu.sp & 0xff) &+ (wideImm & 0xff) > 0xff
-      cpu.fhalfcarry = (cpu.sp & 0xf) &+ (wideImm & 0xf) > 0xf
-      wz = cpu.sp &+ wideImm
-      cpu.sp = wz
-    }
+      defer {
+        cpu.pc &+= 1
+      }
 
-    private var immediate: Int8 = 0
-    private var wz: UInt16 = 0
+      guard let imm8: UInt8 = memory.read(from: cpu.pc),
+            let sp = cpu.sp else {
+        cpu.fcarry = nil
+        cpu.fhalfcarry = nil
+        cpu.sp = nil
+        return
+      }
+
+      let simm8: Int8 = Int8(bitPattern: imm8)
+      let imm16 = UInt16(bitPattern: Int16(truncatingIfNeeded: simm8))
+      cpu.fcarry = (sp & 0xff) &+ (imm16 & 0xff) > 0xff
+      cpu.fhalfcarry = (sp & 0xf) &+ (imm16 & 0xf) > 0xf
+      cpu.sp = sp &+ imm16
+    }
   }
 }

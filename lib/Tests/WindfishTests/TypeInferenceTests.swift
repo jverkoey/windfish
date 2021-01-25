@@ -15,6 +15,131 @@ extension Disassembler.MacroNode: Equatable {
 }
 
 class TypeInferenceTests: XCTestCase {
+  func test_LinksAwakening_01_4219_ff9d_does_not_back_propagate_to_and_3f() throws {
+    let results = RGBDSAssembler.assemble(assembly: """
+    rra
+    rra
+    rra
+    and  $3f
+    ld   e, a
+    ld   d, $00
+    ld   hl, $4191
+    add  hl, de
+    ld   a, [hl]
+    ld   [$ff9d], a
+    ld   a, [$FFB7]
+""")
+    XCTAssertEqual(results.errors, [])
+
+    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+
+    let disassembly = Disassembler(data: data)
+
+    disassembly.createDatatype(named: "LINK_ANIMATION", bitmask: [
+      0x3f: "LINK_ANIMATION_STATE_WALKING_LIFTING_RIGHT",
+    ])
+    disassembly.registerGlobal(at: 0xff9d, named: "hLinkAnimationState", dataType: "LINK_ANIMATION")
+    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
+
+    let (source, _) = try! disassembly.generateSource()
+    let bank00Source = source.sources["bank_00.asm"]
+    if case let .bank(bank, content, _) = bank00Source {
+      XCTAssertEqual(bank, 0)
+
+      XCTAssertEqual(content, """
+SECTION "ROM Bank 00", ROM0[$00]
+
+    rra
+    rra
+    rra
+    and  $3F
+    ld   e, a
+    ld   d, $00
+    ld   hl, $4191
+    add  hl, de
+    ld   a, [hl]
+    ld   [hLinkAnimationState], a
+    ld   a, [$FFB7]
+""")
+    }
+  }
+
+  func test_LinksAwakening_00_0AB6() throws {
+    let results = RGBDSAssembler.assemble(assembly: """
+    ld   a, [$c19f]
+    ld   hl, $C167
+    or   [hl]
+    ld   hl, $C124
+    or   [hl]
+    jr   nz, $18
+
+    ld   a, [$FFCB]
+    cp   $F0
+    jr   nz, $12
+    xor  a
+    ld   [$C16B], a
+    ld   [$C16C], a
+    ld   [$c19f], a
+    ld   [$DB96], a
+    ld   a, $06
+    ld   [$95db], a
+    ld   a, [$95db]
+    rst  $00
+""")
+    XCTAssertEqual(results.errors, [])
+
+    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+
+    let disassembly = Disassembler(data: data)
+
+    disassembly.createDatatype(named: "binary", bitmask: [:], representation: .binary)
+    disassembly.createDatatype(named: "BUTTON", bitmask: [
+      0b00000001: "J_RIGHT",
+      0b00000010: "J_LEFT",
+      0b00000100: "J_UP",
+      0b00001000: "J_DOWN",
+      0b00010000: "J_A",
+      0b00100000: "J_B",
+      0b01000000: "J_SELECT",
+      0b10000000: "J_START",
+    ])
+    disassembly.registerGlobal(at: 0xffcb, named: "hPressedButtonsMask", dataType: "BUTTON")
+    disassembly.registerGlobal(at: 0xc19f, named: "wDialogState", dataType: "binary")
+    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
+
+    let (source, _) = try! disassembly.generateSource()
+    let bank00Source = source.sources["bank_00.asm"]
+    if case let .bank(bank, content, _) = bank00Source {
+      XCTAssertEqual(bank, 0)
+
+      XCTAssertEqual(content, """
+SECTION "ROM Bank 00", ROM0[$00]
+
+    ld   a, [wDialogState]
+    ld   hl, $C167
+    or   [hl]
+    ld   hl, $C124
+    or   [hl]
+    jr   nz, else_01_0025
+
+    ld   a, [hPressedButtonsMask]
+    cp   J_A | J_B | J_SELECT | J_START
+    jr   nz, else_01_0025
+
+    xor  a
+    ld   [$C16B], a
+    ld   [$C16C], a
+    ld   [wDialogState], a
+    ld   [$DB96], a
+    ld   a, $06
+    ld   [$95DB], a
+else_01_0025:
+    ld   a, [$95DB]
+    rst  $00
+""")
+    }
+  }
+
   func test_something() throws {
    let results = RGBDSAssembler.assemble(assembly: """
    ld   a, $44

@@ -9,10 +9,8 @@ extension InstructionEmulatorTests {
       let memory = TestMemory()
 
       let cpu = LR35902.zeroed()
-      cpu.ime = false
 
       let mutations = cpu.copy()
-      mutations.ime = false
       emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
 
       assertEqual(cpu, mutations)

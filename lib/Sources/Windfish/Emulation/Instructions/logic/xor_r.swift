@@ -10,12 +10,27 @@ extension LR35902.Emulation {
       self.register = register
     }
 
-    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
-      cpu.a ^= cpu[register]
-      cpu.fzero = cpu.a == 0
+    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
+      if register == .a {
+        // xor a, a effectively zeroes out the register. Treat this as a reset of the tracer list as well.
+        cpu.registerTraces[.a] = []
+      } else {
+        cpu.registerTraces[.a, default: []].append(contentsOf: cpu.registerTraces[register] ?? [])
+      }
+
       cpu.fsubtract = false
       cpu.fcarry = false
       cpu.fhalfcarry = false
+
+      guard let a: UInt8 = cpu.a,
+            let value: UInt8 = cpu[register] else {
+        cpu.a = nil
+        cpu.fzero = nil
+        return
+      }
+      let result = a ^ value
+      cpu.a = result
+      cpu.fzero = result == 0
     }
 
     private let register: LR35902.Instruction.Numeric

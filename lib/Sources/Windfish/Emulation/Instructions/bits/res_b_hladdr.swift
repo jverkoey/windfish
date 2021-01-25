@@ -9,13 +9,20 @@ extension LR35902.Emulation {
       self.bit = bit
     }
 
-    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
-      value = memory.read(from: cpu.hl)
+    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
+      // No trace needed.
+
+      guard let hl = cpu.hl else {
+        return
+      }
+      guard var value: UInt8 = memory.read(from: hl) else {
+        memory.write(nil, to: hl)
+        return
+      }
       value &= ~(UInt8(1) << bit.rawValue)
-      memory.write(value, to: cpu.hl)
+      memory.write(value, to: hl)
     }
 
     private let bit: LR35902.Instruction.Bit
-    private var value: UInt8 = 0
   }
 }

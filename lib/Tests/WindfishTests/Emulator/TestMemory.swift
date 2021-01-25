@@ -1,7 +1,7 @@
 import Foundation
 @testable import Windfish
 
-class TestMemory: AddressableMemory {
+class TestMemory: TraceableMemory {
   public let addressableRanges: [ClosedRange<LR35902.Address>] = [
     0x0000...0xFFFF
   ]
@@ -9,12 +9,12 @@ class TestMemory: AddressableMemory {
   init(defaultReadValue: UInt8 = 0x00) {
     self.defaultReadValue = defaultReadValue
   }
-  func read(from address: LR35902.Address) -> UInt8 {
+  func read(from address: LR35902.Address) -> UInt8? {
     reads.append(address)
     return storage[address] ?? defaultReadValue
   }
 
-  func write(_ byte: UInt8, to address: LR35902.Address) {
+  func write(_ byte: UInt8?, to address: LR35902.Address) {
     guard !ignoreWrites else {
       return
     }
@@ -29,7 +29,7 @@ class TestMemory: AddressableMemory {
   var defaultReadValue: UInt8 = 0x00
   var reads: [LR35902.Address] = []
   struct WriteOp: Equatable {
-    let byte: UInt8
+    let byte: UInt8?
     let address: LR35902.Address
   }
   var writes: [WriteOp] = []

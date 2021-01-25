@@ -125,13 +125,13 @@ toc_02_41BA:
     add  hl, de
     dec  [hl]
     ld   a, [hSwordIntersectedAreaX]
-    and  $F0
+    and  %11110000
     add  a, $08
     ld   hl, $C200
     add  hl, de
     ld   [hl], a
     ld   a, [hSwordIntersectedAreaY]
-    and  $F0
+    and  %11110000
     add  a, $10
     ld   hl, $C210
     add  hl, de
@@ -311,7 +311,7 @@ toc_02_426E.return_02_431E:
 
 
 toc_02_431F:
-    ifLt [$C15C], $02, .return_02_432C
+    ifLt [$C15C], LINK_ANIMATION_STATE_UNKNOWN_02, .return_02_432C
 
     ld   [hLinkAnimationState], a
     assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_GRAB_SLASH
@@ -434,7 +434,7 @@ toc_02_4353.else_02_43E0:
     ld   hl, $48B3
     add  hl, de
     ld   a, [hl]
-    cp   $0F
+    cp   DIRECTION_KEEP
     jr   z, .else_02_440A
 
     ld   e, a
@@ -587,7 +587,7 @@ toc_02_4497.else_02_44CD:
     bit  7, a
     jr   nz, .else_02_44E7
 
-    ld   e, $FF
+    ld   e, 255
 toc_02_4497.else_02_44E7:
     ld   a, [hLinkPositionXIncrement]
     add  a, e
@@ -611,7 +611,7 @@ toc_02_4497.else_02_44EC:
     bit  7, a
     jr   nz, .else_02_4508
 
-    ld   e, $FF
+    ld   e, 255
 toc_02_4497.else_02_4508:
     ld   a, [hLinkPositionYIncrement]
     add  a, e
@@ -619,7 +619,7 @@ toc_02_4497.else_02_4508:
 toc_02_4497.else_02_450D:
     ifNot [hLinkPositionZHigh], .else_02_4516
 
-    and  $80
+    and  %10000000
     jr   z, .return_02_4556
 
 toc_02_4497.else_02_4516:
@@ -810,7 +810,7 @@ toc_02_4738.else_02_474F:
     ld   a, [hLinkDirection]
     rla
     rla
-    and  $0C
+    and  %00001100
     ld   c, a
     ld   b, $00
     ifGte [$C152], $03, .else_02_478C
@@ -888,7 +888,7 @@ toc_02_4738.toc_02_47D4:
     ld   hl, $45E1
     add  hl, bc
     ld   a, [hl]
-    cp   $FF
+    cp   LINK_ANIMATION_STATE_NO_UPDATE
     jr   z, .else_02_47F7
 
     ld   [hLinkAnimationState], a
@@ -1134,7 +1134,7 @@ toc_02_49C5.else_02_4AA0:
     ld   a, [hLinkPositionY]
     ld   hl, $C210
     add  hl, de
-    sub  a, $08
+    sub  a, 8
     ld   [hl], a
     ld   a, [$C5A5]
     ld   c, a
@@ -1369,7 +1369,7 @@ toc_02_4C35:
     add  hl, de
     ld   a, [hLinkPositionX]
     add  a, [hl]
-    sub  a, $08
+    sub  a, 8
     and  %11110000
     ld   [hSwordIntersectedAreaX], a
     swap a
@@ -1378,7 +1378,7 @@ toc_02_4C35:
     add  hl, de
     ld   a, [hLinkPositionY]
     add  a, [hl]
-    sub  a, $10
+    sub  a, 16
     and  %11110000
     ld   [hSwordIntersectedAreaY], a
     or   c
@@ -3153,12 +3153,12 @@ JumpTable_5BDF_02.return_02_5C3C:
 
 toc_02_5C3D:
     ld   a, [hLinkPositionX]
-    sub  a, $11
+    sub  a, 17
     cp   126
     jr   nc, .return_02_5C64
 
     ld   a, [hLinkPositionY]
-    sub  a, $16
+    sub  a, 22
     cp   94
     jr   nc, .return_02_5C64
 
@@ -3180,13 +3180,13 @@ JumpTable_5C69_02:
     call toc_02_5B75
     assign [$FFD7], $88
     ld   a, [hLinkPositionY]
-    sub  a, $30
+    sub  a, 48
     add  a, 8
     cp   16
     jr   nc, .else_02_5C88
 
     ld   a, [hLinkPositionX]
-    sub  a, $88
+    sub  a, 136
     add  a, 16
     cp   32
     jr   nc, .else_02_5C88
@@ -3205,13 +3205,13 @@ JumpTable_5C69_02.toc_02_5C8A:
 
 toc_02_5C92:
     ld   a, [hLinkPositionY]
-    sub  a, $30
+    sub  a, 48
     add  a, 8
     cp   16
     jr   nc, .else_02_5CAA
 
     ld   a, [hLinkPositionX]
-    sub  a, $88
+    sub  a, 136
     add  a, 16
     cp   32
     jr   nc, .else_02_5CAA
@@ -3228,7 +3228,7 @@ toc_02_5C92.toc_02_5CAC:
     and  %00001111
     ld   e, a
     ld   a, [hSwordIntersectedAreaY]
-    and  $F0
+    and  %11110000
     or   e
     ld   e, a
     ld   d, $00
@@ -3289,7 +3289,7 @@ toc_02_5D00:
     and  %00001111
     ld   e, a
     ld   a, [hSwordIntersectedAreaY]
-    and  $F0
+    and  %11110000
     or   e
     ld   e, a
     ld   d, $00
@@ -5422,7 +5422,7 @@ JumpTable_6D3A_02:
     jr   nz, .else_02_6D5D
 
     ld   a, [hLinkPositionX]
-    sub  a, $46
+    sub  a, 70
     add  a, 4
     cp   8
     jr   nc, .else_02_6D5D
@@ -5488,7 +5488,7 @@ JumpTable_6D3A_02.else_02_6DAC:
     bit  7, a
     jr   nz, .else_02_6DC6
 
-    ld   e, $FF
+    ld   e, 255
 JumpTable_6D3A_02.else_02_6DC6:
     ld   a, [hLinkPositionXIncrement]
     add  a, e
@@ -5598,7 +5598,7 @@ JumpTable_6D3A_02.toc_02_6E6B:
 JumpTable_6D3A_02.else_02_6E6D:
     ld   hl, hLinkPositionYIncrement
     ld   a, [hl]
-    sub  a, $40
+    sub  a, 64
     and  %10000000
     jr   z, .return_02_6E8F
 
@@ -5740,7 +5740,7 @@ toc_02_6F6B:
     ld   hl, $6E95
     add  hl, bc
     ld   a, [hLinkPositionX]
-    sub  a, $08
+    sub  a, 8
     add  a, [hl]
     swap a
     and  %00001111
@@ -5749,7 +5749,7 @@ toc_02_6F6B:
     add  hl, bc
     ld   a, [hLinkPositionY]
     add  a, [hl]
-    sub  a, $10
+    sub  a, 16
     ld   [$FFE9], a
     and  %11110000
     or   e
@@ -6100,7 +6100,7 @@ toc_02_71E6.toc_02_71F2:
     assign [$C11C], $02
     clear [$FF9C]
     ld   a, [hLinkPositionY]
-    sub  a, $08
+    sub  a, 8
     ld   [hLinkPositionY], a
     jp   toc_01_093B.toc_01_0942
 
@@ -6175,7 +6175,7 @@ toc_02_726A:
     ld   hl, $7150
     add  hl, bc
     ld   a, [hLinkPositionX]
-    sub  a, $08
+    sub  a, 8
     add  a, [hl]
     ld   [$FFDB], a
     swap a
@@ -6185,7 +6185,7 @@ toc_02_726A:
     add  hl, bc
     ld   a, [hLinkPositionY]
     add  a, [hl]
-    sub  a, $10
+    sub  a, 16
     ld   [$FFDC], a
     and  %11110000
     or   e
@@ -6447,7 +6447,7 @@ toc_02_726A.toc_02_741D:
     ld   e, [hl]
     ld   a, [hLinkPositionX]
     sub  a, e
-    sub  a, $0C
+    sub  a, 12
     cp   8
     jp   nc, .else_02_75B1
 
@@ -6459,7 +6459,7 @@ toc_02_726A.else_02_7441:
     ld   e, [hl]
     ld   a, [hLinkPositionY]
     sub  a, e
-    sub  a, $14
+    sub  a, 20
     cp   8
     jp   nc, .else_02_75B1
 
@@ -6647,7 +6647,7 @@ toc_02_726A.toc_02_7577:
     cp   221
     jr   nc, .else_02_75B1
 
-    sub  a, $DB
+    sub  a, 219
     ld   e, a
     ld   d, $00
     ld   hl, $7B35
@@ -7000,7 +7000,7 @@ toc_02_77D2:
     swap a
     ld   e, a
     ld   a, [hLinkPositionY]
-    sub  a, $04
+    sub  a, 4
     and  %11110000
     ld   [$FFD8], a
     or   e
@@ -7197,7 +7197,7 @@ toc_02_77FA.else_02_790C:
     jr   nz, .return_02_797F
 
     ld   a, [hLinkPositionX]
-    sub  a, $08
+    sub  a, 8
     ld   hl, $FFD7
     sub  a, [hl]
     bit  7, a
@@ -7223,14 +7223,14 @@ toc_02_77FA.else_02_7947:
     add  a, [hl]
     ld   [hl], a
     ld   a, [hLinkPositionX]
-    sub  a, $08
+    sub  a, 8
     add  a, 2
     and  %00001111
     cp   4
     jr   nc, .return_02_797F
 
     ld   a, [hLinkPositionY]
-    sub  a, $10
+    sub  a, 16
     add  a, 2
     and  %00001111
     cp   4
@@ -7385,7 +7385,7 @@ toc_02_77FA.else_02_7A6C:
     cp   221
     jr   nc, .else_02_7AA3
 
-    sub  a, $DB
+    sub  a, 219
     ld   e, a
     ld   d, $00
     ld   hl, $7B35

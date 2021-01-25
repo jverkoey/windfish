@@ -15,7 +15,7 @@ extension InstructionEmulatorTests {
       let mutations = cpu.copy()
       emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
 
-      mutations[dst] = mutations[src] as UInt8
+      mutations[dst] = mutations[src] as UInt8?
       assertEqual(cpu, mutations)
     }
   }

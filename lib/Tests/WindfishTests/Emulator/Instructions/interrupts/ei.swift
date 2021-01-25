@@ -11,10 +11,10 @@ extension InstructionEmulatorTests {
       let cpu = LR35902.zeroed()
 
       let mutations = cpu.copy()
-      mutations.imeToggleDelay = 2
-emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
+      emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
 
       assertEqual(cpu, mutations)
     }
   }
 }
+

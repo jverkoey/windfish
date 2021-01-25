@@ -10,10 +10,18 @@ extension LR35902.Emulation {
       self.register = register
     }
 
-    func emulate(cpu: LR35902, memory: AddressableMemory, sourceLocation: Gameboy.SourceLocation) {
+    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
+      // No trace needed.
+
       cpu.fsubtract = true
+
+      guard let value: UInt8 = cpu[register] else {
+        cpu.fzero = nil
+        cpu.fhalfcarry = nil
+        return
+      }
       // fcarry not affected
-      let result = (cpu[register] as UInt8) &- 1
+      let result = value &- 1
       cpu[register] = result
       cpu.fzero = result == 0
       cpu.fhalfcarry = (result & 0xf) == 0xf
