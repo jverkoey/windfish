@@ -52,7 +52,7 @@ SECTION "ROM Bank 00", ROM0[$00]
     rra
     rra
     rra
-    and  $3F
+    and  %00111111
     ld   e, a
     ld   d, $00
     ld   hl, $4191

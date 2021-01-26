@@ -301,7 +301,7 @@ toc_01_0179.loop_01_0184:
     ldi  [hl], a
 toc_01_0179.loop_01_021B:
     ld   a, [$FF41]
-    and  $03
+    and  %00000011
     and  a
     jr   nz, .loop_01_021B
 
@@ -340,7 +340,7 @@ toc_01_0179.loop_01_021B:
     add  sp, $04
 toc_01_0179.loop_01_0246:
     ld   a, [$FF41]
-    and  $03
+    and  %00000011
     and  a
     jr   nz, .loop_01_0246
 
@@ -376,7 +376,7 @@ toc_01_0179.loop_01_0246:
     ldi  [hl], a
 toc_01_0179.loop_01_026B:
     ld   a, [$FF41]
-    and  $03
+    and  %00000011
     and  a
     jr   nz, .loop_01_026B
 
@@ -415,7 +415,7 @@ toc_01_0179.loop_01_026B:
     ldi  [hl], a
 toc_01_0179.loop_01_0296:
     ld   a, [$FF41]
-    and  $03
+    and  %00000011
     and  a
     jr   nz, .loop_01_0296
 
@@ -525,7 +525,7 @@ toc_01_02FD.loop_01_0307:
     jr   nz, .loop_01_0307
 
     ld   a, [$FF40]
-    and  $7F
+    and  %01111111
     ld   [$FF40], a
     ld   a, b
     ld   [$FFFF], a
@@ -667,7 +667,7 @@ toc_01_03AD:
     ld   a, [$FF00]
     ld   a, [$FF00]
     cpl
-    and  $0F
+    and  %00001111
     swap a
     ld   b, a
     ld   a, $10
@@ -683,7 +683,7 @@ toc_01_03AD:
     ld   a, [$FF00]
     ld   a, [$FF00]
     cpl
-    and  $0F
+    and  %00001111
     or   b
     ld   [$FFF8], a
     ld   a, $30
@@ -691,7 +691,7 @@ toc_01_03AD:
     ld   a, [$FFF8]
     ld   b, a
     ld   a, [$FFF9]
-    xor  $FF
+    xor  %11111111
     and  b
     ld   [$FFFA], a
     ld   a, [$FFF8]
@@ -715,7 +715,7 @@ toc_01_0407:
     halt
     nop
     ld   a, [$FFFA]
-    and  $09
+    and  %00001001
     jr   z, toc_01_0407
 
     ret
@@ -1019,11 +1019,11 @@ toc_01_06B1.else_01_0706:
 toc_01_0735:
     ld   a, [de]
     swap a
-    and  $0F
+    and  %00001111
     add  a, $E8
     ldi  [hl], a
     ld   a, [de]
-    and  $0F
+    and  %00001111
     add  a, $E8
     ldi  [hl], a
     inc  de
@@ -1245,7 +1245,7 @@ toc_01_0928.toc_01_09C0:
     cp   $10
     jr   z, .else_01_09D8
 
-    and  $03
+    and  %00000011
     jr   nz, .loop_01_095E
 
     push bc
@@ -1450,7 +1450,7 @@ toc_01_0B01:
 toc_01_0B07:
     inc  c
     ld   a, c
-    and  $03
+    and  %00000011
     jr   z, toc_01_0B15
 
     ld   a, [$FFA1]
@@ -1579,7 +1579,7 @@ toc_01_0B8A.toc_01_0BA0:
 toc_01_0B8A.else_01_0BB6:
     inc  c
     ld   a, c
-    and  $03
+    and  %00000011
     jr   z, .else_01_0BC4
 
     ld   a, [$FFA1]
@@ -1731,7 +1731,7 @@ toc_01_0C6C:
     ld   hl, $FFFA
     ld   a, [hl]
     swap a
-    and  $0F
+    and  %00001111
     and  a
     jr   nz, toc_01_0C9C
 
@@ -1791,11 +1791,11 @@ toc_01_0CDC:
     halt
     nop
     ld   a, [$FFFA]
-    and  $04
+    and  %00000100
     jr   nz, toc_01_0CF0
 
     ld   a, [$FFFA]
-    and  $09
+    and  %00001001
     jr   z, toc_01_0CDC
 
     call toc_01_031E.toc_01_0325
