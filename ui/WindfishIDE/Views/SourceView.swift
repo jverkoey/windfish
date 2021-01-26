@@ -93,6 +93,7 @@ final class SourceView: NSTextView {
       }
       let line: Disassembler.Line = bankLines[lineIndex]
       switch line.semantic {
+      case .transferOfControl(_, let labelName): fallthrough
       case .label(let labelName):
         guard let layoutManager: NSLayoutManager = layoutManager,
               let textContainer: NSTextContainer = textContainer  else {
@@ -132,6 +133,7 @@ extension SourceView: NSTextFieldDelegate {
     }
 
     switch editingLine.semantic {
+    case .transferOfControl(_, let labelName): fallthrough
     case .label(let labelName):
       guard labelName != textField.stringValue else {
         break

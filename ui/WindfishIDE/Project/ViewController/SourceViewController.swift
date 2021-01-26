@@ -331,12 +331,19 @@ extension SourceViewController: SourceViewDelegate {
       return
     }
     let location: Cartridge.Location = Cartridge.Location(address: lineAddress, bank: lineBank)
-    guard let region = project.configuration.regions.first(where: { (region: Region) -> Bool in
+    if let region = project.configuration.regions.first(where: { (region: Region) -> Bool in
       Cartridge.Location(address: region.address, bank: region.bank) == location
-    }) else {
-      return
+    }) {
+      region.name = name
+    } else {
+      project.configuration.regions.append(Region(
+        regionType: Region.Kind.label,
+        name: name,
+        bank: lineBank,
+        address: lineAddress,
+        length: 0
+      ))
     }
-    region.name = name
 
     // TODO: Add a fake label to the source view with the renamed label name until disassembly concludes.
 
