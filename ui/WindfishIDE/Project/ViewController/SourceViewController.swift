@@ -51,6 +51,7 @@ final class SourceViewController: NSViewController {
     self.sourceContainerView = sourceContainerView
 
     let sourceView = SourceView(frame: view.bounds)
+    sourceView.sourceViewDelegate = self
     sourceView.isEditable = false
     sourceView.allowsUndo = false
     sourceView.isSelectable = true
@@ -192,8 +193,10 @@ extension SourceViewController {
     if let bank = bank {
       let bankLines = project.disassemblyResults?.bankLines?[bank]
       sourceRulerView?.bankLines = bankLines
+      sourceView?.bankLines = bankLines
     } else {
       sourceRulerView?.bankLines = nil
+      sourceView?.bankLines = nil
     }
     sourceRulerView?.needsDisplay = true
 
@@ -318,5 +321,25 @@ extension SourceViewController: LineNumberViewDelegate {
 //      range = HFRange(location: UInt64(address), length: 1)
 //    }
 //    print(range)
+  }
+}
+
+extension SourceViewController: SourceViewDelegate {
+  func didRenameLabel(at line: Disassembler.Line, to name: String) {
+    guard let lineAddress: LR35902.Address = line.address,
+          let lineBank: Cartridge.Bank = line.bank else {
+      return
+    }
+    let location: Cartridge.Location = Cartridge.Location(address: lineAddress, bank: lineBank)
+    guard let region = project.configuration.regions.first(where: { (region: Region) -> Bool in
+      Cartridge.Location(address: region.address, bank: region.bank) == location
+    }) else {
+      return
+    }
+    region.name = name
+
+    // TODO: Add a fake label to the source view with the renamed label name until disassembly concludes.
+
+    NSApplication.shared.sendAction(#selector(ProjectDocument.disassemble(_:)), to: nil, from: self)
   }
 }
