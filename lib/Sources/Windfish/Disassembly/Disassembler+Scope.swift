@@ -2,8 +2,6 @@ import Foundation
 
 extension Disassembler {
   func rewriteScopes(_ run: Disassembler.Run) {
-    // Compute scope and rewrite function labels if we're a function.
-
     for runGroup: RunGroup in run.runGroups() {
       for run: Run in runGroup {
         propagateTypes(for: run)
@@ -25,7 +23,7 @@ extension Disassembler {
       }
       inferLoops(in: headlessContiguousScope, tocs: tocs)
       inferElses(in: headlessContiguousScope, tocs: tocs)
-      inferReturns(in: headlessContiguousScope)
+      inferReturns(in: headlessContiguousScope, tocs: tocs)
     }
   }
 
@@ -104,18 +102,22 @@ extension Disassembler {
     }
   }
 
-  private func inferReturns(in scope: Range<Cartridge.Location>) {
-    let labelLocations = self.labelLocations(in: scope)
-    let returnLabelAddresses = labelLocations.filter { instructionMap[$0]?.spec.category == .ret }
-    for cartLocation in returnLabelAddresses {
+  private func inferReturns(in scope: Range<Cartridge.Location>, tocs: [(destination: Cartridge.Location, tocs: Set<Cartridge.Location>)]) {
+    let returnLabelAddresses: [Cartridge.Location] = tocs.compactMap { (destination: Cartridge.Location, tocs: Set<Cartridge.Location>) -> Cartridge.Location? in
+      guard instructionMap[destination]?.spec.category == .ret else {
+        return nil
+      }
+      return destination
+    }
+    for cartLocation: Cartridge.Location in returnLabelAddresses {
       labelTypes[cartLocation] = .returnType
     }
   }
 
   private func inferLoops(in scope: Range<Cartridge.Location>, tocs: [(destination: Cartridge.Location, tocs: Set<Cartridge.Location>)]) {
     let backwardTocs: [(source: Cartridge.Location, destination: Cartridge.Location)] = tocs.reduce(into: [], { (accumulator, element) in
-      let tocsInThisScope = element.tocs.filter {
-        scope.contains($0) && element.destination < $0
+      let tocsInThisScope = element.tocs.filter { (location: Cartridge.Location) -> Bool in
+        scope.contains(location) && element.destination < location
           && (configuration.label(at: element.destination) != nil || labelTypes[element.destination] != nil)
       }
       for toc in tocsInThisScope {

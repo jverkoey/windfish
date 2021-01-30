@@ -43,18 +43,6 @@ extension Disassembler {
     return name
   }
 
-  /** Returns the locations of any labels within the given range. */
-  func labelLocations(in range: Range<Cartridge.Location>) -> [Cartridge.Location] {
-    // TODO: Explore faster ways to get label locations in a range.
-    // This is accounting for ~200ms (4.1s) of disassembly time.
-    return range.filter { (location: Cartridge.Location) -> Bool in
-      guard configuration.label(at: location) != nil || labelTypes[location] != nil else {
-        return false
-      }
-      return canShowLabel(at: location)
-    }
-  }
-
   /** Returns false if the location should not be able to show a label. */
   private func canShowLabel(at location: Cartridge.Location) -> Bool {
     guard location.address < 0x8000 else {
