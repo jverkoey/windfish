@@ -736,7 +736,7 @@ clean:
           var chunkPc = initialPc
           switch initialType {
           case .text:
-            let lineLength = lineLengthOfText(at: Cartridge.Location(address: initialPc, bank: initialBank)) ?? 36
+            let lineLength = configuration.lineLengthOfText(at: Cartridge.Location(address: initialPc, bank: initialBank)) ?? 36
             for chunk in accumulator.chunked(into: lineLength) {
               bankLines.append(textLine(for: chunk, characterMap: characterMap, address: chunkPc))
               chunkPc += LR35902.Address(chunk.count)

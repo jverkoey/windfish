@@ -54,47 +54,44 @@ extension ProjectDocument {
         disassembly.mutableConfiguration.registerGlobal(at: global.address, named: global.name, dataType: global.dataType)
       }
 
-      // Disassemble everything first
       for region in self.project.configuration.regions {
         let location = Cartridge.Location(address: region.address, bank: region.bank)
         switch region.regionType {
         case Region.Kind.region:
           disassembly.mutableConfiguration.registerPotentialCode(at: location..<(location + region.length), named: region.name)
+
         case Region.Kind.function:
           disassembly.mutableConfiguration.registerFunction(startingAt: location, named: region.name)
+
+        case Region.Kind.label:
+          disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
+
+        case Region.Kind.string:
+          disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
+          let startLocation = Cartridge.Location(address: region.address, bank: region.bank)
+          disassembly.mutableConfiguration.registerText(at: startLocation..<(startLocation + region.length), lineLength: nil)
+
+        case Region.Kind.image1bpp:
+          disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
+          let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
+          disassembly.registerData(at: startLocation..<(startLocation + region.length), format: .image1bpp)
+
+        case Region.Kind.image2bpp:
+          disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
+          let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
+          disassembly.registerData(at: startLocation..<(startLocation + region.length), format: .image2bpp)
+
+        case Region.Kind.data:
+          disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
+          let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
+          disassembly.registerData(at: startLocation..<(startLocation + region.length))
+
         default:
           break
         }
       }
 
       disassembly.disassemble()
-
-      // And then set any explicit regions
-      for region in self.project.configuration.regions {
-        let location = Cartridge.Location(address: region.address, bank: region.bank)
-        switch region.regionType {
-        case Region.Kind.label:
-          disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
-        case Region.Kind.string:
-          disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
-          let startLocation = Cartridge.Location(address: region.address, bank: region.bank)
-          disassembly.registerText(at: startLocation..<(startLocation + region.length), lineLength: nil)
-        case Region.Kind.image1bpp:
-          disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
-          let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
-          disassembly.registerData(at: startLocation..<(startLocation + region.length), format: .image1bpp)
-        case Region.Kind.image2bpp:
-          disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
-          let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
-          disassembly.registerData(at: startLocation..<(startLocation + region.length), format: .image2bpp)
-        case Region.Kind.data:
-          disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
-          let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
-          disassembly.registerData(at: startLocation..<(startLocation + region.length))
-        default:
-          break
-        }
-      }
 
       for macro in self.project.configuration.macros {
         disassembly.mutableConfiguration.registerMacro(named: macro.name, template: macro.source)

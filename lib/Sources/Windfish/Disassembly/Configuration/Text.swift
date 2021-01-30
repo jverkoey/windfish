@@ -1,6 +1,10 @@
 import Foundation
 
-extension Disassembler {
+extension Disassembler.Configuration {
+  func allPotentialText() -> Set<Range<Cartridge.Location>> {
+    return potentialText
+  }
+  
   /** Returns the maximum length of a line of text at the given location, if known. */
   func lineLengthOfText(at location: Cartridge.Location) -> Int? {
     return textLengths.first { (key: Range<Cartridge.Location>, value: Int) -> Bool in
@@ -13,6 +17,6 @@ extension Disassembler {
     if let lineLength: Int = lineLength {
       textLengths[range] = lineLength
     }
-    registerRegion(range: range, as: .text)
+    potentialText.insert(range)
   }
 }

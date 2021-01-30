@@ -14,6 +14,7 @@ extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {
 
 protocol DisassemblerContext: class {
   func allPotentialCode() -> Set<Range<Cartridge.Location>>
+  func allPotentialText() -> Set<Range<Cartridge.Location>>
 
   func preComment(at location: Cartridge.Location) -> String?
 
@@ -33,6 +34,8 @@ protocol DisassemblerContext: class {
   func macroTreeRoot() -> Disassembler.Configuration.MacroNode
 
   func label(at location: Cartridge.Location) -> String?
+
+  func lineLengthOfText(at location: Cartridge.Location) -> Int?
 }
 
 /// A class that owns and manages disassembly information for a given ROM.
@@ -41,6 +44,9 @@ public final class Disassembler {
   public final class Configuration: DisassemblerContext {
     /** Ranges of executable regions that should be disassembled. */
     var executableRegions = Set<Range<Cartridge.Location>>()
+
+    /** Ranges of cartridge locations that could represent text. */
+    var potentialText = Set<Range<Cartridge.Location>>()
 
     /** Comments that should be placed immediately before the given location. */
     var preComments: [Cartridge.Location: String] = [:]
@@ -68,6 +74,9 @@ public final class Disassembler {
      implementation.
      */
     let macroTree = MacroNode()
+
+    /** The maximum length of a line of text within a given range. */
+    var textLengths: [Range<Cartridge.Location>: Int] = [:]
   }
 
   public let mutableConfiguration = Configuration()
@@ -142,9 +151,6 @@ public final class Disassembler {
   /** All locations that represent text. */
   var text = IndexSet()
 
-  /** The maximum length of a line of text within a given range. */
-  var textLengths: [Range<Cartridge.Location>: Int] = [:]
-
   func effectiveBank(at pc: LR35902.Address, in bank: Cartridge.Bank) -> Cartridge.Bank {
     if pc < 0x4000 {
       return 1
@@ -166,8 +172,10 @@ public final class Disassembler {
       guard let self = self else {
         return
       }
-      self.registerText(at: Cartridge.Location(address: startAddress, bank: bank)..<Cartridge.Location(address: endAddress, bank: bank),
-                        lineLength: lineLength)
+      self.mutableConfiguration.registerText(
+        at: Cartridge.Location(address: startAddress, bank: bank)..<Cartridge.Location(address: endAddress, bank: bank),
+        lineLength: lineLength
+      )
     }
     let registerData: @convention(block) (Int, Int, Int) -> Void = { [weak self] bank, startAddress, endAddress in
       guard let self = self else {
@@ -252,6 +260,10 @@ public final class Disassembler {
         let location = Cartridge.Location(address: address, bank: 0x01)
         registerData(at: location)
       }
+    }
+
+    for range: Range<Cartridge.Location> in configuration.allPotentialText() {
+      registerRegion(range: range, as: .text)
     }
 
     for potentialCodeRegion in configuration.allPotentialCode().sorted(by: { (a: Range<Cartridge.Location>, b: Range<Cartridge.Location>) -> Bool in
