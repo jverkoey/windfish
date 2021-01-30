@@ -158,184 +158,196 @@ extension ProjectDocument {
       ]
       let operandAttributes: [NSAttributedString.Key : Any] = baseAttributes
 
-      let bankTextStorage: [Cartridge.Bank: NSAttributedString] = disassembledSource.sources.compactMapValues {
-        switch $0 {
-        case .bank(_, _, let lines):
-          return lines.reduce(into: NSMutableAttributedString()) { accumulator, line in
-            switch line.semantic {
-            case .newline: fallthrough
-            case .empty:
-              break // Do nothing.
-            case .macroComment: fallthrough
-            case .preComment:
-              accumulator.append(NSAttributedString(string: line.asString(detailedComments: false),
-                                                    attributes: commentAttributes))
-            case .label: fallthrough
-            case .transferOfControl:
-              accumulator.append(NSAttributedString(string: line.asString(detailedComments: false), attributes: [
-                .foregroundColor: labelColor,
-                .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
-              ]))
-            case .section: fallthrough
-            case .macroDefinition: fallthrough
-            case .macroTerminator:
-              accumulator.append(NSAttributedString(string: line.asString(detailedComments: false),
-                                                    attributes: baseAttributes))
-            case let .jumpTable(jumpLocation, index):
-              let assembly = RGBDS.Statement(opcode: "dw", operands: [jumpLocation])
-              accumulator.append(NSAttributedString(string: "    ", attributes: baseAttributes))
-              accumulator.append(assembly.attributedString(attributes: baseAttributes,
-                                                           opcodeAttributes: opcodeAttributes,
-                                                           operandAttributes: operandAttributes,
-                                                           regionLookup: regionLookup,
-                                                           scope: line.scope))
-              accumulator.append(NSAttributedString(string: " ; \(UInt8(truncatingIfNeeded: index).hexString)",
-                                                    attributes: commentAttributes))
-            case let .text(assembly): fallthrough
-            case let .data(assembly): fallthrough
-            case let .unknown(assembly): fallthrough
-            case let .global(assembly, _, _): fallthrough
-            case let .image1bpp(assembly): fallthrough
-            case let .image2bpp(assembly): fallthrough
-            case let .macroInstruction(_, assembly): fallthrough
-            case let .instruction(_, assembly):
-              accumulator.append(NSAttributedString(string: "    ", attributes: baseAttributes))
-              accumulator.append(assembly.attributedString(attributes: baseAttributes,
-                                                           opcodeAttributes: opcodeAttributes,
-                                                           operandAttributes: operandAttributes,
-                                                           regionLookup: regionLookup,
-                                                           scope: line.scope))
-            case let .macro(assembly):
-              accumulator.append(NSAttributedString(string: "    ", attributes: baseAttributes))
-              accumulator.append(assembly.attributedString(attributes: baseAttributes,
-                                                           opcodeAttributes: macroNameAttributes,
-                                                           operandAttributes: operandAttributes,
-                                                           regionLookup: regionLookup,
-                                                           scope: line.scope))
+      let bankSources: [Cartridge.Bank: (String, [Disassembler.Line])] = disassembledSource.sources.reduce(into: [:], {
+        (accumulator: inout [Cartridge.Bank: (String, [Disassembler.Line])],
+         element: (key: String, value: Disassembler.Source.FileDescription)) in
+        switch element.value {
+        case .bank(let bank, _, let lines):
+          accumulator[bank] = (element.key, lines)
+        default: break
+        }
+      })
 
-            case let .imagePlaceholder(format):
-              switch format {
-              case .oneBitPerPixel:
-                let data = line.data!
-                let scale: CGFloat = 4
-                let imageSize = NSSize(width: 48 * scale + 4 * scale, height: 8 * scale + 4 * scale)
-                let image = NSImage(size: imageSize)
-                image.lockFocusFlipped(true)
-                NSColor.textColor.set()
+      var bankTextStorage: [Cartridge.Bank: NSAttributedString] = [:]
+      let q = DispatchQueue(label: "sync queue")
+      DispatchQueue.concurrentPerform(iterations: Int(truncatingIfNeeded: disassembly.numberOfBanks)) { (index: Int) in
+        let bank: Cartridge.Bank = Cartridge.Bank(truncatingIfNeeded: index)
+        let lines: [Disassembler.Line] = bankSources[bank]!.1
 
-                var column: CGFloat = 0
-                var row: CGFloat = 0
-                let pixel = NSRect(x: 2 * scale, y: 2 * scale, width: scale, height: scale)
-                var alternator = false
-                for byte in data {
-                  if (byte & 0x80) != 0 {
-                    pixel.offsetBy(dx: column, dy: row).fill()
-                  }
-                  if (byte & 0x40) != 0 {
-                    pixel.offsetBy(dx: column + 1 * scale, dy: row).fill()
-                  }
-                  if (byte & 0x20) != 0 {
-                    pixel.offsetBy(dx: column + 2 * scale, dy: row).fill()
-                  }
-                  if (byte & 0x10) != 0 {
-                    pixel.offsetBy(dx: column + 3 * scale, dy: row).fill()
-                  }
-                  if (byte & 0x08) != 0 {
-                    pixel.offsetBy(dx: column, dy: row + 1 * scale).fill()
-                  }
-                  if (byte & 0x04) != 0 {
-                    pixel.offsetBy(dx: column + 1 * scale, dy: row + 1 * scale).fill()
-                  }
-                  if (byte & 0x02) != 0 {
-                    pixel.offsetBy(dx: column + 2 * scale, dy: row + 1 * scale).fill()
-                  }
-                  if (byte & 0x01) != 0 {
-                    pixel.offsetBy(dx: column + 3 * scale, dy: row + 1 * scale).fill()
-                  }
-                  if alternator {
-                    column += 4 * scale
-                    row -= 2 * scale
-                  } else {
-                    row += 2 * scale
-                  }
-                  alternator = !alternator
-                  if column >= (imageSize.width - 4 * scale) {
-                    column = 0
-                    row += 4 * scale
-                  }
+        let string: NSAttributedString = lines.reduce(into: NSMutableAttributedString()) { accumulator, line in
+          switch line.semantic {
+          case .newline: fallthrough
+          case .empty:
+            break // Do nothing.
+          case .macroComment: fallthrough
+          case .preComment:
+            accumulator.append(NSAttributedString(string: line.asString(detailedComments: false),
+                                                  attributes: commentAttributes))
+          case .label: fallthrough
+          case .transferOfControl:
+            accumulator.append(NSAttributedString(string: line.asString(detailedComments: false), attributes: [
+              .foregroundColor: labelColor,
+              .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
+            ]))
+          case .section: fallthrough
+          case .macroDefinition: fallthrough
+          case .macroTerminator:
+            accumulator.append(NSAttributedString(string: line.asString(detailedComments: false),
+                                                  attributes: baseAttributes))
+          case let .jumpTable(jumpLocation, index):
+            let assembly = RGBDS.Statement(opcode: "dw", operands: [jumpLocation])
+            accumulator.append(NSAttributedString(string: "    ", attributes: baseAttributes))
+            accumulator.append(assembly.attributedString(attributes: baseAttributes,
+                                                         opcodeAttributes: opcodeAttributes,
+                                                         operandAttributes: operandAttributes,
+                                                         regionLookup: regionLookup,
+                                                         scope: line.scope))
+            accumulator.append(NSAttributedString(string: " ; \(UInt8(truncatingIfNeeded: index).hexString)",
+                                                  attributes: commentAttributes))
+          case let .text(assembly): fallthrough
+          case let .data(assembly): fallthrough
+          case let .unknown(assembly): fallthrough
+          case let .global(assembly, _, _): fallthrough
+          case let .image1bpp(assembly): fallthrough
+          case let .image2bpp(assembly): fallthrough
+          case let .macroInstruction(_, assembly): fallthrough
+          case let .instruction(_, assembly):
+            accumulator.append(NSAttributedString(string: "    ", attributes: baseAttributes))
+            accumulator.append(assembly.attributedString(attributes: baseAttributes,
+                                                         opcodeAttributes: opcodeAttributes,
+                                                         operandAttributes: operandAttributes,
+                                                         regionLookup: regionLookup,
+                                                         scope: line.scope))
+          case let .macro(assembly):
+            accumulator.append(NSAttributedString(string: "    ", attributes: baseAttributes))
+            accumulator.append(assembly.attributedString(attributes: baseAttributes,
+                                                         opcodeAttributes: macroNameAttributes,
+                                                         operandAttributes: operandAttributes,
+                                                         regionLookup: regionLookup,
+                                                         scope: line.scope))
+
+          case let .imagePlaceholder(format):
+            switch format {
+            case .oneBitPerPixel:
+              let data = line.data!
+              let scale: CGFloat = 4
+              let imageSize = NSSize(width: 48 * scale + 4 * scale, height: 8 * scale + 4 * scale)
+              let image = NSImage(size: imageSize)
+              image.lockFocusFlipped(true)
+              NSColor.textColor.set()
+
+              var column: CGFloat = 0
+              var row: CGFloat = 0
+              let pixel = NSRect(x: 2 * scale, y: 2 * scale, width: scale, height: scale)
+              var alternator = false
+              for byte in data {
+                if (byte & 0x80) != 0 {
+                  pixel.offsetBy(dx: column, dy: row).fill()
                 }
-
-                image.unlockFocus()
-
-                let textAttachment = NSTextAttachment()
-                textAttachment.image = image
-                accumulator.append(NSAttributedString(attachment: textAttachment))
-              case .twoBitsPerPixel:
-                let data = line.data!
-                let scale: CGFloat = 8
-                let tiles = data.count / 16
-                let totalColumns = min(8, (tiles + 1) / 2)
-                let totalRows = (tiles - 1) / 16 * 2 + ((tiles - 1) % 16 >= 1 ? 2 : 1)
-                let imageSize = NSSize(width: CGFloat(totalColumns) * 8 * scale + 4 * scale,
-                                       height: CGFloat(totalRows) * 8 * scale + 4 * scale)
-                let image = NSImage(size: imageSize)
-                image.lockFocusFlipped(true)
-                NSColor.textColor.set()
-
-                let colorForBytePair: (UInt8, UInt8, UInt8) -> UInt8 = { highByte, lowByte, bit in
-                  let mask = UInt8(0x01) << bit
-                  return (((highByte & mask) >> bit) << 1) | ((lowByte & mask) >> bit)
+                if (byte & 0x40) != 0 {
+                  pixel.offsetBy(dx: column + 1 * scale, dy: row).fill()
                 }
-
-                let colors: [NSColor] = [
-                  .black,
-                  .darkGray,
-                  .lightGray,
-                  .white,
-                ]
-
-                var tileColumn = 0
-                var tileRow = 0
-                var pixelRow = 0
-                let pixel = NSRect(x: 2 * scale, y: 2 * scale, width: scale, height: scale)
-                for bytePairs in [UInt8](data).chunked(into: 2) {
-                  let lowByte = bytePairs.first!
-                  let highByte = bytePairs.last!
-
-                  for i: UInt8 in 0..<8 {
-                    colors[Int(colorForBytePair(highByte, lowByte, 7 - i))].set()
-                    pixel.offsetBy(dx: CGFloat(tileColumn) * 8 * scale + CGFloat(i) * scale,
-                                   dy: CGFloat(tileRow) * 8 * scale + CGFloat(pixelRow) * scale).fill()
-                  }
-                  pixelRow += 1
-                  if pixelRow >= 16 {
-                    tileColumn += 1
-                    pixelRow = 0
-
-                    if tileColumn >= 8 {
-                      tileColumn = 0
-                      tileRow += 2
-                    }
-                  }
+                if (byte & 0x20) != 0 {
+                  pixel.offsetBy(dx: column + 2 * scale, dy: row).fill()
                 }
-
-                image.unlockFocus()
-
-                let textAttachment = NSTextAttachment()
-                textAttachment.image = image
-                accumulator.append(NSAttributedString(attachment: textAttachment))
-                break
+                if (byte & 0x10) != 0 {
+                  pixel.offsetBy(dx: column + 3 * scale, dy: row).fill()
+                }
+                if (byte & 0x08) != 0 {
+                  pixel.offsetBy(dx: column, dy: row + 1 * scale).fill()
+                }
+                if (byte & 0x04) != 0 {
+                  pixel.offsetBy(dx: column + 1 * scale, dy: row + 1 * scale).fill()
+                }
+                if (byte & 0x02) != 0 {
+                  pixel.offsetBy(dx: column + 2 * scale, dy: row + 1 * scale).fill()
+                }
+                if (byte & 0x01) != 0 {
+                  pixel.offsetBy(dx: column + 3 * scale, dy: row + 1 * scale).fill()
+                }
+                if alternator {
+                  column += 4 * scale
+                  row -= 2 * scale
+                } else {
+                  row += 2 * scale
+                }
+                alternator = !alternator
+                if column >= (imageSize.width - 4 * scale) {
+                  column = 0
+                  row += 4 * scale
+                }
               }
+
+              image.unlockFocus()
+
+              let textAttachment = NSTextAttachment()
+              textAttachment.image = image
+              accumulator.append(NSAttributedString(attachment: textAttachment))
+            case .twoBitsPerPixel:
+              let data = line.data!
+              let scale: CGFloat = 8
+              let tiles = data.count / 16
+              let totalColumns = min(8, (tiles + 1) / 2)
+              let totalRows = (tiles - 1) / 16 * 2 + ((tiles - 1) % 16 >= 1 ? 2 : 1)
+              let imageSize = NSSize(width: CGFloat(totalColumns) * 8 * scale + 4 * scale,
+                                     height: CGFloat(totalRows) * 8 * scale + 4 * scale)
+              let image = NSImage(size: imageSize)
+              image.lockFocusFlipped(true)
+              NSColor.textColor.set()
+
+              let colorForBytePair: (UInt8, UInt8, UInt8) -> UInt8 = { highByte, lowByte, bit in
+                let mask = UInt8(0x01) << bit
+                return (((highByte & mask) >> bit) << 1) | ((lowByte & mask) >> bit)
+              }
+
+              let colors: [NSColor] = [
+                .black,
+                .darkGray,
+                .lightGray,
+                .white,
+              ]
+
+              var tileColumn = 0
+              var tileRow = 0
+              var pixelRow = 0
+              let pixel = NSRect(x: 2 * scale, y: 2 * scale, width: scale, height: scale)
+              for bytePairs in [UInt8](data).chunked(into: 2) {
+                let lowByte = bytePairs.first!
+                let highByte = bytePairs.last!
+
+                for i: UInt8 in 0..<8 {
+                  colors[Int(colorForBytePair(highByte, lowByte, 7 - i))].set()
+                  pixel.offsetBy(dx: CGFloat(tileColumn) * 8 * scale + CGFloat(i) * scale,
+                                 dy: CGFloat(tileRow) * 8 * scale + CGFloat(pixelRow) * scale).fill()
+                }
+                pixelRow += 1
+                if pixelRow >= 16 {
+                  tileColumn += 1
+                  pixelRow = 0
+
+                  if tileColumn >= 8 {
+                    tileColumn = 0
+                    tileRow += 2
+                  }
+                }
+              }
+
+              image.unlockFocus()
+
+              let textAttachment = NSTextAttachment()
+              textAttachment.image = image
+              accumulator.append(NSAttributedString(attachment: textAttachment))
               break
             }
-            accumulator.append(NSAttributedString(string: "\n"))
+            break
           }
-        default:
-          return nil
+          accumulator.append(NSAttributedString(string: "\n"))
         }
-      }.reduce(into: [:]) { accumulator, entry in
-        accumulator[bankMap[entry.0]!] = entry.1
+        q.sync {
+          bankTextStorage[bank] = string
+        }
       }
+
       let disassemblyFiles: [String: Data] = disassembledSource.sources.mapValues {
         switch $0 {
         case .bank(_, let content, _): fallthrough
