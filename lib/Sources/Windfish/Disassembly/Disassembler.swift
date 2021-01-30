@@ -18,6 +18,8 @@ protocol DisassemblerContext: class {
   func datatypeExists(named name: String) -> Bool
   func datatype(named name: String) -> Disassembler.Configuration.Datatype?
   func allDatatypes() -> [String: Disassembler.Configuration.Datatype]
+
+  func shouldTerminateLinearSweep(at location: Cartridge.Location) -> Bool
 }
 
 /// A class that owns and manages disassembly information for a given ROM.
@@ -29,6 +31,9 @@ public final class Disassembler {
 
     /** Registered data types. */
     var dataTypes: [String: Datatype] = [:]
+
+    /** When a soft terminator is encountered during linear sweep the sweep will immediately end. */
+    var softTerminators: [Cartridge.Location: Bool] = [:]
   }
 
   public let mutableConfiguration = Configuration()
@@ -59,9 +64,6 @@ public final class Disassembler {
 
   /** Explicit labels at specific locations. */
   var labelNames: [Cartridge.Location: String] = [:]
-
-  /** When a soft terminator is encountered during linear sweep the sweep will immediately end. */
-  var softTerminators: [Cartridge.Location: Bool] = [:]
 
   /** Hints to the disassembler that a given location should be represented by a specific data type. */
   var typeAtLocation: [Cartridge.Location: String] = [:]
@@ -346,7 +348,7 @@ public final class Disassembler {
       var previousInstruction: LR35902.Instruction? = nil
       linear_sweep: while !run.hasReachedEnd(pc: runContext.pc) && pcIsValid(pc: runContext.pc, bank: runContext.bank) {
         let location = Cartridge.Location(address: runContext.pc, bank: runContext.bank)
-        if softTerminators[location] != nil {
+        if configuration.shouldTerminateLinearSweep(at: location) {
           break
         }
         if data.contains(location.index) || text.contains(location.index) {
