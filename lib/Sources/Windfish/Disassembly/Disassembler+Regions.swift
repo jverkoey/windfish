@@ -96,10 +96,6 @@ extension Disassembler {
     let intRange = range.asIntRange()
     data.remove(integersIn: intRange)
     dataBlocks.remove(integersIn: intRange)
-
-    for key: DataFormat in dataFormats.keys {
-      dataFormats[key]?.remove(integersIn: intRange)
-    }
   }
 
   /**
