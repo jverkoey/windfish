@@ -516,6 +516,8 @@ public final class Disassembler {
 
         // linearSweepDidStep event
         if !linearSweepDidSteps.isEmpty {
+          // TODO: Allow the script to specify which instruction types it cares to be invoked for.
+          // This scripting invocation is accounting for 1s out of 4s disassembly time.
           let args: [Any] = [
             LR35902.InstructionSet.opcodeBytes[instruction.spec]!,
             instruction.immediate?.asInt() ?? 0,
