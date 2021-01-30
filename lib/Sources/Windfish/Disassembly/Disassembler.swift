@@ -13,6 +13,8 @@ extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {
 }
 
 protocol DisassemblerContext: class {
+  func allPotentialCode() -> Set<Range<Cartridge.Location>>
+
   func preComment(at location: Cartridge.Location) -> String?
 
   func datatypeExists(named name: String) -> Bool
@@ -37,6 +39,9 @@ protocol DisassemblerContext: class {
 public final class Disassembler {
 
   public final class Configuration: DisassemblerContext {
+    /** Ranges of executable regions that should be disassembled. */
+    var executableRegions = Set<Range<Cartridge.Location>>()
+
     /** Comments that should be placed immediately before the given location. */
     var preComments: [Cartridge.Location: String] = [:]
 
@@ -87,9 +92,6 @@ public final class Disassembler {
   }
 
   // MARK: - Pre-disassembly hints and configurations
-
-  /** Ranges of executable regions that should be disassembled. */
-  var executableRegions = Set<Range<Cartridge.Location>>()
 
   /** Hints to the disassembler that a given location should be represented by a specific data type. */
   var typeAtLocation: [Cartridge.Location: String] = [:]
@@ -198,7 +200,7 @@ public final class Disassembler {
       guard let self = self else {
         return
       }
-      self.registerFunction(startingAt: Cartridge.Location(address: address, bank: bank), named: name)
+      self.mutableConfiguration.registerFunction(startingAt: Cartridge.Location(address: address, bank: bank), named: name)
     }
     let registerBankChange: @convention(block) (Int, Int, Int) -> Void = { [weak self] _desiredBank, address, bank in
       guard let self = self else {
@@ -245,17 +247,17 @@ public final class Disassembler {
   }
 
   public func disassemble() {
-    for (address, global) in configuration.allGlobals() {
+    for (address, _) in configuration.allGlobals() {
       if address < 0x4000 {
         let location = Cartridge.Location(address: address, bank: 0x01)
         registerData(at: location)
       }
     }
 
-    for executableRegion in executableRegions.sorted(by: { (a: Range<Cartridge.Location>, b: Range<Cartridge.Location>) -> Bool in
+    for potentialCodeRegion in configuration.allPotentialCode().sorted(by: { (a: Range<Cartridge.Location>, b: Range<Cartridge.Location>) -> Bool in
       a.lowerBound < b.lowerBound
     }) {
-      disassemble(range: executableRegion)
+      disassemble(range: potentialCodeRegion)
     }
   }
 

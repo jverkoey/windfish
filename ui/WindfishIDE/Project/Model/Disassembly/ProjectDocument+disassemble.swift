@@ -59,9 +59,9 @@ extension ProjectDocument {
         let location = Cartridge.Location(address: region.address, bank: region.bank)
         switch region.regionType {
         case Region.Kind.region:
-          disassembly.registerExecutableRegion(at: location..<(location + region.length), named: region.name)
+          disassembly.mutableConfiguration.registerPotentialCode(at: location..<(location + region.length), named: region.name)
         case Region.Kind.function:
-          disassembly.registerFunction(startingAt: location, named: region.name)
+          disassembly.mutableConfiguration.registerFunction(startingAt: location, named: region.name)
         default:
           break
         }

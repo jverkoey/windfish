@@ -8,16 +8,16 @@ extension Disassembler {
     let restartSize: LR35902.Address = 8
     let rstAddresses = (0..<numberOfRestartAddresses).map { ($0 * restartSize)..<($0 * restartSize + restartSize) }
     rstAddresses.forEach {
-      registerExecutableRegion(at: Cartridge.Location(address: $0.lowerBound, bank: 0x01)..<Cartridge.Location(address: $0.upperBound, bank: 0x01),
+      mutableConfiguration.registerPotentialCode(at: Cartridge.Location(address: $0.lowerBound, bank: 0x01)..<Cartridge.Location(address: $0.upperBound, bank: 0x01),
                                named: "RST_\($0.lowerBound.hexString)")
     }
 
-    registerExecutableRegion(at: Cartridge.Location(address: 0x0040, bank: 1)..<Cartridge.Location(address: 0x0048, bank: 0x01))
-    registerExecutableRegion(at: Cartridge.Location(address: 0x0048, bank: 1)..<Cartridge.Location(address: 0x0050, bank: 0x01))
-    registerExecutableRegion(at: Cartridge.Location(address: 0x0050, bank: 1)..<Cartridge.Location(address: 0x0058, bank: 0x01))
-    registerExecutableRegion(at: Cartridge.Location(address: 0x0058, bank: 1)..<Cartridge.Location(address: 0x0060, bank: 0x01))
-    registerExecutableRegion(at: Cartridge.Location(address: 0x0060, bank: 1)..<Cartridge.Location(address: 0x0068, bank: 0x01))
-    registerExecutableRegion(at: Cartridge.Location(address: 0x0100, bank: 1)..<Cartridge.Location(address: 0x0104, bank: 0x01))
+    mutableConfiguration.registerPotentialCode(at: Cartridge.Location(address: 0x0040, bank: 1)..<Cartridge.Location(address: 0x0048, bank: 0x01))
+    mutableConfiguration.registerPotentialCode(at: Cartridge.Location(address: 0x0048, bank: 1)..<Cartridge.Location(address: 0x0050, bank: 0x01))
+    mutableConfiguration.registerPotentialCode(at: Cartridge.Location(address: 0x0050, bank: 1)..<Cartridge.Location(address: 0x0058, bank: 0x01))
+    mutableConfiguration.registerPotentialCode(at: Cartridge.Location(address: 0x0058, bank: 1)..<Cartridge.Location(address: 0x0060, bank: 0x01))
+    mutableConfiguration.registerPotentialCode(at: Cartridge.Location(address: 0x0060, bank: 1)..<Cartridge.Location(address: 0x0068, bank: 0x01))
+    mutableConfiguration.registerPotentialCode(at: Cartridge.Location(address: 0x0100, bank: 1)..<Cartridge.Location(address: 0x0104, bank: 0x01))
 
     disassemble()
 

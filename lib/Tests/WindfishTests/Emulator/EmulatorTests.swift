@@ -6,8 +6,10 @@ func disassemblyInitialized(with assembly: String) -> Disassembler {
 
   let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
   let disassembly = Disassembler(data: data)
-  disassembly.registerExecutableRegion(at: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: data.count, bank: 0x01),
-                                       named: "main")
+  disassembly.mutableConfiguration.registerPotentialCode(
+    at: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: data.count, bank: 0x01),
+    named: "main"
+  )
   disassembly.disassemble()
   return disassembly
 }
