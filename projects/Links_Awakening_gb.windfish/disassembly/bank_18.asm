@@ -1780,7 +1780,7 @@ JumpTable_65C8_18:
     add  hl, bc
     ld   a, [hl]
     cp   $0D
-    jp   z, .toc_18_65E8
+    jp   z, .else_18_65E8
 
     inc  [hl]
     ld   e, a
@@ -1795,7 +1795,7 @@ JumpTable_65C8_18.return_18_65E7:
     ret
 
 
-JumpTable_65C8_18.toc_18_65E8:
+JumpTable_65C8_18.else_18_65E8:
     call toc_01_27ED
     and  %00000011
     jp   z, toc_18_6706

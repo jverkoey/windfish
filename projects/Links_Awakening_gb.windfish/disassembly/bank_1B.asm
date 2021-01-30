@@ -225,9 +225,7 @@ toc_1B_411B.toc_1B_4144:
     db   $00, $00, $01, $00, $FF, $FF, $00, $00
 
 toc_1B_421D:
-    ld   a, [$D3E7]
-    and  a
-    jp   z, toc_1B_4481.toc_1B_463D
+    if   [$D3E7], toc_1B_4481.toc_1B_463D
 
     clear [gbAUD3ENA]
     ld   [$D3E7], a
@@ -854,7 +852,7 @@ toc_1B_4481.else_1B_4579:
     call toc_1B_437D
     ld   a, [$D350]
     cp   $04
-    jp   z, .toc_1B_45BB
+    jp   z, .else_1B_45BB
 
     push hl
     ld   a, l
@@ -897,7 +895,7 @@ toc_1B_4481.else_1B_45B6:
     pop  hl
     jr   .toc_1B_45EC
 
-toc_1B_4481.toc_1B_45BB:
+toc_1B_4481.else_1B_45BB:
     push hl
     ld   a, c
     cp   $FF
@@ -1071,7 +1069,7 @@ toc_1B_4670.else_1B_4692:
     call toc_1B_4807
     ld   a, [de]
     and  a
-    jp   z, .toc_1B_46BB
+    jp   z, .else_1B_46BB
 
     ld   a, [$D350]
     ld   c, $13
@@ -1085,7 +1083,7 @@ toc_1B_4670.else_1B_4692:
     ld   c, $1D
     jp   toc_1B_47D0
 
-toc_1B_4670.toc_1B_46BB:
+toc_1B_4670.else_1B_46BB:
     ld   a, [$D350]
     cp   $03
     jp   nz, toc_1B_466E

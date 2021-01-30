@@ -166,9 +166,13 @@ extension Disassembler {
           && element.destination > location
           && (configuration.label(at: element.destination) != nil || labelTypes[element.destination] != nil)
       }
-      for toc: Cartridge.Location in tocsInThisScope {
-        if case .jr(let condition, _) = instructionMap[toc]?.spec, condition != nil {
-          accumulator.append((toc, element.destination))
+      for location: Cartridge.Location in tocsInThisScope {
+        switch instructionMap[location]?.spec {
+        case .jr(let condition, _) where condition != nil,
+             .jp(let condition, _) where condition != nil:
+          accumulator.append((location, element.destination))
+        default:
+          break
         }
       }
     })

@@ -305,7 +305,7 @@ toc_05_4230.return_05_425A:
 toc_05_42A0:
     ld   a, [$DB56]
     cp   $80
-    jp   z, .toc_05_4338
+    jp   z, .else_05_4338
 
     call toc_01_27ED
     ld   d, b
@@ -402,7 +402,7 @@ toc_05_42A0.else_05_432C:
     cp   [hl]
     jr   nz, .loop_05_42C2
 
-toc_05_42A0.toc_05_4338:
+toc_05_42A0.else_05_4338:
     call toc_01_0891
     ld   [hl], $10
     ret
@@ -2316,7 +2316,7 @@ JumpTable_54D1_05:
 
 JumpTable_54DF_05:
     call toc_01_0891
-    jp   z, .toc_05_54F2
+    jp   z, .else_05_54F2
 
     ld   hl, $C420
     add  hl, bc
@@ -2329,7 +2329,7 @@ JumpTable_54DF_05.return_05_54F1:
     ret
 
 
-JumpTable_54DF_05.toc_05_54F2:
+JumpTable_54DF_05.else_05_54F2:
     call toc_05_74AD
     ld   hl, $C480
     add  hl, de
@@ -3457,7 +3457,7 @@ JumpTable_5D33_05.else_05_5D55:
 
 JumpTable_5D84_05:
     call toc_01_0891
-    jp   z, .toc_05_5E77
+    jp   z, .else_05_5E77
 
     ld   hl, $C210
     add  hl, bc
@@ -3610,7 +3610,7 @@ JumpTable_5D84_05.return_05_5E76:
     ret
 
 
-JumpTable_5D84_05.toc_05_5E77:
+JumpTable_5D84_05.else_05_5E77:
     call JumpTable_3B8D_00
     call toc_01_0891
     ld   [hl], $50
@@ -4088,7 +4088,7 @@ JumpTable_628F_05.toc_05_6294:
 
 JumpTable_629A_05:
     call toc_01_0891
-    jp   z, .toc_05_62AD
+    jp   z, .else_05_62AD
 
     ld   hl, $C420
     add  hl, bc
@@ -4101,7 +4101,7 @@ JumpTable_629A_05.return_05_62AC:
     ret
 
 
-JumpTable_629A_05.toc_05_62AD:
+JumpTable_629A_05.else_05_62AD:
     call toc_05_74AD
     ld   hl, $C200
     add  hl, de
@@ -5143,7 +5143,7 @@ JumpTable_6CA9_05:
     add  hl, bc
     ld   [hl], a
     call toc_01_0891
-    jp   nz, .toc_05_6D48
+    jp   nz, .else_05_6D48
 
     ld   [hl], $FF
     clear [$D3E8]
@@ -5207,7 +5207,7 @@ JumpTable_6CA9_05.toc_05_6D2D:
     ret
 
 
-JumpTable_6CA9_05.toc_05_6D48:
+JumpTable_6CA9_05.else_05_6D48:
     cp   $40
     jp   nz, .return_05_6D94
 
@@ -5635,7 +5635,7 @@ JumpTable_700B_05.else_05_70BA:
     dec  e
     ld   a, e
     cp   $F0
-    jp   nc, .toc_05_71EA
+    jp   nc, .else_05_71EA
 
     sla  e
     ld   d, b
@@ -5667,7 +5667,7 @@ JumpTable_700B_05.else_05_70BA:
     dec  e
     ld   a, e
     cp   $F0
-    jp   nc, .toc_05_71EA
+    jp   nc, .else_05_71EA
 
     sla  e
     ld   d, b
@@ -5700,7 +5700,7 @@ JumpTable_700B_05.else_05_70BA:
     dec  e
     ld   a, e
     cp   $F0
-    jp   nc, .toc_05_71EA
+    jp   nc, .else_05_71EA
 
     sla  e
     ld   d, b
@@ -5726,7 +5726,7 @@ JumpTable_700B_05.else_05_70BA:
     dec  e
     ld   a, e
     cp   $F0
-    jp   nc, .toc_05_71EA
+    jp   nc, .else_05_71EA
 
     sla  e
     ld   d, b
@@ -5780,7 +5780,7 @@ JumpTable_700B_05.return_05_71E9:
     ret
 
 
-JumpTable_700B_05.toc_05_71EA:
+JumpTable_700B_05.else_05_71EA:
     pop  de
     ret
 
@@ -5888,9 +5888,7 @@ JumpTable_7285_05.else_05_72B7:
     and  DIRECTION_UP
     jp   z, .return_05_7347
 
-    ld   a, [$C1A6]
-    and  a
-    jp   z, .return_05_7347
+    if   [$C1A6], .return_05_7347
 
     dec  a
     ld   [$D202], a
@@ -6929,7 +6927,7 @@ JumpTable_7B72_05.else_05_7BA9:
     add  a, $08
     ld   hl, hLinkPositionY
     cp   [hl]
-    jp   c, .toc_05_7BD3
+    jp   c, .else_05_7BD3
 
     call toc_01_0891
     ld   [hl], $60
@@ -6949,7 +6947,7 @@ JumpTable_7B72_05.else_05_7BCE:
     ld   [hl], $F8
     jp   .else_05_7C61
 
-JumpTable_7B72_05.toc_05_7BD3:
+JumpTable_7B72_05.else_05_7BD3:
     ld   hl, $C210
     add  hl, bc
     ld   a, [hLinkPositionY]
@@ -7075,7 +7073,7 @@ JumpTable_7C83_05:
     add  hl, bc
     ld   a, [hl]
     and  a
-    jp   nz, .toc_05_7CFD
+    jp   nz, .else_05_7CFD
 
     call toc_01_0891
     cp   $02
@@ -7109,7 +7107,7 @@ JumpTable_7C83_05.toc_05_7CB8:
     add  a, $08
     ld   hl, hLinkPositionY
     cp   [hl]
-    jp   nc, .toc_05_7D09
+    jp   nc, .else_05_7D09
 
     jp   .else_05_7D11
 
@@ -7146,7 +7144,7 @@ JumpTable_7C83_05.else_05_7CF9:
     ld   [hl], $F8
     jr   .else_05_7D11
 
-JumpTable_7C83_05.toc_05_7CFD:
+JumpTable_7C83_05.else_05_7CFD:
     ld   hl, $C2D0
     add  hl, bc
     ld   a, [hl]
@@ -7155,7 +7153,7 @@ JumpTable_7C83_05.toc_05_7CFD:
     cp   [hl]
     jr   c, .else_05_7D11
 
-JumpTable_7C83_05.toc_05_7D09:
+JumpTable_7C83_05.else_05_7D09:
     call toc_01_3DAF
     call JumpTable_3B8D_00
     ld   [hl], $01

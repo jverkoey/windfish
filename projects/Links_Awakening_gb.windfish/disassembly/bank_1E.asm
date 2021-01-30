@@ -262,9 +262,7 @@ toc_1E_4163.toc_1E_418E:
     db   $00, $00, $01, $00, $FF, $FF, $00, $00
 
 toc_1E_432A:
-    ld   a, [$D3E7]
-    and  a
-    jp   z, toc_1E_457C.toc_1E_473A
+    if   [$D3E7], toc_1E_457C.toc_1E_473A
 
     clear [gbAUD3ENA]
     ld   [$D3E7], a
@@ -881,7 +879,7 @@ toc_1E_457C.else_1E_4676:
     call toc_1E_4482
     ld   a, [$D350]
     cp   $04
-    jp   z, .toc_1E_46B8
+    jp   z, .else_1E_46B8
 
     push hl
     ld   a, l
@@ -924,7 +922,7 @@ toc_1E_457C.else_1E_46B3:
     pop  hl
     jr   .toc_1E_46E9
 
-toc_1E_457C.toc_1E_46B8:
+toc_1E_457C.else_1E_46B8:
     push hl
     ld   a, c
     cp   $FF
@@ -1098,7 +1096,7 @@ toc_1E_476D.else_1E_478F:
     call toc_1E_4937
     ld   a, [de]
     and  a
-    jp   z, .toc_1E_47B8
+    jp   z, .else_1E_47B8
 
     ld   a, [$D350]
     ld   c, $13
@@ -1112,7 +1110,7 @@ toc_1E_476D.else_1E_478F:
     ld   c, $1D
     jp   toc_1E_4900
 
-toc_1E_476D.toc_1E_47B8:
+toc_1E_476D.else_1E_47B8:
     ld   a, [$D350]
     cp   $03
     jp   nz, toc_1E_476B

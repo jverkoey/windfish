@@ -2242,10 +2242,10 @@ toc_15_79A5:
     add  hl, bc
     ld   a, [hl]
     cp   $02
-    jp   z, .toc_15_79F5
+    jp   z, .else_15_79F5
 
     cp   $03
-    jp   z, .toc_15_7A3E
+    jp   z, .else_15_7A3E
 
     ld   hl, $C310
     add  hl, bc
@@ -2288,7 +2288,7 @@ toc_15_79A5.return_15_79F4:
     ret
 
 
-toc_15_79A5.toc_15_79F5:
+toc_15_79A5.else_15_79F5:
     ifNe [$FFEB], $02, .else_15_7A06
 
     ld   hl, $FFEC
@@ -2335,7 +2335,7 @@ toc_15_79A5.else_15_7A1A:
     ret
 
 
-toc_15_79A5.toc_15_7A3E:
+toc_15_79A5.else_15_7A3E:
     push bc
     ld   hl, $C3D0
     add  hl, bc

@@ -1886,9 +1886,7 @@ JumpTable_64C0_07.else_07_64CA:
     db   $AF, $C3, $87, $3B
 
 toc_07_650E:
-    ld   a, [hLinkPositionZHigh]
-    and  a
-    jp   z, toc_01_3BD5
+    if   [hLinkPositionZHigh], toc_01_3BD5
 
     cp   $08
     jp   c, toc_01_3BD5

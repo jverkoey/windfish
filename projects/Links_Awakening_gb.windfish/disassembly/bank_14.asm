@@ -1365,9 +1365,7 @@ toc_14_59DE.else_14_5A1D:
     jp   .toc_14_5AE9
 
 toc_14_59DE.else_14_5A24:
-    ld   a, [$DBA5]
-    and  a
-    jp   z, .toc_14_5A9F
+    if   [$DBA5], .else_14_5A9F
 
     ifNot [$FFF9], .else_14_5A6B
 
@@ -1436,7 +1434,7 @@ toc_14_59DE.else_14_5A6B:
     ld   a, $13
     jr   .toc_14_5AE4
 
-toc_14_59DE.toc_14_5A9F:
+toc_14_59DE.else_14_5A9F:
     ifNe [hObjectUnderEntity], 32, .else_14_5AB2
 
     ifEq [$FFF6], $52, .else_14_5AAF

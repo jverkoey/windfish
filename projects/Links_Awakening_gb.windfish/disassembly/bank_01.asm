@@ -11,7 +11,7 @@ toc_01_4000:
     dw JumpTable_55FD_01 ; 05
 
 JumpTable_4010_01:
-    call JumpTable_1C56_00.toc_01_1CCC
+    call JumpTable_1C56_00.else_01_1CCC
     call toc_01_0B22
     call toc_01_1776
     ifNe [$C16B], $04, .return_01_4040
@@ -639,9 +639,7 @@ toc_01_460F:
     call toc_01_46DD
     ld   de, $070A
     call toc_01_46DD
-    ld   a, [DEBUG_TOOL1]
-    and  a
-    jp   z, .return_01_46DC
+    if   [DEBUG_TOOL1], .return_01_46DC
 
     ld   e, $00
     ld   d, $00
@@ -2176,9 +2174,7 @@ toc_01_5D6B.else_01_5E11:
     inc  [hl]
     assign [$FFF2], $2D
 toc_01_5D6B.else_01_5E37:
-    ld   a, [$DB73]
-    and  a
-    jp   z, toc_01_5ED7
+    if   [$DB73], toc_01_5ED7
 
     ld   e, $0F
     ld   d, $00
@@ -4059,7 +4055,7 @@ toc_01_7C00.loop_01_7C09:
     add  hl, de
     ld   a, [hl]
     bit  1, a
-    jp   nz, .toc_01_7C3A
+    jp   nz, .else_01_7C3A
 
     ld   c, $00
     ld   b, c
@@ -4079,7 +4075,7 @@ toc_01_7C00.loop_01_7C09:
     pop  hl
     jr   .toc_01_7C58
 
-toc_01_7C00.toc_01_7C3A:
+toc_01_7C00.else_01_7C3A:
     ld   c, $00
     ld   b, c
     ld   hl, $7BDF

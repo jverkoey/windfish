@@ -887,9 +887,7 @@ JumpTable_4C7E_03.toc_03_4C80:
 JumpTable_4C86_03:
     ifLt [$FFF6], $C0, .else_03_4CA9
 
-    ld   a, [$DB74]
-    and  a
-    jp   z, toc_01_3F7A.else_01_3FB7
+    if   [$DB74], toc_01_3F7A.else_01_3FB7
 
     ld   a, [$DB73]
     and  a
@@ -1673,7 +1671,7 @@ JumpTable_5123_03:
 JumpTable_5123_03.else_03_515A:
     ld   e, a
     cp   $21
-    jp   nc, .toc_03_51D8
+    jp   nc, .else_03_51D8
 
     cp   $20
     jr   nz, .else_03_5167
@@ -1696,7 +1694,7 @@ JumpTable_5123_03.else_03_5167:
     ld   a, [hl]
     ld   [$DB8F], a
     assign [$C3CE], $18
-    jr   .toc_03_51D8
+    jr   .else_03_51D8
 
 JumpTable_5123_03.else_03_5186:
     cp   $16
@@ -1712,7 +1710,7 @@ JumpTable_5123_03.else_03_5186:
     add  hl, de
     inc  [hl]
     call toc_01_27E2
-    jr   .toc_03_51D8
+    jr   .else_03_51D8
 
 JumpTable_5123_03.else_03_519D:
     cp   $0C
@@ -1742,13 +1740,13 @@ JumpTable_5123_03.else_03_51C8:
     add  hl, de
     ld   d, [hl]
     call JumpTable_6472_03.toc_03_6497
-    jr   .toc_03_51D8
+    jr   .else_03_51D8
 
 JumpTable_5123_03.else_03_51D3:
     ld   hl, $DB00
     add  hl, de
     inc  [hl]
-JumpTable_5123_03.toc_03_51D8:
+JumpTable_5123_03.else_03_51D8:
     call toc_03_51E2
     ld   a, [hl]
     or   %00010000
@@ -2953,7 +2951,7 @@ JumpTable_5B53_03:
     assign [hNeedsUpdatingBGTiles], $06
     call toc_01_3F7A.else_01_3FB7
     assign [$FFA5], $0D
-    jp   JumpTable_5123_03.toc_03_51D8
+    jp   JumpTable_5123_03.else_03_51D8
 
     db   $9A, $00, $9A, $20, $9C, $00, $9A, $20
     db   $9E, $00, $9A, $20, $9E, $00, $9C, $20
@@ -3066,7 +3064,7 @@ JumpTable_5C56_03:
     ld   d, $01
     call JumpTable_6472_03.toc_03_6497
     assign [$DB4E], $01
-    call JumpTable_5123_03.toc_03_51D8
+    call JumpTable_5123_03.else_03_51D8
     jp   toc_01_3F7A.else_01_3FB7
 
 JumpTable_5C56_03.else_03_5C7E:
@@ -3756,7 +3754,7 @@ JumpTable_638D_03:
     ld   a, $EF
     call toc_01_2197
 JumpTable_638D_03.toc_03_6392:
-    call JumpTable_5123_03.toc_03_51D8
+    call JumpTable_5123_03.else_03_51D8
     ld   hl, $DB0F
     ld   a, [hl]
     cp   $99
@@ -3951,7 +3949,7 @@ JumpTable_64B4_03.else_03_64CD:
     jp   toc_03_63F7
 
 JumpTable_64B4_03.else_03_64DA:
-    call JumpTable_5123_03.toc_03_51D8
+    call JumpTable_5123_03.else_03_51D8
     incAddr $DBD0
     call toc_01_27E2
     ret
@@ -4613,7 +4611,7 @@ toc_03_6C87.else_03_6D6A:
 
     ld   a, [$C13E]
     and  a
-    jp   nz, .toc_03_6E1F
+    jp   nz, .else_03_6E1F
 
 toc_03_6C87.else_03_6D79:
     ifNe [$FFEB], $E4, .else_03_6D8F
@@ -4634,7 +4632,7 @@ toc_03_6C87.else_03_6D8F:
     or   [hl]
     ld   hl, $C1A9
     or   [hl]
-    jp   nz, .toc_03_6E1F
+    jp   nz, .else_03_6E1F
 
     assign [$FFF3], $03
     ld   hl, $C4D0
@@ -4702,7 +4700,7 @@ toc_03_6C87.else_03_6E17:
     and  a
     jr   nz, toc_03_6E23
 
-toc_03_6C87.toc_03_6E1F:
+toc_03_6C87.else_03_6E1F:
     scf
     ret
 
@@ -4710,7 +4708,7 @@ toc_03_6C87.toc_03_6E1F:
     db   $0C, $F4
 
 toc_03_6E23:
-    ifEq [$FF9C], $02, toc_03_6C87.toc_03_6E1F
+    ifEq [$FF9C], $02, toc_03_6C87.else_03_6E1F
 
     call toc_03_7EAB
     ld   d, b
@@ -5120,7 +5118,7 @@ JumpTable_702D_03.else_03_7094:
     add  hl, bc
     ld   a, [hl]
     cp   $04
-    jp   nz, .toc_03_70B4
+    jp   nz, .else_03_70B4
 
     ifNot [$C14A], .else_03_7113
 
@@ -5130,7 +5128,7 @@ JumpTable_702D_03.else_03_7094:
     ret
 
 
-JumpTable_702D_03.toc_03_70B4:
+JumpTable_702D_03.else_03_70B4:
     ifNot [$C14A], .else_03_70C4
 
     call toc_03_6C87.else_03_6DF4
@@ -5813,7 +5811,7 @@ toc_03_75A6.else_03_7634:
     add  hl, de
     ld   a, [hl]
     and  %00100000
-    jp   nz, .toc_03_7719
+    jp   nz, .else_03_7719
 
     ifEq [$FFEB], $08, .else_03_766C
 
@@ -5950,7 +5948,7 @@ toc_03_75A6.else_03_7714:
     call toc_03_77A5
     jr   .else_03_773B
 
-toc_03_75A6.toc_03_7719:
+toc_03_75A6.else_03_7719:
     ifEq [$FFEB], $01, .else_03_7723
 
     cp   $03
@@ -6171,9 +6169,7 @@ toc_03_7892.toc_03_78E2:
     ld   e, $01
     ifEq [hObjectUnderEntity], 103, .else_03_7906
 
-    ld   a, [$FFDA]
-    and  a
-    jp   z, .else_03_7A17
+    if   [$FFDA], .else_03_7A17
 
     cp   $0B
     jr   z, .toc_03_78C4
@@ -6512,7 +6508,7 @@ toc_03_7ACC.toc_03_7B12:
     ld   a, [hl]
     ld   [hObjectUnderEntity], a
     cp   $20
-    jp   z, .toc_03_7C7A
+    jp   z, .else_03_7C7A
 
     push de
     ld   e, a
@@ -6537,9 +6533,7 @@ toc_03_7ACC.else_03_7B4D:
     jp   .else_03_7C74
 
 toc_03_7ACC.else_03_7B5C:
-    ld   a, [$FFDA]
-    and  a
-    jp   z, .else_03_7CA6
+    if   [$FFDA], .else_03_7CA6
 
     cp   $0B
     jr   z, .else_03_7B6E
@@ -6571,10 +6565,10 @@ toc_03_7ACC.else_03_7B6E:
 
 toc_03_7ACC.else_03_7B8A:
     cp   $7C
-    jp   c, .toc_03_7BE3
+    jp   c, .else_03_7BE3
 
     cp   $90
-    jp   nc, .toc_03_7BE3
+    jp   nc, .else_03_7BE3
 
     cp   $80
     ld   a, [$FFEB]
@@ -6630,7 +6624,7 @@ toc_03_7ACC.toc_03_7BBA:
     and  a
     jp   z, .else_03_7CA6
 
-toc_03_7ACC.toc_03_7BE3:
+toc_03_7ACC.else_03_7BE3:
     ifLt [$FFDA], $D0, .else_03_7C2A
 
     cp   $D4
@@ -6732,7 +6726,7 @@ toc_03_7ACC.else_03_7C59:
 toc_03_7ACC.else_03_7C74:
     ifNe [$FFDA], $60, .else_03_7C90
 
-toc_03_7ACC.toc_03_7C7A:
+toc_03_7ACC.else_03_7C7A:
     ifNe [$FFEB], $03, .else_03_7C90
 
     call toc_01_0891
@@ -6847,7 +6841,7 @@ toc_03_7DE0:
 toc_03_7E17:
     ld   [$FFD8], a
     and  a
-    jp   z, .toc_03_7E95
+    jp   z, .else_03_7E95
 
     call toc_03_7EBB
     dec  e
@@ -6938,7 +6932,7 @@ toc_03_7E17.return_03_7E94:
     ret
 
 
-toc_03_7E17.toc_03_7E95:
+toc_03_7E17.else_03_7E95:
     clear [$FFD7]
     ret
 

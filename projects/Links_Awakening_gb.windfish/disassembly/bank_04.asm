@@ -432,7 +432,7 @@ JumpTable_42F4_04.return_04_42FE:
 
 JumpTable_42FF_04:
     call toc_01_0891
-    jp   z, JumpTable_5712_04.toc_04_5746
+    jp   z, JumpTable_5712_04.else_04_5746
 
     call JumpTable_50ED_04.toc_04_50F3
     ret
@@ -1776,7 +1776,7 @@ JumpTable_4E26_04.else_04_4E43:
     cp   $FF
     jr   nz, .loop_04_4E2E
 
-    jp   JumpTable_5712_04.toc_04_5746
+    jp   JumpTable_5712_04.else_04_5746
 
 JumpTable_4E26_04.else_04_4E4C:
     jp   toc_04_6D44
@@ -2145,7 +2145,7 @@ JumpTable_50E3_04.return_04_50EC:
 
 JumpTable_50ED_04:
     call toc_01_0891
-    jp   z, JumpTable_5712_04.toc_04_5746
+    jp   z, JumpTable_5712_04.else_04_5746
 
 JumpTable_50ED_04.toc_04_50F3:
     and  %00000111
@@ -2947,7 +2947,7 @@ JumpTable_56E5_04.else_04_56FA:
 
 JumpTable_5712_04:
     call toc_01_0891
-    jp   z, .toc_04_5746
+    jp   z, .else_04_5746
 
     and  %00000011
     jr   nz, .return_04_5745
@@ -2980,7 +2980,7 @@ JumpTable_5712_04.return_04_5745:
     ret
 
 
-JumpTable_5712_04.toc_04_5746:
+JumpTable_5712_04.else_04_5746:
     ld   a, $36
     call toc_01_3C01
     ifLt [$FFD7], $88, .else_04_5753
@@ -3939,7 +3939,7 @@ JumpTable_680A_04:
 JumpTable_680A_04.else_04_6815:
     ld   a, [$C11C]
     cp   $00
-    jp   nz, .toc_04_68A7
+    jp   nz, .else_04_68A7
 
     ld   a, [hLinkPositionXIncrement]
     push af
@@ -3984,7 +3984,7 @@ JumpTable_680A_04.else_04_6847:
     clear [$C144]
     ld   a, [$FFEB]
     cp   $52
-    jp   nz, .toc_04_68A7
+    jp   nz, .else_04_68A7
 
     ld   a, [$C146]
     and  a
@@ -4022,7 +4022,7 @@ JumpTable_680A_04.else_04_6897:
     add  hl, de
     ld   a, [hl]
     ld   [hLinkDirection], a
-JumpTable_680A_04.toc_04_68A7:
+JumpTable_680A_04.else_04_68A7:
     call toc_04_68D0
     ld   a, [hFrameCounter]
     rra
@@ -4058,13 +4058,13 @@ toc_04_68D0.loop_04_68D3:
     push de
     ld   a, e
     cp   c
-    jp   z, .toc_04_6968
+    jp   z, .else_04_6968
 
     ld   hl, $C280
     add  hl, de
     ld   a, [hl]
     and  a
-    jp   z, .toc_04_6968
+    jp   z, .else_04_6968
 
     call toc_01_3DBA
     push bc
@@ -4149,7 +4149,7 @@ toc_04_68D0.else_04_6955:
     ld   [hLinkPositionX], a
 toc_04_68D0.else_04_6967:
     pop  bc
-toc_04_68D0.toc_04_6968:
+toc_04_68D0.else_04_6968:
     pop  de
     dec  e
     ld   a, e

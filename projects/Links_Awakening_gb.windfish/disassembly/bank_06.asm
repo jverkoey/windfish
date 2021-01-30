@@ -4460,9 +4460,7 @@ JumpTable_68E1_06:
     jr   .toc_06_6902
 
 JumpTable_68E1_06.else_06_68FB:
-    ld   a, [$DB4E]
-    and  a
-    jp   z, toc_06_65E5
+    if   [$DB4E], toc_06_65E5
 
 JumpTable_68E1_06.toc_06_6902:
     ld   a, [hDefaultMusicTrack]
@@ -4750,7 +4748,7 @@ JumpTable_6C85_06:
 
 JumpTable_6C96_06:
     call toc_01_0891
-    jp   z, .toc_06_6CA9
+    jp   z, .else_06_6CA9
 
     ld   hl, $C420
     add  hl, bc
@@ -4763,7 +4761,7 @@ JumpTable_6C96_06.return_06_6CA8:
     ret
 
 
-JumpTable_6C96_06.toc_06_6CA9:
+JumpTable_6C96_06.else_06_6CA9:
     call toc_01_27BD
     call toc_01_3F7A
     ld   a, [$FFF7]
@@ -6223,7 +6221,7 @@ toc_06_7940:
 JumpTable_7ACC_06:
     ld   a, [$C1A2]
     and  a
-    jp   nz, .toc_06_7B45
+    jp   nz, .else_06_7B45
 
     call toc_01_0891
     jr   nz, .else_06_7B1B
@@ -6291,7 +6289,7 @@ JumpTable_7ACC_06.return_06_7B44:
     ret
 
 
-JumpTable_7ACC_06.toc_06_7B45:
+JumpTable_7ACC_06.else_06_7B45:
     call JumpTable_3B8D_00
     ld   [hl], $01
     ret

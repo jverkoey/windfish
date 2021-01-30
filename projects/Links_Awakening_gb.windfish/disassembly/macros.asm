@@ -38,6 +38,15 @@ copyFromTo: MACRO
 
 ; Arguments:
 ; - 1 type: ffimm8addr
+; - 2 type: imm16
+if: MACRO
+    ld   a, \1
+    and  a
+    jp   z, \2
+    ENDM
+
+; Arguments:
+; - 1 type: ffimm8addr
 ; - 2 type: imm8
 ; - 3 type: simm8
 ifEq: MACRO

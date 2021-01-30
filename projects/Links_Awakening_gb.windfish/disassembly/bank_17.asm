@@ -244,7 +244,7 @@ toc_17_46A6.loop_17_46DD:
     ld   [$C17D], a
     ld   a, [$C17C]
     cp   $50
-    jp   z, .toc_17_4726
+    jp   z, .else_17_4726
 
     ld   hl, $C180
     ld   a, [$C17C]
@@ -267,7 +267,7 @@ toc_17_46A6.loop_17_46DD:
     ld   [gbSCY], a
     jp   .loop_17_46D5
 
-toc_17_46A6.toc_17_4726:
+toc_17_46A6.else_17_4726:
     clear [gbSCX]
     ret
 
