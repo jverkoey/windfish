@@ -824,6 +824,7 @@ clean:
         })
         lines.append(Line(semantic: .macroTerminator))
         macrosAsm?.append(linesAsString(lines))
+        macrosAsm?.append("\n")
       }
       if let macrosAsm = macrosAsm {
         sources["macros.asm"] = .macros(content: macrosAsm)
