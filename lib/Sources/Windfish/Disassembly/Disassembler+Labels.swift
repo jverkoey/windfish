@@ -15,7 +15,7 @@ extension Disassembler {
     }
 
     let name: String
-    if let explicitName: String = labelNames[location] {
+    if let explicitName: String = configuration.label(at: location) {
       name = explicitName
     } else if let labelType: LabelType = labelTypes[location] {
       let bank: Cartridge.Bank = effectiveBank(at: location.address, in: location.bank)
@@ -46,18 +46,11 @@ extension Disassembler {
   /** Returns the locations of any labels within the given range. */
   func labelLocations(in range: Range<Cartridge.Location>) -> [Cartridge.Location] {
     return range.filter { (location: Cartridge.Location) -> Bool in
-      guard labelNames[location] != nil || labelTypes[location] != nil else {
+      guard configuration.label(at: location) != nil || labelTypes[location] != nil else {
         return false
       }
       return canShowLabel(at: location)
     }
-  }
-
-  /** Registers a label name at a specific location. */
-  public func registerLabel(at location: Cartridge.Location, named name: String) {
-    // TODO: Make this throw an exception that can be presented to the user.
-    precondition(!name.contains("."), "Labels cannot contain dots.")
-    labelNames[location] = name
   }
 
   /** Returns false if the location should not be able to show a label. */

@@ -29,5 +29,10 @@ extension Disassembler.Configuration {
       precondition(datatypeExists(named: dataType), "Data type is not registered.")
     }
     globals[address] = Global(name: name, dataType: dataType)
+
+    if address < 0x4000 {
+      let location = Cartridge.Location(address: address, bank: 0x01)
+      registerLabel(at: location, named: name)
+    }
   }
 }

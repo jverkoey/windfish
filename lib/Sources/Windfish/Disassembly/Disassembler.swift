@@ -29,6 +29,8 @@ protocol DisassemblerContext: class {
   func allMappedCharacters() -> [UInt8: String]
 
   func macroTreeRoot() -> Disassembler.Configuration.MacroNode
+
+  func label(at location: Cartridge.Location) -> String?
 }
 
 /// A class that owns and manages disassembly information for a given ROM.
@@ -43,6 +45,9 @@ public final class Disassembler {
 
     /** Named regions of memory that can be read as data. */
     var globals: [LR35902.Address: Global] = [:]
+
+    /** The names of specific locations in the cartridge. */
+    var labelNames: [Cartridge.Location: String] = [:]
 
     /** When a soft terminator is encountered during linear sweep the sweep will immediately end. */
     var softTerminators: [Cartridge.Location: Bool] = [:]
@@ -85,9 +90,6 @@ public final class Disassembler {
 
   /** Ranges of executable regions that should be disassembled. */
   var executableRegions = Set<Range<Cartridge.Location>>()
-
-  /** Explicit labels at specific locations. */
-  var labelNames: [Cartridge.Location: String] = [:]
 
   /** Hints to the disassembler that a given location should be represented by a specific data type. */
   var typeAtLocation: [Cartridge.Location: String] = [:]
@@ -246,7 +248,6 @@ public final class Disassembler {
     for (address, global) in configuration.allGlobals() {
       if address < 0x4000 {
         let location = Cartridge.Location(address: address, bank: 0x01)
-        registerLabel(at: location, named: global.name)
         registerData(at: location)
       }
     }

@@ -8,7 +8,7 @@ extension Disassembler {
       return
     }
     if let name = name {
-      registerLabel(at: range.lowerBound, named: name)
+      mutableConfiguration.registerLabel(at: range.lowerBound, named: name)
     }
 
     executableRegions.insert(range)

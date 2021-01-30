@@ -217,7 +217,7 @@ extension Disassembler {
     let backwardTocs: [(source: Cartridge.Location, destination: Cartridge.Location)] = tocs.reduce(into: [], { (accumulator, element) in
       let tocsInThisScope = element.tocs.filter {
         scope.contains($0) && element.destination < $0
-          && (labelNames[element.destination] != nil || labelTypes[element.destination] != nil)
+          && (configuration.label(at: element.destination) != nil || labelTypes[element.destination] != nil)
       }
       for toc in tocsInThisScope {
         if case .jr(let condition, _) = instructionMap[toc]?.spec, condition != nil {
@@ -266,7 +266,7 @@ extension Disassembler {
       let tocsInThisScope = element.tocs.filter {
         scope.contains($0)
           && element.destination > $0
-          && (labelNames[element.destination] != nil || labelTypes[element.destination] != nil)
+          && (configuration.label(at: element.destination) != nil || labelTypes[element.destination] != nil)
       }
       for toc in tocsInThisScope {
         if case .jr(let condition, _) = instructionMap[toc]?.spec, condition != nil {

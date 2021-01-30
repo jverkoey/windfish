@@ -116,7 +116,6 @@ extension Disassembler {
     for location: Cartridge.Location in range.dropFirst() {
       deleteInstruction(at: location)
       transfers[location] = nil
-      labelNames[location] = nil
       labelTypes[location] = nil
       bankChanges[location] = nil
     }

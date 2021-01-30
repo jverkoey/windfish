@@ -74,21 +74,21 @@ extension ProjectDocument {
         let location = Cartridge.Location(address: region.address, bank: region.bank)
         switch region.regionType {
         case Region.Kind.label:
-          disassembly.registerLabel(at: location, named: region.name)
+          disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
         case Region.Kind.string:
-          disassembly.registerLabel(at: location, named: region.name)
+          disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
           let startLocation = Cartridge.Location(address: region.address, bank: region.bank)
           disassembly.registerText(at: startLocation..<(startLocation + region.length), lineLength: nil)
         case Region.Kind.image1bpp:
-          disassembly.registerLabel(at: location, named: region.name)
+          disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
           let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
           disassembly.registerData(at: startLocation..<(startLocation + region.length), format: .image1bpp)
         case Region.Kind.image2bpp:
-          disassembly.registerLabel(at: location, named: region.name)
+          disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
           let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
           disassembly.registerData(at: startLocation..<(startLocation + region.length), format: .image2bpp)
         case Region.Kind.data:
-          disassembly.registerLabel(at: location, named: region.name)
+          disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
           let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
           disassembly.registerData(at: startLocation..<(startLocation + region.length))
         default:
