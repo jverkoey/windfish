@@ -342,25 +342,34 @@ clean:
 
     var instructionsDecoded = 0
 
-    var macrosAsm: String? = nil
-    var writtenMacros = Set<String>()
+    let linesAsString: ([Line]) -> String = { lines in
+      return lines.map { $0.asString(detailedComments: false) }.joined(separator: "\n")
+    }
 
-    for bankToWrite in UInt8(0)..<UInt8(numberOfBanks) {
+    var macrosAsm: String? = nil
+    var macrosToWrite: [(macro: Disassembler.Configuration.Macro, arguments: [Int: String], rawArguments: [Int: String],
+                      instructions: [(LR35902.Instruction, Statement)])] = []
+    let q = DispatchQueue(label: "sync queue")
+    DispatchQueue.concurrentPerform(iterations: Int(truncatingIfNeeded: numberOfBanks)) { (index: Int) in
+      let bankToWrite: Cartridge.Bank = Cartridge.Bank(truncatingIfNeeded: index)
+      var macrosUsed: [(macro: Disassembler.Configuration.Macro, arguments: [Int: String], rawArguments: [Int: String],
+                        instructions: [(LR35902.Instruction, Statement)])] = []
+
       var bankLines: [Line] = []
       defer {
-        var lastLine: Line?
-        let filteredBankLines = bankLines.filter { thisLine in
-          if let lastLine = lastLine, lastLine.semantic == .empty && thisLine.semantic == .empty {
-            return false
-          }
-          lastLine = thisLine
-          return true
-        }
-        sources["bank_\(bankToWrite.hexString).asm"] = .bank(number: bankToWrite, content: linesAsString(filteredBankLines), lines: filteredBankLines)
-      }
+        q.sync {
+          macrosToWrite.append(contentsOf: macrosUsed)
 
-      let linesAsString: ([Line]) -> String = { lines in
-        return lines.map { $0.asString(detailedComments: false) }.joined(separator: "\n")
+          var lastLine: Line?
+          let filteredBankLines = bankLines.filter { thisLine in
+            if let lastLine = lastLine, lastLine.semantic == .empty && thisLine.semantic == .empty {
+              return false
+            }
+            lastLine = thisLine
+            return true
+          }
+          sources["bank_\(bankToWrite.hexString).asm"] = .bank(number: bankToWrite, content: linesAsString(filteredBankLines), lines: filteredBankLines)
+        }
       }
 
       bankLines.append(Line(semantic: .section(bankToWrite)))
@@ -493,87 +502,7 @@ clean:
           precondition(validMacros.count <= 1, "More than one macro matched.")
 
           if let macro = validMacros.first {
-            if !writtenMacros.contains(macro.macro.name) {
-              writtenMacros.insert(macro.macro.name)
-              if macrosAsm == nil {
-                macrosAsm = ""
-                gameAsm += "INCLUDE \"macros.asm\"\n"
-              }
-
-              var lines: [Line] = []
-              lines.append(Line(semantic: .empty))
-              if !macro.arguments.isEmpty {
-                lines.append(Line(semantic: .macroComment(comment: "Arguments:")))
-
-                let macroSpecs: [LR35902.Instruction.Spec] = macro.macro.macroLines.map { $0.specs() }.reduce([], +)
-
-                let argumentTypes: [Int: String] = zip(macro.macro.macroLines, macroSpecs).reduce([:], { (iter, zipped) -> [Int: String] in
-                  guard case let .arg(spec, argumentOrNil, _) = zipped.0,
-                        let argument = argumentOrNil else {
-                    return iter
-                  }
-                  let args = extractArgTypes(from: zipped.1, using: spec, argument: Int(argument))
-                  return iter.merging(args, uniquingKeysWith: { first, second in
-                    assert(first == second, "Mismatch in arguments")
-                    return first
-                  })
-                })
-
-                for argNumber in macro.arguments.keys.sorted() {
-                  let argType: String
-                  if let type = argumentTypes[argNumber] {
-                    argType = " type: \(type)"
-                  } else {
-                    argType = ""
-                  }
-                  if let validation = macro.macro.validArgumentValues?[argNumber] {
-                    let ranges = validation.rangeView.map {
-                      "$\(LR35902.Address($0.lowerBound).hexString)..<$\(LR35902.Address($0.upperBound).hexString)"
-                    }.joined(separator: ", ")
-                    lines.append(Line(semantic: .macroComment(comment: "- \(argNumber)\(argType): valid values in \(ranges)")))
-                  } else {
-                    lines.append(Line(semantic: .macroComment(comment: "- \(argNumber)\(argType)")))
-                  }
-                }
-              }
-              lines.append(Line(semantic: .macroDefinition(macro.macro.name)))
-              lines.append(contentsOf: zip(macro.macro.macroLines, instructions).map { line, instruction in
-                let macroInstruction = instruction.0
-
-                let argumentString: String?
-                switch line {
-                case let .arg(_, argumentOrNil, argumentText):
-                  if let argumentText = argumentText {
-                    argumentString = argumentText
-                  } else if let argument = argumentOrNil {
-                    argumentString = "\\\(argument)"
-                  } else {
-                    argumentString = nil
-                  }
-                case let .any(_, argument: argumentOrNil, argumentText: argumentText):
-                  if let argumentText = argumentText {
-                    argumentString = argumentText
-                  } else if let argument = argumentOrNil {
-                    argumentString = "\\\(argument)"
-                  } else {
-                    argumentString = nil
-                  }
-                case .instruction:
-                  argumentString = nil
-                }
-
-                let context = RGBDSDisassembler.Context(
-                  address: writeContext.pc,
-                  bank: writeContext.bank,
-                  disassembly: self,
-                  argumentString: argumentString
-                )
-                let macroAssembly = RGBDSDisassembler.statement(for: macroInstruction, with: context)
-                return Line(semantic: .macroInstruction(macroInstruction, macroAssembly))
-              })
-              lines.append(Line(semantic: .macroTerminator))
-              macrosAsm?.append(linesAsString(lines))
-            }
+            macrosUsed.append((macro: macro.macro, arguments: macro.arguments, rawArguments: macro.rawArguments, instructions))
 
             let lowerBound = Cartridge.Location(address: lineBufferAddress, bank: writeContext.bank)
             let upperBound = Cartridge.Location(address: lastAddress, bank: writeContext.bank)
@@ -662,7 +591,7 @@ clean:
             macroNode = child
           } else {
             let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!.total
-            try flushMacro(writeContext.pc - instructionWidth)
+            try! flushMacro(writeContext.pc - instructionWidth)
           }
 
           // Handle context changes.
@@ -697,7 +626,7 @@ clean:
           }
 
         } else {
-          try flushMacro(writeContext.pc)
+          try! flushMacro(writeContext.pc)
 
           lineBuffer.append(contentsOf: lineGroup)
           flush()
@@ -806,14 +735,101 @@ clean:
         }
       }
 
-      try flushMacro(writeContext.pc)
+      try! flushMacro(writeContext.pc)
 
       flush()
     }
 
-    if let macrosAsm = macrosAsm {
-      sources["macros.asm"] = .macros(content: macrosAsm)
+    if !macrosToWrite.isEmpty {
+      macrosAsm = ""
+      gameAsm += "INCLUDE \"macros.asm\"\n"
+
+      var writtenMacros: Set<String> = Set<String>()
+      for macro in macrosToWrite.sorted(by: { $0.macro.name < $1.macro.name }) {
+        guard !writtenMacros.contains(macro.macro.name) else {
+          continue
+        }
+        writtenMacros.insert(macro.macro.name)
+
+        var lines: [Line] = []
+        lines.append(Line(semantic: .empty))
+        if !macro.arguments.isEmpty {
+          lines.append(Line(semantic: .macroComment(comment: "Arguments:")))
+
+          let macroSpecs: [LR35902.Instruction.Spec] = macro.macro.macroLines.map { $0.specs() }.reduce([], +)
+
+          let argumentTypes: [Int: String] = zip(macro.macro.macroLines, macroSpecs).reduce([:], { (iter, zipped) -> [Int: String] in
+            guard case let .arg(spec, argumentOrNil, _) = zipped.0,
+                  let argument = argumentOrNil else {
+              return iter
+            }
+            let args = extractArgTypes(from: zipped.1, using: spec, argument: Int(argument))
+            return iter.merging(args, uniquingKeysWith: { first, second in
+              assert(first == second, "Mismatch in arguments")
+              return first
+            })
+          })
+
+          for argNumber in macro.arguments.keys.sorted() {
+            let argType: String
+            if let type = argumentTypes[argNumber] {
+              argType = " type: \(type)"
+            } else {
+              argType = ""
+            }
+            if let validation = macro.macro.validArgumentValues?[argNumber] {
+              let ranges = validation.rangeView.map {
+                "$\(LR35902.Address($0.lowerBound).hexString)..<$\(LR35902.Address($0.upperBound).hexString)"
+              }.joined(separator: ", ")
+              lines.append(Line(semantic: .macroComment(comment: "- \(argNumber)\(argType): valid values in \(ranges)")))
+            } else {
+              lines.append(Line(semantic: .macroComment(comment: "- \(argNumber)\(argType)")))
+            }
+          }
+        }
+        lines.append(Line(semantic: .macroDefinition(macro.macro.name)))
+        lines.append(contentsOf: zip(macro.macro.macroLines, macro.instructions).map { line, instruction in
+          let macroInstruction = instruction.0
+
+          let argumentString: String?
+          switch line {
+          case let .arg(_, argumentOrNil, argumentText):
+            if let argumentText = argumentText {
+              argumentString = argumentText
+            } else if let argument = argumentOrNil {
+              argumentString = "\\\(argument)"
+            } else {
+              argumentString = nil
+            }
+          case let .any(_, argument: argumentOrNil, argumentText: argumentText):
+            if let argumentText = argumentText {
+              argumentString = argumentText
+            } else if let argument = argumentOrNil {
+              argumentString = "\\\(argument)"
+            } else {
+              argumentString = nil
+            }
+          case .instruction:
+            argumentString = nil
+          }
+
+          let context = RGBDSDisassembler.Context(
+            address: 0,
+            bank: 0,
+            disassembly: self,
+            argumentString: argumentString
+          )
+          let macroAssembly = RGBDSDisassembler.statement(for: macroInstruction, with: context)
+          return Line(semantic: .macroInstruction(macroInstruction, macroAssembly))
+        })
+        lines.append(Line(semantic: .macroTerminator))
+        macrosAsm?.append(linesAsString(lines))
+      }
+      if let macrosAsm = macrosAsm {
+        sources["macros.asm"] = .macros(content: macrosAsm)
+      }
     }
+
     gameAsm += ((UInt8(0)..<UInt8(numberOfBanks))
                   .map { "INCLUDE \"bank_\($0.hexString).asm\"" }
                   .joined(separator: "\n") + "\n")
