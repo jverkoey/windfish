@@ -27,7 +27,7 @@ extension Disassembler {
       return .code
     }
     if data.contains(index) {
-      switch formatOfData(at: location) {
+      switch configuration.formatOfData(at: location) {
       case .image1bpp:  return .image1bpp
       case .image2bpp:  return .image2bpp
       case .jumpTable:  return .jumpTable

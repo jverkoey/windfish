@@ -1811,15 +1811,15 @@ toc_01_0D32:
     jumptable
     dw JumpTable_0D5F_00 ; 00
     dw $4D92 ; 01
-    dw JumpTable_490A_03.JumpTable_490E_03 ; 02
+    dw $490E ; 02
     dw JumpTable_15B3_00 ; 03
     dw JumpTable_1732_00 ; 04
-    dw JumpTable_4D00_03 ; 05
+    dw $4D00 ; 05
     dw $4F30 ; 06
     dw JumpTable_0D57_00 ; 07
-    dw JumpTable_50A2_03 ; 08
+    dw $50A2 ; 08
     dw JumpTable_0D4F_00 ; 09
-    dw JumpTable_4EBC_03.JumpTable_4EFF_03 ; 0A
+    dw $4EFF ; 0A
 
 toc_01_0D49:
     call toc_01_149B

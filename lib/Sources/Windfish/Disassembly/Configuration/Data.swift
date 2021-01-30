@@ -1,6 +1,6 @@
 import Foundation
 
-extension Disassembler {
+extension Disassembler.Configuration {
   public enum DataFormat {
     case bytes
     case image1bpp
@@ -8,9 +8,17 @@ extension Disassembler {
     case jumpTable
   }
 
+  func allPotentialData() -> Set<Range<Cartridge.Location>> {
+    return potentialData
+  }
+
+  func allDataFormats() -> [DataFormat: IndexSet] {
+    return dataFormats
+  }
+
   /** Returns the format of the data at the given location, if any is known. */
   func formatOfData(at location: Cartridge.Location) -> DataFormat? {
-    let index = location.index
+    let index: Int = location.index
     return dataFormats.first { (key: DataFormat, value: IndexSet) -> Bool in
       value.contains(index)
     }?.key
@@ -28,6 +36,6 @@ extension Disassembler {
       dataFormats[key]?.remove(integersIn: intRange)
     }
     dataFormats[format, default: IndexSet()].insert(integersIn: intRange)
-    registerRegion(range: range, as: .data)
+    potentialData.insert(range)
   }
 }

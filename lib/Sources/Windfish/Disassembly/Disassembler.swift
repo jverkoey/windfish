@@ -15,8 +15,12 @@ extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {
 protocol DisassemblerContext: class {
   func allPotentialCode() -> Set<Range<Cartridge.Location>>
   func allPotentialText() -> Set<Range<Cartridge.Location>>
+  func allPotentialData() -> Set<Range<Cartridge.Location>>
 
   func preComment(at location: Cartridge.Location) -> String?
+
+  func allDataFormats() -> [Disassembler.Configuration.DataFormat: IndexSet]
+  func formatOfData(at location: Cartridge.Location) -> Disassembler.Configuration.DataFormat?
 
   func datatypeExists(named name: String) -> Bool
   func datatype(named name: String) -> Disassembler.Configuration.Datatype?
@@ -48,6 +52,9 @@ public final class Disassembler {
     /** Ranges of cartridge locations that could represent text. */
     var potentialText = Set<Range<Cartridge.Location>>()
 
+    /** Ranges of cartridge locations that could represent data. */
+    var potentialData = Set<Range<Cartridge.Location>>()
+
     /** Comments that should be placed immediately before the given location. */
     var preComments: [Cartridge.Location: String] = [:]
 
@@ -77,6 +84,9 @@ public final class Disassembler {
 
     /** The maximum length of a line of text within a given range. */
     var textLengths: [Range<Cartridge.Location>: Int] = [:]
+
+    /** The format of the data at specific locations. */
+    var dataFormats: [DataFormat: IndexSet] = [:]
   }
 
   public let mutableConfiguration = Configuration()
@@ -143,9 +153,6 @@ public final class Disassembler {
    */
   var dataBlocks = IndexSet()
 
-  /** The format of the data at specific locations. */
-  var dataFormats: [DataFormat: IndexSet] = [:]
-
   // MARK: Text
 
   /** All locations that represent text. */
@@ -181,7 +188,7 @@ public final class Disassembler {
       guard let self = self else {
         return
       }
-      self.registerData(
+      self.mutableConfiguration.registerData(
         at: Cartridge.Location(address: startAddress, bank: bank)..<Cartridge.Location(address: endAddress, bank: bank)
       )
     }
@@ -189,7 +196,7 @@ public final class Disassembler {
       guard let self = self else {
         return
       }
-      self.registerData(
+      self.mutableConfiguration.registerData(
         at: Cartridge.Location(address: startAddress, bank: bank)..<Cartridge.Location(address: endAddress, bank: bank),
         format: .jumpTable
       )
@@ -255,21 +262,25 @@ public final class Disassembler {
   }
 
   public func disassemble() {
-    for (address, _) in configuration.allGlobals() {
-      if address < 0x4000 {
-        let location = Cartridge.Location(address: address, bank: 0x01)
-        registerData(at: location)
-      }
-    }
-
-    for range: Range<Cartridge.Location> in configuration.allPotentialText() {
-      registerRegion(range: range, as: .text)
-    }
-
     for potentialCodeRegion in configuration.allPotentialCode().sorted(by: { (a: Range<Cartridge.Location>, b: Range<Cartridge.Location>) -> Bool in
       a.lowerBound < b.lowerBound
     }) {
       disassemble(range: potentialCodeRegion)
+    }
+
+    for (address, _) in configuration.allGlobals() {
+      if address < 0x4000 {
+        let location = Cartridge.Location(address: address, bank: 0x01)
+        registerRegion(range: location..<(location + 1), as: .data)
+      }
+    }
+
+    for range: Range<Cartridge.Location> in configuration.allPotentialData() {
+      registerRegion(range: range, as: .data)
+    }
+
+    for range: Range<Cartridge.Location> in configuration.allPotentialText() {
+      registerRegion(range: range, as: .text)
     }
   }
 

@@ -74,17 +74,17 @@ extension ProjectDocument {
         case Region.Kind.image1bpp:
           disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
           let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
-          disassembly.registerData(at: startLocation..<(startLocation + region.length), format: .image1bpp)
+          disassembly.mutableConfiguration.registerData(at: startLocation..<(startLocation + region.length), format: .image1bpp)
 
         case Region.Kind.image2bpp:
           disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
           let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
-          disassembly.registerData(at: startLocation..<(startLocation + region.length), format: .image2bpp)
+          disassembly.mutableConfiguration.registerData(at: startLocation..<(startLocation + region.length), format: .image2bpp)
 
         case Region.Kind.data:
           disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
           let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
-          disassembly.registerData(at: startLocation..<(startLocation + region.length))
+          disassembly.mutableConfiguration.registerData(at: startLocation..<(startLocation + region.length))
 
         default:
           break
