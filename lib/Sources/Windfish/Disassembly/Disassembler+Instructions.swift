@@ -13,8 +13,11 @@ extension Disassembler {
 
   /** Register an instruction at the given location. */
   func register(instruction: LR35902.Instruction, at location: Cartridge.Location) {
+    guard instructionMap[location] == nil else {
+      return
+    }
     // Don't register instructions in the middle of existing instructions.
-    if code.contains(location.index) && instructionMap[location] == nil {
+    if code.contains(location.index) {
       return
     }
 
