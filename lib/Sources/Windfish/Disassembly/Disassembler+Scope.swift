@@ -103,14 +103,11 @@ extension Disassembler {
   }
 
   private func inferReturns(in scope: Range<Cartridge.Location>, tocs: [(destination: Cartridge.Location, tocs: Set<Cartridge.Location>)]) {
-    let returnLabelAddresses: [Cartridge.Location] = tocs.compactMap { (destination: Cartridge.Location, tocs: Set<Cartridge.Location>) -> Cartridge.Location? in
+    for (destination, _) in tocs {
       guard instructionMap[destination]?.spec.category == .ret else {
-        return nil
+        continue
       }
-      return destination
-    }
-    for cartLocation: Cartridge.Location in returnLabelAddresses {
-      labelTypes[cartLocation] = .returnTransfer
+      labelTypes[destination] = .returnTransfer
     }
   }
 
