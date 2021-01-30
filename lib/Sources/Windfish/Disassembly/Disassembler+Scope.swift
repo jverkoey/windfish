@@ -8,20 +8,20 @@ extension Disassembler {
       }
       // Define the initial contiguous scope for the rungroup's label.
       // This allows functions to rewrite local labels as relative labels.
-      guard let contiguousScope = runGroup.firstContiguousScopeRange else {
+      guard let contiguousScope: Range<Cartridge.Location> = runGroup.firstContiguousScopeRange else {
         continue
       }
       registerContiguousScope(range: contiguousScope)
 
-      let headlessContiguousScope = contiguousScope.dropFirst()
+      let headlessContiguousScope: Range<Cartridge.Location> = contiguousScope.dropFirst()
 
       let tocs: [(destination: Cartridge.Location, tocs: Set<Cartridge.Location>)] = headlessContiguousScope.compactMap {
-        guard let toc = transfersOfControl(at: $0) else {
+        guard let toc: Set<Cartridge.Location> = transfersOfControl(at: $0) else {
           return nil
         }
         return ($0, toc)
       }
-      inferLoops(in: headlessContiguousScope, tocs: tocs)
+      inferDoWhiles(in: headlessContiguousScope, tocs: tocs)
       inferElses(in: headlessContiguousScope, tocs: tocs)
       inferReturns(in: headlessContiguousScope, tocs: tocs)
     }
@@ -110,59 +110,62 @@ extension Disassembler {
       return destination
     }
     for cartLocation: Cartridge.Location in returnLabelAddresses {
-      labelTypes[cartLocation] = .returnType
+      labelTypes[cartLocation] = .returnTransfer
     }
   }
 
-  private func inferLoops(in scope: Range<Cartridge.Location>, tocs: [(destination: Cartridge.Location, tocs: Set<Cartridge.Location>)]) {
+  private func inferDoWhiles(in scope: Range<Cartridge.Location>, tocs: [(destination: Cartridge.Location, tocs: Set<Cartridge.Location>)]) {
+    // Do-while loops are transfers of control that conditionally jump backward into the same contiguous scope.
     let backwardTocs: [(source: Cartridge.Location, destination: Cartridge.Location)] = tocs.reduce(into: [], { (accumulator, element) in
       let tocsInThisScope = element.tocs.filter { (location: Cartridge.Location) -> Bool in
         scope.contains(location) && element.destination < location
-          && (configuration.label(at: element.destination) != nil || labelTypes[element.destination] != nil)
       }
       for toc in tocsInThisScope {
-        if case .jr(let condition, _) = instructionMap[toc]?.spec, condition != nil {
-          accumulator.append((toc, element.destination))
+        guard case .jr(let condition, _) = instructionMap[toc]?.spec, condition != nil else {
+          continue
         }
+        accumulator.append((toc, element.destination))
       }
     })
     if backwardTocs.isEmpty {
       return
     }
-    // Loops do not include other unconditional transfers of control.
-    let loops = backwardTocs.filter {
-      let loopRange = ($0.destination..<$0.source)
-      let tocsWithinLoop: [LR35902.Instruction] = tocs.flatMap {
-        $0.tocs
+    // do-while loops do not include other unconditional transfers of control.
+    let loops = backwardTocs.filter { (source: Cartridge.Location, destination: Cartridge.Location) -> Bool in
+      let loopRange = (destination..<source)
+      let tocsWithinLoop: [LR35902.Instruction] = tocs.flatMap { (destination: Cartridge.Location, tocs: Set<Cartridge.Location>) -> [LR35902.Instruction] in
+        tocs
           .filter { loopRange.contains($0) }
           .compactMap { instructionMap[$0] }
       }
-      return !tocsWithinLoop.contains {
-        switch $0.spec {
-        case .jp(let condition, _), .ret(let condition):
+      return !tocsWithinLoop.contains(where: { (instruction: LR35902.Instruction) -> Bool in
+        switch instruction.spec {
+        case .jp(let condition, _),
+             .ret(let condition):
           return condition == nil
         default:
           return false
         }
-      }
+      })
     }
     if loops.isEmpty {
       return
     }
-    let destinations = Set(loops.map { $0.destination })
-    for location in destinations {
-      labelTypes[location] = .loopType
+    let destinations: Set<Cartridge.Location> = Set(loops.map { $0.destination })
+    for location: Cartridge.Location in destinations {
+      labelTypes[location] = .doWhile
     }
   }
 
   private func inferElses(in scope: Range<Cartridge.Location>, tocs: [(destination: Cartridge.Location, tocs: Set<Cartridge.Location>)]) {
+    // Else statements are transfers of control that jump forward into the same contiguous scope.
     let forwardTocs: [(source: Cartridge.Location, destination: Cartridge.Location)] = tocs.reduce(into: [], { (accumulator, element) in
-      let tocsInThisScope = element.tocs.filter {
-        scope.contains($0)
-          && element.destination > $0
+      let tocsInThisScope: Set<Cartridge.Location> = element.tocs.filter { (location: Cartridge.Location) -> Bool in
+        scope.contains(location)
+          && element.destination > location
           && (configuration.label(at: element.destination) != nil || labelTypes[element.destination] != nil)
       }
-      for toc in tocsInThisScope {
+      for toc: Cartridge.Location in tocsInThisScope {
         if case .jr(let condition, _) = instructionMap[toc]?.spec, condition != nil {
           accumulator.append((toc, element.destination))
         }
@@ -171,9 +174,9 @@ extension Disassembler {
     if forwardTocs.isEmpty {
       return
     }
-    let destinations = Set(forwardTocs.map { $0.destination })
-    for location in destinations {
-      labelTypes[location] = .elseType
+    let destinations: Set<Cartridge.Location> = Set(forwardTocs.map { $0.destination })
+    for location: Cartridge.Location in destinations {
+      labelTypes[location] = .logicalElse
     }
   }
 

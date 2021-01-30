@@ -16,7 +16,7 @@ extension Disassembler {
     if labelTypes[toLocation] == nil
         // Don't create a label in the middle of an instruction.
         && (!code.contains(toLocation.index) || instruction(at: toLocation) != nil) {
-      labelTypes[toLocation] = .transferOfControlType
+      labelTypes[toLocation] = .transferOfControl
     }
   }
 }

@@ -2,10 +2,10 @@ import Foundation
 
 extension Disassembler {
   enum LabelType {
-    case transferOfControlType
-    case elseType
-    case returnType
-    case loopType
+    case transferOfControl
+    case logicalElse
+    case returnTransfer
+    case doWhile
   }
 
   /** Returns the label at the given location, if any. */
@@ -20,10 +20,10 @@ extension Disassembler {
     } else if let labelType: LabelType = labelTypes[location] {
       let bank: Cartridge.Bank = effectiveBank(at: location.address, in: location.bank)
       switch labelType {
-      case .transferOfControlType: name = "toc_\(bank.hexString)_\(location.address.hexString)"
-      case .elseType:              name = "else_\(bank.hexString)_\(location.address.hexString)"
-      case .loopType:              name = "loop_\(bank.hexString)_\(location.address.hexString)"
-      case .returnType:            name = "return_\(bank.hexString)_\(location.address.hexString)"
+      case .transferOfControl: name = "toc_\(bank.hexString)_\(location.address.hexString)"
+      case .logicalElse:       name = "else_\(bank.hexString)_\(location.address.hexString)"
+      case .doWhile:           name = "loop_\(bank.hexString)_\(location.address.hexString)"
+      case .returnTransfer:    name = "return_\(bank.hexString)_\(location.address.hexString)"
       }
     } else {
       return nil
