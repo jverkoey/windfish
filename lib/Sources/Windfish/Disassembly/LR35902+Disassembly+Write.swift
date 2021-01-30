@@ -330,6 +330,7 @@ clean:
       gameAsm += "INCLUDE \"variables.asm\"\n"
     }
 
+    let characterMap = configuration.allMappedCharacters()
     if !characterMap.isEmpty {
       let asm = characterMap.sorted { $0.key < $1.key }.map { value, string in
         "charmap \"\(string)\", $\(value.hexString)"

@@ -15,9 +15,4 @@ extension Disassembler {
     }
     registerRegion(range: range, as: .text)
   }
-
-  /** Maps a character to a specific string. */
-  func mapCharacter(_ character: UInt8, to string: String) {
-    characterMap[character] = string
-  }
 }

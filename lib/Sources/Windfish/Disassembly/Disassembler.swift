@@ -25,6 +25,8 @@ protocol DisassemblerContext: class {
   func allGlobals() -> [LR35902.Address: Disassembler.Configuration.Global]
 
   func allScripts() -> [String: Disassembler.Configuration.Script]
+
+  func allMappedCharacters() -> [UInt8: String]
 }
 
 /// A class that owns and manages disassembly information for a given ROM.
@@ -45,6 +47,9 @@ public final class Disassembler {
 
     /** Scripts that should be executed alongside the disassembler. */
     var scripts: [String: Script] = [:]
+
+    /** Character codes mapped to strings. */
+    var characterMap: [UInt8: String] = [:]
   }
 
   public let mutableConfiguration = Configuration()
@@ -133,9 +138,6 @@ public final class Disassembler {
 
   /** The maximum length of a line of text within a given range. */
   var textLengths: [Range<Cartridge.Location>: Int] = [:]
-
-  /** Character codes mapped to strings. */
-  var characterMap: [UInt8: String] = [:]
 
   func effectiveBank(at pc: LR35902.Address, in bank: Cartridge.Bank) -> Cartridge.Bank {
     if pc < 0x4000 {
