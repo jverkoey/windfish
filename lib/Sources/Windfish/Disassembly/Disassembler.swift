@@ -12,8 +12,22 @@ extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {
   }
 }
 
+protocol DisassemblerContext: class {
+  func preComment(at location: Cartridge.Location) -> String?
+}
+
 /// A class that owns and manages disassembly information for a given ROM.
 public final class Disassembler {
+
+  public final class Configuration: DisassemblerContext {
+    /** Comments that should be placed immediately before the given location. */
+    var preComments: [Cartridge.Location: String] = [:]
+  }
+
+  let mutableConfiguration = Configuration()
+  var configuration: DisassemblerContext {
+    return mutableConfiguration
+  }
 
   let memory: DisassemblerMemory
   let cartridgeData: Data
@@ -50,9 +64,6 @@ public final class Disassembler {
 
   /** Named regions of memory that can be read as data. */
   var globals: [LR35902.Address: Global] = [:]
-
-  /** Comments that should be placed immediately before the given location. */
-  var preComments: [Cartridge.Location: String] = [:]
 
   /** Scripts that should be executed alongside the disassembler. */
   var scripts: [String: Script] = [:]

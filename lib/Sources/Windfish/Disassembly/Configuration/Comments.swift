@@ -1,6 +1,6 @@
 import Foundation
 
-extension Disassembler {
+extension Disassembler.Configuration {
   /** Returns the pre-comment registered at the given location, if any. */
   func preComment(at location: Cartridge.Location) -> String? {
     return preComments[location]

@@ -606,7 +606,7 @@ clean:
       while writeContext.pc < end {
         var isLabeled = false
         var lineGroup: [Line] = []
-        if let preComment = preComment(at: Cartridge.Location(address: writeContext.pc, bank: writeContext.bank)) {
+        if let preComment = configuration.preComment(at: Cartridge.Location(address: writeContext.pc, bank: writeContext.bank)) {
           lineGroup.append(Line(semantic: .empty))
           lineGroup.append(Line(semantic: .preComment(comment: preComment)))
         }
