@@ -38,7 +38,7 @@ class TypeInferenceTests: XCTestCase {
     disassembly.mutableConfiguration.createDatatype(named: "LINK_ANIMATION", bitmask: [
       0x3f: "LINK_ANIMATION_STATE_WALKING_LIFTING_RIGHT",
     ])
-    disassembly.registerGlobal(at: 0xff9d, named: "hLinkAnimationState", dataType: "LINK_ANIMATION")
+    disassembly.mutableConfiguration.registerGlobal(at: 0xff9d, named: "hLinkAnimationState", dataType: "LINK_ANIMATION")
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     let (source, _) = try! disassembly.generateSource()
@@ -103,8 +103,8 @@ SECTION "ROM Bank 00", ROM0[$00]
       0b01000000: "J_SELECT",
       0b10000000: "J_START",
     ])
-    disassembly.registerGlobal(at: 0xffcb, named: "hPressedButtonsMask", dataType: "BUTTON")
-    disassembly.registerGlobal(at: 0xc19f, named: "wDialogState", dataType: "binary")
+    disassembly.mutableConfiguration.registerGlobal(at: 0xffcb, named: "hPressedButtonsMask", dataType: "BUTTON")
+    disassembly.mutableConfiguration.registerGlobal(at: 0xc19f, named: "wDialogState", dataType: "binary")
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     let (source, _) = try! disassembly.generateSource()
@@ -161,7 +161,7 @@ else_01_0025:
       0b0000_0001: "STATF_VB",
       0b0000_0000: "STATF_HB"
     ])
-    disassembly.registerGlobal(at: 0xff41, named: "gbSTAT", dataType: "STATF")
+    disassembly.mutableConfiguration.registerGlobal(at: 0xff41, named: "gbSTAT", dataType: "STATF")
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     let (source, _) = try! disassembly.generateSource()

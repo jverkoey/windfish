@@ -51,7 +51,7 @@ extension ProjectDocument {
       }
 
       for global in self.project.configuration.globals {
-        disassembly.registerGlobal(at: global.address, named: global.name, dataType: global.dataType)
+        disassembly.mutableConfiguration.registerGlobal(at: global.address, named: global.name, dataType: global.dataType)
       }
 
       // Disassemble everything first

@@ -320,6 +320,7 @@ clean:
       gameAsm += "INCLUDE \"datatypes.asm\"\n"
     }
 
+    let globals: [LR35902.Address: Configuration.Global] = configuration.allGlobals()
     if !globals.isEmpty {
       let asm = globals.filter { $0.key >= 0x8000 }.sorted { $0.0 < $1.0 }.map { address, global in
         "\(global.name) EQU $\(address.hexString)"
@@ -704,10 +705,10 @@ clean:
           // Accumulate bytes until the next instruction or transfer of control.
           var accumulator: [UInt8] = []
           let initialPc = writeContext.pc
-          var global: Global?
+          var global: Configuration.Global?
           repeat {
             if writeContext.pc < 0x4000 {
-              global = globals[writeContext.pc]
+              global = configuration.global(at: writeContext.pc)
             }
             accumulator.append(cartridgeData[Cartridge.Location(address: writeContext.pc, bank: initialBank).index])
             writeContext.pc += 1

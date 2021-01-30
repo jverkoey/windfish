@@ -1,6 +1,6 @@
 import Foundation
 
-extension Disassembler {
+extension Disassembler.Configuration {
   final class Global {
     let name: String
     let dataType: String?
@@ -15,17 +15,19 @@ extension Disassembler {
     }
   }
 
+  func allGlobals() -> [LR35902.Address: Disassembler.Configuration.Global] {
+    return globals
+  }
+
+  func global(at address: LR35902.Address) -> Disassembler.Configuration.Global? {
+    return globals[address]
+  }
+
   /** Registers a new global at the given address. */
   public func registerGlobal(at address: LR35902.Address, named name: String, dataType: String? = nil) {
     if let dataType: String = dataType, !dataType.isEmpty {
-      precondition(configuration.datatypeExists(named: dataType), "Data type is not registered.")
+      precondition(datatypeExists(named: dataType), "Data type is not registered.")
     }
     globals[address] = Global(name: name, dataType: dataType)
-
-    if address < 0x4000 {
-      let location = Cartridge.Location(address: address, bank: 0x01)
-      registerLabel(at: location, named: name)
-      registerData(at: location)
-    }
   }
 }

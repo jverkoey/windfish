@@ -46,7 +46,7 @@ extension RGBDSDisassembler {
       // TODO: These are only globals if they're referenced as an address in a subsequent instruction.
       if let argumentString = context.argumentString {
         addressLabel = argumentString
-      } else if let name = context.disassembly.globals[immediate]?.name {
+      } else if let name = context.disassembly.configuration.global(at: immediate)?.name {
         addressLabel = name
       } else {
         addressLabel = "$\(immediate.hexString)"
@@ -300,11 +300,11 @@ extension RGBDSDisassembler {
   private static func prettify(imm16: UInt16, with context: Context) -> String {
     if let label = context.disassembly.label(at: Cartridge.Location(address:imm16, bank: context.bank)) {
       return label
-    } else if let global = context.disassembly.globals[imm16] {
-      return global.name
-    } else {
-      return RGBDS.asHexString(imm16)
     }
+    if let global = context.disassembly.configuration.global(at: imm16) {
+      return global.name
+    }
+    return RGBDS.asHexString(imm16)
   }
 
   private static func addressLabel(_ context: Context, address immediate: (UInt16)) -> String? {

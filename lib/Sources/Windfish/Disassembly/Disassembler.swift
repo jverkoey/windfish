@@ -20,6 +20,9 @@ protocol DisassemblerContext: class {
   func allDatatypes() -> [String: Disassembler.Configuration.Datatype]
 
   func shouldTerminateLinearSweep(at location: Cartridge.Location) -> Bool
+
+  func global(at address: LR35902.Address) -> Disassembler.Configuration.Global?
+  func allGlobals() -> [LR35902.Address: Disassembler.Configuration.Global]
 }
 
 /// A class that owns and manages disassembly information for a given ROM.
@@ -31,6 +34,9 @@ public final class Disassembler {
 
     /** Registered data types. */
     var dataTypes: [String: Datatype] = [:]
+
+    /** Named regions of memory that can be read as data. */
+    var globals: [LR35902.Address: Global] = [:]
 
     /** When a soft terminator is encountered during linear sweep the sweep will immediately end. */
     var softTerminators: [Cartridge.Location: Bool] = [:]
@@ -67,9 +73,6 @@ public final class Disassembler {
 
   /** Hints to the disassembler that a given location should be represented by a specific data type. */
   var typeAtLocation: [Cartridge.Location: String] = [:]
-
-  /** Named regions of memory that can be read as data. */
-  var globals: [LR35902.Address: Global] = [:]
 
   /** Scripts that should be executed alongside the disassembler. */
   var scripts: [String: Script] = [:]
@@ -233,6 +236,14 @@ public final class Disassembler {
   }
 
   public func disassemble() {
+    for (address, global) in configuration.allGlobals() {
+      if address < 0x4000 {
+        let location = Cartridge.Location(address: address, bank: 0x01)
+        registerLabel(at: location, named: global.name)
+        registerData(at: location)
+      }
+    }
+
     for executableRegion in executableRegions.sorted(by: { (a: Range<Cartridge.Location>, b: Range<Cartridge.Location>) -> Bool in
       a.lowerBound < b.lowerBound
     }) {

@@ -104,7 +104,7 @@ extension Disassembler {
             guard case let .imm16(address) = instruction.immediate else {
               preconditionFailure("Invalid immediate associated with instruction")
             }
-            if let global = self.globals[address], let dataType = global.dataType,
+            if let global = self.configuration.global(at: address), let dataType = global.dataType,
               let registerTraces: [LR35902.RegisterTrace] = cpu.registerTraces[register] {
               registerTraces.forEach { (trace: LR35902.RegisterTrace) in
                 switch trace {
@@ -123,7 +123,7 @@ extension Disassembler {
               preconditionFailure("Invalid immediate associated with instruction")
             }
             let address = 0xFF00 | LR35902.Address(addressLowByte)
-            if let global = self.globals[address], let dataType = global.dataType,
+            if let global = self.configuration.global(at: address), let dataType = global.dataType,
               let registerTraces: [LR35902.RegisterTrace] = cpu.registerTraces[register] {
               registerTraces.forEach { (trace: LR35902.RegisterTrace) in
                 switch trace {
@@ -167,7 +167,7 @@ extension Disassembler {
                 guard case .loadFromAddress(let address) = trace else {
                   return nil
                 }
-                guard let global = self.globals[address], let dataType = global.dataType else {
+                guard let global = self.configuration.global(at: address), let dataType = global.dataType else {
                   return nil
                 }
                 return dataType
