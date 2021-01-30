@@ -16,8 +16,15 @@ extension Disassembler {
       registerContiguousScope(range: contiguousScope)
 
       let headlessContiguousScope = contiguousScope.dropFirst()
-      inferLoops(in: headlessContiguousScope)
-      inferElses(in: headlessContiguousScope)
+
+      let tocs: [(destination: Cartridge.Location, tocs: Set<Cartridge.Location>)] = headlessContiguousScope.compactMap {
+        guard let toc = transfersOfControl(at: $0) else {
+          return nil
+        }
+        return ($0, toc)
+      }
+      inferLoops(in: headlessContiguousScope, tocs: tocs)
+      inferElses(in: headlessContiguousScope, tocs: tocs)
       inferReturns(in: headlessContiguousScope)
     }
   }
@@ -105,14 +112,7 @@ extension Disassembler {
     }
   }
 
-  private func inferLoops(in scope: Range<Cartridge.Location>) {
-    let tocs: [(destination: Cartridge.Location, tocs: Set<Cartridge.Location>)] = scope.compactMap {
-      if let toc = transfersOfControl(at: Cartridge.Location(address: $0.address, bank: $0.bank)) {
-        return ($0, toc)
-      } else {
-        return nil
-      }
-    }
+  private func inferLoops(in scope: Range<Cartridge.Location>, tocs: [(destination: Cartridge.Location, tocs: Set<Cartridge.Location>)]) {
     let backwardTocs: [(source: Cartridge.Location, destination: Cartridge.Location)] = tocs.reduce(into: [], { (accumulator, element) in
       let tocsInThisScope = element.tocs.filter {
         scope.contains($0) && element.destination < $0
@@ -153,14 +153,7 @@ extension Disassembler {
     }
   }
 
-  private func inferElses(in scope: Range<Cartridge.Location>) {
-    let tocs: [(destination: Cartridge.Location, tocs: Set<Cartridge.Location>)] = scope.compactMap {
-      if let toc = transfersOfControl(at: $0) {
-        return ($0, toc)
-      } else {
-        return nil
-      }
-    }
+  private func inferElses(in scope: Range<Cartridge.Location>, tocs: [(destination: Cartridge.Location, tocs: Set<Cartridge.Location>)]) {
     let forwardTocs: [(source: Cartridge.Location, destination: Cartridge.Location)] = tocs.reduce(into: [], { (accumulator, element) in
       let tocsInThisScope = element.tocs.filter {
         scope.contains($0)
