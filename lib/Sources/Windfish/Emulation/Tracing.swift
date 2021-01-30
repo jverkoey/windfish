@@ -89,8 +89,7 @@ extension Disassembler {
       emulator.emulate(cpu: cpu, memory: tracerMemory, sourceLocation: sourceLocation)
       step?(instruction, location, cpu)
 
-      cpu.pc = initialPc + LR35902.Address(truncatingIfNeeded: LR35902.InstructionSet.data(representing: instruction).count)
+      cpu.pc = initialPc + LR35902.InstructionSet.widths[instruction.spec]!.opcode
     }
   }
 }
-
