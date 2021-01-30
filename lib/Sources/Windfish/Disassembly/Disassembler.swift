@@ -161,13 +161,6 @@ public final class Disassembler {
   /** All locations that represent text. */
   var text = IndexSet()
 
-  func effectiveBank(at pc: LR35902.Address, in bank: Cartridge.Bank) -> Cartridge.Bank {
-    if pc < 0x4000 {
-      return 1
-    }
-    return bank
-  }
-
   public func willStart() {
     let oslog = OSLog(subsystem: "com.featherless.windfish", category: "PointsOfInterest")
 

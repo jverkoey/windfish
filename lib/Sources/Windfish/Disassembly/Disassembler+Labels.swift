@@ -18,12 +18,11 @@ extension Disassembler {
     if let explicitName: String = configuration.label(at: location) {
       name = explicitName
     } else if let labelType: LabelType = labelTypes[location] {
-      let bank: Cartridge.Bank = effectiveBank(at: location.address, in: location.bank)
       switch labelType {
-      case .transferOfControl: name = "toc_\(bank.hexString)_\(location.address.hexString)"
-      case .logicalElse:       name = "else_\(bank.hexString)_\(location.address.hexString)"
-      case .doWhile:           name = "loop_\(bank.hexString)_\(location.address.hexString)"
-      case .returnTransfer:    name = "return_\(bank.hexString)_\(location.address.hexString)"
+      case .transferOfControl: name = "toc_\(location.bank.hexString)_\(location.address.hexString)"
+      case .logicalElse:       name = "else_\(location.bank.hexString)_\(location.address.hexString)"
+      case .doWhile:           name = "loop_\(location.bank.hexString)_\(location.address.hexString)"
+      case .returnTransfer:    name = "return_\(location.bank.hexString)_\(location.address.hexString)"
       }
     } else {
       return nil
