@@ -4054,7 +4054,7 @@ JumpTable_68C0_04.else_04_68CB:
 toc_04_68D0:
     ld   e, $0F
     ld   d, b
-toc_04_68D0.toc_04_68D3:
+toc_04_68D0.loop_04_68D3:
     push de
     ld   a, e
     cp   c
@@ -4154,7 +4154,7 @@ toc_04_68D0.toc_04_6968:
     dec  e
     ld   a, e
     cp   $FF
-    jp   nz, .toc_04_68D3
+    jp   nz, .loop_04_68D3
 
     ret
 

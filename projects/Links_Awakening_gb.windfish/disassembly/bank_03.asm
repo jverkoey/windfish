@@ -1954,7 +1954,7 @@ toc_03_52BE.return_03_5342:
 toc_03_5343:
     ld   e, $0F
     ld   d, b
-toc_03_5343.toc_03_5346:
+toc_03_5343.loop_03_5346:
     ld   hl, $C280
     add  hl, de
     ld   a, [hl]
@@ -2005,7 +2005,7 @@ toc_03_5343.else_03_538D:
     dec  e
     ld   a, e
     cp   $FF
-    jp   nz, .toc_03_5346
+    jp   nz, .loop_03_5346
 
     ret
 

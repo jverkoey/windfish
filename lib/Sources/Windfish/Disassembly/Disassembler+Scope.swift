@@ -117,14 +117,17 @@ extension Disassembler {
   private func inferDoWhiles(in scope: Range<Cartridge.Location>, tocs: [(destination: Cartridge.Location, tocs: Set<Cartridge.Location>)]) {
     // Do-while loops are transfers of control that conditionally jump backward into the same contiguous scope.
     let backwardTocs: [(source: Cartridge.Location, destination: Cartridge.Location)] = tocs.reduce(into: [], { (accumulator, element) in
-      let tocsInThisScope = element.tocs.filter { (location: Cartridge.Location) -> Bool in
-        scope.contains(location) && element.destination < location
-      }
-      for toc in tocsInThisScope {
-        guard case .jr(let condition, _) = instructionMap[toc]?.spec, condition != nil else {
+      for location: Cartridge.Location in element.tocs {
+        guard scope.contains(location) && element.destination < location else {
           continue
         }
-        accumulator.append((toc, element.destination))
+        switch instructionMap[location]?.spec {
+        case .jr(let condition, _) where condition != nil,
+             .jp(let condition, _) where condition != nil:
+          accumulator.append((location, element.destination))
+        default:
+          break
+        }
       }
     })
     if backwardTocs.isEmpty {
@@ -134,9 +137,7 @@ extension Disassembler {
     let loops = backwardTocs.filter { (source: Cartridge.Location, destination: Cartridge.Location) -> Bool in
       let loopRange = (destination..<source)
       let tocsWithinLoop: [LR35902.Instruction] = tocs.flatMap { (destination: Cartridge.Location, tocs: Set<Cartridge.Location>) -> [LR35902.Instruction] in
-        tocs
-          .filter { loopRange.contains($0) }
-          .compactMap { instructionMap[$0] }
+        tocs.filter { loopRange.contains($0) }.compactMap { instructionMap[$0] }
       }
       return !tocsWithinLoop.contains(where: { (instruction: LR35902.Instruction) -> Bool in
         switch instruction.spec {

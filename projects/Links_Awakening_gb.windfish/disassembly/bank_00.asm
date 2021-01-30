@@ -1675,7 +1675,7 @@ JumpTable_0B53_00.else_01_0BF5:
     dec  c
     dec  e
 JumpTable_0B53_00.else_01_0C27:
-    call toc_02_61E7.toc_02_61ED
+    call toc_02_61E7.loop_02_61ED
 JumpTable_0B53_00.else_01_0C2A:
     call_changebank $14
     call toc_14_59B0
@@ -6384,7 +6384,7 @@ JumpTable_2D73_00:
 
 JumpTable_2D88_00:
     xor  a
-JumpTable_2D88_00.toc_01_2D89:
+JumpTable_2D88_00.loop_01_2D89:
     ld   [$FFD7], a
     ld   hl, $C193
     ld   e, a
@@ -6463,7 +6463,7 @@ JumpTable_2D88_00.toc_01_2DD8:
     ld   a, [$FFD7]
     inc  a
     cp   $04
-    jp   nz, .toc_01_2D89
+    jp   nz, .loop_01_2D89
 
     ld   de, $9000
     ifNot [$DBA5], .else_01_2E55

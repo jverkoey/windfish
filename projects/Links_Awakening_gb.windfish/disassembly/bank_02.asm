@@ -3598,7 +3598,7 @@ toc_02_5EF2:
     ld   b, $00
     dec  a
     ld   e, a
-    call toc_02_61E7.toc_02_61ED
+    call toc_02_61E7.loop_02_61ED
     ld   a, [$C154]
     dec  a
     ld   [$C154], a
@@ -4001,7 +4001,7 @@ toc_02_61E7:
     ld   c, $01
     ld   b, $00
     ld   e, $FF
-toc_02_61E7.toc_02_61ED:
+toc_02_61E7.loop_02_61ED:
     ld   a, [DEBUG_TOOL2]
     and  a
     ret  nz
@@ -4099,7 +4099,7 @@ toc_02_61E7.toc_02_61ED:
     dec  c
     ld   a, c
     cp   e
-    jp   nz, .toc_02_61ED
+    jp   nz, .loop_02_61ED
 
     ret
 
@@ -4637,7 +4637,7 @@ toc_02_6505.else_02_6613:
     ld   c, $01
     ld   b, $00
     ld   e, $00
-    call toc_02_61E7.toc_02_61ED
+    call toc_02_61E7.loop_02_61ED
     jr   .toc_02_666A
 
 toc_02_6505.else_02_661E:
@@ -4675,7 +4675,7 @@ toc_02_6505.else_02_6661:
     ld   c, $00
     ld   b, $00
     ld   e, $FF
-    call toc_02_61E7.toc_02_61ED
+    call toc_02_61E7.loop_02_61ED
 toc_02_6505.toc_02_666A:
     assign [$FFF2], $13
     ld   a, [$DBA3]
@@ -4684,7 +4684,7 @@ toc_02_6505.toc_02_666A:
     ld   b, $00
     dec  a
     ld   e, a
-    call toc_02_61E7.toc_02_61ED
+    call toc_02_61E7.loop_02_61ED
 toc_02_6505.return_02_667B:
     ret
 

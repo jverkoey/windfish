@@ -4050,7 +4050,7 @@ toc_01_7C00.toc_01_7C04:
     ld   a, c
     ld   [$FFE0], a
     ld   d, $00
-toc_01_7C00.toc_01_7C09:
+toc_01_7C00.loop_01_7C09:
     clear [$FFD7]
     ld   [$FFD8], a
     ld   [$FFD9], a
@@ -4117,7 +4117,7 @@ toc_01_7C00.toc_01_7C58:
     ld   a, e
     ld   hl, $FFE0
     cp   [hl]
-    jp   nz, .toc_01_7C09
+    jp   nz, .loop_01_7C09
 
     ret
 
