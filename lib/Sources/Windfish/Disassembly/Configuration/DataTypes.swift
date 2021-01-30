@@ -1,6 +1,6 @@
 import Foundation
 
-extension Disassembler {
+extension Disassembler.Configuration {
   public struct Datatype: Equatable {
     public let namedValues: [UInt8: String]
     public let interpretation: Interpretation
@@ -17,6 +17,18 @@ extension Disassembler {
       case hexadecimal
       case binary
     }
+  }
+
+  func datatypeExists(named name: String) -> Bool {
+    return dataTypes[name] != nil
+  }
+
+  func datatype(named name: String) -> Disassembler.Configuration.Datatype? {
+    return dataTypes[name]
+  }
+
+  func allDatatypes() -> [String: Datatype] {
+    return dataTypes
   }
 
   /** Registers a new enumeration datatype. */
@@ -48,7 +60,9 @@ extension Disassembler {
     }
     dataTypes[name] = Datatype(namedValues: [:], interpretation: .any, representation: representation)
   }
+}
 
+extension Disassembler {
   /** Registers that a given instruction should use the given data type. */
   func registerDataType(at location: Cartridge.Location, to type: String) {
     guard !type.isEmpty else {

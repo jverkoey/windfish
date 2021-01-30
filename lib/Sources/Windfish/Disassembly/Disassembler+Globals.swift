@@ -18,7 +18,7 @@ extension Disassembler {
   /** Registers a new global at the given address. */
   public func registerGlobal(at address: LR35902.Address, named name: String, dataType: String? = nil) {
     if let dataType: String = dataType, !dataType.isEmpty {
-      precondition(dataTypes[dataType] != nil, "Data type is not registered.")
+      precondition(configuration.datatypeExists(named: dataType), "Data type is not registered.")
     }
     globals[address] = Global(name: name, dataType: dataType)
 

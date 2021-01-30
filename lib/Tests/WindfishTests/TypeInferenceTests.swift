@@ -35,7 +35,7 @@ class TypeInferenceTests: XCTestCase {
 
     let disassembly = Disassembler(data: data)
 
-    disassembly.createDatatype(named: "LINK_ANIMATION", bitmask: [
+    disassembly.mutableConfiguration.createDatatype(named: "LINK_ANIMATION", bitmask: [
       0x3f: "LINK_ANIMATION_STATE_WALKING_LIFTING_RIGHT",
     ])
     disassembly.registerGlobal(at: 0xff9d, named: "hLinkAnimationState", dataType: "LINK_ANIMATION")
@@ -92,8 +92,8 @@ SECTION "ROM Bank 00", ROM0[$00]
 
     let disassembly = Disassembler(data: data)
 
-    disassembly.createDatatype(named: "binary", bitmask: [:], representation: .binary)
-    disassembly.createDatatype(named: "BUTTON", bitmask: [
+    disassembly.mutableConfiguration.createDatatype(named: "binary", bitmask: [:], representation: .binary)
+    disassembly.mutableConfiguration.createDatatype(named: "BUTTON", bitmask: [
       0b00000001: "J_RIGHT",
       0b00000010: "J_LEFT",
       0b00000100: "J_UP",
@@ -151,7 +151,7 @@ else_01_0025:
 
     let disassembly = Disassembler(data: data)
 
-    disassembly.createDatatype(named: "STATF", bitmask: [
+    disassembly.mutableConfiguration.createDatatype(named: "STATF", bitmask: [
       0b0100_0000: "STATF_LYC",
       0b0010_0000: "STATF_MODE10",
       0b0001_0000: "STATF_MODE01",

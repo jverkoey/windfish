@@ -236,7 +236,7 @@ extension RGBDSDisassembler {
     let location = Cartridge.Location(address: context.address, bank: context.bank)
 
     guard let type = context.disassembly.typeAtLocation[location],
-          let dataType = context.disassembly.dataTypes[type] else {
+          let dataType = context.disassembly.configuration.datatype(named: type) else {
       if let instruction = context.disassembly.instruction(at: location),
          instruction.spec == .and(.imm8) || instruction.spec == .xor(.imm8) || instruction.spec == .or(.imm8) {
         // Default to treating bit arithmetic as a binary type.
@@ -327,9 +327,9 @@ extension RGBDSDisassembler {
   }
 
   /** Returns the immediate formatted with the given representation. */
-  private static func literal(for imm8: UInt8, using representation: Disassembler.Datatype.Representation, with context: Context) -> String {
+  private static func literal(for imm8: UInt8, using representation: Disassembler.Configuration.Datatype.Representation, with context: Context) -> String {
     let location = Cartridge.Location(address: context.address, bank: context.bank)
-    let forcedRepresentation: Disassembler.Datatype.Representation
+    let forcedRepresentation: Disassembler.Configuration.Datatype.Representation
     if let instruction = context.disassembly.instruction(at: location),
        instruction.spec == .and(.imm8) || instruction.spec == .xor(.imm8) || instruction.spec == .or(.imm8) {
       // Always treat bit arithmetic as a bitmask, regardless of the type.

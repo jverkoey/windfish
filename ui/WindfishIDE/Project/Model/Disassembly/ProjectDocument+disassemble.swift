@@ -27,7 +27,7 @@ extension ProjectDocument {
         let mappingDict = dataType.mappings.reduce(into: [:]) { accumulator, mapping in
           accumulator[mapping.value] = mapping.name
         }
-        let representation: Disassembler.Datatype.Representation
+        let representation: Disassembler.Configuration.Datatype.Representation
         switch dataType.representation {
         case DataType.Representation.binary:
           representation = .binary
@@ -40,11 +40,11 @@ extension ProjectDocument {
         }
         switch dataType.interpretation {
         case DataType.Interpretation.any:
-          disassembly.registerDatatype(named: dataType.name, representation: representation)
+          disassembly.mutableConfiguration.registerDatatype(named: dataType.name, representation: representation)
         case DataType.Interpretation.bitmask:
-          disassembly.createDatatype(named: dataType.name, bitmask: mappingDict, representation: representation)
+          disassembly.mutableConfiguration.createDatatype(named: dataType.name, bitmask: mappingDict, representation: representation)
         case DataType.Interpretation.enumerated:
-          disassembly.createDatatype(named: dataType.name, enumeration: mappingDict, representation: representation)
+          disassembly.mutableConfiguration.createDatatype(named: dataType.name, enumeration: mappingDict, representation: representation)
         default:
           preconditionFailure()
         }

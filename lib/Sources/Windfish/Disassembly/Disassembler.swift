@@ -14,6 +14,10 @@ extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {
 
 protocol DisassemblerContext: class {
   func preComment(at location: Cartridge.Location) -> String?
+
+  func datatypeExists(named name: String) -> Bool
+  func datatype(named name: String) -> Disassembler.Configuration.Datatype?
+  func allDatatypes() -> [String: Disassembler.Configuration.Datatype]
 }
 
 /// A class that owns and manages disassembly information for a given ROM.
@@ -22,9 +26,12 @@ public final class Disassembler {
   public final class Configuration: DisassemblerContext {
     /** Comments that should be placed immediately before the given location. */
     var preComments: [Cartridge.Location: String] = [:]
+
+    /** Registered data types. */
+    var dataTypes: [String: Datatype] = [:]
   }
 
-  let mutableConfiguration = Configuration()
+  public let mutableConfiguration = Configuration()
   var configuration: DisassemblerContext {
     return mutableConfiguration
   }
@@ -58,9 +65,6 @@ public final class Disassembler {
 
   /** Hints to the disassembler that a given location should be represented by a specific data type. */
   var typeAtLocation: [Cartridge.Location: String] = [:]
-
-  /** Registered data types. */
-  var dataTypes: [String: Datatype] = [:]
 
   /** Named regions of memory that can be read as data. */
   var globals: [LR35902.Address: Global] = [:]
