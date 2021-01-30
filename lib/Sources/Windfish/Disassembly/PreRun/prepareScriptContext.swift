@@ -1,65 +1,45 @@
 import Foundation
 
 extension Disassembler {
+  private func getROMData(bank: Cartridge.Bank, startAddress: LR35902.Address, endAddress: LR35902.Address) -> [UInt8] {
+    let startLocation = Cartridge.Location(address: startAddress, bank: bank)
+    let endLocation = Cartridge.Location(address: endAddress, bank: bank)
+    return [UInt8](self.cartridgeData[startLocation.index..<endLocation.index])
+  }
+
   func prepareScriptContext() {
-    let getROMData: @convention(block) (Int, Int, Int) -> [UInt8] = { [weak self] bank, startAddress, endAddress in
-      guard let self = self else {
-        return []
+    let getROMData: @convention(block) (Cartridge.Bank, LR35902.Address, LR35902.Address) -> [UInt8] = { [weak self] (bank: Cartridge.Bank, startAddress: LR35902.Address, endAddress: LR35902.Address) in
+        return self?.getROMData(bank: bank, startAddress: startAddress, endAddress: endAddress) ?? []
       }
-      let startLocation = Cartridge.Location(address: startAddress, bank: bank)
-      let endLocation = Cartridge.Location(address: endAddress, bank: bank)
-      return [UInt8](self.cartridgeData[startLocation.index..<endLocation.index])
-    }
-    let registerText: @convention(block) (Int, Int, Int, Int) -> Void = { [weak self] bank, startAddress, endAddress, lineLength in
-      guard let self = self else {
-        return
-      }
-      self.mutableConfiguration.registerText(
+    let registerText: @convention(block) (Cartridge.Bank, LR35902.Address, LR35902.Address, Int) -> Void = { [weak self] bank, startAddress, endAddress, lineLength in
+      self?.mutableConfiguration.registerText(
         at: Cartridge.Location(address: startAddress, bank: bank)..<Cartridge.Location(address: endAddress, bank: bank),
         lineLength: lineLength
       )
     }
-    let registerData: @convention(block) (Int, Int, Int) -> Void = { [weak self] bank, startAddress, endAddress in
-      guard let self = self else {
-        return
-      }
-      self.mutableConfiguration.registerData(
+    let registerData: @convention(block) (Cartridge.Bank, LR35902.Address, LR35902.Address) -> Void = { [weak self] bank, startAddress, endAddress in
+      self?.mutableConfiguration.registerData(
         at: Cartridge.Location(address: startAddress, bank: bank)..<Cartridge.Location(address: endAddress, bank: bank)
       )
     }
-    let registerJumpTable: @convention(block) (Int, Int, Int) -> Void = { [weak self] bank, startAddress, endAddress in
-      guard let self = self else {
-        return
-      }
-      self.mutableConfiguration.registerData(
+    let registerJumpTable: @convention(block) (Cartridge.Bank, LR35902.Address, LR35902.Address) -> Void = { [weak self] bank, startAddress, endAddress in
+      self?.mutableConfiguration.registerData(
         at: Cartridge.Location(address: startAddress, bank: bank)..<Cartridge.Location(address: endAddress, bank: bank),
         format: .jumpTable
       )
     }
-    let registerTransferOfControl: @convention(block) (Int, Int, Int, Int, Int) -> Void = { [weak self] toBank, toAddress, fromBank, fromAddress, opcode in
-      guard let self = self else {
-        return
-      }
-      self.registerTransferOfControl(
+    let registerTransferOfControl: @convention(block) (Cartridge.Bank, LR35902.Address, Cartridge.Bank, LR35902.Address, Int) -> Void = { [weak self] toBank, toAddress, fromBank, fromAddress, opcode in
+      self?.registerTransferOfControl(
         to: Cartridge.Location(address: toAddress, bank: toBank),
         from: Cartridge.Location(address: fromAddress, bank: fromBank),
         spec: LR35902.InstructionSet.table[opcode]
       )
     }
-    let registerFunction: @convention(block) (Int, Int, String) -> Void = { [weak self] bank, address, name in
-      guard let self = self else {
-        return
-      }
-      self.mutableConfiguration.registerFunction(startingAt: Cartridge.Location(address: address, bank: bank), named: name)
+    let registerFunction: @convention(block) (Cartridge.Bank, LR35902.Address, String) -> Void = { [weak self] bank, address, name in
+      self?.mutableConfiguration.registerFunction(startingAt: Cartridge.Location(address: address, bank: bank), named: name)
     }
-    let registerBankChange: @convention(block) (Int, Int, Int) -> Void = { [weak self] _desiredBank, address, bank in
-      guard let self = self else {
-        return
-      }
-      let desiredBank = Cartridge.Bank(truncatingIfNeeded: _desiredBank)
-      let location = Cartridge.Location(address: LR35902.Address(truncatingIfNeeded: address),
-                                        bank: Cartridge.Bank(truncatingIfNeeded: bank))
-      self.registerBankChange(to: max(1, desiredBank), at: location)
+    let registerBankChange: @convention(block) (Cartridge.Bank, LR35902.Address, Cartridge.Bank) -> Void = { [weak self] desiredBank, address, bank in
+      self?.registerBankChange(to: max(1, desiredBank), at: Cartridge.Location(address: address, bank: bank))
     }
     let hex16: @convention(block) (Int) -> String = { value in
       return UInt16(truncatingIfNeeded: value).hexString
