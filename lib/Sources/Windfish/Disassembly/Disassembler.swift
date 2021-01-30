@@ -1,5 +1,7 @@
 import Foundation
 
+import os.log
+
 import RGBDS
 
 extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {
@@ -166,6 +168,10 @@ public final class Disassembler {
   }
 
   public func willStart() {
+    let oslog = OSLog(subsystem: "com.featherless.windfish", category: "PointsOfInterest")
+
+    let signpostID = OSSignpostID(log: oslog)
+    os_signpost(.begin, log: oslog, name: "Disassembler", signpostID: signpostID, "%{public}s", "willStart")
     // Script functions
     let getROMData: @convention(block) (Int, Int, Int) -> [UInt8] = { [weak self] bank, startAddress, endAddress in
       guard let self = self else {
@@ -259,9 +265,13 @@ public final class Disassembler {
     for script in disassemblyWillStarts {
       script.disassemblyWillStart?.call(withArguments: [])
     }
+    os_signpost(.end, log: oslog, name: "Disassembler", signpostID: signpostID, "%{public}s", "willStart")
   }
 
   public func disassemble() {
+    let log = OSLog(subsystem: "com.featherless.windfish", category: "PointsOfInterest")
+    let signpostID = OSSignpostID(log: log)
+    os_signpost(.begin, log: log, name: "Disassembler", signpostID: signpostID, "%{public}s", "disassemble")
     for potentialCodeRegion in configuration.allPotentialCode().sorted(by: { (a: Range<Cartridge.Location>, b: Range<Cartridge.Location>) -> Bool in
       a.lowerBound < b.lowerBound
     }) {
@@ -282,6 +292,7 @@ public final class Disassembler {
     for range: Range<Cartridge.Location> in configuration.allPotentialText() {
       registerRegion(range: range, as: .text)
     }
+    os_signpost(.end, log: log, name: "Disassembler", signpostID: signpostID, "%{public}s", "disassemble")
   }
 
   private static func disassembleInstructionSpec(at pc: inout LR35902.Address, memory: DisassemblerMemory) -> LR35902.Instruction.Spec {

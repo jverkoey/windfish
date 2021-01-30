@@ -2,6 +2,8 @@ import AppKit
 import Foundation
 import Cocoa
 
+import os.log
+
 import RGBDS
 import Windfish
 
@@ -168,9 +170,14 @@ extension ProjectDocument {
         }
       })
 
+      let log = OSLog(subsystem: "com.featherless.windfish", category: "PointsOfInterest")
+
       var bankTextStorage: [Cartridge.Bank: NSAttributedString] = [:]
       let q = DispatchQueue(label: "sync queue")
       DispatchQueue.concurrentPerform(iterations: Int(truncatingIfNeeded: disassembly.numberOfBanks)) { (index: Int) in
+        let signpostID = OSSignpostID(log: log)
+        os_signpost(.begin, log: log, name: "Generate attributed string", signpostID: signpostID, "%{public}d", index)
+
         let bank: Cartridge.Bank = Cartridge.Bank(truncatingIfNeeded: index)
         let lines: [Disassembler.Line] = bankSources[bank]!.1
 
@@ -343,6 +350,8 @@ extension ProjectDocument {
           }
           accumulator.append(NSAttributedString(string: "\n"))
         }
+        os_signpost(.end, log: log, name: "Generate attributed string", signpostID: signpostID, "%{public}d", index)
+
         q.sync {
           bankTextStorage[bank] = string
         }

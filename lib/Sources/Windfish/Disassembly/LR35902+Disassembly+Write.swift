@@ -1,5 +1,7 @@
 import Foundation
 
+import os.log
+
 import CPU
 import RGBDS
 
@@ -346,17 +348,24 @@ clean:
       return lines.map { $0.asString(detailedComments: false) }.joined(separator: "\n")
     }
 
+    let log = OSLog(subsystem: "com.featherless.windfish", category: "PointsOfInterest")
+
     var macrosAsm: String? = nil
     var macrosToWrite: [(macro: Disassembler.Configuration.Macro, arguments: [Int: String], rawArguments: [Int: String],
                       instructions: [(LR35902.Instruction, Statement)])] = []
     let q = DispatchQueue(label: "sync queue")
     DispatchQueue.concurrentPerform(iterations: Int(truncatingIfNeeded: numberOfBanks)) { (index: Int) in
+      let signpostID = OSSignpostID(log: log)
+      os_signpost(.begin, log: log, name: "Generate source", signpostID: signpostID, "%{public}d", index)
+
       let bankToWrite: Cartridge.Bank = Cartridge.Bank(truncatingIfNeeded: index)
       var macrosUsed: [(macro: Disassembler.Configuration.Macro, arguments: [Int: String], rawArguments: [Int: String],
                         instructions: [(LR35902.Instruction, Statement)])] = []
 
       var bankLines: [Line] = []
       defer {
+        os_signpost(.end, log: log, name: "Generate source", signpostID: signpostID, "%{public}d", index)
+
         q.sync {
           macrosToWrite.append(contentsOf: macrosUsed)
 
