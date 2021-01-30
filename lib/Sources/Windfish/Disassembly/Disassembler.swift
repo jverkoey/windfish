@@ -112,12 +112,10 @@ public final class Disassembler {
     return pc < 0x8000 && Cartridge.Location(address: pc, bank: bank).index < cartridgeSize
   }
 
-  // MARK: - Pre-disassembly hints and configurations
-
-  /** Hints to the disassembler that a given location should be represented by a specific data type. */
-  var typeAtLocation: [Cartridge.Location: String] = [:]
-
   // MARK: - Disassembly results
+
+  // TODO: Split all disassembly results by bank. This will enable disassembly to happen such that each bank has its
+  // own processing queue.
 
   // MARK: Code
 
@@ -132,6 +130,9 @@ public final class Disassembler {
 
   /** Each bank tracks ranges of code that represent contiguous scopes of instructions. */
   var contiguousScopes: [Cartridge.Bank: Set<Range<Cartridge.Location>>] = [:]
+
+  /** Hints to the disassembler that a given location should be represented by a specific data type. */
+  var typeAtLocation: [Cartridge.Location: String] = [:]
 
   /**
    Label types at specific locations.
