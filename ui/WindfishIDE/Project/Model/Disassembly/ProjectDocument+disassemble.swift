@@ -18,7 +18,7 @@ extension ProjectDocument {
 
       // Integrate scripts before any disassembly in order to allow the scripts to modify the disassembly runs.
       for script in self.project.configuration.scripts {
-        disassembly.registerScript(named: script.name, source: script.source)
+        disassembly.mutableConfiguration.registerScript(named: script.name, source: script.source)
       }
 
       disassembly.willStart()

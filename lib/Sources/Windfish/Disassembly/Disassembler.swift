@@ -23,6 +23,8 @@ protocol DisassemblerContext: class {
 
   func global(at address: LR35902.Address) -> Disassembler.Configuration.Global?
   func allGlobals() -> [LR35902.Address: Disassembler.Configuration.Global]
+
+  func allScripts() -> [String: Disassembler.Configuration.Script]
 }
 
 /// A class that owns and manages disassembly information for a given ROM.
@@ -40,6 +42,9 @@ public final class Disassembler {
 
     /** When a soft terminator is encountered during linear sweep the sweep will immediately end. */
     var softTerminators: [Cartridge.Location: Bool] = [:]
+
+    /** Scripts that should be executed alongside the disassembler. */
+    var scripts: [String: Script] = [:]
   }
 
   public let mutableConfiguration = Configuration()
@@ -73,9 +78,6 @@ public final class Disassembler {
 
   /** Hints to the disassembler that a given location should be represented by a specific data type. */
   var typeAtLocation: [Cartridge.Location: String] = [:]
-
-  /** Scripts that should be executed alongside the disassembler. */
-  var scripts: [String: Script] = [:]
 
   /**
    Macros are stored in a tree, where each edge is a representation of an instruction and the leaf nodes are the macro
@@ -211,6 +213,7 @@ public final class Disassembler {
       print(value.hexString)
     }
 
+    let scripts: [String: Configuration.Script] = configuration.allScripts()
     for script in scripts.values {
       script.context.setObject(getROMData, forKeyedSubscript: "getROMData" as NSString)
       script.context.setObject(registerText, forKeyedSubscript: "registerText" as NSString)
@@ -314,6 +317,7 @@ public final class Disassembler {
     }
 
     // Extract any scripted events.
+    let scripts: [String: Configuration.Script] = configuration.allScripts()
     let linearSweepDidSteps = scripts.values.filter { $0.linearSweepDidStep != nil }
     let linearSweepWillStarts = scripts.values.filter { $0.linearSweepWillStart != nil }
 

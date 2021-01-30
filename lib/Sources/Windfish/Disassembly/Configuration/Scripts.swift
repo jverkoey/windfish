@@ -1,7 +1,7 @@
 import Foundation
 import JavaScriptCore
 
-extension Disassembler {
+extension Disassembler.Configuration {
   final class Script {
     init(source: String) {
       self.source = source
@@ -38,6 +38,10 @@ extension Disassembler {
     let linearSweepWillStart: JSValue?
     let linearSweepDidStep: JSValue?
     let disassemblyWillStart: JSValue?
+  }
+
+  func allScripts() -> [String: Script] {
+    return scripts
   }
 
   public func registerScript(named name: String, source: String) {
