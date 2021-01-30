@@ -27,6 +27,8 @@ protocol DisassemblerContext: class {
   func allScripts() -> [String: Disassembler.Configuration.Script]
 
   func allMappedCharacters() -> [UInt8: String]
+
+  func macroTreeRoot() -> Disassembler.Configuration.MacroNode
 }
 
 /// A class that owns and manages disassembly information for a given ROM.
@@ -50,6 +52,12 @@ public final class Disassembler {
 
     /** Character codes mapped to strings. */
     var characterMap: [UInt8: String] = [:]
+
+    /**
+     Macros are stored in a tree, where each edge is a representation of an instruction and the leaf nodes are the macro
+     implementation.
+     */
+    let macroTree = MacroNode()
   }
 
   public let mutableConfiguration = Configuration()
@@ -83,12 +91,6 @@ public final class Disassembler {
 
   /** Hints to the disassembler that a given location should be represented by a specific data type. */
   var typeAtLocation: [Cartridge.Location: String] = [:]
-
-  /**
-   Macros are stored in a tree, where each edge is a representation of an instruction and the leaf nodes are the macro
-   implementation.
-   */
-  let macroTree = MacroNode()
 
   // MARK: - Disassembly results
 

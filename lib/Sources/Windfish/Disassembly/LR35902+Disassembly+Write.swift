@@ -374,7 +374,7 @@ clean:
       var lineBufferAddress: LR35902.Address = writeContext.pc
       var lineBuffer: [Line] = []
       lineBuffer.append(Line(semantic: .empty))
-      var macroNode: MacroNode? = nil
+      var macroNode: Configuration.MacroNode? = nil
 
       let flush = {
         bankLines += lineBuffer
@@ -382,22 +382,23 @@ clean:
         macroNode = nil
       }
 
-      let initialCheckMacro: (LR35902.Instruction) -> MacroNode? = { instruction in
-        let asInstruction = MacroTreeEdge.instruction(instruction)
-        let asAny = MacroTreeEdge.arg(instruction.spec)
-        guard macroNode == nil, let child = self.macroTree.children[asInstruction] ?? self.macroTree.children[asAny] else {
+      let initialCheckMacro: (LR35902.Instruction) -> Configuration.MacroNode? = { instruction in
+        let asInstruction = Configuration.MacroTreeEdge.instruction(instruction)
+        let asAny = Configuration.MacroTreeEdge.arg(instruction.spec)
+        guard macroNode == nil,
+              let child = self.configuration.macroTreeRoot().children[asInstruction] ?? self.configuration.macroTreeRoot().children[asAny] else {
           return nil
         }
         return child
       }
 
-      let followUpCheckMacro: (LR35902.Instruction, Bool) -> MacroNode? = { instruction, isLabeled in
+      let followUpCheckMacro: (LR35902.Instruction, Bool) -> Configuration.MacroNode? = { instruction, isLabeled in
         // Is this the beginning of a macro?
         guard let macroNodeIterator = macroNode else {
           return nil
         }
-        let asInstruction = MacroTreeEdge.instruction(instruction)
-        let asArg = MacroTreeEdge.arg(instruction.spec)
+        let asInstruction = Configuration.MacroTreeEdge.instruction(instruction)
+        let asArg = Configuration.MacroTreeEdge.arg(instruction.spec)
         // Only descend the tree if we're not a label.
         guard !isLabeled, let child = macroNodeIterator.children[asInstruction] ?? macroNodeIterator.children[asArg] else {
           return nil
@@ -420,7 +421,7 @@ clean:
             }
           }
 
-          let macros: [(macro: Disassembler.Macro, arguments: [Int: String], rawArguments: [Int: String])] = macroNodeIterator.macros.compactMap { macro in
+          let macros: [(macro: Disassembler.Configuration.Macro, arguments: [Int: String], rawArguments: [Int: String])] = macroNodeIterator.macros.compactMap { macro in
             // Extract the arguments.
             var anyArgumentMismatches = false
             let arguments: [Int: String] = zip(macro.macroLines, instructions).reduce([:], { (iter, zipped) -> [Int: String] in

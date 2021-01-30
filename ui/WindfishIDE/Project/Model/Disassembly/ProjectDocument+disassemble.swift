@@ -97,7 +97,7 @@ extension ProjectDocument {
       }
 
       for macro in self.project.configuration.macros {
-        disassembly.registerMacro(named: macro.name, template: macro.source)
+        disassembly.mutableConfiguration.registerMacro(named: macro.name, template: macro.source)
       }
 
       let (disassembledSource, statistics) = try! disassembly.generateSource()

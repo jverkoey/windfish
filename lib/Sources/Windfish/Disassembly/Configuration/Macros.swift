@@ -2,7 +2,7 @@ import Foundation
 
 import RGBDS
 
-extension Disassembler {
+extension Disassembler.Configuration {
   /** A representation of a macro. */
   final class Macro {
     /** The name by which the macro is invoked in the generated assembly. */
@@ -86,6 +86,10 @@ extension Disassembler {
       self.children = children
       self.macros = macros
     }
+  }
+
+  func macroTreeRoot() -> MacroNode {
+    return macroTree
   }
 
   /** Registers a new macro with the given template string. */
