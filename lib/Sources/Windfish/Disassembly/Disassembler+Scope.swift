@@ -161,12 +161,10 @@ extension Disassembler {
   private func inferElses(in scope: Range<Cartridge.Location>, tocs: [(destination: Cartridge.Location, tocs: Set<Cartridge.Location>)]) {
     // Else statements are transfers of control that jump forward into the same contiguous scope.
     let forwardTocs: [(source: Cartridge.Location, destination: Cartridge.Location)] = tocs.reduce(into: [], { (accumulator, element) in
-      let tocsInThisScope: Set<Cartridge.Location> = element.tocs.filter { (location: Cartridge.Location) -> Bool in
-        scope.contains(location)
-          && element.destination > location
-          && (configuration.label(at: element.destination) != nil || labelTypes[element.destination] != nil)
-      }
-      for location: Cartridge.Location in tocsInThisScope {
+      for location: Cartridge.Location in element.tocs {
+        guard scope.contains(location) && element.destination > location else {
+          continue
+        }
         switch instructionMap[location]?.spec {
         case .jr(let condition, _) where condition != nil,
              .jp(let condition, _) where condition != nil:
