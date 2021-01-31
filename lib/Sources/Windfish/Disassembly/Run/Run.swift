@@ -67,6 +67,7 @@ final class RunGroup: Sequence {
 }
 
 extension Disassembler {
+  /** A run represents a single contiguous linear sweep. */
   final class Run {
     let startLocation: Cartridge.Location
     let endLocation: Cartridge.Location?
@@ -97,34 +98,34 @@ extension Disassembler {
       }
       return pc >= endLocation.address
     }
-  }
-}
 
-extension Disassembler.Run {
-  /**
-   Breaks this run apart into call groups.
+    /**
+     Breaks this run apart into call groups.
 
-   - Returns: a collection of arrays of Runs, where each array of Runs is part of a single call invocation.
-   */
-  func runGroups() -> [RunGroup] {
-    var runGroups: [RunGroup] = []
+     - Returns: a collection of run groups, where each run group represents a single call invocation.
+     */
+    func runGroups() -> [RunGroup] {
+      var runGroups: [RunGroup] = []
 
-    var sanityCheckSeenRuns = 0
+      var sanityCheckSeenRuns = 0
 
-    var runGroupQueue = [self]
-    while !runGroupQueue.isEmpty {
-      let run = runGroupQueue.removeFirst()
-      var runGroup = [run]
+      var runGroupQueue = [self]
+      while !runGroupQueue.isEmpty {
+        let run = runGroupQueue.removeFirst()
+        var runGroup = [run]
 
-      sanityCheckSeenRuns += 1
+        sanityCheckSeenRuns += 1
 
-      var descendantQueue = run.children
-      while !descendantQueue.isEmpty {
-        let descendant = descendantQueue.removeFirst()
-        if case .call = descendant.invocationInstruction?.spec.category {
-          // Calls mark the start of a new run group.
-          runGroupQueue.append(descendant)
-        } else {
+        var descendantQueue = run.children
+        while !descendantQueue.isEmpty {
+          let descendant = descendantQueue.removeFirst()
+
+          if case .call = descendant.invocationInstruction?.spec.category {
+            // Calls mark the start of a new run group.
+            runGroupQueue.append(descendant)
+            continue
+          }
+
           // Everything else is part of the current group...
           runGroup.append(descendant)
           // ...including any of its descendants.
@@ -132,13 +133,13 @@ extension Disassembler.Run {
 
           sanityCheckSeenRuns += 1
         }
+
+        runGroups.append(RunGroup(runs: runGroup))
       }
 
-      runGroups.append(RunGroup(runs: runGroup))
+      assert(sanityCheckSeenRuns == (runGroups.reduce(0) { $0 + $1.runs.count }))
+
+      return runGroups
     }
-
-    assert(sanityCheckSeenRuns == (runGroups.reduce(0) { $0 + $1.runs.count }))
-
-    return runGroups
   }
 }
