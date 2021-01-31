@@ -35,6 +35,7 @@ class TypeInferenceTests: XCTestCase {
 
     let disassembly = Disassembler(data: data)
 
+    disassembly.willStart()
     disassembly.mutableConfiguration.createDatatype(named: "LINK_ANIMATION", bitmask: [
       0x3f: "LINK_ANIMATION_STATE_WALKING_LIFTING_RIGHT",
     ])
@@ -92,6 +93,7 @@ SECTION "ROM Bank 00", ROM0[$00]
 
     let disassembly = Disassembler(data: data)
 
+    disassembly.willStart()
     disassembly.mutableConfiguration.createDatatype(named: "binary", bitmask: [:], representation: .binary)
     disassembly.mutableConfiguration.createDatatype(named: "BUTTON", bitmask: [
       0b00000001: "J_RIGHT",
@@ -151,6 +153,7 @@ else_01_0025:
 
     let disassembly = Disassembler(data: data)
 
+    disassembly.willStart()
     disassembly.mutableConfiguration.createDatatype(named: "STATF", bitmask: [
       0b0100_0000: "STATF_LYC",
       0b0010_0000: "STATF_MODE10",
@@ -204,6 +207,7 @@ ld   a, [#1]
 and  a
 jr   z, #2
 """)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     let tree = Disassembler.Configuration.MacroNode(
@@ -289,6 +293,7 @@ inc  [hl]
 ld hl, #1
 inc [hl]
 """)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(disassembly.configuration.macroTreeRoot(), Disassembler.Configuration.MacroNode(
@@ -336,6 +341,7 @@ nop
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
 
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     let (source, _) = try! disassembly.generateSource()
@@ -359,6 +365,7 @@ ld [$abcd], a
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
 
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     let (source, _) = try! disassembly.generateSource()
@@ -383,6 +390,7 @@ jr @-$01
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
 
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     let (source, _) = try! disassembly.generateSource()
@@ -419,6 +427,7 @@ call #1
 """, validArgumentValues: [
   1: IndexSet(integersIn: 0x4000..<0x8000)
 ])
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(disassembly.configuration.macroTreeRoot(), Disassembler.Configuration.MacroNode(

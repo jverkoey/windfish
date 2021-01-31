@@ -40,7 +40,7 @@ private final class TracerMemory: TraceableMemory {
   }
 }
 
-extension Disassembler.BankWorker {
+extension Disassembler {
   // TODO: Extract this engine into a generic emulator so that the following code can be debugged in an interactive session:
   /*
    ; Store the read joypad state into c
@@ -58,9 +58,11 @@ extension Disassembler.BankWorker {
    The returned dictionary is a mapping of cartridge locations to the post-execution CPU state for the instruction at
    that location.
    */
-  func trace(range: Range<Cartridge.Location>,
-             cpu: LR35902 = LR35902(),
-             step: ((LR35902.Instruction, Cartridge.Location, LR35902) -> Void)? = nil) {
+  class func trace(range: Range<Cartridge.Location>,
+                   cpu: LR35902 = LR35902(),
+                   context: DisassemblerContext,
+                   router: BankRouter,
+                   step: ((LR35902.Instruction, Cartridge.Location, LR35902) -> Void)? = nil) {
     let bank: Cartridge.Bank = range.lowerBound.bank
     let upperBoundPc: LR35902.Address = range.upperBound.address
 
@@ -71,7 +73,7 @@ extension Disassembler.BankWorker {
     tracerMemory.selectedBank = bank
 
     while cpu.pc < upperBoundPc {
-      guard let instruction: LR35902.Instruction = self.instruction(at: Cartridge.Location(address: cpu.pc, bank: bank)) else {
+      guard let instruction: LR35902.Instruction = router.instruction(at: Cartridge.Location(address: cpu.pc, bank: bank)) else {
         cpu.pc &+= 1
         continue
       }

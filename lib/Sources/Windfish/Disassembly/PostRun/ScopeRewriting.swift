@@ -38,7 +38,7 @@ extension Disassembler.BankWorker {
 
     let registers8: Set<LR35902.Instruction.Numeric> = LR35902.Instruction.Numeric.registers8
 
-    trace(range: visitedRange) { (instruction: LR35902.Instruction, currentLocation: Cartridge.Location, cpu: LR35902) in
+    Disassembler.trace(range: visitedRange, context: context, router: router!) { (instruction: LR35902.Instruction, currentLocation: Cartridge.Location, cpu: LR35902) in
       switch instruction.spec {
 
       // MARK: Backward type propagation

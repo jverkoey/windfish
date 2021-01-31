@@ -565,7 +565,7 @@ clean:
         }
 
         if let instruction = lastBankRouter!.instruction(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) {
-          instructionsDecoded[Int(truncatingIfNeeded: initialBank)] += 1
+          instructionsDecoded[Int(truncatingIfNeeded: bankToWrite)] += 1
 
           if let bankChange = lastBankRouter!.bankChange(at: Cartridge.Location(address: writeContext.pc, bank: writeContext.bank)) {
             writeContext.bank = bankChange

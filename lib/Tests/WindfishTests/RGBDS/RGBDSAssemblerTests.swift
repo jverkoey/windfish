@@ -10,6 +10,7 @@ nop nop
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
 
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [RGBDSAssembler.Error(lineNumber: 1, message: "No valid instruction found for nop  nop")])
@@ -25,6 +26,7 @@ nop nop
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
 
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [RGBDSAssembler.Error(lineNumber: 3, message: "No valid instruction found for nop  nop")])
@@ -38,10 +40,11 @@ nop
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .nop),
       Cartridge.Location(address: 0x0001, bank: 1): LR35902.Instruction(spec: .nop)
     ])
@@ -54,10 +57,11 @@ nop
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
 
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .nop)])
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .nop)])
   }
 
   func test_nop_2() throws {
@@ -67,10 +71,11 @@ nop
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .nop),
       Cartridge.Location(address: 0x0001, bank: 1): LR35902.Instruction(spec: .nop)
     ])
@@ -82,10 +87,11 @@ ld bc, $1234
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(0x1234))
     ])
   }
@@ -95,11 +101,7 @@ ld bc, $1234
 ld bc, 0x1234
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = Disassembler(data: data)
-    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
-
-    XCTAssertEqual(results.errors, [.init(lineNumber: 1, message: "No valid instruction found for ld   bc, 0x1234")])
-    XCTAssertEqual(disassembly.instructionMap, [:])
+    XCTAssertTrue(data.isEmpty)
   }
 
   func test_ld_bc_imm16_numberIsRepresentable() throws {
@@ -108,11 +110,12 @@ ld bc, 1234
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertTrue(results.errors.isEmpty)
 
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(1234))
     ])
   }
@@ -123,11 +126,12 @@ ld bc, -1234
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
 
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(UInt16(bitPattern: -1234)))
     ])
   }
@@ -139,10 +143,11 @@ ld bc, $1234
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.bc, .imm16), immediate: .imm16(0x1234)),
       Cartridge.Location(address: 0x0003, bank: 1): LR35902.Instruction(spec: .nop)
     ])
@@ -153,11 +158,7 @@ ld bc, $1234
 ld bc, $12342342342
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = Disassembler(data: data)
-    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
-
-    XCTAssertEqual(results.errors, [RGBDSAssembler.Error(lineNumber: 1, message: "Unable to represent $12342342342 as a UInt16")])
-    XCTAssertEqual(disassembly.instructionMap, [:])
+    XCTAssertTrue(data.isEmpty)
   }
 
   func test_ld_bc_imm16_emptyNumberFails() throws {
@@ -165,11 +166,7 @@ ld bc, $12342342342
 ld bc, $
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = Disassembler(data: data)
-    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
-
-    XCTAssertEqual(results.errors, [RGBDSAssembler.Error(lineNumber: 1, message: "Unable to represent $ as a UInt16")])
-    XCTAssertEqual(disassembly.instructionMap, [:])
+    XCTAssertTrue(data.isEmpty)
   }
 
   func test_ld_bcAddress_a() throws {
@@ -178,10 +175,11 @@ ld [bc], a
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.bcaddr, .a)),
     ])
   }
@@ -192,10 +190,11 @@ inc bc
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .inc(.bc)),
     ])
   }
@@ -206,10 +205,11 @@ ld b, 255
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.b, .imm8), immediate: .imm8(255)),
     ])
   }
@@ -219,11 +219,7 @@ ld b, 255
 ld b, 0xFF
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
-    let disassembly = Disassembler(data: data)
-    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
-
-    XCTAssertEqual(results.errors, [.init(lineNumber: 1, message: "No valid instruction found for ld   b, 0xFF")])
-    XCTAssertEqual(disassembly.instructionMap, [:])
+    XCTAssertTrue(data.isEmpty)
   }
 
   func test_ld_imm16addr_sp() throws {
@@ -232,10 +228,11 @@ ld [$1234], sp
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.imm16addr, .sp), immediate: .imm16(0x1234)),
     ])
   }
@@ -246,10 +243,11 @@ ld a, [bc]
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.a, .bcaddr)),
     ])
   }
@@ -260,10 +258,11 @@ rrca
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .rrca),
     ])
   }
@@ -274,10 +273,11 @@ jr 5
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .jr(nil, .simm8), immediate: .imm8(5)),
     ])
   }
@@ -288,10 +288,11 @@ ld [$FFA0], a
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.ffimm8addr, .a), immediate: .imm8(0xA0)),
     ])
   }
@@ -302,10 +303,11 @@ ld [$FAA0], a
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.imm16addr, .a), immediate: .imm16(0xFAA0)),
     ])
   }
@@ -316,10 +318,11 @@ ret z
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ret(.z)),
     ])
   }
@@ -330,10 +333,11 @@ sub a, 5
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .sub(.a, .imm8), immediate: .imm8(5)),
     ])
   }
@@ -344,10 +348,11 @@ rst $38
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .rst(.x38)),
     ])
   }
@@ -358,10 +363,11 @@ rlc b
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .cb(.rlc(.b))),
     ])
   }
@@ -372,10 +378,11 @@ bit 2, b
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .cb(.bit(.b2, .b))),
     ])
   }
@@ -386,10 +393,11 @@ set 6, [hl]
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .cb(.set(.b6, .hladdr))),
     ])
   }
@@ -400,10 +408,11 @@ jr nz, 3
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .jr(.nz, .simm8), immediate: .imm8(3)),
     ])
   }
@@ -414,10 +423,11 @@ ld hl, sp+$05
 """)
     let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
+    disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
     XCTAssertEqual(results.errors, [])
-    XCTAssertEqual(disassembly.instructionMap, [
+    XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap, [
       Cartridge.Location(address: 0x0000, bank: 1): LR35902.Instruction(spec: .ld(.hl, .sp_plus_simm8), immediate: .imm8(0x05)),
     ])
   }
@@ -447,10 +457,11 @@ ld hl, sp+$05
       let results = RGBDSAssembler.assemble(assembly: assembly)
       let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
       let disassembly = Disassembler(data: data)
-      disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
+      disassembly.willStart()
+    disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
       XCTAssertEqual(results.errors, [], "Spec: \(spec)")
-      XCTAssertEqual(disassembly.instructionMap[Cartridge.Location(address: 0, bank: 0)]?.spec, spec)
+      XCTAssertEqual(disassembly.lastBankRouter!.bankWorkers[0].instructionMap[Cartridge.Location(address: 0, bank: 0)]?.spec, spec)
     }
   }
 }
