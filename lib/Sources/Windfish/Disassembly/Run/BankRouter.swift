@@ -20,9 +20,8 @@ extension Disassembler {
     }
 
     func schedule(run: Run) {
-      workGroup.enter()
-
       print("[router] Scheduling \(run.startLocation.bank.hexString):\(run.startLocation.address.hexString)")
+
       let bankWorker: BankWorker = bankWorkers[Int(truncatingIfNeeded: run.startLocation.bankIndex)]
       bankWorker.schedule(run: run)
     }
@@ -58,11 +57,15 @@ extension Disassembler {
     // MARK: - Scheduling runs
 
     func schedule(run: Run) {
+      router?.workGroup.enter()
+
       queue.async {
+        defer {
+          self.router?.workGroup.leave()
+        }
+
         // TODO: Do something with the run.
         print("[worker \(self.bank.hexString)] Running \(run.startLocation.bank.hexString):\(run.startLocation.address.hexString)")
-
-        self.router?.workGroup.leave()
 
         print("[worker \(self.bank.hexString)] Finished \(run.startLocation.bank.hexString):\(run.startLocation.address.hexString)")
       }
