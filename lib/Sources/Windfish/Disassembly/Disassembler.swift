@@ -14,6 +14,7 @@ extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {
   }
 }
 
+// TODO: Rename something like "ConfigurationInput".
 protocol DisassemblerContext: class {
   func allPotentialCode() -> Set<Range<Cartridge.Location>>
   func allPotentialText() -> Set<Range<Cartridge.Location>>
@@ -168,7 +169,7 @@ public final class Disassembler {
 
     let async = false
     if async {
-      let bankRouter: BankRouter = BankRouter(numberOfBanks: Int(truncatingIfNeeded: numberOfBanks))
+      let bankRouter: BankRouter = BankRouter(numberOfBanks: Int(truncatingIfNeeded: numberOfBanks), context: configuration)
 
       for range in configuration.allPotentialCode().sorted(by: { (a: Range<Cartridge.Location>, b: Range<Cartridge.Location>) -> Bool in
         a.lowerBound < b.lowerBound
@@ -225,6 +226,8 @@ public final class Disassembler {
                                      from: Cartridge.Location(address: fromAddress, bank: bank),
                                      spec: instruction.spec)
     }
+
+    // MARK: - All above migrated to BankRouter.
 
     // Extract any scripted events.
     let scripts: [String: Configuration.Script] = configuration.allScripts()
