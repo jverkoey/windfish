@@ -1580,7 +1580,7 @@ toc_06_4C72:
     jr   c, .else_06_4C8C
 
     cp   $68
-    jr   c, toc_06_4CAB
+    jr   c, toc_06_4C9D.toc_06_4CAB
 
 toc_06_4C72.else_06_4C8C:
     ld   a, [$FFEF]
@@ -1607,7 +1607,7 @@ toc_06_4C9D:
     add  a, e
     and  %00000011
     ld   [hl], a
-toc_06_4CAB:
+toc_06_4C9D.toc_06_4CAB:
     ld   hl, $C380
     add  hl, bc
     ld   a, [hl]
@@ -1645,7 +1645,7 @@ toc_06_4CAB:
 
     assign [$FFF4], $2F
     ld   a, $01
-toc_06_4CAB.loop_06_4CE8:
+toc_06_4C9D.loop_06_4CE8:
     ld   [$FFE8], a
     ld   a, $8E
     call toc_01_3C01
@@ -1709,7 +1709,7 @@ toc_06_4CAB.loop_06_4CE8:
     cp   $FF
     jr   nz, .loop_06_4CE8
 
-toc_06_4CAB.return_06_4D54:
+toc_06_4C9D.return_06_4D54:
     ret
 
 
@@ -1740,7 +1740,7 @@ JumpTable_4D55_06.else_06_4D6B:
     and  %00000011
     ld   [hl], a
 JumpTable_4D55_06.else_06_4D78:
-    call toc_06_4CAB
+    call toc_06_4C9D.toc_06_4CAB
     call toc_01_3DAF
     ret
 
@@ -2471,7 +2471,7 @@ toc_06_5625:
     db   $10
 
     ld   a, d
-toc_06_562F:
+toc_06_5625.toc_06_562F:
     jr   nz, toc_06_5625
 
     ld   hl, sp+$70
@@ -2492,7 +2492,7 @@ toc_06_562F:
     ld   hl, sp+$74
     nop
     inc  b
-toc_06_562F.else_06_5645:
+toc_06_5625.else_06_5645:
     nop
     halt
     nop
@@ -2522,7 +2522,7 @@ toc_06_562F.else_06_5645:
     ld   hl, sp+$74
     nop
     inc  b
-toc_06_562F.else_06_5665:
+toc_06_5625.else_06_5665:
     nop
     halt
     nop
@@ -2542,7 +2542,7 @@ toc_06_562F.else_06_5665:
     rlca
     ld   h, $00
     inc  c
-toc_06_562F.else_06_567D:
+toc_06_5625.else_06_567D:
     dec  c
     ld   h, $00
     ld   a, [$FFF1]
@@ -2570,7 +2570,7 @@ toc_06_562F.else_06_567D:
     ld   hl, $5670
     ld   c, $04
     call toc_01_3D26
-toc_06_562F.else_06_56AD:
+toc_06_5625.else_06_56AD:
     jp   toc_01_3DBA
 
     db   $00, $04, $FC, $08, $F8, $21, $D0, $C2
@@ -2928,9 +2928,9 @@ JumpTable_5972_06:
     ld   [hl], h
     nop
     ld   [hl], h
-    jr   nz, toc_06_59EB
+    jr   nz, toc_06_59A3.toc_06_59EB
 
-    jr   nz, toc_06_59EB
+    jr   nz, toc_06_59A3.toc_06_59EB
 
     nop
     ld   [hl], b
@@ -2942,7 +2942,7 @@ JumpTable_5972_06:
     halt
     nop
     halt
-    jr   nz, toc_06_5A01
+    jr   nz, toc_06_59A3.else_06_5A01
 
     nop
     ld   a, d
@@ -2966,27 +2966,27 @@ JumpTable_5972_06:
     db   $E6, $80
 
 toc_06_59A3:
-    jr   nz, toc_06_59AB
+    jr   nz, .toc_06_59AB
 
     ld   de, $5972
     call toc_01_3C3B
-toc_06_59AB:
+toc_06_59A3.toc_06_59AB:
     ld   hl, $C3D0
     add  hl, bc
     ld   a, [hl]
     ld   [$FFD7], a
     ld   a, [hFrameCounter]
     and  %00000001
-    jr   z, toc_06_59C0
+    jr   z, .else_06_59C0
 
     assign [$FFE9], $06
     ld   a, $00
-    jr   toc_06_59C6
+    jr   .loop_06_59C6
 
-toc_06_59C0:
+toc_06_59A3.else_06_59C0:
     assign [$FFE9], $FF
     ld   a, $05
-toc_06_59C6:
+toc_06_59A3.loop_06_59C6:
     ld   [$FFE8], a
     ld   e, a
     ld   d, b
@@ -3009,15 +3009,15 @@ toc_06_59C6:
     add  hl, de
     sub  a, [hl]
     ld   [$FFEC], a
-toc_06_59EB:
+toc_06_59A3.toc_06_59EB:
     ld   a, [hl]
     and  %10000000
-    jr   nz, toc_06_5A09
+    jr   nz, .else_06_5A09
 
     ld   a, [$FFE8]
     cp   $05
     ld   a, $04
-    jr   nz, toc_06_5A01
+    jr   nz, .else_06_5A01
 
     ld   a, [hFrameCounter]
     rra
@@ -3025,23 +3025,23 @@ toc_06_59EB:
     rra
     and  %00000001
     add  a, 7
-toc_06_5A01:
+toc_06_59A3.else_06_5A01:
     ld   [$FFF1], a
     ld   de, $5972
     call toc_01_3C3B
-toc_06_5A09:
+toc_06_59A3.else_06_5A09:
     ld   e, $FF
     ld   a, [hFrameCounter]
     and  %00000001
-    jr   z, toc_06_5A13
+    jr   z, .else_06_5A13
 
     ld   e, $01
-toc_06_5A13:
+toc_06_59A3.else_06_5A13:
     ld   hl, $FFE9
     ld   a, [$FFE8]
     add  a, e
     cp   [hl]
-    jr   nz, toc_06_59C6
+    jr   nz, .loop_06_59C6
 
     jp   toc_01_3DBA
 
@@ -4460,7 +4460,7 @@ JumpTable_68E1_06:
     jr   .toc_06_6902
 
 JumpTable_68E1_06.else_06_68FB:
-    if   [$DB4E], toc_06_65E5
+    ifNotZero [$DB4E], toc_06_65E5
 
 JumpTable_68E1_06.toc_06_6902:
     ld   a, [hDefaultMusicTrack]
@@ -6769,8 +6769,8 @@ JumpTable_7EE5_06.else_06_7F2E:
     copyFromTo [$FFEF], [hLinkPositionY]
     clear [$C146]
     ld   [hLinkPositionZHigh], a
-    call toc_06_7FDF
-    call toc_06_7FDF
+    call toc_06_7F77.toc_06_7FDF
+    call toc_06_7F77.toc_06_7FDF
     ret
 
 
@@ -6788,37 +6788,37 @@ toc_06_7F77:
     add  hl, bc
     ld   a, [hl]
     and  %00000011
-    jr   nz, toc_06_7F95
+    jr   nz, .else_06_7F95
 
     ld   a, [hl]
     and  %00001100
-    jr   z, toc_06_7F9D
+    jr   z, .else_06_7F9D
 
     ld   hl, $C250
     add  hl, bc
     ld   a, [hl]
     xor  %11110000
     ld   [hl], a
-    jr   toc_06_7F9D
+    jr   .else_06_7F9D
 
-toc_06_7F95:
+toc_06_7F77.else_06_7F95:
     ld   hl, $C240
     add  hl, bc
     ld   a, [hl]
     xor  %11110000
     ld   [hl], a
-toc_06_7F9D:
+toc_06_7F77.else_06_7F9D:
     ld   hl, $C290
     add  hl, bc
     ld   a, [hl]
     and  a
-    jr   nz, toc_06_7FAC
+    jr   nz, .else_06_7FAC
 
     call toc_01_27ED
     and  %00111111
-    jr   nz, toc_06_7FD9
+    jr   nz, .else_06_7FD9
 
-toc_06_7FAC:
+toc_06_7F77.else_06_7FAC:
     xor  a
     ld   hl, $C250
     add  hl, bc
@@ -6834,7 +6834,7 @@ toc_06_7FAC:
     add  hl, bc
     ld   [hl], a
     and  a
-    jr   nz, toc_06_7FD9
+    jr   nz, .else_06_7FD9
 
     call toc_01_27ED
     and  %00000001
@@ -6847,12 +6847,12 @@ toc_06_7FAC:
     ld   hl, $C250
     add  hl, bc
     ld   [hl], a
-toc_06_7FD9:
+toc_06_7F77.else_06_7FD9:
     ld   hl, $C290
     add  hl, bc
     xor  a
     ld   [hl], a
-toc_06_7FDF:
+toc_06_7F77.toc_06_7FDF:
     ld   hl, $C440
     add  hl, bc
     ld   a, [hl]

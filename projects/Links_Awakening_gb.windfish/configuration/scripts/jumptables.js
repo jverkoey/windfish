@@ -1,8 +1,6 @@
 
 var jumpTableIndex = 0;
 
-const jp_r16 = 0xc3;
-
 function disassembleJumpTable(bank, startAddress, endAddress, selectedBank, functionNames) {
   jumpTableIndex += 1;
 
@@ -44,7 +42,7 @@ function disassembleJumpTable(bank, startAddress, endAddress, selectedBank, func
     } else {
       jumpName = "JumpTable_" + hex16(jumpToAddress) + "_" + hex8(selectedBank);
     }
-    registerTransferOfControl(selectedBank, jumpToAddress, bank, jumpFromAddress, jp_r16);
+    registerTransferOfControl(selectedBank, jumpToAddress, bank, jumpFromAddress);
     registerFunction(selectedBank, jumpToAddress, jumpName);
   }
 }

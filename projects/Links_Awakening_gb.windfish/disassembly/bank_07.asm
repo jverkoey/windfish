@@ -1886,7 +1886,7 @@ JumpTable_64C0_07.else_07_64CA:
     db   $AF, $C3, $87, $3B
 
 toc_07_650E:
-    if   [hLinkPositionZHigh], toc_01_3BD5
+    ifNotZero [hLinkPositionZHigh], toc_01_3BD5
 
     cp   $08
     jp   c, toc_01_3BD5
@@ -2832,14 +2832,14 @@ toc_07_7789:
     call toc_07_7D35
     add  a, $06
     cp   $0A
-    jr   c, toc_07_77A7
+    jr   c, .else_07_77A7
 
     call toc_07_7D45
     add  a, $06
     cp   $0A
-    jr   nc, toc_07_77B7
+    jr   nc, .return_07_77B7
 
-toc_07_77A7:
+toc_07_7789.else_07_77A7:
     call toc_07_7D55
     ld   hl, $C380
     add  hl, bc
@@ -2847,7 +2847,7 @@ toc_07_77A7:
     call JumpTable_3B8D_00
     call toc_01_0891
     ld   [hl], $FF
-toc_07_77B7:
+toc_07_7789.return_07_77B7:
     ret
 
 

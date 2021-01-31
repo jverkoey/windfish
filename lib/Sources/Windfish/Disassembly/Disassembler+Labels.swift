@@ -1,6 +1,14 @@
 import Foundation
 
-extension Disassembler {
+extension Disassembler.BankRouter {
+
+  /** Returns the label at the given location, if any. */
+  func label(at location: Cartridge.Location) -> String? {
+    return bankWorkers[Int(truncatingIfNeeded: location.bankIndex)].label(at: location)
+  }
+}
+
+extension Disassembler.BankWorker {
   enum LabelType {
     case transferOfControl
     case logicalElse
@@ -10,12 +18,13 @@ extension Disassembler {
 
   /** Returns the label at the given location, if any. */
   func label(at location: Cartridge.Location) -> String? {
+    assert(location.bankIndex == bank)
     guard canShowLabel(at: location) else {
       return nil
     }
 
     let name: String
-    if let explicitName: String = configuration.label(at: location) {
+    if let explicitName: String = context.label(at: location) {
       name = explicitName
     } else if let labelType: LabelType = labelTypes[location] {
       switch labelType {

@@ -56,7 +56,7 @@ JumpTable_4073_01:
     call toc_01_40EB
     ld   a, [$FFCC]
     and  %10110000
-    jr   z, toc_01_40CE.toc_01_40E8
+    jr   z, toc_01_40C2.return_01_40E8
 
     assign [$FFF2], $13
     ifEq [$C13F], $01, toc_01_40C2
@@ -83,7 +83,7 @@ toc_01_40C2:
     call toc_01_5B94
     call toc_01_2985
     call toc_01_5F1A
-toc_01_40CE:
+toc_01_40C2.toc_01_40CE:
     assign [gbLCDC], LCDCF_BG_DISPLAY | LCDCF_OBJ_16_16 | LCDCF_OBJ_DISPLAY | LCDCF_ON | LCDCF_TILEMAP_9C00
     ld   [$D6FD], a
     assign [gbWX], $07
@@ -91,7 +91,7 @@ toc_01_40CE:
     ld   [gbWY], a
     assign [hVolumeRight], $07
     assign [hVolumeLeft], $70
-toc_01_40CE.toc_01_40E8:
+toc_01_40C2.return_01_40E8:
     ret
 
 
@@ -639,7 +639,7 @@ toc_01_460F:
     call toc_01_46DD
     ld   de, $070A
     call toc_01_46DD
-    if   [DEBUG_TOOL1], .return_01_46DC
+    ifNotZero [DEBUG_TOOL1], .return_01_46DC
 
     ld   e, $00
     ld   d, $00
@@ -1359,7 +1359,7 @@ toc_01_5357.loop_01_53D2:
 
     ld   a, [$DBB0]
     and  %00000011
-    jr   z, .else_01_5406
+    jr   z, .loop_01_5406
 
     ld   a, [$DBB0]
     and  %00110000
@@ -1370,7 +1370,7 @@ toc_01_5357.loop_01_53D2:
     add  a, $04
     ld   c, a
     ld   b, $00
-    jr   .else_01_5406
+    jr   .loop_01_5406
 
 toc_01_5357.else_01_53F5:
     ld   a, [$DBB0]
@@ -1386,7 +1386,7 @@ toc_01_5357.loop_01_53FB:
     and  a
     jr   nz, .loop_01_53FB
 
-toc_01_5357.else_01_5406:
+toc_01_5357.loop_01_5406:
     push hl
     ld   hl, $525E
     add  hl, bc
@@ -1411,7 +1411,7 @@ toc_01_5357.else_01_5406:
     pop  hl
     inc  hl
     cp   $FF
-    jr   nz, .else_01_5406
+    jr   nz, .loop_01_5406
 
 toc_01_5357.else_01_5430:
     xor  a
@@ -2174,7 +2174,7 @@ toc_01_5D6B.else_01_5E11:
     inc  [hl]
     assign [$FFF2], $2D
 toc_01_5D6B.else_01_5E37:
-    if   [$DB73], toc_01_5ED7
+    ifNotZero [$DB73], toc_01_5ED7
 
     ld   e, $0F
     ld   d, $00
@@ -2270,29 +2270,29 @@ toc_01_5ED7:
     cp   $A7
     ret  z
 
-    ifNe [$DB56], $01, toc_01_5F19
+    ifNe [$DB56], $01, .return_01_5F19
 
     ld   e, $0F
     ld   d, $00
-toc_01_5EE7:
+toc_01_5ED7.loop_01_5EE7:
     ld   hl, $C3A0
     add  hl, de
     ld   a, [hl]
     cp   $6D
-    jr   nz, toc_01_5EF9
+    jr   nz, .else_01_5EF9
 
     ld   hl, $C280
     add  hl, de
     ld   a, [hl]
     and  a
-    jr   z, toc_01_5EF9
+    jr   z, .else_01_5EF9
 
     ld   [hl], d
-toc_01_5EF9:
+toc_01_5ED7.else_01_5EF9:
     dec  e
     ld   a, e
     cp   $FF
-    jr   nz, toc_01_5EE7
+    jr   nz, .loop_01_5EE7
 
     ld   a, $6D
     call toc_01_3C01
@@ -2308,7 +2308,7 @@ toc_01_5EF9:
     ld   hl, $C310
     add  hl, de
     ld   [hl], a
-toc_01_5F19:
+toc_01_5ED7.return_01_5F19:
     ret
 
 
@@ -2947,19 +2947,19 @@ toc_01_6E2D.return_01_6E39:
     db   $C6, $C2, $C0, $C2
 
 toc_01_6E3E:
-    ifNot [hButtonsInactiveDelay], toc_01_6E48
+    ifNot [hButtonsInactiveDelay], .else_01_6E48
 
     dec  a
     ld   [hButtonsInactiveDelay], a
     jr   toc_01_6EAD
 
-toc_01_6E48:
+toc_01_6E3E.else_01_6E48:
     ld   a, [$FFCC]
     and  %10000000
     jr   z, toc_01_6EAD
 
     call toc_01_27D2
-    ifEq [$DB96], $0B, toc_01_6E90
+    ifEq [$DB96], $0B, .else_01_6E90
 
     assign [hButtonsInactiveDelay], 40
     assign [$D6FF], $11
@@ -2978,7 +2978,7 @@ toc_01_6E48:
     call toc_01_7B11
     jr   toc_01_6EA4
 
-toc_01_6E90:
+toc_01_6E3E.else_01_6E90:
     jp   toc_01_44BC
 
     db   $AF, $EA, $96, $DB, $E0, $96, $E0, $97
@@ -2992,13 +2992,13 @@ toc_01_6EA4:
 
 
 toc_01_6EAD:
-    ifGte [$DB96], $05, toc_01_6ECD
+    ifGte [$DB96], $05, .else_01_6ECD
 
-    ifNot [$D000], toc_01_6EBE
+    ifNot [$D000], .else_01_6EBE
 
     dec  a
     ld   [$D000], a
-toc_01_6EBE:
+toc_01_6EAD.else_01_6EBE:
     rra
     nop
     and  %00000011
@@ -3008,7 +3008,7 @@ toc_01_6EBE:
     add  hl, de
     ld   a, [hl]
     ld   [$DB97], a
-toc_01_6ECD:
+toc_01_6EAD.else_01_6ECD:
     ld   a, [$DB96]
     jumptable
     db   $ED, $6E, $11, $6F, $19, $6F, $84, $6F
@@ -4269,9 +4269,9 @@ toc_01_7DC1:
     and  a
     ret  nz
 
-    ifNot [$DBA5], toc_01_7DE7
+    ifNot [$DBA5], .return_01_7DE7
 
-    ifGte [$FFF7], $08, toc_01_7DE7
+    ifGte [$FFF7], $08, .return_01_7DE7
 
     sla  a
     ld   e, a
@@ -4282,10 +4282,10 @@ toc_01_7DC1:
     ld   h, [hl]
     ld   l, a
     ld   [hl], $A3
-    ifNot [$FFF9], toc_01_7DE7
+    ifNot [$FFF9], .return_01_7DE7
 
     ld   [hl], $7F
-toc_01_7DE7:
+toc_01_7DC1.return_01_7DE7:
     ret
 
 

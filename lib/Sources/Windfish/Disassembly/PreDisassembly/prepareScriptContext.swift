@@ -28,18 +28,17 @@ extension Disassembler {
         format: .jumpTable
       )
     }
-    let registerTransferOfControl: @convention(block) (Cartridge.Bank, LR35902.Address, Cartridge.Bank, LR35902.Address, Int) -> Void = { [weak self] toBank, toAddress, fromBank, fromAddress, opcode in
-      self?.registerTransferOfControl(
+    let registerTransferOfControl: @convention(block) (Cartridge.Bank, LR35902.Address, Cartridge.Bank, LR35902.Address) -> Void = { [weak self] toBank, toAddress, fromBank, fromAddress in
+      self?.lastBankRouter?.registerTransferOfControl(
         to: Cartridge.Location(address: toAddress, bank: toBank),
-        from: Cartridge.Location(address: fromAddress, bank: fromBank),
-        spec: LR35902.InstructionSet.table[opcode]
+        from: Cartridge.Location(address: fromAddress, bank: fromBank)
       )
     }
     let registerFunction: @convention(block) (Cartridge.Bank, LR35902.Address, String) -> Void = { [weak self] bank, address, name in
       self?.mutableConfiguration.registerFunction(startingAt: Cartridge.Location(address: address, bank: bank), named: name)
     }
     let registerBankChange: @convention(block) (Cartridge.Bank, LR35902.Address, Cartridge.Bank) -> Void = { [weak self] desiredBank, address, bank in
-      self?.registerBankChange(to: max(1, desiredBank), at: Cartridge.Location(address: address, bank: bank))
+      self?.mutableConfiguration.registerBankChange(to: max(1, desiredBank), at: Cartridge.Location(address: address, bank: bank))
     }
     let hex16: @convention(block) (Int) -> String = { value in
       return UInt16(truncatingIfNeeded: value).hexString

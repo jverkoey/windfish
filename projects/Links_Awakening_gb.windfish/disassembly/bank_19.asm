@@ -2070,11 +2070,11 @@ JumpTable_65EA_19.else_19_6619:
 toc_19_6705:
     ld   a, [hFrameCounter]
     and  %00000011
-    jr   nz, toc_19_6742
+    jr   nz, .return_19_6742
 
     ld   a, $A7
     call toc_01_3C01
-    jr   c, toc_19_6742
+    jr   c, .return_19_6742
 
     push bc
     call toc_01_27ED
@@ -2102,7 +2102,7 @@ toc_19_6705:
     ld   hl, $C2B0
     add  hl, de
     ld   [hl], $01
-toc_19_6742:
+toc_19_6705.return_19_6742:
     ret
 
 

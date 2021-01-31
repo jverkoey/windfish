@@ -448,10 +448,10 @@ toc_04_4309:
     add  hl, bc
     ld   a, [hl]
     ld   [$D001], a
-    ifEq [$FFF0], $05, toc_04_4325
+    ifEq [$FFF0], $05, .else_04_4325
 
     call toc_01_3BBF
-toc_04_4325:
+toc_04_4309.else_04_4325:
     ld   a, [$FFF0]
     jumptable
     dw JumpTable_4334_04 ; 00
@@ -1251,7 +1251,7 @@ JumpTable_4936_04:
 
 toc_04_4967:
     clear [$FFE8]
-toc_04_496A:
+toc_04_4967.loop_04_496A:
     ld   a, $5B
     call toc_01_3C01
     ld   hl, $C390
@@ -1291,7 +1291,7 @@ toc_04_496A:
     inc  a
     ld   [$FFE8], a
     cp   $02
-    jr   nz, toc_04_496A
+    jr   nz, .loop_04_496A
 
     jp   toc_04_6D44
 
@@ -1793,23 +1793,23 @@ toc_04_4E60:
     add  hl, bc
     ld   a, [hl]
     cp   $02
-    jr   nz, toc_04_4E83
+    jr   nz, .else_04_4E83
 
     ld   hl, $C2B0
     add  hl, bc
     ld   a, [hl]
     and  a
-    jr   z, toc_04_4E82
+    jr   z, .else_04_4E82
 
     call JumpTable_3B8D_00
     ld   [hl], $02
     assign [$FFF2], $24
     call toc_01_3DAF
-    jr   toc_04_4E83
+    jr   .else_04_4E83
 
-toc_04_4E82:
+toc_04_4E60.else_04_4E82:
     inc  [hl]
-toc_04_4E83:
+toc_04_4E60.else_04_4E83:
     call toc_04_6D4A
     clear [$FFE8]
     ld   a, [$FFF0]
@@ -2176,12 +2176,12 @@ toc_04_5115:
     add  hl, bc
     ld   a, [hl]
     and  a
-    jr   z, toc_04_5126
+    jr   z, .else_04_5126
 
     ld   hl, $C390
     add  hl, bc
     ld   [hl], $FF
-toc_04_5126:
+toc_04_5115.else_04_5126:
     ld   hl, $C340
     add  hl, bc
     ld   [hl], $08
@@ -2793,27 +2793,27 @@ JumpTable_55E1_04:
 toc_04_5608:
     ld   de, $55FC
     ld   a, $AA
-    jr   toc_04_5629
+    jr   toc_04_5624.toc_04_5629
 
 toc_04_560F:
     ld   de, $5600
     ld   a, $AE
-    jr   toc_04_5629
+    jr   toc_04_5624.toc_04_5629
 
 toc_04_5616:
     ld   de, $5604
     ld   a, $1D
-    jr   toc_04_5629
+    jr   toc_04_5624.toc_04_5629
 
 toc_04_561D:
     ld   de, $55F8
     ld   a, $0D
-    jr   toc_04_5629
+    jr   toc_04_5624.toc_04_5629
 
 toc_04_5624:
     ld   de, $55F4
     ld   a, $0D
-toc_04_5629:
+toc_04_5624.toc_04_5629:
     ld   [$FFD7], a
     push de
     ld   a, [$FFEF]
@@ -3369,7 +3369,7 @@ JumpTable_5E6E_04.else_04_5E9C:
 JumpTable_5EAF_04:
     call toc_01_0891
     cp   $18
-    jr   nc, toc_04_5EEE
+    jr   nc, toc_04_5EDF.return_04_5EEE
 
     and  a
     jr   nz, toc_04_5EDF
@@ -3414,7 +3414,7 @@ toc_04_5EDF:
     add  hl, de
     ld   a, [hl]
     call toc_01_3B87
-toc_04_5EEE:
+toc_04_5EDF.return_04_5EEE:
     ret
 
 
@@ -5925,82 +5925,82 @@ toc_04_792F:
     ld   a, [$C509]
     ld   e, a
     cp   $02
-    jr   nz, toc_04_793F
+    jr   nz, .else_04_793F
 
     ld   a, [$C5A9]
     and  a
-    jr   nz, toc_04_7989
+    jr   nz, .else_04_7989
 
-    jr   toc_04_7990
+    jr   .else_04_7990
 
-toc_04_793F:
+toc_04_792F.else_04_793F:
     cp   $04
-    jr   nz, toc_04_795D
+    jr   nz, .else_04_795D
 
     ld   hl, $DB00
     ld   d, $0C
-toc_04_7948:
+toc_04_792F.loop_04_7948:
     ldi  a, [hl]
     cp   $02
-    jr   z, toc_04_7952
+    jr   z, .else_04_7952
 
     dec  d
-    jr   nz, toc_04_7948
+    jr   nz, .loop_04_7948
 
-    jr   toc_04_7990
+    jr   .else_04_7990
 
-toc_04_7952:
+toc_04_792F.else_04_7952:
     ld   a, [$DB4D]
     ld   hl, $DB77
     cp   [hl]
-    jr   nc, toc_04_7989
+    jr   nc, .else_04_7989
 
-    jr   toc_04_7990
+    jr   .else_04_7990
 
-toc_04_795D:
+toc_04_792F.else_04_795D:
     cp   $06
-    jr   nz, toc_04_797B
+    jr   nz, .else_04_797B
 
     ld   hl, $DB00
     ld   d, $0C
-toc_04_7966:
+toc_04_792F.loop_04_7966:
     ldi  a, [hl]
     cp   $05
-    jr   z, toc_04_7970
+    jr   z, .else_04_7970
 
     dec  d
-    jr   nz, toc_04_7966
+    jr   nz, .loop_04_7966
 
-    jr   toc_04_7990
+    jr   .else_04_7990
 
-toc_04_7970:
+toc_04_792F.else_04_7970:
     ld   a, [$DB45]
     ld   hl, $DB78
     cp   [hl]
-    jr   nc, toc_04_7989
+    jr   nc, .else_04_7989
 
-    jr   toc_04_7990
+    jr   .else_04_7990
 
-toc_04_797B:
+toc_04_792F.else_04_797B:
     cp   $03
-    jr   nz, toc_04_7990
+    jr   nz, .else_04_7990
 
     ld   hl, $DB00
     ld   d, $0C
-toc_04_7984:
+toc_04_792F.loop_04_7984:
     ldi  a, [hl]
     cp   $04
-    jr   nz, toc_04_798D
+    jr   nz, .else_04_798D
 
-toc_04_7989:
+toc_04_792F.else_04_7989:
     ld   a, $29
-    jr   toc_04_79A8
+    jr   .toc_04_79A8
 
-toc_04_798D:
+toc_04_792F.else_04_798D:
     dec  d
-    jr   nz, toc_04_7984
+    jr   nz, .loop_04_7984
 
-toc_04_7990:
+toc_04_792F.else_04_7990:
     ld   d, b
     ld   hl, $7761
     add  hl, de
@@ -6013,10 +6013,10 @@ toc_04_7990:
     sub  a, e
     ld   a, [$DB5D]
     sbc  d
-    jr   nc, toc_04_79B2
+    jr   nc, .else_04_79B2
 
     ld   a, $34
-toc_04_79A8:
+toc_04_792F.toc_04_79A8:
     call toc_01_2197
     ld   hl, $C290
     add  hl, bc
@@ -6024,7 +6024,7 @@ toc_04_79A8:
     ret
 
 
-toc_04_79B2:
+toc_04_792F.else_04_79B2:
     ld   hl, $C509
     ld   a, [hl]
     push af
@@ -6051,7 +6051,7 @@ toc_04_79B2:
     ld   a, $35
     call toc_01_2197
     pop  af
-toc_04_79E3:
+toc_04_792F.toc_04_79E3:
     dec  a
     jumptable
     dw JumpTable_7A2E_04 ; 00

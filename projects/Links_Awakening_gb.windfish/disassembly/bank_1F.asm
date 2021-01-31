@@ -11,10 +11,10 @@ toc_1F_4006:
 
 toc_1F_4009:
     ld   hl, $D300
-toc_1F_400C:
+toc_1F_4009.loop_1F_400C:
     ld   [hl], $00
     inc  l
-    jr   nz, toc_1F_400C
+    jr   nz, .loop_1F_400C
 
     assign [gbAUDENA], $80
     assign [gbAUDVOL], $77

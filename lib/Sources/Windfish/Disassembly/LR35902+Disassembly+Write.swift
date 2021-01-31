@@ -527,7 +527,7 @@ clean:
             } else {
               bank = writeContext.bank
             }
-            let macroScopes = self.labeledContiguousScopes(at: Cartridge.Location(address: lineBufferAddress, bank: bank)).map { $0.label }
+            let macroScopes = self.lastBankRouter!.labeledContiguousScopes(at: Cartridge.Location(address: lineBufferAddress, bank: bank)).map { $0.label }
             let statement = RGBDS.Statement(opcode: macro.macro.name, operands: macroArgs)
             lineBuffer.replaceSubrange(firstInstruction...lastInstruction,
                                        with: [Line(semantic: .macro(statement),
@@ -552,11 +552,11 @@ clean:
           lineGroup.append(Line(semantic: .empty))
           lineGroup.append(Line(semantic: .preComment(comment: preComment)))
         }
-        if let label = label(at: Cartridge.Location(address:writeContext.pc, bank: initialBank)) {
-          if let transfersOfControl = transfersOfControl(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) {
+        if let label = lastBankRouter!.label(at: Cartridge.Location(address:writeContext.pc, bank: initialBank)) {
+          if let transfersOfControl = lastBankRouter!.transfersOfControl(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) {
             lineGroup.append(Line(semantic: .transferOfControl(transfersOfControl, label), address: writeContext.pc, bank: writeContext.bank))
           } else {
-            let instructionScope = labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)).map { $0.label }
+            let instructionScope = lastBankRouter!.labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)).map { $0.label }
             let scope = instructionScope.sorted().joined(separator: ", ")
             lineGroup.append(Line(semantic: .empty, address: writeContext.pc, bank: writeContext.bank, scope: scope))
             lineGroup.append(Line(semantic: .label(labelName: label), address: writeContext.pc, bank: writeContext.bank, scope: scope))
@@ -564,10 +564,10 @@ clean:
           isLabeled = true
         }
 
-        if let instruction = instruction(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) {
+        if let instruction = lastBankRouter!.instruction(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) {
           instructionsDecoded += 1
 
-          if let bankChange = bankChange(at: Cartridge.Location(address: writeContext.pc, bank: writeContext.bank)) {
+          if let bankChange = lastBankRouter!.bankChange(at: Cartridge.Location(address: writeContext.pc, bank: writeContext.bank)) {
             writeContext.bank = bankChange
           }
 
@@ -575,7 +575,7 @@ clean:
           let index = Cartridge.Location(address: writeContext.pc, bank: initialBank)
           let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!.total
           let bytes = cartridgeData[index.index..<(index + instructionWidth).index]
-          let instructionScope = labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)).map { $0.label }
+          let instructionScope = lastBankRouter!.labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)).map { $0.label }
           let context = RGBDSDisassembler.Context(
             address: writeContext.pc,
             bank: writeContext.bank,
@@ -606,7 +606,7 @@ clean:
           // Handle context changes.
           switch instruction.spec {
           case .jp(let condition, _), .jr(let condition, _):
-            let instructionScope = labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)).map { $0.label }
+            let instructionScope = lastBankRouter!.labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)).map { $0.label }
             let scope = instructionScope.sorted().joined(separator: ", ")
             lineGroup.append(Line(semantic: .empty, scope: scope))
             if condition == nil {
@@ -640,7 +640,7 @@ clean:
           lineBuffer.append(contentsOf: lineGroup)
           flush()
 
-          let initialType = type(at: Cartridge.Location(address: writeContext.pc, bank: initialBank))
+          let initialType = lastBankRouter!.disassemblyType(at: Cartridge.Location(address: writeContext.pc, bank: initialBank))
 
           // Accumulate bytes until the next instruction or transfer of control.
           var accumulator: [UInt8] = []
@@ -653,9 +653,9 @@ clean:
             accumulator.append(cartridgeData[Cartridge.Location(address: writeContext.pc, bank: initialBank).index])
             writeContext.pc += 1
           } while writeContext.pc < end
-            && instruction(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) == nil
-            && label(at: Cartridge.Location(address:writeContext.pc, bank: initialBank)) == nil
-            && type(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) == initialType
+            && lastBankRouter!.instruction(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) == nil
+            && lastBankRouter!.label(at: Cartridge.Location(address:writeContext.pc, bank: initialBank)) == nil
+            && lastBankRouter!.disassemblyType(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) == initialType
             && global == nil
 
           let globalValue: String?
@@ -684,12 +684,12 @@ clean:
               let address = (LR35902.Address(pair[1]) << 8) | LR35902.Address(pair[0])
               let jumpLocation: String
               let effectiveBank: Cartridge.Bank
-              if let changedBank = bankChange(at: Cartridge.Location(address: chunkPc, bank: initialBank)) {
+              if let changedBank = lastBankRouter!.bankChange(at: Cartridge.Location(address: chunkPc, bank: initialBank)) {
                 effectiveBank = changedBank
               } else {
                 effectiveBank = writeContext.bank
               }
-              if let label = label(at: Cartridge.Location(address:address, bank: effectiveBank)) {
+              if let label = lastBankRouter!.label(at: Cartridge.Location(address:address, bank: effectiveBank)) {
                 jumpLocation = label
               } else {
                 jumpLocation = "$\(address.hexString)"
@@ -846,7 +846,7 @@ clean:
 
     sources["game.asm"] = .game(content: gameAsm)
 
-    let disassembledLocations = self.disassembledLocations()
+    let disassembledLocations = self.lastBankRouter!.disassembledLocations()
     let bankPercents: [Cartridge.Bank: Double] = (0..<numberOfBanks).reduce(into: [:]) { accumulator, bank in
       let disassembledBankLocations = disassembledLocations.intersection(
         IndexSet(integersIn: (Int(bank) * Int(Cartridge.bankSize))..<(Int(bank + 1) * Int(Cartridge.bankSize)))

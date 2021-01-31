@@ -32,7 +32,7 @@ toc_17_4060:
     ld   c, [hl]
     xor  a
     ld   d, a
-toc_17_407B:
+toc_17_4060.loop_17_407B:
     ld   [$FFD9], a
     sla  a
     ld   e, a
@@ -51,7 +51,7 @@ toc_17_407B:
     ld   a, [$FFD9]
     inc  a
     cp   $0C
-    jr   nz, toc_17_407B
+    jr   nz, .loop_17_407B
 
     clear [$FFA5]
     ret
@@ -2098,12 +2098,12 @@ toc_17_7B07:
     ld   e, $00
     ld   a, [wDialogState]
     and  %10000000
-    jr   z, toc_17_7B16
+    jr   z, .else_17_7B16
 
     inc  e
-toc_17_7B16:
+toc_17_7B07.else_17_7B16:
     ld   d, $00
-    ifEq [wGameMode], GAMEMODE_CREDITS, toc_17_7B37
+    ifEq [wGameMode], GAMEMODE_CREDITS, .else_17_7B37
 
     ld   hl, $7B05
     add  hl, de
@@ -2115,7 +2115,7 @@ toc_17_7B16:
     ret
 
 
-toc_17_7B37:
+toc_17_7B07.else_17_7B37:
     ld   hl, $7B05
     add  hl, de
     ld   a, [hl]
@@ -2134,12 +2134,12 @@ toc_17_7B57:
     ld   e, $00
     ld   a, [wDialogState]
     and  %10000000
-    jr   z, toc_17_7B61
+    jr   z, .else_17_7B61
 
     inc  e
-toc_17_7B61:
+toc_17_7B57.else_17_7B61:
     ld   d, $00
-    ifEq [wGameMode], GAMEMODE_CREDITS, toc_17_7B8F
+    ifEq [wGameMode], GAMEMODE_CREDITS, .else_17_7B8F
 
     ld   hl, $7B53
     add  hl, de
@@ -2148,10 +2148,10 @@ toc_17_7B61:
     ld   e, $00
     ld   a, [$C177]
     and  %00000001
-    jr   z, toc_17_7B7C
+    jr   z, .else_17_7B7C
 
     inc  e
-toc_17_7B7C:
+toc_17_7B57.else_17_7B7C:
     ld   hl, $7B55
     add  hl, de
     ld   a, [hl]
@@ -2161,7 +2161,7 @@ toc_17_7B7C:
     ret
 
 
-toc_17_7B8F:
+toc_17_7B57.else_17_7B8F:
     ld   hl, $7B53
     add  hl, de
     ld   a, [hl]
@@ -2171,10 +2171,10 @@ toc_17_7B8F:
     ld   e, $00
     ld   a, [$C177]
     and  %00000001
-    jr   z, toc_17_7BA5
+    jr   z, .else_17_7BA5
 
     inc  e
-toc_17_7BA5:
+toc_17_7B57.else_17_7BA5:
     ld   hl, $7B55
     add  hl, de
     ld   a, [hl]

@@ -2,9 +2,22 @@ import Foundation
 
 import CPU
 
-extension Disassembler {
+extension Disassembler.BankRouter {
+  /** Registers a range as a specific region category. Will clear any existing regions in the range. */
+  public func instruction(at location: Cartridge.Location) -> LR35902.Instruction? {
+    return bankWorkers[Int(truncatingIfNeeded: location.bankIndex)].instruction(at: location)
+  }
+
+  /** Registers a range as a specific region category. Will clear any existing regions in the range. */
+  public func type(at location: Cartridge.Location) -> String? {
+    return bankWorkers[Int(truncatingIfNeeded: location.bankIndex)].typeAtLocation[location]
+  }
+}
+
+extension Disassembler.BankWorker {
   /** Get the instruction at the given location, if one exists. */
   public func instruction(at location: Cartridge.Location) -> LR35902.Instruction? {
+    assert(location.bankIndex == bank)
     guard code.contains(location.index) else {
       return nil
     }
@@ -13,6 +26,7 @@ extension Disassembler {
 
   /** Register an instruction at the given location. */
   func register(instruction: LR35902.Instruction, at location: Cartridge.Location) {
+    assert(location.bankIndex == bank)
     guard instructionMap[location] == nil else {
       return
     }

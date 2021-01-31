@@ -1,6 +1,28 @@
 import Foundation
 
-extension Disassembler {
+extension Disassembler.BankRouter {
+
+  /** Returns all disassembled locations. */
+  func disassembledLocations() -> IndexSet {
+    var indexSet: IndexSet = IndexSet()
+    for bankWorker: Disassembler.BankWorker in bankWorkers {
+      indexSet = indexSet.union(bankWorker.disassembledLocations())
+    }
+    return indexSet
+  }
+
+  /** Registers a range as a specific region category. Will clear any existing regions in the range. */
+  func registerRegion(range: Range<Cartridge.Location>, as category: Disassembler.BankWorker.RegionCategory) {
+    bankWorkers[Int(truncatingIfNeeded: range.lowerBound.bankIndex)].registerRegion(range: range, as: category)
+  }
+
+  /** Returns the type of information at the given location. */
+  func disassemblyType(at location: Cartridge.Location) -> Disassembler.BankWorker.ByteType {
+    bankWorkers[Int(truncatingIfNeeded: location.bankIndex)].type(at: location)
+  }
+}
+
+extension Disassembler.BankWorker {
   enum ByteType {
     case unknown
     case code
@@ -19,6 +41,7 @@ extension Disassembler {
 
   /** Returns the type of information at the given location. */
   func type(at location: Cartridge.Location) -> ByteType {
+    assert(location.bankIndex == bank)
     guard location.address < 0x8000 else {
       return .ram
     }
@@ -27,7 +50,7 @@ extension Disassembler {
       return .code
     }
     if data.contains(index) {
-      switch configuration.formatOfData(at: location) {
+      switch context.formatOfData(at: location) {
       case .image1bpp:  return .image1bpp
       case .image2bpp:  return .image2bpp
       case .jumpTable:  return .jumpTable
@@ -49,6 +72,7 @@ extension Disassembler {
 
   /** Registers a range as a specific region category. Will clear any existing regions in the range. */
   func registerRegion(range: Range<Cartridge.Location>, as category: RegionCategory) {
+    assert(range.lowerBound.bankIndex == bank)
     let intRange = range.asIntRange()
     switch category {
     case .code:
@@ -76,6 +100,7 @@ extension Disassembler {
 
   /** Deletes an instruction from a specific location and clears any code-related information in its footprint. */
   func deleteInstruction(at location: Cartridge.Location) {
+    assert(location.bankIndex == bank)
     guard let instruction: LR35902.Instruction = instructionMap[location] else {
       return
     }
@@ -119,18 +144,16 @@ extension Disassembler {
     // For any existing scope that intersects this range:
     // 1. Shorten it if it begins before the range.
     // 2. Delete it if it begins within the range.
-    if let overlappingScopes: Set<Range<Cartridge.Location>> = contiguousScopes[range.lowerBound.bank] {
-      var mutatedScopes: Set<Range<Cartridge.Location>> = overlappingScopes
-      for scope: Range<Cartridge.Location> in overlappingScopes {
-        guard scope.overlaps(range) else {
-          continue
-        }
-        mutatedScopes.remove(scope)
-        if scope.lowerBound < range.lowerBound {
-          mutatedScopes.insert(scope.lowerBound..<range.lowerBound)
-        }
+    var mutatedScopes: Set<Range<Cartridge.Location>> = contiguousScopes
+    for scope: Range<Cartridge.Location> in contiguousScopes {
+      guard scope.overlaps(range) else {
+        continue
       }
-      contiguousScopes[range.lowerBound.bank] = mutatedScopes
+      mutatedScopes.remove(scope)
+      if scope.lowerBound < range.lowerBound {
+        mutatedScopes.insert(scope.lowerBound..<range.lowerBound)
+      }
     }
+    contiguousScopes = mutatedScopes
   }
 }

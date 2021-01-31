@@ -61,13 +61,3 @@ extension Disassembler.Configuration {
     dataTypes[name] = Datatype(namedValues: [:], interpretation: .any, representation: representation)
   }
 }
-
-extension Disassembler {
-  /** Registers that a given instruction should use the given data type. */
-  func registerDataType(at location: Cartridge.Location, to type: String) {
-    guard !type.isEmpty else {
-      return
-    }
-    typeAtLocation[location] = type
-  }
-}

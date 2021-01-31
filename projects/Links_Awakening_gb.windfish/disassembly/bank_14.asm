@@ -1223,27 +1223,27 @@ toc_14_591F:
 toc_14_5924:
     ld   a, [$C3C9]
     and  a
-    jr   nz, toc_14_5935
+    jr   nz, .else_14_5935
 
     ifEq [$C11C], $03, toc_14_591F
 
     cp   $04
     jr   z, toc_14_591F
 
-toc_14_5935:
-    ifEq [wGameMode], GAMEMODE_CREDITS, toc_14_595A
+toc_14_5924.else_14_5935:
+    ifEq [wGameMode], GAMEMODE_CREDITS, .else_14_595A
 
     ld   a, [$C3CB]
     and  a
-    jr   nz, toc_14_595A
+    jr   nz, .else_14_595A
 
-    ifEq [hLinkAnimationState], LINK_ANIMATION_STATE_GOT_ITEM, toc_14_595A
+    ifEq [hLinkAnimationState], LINK_ANIMATION_STATE_GOT_ITEM, .else_14_595A
 
     assign [$C16B], $04
     assign [$DB97], $E4
     ld   [$DB99], a
     assign [$DB98], $1C
-toc_14_595A:
+toc_14_5924.else_14_595A:
     ld   a, [$D601]
     and  a
     ret  nz
@@ -1365,7 +1365,7 @@ toc_14_59DE.else_14_5A1D:
     jp   .toc_14_5AE9
 
 toc_14_59DE.else_14_5A24:
-    if   [$DBA5], .else_14_5A9F
+    ifNotZero [$DBA5], .else_14_5A9F
 
     ifNot [$FFF9], .else_14_5A6B
 

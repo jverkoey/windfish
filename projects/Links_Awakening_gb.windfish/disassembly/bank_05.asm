@@ -2345,15 +2345,15 @@ toc_05_5500:
     add  hl, bc
     ld   a, [hl]
     and  a
-    jr   z, toc_05_5554
+    jr   z, .else_05_5554
 
     and  %00111111
-    jr   nz, toc_05_5554
+    jr   nz, .else_05_5554
 
     ld   a, $65
     ld   e, $04
     call toc_01_3C13
-    jr   c, toc_05_5586
+    jr   c, .else_05_5586
 
     ld   hl, $C340
     add  hl, de
@@ -2374,10 +2374,10 @@ toc_05_5500:
     add  a, $20
     ld   [$D202], a
     cp   $A8
-    jr   c, toc_05_5546
+    jr   c, .else_05_5546
 
     assign [$D202], $08
-toc_05_5546:
+toc_05_5500.else_05_5546:
     call toc_01_27ED
     ld   hl, $C3D0
     add  hl, de
@@ -2385,17 +2385,17 @@ toc_05_5546:
     ld   hl, $C210
     add  hl, de
     ld   [hl], $00
-toc_05_5554:
+toc_05_5500.else_05_5554:
     ld   a, [$D201]
     inc  a
     ld   [$D201], a
     and  %01111111
-    jr   nz, toc_05_5586
+    jr   nz, .else_05_5586
 
     ld   a, $65
     ld   e, $04
     call toc_01_3C13
-    jr   c, toc_05_5586
+    jr   c, .else_05_5586
 
     ld   hl, $C340
     add  hl, de
@@ -2413,22 +2413,22 @@ toc_05_5554:
     ld   hl, $C210
     add  hl, de
     ld   [hl], a
-toc_05_5586:
+toc_05_5500.else_05_5586:
     ld   hl, $C360
     add  hl, bc
     ld   a, [hl]
     cp   $0A
-    jr   nc, toc_05_55E7
+    jr   nc, .else_05_55E7
 
     ld   a, [$D201]
     add  a, $40
     and  %11111111
-    jr   nz, toc_05_55E7
+    jr   nz, .else_05_55E7
 
     ld   a, $65
     ld   e, $04
     call toc_01_3C13
-    jr   c, toc_05_55E7
+    jr   c, .else_05_55E7
 
     ld   hl, $C4D0
     add  hl, de
@@ -2470,7 +2470,7 @@ toc_05_5586:
     add  hl, de
     ld   [hl], $40
     pop  bc
-toc_05_55E7:
+toc_05_5500.else_05_55E7:
     call toc_01_08E2
     ld   hl, $C3D0
     add  hl, bc
@@ -5888,7 +5888,7 @@ JumpTable_7285_05.else_05_72B7:
     and  DIRECTION_UP
     jp   z, .return_05_7347
 
-    if   [$C1A6], .return_05_7347
+    ifNotZero [$C1A6], .return_05_7347
 
     dec  a
     ld   [$D202], a
@@ -6184,14 +6184,14 @@ toc_05_7498:
 toc_05_74AD:
     ld   a, $36
     call toc_01_3C01
-    jr   toc_05_74C1
+    jr   toc_05_74B4.toc_05_74C1
 
 toc_05_74B4:
     ld   a, $36
     call toc_01_3C01
     assign [$FFD7], $48
     assign [$FFD8], $10
-toc_05_74C1:
+toc_05_74B4.toc_05_74C1:
     ld   a, [$FFD8]
     ld   hl, $C210
     add  hl, de
@@ -6200,21 +6200,21 @@ toc_05_74C1:
     ld   hl, $C200
     add  hl, de
     ld   [hl], a
-    ifNot [$FFF9], toc_05_74DC
+    ifNot [$FFF9], .else_05_74DC
 
     ld   hl, $C250
     add  hl, bc
     ld   [hl], $F0
-    jr   toc_05_74E8
+    jr   .toc_05_74E8
 
-toc_05_74DC:
+toc_05_74B4.else_05_74DC:
     ld   hl, $C320
     add  hl, de
     ld   [hl], $10
     ld   hl, $C310
     add  hl, de
     ld   [hl], $08
-toc_05_74E8:
+toc_05_74B4.toc_05_74E8:
     call toc_05_7A6B
     ld   hl, $FFF4
     ld   [hl], $1A

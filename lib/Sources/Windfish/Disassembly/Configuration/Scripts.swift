@@ -34,6 +34,10 @@ extension Disassembler.Configuration {
     }
     let source: String
 
+    public func copy() -> Script {
+      return Script(source: source)
+    }
+
     let context: JSContext
     let linearSweepWillStart: JSValue?
     let linearSweepDidStep: JSValue?

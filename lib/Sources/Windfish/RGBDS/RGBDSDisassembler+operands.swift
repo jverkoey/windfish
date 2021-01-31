@@ -26,7 +26,7 @@ extension RGBDSDisassembler {
       guard case let .imm16(immediate) = instruction.immediate else {
         preconditionFailure("Invalid immediate associated with instruction")
       }
-      guard context.disassembly.transfersOfControl(at: Cartridge.Location(address: immediate, bank: context.bank)) != nil else {
+      guard context.disassembly.lastBankRouter?.transfersOfControl(at: Cartridge.Location(address: immediate, bank: context.bank)) != nil else {
         break // Fall through to the default handler.
       }
       let addressLabel = self.addressLabel(context, address: immediate) ?? RGBDS.asHexString(immediate)
@@ -170,7 +170,7 @@ extension RGBDSDisassembler {
       }
       if let context = context {
         let jumpAddress = (context.address + LR35902.InstructionSet.widths[instruction.spec]!.total).advanced(by: Int(Int8(bitPattern: immediate)))
-        if context.disassembly.transfersOfControl(at: Cartridge.Location(address: jumpAddress, bank: context.bank)) != nil {
+        if context.disassembly.lastBankRouter?.transfersOfControl(at: Cartridge.Location(address: jumpAddress, bank: context.bank)) != nil {
           if let label = addressLabel(context, address: jumpAddress) {
             return label
           }
@@ -235,9 +235,9 @@ extension RGBDSDisassembler {
   private static func typedOperand(for imm8: UInt8, with context: Context) -> String? {
     let location = Cartridge.Location(address: context.address, bank: context.bank)
 
-    guard let type = context.disassembly.typeAtLocation[location],
+    guard let type = context.disassembly.lastBankRouter?.type(at: location),
           let dataType = context.disassembly.configuration.datatype(named: type) else {
-      if let instruction = context.disassembly.instruction(at: location),
+      if let instruction = context.disassembly.lastBankRouter?.instruction(at: location),
          instruction.spec == .and(.imm8) || instruction.spec == .xor(.imm8) || instruction.spec == .or(.imm8) {
         // Default to treating bit arithmetic as a binary type.
         return literal(for: imm8, using: .binary, with: context)
@@ -298,7 +298,7 @@ extension RGBDSDisassembler {
 extension RGBDSDisassembler {
   /** Returns one of a label, a global, or a hexadecimal representation of a given imm16 value. */
   private static func prettify(imm16: UInt16, with context: Context) -> String {
-    if let label = context.disassembly.label(at: Cartridge.Location(address:imm16, bank: context.bank)) {
+    if let label = context.disassembly.lastBankRouter?.label(at: Cartridge.Location(address:imm16, bank: context.bank)) {
       return label
     }
     if let global = context.disassembly.configuration.global(at: imm16) {
@@ -313,8 +313,8 @@ extension RGBDSDisassembler {
       return argumentString
     }
 
-    if let label = context.disassembly.label(at: Cartridge.Location(address:immediate, bank: context.bank)) {
-      if let scope = context.disassembly.labeledContiguousScopes(at: Cartridge.Location(address: context.address, bank: context.bank))
+    if let label = context.disassembly.lastBankRouter?.label(at: Cartridge.Location(address:immediate, bank: context.bank)) {
+      if let scope = context.disassembly.lastBankRouter?.labeledContiguousScopes(at: Cartridge.Location(address: context.address, bank: context.bank))
           .first(where: { labeledScope in
             label.starts(with: "\(labeledScope.label).")
           })?.label {
@@ -330,7 +330,7 @@ extension RGBDSDisassembler {
   private static func literal(for imm8: UInt8, using representation: Disassembler.Configuration.Datatype.Representation, with context: Context) -> String {
     let location = Cartridge.Location(address: context.address, bank: context.bank)
     let forcedRepresentation: Disassembler.Configuration.Datatype.Representation
-    if let instruction = context.disassembly.instruction(at: location),
+    if let instruction = context.disassembly.lastBankRouter?.instruction(at: location),
        instruction.spec == .and(.imm8) || instruction.spec == .xor(.imm8) || instruction.spec == .or(.imm8) {
       // Always treat bit arithmetic as a bitmask, regardless of the type.
       forcedRepresentation = .binary

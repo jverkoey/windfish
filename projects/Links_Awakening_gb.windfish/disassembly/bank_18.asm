@@ -1752,10 +1752,10 @@ toc_18_646E:
 toc_18_6594:
     ld   [$D205], a
     cp   $01
-    jr   nz, toc_18_659F
+    jr   nz, .else_18_659F
 
     assign [$FFF4], $0A
-toc_18_659F:
+toc_18_6594.else_18_659F:
     call toc_01_0891
     ld   [hl], $00
     ld   hl, $C3D0

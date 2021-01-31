@@ -56,10 +56,14 @@ final class RunGroup: Sequence {
     guard let startLocation = startLocation else {
       return nil
     }
+    // Is there a range that starts at this run group's starting location?
     if let range = scope.rangeView.first(where: { $0.lowerBound == startLocation.index }) {
+      // Yep; return the full range then.
       return Cartridge.Location(index: range.lowerBound)..<Cartridge.Location(index: range.upperBound)
     }
+    // Is there a range that includes this run group's starting location?
     if let range = scope.rangeView.first(where: { $0.contains(startLocation.index) }) {
+      // Yep; return the subset of that range that starts after this run group's start location.
       return startLocation..<Cartridge.Location(index: range.upperBound)
     }
     return nil
@@ -77,7 +81,9 @@ extension Disassembler {
 
     init(from startAddress: LR35902.Address,
          selectedBank unsafeInitialBank: Cartridge.Bank,
-         upTo endAddress: LR35902.Address? = nil) {
+         upTo endAddress: LR35902.Address? = nil,
+         numberOfBanks: Int) {
+      self.visitHistory = (0..<numberOfBanks).map { _ in VisitHistory() }
       let initialBank = max(1, unsafeInitialBank)
       self.startLocation = Cartridge.Location(address: startAddress, bank: initialBank)
       if let endAddress = endAddress, endAddress > 0 {
@@ -89,6 +95,38 @@ extension Disassembler {
       self.pc = self.startLocation.address
       self.selectedBank = initialBank
     }
+
+    init(from startAddress: LR35902.Address,
+         selectedBank unsafeInitialBank: Cartridge.Bank,
+         upTo endAddress: LR35902.Address? = nil,
+         visitHistory: [VisitHistory]) {
+      self.visitHistory = visitHistory
+      let initialBank = max(1, unsafeInitialBank)
+      self.startLocation = Cartridge.Location(address: startAddress, bank: initialBank)
+      if let endAddress = endAddress, endAddress > 0 {
+        self.endLocation = Cartridge.Location(address: endAddress, bank: initialBank)
+      } else {
+        self.endLocation = nil
+      }
+
+      self.pc = self.startLocation.address
+      self.selectedBank = initialBank
+    }
+
+    final class VisitHistory {
+      var visitedLocations: IndexSet = IndexSet()
+    }
+
+    /**
+     A run ancestry shares a common visit history.
+
+     Note that this is an array of classes where each index corresponds to a bank number. This is done instead of a
+     single IndexSet in order to preserve thread safety in a lockless manner. By using a pre-allocated array of class
+     objects, each run is able to read and write to the visitedLocations index set without blocking any other bank's
+     worker. This works because bank workers are fifo queues, so it's not possible for a given bank worker to get into
+     an asynchronous conflict with itself.
+     */
+    var visitHistory: [VisitHistory]
 
     var visitedRange: Range<Cartridge.Location>?
 
@@ -105,7 +143,7 @@ extension Disassembler {
       return currentCartAddress.index..<(currentCartAddress + amount).index
     }
 
-    func hasReachedEnd(pc: LR35902.Address) -> Bool {
+    func hasReachedEnd() -> Bool {
       guard let endLocation = endLocation else {
         return false
       }

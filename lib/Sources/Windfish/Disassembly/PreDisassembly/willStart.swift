@@ -8,6 +8,8 @@ extension Disassembler {
     let signpostID = OSSignpostID(log: oslog)
     os_signpost(.begin, log: oslog, name: "Disassembler", signpostID: signpostID, "%{public}s", "willStart")
 
+    lastBankRouter = BankRouter(numberOfBanks: Int(truncatingIfNeeded: numberOfBanks), context: configuration)
+
     prepareScriptContext()
 
     // Extract any scripted events.

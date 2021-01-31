@@ -4,8 +4,9 @@ import CPU
 extension Disassembler {
   final class BankRouter {
     private let context: DisassemblerContext
+    private var disassembling: Bool = false
 
-    private let bankWorkers: ContiguousArray<BankWorker>
+    let bankWorkers: ContiguousArray<BankWorker>
     fileprivate let workGroup = DispatchGroup()
 
     init(numberOfBanks: Int, context: DisassemblerContext) {
@@ -21,8 +22,7 @@ extension Disassembler {
     }
 
     func schedule(run: Run) {
-      print("[router] Scheduling \(run.startLocation.bank.hexString):\(run.startLocation.address.hexString)")
-
+      disassembling = true
       let bankWorker: BankWorker = bankWorkers[Int(truncatingIfNeeded: run.startLocation.bankIndex)]
       bankWorker.schedule(run: run)
     }
@@ -30,26 +30,54 @@ extension Disassembler {
     func finish() {
       workGroup.wait()
 
+      var bankedRunGroups: [Cartridge.Bank: [RunGroup]] = [:]
       for bankWorker: BankWorker in bankWorkers {
-        bankWorker.startPostDisassemblyWork()
+        for run: Run in bankWorker.runs {
+          for runGroup: RunGroup in run.runGroups() {
+            bankedRunGroups[runGroup.startLocation!.bankIndex, default: []].append(runGroup)
+          }
+        }
+      }
+
+      for bankWorker: BankWorker in bankWorkers {
+        guard let runGroups = bankedRunGroups[bankWorker.bank] else {
+          continue
+        }
+        bankWorker.rewriteRunGroups(runGroups)
       }
 
       workGroup.wait()
 
-      print("All scheduled work has concluded")
+      disassembling = false
+    }
+
+    func registerTransferOfControl(to toLocation: Cartridge.Location,
+                                   from fromLocation: Cartridge.Location) {
+      let bankWorker: BankWorker = bankWorkers[Int(truncatingIfNeeded: toLocation.bankIndex)]
+      if !disassembling {
+        // No need to worry about synchronization yet.
+        bankWorker.registerTransferOfControl(to: toLocation, from: fromLocation)
+        return
+      }
+
+      workGroup.enter()
+      bankWorker.queue.async {
+        bankWorker.registerTransferOfControl(to: toLocation, from: fromLocation)
+        self.workGroup.leave()
+      }
     }
   }
 
   final class BankWorker {
     // Initialization data
-    private let bank: Cartridge.Bank
+    let bank: Cartridge.Bank
     let context: DisassemblerContext
     private let cartridgeSize: Int
     private let memory: DisassemblerMemory
 
-    fileprivate weak var router: BankRouter?
-    private let queue: DispatchQueue
-    private var runs: [Run] = []
+    weak var router: BankRouter?
+    let queue: DispatchQueue
+    var runs: [Run] = []
 
     private let linearSweepDidSteps: [Configuration.Script]
     private let linearSweepWillStarts: [Configuration.Script]
@@ -72,16 +100,17 @@ extension Disassembler {
       var linearSweepScripts: [Configuration.Script] = []
       for script: Configuration.Script in scripts.values {
         var hasLinearSweepEvent: Bool = false
+        let copiedScript = script.copy()
         if script.linearSweepDidStep != nil {
-          linearSweepDidSteps.append(script)
+          linearSweepDidSteps.append(copiedScript)
           hasLinearSweepEvent = true
         }
         if script.linearSweepWillStart != nil {
-          linearSweepWillStarts.append(script)
+          linearSweepWillStarts.append(copiedScript)
           hasLinearSweepEvent = true
         }
         if hasLinearSweepEvent {
-          linearSweepScripts.append(script)
+          linearSweepScripts.append(copiedScript)
         }
       }
       self.linearSweepDidSteps = linearSweepDidSteps
@@ -101,16 +130,13 @@ extension Disassembler {
       }
     }
 
-    /** All cartridge locations that have been visited so far during disassembly. */
-    var visitedAddresses = IndexSet()
-
     // MARK: - Scheduling runs
 
     fileprivate func schedule(run: Run) {
-      runs.append(run)
-
       router?.workGroup.enter()
       queue.async {
+        self.runs.append(run)
+
         self.disassemble(run: run)
         self.router?.workGroup.leave()
       }
@@ -123,10 +149,9 @@ extension Disassembler {
 
     var currentRun: Run?
     private func disassemble(run: Run) {
-      // TODO: Do something with the run.
-      print("[worker \(bank.hexString)] Running \(run.startLocation.bank.hexString):\(run.startLocation.address.hexString)")
+      assert(run.startLocation.bankIndex == bank)
 
-      if visitedAddresses.contains(run.startLocation.index) {
+      if run.visitHistory[Int(truncatingIfNeeded: bank)].visitedLocations.contains(run.startLocation.index) {
         // We've already visited this instruction, so we can skip it.
         return
       }
@@ -141,11 +166,11 @@ extension Disassembler {
       }
 
       let advance: (LR35902.Address) -> Void = { amount in
-        self.visitedAddresses.insert(integersIn: run.advance(amount: 56))
+        run.visitHistory[Int(truncatingIfNeeded: self.bank)].visitedLocations.insert(integersIn: run.advance(amount: amount))
       }
 
       var previousInstruction: LR35902.Instruction? = nil
-      linear_sweep: while !run.hasReachedEnd(pc: run.pc) && pcIsValid(pc: run.pc, bank: run.selectedBank) {
+      linear_sweep: while !run.hasReachedEnd() && pcIsValid(pc: run.pc, bank: run.selectedBank) {
         let location = Cartridge.Location(address: run.pc, bank: run.selectedBank)
         if context.shouldTerminateLinearSweep(at: location) {
           break
@@ -293,17 +318,16 @@ extension Disassembler {
 
         previousInstruction = instruction
       }
-      print("[worker \(bank.hexString)] Finished \(run.startLocation.bank.hexString):\(run.startLocation.address.hexString)")
     }
 
-    fileprivate func startPostDisassemblyWork() {
+    fileprivate func rewriteRunGroups(_ runGroups: [RunGroup]) {
       router?.workGroup.enter()
       queue.async {
         defer {
           self.router?.workGroup.leave()
         }
-        for run in self.runs {
-          self.rewriteScopes(run)
+        for runGroup in runGroups {
+          self.rewriteRunGroup(runGroup)
         }
       }
     }
@@ -314,24 +338,23 @@ extension Disassembler {
       guard toAddress < 0x8000 else {
         return  // We can't disassemble in-memory regions.
       }
-      let run = Run(from: toAddress, selectedBank: bank)
+      let run = Run(from: toAddress, selectedBank: selectedBank, visitHistory: fromRun.visitHistory)
       run.invocationInstruction = instruction
       fromRun.children.append(run)
 
       router?.schedule(run: run)
 
-      registerTransferOfControl(to: Cartridge.Location(address: toAddress, bank: bank),
-                                from: Cartridge.Location(address: fromAddress, bank: bank),
-                                spec: instruction.spec)
+      registerTransferOfControl(to: Cartridge.Location(address: toAddress, bank: selectedBank),
+                                from: Cartridge.Location(address: fromAddress, bank: selectedBank))
     }
 
     // MARK: - Registering information discovered during disassembly
 
     /** All locations that represent code. */
-    private var code = IndexSet()
+    var code = IndexSet()
 
     /** All locations that represent code. */
-    private var data = IndexSet()
+    var data = IndexSet()
 
     /**
      We never want to show labels in the middle of a contiguous block of data, so when registering data regions we remove
@@ -341,22 +364,22 @@ extension Disassembler {
     var dataBlocks = IndexSet()
 
     /** All locations that represent code. */
-    private var text = IndexSet()
+    var text = IndexSet()
 
     /** Which instruction exists at a specific location. */
     var instructionMap: [Cartridge.Location: LR35902.Instruction] = [:]
 
     /** Locations that can transfer control (jp/call) to a specific location. */
-    private var transfers: [Cartridge.Location: Set<Cartridge.Location>] = [:]
+    var transfers: [Cartridge.Location: Set<Cartridge.Location>] = [:]
 
     /** Tracks ranges of code that represent contiguous scopes of instructions. */
-    private var contiguousScopes: Set<Range<Cartridge.Location>> = Set<Range<Cartridge.Location>>()
+    var contiguousScopes: Set<Range<Cartridge.Location>> = Set<Range<Cartridge.Location>>()
 
     /** Hints to the disassembler that a given location should be represented by a specific data type. */
     var typeAtLocation: [Cartridge.Location: String] = [:]
 
     /** Bank changes that occur at a specific location. */
-    private var bankChanges: [Cartridge.Location: Cartridge.Bank] = [:]
+    var bankChanges: [Cartridge.Location: Cartridge.Bank] = [:]
 
     /**
      Label types at specific locations.
@@ -364,204 +387,5 @@ extension Disassembler {
      There does not always need to be a corresponding name set in the labelNames dictionary.
      */
     var labelTypes: [Cartridge.Location: LabelType] = [:]
-
-    /** Register an instruction at the given location. */
-    func register(instruction: LR35902.Instruction, at location: Cartridge.Location) {
-      guard instructionMap[location] == nil else {
-        return
-      }
-      // Don't register instructions in the middle of existing instructions.
-      if code.contains(location.index) {
-        return
-      }
-
-      // Clear any existing instructions in this instruction's footprint.
-      let instructionWidths: [LR35902.Instruction.Spec: CPU.InstructionWidth<UInt16>] = LR35902.InstructionSet.widths
-      let instructionRange: Range<Cartridge.Location> = location..<(location + instructionWidths[instruction.spec]!.total)
-      for clearLocation in instructionRange.dropFirst() {
-        deleteInstruction(at: clearLocation)
-      }
-
-      instructionMap[location] = instruction
-      // Set the code bit for the instruction's footprint.
-      registerRegion(range: instructionRange, as: .code)
-    }
-
-    /** Register a new transfer of control to a given location from another location. */
-    func registerTransferOfControl(to toLocation: Cartridge.Location,
-                                   from fromLocation: Cartridge.Location,
-                                   spec: LR35902.Instruction.Spec) {
-      transfers[toLocation, default: Set()].insert(fromLocation)
-
-      // Tag the label type at this address
-      if labelTypes[toLocation] == nil
-          // Don't create a label in the middle of an instruction.
-          && (!code.contains(toLocation.index) || instruction(at: toLocation) != nil) {
-        labelTypes[toLocation] = .transferOfControl
-      }
-    }
-
-    /** Registers a new contiguous scope at the given range. */
-    func registerContiguousScope(range: Range<Cartridge.Location>) {
-      contiguousScopes.insert(range)
-    }
-
-    /** Registers a bank change at a specific location. */
-    func registerBankChange(to: Cartridge.Bank, at location: Cartridge.Location) {
-      bankChanges[location] = to
-    }
-
-    // MARK: - Querying discovered information
-
-    /** Returns the bank set at this location, if any. */
-    func bankChange(at location: Cartridge.Location) -> Cartridge.Bank? {
-      return bankChanges[location]
-    }
-
-    /** Get the instruction at the given location, if one exists. */
-    func instruction(at location: Cartridge.Location) -> LR35902.Instruction? {
-      guard code.contains(location.index) else {
-        return nil
-      }
-      return instructionMap[location]
-    }
-
-    /** Get all of the transfers of control to the given location. */
-    func transfersOfControl(at location: Cartridge.Location) -> Set<Cartridge.Location>? {
-      return transfers[location]
-    }
-  }
-}
-
-extension Disassembler.BankWorker {
-  enum ByteType {
-    case unknown
-    case code
-    case data
-    case jumpTable
-    case text
-    case image1bpp
-    case image2bpp
-    case ram
-  }
-
-  /** Returns all disassembled locations. */
-  func disassembledLocations() -> IndexSet {
-    return code.union(data).union(text)
-  }
-
-  /** Returns the type of information at the given location. */
-  func type(at location: Cartridge.Location) -> ByteType {
-    guard location.address < 0x8000 else {
-      return .ram
-    }
-    let index = location.index
-    if code.contains(index) {
-      return .code
-    }
-    if data.contains(index) {
-      switch context.formatOfData(at: location) {
-      case .image1bpp:  return .image1bpp
-      case .image2bpp:  return .image2bpp
-      case .jumpTable:  return .jumpTable
-      case .bytes:      return .data
-      case .none:       return .data
-      }
-    }
-    if text.contains(index) {
-      return .text
-    }
-    return .unknown
-  }
-
-  public enum RegionCategory {
-    case code
-    case data
-    case text
-  }
-
-  /** Registers a range as a specific region category. Will clear any existing regions in the range. */
-  func registerRegion(range: Range<Cartridge.Location>, as category: RegionCategory) {
-    let intRange = range.asIntRange()
-    switch category {
-    case .code:
-      code.insert(integersIn: intRange)
-
-      clearData(in: range)
-      clearText(in: range)
-
-    case .data:
-      data.insert(integersIn: intRange)
-      if range.count > 1 {
-        dataBlocks.insert(integersIn: intRange.dropFirst())
-      }
-
-      clearCode(in: range)
-      clearText(in: range)
-
-    case .text:
-      text.insert(integersIn: intRange)
-
-      clearCode(in: range)
-      clearData(in: range)
-    }
-  }
-
-  /** Deletes an instruction from a specific location and clears any code-related information in its footprint. */
-  func deleteInstruction(at location: Cartridge.Location) {
-    guard let instruction: LR35902.Instruction = instructionMap[location] else {
-      return
-    }
-    instructionMap[location] = nil
-
-    clearCode(in: location..<(location + LR35902.InstructionSet.widths[instruction.spec]!.total))
-  }
-
-  // MARK: Clearing regions
-
-  /** Removes all text-related information from the given range. */
-  private func clearText(in range: Range<Cartridge.Location>) {
-    text.remove(integersIn: range.asIntRange())
-  }
-
-  /** Removes all data-related information from the given range. */
-  private func clearData(in range: Range<Cartridge.Location>) {
-    let intRange = range.asIntRange()
-    data.remove(integersIn: intRange)
-    dataBlocks.remove(integersIn: intRange)
-  }
-
-  /**
-   Removes all code-related information from the given range.
-
-   Note that if an instruction footprint overlaps with the end of the given range then it is possible for some
-   additional code to be cleared beyond the range.
-   */
-  private func clearCode(in range: Range<Cartridge.Location>) {
-    let intRange = range.asIntRange()
-    code.remove(integersIn: intRange)
-
-    // Remove any labels, instructions, and transfers of control in this range.
-    for location: Cartridge.Location in range.dropFirst() {
-      deleteInstruction(at: location)
-      transfers[location] = nil
-      labelTypes[location] = nil
-      bankChanges[location] = nil
-    }
-
-    // For any existing scope that intersects this range:
-    // 1. Shorten it if it begins before the range.
-    // 2. Delete it if it begins within the range.
-    var mutatedScopes: Set<Range<Cartridge.Location>> = contiguousScopes
-    for scope: Range<Cartridge.Location> in contiguousScopes {
-      guard scope.overlaps(range) else {
-        continue
-      }
-      mutatedScopes.remove(scope)
-      if scope.lowerBound < range.lowerBound {
-        mutatedScopes.insert(scope.lowerBound..<range.lowerBound)
-      }
-    }
-    contiguousScopes = mutatedScopes
   }
 }
