@@ -151,6 +151,10 @@ extension Disassembler {
     private func disassemble(run: Run) {
       assert(run.startLocation.bankIndex == bank)
 
+      if code.contains(run.startLocation.index) && instruction(at: run.startLocation) != nil {
+        // We've already disassembled on this alignment before; no need to do so again.
+        return
+      }
       if run.visitHistory[Int(truncatingIfNeeded: bank)].visitedLocations.contains(run.startLocation.index) {
         // We've already visited this instruction, so we can skip it.
         return
@@ -180,7 +184,7 @@ extension Disassembler {
           continue
         }
 
-        // The conext of the current instruction prior to its execution.
+        // The context of the current instruction prior to its execution.
         let instructionContext = (pc: run.pc, selectedBank: run.selectedBank)
 
         // Don't commit the fetch to the context pc yet in case the instruction was invalid.

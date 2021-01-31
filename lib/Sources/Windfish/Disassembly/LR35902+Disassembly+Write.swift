@@ -342,7 +342,7 @@ clean:
       gameAsm += "INCLUDE \"charmap.asm\"\n"
     }
 
-    var instructionsDecoded = 0
+    var instructionsDecoded: ContiguousArray<Int> = ContiguousArray<Int>(repeating: 0, count: Int(truncatingIfNeeded: numberOfBanks))
 
     let linesAsString: ([Line]) -> String = { lines in
       return lines.map { $0.asString(detailedComments: false) }.joined(separator: "\n")
@@ -565,7 +565,7 @@ clean:
         }
 
         if let instruction = lastBankRouter!.instruction(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) {
-          instructionsDecoded += 1
+          instructionsDecoded[Int(truncatingIfNeeded: initialBank)] += 1
 
           if let bankChange = lastBankRouter!.bankChange(at: Cartridge.Location(address: writeContext.pc, bank: writeContext.bank)) {
             writeContext.bank = bankChange
@@ -854,7 +854,7 @@ clean:
       accumulator[bank] = Double(disassembledBankLocations.count * 100) / Double(Cartridge.bankSize)
     }
     let statistics = Statistics(
-      instructionsDecoded: instructionsDecoded,
+      instructionsDecoded: instructionsDecoded.reduce(0, +),
       percent: Double(disassembledLocations.count * 100) / Double(cartridgeSize),
       bankPercents: bankPercents
     )

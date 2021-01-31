@@ -1025,7 +1025,8 @@ JumpTable_4D1E_03:
     ret
 
 
-    db   $F0, $EB, $FE, $1F, $20, $0F
+toc_03_4D51:
+    ifNe [$FFEB], $1F, else_03_4D66
 
 toc_03_4D57:
     ld   hl, $C3A0
@@ -1036,9 +1037,21 @@ toc_03_4D57:
     ld   [hl], $05
     jp   toc_03_48B0.toc_03_48C0
 
-    db   $21, $80, $C4, $09, $36, $1F, $21, $80
-    db   $C2, $09, $36, $01, $21, $40, $C3, $09
-    db   $36, $04, $21, $F4, $FF, $36, $13, $C9
+else_03_4D66:
+    ld   hl, $C480
+    add  hl, bc
+    ld   [hl], $1F
+    ld   hl, $C280
+    add  hl, bc
+    ld   [hl], $01
+    ld   hl, $C340
+    add  hl, bc
+    ld   [hl], $04
+    ld   hl, $FFF4
+    ld   [hl], $13
+    ret
+
+
     db   $00, $00, $04, $00, $00, $01, $03, $06
     db   $24, $00, $24, $00, $3E, $00, $1E, $00
     db   $1E, $60
@@ -4369,15 +4382,15 @@ toc_03_6C87.else_03_6CE9:
     ld   a, [hLinkAnimationState]
     sub  a, LINK_ANIMATION_STATE_HOLD_SWIMMING_2
     cp   LINK_ANIMATION_STATE_UNKNOWN_02
-    jr   c, toc_03_6C87.loop_03_6CE5
+    jr   c, .loop_03_6CE5
 
 toc_03_6C87.toc_03_6CF1:
-    ifNe [$FFEB], $AC, toc_03_6C87.else_03_6D15
+    ifNe [$FFEB], $AC, .else_03_6D15
 
     call toc_03_7EBB
     ld   a, e
     cp   $02
-    jr   nz, toc_03_6C87.else_03_6D59
+    jr   nz, .else_03_6D59
 
     call JumpTable_3B8D_00
     ld   [hl], $05

@@ -133,12 +133,11 @@ public final class Disassembler {
     let signpostID = OSSignpostID(log: log)
     os_signpost(.begin, log: log, name: "Disassembler", signpostID: signpostID, "%{public}s", "disassemble")
 
-    let visitHistory = (0..<Int(truncatingIfNeeded: numberOfBanks)).map { _ in Run.VisitHistory() }
     for range in configuration.allPotentialCode().sorted(by: { (a: Range<Cartridge.Location>, b: Range<Cartridge.Location>) -> Bool in
       a.lowerBound < b.lowerBound
     }) {
       let run = Run(from: range.lowerBound.address, selectedBank: range.lowerBound.bank, upTo: range.upperBound.address,
-                    visitHistory: visitHistory)
+                    numberOfBanks: Int(truncatingIfNeeded: numberOfBanks))
       lastBankRouter!.schedule(run: run)
     }
 
