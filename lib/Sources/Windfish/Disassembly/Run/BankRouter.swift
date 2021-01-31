@@ -26,7 +26,13 @@ extension Disassembler {
       bankWorker.schedule(run: run)
     }
 
-    func wait() {
+    func finish() {
+      workGroup.wait()
+
+      for bankWorker: BankWorker in bankWorkers {
+        bankWorker.startPostDisassemblyWork()
+      }
+
       workGroup.wait()
 
       print("All scheduled work has concluded")
@@ -36,10 +42,14 @@ extension Disassembler {
   final class BankWorker {
     // Initialization data
     private let bank: Cartridge.Bank
-    private let context: DisassemblerContext
+    let context: DisassemblerContext
 
-    weak var router: BankRouter?
+    fileprivate weak var router: BankRouter?
     private let queue: DispatchQueue
+    private var runs: [Run] = []
+
+    private let linearSweepDidSteps: [Configuration.Script]
+    private let linearSweepWillStarts: [Configuration.Script]
 
     init(bank: Cartridge.Bank, context: DisassemblerContext) {
       self.bank = bank
@@ -49,6 +59,9 @@ extension Disassembler {
                                  attributes: [],
                                  autoreleaseFrequency: .workItem,
                                  target: nil)
+      let scripts: [String: Configuration.Script] = context.allScripts()
+      self.linearSweepDidSteps = scripts.values.filter { $0.linearSweepDidStep != nil }
+      self.linearSweepWillStarts = scripts.values.filter { $0.linearSweepWillStart != nil }
     }
 
     /** All cartridge locations that have been visited so far during disassembly. */
@@ -56,9 +69,10 @@ extension Disassembler {
 
     // MARK: - Scheduling runs
 
-    func schedule(run: Run) {
-      router?.workGroup.enter()
+    fileprivate func schedule(run: Run) {
+      runs.append(run)
 
+      router?.workGroup.enter()
       queue.async {
         defer {
           self.router?.workGroup.leave()
@@ -71,9 +85,21 @@ extension Disassembler {
       }
     }
 
+    fileprivate func startPostDisassemblyWork() {
+      router?.workGroup.enter()
+      queue.async {
+        defer {
+          self.router?.workGroup.leave()
+        }
+        for run in self.runs {
+          self.rewriteScopes(run)
+        }
+      }
+    }
+
     // MARK: - Events that occur during a disassembly run
 
-    func didEncounterTransferOfControl(fromRun: Run, fromAddress: LR35902.Address, toAddress: LR35902.Address, selectedBank: Cartridge.Bank, instruction: LR35902.Instruction) {
+    private func didEncounterTransferOfControl(fromRun: Run, fromAddress: LR35902.Address, toAddress: LR35902.Address, selectedBank: Cartridge.Bank, instruction: LR35902.Instruction) {
       guard toAddress < 0x8000 else {
         return  // We can't disassemble in-memory regions.
       }
@@ -91,13 +117,19 @@ extension Disassembler {
     // MARK: - Registering information discovered during disassembly
 
     /** All locations that represent code. */
-    var code = IndexSet()
+    private var code = IndexSet()
 
     /** Which instruction exists at a specific location. */
     var instructionMap: [Cartridge.Location: LR35902.Instruction] = [:]
 
     /** Locations that can transfer control (jp/call) to a specific location. */
-    var transfers: [Cartridge.Location: Set<Cartridge.Location>] = [:]
+    private var transfers: [Cartridge.Location: Set<Cartridge.Location>] = [:]
+
+    /** Each bank tracks ranges of code that represent contiguous scopes of instructions. */
+    private var contiguousScopes: Set<Range<Cartridge.Location>> = Set<Range<Cartridge.Location>>()
+
+    /** Hints to the disassembler that a given location should be represented by a specific data type. */
+    var typeAtLocation: [Cartridge.Location: String] = [:]
 
     /**
      Label types at specific locations.
@@ -120,14 +152,24 @@ extension Disassembler {
       }
     }
 
+    /** Registers a new contiguous scope at the given range. */
+    func registerContiguousScope(range: Range<Cartridge.Location>) {
+      contiguousScopes.insert(range)
+    }
+
     // MARK: - Querying discovered information
 
     /** Get the instruction at the given location, if one exists. */
-    public func instruction(at location: Cartridge.Location) -> LR35902.Instruction? {
+    func instruction(at location: Cartridge.Location) -> LR35902.Instruction? {
       guard code.contains(location.index) else {
         return nil
       }
       return instructionMap[location]
+    }
+
+    /** Get all of the transfers of control to the given location. */
+    func transfersOfControl(at location: Cartridge.Location) -> Set<Cartridge.Location>? {
+      return transfers[location]
     }
   }
 }

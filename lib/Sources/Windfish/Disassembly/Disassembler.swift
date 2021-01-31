@@ -16,6 +16,8 @@ extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {
 
 // TODO: Rename something like "ConfigurationInput".
 protocol DisassemblerContext: class {
+  var cartridgeData: Data { get }
+
   func allPotentialCode() -> Set<Range<Cartridge.Location>>
   func allPotentialText() -> Set<Range<Cartridge.Location>>
   func allPotentialData() -> Set<Range<Cartridge.Location>>
@@ -49,6 +51,12 @@ protocol DisassemblerContext: class {
 public final class Disassembler {
 
   public final class Configuration: DisassemblerContext {
+    let cartridgeData: Data
+
+    init(cartridgeData: Data) {
+      self.cartridgeData = cartridgeData
+    }
+
     /** Ranges of executable regions that should be disassembled. */
     var executableRegions = Set<Range<Cartridge.Location>>()
 
@@ -92,7 +100,7 @@ public final class Disassembler {
     var dataFormats: [DataFormat: IndexSet] = [:]
   }
 
-  public let mutableConfiguration = Configuration()
+  public let mutableConfiguration: Configuration
   var configuration: DisassemblerContext {
     return mutableConfiguration
   }
@@ -102,6 +110,7 @@ public final class Disassembler {
   let cartridgeSize: Cartridge.Length
   public let numberOfBanks: Cartridge.Bank
   public init(data: Data) {
+    self.mutableConfiguration = Configuration(cartridgeData: data)
     self.cartridgeData = data
     self.memory = DisassemblerMemory(data: data)
     self.cartridgeSize = Cartridge.Length(data.count)
@@ -178,7 +187,7 @@ public final class Disassembler {
         bankRouter.schedule(run: run)
       }
 
-      bankRouter.wait()
+      bankRouter.finish()
 
     } else {
       for potentialCodeRegion in configuration.allPotentialCode().sorted(by: { (a: Range<Cartridge.Location>, b: Range<Cartridge.Location>) -> Bool in
@@ -227,12 +236,12 @@ public final class Disassembler {
                                      spec: instruction.spec)
     }
 
-    // MARK: - All above migrated to BankRouter.
-
     // Extract any scripted events.
     let scripts: [String: Configuration.Script] = configuration.allScripts()
     let linearSweepDidSteps = scripts.values.filter { $0.linearSweepDidStep != nil }
     let linearSweepWillStarts = scripts.values.filter { $0.linearSweepWillStart != nil }
+
+    // MARK: - All above migrated to BankRouter.
 
     while !runQueue.isEmpty {
       let run = runQueue.dequeue()
