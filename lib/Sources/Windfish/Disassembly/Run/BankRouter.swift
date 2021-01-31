@@ -89,7 +89,7 @@ extension Disassembler {
           return
         }
         self.registerBankChange(to: max(1, desiredBank), at: Cartridge.Location(address: address, bank: bank))
-        self.runContext.bank = desiredBank
+        self.currentRun?.selectedBank = desiredBank
       }
       for script in self.linearSweepScripts {
         script.context.setObject(changeBank, forKeyedSubscript: "changeBank" as NSString)
@@ -111,9 +111,7 @@ extension Disassembler {
       }
     }
 
-    // Initialize the run's program counter
-    var runContext: (pc: LR35902.Address, bank: Cartridge.Bank) = (pc: 0, bank: 0)
-
+    var currentRun: Run?
     private func disassemble(run: Run) {
       // TODO: Do something with the run.
       print("[worker \(bank.hexString)] Running \(run.startLocation.bank.hexString):\(run.startLocation.address.hexString)")
@@ -123,8 +121,12 @@ extension Disassembler {
         return
       }
 
-      // Initialize the run's program counter
-      runContext = (pc: run.startLocation.address, bank: run.selectedBank)
+      currentRun = run
+      defer {
+        currentRun = nil
+      }
+
+//      visitedAddresses.insert(integersIn: run.advance(amount: 56))
 
       print("[worker \(bank.hexString)] Finished \(run.startLocation.bank.hexString):\(run.startLocation.address.hexString)")
     }

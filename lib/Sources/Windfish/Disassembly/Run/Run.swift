@@ -71,7 +71,9 @@ extension Disassembler {
   final class Run {
     let startLocation: Cartridge.Location
     let endLocation: Cartridge.Location?
-    let selectedBank: Cartridge.Bank
+
+    var pc: LR35902.Address
+    var selectedBank: Cartridge.Bank
 
     init(from startAddress: LR35902.Address,
          selectedBank unsafeInitialBank: Cartridge.Bank,
@@ -83,6 +85,8 @@ extension Disassembler {
       } else {
         self.endLocation = nil
       }
+
+      self.pc = self.startLocation.address
       self.selectedBank = initialBank
     }
 
@@ -91,6 +95,15 @@ extension Disassembler {
     var children: [Run] = []
 
     var invocationInstruction: LR35902.Instruction?
+
+    func advance(amount: LR35902.Address) -> Range<Int> {
+      let currentCartAddress = Cartridge.Location(address: pc, bank: selectedBank)
+      visitedRange = startLocation..<(currentCartAddress + amount)
+
+      pc += amount
+
+      return currentCartAddress.index..<(currentCartAddress + amount).index
+    }
 
     func hasReachedEnd(pc: LR35902.Address) -> Bool {
       guard let endLocation = endLocation else {

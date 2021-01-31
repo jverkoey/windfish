@@ -267,8 +267,6 @@ public final class Disassembler {
         script.context.setObject(changeBank, forKeyedSubscript: "changeBank" as NSString)
       }
 
-      // MARK: - All above migrated to BankRouter.
-
       let advance: (LR35902.Address) -> Void = { amount in
         let currentCartAddress = Cartridge.Location(address: runContext.pc, bank: runContext.bank)
         run.visitedRange = run.startLocation..<(currentCartAddress + amount)
@@ -277,6 +275,8 @@ public final class Disassembler {
 
         runContext.pc += amount
       }
+
+      // MARK: - All above migrated to BankRouter.
 
       linearSweepWillStarts.forEach {
         $0.linearSweepWillStart?.call(withArguments: [])
