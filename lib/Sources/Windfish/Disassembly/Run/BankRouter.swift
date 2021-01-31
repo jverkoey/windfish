@@ -50,6 +50,7 @@ extension Disassembler {
 
     private let linearSweepDidSteps: [Configuration.Script]
     private let linearSweepWillStarts: [Configuration.Script]
+    private let linearSweepScripts: [Configuration.Script]
 
     init(bank: Cartridge.Bank, context: DisassemblerContext) {
       self.bank = bank
@@ -59,9 +60,40 @@ extension Disassembler {
                                  attributes: [],
                                  autoreleaseFrequency: .workItem,
                                  target: nil)
+
       let scripts: [String: Configuration.Script] = context.allScripts()
-      self.linearSweepDidSteps = scripts.values.filter { $0.linearSweepDidStep != nil }
-      self.linearSweepWillStarts = scripts.values.filter { $0.linearSweepWillStart != nil }
+      var linearSweepDidSteps: [Configuration.Script] = []
+      var linearSweepWillStarts: [Configuration.Script] = []
+      var linearSweepScripts: [Configuration.Script] = []
+      for script: Configuration.Script in scripts.values {
+        var hasLinearSweepEvent: Bool = false
+        if script.linearSweepDidStep != nil {
+          linearSweepDidSteps.append(script)
+          hasLinearSweepEvent = true
+        }
+        if script.linearSweepWillStart != nil {
+          linearSweepWillStarts.append(script)
+          hasLinearSweepEvent = true
+        }
+        if hasLinearSweepEvent {
+          linearSweepScripts.append(script)
+        }
+      }
+      self.linearSweepDidSteps = linearSweepDidSteps
+      self.linearSweepWillStarts = linearSweepWillStarts
+      self.linearSweepScripts = linearSweepScripts
+
+      // Register linear sweep script functions.
+      let changeBank: @convention(block) (Cartridge.Bank, LR35902.Address, Cartridge.Bank) -> Void = { [weak self] desiredBank, address, bank in
+        guard let self = self else {
+          return
+        }
+        self.registerBankChange(to: max(1, desiredBank), at: Cartridge.Location(address: address, bank: bank))
+        self.runContext.bank = desiredBank
+      }
+      for script in self.linearSweepScripts {
+        script.context.setObject(changeBank, forKeyedSubscript: "changeBank" as NSString)
+      }
     }
 
     /** All cartridge locations that have been visited so far during disassembly. */
@@ -74,15 +106,27 @@ extension Disassembler {
 
       router?.workGroup.enter()
       queue.async {
-        defer {
-          self.router?.workGroup.leave()
-        }
-
-        // TODO: Do something with the run.
-        print("[worker \(self.bank.hexString)] Running \(run.startLocation.bank.hexString):\(run.startLocation.address.hexString)")
-
-        print("[worker \(self.bank.hexString)] Finished \(run.startLocation.bank.hexString):\(run.startLocation.address.hexString)")
+        self.disassemble(run: run)
+        self.router?.workGroup.leave()
       }
+    }
+
+    // Initialize the run's program counter
+    var runContext: (pc: LR35902.Address, bank: Cartridge.Bank) = (pc: 0, bank: 0)
+
+    private func disassemble(run: Run) {
+      // TODO: Do something with the run.
+      print("[worker \(bank.hexString)] Running \(run.startLocation.bank.hexString):\(run.startLocation.address.hexString)")
+
+      if visitedAddresses.contains(run.startLocation.index) {
+        // We've already visited this instruction, so we can skip it.
+        return
+      }
+
+      // Initialize the run's program counter
+      runContext = (pc: run.startLocation.address, bank: run.selectedBank)
+
+      print("[worker \(bank.hexString)] Finished \(run.startLocation.bank.hexString):\(run.startLocation.address.hexString)")
     }
 
     fileprivate func startPostDisassemblyWork() {
@@ -131,6 +175,9 @@ extension Disassembler {
     /** Hints to the disassembler that a given location should be represented by a specific data type. */
     var typeAtLocation: [Cartridge.Location: String] = [:]
 
+    /** Bank changes that occur at a specific location. */
+    private var bankChanges: [Cartridge.Location: Cartridge.Bank] = [:]
+
     /**
      Label types at specific locations.
 
@@ -155,6 +202,11 @@ extension Disassembler {
     /** Registers a new contiguous scope at the given range. */
     func registerContiguousScope(range: Range<Cartridge.Location>) {
       contiguousScopes.insert(range)
+    }
+
+    /** Registers a bank change at a specific location. */
+    func registerBankChange(to: Cartridge.Bank, at location: Cartridge.Location) {
+      bankChanges[location] = to
     }
 
     // MARK: - Querying discovered information

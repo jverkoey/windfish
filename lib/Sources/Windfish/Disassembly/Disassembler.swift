@@ -241,8 +241,6 @@ public final class Disassembler {
     let linearSweepDidSteps = scripts.values.filter { $0.linearSweepDidStep != nil }
     let linearSweepWillStarts = scripts.values.filter { $0.linearSweepWillStart != nil }
 
-    // MARK: - All above migrated to BankRouter.
-
     while !runQueue.isEmpty {
       let run = runQueue.dequeue()
 
@@ -268,6 +266,8 @@ public final class Disassembler {
       for script in scripts.values {
         script.context.setObject(changeBank, forKeyedSubscript: "changeBank" as NSString)
       }
+
+      // MARK: - All above migrated to BankRouter.
 
       let advance: (LR35902.Address) -> Void = { amount in
         let currentCartAddress = Cartridge.Location(address: runContext.pc, bank: runContext.bank)
