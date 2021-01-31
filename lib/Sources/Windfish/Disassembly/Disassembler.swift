@@ -276,11 +276,11 @@ public final class Disassembler {
         runContext.pc += amount
       }
 
-      // MARK: - All above migrated to BankRouter.
-
       linearSweepWillStarts.forEach {
         $0.linearSweepWillStart?.call(withArguments: [])
       }
+
+      // MARK: - All above migrated to BankRouter.
 
       var previousInstruction: LR35902.Instruction? = nil
       linear_sweep: while !run.hasReachedEnd(pc: runContext.pc) && pcIsValid(pc: runContext.pc, bank: runContext.bank) {
