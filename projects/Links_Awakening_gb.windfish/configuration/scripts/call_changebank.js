@@ -14,7 +14,7 @@ function linearSweepWillStart() {
 function linearSweepDidStep(opcode, immediate, pc, bank) {
   if (previousOpcode == ld_a_imm8
       && opcode == call_r16 && immediate == 0x07b9) {
-    registerBankChange(previousImmediate, pc, bank);
+    changeBank(previousImmediate, pc, bank);
   }
 
   previousOpcode = opcode;

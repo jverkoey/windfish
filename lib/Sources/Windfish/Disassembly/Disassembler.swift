@@ -235,10 +235,6 @@ public final class Disassembler {
     let linearSweepWillStarts = scripts.values.filter { $0.linearSweepWillStart != nil }
 
     while !runQueue.isEmpty {
-      linearSweepWillStarts.forEach {
-        $0.linearSweepWillStart?.call(withArguments: [])
-      }
-
       let run = runQueue.dequeue()
 
       if visitedAddresses.contains(run.startLocation.index) {
@@ -250,7 +246,7 @@ public final class Disassembler {
       var runContext = (pc: run.startLocation.address, bank: run.selectedBank)
 
       // Script functions
-      let registerBankChange: @convention(block) (Int, Int, Int) -> Void = { [weak self] _desiredBank, address, bank in
+      let changeBank: @convention(block) (Int, Int, Int) -> Void = { [weak self] _desiredBank, address, bank in
         guard let self = self else {
           return
         }
@@ -261,7 +257,7 @@ public final class Disassembler {
         runContext.bank = desiredBank
       }
       for script in scripts.values {
-        script.context.setObject(registerBankChange, forKeyedSubscript: "registerBankChange" as NSString)
+        script.context.setObject(changeBank, forKeyedSubscript: "changeBank" as NSString)
       }
 
       let advance: (LR35902.Address) -> Void = { amount in
@@ -271,6 +267,10 @@ public final class Disassembler {
         visitedAddresses.insert(integersIn: currentCartAddress.index..<(currentCartAddress + amount).index)
 
         runContext.pc += amount
+      }
+
+      linearSweepWillStarts.forEach {
+        $0.linearSweepWillStart?.call(withArguments: [])
       }
 
       var previousInstruction: LR35902.Instruction? = nil
