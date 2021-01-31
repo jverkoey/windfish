@@ -19,6 +19,11 @@ extension Cartridge {
     public let address: LR35902.Address
     public let bank: Cartridge.Bank
 
+    /** Returns a zero-based bank index, where addresses below 0x4000 are treated as bank 0. */
+    public var bankIndex: Cartridge.Bank {
+      return address < 0x4000 ? 0 : bank
+    }
+
     lazy var index: Int = {
       (address < 0x4000)
         ? Int(truncatingIfNeeded: address)
@@ -27,6 +32,7 @@ extension Cartridge {
 
     public init(address: LR35902.Address, bank: Cartridge.Bank) {
       self.address = address
+      // Always pin addresses below 0x4000 to bank 1.
       self.bank = address < 0x4000 ? 1 : max(1, bank)
     }
 

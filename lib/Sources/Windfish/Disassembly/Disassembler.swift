@@ -165,10 +165,26 @@ public final class Disassembler {
     let log = OSLog(subsystem: "com.featherless.windfish", category: "PointsOfInterest")
     let signpostID = OSSignpostID(log: log)
     os_signpost(.begin, log: log, name: "Disassembler", signpostID: signpostID, "%{public}s", "disassemble")
-    for potentialCodeRegion in configuration.allPotentialCode().sorted(by: { (a: Range<Cartridge.Location>, b: Range<Cartridge.Location>) -> Bool in
-      a.lowerBound < b.lowerBound
-    }) {
-      disassemble(range: potentialCodeRegion)
+
+    let async = false
+    if async {
+      let bankRouter: BankRouter = BankRouter(numberOfBanks: Int(truncatingIfNeeded: numberOfBanks))
+
+      for range in configuration.allPotentialCode().sorted(by: { (a: Range<Cartridge.Location>, b: Range<Cartridge.Location>) -> Bool in
+        a.lowerBound < b.lowerBound
+      }) {
+        let run = Run(from: range.lowerBound.address, selectedBank: range.lowerBound.bank, upTo: range.upperBound.address)
+        bankRouter.schedule(run: run)
+      }
+
+      bankRouter.wait()
+
+    } else {
+      for potentialCodeRegion in configuration.allPotentialCode().sorted(by: { (a: Range<Cartridge.Location>, b: Range<Cartridge.Location>) -> Bool in
+        a.lowerBound < b.lowerBound
+      }) {
+        disassemble(range: potentialCodeRegion)
+      }
     }
 
     for (address, _) in configuration.allGlobals() {
