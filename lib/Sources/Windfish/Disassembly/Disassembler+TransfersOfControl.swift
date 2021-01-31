@@ -3,6 +3,9 @@ import Foundation
 extension Disassembler.BankRouter {
   /** Get all of the transfers of control to the given location. */
   func transfersOfControl(at location: Cartridge.Location) -> Set<Cartridge.Location>? {
+    guard location.bankIndex < bankWorkers.count else {
+      return nil
+    }
     return bankWorkers[Int(truncatingIfNeeded: location.bankIndex)].transfersOfControl(at: location)
   }
 }

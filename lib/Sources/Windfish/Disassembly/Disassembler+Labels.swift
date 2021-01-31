@@ -4,6 +4,9 @@ extension Disassembler.BankRouter {
 
   /** Returns the label at the given location, if any. */
   func label(at location: Cartridge.Location) -> String? {
+    guard location.bankIndex < bankWorkers.count else {
+      return nil
+    }
     return bankWorkers[Int(truncatingIfNeeded: location.bankIndex)].label(at: location)
   }
 }

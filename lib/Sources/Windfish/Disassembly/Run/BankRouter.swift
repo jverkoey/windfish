@@ -22,6 +22,9 @@ extension Disassembler {
     }
 
     func schedule(run: Run) {
+      guard run.startLocation.bankIndex < bankWorkers.count else {
+        return
+      }
       disassembling = true
       let bankWorker: BankWorker = bankWorkers[Int(truncatingIfNeeded: run.startLocation.bankIndex)]
       bankWorker.schedule(run: run)
@@ -53,6 +56,9 @@ extension Disassembler {
 
     func registerTransferOfControl(to toLocation: Cartridge.Location,
                                    from fromLocation: Cartridge.Location) {
+      guard toLocation.bankIndex < bankWorkers.count else {
+        return
+      }
       let bankWorker: BankWorker = bankWorkers[Int(truncatingIfNeeded: toLocation.bankIndex)]
       if !disassembling {
         // No need to worry about synchronization yet.

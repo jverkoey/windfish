@@ -468,7 +468,7 @@ call #1
       XCTAssertEqual(content, """
 SECTION "ROM Bank 00", ROM0[$00]
 
-    callcb toc_01_4100
+    callcb $4100
 """)
     }
 
