@@ -432,7 +432,7 @@ JumpTable_42F4_04.return_04_42FE:
 
 JumpTable_42FF_04:
     call toc_01_0891
-    jp   z, JumpTable_5712_04.else_04_5746
+    jp   z, toc_04_5746
 
     call JumpTable_50ED_04.toc_04_50F3
     ret
@@ -1776,7 +1776,7 @@ JumpTable_4E26_04.else_04_4E43:
     cp   $FF
     jr   nz, .loop_04_4E2E
 
-    jp   JumpTable_5712_04.else_04_5746
+    jp   toc_04_5746
 
 JumpTable_4E26_04.else_04_4E4C:
     jp   toc_04_6D44
@@ -2145,7 +2145,7 @@ JumpTable_50E3_04.return_04_50EC:
 
 JumpTable_50ED_04:
     call toc_01_0891
-    jp   z, JumpTable_5712_04.else_04_5746
+    jp   z, toc_04_5746
 
 JumpTable_50ED_04.toc_04_50F3:
     and  %00000111
@@ -2947,7 +2947,7 @@ JumpTable_56E5_04.else_04_56FA:
 
 JumpTable_5712_04:
     call toc_01_0891
-    jp   z, .else_04_5746
+    jp   z, toc_04_5746
 
     and  %00000011
     jr   nz, .return_04_5745
@@ -2980,30 +2980,30 @@ JumpTable_5712_04.return_04_5745:
     ret
 
 
-JumpTable_5712_04.else_04_5746:
+toc_04_5746:
     ld   a, $36
     call toc_01_3C01
     ifLt [$FFD7], $88, .else_04_5753
 
     ld   a, $88
-JumpTable_5712_04.else_04_5753:
+toc_04_5746.else_04_5753:
     cp   $18
     jr   nc, .else_04_5759
 
     ld   a, $18
-JumpTable_5712_04.else_04_5759:
+toc_04_5746.else_04_5759:
     ld   hl, $C200
     add  hl, de
     ld   [hl], a
     ifLt [$FFD8], $70, .else_04_5766
 
     ld   a, $70
-JumpTable_5712_04.else_04_5766:
+toc_04_5746.else_04_5766:
     cp   $20
     jr   nc, .else_04_576C
 
     ld   a, $20
-JumpTable_5712_04.else_04_576C:
+toc_04_5746.else_04_576C:
     ld   hl, $C210
     add  hl, de
     ld   [hl], a

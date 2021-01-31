@@ -3529,7 +3529,7 @@ toc_02_5DD5.else_02_5E96:
 toc_02_5DD5.toc_02_5E97:
     call toc_02_77FA.else_02_781B
     call toc_01_149B.toc_01_149E
-    call JumpTable_1C56_00.else_01_1CCC
+    call JumpTable_1C5A_00.else_01_1CCC
     call toc_01_0B2B
     ret
 
@@ -7729,7 +7729,7 @@ JumpTable_7C7E_02.toc_02_7D0D:
 JumpTable_7C7E_02.else_02_7D25:
     call toc_01_2ED7
     call toc_01_36E6
-    call JumpTable_1C56_00.else_01_1CCC
+    call JumpTable_1C5A_00.else_01_1CCC
     call toc_01_149B
     ifNot [$C1CF], .else_02_7D4C
 

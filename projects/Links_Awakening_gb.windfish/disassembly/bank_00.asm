@@ -694,7 +694,7 @@ vblank.else_01_0566:
     ifGte [$FFE8], $08, .else_01_0586
 
 vblank.toc_01_0583:
-    call JumpTable_1C56_00.else_01_1CCC
+    call JumpTable_1C5A_00.else_01_1CCC
 vblank.else_01_0586:
     call $FFC0
     jr   .else_01_05B6
@@ -1758,7 +1758,7 @@ toc_01_0C8C:
     assign [wGameMode], GAMEMODE_WORLD_MAP
     changebank $02
     call toc_02_77FA.else_02_781B
-    call JumpTable_1C56_00.else_01_1CCC
+    call JumpTable_1C5A_00.else_01_1CCC
     call toc_01_3843
     pop  af
     ret
@@ -1819,7 +1819,7 @@ toc_01_0C8C.else_01_0D32:
 
 toc_01_0D49:
     call toc_01_149B
-    jp   JumpTable_1C56_00.else_01_1CCC
+    jp   JumpTable_1C5A_00.else_01_1CCC
 
 JumpTable_0D4F_00:
     call_changebank $19
@@ -3595,25 +3595,25 @@ toc_01_1AA9.else_01_1ADF:
 
 toc_01_1AA9.else_01_1AEC:
     cp   $0B
-    jp   c, JumpTable_1C56_00.return_01_1D14
+    jp   c, JumpTable_1C5A_00.return_01_1D14
 
     ld   a, [$DB9A]
     cp   $80
-    jp   nz, JumpTable_1C56_00.return_01_1D14
+    jp   nz, JumpTable_1C5A_00.return_01_1D14
 
     ld   a, [$C14F]
     and  a
-    jp   nz, JumpTable_1C56_00.else_01_1CCC
+    jp   nz, JumpTable_1C5A_00.else_01_1CCC
 
     ld   hl, $C124
     ld   a, [$D601]
     or   [hl]
-    jp   nz, JumpTable_1C56_00.else_01_1CCC
+    jp   nz, JumpTable_1C5A_00.else_01_1CCC
 
     ifNot [$D6F8], .else_01_1B16
 
     call toc_01_1DEE
-    jp   JumpTable_1C56_00.else_01_1CCC
+    jp   JumpTable_1C5A_00.else_01_1CCC
 
 toc_01_1AA9.else_01_1B16:
     ifNot [$FFA5], .else_01_1B66
@@ -3658,7 +3658,7 @@ toc_01_1AA9.else_01_1B1B:
     cp   $10
     jp   z, toc_01_1D15
 
-    jp   JumpTable_1C56_00.else_01_1CCC
+    jp   JumpTable_1C5A_00.else_01_1CCC
 
 toc_01_1AA9.else_01_1B5E:
     changebank $17
@@ -3671,7 +3671,7 @@ toc_01_1AA9.else_01_1B66:
 toc_01_1AA9.toc_01_1B6B:
     ld   a, [hAnimatedTilesGroup]
     jumptable
-    dw JumpTable_1C56_00.JumpTable_1C5A_00 ; 00
+    dw JumpTable_1C5A_00 ; 00
     dw JumpTable_1B90_00 ; 01
     dw JumpTable_1BAA_00 ; 02
     dw JumpTable_1BAE_00 ; 03
@@ -3692,12 +3692,12 @@ toc_01_1AA9.toc_01_1B6B:
 JumpTable_1B90_00:
     ld   a, [hAnimatedTilesFrameCount]
     and  %00000111
-    jp   nz, JumpTable_1C56_00.JumpTable_1C5A_00
+    jp   nz, JumpTable_1C5A_00
 
     changebank $01
     call toc_01_5F62
     changebank $0C
-    jp   JumpTable_1C56_00.else_01_1CCC
+    jp   JumpTable_1C5A_00.else_01_1CCC
 
 toc_01_1BA7:
     ld   l, a
@@ -3720,7 +3720,7 @@ JumpTable_1BB6_00:
 JumpTable_1BB6_00.toc_01_1BB8:
     ld   a, [hAnimatedTilesFrameCount]
     and  %00001111
-    jp   nz, JumpTable_1C56_00.JumpTable_1C5A_00
+    jp   nz, JumpTable_1C5A_00
 
     call toc_01_1C43
     jp   toc_01_1BA7
@@ -3730,7 +3730,7 @@ JumpTable_1BB6_00.toc_01_1BB8:
 JumpTable_1BCD_00:
     ld   a, [hAnimatedTilesFrameCount]
     and  %00000111
-    jp   nz, JumpTable_1C56_00.JumpTable_1C5A_00
+    jp   nz, JumpTable_1C5A_00
 
     ld   a, [hAnimatedTilesFrameCount]
     rra
@@ -3748,7 +3748,7 @@ JumpTable_1BCD_00.toc_01_1BE5:
 JumpTable_1BCD_00.toc_01_1BE8:
     ld   bc, $0040
     call toc_01_28C5
-    jp   JumpTable_1C56_00.else_01_1CCC
+    jp   JumpTable_1C5A_00.else_01_1CCC
 
 JumpTable_1BF1_00:
     ld   h, $6E
@@ -3757,7 +3757,7 @@ JumpTable_1BF1_00:
 JumpTable_1BF5_00:
     ld   a, [hAnimatedTilesFrameCount]
     and  %00000111
-    jp   nz, JumpTable_1C56_00.JumpTable_1C5A_00
+    jp   nz, JumpTable_1C5A_00
 
     ld   a, [hAnimatedTilesFrameCount]
     rra
@@ -3787,7 +3787,7 @@ JumpTable_1C21_00:
 JumpTable_1C21_00.toc_01_1C23:
     ld   a, [hAnimatedTilesFrameCount]
     and  %00000111
-    jp   nz, JumpTable_1C56_00.JumpTable_1C5A_00
+    jp   nz, JumpTable_1C5A_00
 
     call toc_01_1C43
     jp   toc_01_1BA7
@@ -3797,7 +3797,7 @@ JumpTable_1C30_00:
 JumpTable_1C30_00.toc_01_1C32:
     ld   a, [hAnimatedTilesFrameCount]
     and  %00000011
-    jp   nz, JumpTable_1C56_00.JumpTable_1C5A_00
+    jp   nz, JumpTable_1C5A_00
 
     call toc_01_1C43
     jp   toc_01_1BA7
@@ -3829,7 +3829,7 @@ JumpTable_1C56_00:
     ld   h, $76
     jr   JumpTable_1C21_00.toc_01_1C23
 
-JumpTable_1C56_00.JumpTable_1C5A_00:
+JumpTable_1C5A_00:
     ld   a, [hLinkAnimationState]
     cp   LINK_ANIMATION_STATE_NO_UPDATE
     jp   z, .else_01_1CCC
@@ -3867,7 +3867,7 @@ JumpTable_1C56_00.JumpTable_1C5A_00:
     pop  bc
     ld   hl, gbVRAM
     ld   d, $20
-JumpTable_1C56_00.loop_01_1CA0:
+JumpTable_1C5A_00.loop_01_1CA0:
     ld   a, [bc]
     inc  bc
     ldi  [hl], a
@@ -3892,14 +3892,14 @@ JumpTable_1C56_00.loop_01_1CA0:
     pop  bc
     ld   hl, $8020
     ld   d, $20
-JumpTable_1C56_00.loop_01_1CC6:
+JumpTable_1C5A_00.loop_01_1CC6:
     ld   a, [bc]
     inc  bc
     ldi  [hl], a
     dec  d
     jr   nz, .loop_01_1CC6
 
-JumpTable_1C56_00.else_01_1CCC:
+JumpTable_1C5A_00.else_01_1CCC:
     ld   a, [hLinkAnimationState]
     inc  a
     jr   z, .return_01_1D14
@@ -3944,7 +3944,7 @@ JumpTable_1C56_00.else_01_1CCC:
     ld   a, [$C11E]
     or   d
     ldi  [hl], a
-JumpTable_1C56_00.return_01_1D14:
+JumpTable_1C5A_00.return_01_1D14:
     ret
 
 
@@ -4118,7 +4118,7 @@ toc_01_1DEE.toc_01_1E3E:
     jp   toc_01_28C5
 
 toc_01_1DEE.else_01_1E47:
-    jp   JumpTable_1C56_00.else_01_1CCC
+    jp   JumpTable_1C5A_00.else_01_1CCC
 
 toc_01_1E4A:
     ld   bc, $0040
@@ -4127,7 +4127,7 @@ toc_01_1E4A.toc_01_1E4D:
 toc_01_1E4A.toc_01_1E50:
     clear [$FFA5]
     changebank $0C
-    jp   JumpTable_1C56_00.else_01_1CCC
+    jp   JumpTable_1C5A_00.else_01_1CCC
 
     db   $0C, $03, $08, $08, $0A, $0A, $05, $10
     db   $36, $38, $3A, $3C, $02, $01, $08, $04
@@ -4601,7 +4601,7 @@ toc_01_2133.else_01_2157:
     dw JumpTable_2253_00 ; 04
     dw JumpTable_2320_00 ; 05
     dw JumpTable_2359_00 ; 06
-    dw JumpTable_2359_00.JumpTable_23B5_00 ; 07
+    dw JumpTable_23B5_00 ; 07
     dw JumpTable_2521_00 ; 08
     dw JumpTable_2521_00.JumpTable_25A0_00 ; 09
     dw JumpTable_25F4_00 ; 0A
@@ -4948,9 +4948,9 @@ JumpTable_2359_00.else_01_2399:
     pop  hl
     ldi  [hl], a
     call JumpTable_2253_00.else_01_2290
-    jp   .JumpTable_23B5_00
+    jp   JumpTable_23B5_00
 
-JumpTable_2359_00.JumpTable_23B5_00:
+JumpTable_23B5_00:
     changebank $1C
     ld   a, [$C170]
     and  %00011111
@@ -5012,23 +5012,23 @@ JumpTable_2359_00.JumpTable_23B5_00:
 
     pop  hl
     clear [$D601]
-JumpTable_2359_00.toc_01_2421:
+JumpTable_23B5_00.toc_01_2421:
     ld   a, [wDialogState]
     and  %11110000
     or   %00001101
     ld   [wDialogState], a
-JumpTable_2359_00.toc_01_242B:
+JumpTable_23B5_00.toc_01_242B:
     assign [$FFF2], $15
     ret
 
 
-JumpTable_2359_00.else_01_2430:
+JumpTable_23B5_00.else_01_2430:
     cp   $FF
     jr   nz, toc_01_2449
 
     pop  hl
     clear [$D601]
-JumpTable_2359_00.toc_01_2439:
+JumpTable_23B5_00.toc_01_2439:
     ld   a, [wDialogState]
     and  %11110000
     or   %00001100
@@ -5178,10 +5178,10 @@ JumpTable_2521_00:
 
     ld   a, [$C3C3]
     cp   $FF
-    jp   z, JumpTable_2359_00.toc_01_2439
+    jp   z, JumpTable_23B5_00.toc_01_2439
 
     cp   $FE
-    jp   z, JumpTable_2359_00.toc_01_2421
+    jp   z, JumpTable_23B5_00.toc_01_2421
 
     ld   a, [$C1CC]
     and  a
@@ -5189,7 +5189,7 @@ JumpTable_2521_00:
 
     inc  a
     ld   [$C1CC], a
-    call JumpTable_2359_00.toc_01_242B
+    call JumpTable_23B5_00.toc_01_242B
 JumpTable_2521_00.else_01_2542:
     call toc_01_264D
     ld   a, [$FFCC]
@@ -9010,6 +9010,6 @@ toc_01_3FD3.toc_01_3FE7:
     call toc_01_28C5
     clear [$FFA5]
     changebank $0C
-    jp   JumpTable_1C56_00.else_01_1CCC
+    jp   JumpTable_1C5A_00.else_01_1CCC
 
     db   $FF, $FF, $FF, $FF, $FF

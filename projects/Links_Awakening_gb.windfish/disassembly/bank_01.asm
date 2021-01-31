@@ -11,7 +11,7 @@ toc_01_4000:
     dw JumpTable_55FD_01 ; 05
 
 JumpTable_4010_01:
-    call JumpTable_1C56_00.else_01_1CCC
+    call JumpTable_1C5A_00.else_01_1CCC
     call toc_01_0B22
     call toc_01_1776
     ifNe [$C16B], $04, .return_01_4040

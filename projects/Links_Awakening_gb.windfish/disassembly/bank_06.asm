@@ -3550,11 +3550,11 @@ JumpTable_5FA8_06.else_06_5FCA:
 JumpTable_5FE5_06:
     ld   a, [wDialogState]
     and  a
-    jp   nz, .return_06_606F
+    jp   nz, toc_06_6061.return_06_606F
 
     ld   a, [$C177]
     and  a
-    jr   nz, .else_06_6061
+    jr   nz, toc_06_6061
 
     ld   hl, $C2B0
     add  hl, bc
@@ -3574,14 +3574,14 @@ JumpTable_5FE5_06:
     jr   nc, .else_06_6011
 
     ld   a, $1B
-    jr   .toc_06_6063
+    jr   toc_06_6061.toc_06_6063
 
 JumpTable_5FE5_06.else_06_6011:
     ld   a, [$DB75]
     inc  a
     and  %00000111
     ld   [$DB75], a
-    jr   nz, .else_06_6029
+    jr   nz, toc_06_6029
 
     ld   a, $1E
     call toc_01_2197
@@ -3589,7 +3589,7 @@ JumpTable_5FE5_06.else_06_6011:
     set  7, [hl]
     jp   JumpTable_3B8D_00
 
-JumpTable_5FE5_06.else_06_6029:
+toc_06_6029:
     ld   hl, $C2B0
     add  hl, bc
     ld   e, [hl]
@@ -3608,7 +3608,7 @@ JumpTable_5FE5_06.else_06_6029:
     ld   [$DB91], a
     incAddr $DB0D
     ld   a, $1A
-    call .toc_06_6063
+    call toc_06_6061.toc_06_6063
     call JumpTable_3B8D_00
     ld   [hl], $04
     call toc_01_0891
@@ -3617,15 +3617,15 @@ JumpTable_5FE5_06.else_06_6029:
     ret
 
 
-JumpTable_5FE5_06.else_06_6061:
+toc_06_6061:
     ld   a, $1D
-JumpTable_5FE5_06.toc_06_6063:
+toc_06_6061.toc_06_6063:
     call toc_01_2197
     ld   hl, wDialogState
     set  7, [hl]
     call JumpTable_3B8D_00
     ld   [hl], b
-JumpTable_5FE5_06.return_06_606F:
+toc_06_6061.return_06_606F:
     ret
 
 
@@ -3634,7 +3634,7 @@ JumpTable_6070_06:
     and  a
     jr   nz, .return_06_6078
 
-    jr   JumpTable_5FE5_06.else_06_6029
+    jr   toc_06_6029
 
 JumpTable_6070_06.return_06_6078:
     ret
@@ -4505,7 +4505,7 @@ JumpTable_693C_06:
     ld   [hLinkDirection], a
     assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     assign [$C111], $05
-    call JumpTable_69B1_06.else_06_69CD
+    call toc_06_69CD
     call toc_06_654B
     ld   hl, $C310
     add  hl, bc
@@ -4569,7 +4569,7 @@ JumpTable_69B1_06:
     ifEq [$FFF6], $06, .else_06_69C2
 
     call toc_01_0891
-    jr   nz, .else_06_69CD
+    jr   nz, toc_06_69CD
 
     call JumpTable_3B8D_00
 JumpTable_69B1_06.else_06_69C2:
@@ -4582,7 +4582,7 @@ JumpTable_69B1_06.else_06_69C2:
     ret
 
 
-JumpTable_69B1_06.else_06_69CD:
+toc_06_69CD:
     assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     ld   a, [hFrameCounter]
     rra
@@ -4594,7 +4594,7 @@ JumpTable_69B1_06.else_06_69CD:
 
 JumpTable_69DB_06:
     call toc_06_64DF
-    call JumpTable_69B1_06.else_06_69CD
+    call toc_06_69CD
     call toc_06_654B
     call JumpTable_5E7F_06.toc_06_5EBC
     ld   hl, $C320
