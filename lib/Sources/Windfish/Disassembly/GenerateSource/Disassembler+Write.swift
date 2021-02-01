@@ -83,24 +83,7 @@ extension Disassembler {
   public func generateSource() throws -> (Source, Statistics) {
     var sources: [String: Source.FileDescription] = [:]
 
-    sources["Makefile"] = .makefile(content:
-      """
-all: game.gb
-
-game.o: game.asm bank_*.asm
-\trgbasm -h -o game.o game.asm
-
-game.gb: game.o
-\trgblink -d -n game.sym -m game.map -o $@ $<
-\trgbfix -v -p 255 $@
-
-\tmd5 $@
-
-clean:
-\trm -f game.o game.gb game.sym game.map *.o
-\tfind . \\( -iname '*.1bpp' -o -iname '*.2bpp' \\) -exec rm {} +
-
-""")
+    sources["Makefile"] = createMakefile()
 
     // TODO: Source should be generated in a tokenized fashion, such that there is a String representing the source and
     // an array of tokens representing a range and a set of attributes. This will enable the Windfish UI to associate
