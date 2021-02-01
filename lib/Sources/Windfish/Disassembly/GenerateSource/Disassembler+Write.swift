@@ -94,7 +94,6 @@ extension Disassembler {
 
     let dataTypes = configuration.allDatatypes()
     let characterMap = configuration.allMappedCharacters()
-    var macrosAsm: String? = nil
     var macrosToWrite: [(macro: Disassembler.Configuration.Macro, arguments: [Int: String], rawArguments: [Int: String],
                       instructions: [(LR35902.Instruction, Statement)])] = []
     let q = DispatchQueue(label: "sync queue")
