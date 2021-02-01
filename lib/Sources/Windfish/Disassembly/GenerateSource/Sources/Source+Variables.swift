@@ -9,7 +9,7 @@ extension Disassembler {
     }
 
     let asm = globals.filter { $0.key >= 0x8000 }.sorted { $0.key < $1.key }.map { (key: LR35902.Address, value: Configuration.Global) in
-      "\(value.name) EQU $\(key.hexString)"
+      "\(value.name) EQU \(RGBDS.asHexString(key))"
     }.joined(separator: "\n\n")
 
     return .variables(content: asm)
