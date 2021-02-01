@@ -91,14 +91,8 @@ extension Disassembler {
       sources["datatypes.asm"] = dataTypesSource
       gameAsm += "INCLUDE \"datatypes.asm\"\n"
     }
-
-    let globals: [LR35902.Address: Configuration.Global] = configuration.allGlobals()
-    if !globals.isEmpty {
-      let asm = globals.filter { $0.key >= 0x8000 }.sorted { $0.0 < $1.0 }.map { address, global in
-        "\(global.name) EQU $\(address.hexString)"
-      }.joined(separator: "\n\n")
-
-      sources["variables.asm"] = .variables(content: asm)
+    if let variablesSource = createVariablesSource() {
+      sources["variables.asm"] = variablesSource
       gameAsm += "INCLUDE \"variables.asm\"\n"
     }
 
