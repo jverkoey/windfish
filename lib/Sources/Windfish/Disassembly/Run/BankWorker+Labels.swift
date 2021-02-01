@@ -29,7 +29,7 @@ extension Disassembler.BankWorker {
     let name: String
     if let explicitName: String = context.label(at: location) {
       name = explicitName
-    } else if let labelType: LabelType = labelTypes[location] {
+    } else if let labelType: LabelType = labelTypes[location.address] {
       switch labelType {
       case .transferOfControl: name = "toc_\(location.bank.hexString)_\(location.address.hexString)"
       case .logicalElse:       name = "else_\(location.bank.hexString)_\(location.address.hexString)"

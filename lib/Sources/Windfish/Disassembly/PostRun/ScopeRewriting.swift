@@ -111,7 +111,7 @@ extension Disassembler.BankWorker {
       guard instructionMap[destination.address]?.spec.category == .ret else {
         continue
       }
-      labelTypes[destination] = .returnTransfer
+      labelTypes[destination.address] = .returnTransfer
     }
   }
 
@@ -155,7 +155,7 @@ extension Disassembler.BankWorker {
     }
     let destinations: Set<Cartridge.Location> = Set(loops.map { $0.destination })
     for location: Cartridge.Location in destinations {
-      labelTypes[location] = .doWhile
+      labelTypes[location.address] = .doWhile
     }
   }
 
@@ -180,7 +180,7 @@ extension Disassembler.BankWorker {
     }
     let destinations: Set<Cartridge.Location> = Set(forwardTocs.map { $0.destination })
     for location: Cartridge.Location in destinations {
-      labelTypes[location] = .logicalElse
+      labelTypes[location.address] = .logicalElse
     }
   }
 

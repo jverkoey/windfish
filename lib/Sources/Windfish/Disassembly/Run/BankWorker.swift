@@ -332,6 +332,6 @@ extension Disassembler {
 
      There does not always need to be a corresponding name set in the labelNames dictionary.
      */
-    var labelTypes: [Cartridge.Location: LabelType] = [:]
+    var labelTypes: [LR35902.Address: LabelType] = [:]
   }
 }

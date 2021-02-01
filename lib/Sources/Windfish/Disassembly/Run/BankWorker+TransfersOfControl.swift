@@ -28,10 +28,10 @@ extension Disassembler.BankWorker {
     transfers[toLocation, default: Set()].insert(fromLocation)
 
     // Tag the label type at this address
-    if labelTypes[toLocation] == nil
+    if labelTypes[toLocation.address] == nil
         // Don't create a label in the middle of an instruction.
         && (!code.contains(toLocation.index) || instruction(at: toLocation) != nil) {
-      labelTypes[toLocation] = .transferOfControl
+      labelTypes[toLocation.address] = .transferOfControl
     }
   }
 }

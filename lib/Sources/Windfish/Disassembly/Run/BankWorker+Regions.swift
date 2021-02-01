@@ -137,7 +137,7 @@ extension Disassembler.BankWorker {
     for location: Cartridge.Location in range.dropFirst() {
       deleteInstruction(at: location)
       transfers[location] = nil
-      labelTypes[location] = nil
+      labelTypes[location.address] = nil
       bankChanges[location.address] = nil
     }
 
