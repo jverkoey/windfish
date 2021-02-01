@@ -22,6 +22,9 @@ extension Disassembler {
     var macrosUsed: [Disassembler.EncounteredMacro] = []
     var bankLines: [Line] = []
 
+    private var lineBuffer: [Line] = []
+    private var macroNode: Configuration.MacroNode? = nil
+
     func generateSource() {
       let dataTypes = context.allDatatypes()
       let characterMap = context.allMappedCharacters()
@@ -36,29 +39,11 @@ extension Disassembler {
       let initialBank = max(1, self.bank)
 
       var lineBufferAddress: LR35902.Address = writeContext.pc
-      var lineBuffer: [Line] = []
       lineBuffer.append(Line(semantic: .emptyAndCollapsible))
-      var macroNode: Configuration.MacroNode? = nil
-
-      let flush = {
-        self.bankLines += lineBuffer
-        lineBuffer.removeAll()
-        macroNode = nil
-      }
-
-      let initialCheckMacro: (LR35902.Instruction) -> Configuration.MacroNode? = { instruction in
-        let asInstruction = Configuration.MacroTreeEdge.instruction(instruction)
-        let asAny = Configuration.MacroTreeEdge.arg(instruction.spec)
-        guard macroNode == nil,
-              let child = self.context.macroTreeRoot().children[asInstruction] ?? self.context.macroTreeRoot().children[asAny] else {
-          return nil
-        }
-        return child
-      }
 
       let followUpCheckMacro: (LR35902.Instruction, Bool) -> Configuration.MacroNode? = { instruction, isLabeled in
         // Is this the beginning of a macro?
-        guard let macroNodeIterator = macroNode else {
+        guard let macroNodeIterator = self.macroNode else {
           return nil
         }
         let asInstruction = Configuration.MacroTreeEdge.instruction(instruction)
@@ -72,12 +57,12 @@ extension Disassembler {
 
       let flushMacro: (LR35902.Address) throws -> Void = { lastAddress in
         // Is this the beginning of a macro?
-        guard let macroNodeIterator = macroNode else {
+        guard let macroNodeIterator = self.macroNode else {
           return
         }
         // No further nodes to be traversed; is this the end of a macro?
         if !macroNodeIterator.macros.isEmpty {
-          let instructions = lineBuffer.compactMap { thisLine -> (LR35902.Instruction, RGBDS.Statement)? in
+          let instructions = self.lineBuffer.compactMap { thisLine -> (LR35902.Instruction, RGBDS.Statement)? in
             if case let .instruction(instruction, assembly) = thisLine.semantic {
               return (instruction, assembly)
             } else {
@@ -165,17 +150,17 @@ extension Disassembler {
 
             let macroArgs = macro.arguments.keys.sorted().map { macro.arguments[$0]! }
 
-            let firstInstruction = lineBuffer.firstIndex { line in if case .instruction = line.semantic { return true } else { return false} }!
-            let lastInstruction = lineBuffer.lastIndex { line in if case .instruction = line.semantic { return true } else { return false} }!
+            let firstInstruction = self.lineBuffer.firstIndex { line in if case .instruction = line.semantic { return true } else { return false} }!
+            let lastInstruction = self.lineBuffer.lastIndex { line in if case .instruction = line.semantic { return true } else { return false} }!
             let bank: Cartridge.Bank
-            if case .instruction = lineBuffer[lastInstruction].semantic {
-              bank = lineBuffer[lastInstruction].bank!
+            if case .instruction = self.lineBuffer[lastInstruction].semantic {
+              bank = self.lineBuffer[lastInstruction].bank!
             } else {
               bank = writeContext.bank
             }
             let macroScopes = self.router.labeledContiguousScopes(at: Cartridge.Location(address: lineBufferAddress, bank: bank))
             let statement = RGBDS.Statement(opcode: macro.macro.name, operands: macroArgs)
-            lineBuffer.replaceSubrange(firstInstruction...lastInstruction,
+            self.lineBuffer.replaceSubrange(firstInstruction...lastInstruction,
                                        with: [Line(semantic: .macro(statement),
                                                    address: lineBufferAddress,
                                                    bank: bank,
@@ -183,12 +168,12 @@ extension Disassembler {
                                                    data: bytes)])
             lineBufferAddress = writeContext.pc
           } else {
-            flush()
+            self.flush()
           }
         } else {
-          flush()
+          self.flush()
         }
-        macroNode = nil
+        self.macroNode = nil
       }
 
       while writeContext.pc < end {
@@ -236,7 +221,7 @@ extension Disassembler {
 
           // TODO: Start a macro descent for every instruction.
 
-          if let child = initialCheckMacro(instruction) {
+          if let child = initialCheckMacro(instruction: instruction) {
             flush()
             lineBufferAddress = writeContext.pc - instructionWidth
             macroNode = child
@@ -273,7 +258,7 @@ extension Disassembler {
           lineBuffer.append(contentsOf: lineGroup)
 
           // Immediately start looking for the next macro.
-          if let child = initialCheckMacro(instruction) {
+          if let child = initialCheckMacro(instruction: instruction) {
             lineBufferAddress = writeContext.pc - instructionWidth
             macroNode = child
           }
@@ -391,6 +376,27 @@ extension Disassembler {
       try! flushMacro(writeContext.pc)
 
       flush()
+    }
+
+    // MARK: - Managing the line buffer
+
+    /** Flushes all lines in the line buffer to the bank's lines. */
+    private func flush() {
+      bankLines += lineBuffer
+      lineBuffer.removeAll()
+      macroNode = nil
+    }
+
+    // MARK: - Handling macros
+
+    private func initialCheckMacro(instruction: LR35902.Instruction) -> Configuration.MacroNode? {
+      let asInstruction = Configuration.MacroTreeEdge.instruction(instruction)
+      let asAny = Configuration.MacroTreeEdge.arg(instruction.spec)
+      guard macroNode == nil,
+            let child = context.macroTreeRoot().children[asInstruction] ?? context.macroTreeRoot().children[asAny] else {
+        return nil
+      }
+      return child
     }
   }
 }
