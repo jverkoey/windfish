@@ -3,12 +3,10 @@ import Foundation
 import RGBDS
 
 extension Disassembler {
-  // TODO: The instructions may no longer be necessary.
   typealias EncounteredMacro = (
     macro: Disassembler.Configuration.Macro,
     arguments: [Int: String],
-    rawArguments: [Int: String],
-    instructions: [(LR35902.Instruction, RGBDS.Statement)]
+    rawArguments: [Int: String]
   )
   private typealias DatatypeElement = Dictionary<String, Configuration.Datatype>.Element
 

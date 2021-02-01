@@ -94,16 +94,14 @@ extension Disassembler {
 
     let dataTypes = configuration.allDatatypes()
     let characterMap = configuration.allMappedCharacters()
-    var macrosToWrite: [(macro: Disassembler.Configuration.Macro, arguments: [Int: String], rawArguments: [Int: String],
-                      instructions: [(LR35902.Instruction, Statement)])] = []
+    var macrosToWrite: [Disassembler.EncounteredMacro] = []
     let q = DispatchQueue(label: "sync queue")
     DispatchQueue.concurrentPerform(iterations: Int(truncatingIfNeeded: numberOfBanks)) { (index: Int) in
       let signpostID = OSSignpostID(log: log)
       os_signpost(.begin, log: log, name: "Generate source", signpostID: signpostID, "%{public}d", index)
 
       let bankToWrite: Cartridge.Bank = Cartridge.Bank(truncatingIfNeeded: index)
-      var macrosUsed: [(macro: Disassembler.Configuration.Macro, arguments: [Int: String], rawArguments: [Int: String],
-                        instructions: [(LR35902.Instruction, Statement)])] = []
+      var macrosUsed: [Disassembler.EncounteredMacro] = []
 
       var bankLines: [Line] = []
       defer {
@@ -247,7 +245,7 @@ extension Disassembler {
           precondition(validMacros.count <= 1, "More than one macro matched.")
 
           if let macro = validMacros.first {
-            macrosUsed.append((macro: macro.macro, arguments: macro.arguments, rawArguments: macro.rawArguments, instructions))
+            macrosUsed.append((macro: macro.macro, arguments: macro.arguments, rawArguments: macro.rawArguments))
 
             let lowerBound = Cartridge.Location(address: lineBufferAddress, bank: writeContext.bank)
             let upperBound = Cartridge.Location(address: lastAddress, bank: writeContext.bank)
