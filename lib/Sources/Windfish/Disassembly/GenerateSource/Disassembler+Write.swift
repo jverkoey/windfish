@@ -288,6 +288,10 @@ clean:
 
 """)
 
+    // TODO: Source should be generated in a tokenized fashion, such that there is a String representing the source and
+    // an array of tokens representing a range and a set of attributes. This will enable the Windfish UI to associate
+    // attributes to the string by simply mapping tokens to attributes.
+
     var gameAsm = ""
 
     let dataTypes = configuration.allDatatypes()
