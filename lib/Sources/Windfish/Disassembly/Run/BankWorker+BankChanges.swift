@@ -11,12 +11,12 @@ extension Disassembler.BankWorker {
   /** Returns the bank set at this location, if any. */
   func bankChange(at location: Cartridge.Location) -> Cartridge.Bank? {
     assert(location.bankIndex == bank)
-    return context.bankChange(at: location) ?? bankChanges[location]
+    return context.bankChange(at: location) ?? bankChanges[location.address]
   }
 
   /** Registers a bank change at a specific location. */
   func registerBankChange(to: Cartridge.Bank, at location: Cartridge.Location) {
     assert(location.bankIndex == bank)
-    bankChanges[location] = to
+    bankChanges[location.address] = to
   }
 }

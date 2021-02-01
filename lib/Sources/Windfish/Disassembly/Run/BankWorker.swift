@@ -325,7 +325,7 @@ extension Disassembler {
     var typeAtLocation: [Cartridge.Location: String] = [:]
 
     /** Bank changes that occur at a specific location. */
-    var bankChanges: [Cartridge.Location: Cartridge.Bank] = [:]
+    var bankChanges: [LR35902.Address: Cartridge.Bank] = [:]
 
     /**
      Label types at specific locations.

@@ -138,7 +138,7 @@ extension Disassembler.BankWorker {
       deleteInstruction(at: location)
       transfers[location] = nil
       labelTypes[location] = nil
-      bankChanges[location] = nil
+      bankChanges[location.address] = nil
     }
 
     // For any existing scope that intersects this range:
