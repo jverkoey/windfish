@@ -183,8 +183,8 @@ extension ProjectDocument {
 
         let string: NSAttributedString = lines.reduce(into: NSMutableAttributedString()) { accumulator, line in
           switch line.semantic {
-          case .newline: fallthrough
-          case .empty:
+          case .empty: fallthrough
+          case .emptyAndCollapsible:
             break // Do nothing.
           case .macroComment: fallthrough
           case .preComment:

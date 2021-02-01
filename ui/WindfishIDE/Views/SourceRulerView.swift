@@ -131,7 +131,7 @@ final class SourceRulerView: NSRulerView {
         let isLabel: Bool
         switch bankLines[lineNumber].semantic {
         case .label: fallthrough
-        case .empty: fallthrough
+        case .emptyAndCollapsible: fallthrough
         case .imagePlaceholder: fallthrough
         case .transferOfControl:
           isLabel = true

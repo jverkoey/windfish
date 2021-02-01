@@ -9,8 +9,12 @@ extension Disassembler {
       case twoBitsPerPixel
     }
     public enum Semantic: Equatable {
-      case newline
+      /** An empty line. */
       case empty
+
+      /** Like an empty line, but contiguous blocks of these lines will compact into a single empty line. */
+      case emptyAndCollapsible
+
       case macroComment(comment: String)
       case preComment(comment: String)
       case label(labelName: String)
@@ -55,9 +59,9 @@ extension Disassembler {
 
     public func asString(detailedComments: Bool) -> String {
       switch semantic {
-      case .newline:                           return ""
+      case .empty:                           return ""
 
-      case .empty:                             return ""
+      case .emptyAndCollapsible:                             return ""
 
       case .imagePlaceholder:                  return ""
 

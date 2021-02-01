@@ -179,7 +179,7 @@ SECTION "ROM Bank 00", ROM0[$00]
 """)
       XCTAssertEqual(lines, [
         Disassembler.Line(semantic: .section(0), address: nil, bank: nil, scope: nil, data: nil),
-        Disassembler.Line(semantic: .empty, address: nil, bank: nil, scope: nil, data: nil),
+        Disassembler.Line(semantic: .emptyAndCollapsible, address: nil, bank: nil, scope: nil, data: nil),
         Disassembler.Line(semantic: .instruction(.init(spec: .ld(.a, .imm8), immediate: .imm8(68)),
                                                         .init(opcode: "ld", operands: ["a", "STATF_LYC | STATF_LYCF"])),
                                  address: 0, bank: 0x01, scope: "", data: Data([0x3e, 0x44])),

@@ -133,7 +133,7 @@ extension Disassembler {
 
           var lastLine: Line?
           let filteredBankLines = bankLines.filter { thisLine in
-            if let lastLine = lastLine, lastLine.semantic == .empty && thisLine.semantic == .empty {
+            if let lastLine = lastLine, lastLine.semantic == .emptyAndCollapsible && thisLine.semantic == .emptyAndCollapsible {
               return false
             }
             lastLine = thisLine
@@ -153,7 +153,7 @@ extension Disassembler {
 
       var lineBufferAddress: LR35902.Address = writeContext.pc
       var lineBuffer: [Line] = []
-      lineBuffer.append(Line(semantic: .empty))
+      lineBuffer.append(Line(semantic: .emptyAndCollapsible))
       var macroNode: Configuration.MacroNode? = nil
 
       let flush = {
@@ -311,7 +311,7 @@ extension Disassembler {
         var isLabeled = false
         var lineGroup: [Line] = []
         if let preComment = configuration.preComment(at: Cartridge.Location(address: writeContext.pc, bank: writeContext.bank)) {
-          lineGroup.append(Line(semantic: .empty))
+          lineGroup.append(Line(semantic: .emptyAndCollapsible))
           lineGroup.append(Line(semantic: .preComment(comment: preComment)))
         }
         if let label = lastBankRouter!.label(at: Cartridge.Location(address:writeContext.pc, bank: initialBank)) {
@@ -320,7 +320,7 @@ extension Disassembler {
           } else {
             let instructionScope = lastBankRouter!.labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank))
             let scope = instructionScope.sorted().joined(separator: ", ")
-            lineGroup.append(Line(semantic: .empty, address: writeContext.pc, bank: writeContext.bank, scope: scope))
+            lineGroup.append(Line(semantic: .emptyAndCollapsible, address: writeContext.pc, bank: writeContext.bank, scope: scope))
             lineGroup.append(Line(semantic: .label(labelName: label), address: writeContext.pc, bank: writeContext.bank, scope: scope))
           }
           isLabeled = true
@@ -368,19 +368,19 @@ extension Disassembler {
           case .jp(let condition, _), .jr(let condition, _):
             let instructionScope = lastBankRouter!.labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank))
             let scope = instructionScope.sorted().joined(separator: ", ")
-            lineGroup.append(Line(semantic: .empty, scope: scope))
+            lineGroup.append(Line(semantic: .emptyAndCollapsible, scope: scope))
             if condition == nil {
               writeContext.bank = initialBank
             }
           case .ret(let condition):
-            lineGroup.append(Line(semantic: .newline))
+            lineGroup.append(Line(semantic: .empty))
             if condition == nil {
-              lineGroup.append(Line(semantic: .empty))
+              lineGroup.append(Line(semantic: .emptyAndCollapsible))
               writeContext.bank = initialBank
             }
           case .reti:
-            lineGroup.append(Line(semantic: .newline))
             lineGroup.append(Line(semantic: .empty))
+            lineGroup.append(Line(semantic: .emptyAndCollapsible))
             writeContext.bank = initialBank
           default:
             break
@@ -498,7 +498,7 @@ extension Disassembler {
             bankLines.append(Line(semantic: .global(RGBDS.Statement(representingBytesWithConstant: globalValue), dataTypeName: dataTypeName, dataType: dataType), address: chunkPc, data: globalData))
           }
 
-          lineBuffer.append(Line(semantic: .empty))
+          lineBuffer.append(Line(semantic: .emptyAndCollapsible))
           lineBufferAddress = writeContext.pc
           writeContext.bank = initialBank
         }
@@ -521,7 +521,7 @@ extension Disassembler {
         writtenMacros.insert(macro.macro.name)
 
         var lines: [Line] = []
-        lines.append(Line(semantic: .empty))
+        lines.append(Line(semantic: .emptyAndCollapsible))
         if !macro.arguments.isEmpty {
           lines.append(Line(semantic: .macroComment(comment: "Arguments:")))
 
