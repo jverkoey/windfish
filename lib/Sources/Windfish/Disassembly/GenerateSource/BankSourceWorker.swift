@@ -20,7 +20,7 @@ extension Disassembler {
     }
 
     var macrosUsed: [Disassembler.EncounteredMacro] = []
-    var bankLines: [Line] = []
+    var lines: [Line] = []
 
     private var lineBuffer: [Line] = []
     private var macroNode: Configuration.MacroNode? = nil
@@ -29,7 +29,7 @@ extension Disassembler {
       let dataTypes = context.allDatatypes()
       let characterMap = context.allMappedCharacters()
 
-      bankLines.append(Line(semantic: .section(self.bank)))
+      lines.append(Line(semantic: .section(self.bank)))
 
       var writeContext = (pc: LR35902.Address((self.bank == 0) ? 0x0000 : 0x4000),
                           bank: max(1, self.bank))
@@ -305,7 +305,7 @@ extension Disassembler {
           case .text:
             let lineLength = context.lineLengthOfText(at: Cartridge.Location(address: initialPc, bank: initialBank)) ?? 36
             for chunk in accumulator.chunked(into: lineLength) {
-              bankLines.append(textLine(for: chunk, characterMap: characterMap, address: chunkPc))
+              lines.append(textLine(for: chunk, characterMap: characterMap, address: chunkPc))
               chunkPc += LR35902.Address(chunk.count)
             }
           case .jumpTable:
@@ -324,7 +324,7 @@ extension Disassembler {
                 jumpLocation = "$\(address.hexString)"
               }
               let bytes = context.cartridgeData[Cartridge.Location(address: chunkPc, bank: initialBank).index..<(Cartridge.Location(address: chunkPc, bank: initialBank) + 2).index]
-              bankLines.append(Line(semantic: .jumpTable(jumpLocation, index), address: chunkPc, data: bytes))
+              lines.append(Line(semantic: .jumpTable(jumpLocation, index), address: chunkPc, data: bytes))
               chunkPc += LR35902.Address(pair.count)
             }
             break
@@ -336,24 +336,24 @@ extension Disassembler {
             fallthrough
           case .unknown:
             for chunk in accumulator.chunked(into: 8) {
-              bankLines.append(Line(semantic: .unknown(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
+              lines.append(Line(semantic: .unknown(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
               chunkPc += LR35902.Address(chunk.count)
             }
           case .data:
             for chunk in accumulator.chunked(into: 8) {
-              bankLines.append(Line(semantic: .data(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
+              lines.append(Line(semantic: .data(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
               chunkPc += LR35902.Address(chunk.count)
             }
           case .image2bpp:
-            bankLines.append(Line(semantic: .imagePlaceholder(format: .twoBitsPerPixel), address: chunkPc, data: Data(accumulator)))
+            lines.append(Line(semantic: .imagePlaceholder(format: .twoBitsPerPixel), address: chunkPc, data: Data(accumulator)))
             for chunk in accumulator.chunked(into: 8) {
-              bankLines.append(Line(semantic: .image2bpp(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
+              lines.append(Line(semantic: .image2bpp(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
               chunkPc += LR35902.Address(chunk.count)
             }
           case .image1bpp:
-            bankLines.append(Line(semantic: .imagePlaceholder(format: .oneBitPerPixel), address: chunkPc, data: Data(accumulator)))
+            lines.append(Line(semantic: .imagePlaceholder(format: .oneBitPerPixel), address: chunkPc, data: Data(accumulator)))
             for chunk in accumulator.chunked(into: 8) {
-              bankLines.append(Line(semantic: .image1bpp(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
+              lines.append(Line(semantic: .image1bpp(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
               chunkPc += LR35902.Address(chunk.count)
             }
           case .ram:
@@ -364,7 +364,7 @@ extension Disassembler {
              let dataTypeName = global.dataType,
              let dataType = dataTypes[dataTypeName],
              let globalValue = globalValue {
-            bankLines.append(Line(semantic: .global(RGBDS.Statement(representingBytesWithConstant: globalValue), dataTypeName: dataTypeName, dataType: dataType), address: chunkPc, data: globalData))
+            lines.append(Line(semantic: .global(RGBDS.Statement(representingBytesWithConstant: globalValue), dataTypeName: dataTypeName, dataType: dataType), address: chunkPc, data: globalData))
           }
 
           lineBuffer.append(Line(semantic: .emptyAndCollapsible))
@@ -382,7 +382,7 @@ extension Disassembler {
 
     /** Flushes all lines in the line buffer to the bank's lines. */
     private func flush() {
-      bankLines += lineBuffer
+      lines += lineBuffer
       lineBuffer.removeAll()
       macroNode = nil
     }

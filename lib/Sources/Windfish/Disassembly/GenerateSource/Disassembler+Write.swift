@@ -84,7 +84,7 @@ extension Disassembler {
       q.sync {
         macrosToWrite.append(contentsOf: worker.macrosUsed)
 
-        let (content, filteredBankLines) = processLines(worker.bankLines)
+        let (content, filteredBankLines) = processLines(worker.lines)
         sources["bank_\(worker.bank.hexString).asm"] = .bank(number: worker.bank, content: content, lines: filteredBankLines)
       }
     }
