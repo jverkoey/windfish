@@ -54,8 +54,16 @@ func textLine(for bytes: [UInt8], characterMap: [UInt8: String], address: LR3590
 }
 
 extension Disassembler {
-  func linesAsString(_ lines: [Line]) -> String {
-    return lines.map { $0.asString(detailedComments: false) }.joined(separator: "\n")
+  func processLines(_ lines: [Line]) -> (source: String, filteredLines: [Line]) {
+    var lastLine: Line?
+    let filteredLines = lines.filter { thisLine in
+      if let lastLine = lastLine, lastLine.semantic == .emptyAndCollapsible && thisLine.semantic == .emptyAndCollapsible {
+        return false
+      }
+      lastLine = thisLine
+      return true
+    }
+    return (filteredLines.map { $0.asString(detailedComments: false) }.joined(separator: "\n"), filteredLines)
   }
 
   public func generateSource() throws -> (Source, Statistics) {
@@ -105,15 +113,8 @@ extension Disassembler {
         q.sync {
           macrosToWrite.append(contentsOf: macrosUsed)
 
-          var lastLine: Line?
-          let filteredBankLines = bankLines.filter { thisLine in
-            if let lastLine = lastLine, lastLine.semantic == .emptyAndCollapsible && thisLine.semantic == .emptyAndCollapsible {
-              return false
-            }
-            lastLine = thisLine
-            return true
-          }
-          sources["bank_\(bankToWrite.hexString).asm"] = .bank(number: bankToWrite, content: linesAsString(filteredBankLines), lines: filteredBankLines)
+          let (content, filteredBankLines) = processLines(bankLines)
+          sources["bank_\(bankToWrite.hexString).asm"] = .bank(number: bankToWrite, content: content, lines: filteredBankLines)
         }
       }
 

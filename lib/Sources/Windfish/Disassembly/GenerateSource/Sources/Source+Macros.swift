@@ -17,6 +17,7 @@ extension Disassembler {
     }
     var macrosAsm: String = ""
 
+    var lines: [Line] = []
     var writtenMacros: Set<String> = Set<String>()
     for macro: EncounteredMacro in macrosToWrite.sorted(by: { $0.macro.name < $1.macro.name }) {
       guard !writtenMacros.contains(macro.macro.name) else {
@@ -24,7 +25,6 @@ extension Disassembler {
       }
       writtenMacros.insert(macro.macro.name)
 
-      var lines: [Line] = []
       lines.append(Line(semantic: .emptyAndCollapsible))
       lines.append(Line(semantic: .macroDefinition(macro.macro.name)))
       lines.append(contentsOf: zip(macro.macro.macroLines, macro.instructions).map { line, instruction in
@@ -62,9 +62,9 @@ extension Disassembler {
         return Line(semantic: .macroInstruction(macroInstruction, macroAssembly))
       })
       lines.append(Line(semantic: .macroTerminator))
-      macrosAsm.append(linesAsString(lines))
-      macrosAsm.append("\n")
+      lines.append(Line(semantic: .emptyAndCollapsible))
     }
+    macrosAsm.append(processLines(lines).source)
     return .macros(content: macrosAsm)
   }
 }
