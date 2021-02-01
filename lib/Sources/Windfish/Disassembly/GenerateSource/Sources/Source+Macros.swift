@@ -16,8 +16,6 @@ extension Disassembler {
     guard !macrosToWrite.isEmpty else {
       return nil
     }
-    var macrosAsm: String = ""
-
     var lines: [Line] = []
     var writtenMacros: Set<String> = Set<String>()
     for macro: EncounteredMacro in macrosToWrite.sorted(by: { $0.macro.name < $1.macro.name }) {
@@ -79,7 +77,6 @@ extension Disassembler {
       lines.append(Line(semantic: .macroTerminator))
       lines.append(Line(semantic: .emptyAndCollapsible))
     }
-    macrosAsm.append(processLines(lines).source)
-    return .macros(content: macrosAsm)
+    return .macros(content: processLines(lines).source)
   }
 }
