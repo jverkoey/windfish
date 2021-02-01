@@ -59,7 +59,7 @@ extension Disassembler {
     // MARK: - Generating source
 
     private func checkPreamble(_ lineGroup: inout [Disassembler.Line]) -> Bool {
-      if let preComment = context.preComment(at: Cartridge.Location(address: writeContext.pc, bank: writeContext.bank)) {
+      if let preComment = context.preComment(at: Cartridge.Location(address: writeContext.pc, bank: bank)) {
         lineGroup.append(Line(semantic: .emptyAndCollapsible))
         lineGroup.append(Line(semantic: .preComment(comment: preComment)))
       }
@@ -67,7 +67,7 @@ extension Disassembler {
         return false
       }
       if let transfersOfControl = router.transfersOfControl(at: Cartridge.Location(address: writeContext.pc, bank: bank)) {
-        lineGroup.append(Line(semantic: .transferOfControl(transfersOfControl, label), address: writeContext.pc, bank: writeContext.bank))
+        lineGroup.append(Line(semantic: .transferOfControl(transfersOfControl, label), address: writeContext.pc, bank: bank))
       } else {
         let instructionScope = router.labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: bank))
         let scope = instructionScope.sorted().joined(separator: ", ")
