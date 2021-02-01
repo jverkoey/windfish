@@ -17,7 +17,6 @@ extension Disassembler {
       self.bank = bank
       self.router = router
       self.disassembler = disassembler
-      self.initialBank = max(1, bank)
 
       let cartridgeSize = context.cartridgeData.count
       self.endAddress = (bank == 0) ? (cartridgeSize < 0x4000 ? LR35902.Address(truncatingIfNeeded: cartridgeSize) : 0x4000) : 0x8000
@@ -27,7 +26,6 @@ extension Disassembler {
     var lines: [Line] = []
 
     private let endAddress: LR35902.Address
-    private let initialBank: Cartridge.Bank
     private var lineBufferAddress: LR35902.Address = 0
     private var lineBuffer: [Line] = []
     private var macroNode: Configuration.MacroNode? = nil
@@ -46,7 +44,7 @@ extension Disassembler {
       while writeContext.pc < endAddress {
         var lineGroup: [Line] = []
         let isLabeled = checkPreamble(&lineGroup)
-        if let instruction = router.instruction(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) {
+        if let instruction = router.instruction(at: Cartridge.Location(address: writeContext.pc, bank: bank)) {
           flush(instruction: instruction, &lineGroup, isLabeled)
         } else {
           flushNonCodeBlock(lineGroup, dataTypes, characterMap)
@@ -65,13 +63,13 @@ extension Disassembler {
         lineGroup.append(Line(semantic: .emptyAndCollapsible))
         lineGroup.append(Line(semantic: .preComment(comment: preComment)))
       }
-      guard let label = router.label(at: Cartridge.Location(address:writeContext.pc, bank: initialBank)) else {
+      guard let label = router.label(at: Cartridge.Location(address:writeContext.pc, bank: bank)) else {
         return false
       }
-      if let transfersOfControl = router.transfersOfControl(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) {
+      if let transfersOfControl = router.transfersOfControl(at: Cartridge.Location(address: writeContext.pc, bank: bank)) {
         lineGroup.append(Line(semantic: .transferOfControl(transfersOfControl, label), address: writeContext.pc, bank: writeContext.bank))
       } else {
-        let instructionScope = router.labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank))
+        let instructionScope = router.labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: bank))
         let scope = instructionScope.sorted().joined(separator: ", ")
         lineGroup.append(Line(semantic: .emptyAndCollapsible, address: writeContext.pc, bank: writeContext.bank, scope: scope))
         lineGroup.append(Line(semantic: .label(labelName: label), address: writeContext.pc, bank: writeContext.bank, scope: scope))
@@ -85,10 +83,10 @@ extension Disassembler {
       }
 
       // Write the instruction as assembly.
-      let index = Cartridge.Location(address: writeContext.pc, bank: initialBank)
+      let index = Cartridge.Location(address: writeContext.pc, bank: bank)
       let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!.total
       let bytes = context.cartridgeData[index.index..<(index + instructionWidth).index]
-      let instructionScope = router.labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank))
+      let instructionScope = router.labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: bank))
       let context = RGBDSDisassembler.Context(
         address: writeContext.pc,
         bank: writeContext.bank,
@@ -119,22 +117,22 @@ extension Disassembler {
       // Handle context changes.
       switch instruction.spec {
       case .jp(let condition, _), .jr(let condition, _):
-        let instructionScope = router.labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank))
+        let instructionScope = router.labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: bank))
         let scope = instructionScope.sorted().joined(separator: ", ")
         lineGroup.append(Line(semantic: .emptyAndCollapsible, scope: scope))
         if condition == nil {
-          writeContext.bank = initialBank
+          writeContext.bank = bank
         }
       case .ret(let condition):
         lineGroup.append(Line(semantic: .empty))
         if condition == nil {
           lineGroup.append(Line(semantic: .emptyAndCollapsible))
-          writeContext.bank = initialBank
+          writeContext.bank = bank
         }
       case .reti:
         lineGroup.append(Line(semantic: .empty))
         lineGroup.append(Line(semantic: .emptyAndCollapsible))
-        writeContext.bank = initialBank
+        writeContext.bank = bank
       default:
         break
       }
@@ -154,7 +152,7 @@ extension Disassembler {
       lineBuffer.append(contentsOf: lineGroup)
       flush()
 
-      let initialType = router.disassemblyType(at: Cartridge.Location(address: writeContext.pc, bank: initialBank))
+      let initialType = router.disassemblyType(at: Cartridge.Location(address: writeContext.pc, bank: bank))
 
       // Accumulate bytes until the next instruction or transfer of control.
       var accumulator: [UInt8] = []
@@ -164,12 +162,12 @@ extension Disassembler {
         if writeContext.pc < 0x4000 {
           global = context.global(at: writeContext.pc)
         }
-        accumulator.append(context.cartridgeData[Cartridge.Location(address: writeContext.pc, bank: initialBank).index])
+        accumulator.append(context.cartridgeData[Cartridge.Location(address: writeContext.pc, bank: bank).index])
         writeContext.pc += 1
       } while writeContext.pc < endAddress
-        && router.instruction(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) == nil
-        && router.label(at: Cartridge.Location(address:writeContext.pc, bank: initialBank)) == nil
-        && router.disassemblyType(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) == initialType
+        && router.instruction(at: Cartridge.Location(address: writeContext.pc, bank: bank)) == nil
+        && router.label(at: Cartridge.Location(address:writeContext.pc, bank: bank)) == nil
+        && router.disassemblyType(at: Cartridge.Location(address: writeContext.pc, bank: bank)) == initialType
         && global == nil
 
       let globalValue: String?
@@ -188,7 +186,7 @@ extension Disassembler {
       var chunkPc = initialPc
       switch initialType {
       case .text:
-        let lineLength = context.lineLengthOfText(at: Cartridge.Location(address: initialPc, bank: initialBank)) ?? 36
+        let lineLength = context.lineLengthOfText(at: Cartridge.Location(address: initialPc, bank: bank)) ?? 36
         for chunk in accumulator.chunked(into: lineLength) {
           lines.append(textLine(for: chunk, characterMap: characterMap, address: chunkPc))
           chunkPc += LR35902.Address(chunk.count)
@@ -198,7 +196,7 @@ extension Disassembler {
           let address = (LR35902.Address(pair[1]) << 8) | LR35902.Address(pair[0])
           let jumpLocation: String
           let effectiveBank: Cartridge.Bank
-          if let changedBank = router.bankChange(at: Cartridge.Location(address: chunkPc, bank: initialBank)) {
+          if let changedBank = router.bankChange(at: Cartridge.Location(address: chunkPc, bank: bank)) {
             effectiveBank = changedBank
           } else {
             effectiveBank = writeContext.bank
@@ -208,7 +206,7 @@ extension Disassembler {
           } else {
             jumpLocation = "$\(address.hexString)"
           }
-          let bytes = context.cartridgeData[Cartridge.Location(address: chunkPc, bank: initialBank).index..<(Cartridge.Location(address: chunkPc, bank: initialBank) + 2).index]
+          let bytes = context.cartridgeData[Cartridge.Location(address: chunkPc, bank: bank).index..<(Cartridge.Location(address: chunkPc, bank: bank) + 2).index]
           lines.append(Line(semantic: .jumpTable(jumpLocation, index), address: chunkPc, data: bytes))
           chunkPc += LR35902.Address(pair.count)
         }
@@ -217,7 +215,7 @@ extension Disassembler {
         // This should not happen; it means that there is some overlap in interpretation of instructions causing us
         // to parse an instruction mid-instruction. Fall through to treating this as unknown data, but log a
         // warning.
-        print("Instruction overlap detected at \(initialBank.hexString):\(initialPc.hexString)")
+        print("Instruction overlap detected at \(bank.hexString):\(initialPc.hexString)")
         fallthrough
       case .unknown:
         for chunk in accumulator.chunked(into: 8) {
@@ -254,7 +252,7 @@ extension Disassembler {
 
       lineBuffer.append(Line(semantic: .emptyAndCollapsible))
       lineBufferAddress = writeContext.pc
-      writeContext.bank = initialBank
+      writeContext.bank = bank
     }
 
     // MARK: - Managing the line buffer
