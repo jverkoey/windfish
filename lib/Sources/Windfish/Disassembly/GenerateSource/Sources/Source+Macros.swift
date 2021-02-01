@@ -26,9 +26,6 @@ extension Disassembler {
 
       var lines: [Line] = []
       lines.append(Line(semantic: .emptyAndCollapsible))
-      if !macro.arguments.isEmpty {
-        writeMacroArguments(to: &lines, macro: macro)
-      }
       lines.append(Line(semantic: .macroDefinition(macro.macro.name)))
       lines.append(contentsOf: zip(macro.macro.macroLines, macro.instructions).map { line, instruction in
         let macroInstruction = instruction.0
@@ -70,69 +67,4 @@ extension Disassembler {
     }
     return .macros(content: macrosAsm)
   }
-
-  private func writeMacroArguments(to lines: inout [Disassembler.Line], macro: Disassembler.EncounteredMacro) {
-    lines.append(Line(semantic: .macroComment(comment: "Arguments:")))
-
-    let macroSpecs: [LR35902.Instruction.Spec] = macro.macro.macroLines.map { $0.specs() }.reduce([], +)
-
-    let argumentTypes: [Int: String] = zip(macro.macro.macroLines, macroSpecs).reduce([:], { (iter, zipped) -> [Int: String] in
-      guard case let .arg(spec, argumentOrNil, _) = zipped.0,
-            let argument = argumentOrNil else {
-        return iter
-      }
-      let args = extractArgumentTypes(from: zipped.1, using: spec, argument: Int(argument))
-      return iter.merging(args, uniquingKeysWith: { first, second in
-        assert(first == second, "Mismatch in arguments")
-        return first
-      })
-    })
-
-    for argNumber in macro.arguments.keys.sorted() {
-      let argType: String
-      if let type = argumentTypes[argNumber] {
-        argType = " type: \(type)"
-      } else {
-        argType = ""
-      }
-      if let validation = macro.macro.validArgumentValues?[argNumber] {
-        let ranges = validation.rangeView.map {
-          "$\(LR35902.Address($0.lowerBound).hexString)..<$\(LR35902.Address($0.upperBound).hexString)"
-        }.joined(separator: ", ")
-        lines.append(Line(semantic: .macroComment(comment: "- \(argNumber)\(argType): valid values in \(ranges)")))
-      } else {
-        lines.append(Line(semantic: .macroComment(comment: "- \(argNumber)\(argType)")))
-      }
-    }
-  }
-}
-
-private func extractArgumentTypes(from instruction: LR35902.Instruction.Spec, using spec: LR35902.Instruction.Spec, argument: Int) -> [Int: String] {
-  assert(instruction == spec)
-  var args: [Int: String] = [:]
-  try? spec.visit { operand, _ in
-    guard let operand = operand else {
-      return
-    }
-
-    switch operand.value {
-    case LR35902.Instruction.Numeric.imm16,
-         LR35902.Instruction.Numeric.imm8,
-         LR35902.Instruction.Numeric.imm16addr,
-         LR35902.Instruction.Numeric.simm8,
-         LR35902.Instruction.Numeric.sp_plus_simm8,
-         LR35902.Instruction.Numeric.ffimm8addr:
-      // If the instruction has more than one operand, we need to step into the operand array first.
-      if let operand = Mirror(reflecting: instruction).descendant(0, operand.index) {
-        args[argument] = "\(operand)"
-
-        // Otherwise, the instruction only has a single operand so we extract it directly.
-      } else if let operand = Mirror(reflecting: instruction).descendant(operand.index) {
-        args[argument] = "\(operand)"
-      }
-    default:
-      break
-    }
-  }
-  return args
 }
