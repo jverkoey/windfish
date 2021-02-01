@@ -3,6 +3,7 @@ import Foundation
 import RGBDS
 
 extension Disassembler {
+  // TODO: The instructions may no longer be necessary.
   typealias EncounteredMacro = (
     macro: Disassembler.Configuration.Macro,
     arguments: [Int: String],
@@ -27,19 +28,34 @@ extension Disassembler {
 
       lines.append(Line(semantic: .emptyAndCollapsible))
       lines.append(Line(semantic: .macroDefinition(macro.macro.name)))
-      lines.append(contentsOf: zip(macro.macro.macroLines, macro.instructions).map { line, instruction in
+      lines.append(contentsOf: macro.macro.macroLines.map { line in
         let argumentString: String?
+        let macroInstruction: LR35902.Instruction
         switch line {
-        case let .arg(_, argumentOrNil, argumentText):
+        case let .arg(spec, number, argumentText):
           if let argumentText = argumentText {
             argumentString = argumentText
-          } else if let argument = argumentOrNil {
-            argumentString = "\\\(argument)"
+          } else if let number = number {
+            argumentString = "\\\(number)"
           } else {
-            argumentString = nil
+            // Lines with an argument in them are expected to have either a number of an explicit string.
+            fatalError()
           }
-        case .instruction:
+
+          // Fill the immediate with a default value; it doesn't matter because we'll replace it with argumentString
+          // when the RGBDS statement is created.
+          let operandWidth = LR35902.InstructionSet.widths[spec]!.operand
+          let immediate: LR35902.Instruction.ImmediateValue?
+          switch operandWidth {
+          case 1:  immediate = .imm8(0)
+          case 2:  immediate = .imm16(0)
+          default: immediate = nil
+          }
+          macroInstruction = LR35902.Instruction(spec: spec, immediate: immediate)
+
+        case let .instruction(instruction):
           argumentString = nil
+          macroInstruction = instruction
 
         case .any:
           // This is technically impossible because the macro's lines have already been collapsed into their arg or
@@ -49,9 +65,8 @@ extension Disassembler {
           fatalError()
         }
 
-        let macroInstruction: LR35902.Instruction = instruction.0
-
         // Generating the statement with the disassembly context enables the macro to use labels where relevant.
+        // TODO: Explore whether it's possible to dropo the address and bank from the context.
         let context: RGBDSDisassembler.Context = RGBDSDisassembler.Context(
           address: 0,
           bank: 0,
