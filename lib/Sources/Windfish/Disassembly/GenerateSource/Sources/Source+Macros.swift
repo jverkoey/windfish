@@ -28,12 +28,9 @@ extension Disassembler {
       lines.append(Line(semantic: .emptyAndCollapsible))
       lines.append(Line(semantic: .macroDefinition(macro.macro.name)))
       lines.append(contentsOf: zip(macro.macro.macroLines, macro.instructions).map { line, instruction in
-        let macroInstruction = instruction.0
-
         let argumentString: String?
         switch line {
-        case let .arg(_, argumentOrNil, argumentText),
-             let .any(_, argument: argumentOrNil, argumentText: argumentText):
+        case let .arg(_, argumentOrNil, argumentText):
           if let argumentText = argumentText {
             argumentString = argumentText
           } else if let argument = argumentOrNil {
@@ -43,15 +40,25 @@ extension Disassembler {
           }
         case .instruction:
           argumentString = nil
+
+        case .any:
+          // This is technically impossible because the macro's lines have already been collapsed into their arg or
+          // instruction form in order for us to be parsing it here.
+          // TODO: Explore ways to make it so that .any can't be stored on the Macro's lines, but allow .any to be
+          // provided in the Macro's definition for the purposes of exploding the tree walk.
+          fatalError()
         }
 
-        let context = RGBDSDisassembler.Context(
+        let macroInstruction: LR35902.Instruction = instruction.0
+
+        // Generating the statement with the disassembly context enables the macro to use labels where relevant.
+        let context: RGBDSDisassembler.Context = RGBDSDisassembler.Context(
           address: 0,
           bank: 0,
           disassembly: self,
           argumentString: argumentString
         )
-        let macroAssembly = RGBDSDisassembler.statement(for: macroInstruction, with: context)
+        let macroAssembly: RGBDS.Statement = RGBDSDisassembler.statement(for: macroInstruction, with: context)
         return Line(semantic: .macroInstruction(macroInstruction, macroAssembly))
       })
       lines.append(Line(semantic: .macroTerminator))

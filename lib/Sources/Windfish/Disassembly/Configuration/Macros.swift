@@ -24,10 +24,10 @@ extension Disassembler.Configuration {
   /** A representation of a single templatized line in a macro. */
   enum MacroLine: Equatable {
     /** The line can match any of a given set of opcodes. */
-    case any(specs: [LR35902.Instruction.Spec], argument: UInt64? = nil, argumentText: String? = nil)
+    case any(specs: [LR35902.Instruction.Spec], number: UInt64? = nil, argumentText: String? = nil)
 
     /** The line must match a specific opcode. */
-    case arg(spec: LR35902.Instruction.Spec, argument: UInt64? = nil, argumentText: String? = nil)
+    case arg(spec: LR35902.Instruction.Spec, number: UInt64? = nil, argumentText: String? = nil)
 
     /** the line must match exactly the given opcode and arguments. */
     case instruction(LR35902.Instruction)
@@ -59,14 +59,14 @@ extension Disassembler.Configuration {
     /** Simplifies the given line into a line representing exactly one opcode: this edge's. */
     func resolve(into line: MacroLine) -> MacroLine {
       switch line {
-      case let .any(_, argument, argumentText):
+      case let .any(_, number, argumentText):
         guard case let .arg(spec) = self else {
           preconditionFailure("Mismatched types")
         }
-        return .arg(spec: spec, argument: argument, argumentText: argumentText)
+        return .arg(spec: spec, number: number, argumentText: argumentText)
 
-      case let .arg(spec, argument, argumentText):
-        return .arg(spec: spec, argument: argument, argumentText: argumentText)
+      case let .arg(spec, number, argumentText):
+        return .arg(spec: spec, number: number, argumentText: argumentText)
 
       case let .instruction(instruction):
         return .instruction(instruction)
@@ -109,24 +109,24 @@ extension Disassembler.Configuration {
       }
 
       if let argumentOperand = statement.operands.first(where: { $0.contains("#") }) {
-        let argument: UInt64?
+        let number: UInt64?
         let argumentText: String?
 
         // Special-case the bank extraction method as a function that accepts a literal argument.
         if argumentOperand.hasPrefix("bank(") && argumentOperand.hasSuffix(")") {
           argumentText = argumentOperand.replacingOccurrences(of: "#", with: "\\")
-          argument = nil
+          number = nil
         } else {
           argumentText = nil
           let scanner = Scanner(string: argumentOperand)
           _ = scanner.scanUpToString("#")
           _ = scanner.scanCharacter()
-          argument = scanner.scanUInt64()
+          number = scanner.scanUInt64()
         }
         if specs.count > 1 {
-          lines.append(.any(specs: specs, argument: argument, argumentText: argumentText))
+          lines.append(.any(specs: specs, number: number, argumentText: argumentText))
         } else {
-          lines.append(.arg(spec: specs.first!, argument: argument, argumentText: argumentText))
+          lines.append(.arg(spec: specs.first!, number: number, argumentText: argumentText))
         }
       } else {
         let potentialInstructions: [LR35902.Instruction]
