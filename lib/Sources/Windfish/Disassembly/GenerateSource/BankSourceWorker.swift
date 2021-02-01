@@ -149,6 +149,22 @@ extension Disassembler {
       }
     }
 
+    private func advanceToNextBlock(_ initialLocation: Cartridge.Location, _ global: inout Disassembler.Configuration.Global?, _ initialType: Disassembler.BankWorker.ByteType) {
+      var locationIterator: Cartridge.Location = initialLocation
+      repeat {
+        if writeContext.pc < 0x4000 {
+          global = context.global(at: writeContext.pc)
+        }
+        writeContext.pc += 1
+
+        locationIterator = Cartridge.Location(address: writeContext.pc, bank: bank)
+      } while writeContext.pc < endAddress
+        && router.instruction(at: locationIterator) == nil
+        && router.label(at: locationIterator) == nil
+        && router.disassemblyType(at: locationIterator) == initialType
+        && global == nil
+    }
+
     private func flushNonCodeBlock(_ lineGroup: [Disassembler.Line], _ dataTypes: [String : Disassembler.Configuration.Datatype], _ characterMap: [UInt8 : String]) {
       flushMacro(lastAddress: writeContext.pc)
 
@@ -160,16 +176,7 @@ extension Disassembler {
       // Accumulate bytes until the next instruction or transfer of control.
       let initialLocation: Cartridge.Location = Cartridge.Location(address: writeContext.pc, bank: bank)
       var global: Configuration.Global?
-      repeat {
-        if writeContext.pc < 0x4000 {
-          global = context.global(at: writeContext.pc)
-        }
-        writeContext.pc += 1
-      } while writeContext.pc < endAddress
-        && router.instruction(at: Cartridge.Location(address: writeContext.pc, bank: bank)) == nil
-        && router.label(at: Cartridge.Location(address:writeContext.pc, bank: bank)) == nil
-        && router.disassemblyType(at: Cartridge.Location(address: writeContext.pc, bank: bank)) == initialType
-        && global == nil
+      advanceToNextBlock(initialLocation, &global, initialType)
 
       var dataSlice: Data = context.cartridgeData[initialLocation.index..<Cartridge.Location(address: writeContext.pc, bank: bank).index]
 
