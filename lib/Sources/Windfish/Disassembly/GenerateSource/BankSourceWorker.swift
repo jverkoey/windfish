@@ -53,7 +53,7 @@ extension Disassembler {
 
       flushMacro(lastAddress: writeContext.pc)
 
-      flush()
+      flushLineBuffer()
     }
 
     // MARK: - Generating source
@@ -104,7 +104,7 @@ extension Disassembler {
       // TODO: Start a macro descent for every instruction.
 
       if let child = initialCheckMacro(instruction: instruction) {
-        flush()
+        flushLineBuffer()
         lineBufferAddress = writeContext.pc - instructionWidth
         macroNode = child
       } else if let child = self.followUpCheckMacro(instruction: instruction, isLabeled: isLabeled) {
@@ -150,7 +150,7 @@ extension Disassembler {
       flushMacro(lastAddress: writeContext.pc)
 
       lineBuffer.append(contentsOf: lineGroup)
-      flush()
+      flushLineBuffer()
 
       let initialType = router.disassemblyType(at: Cartridge.Location(address: writeContext.pc, bank: bank))
 
@@ -258,7 +258,7 @@ extension Disassembler {
     // MARK: - Managing the line buffer
 
     /** Flushes all lines in the line buffer to the bank's lines. */
-    private func flush() {
+    private func flushLineBuffer() {
       lines += lineBuffer
       lineBuffer.removeAll()
       macroNode = nil
@@ -403,10 +403,10 @@ extension Disassembler {
                                                       data: bytes)])
           lineBufferAddress = writeContext.pc
         } else {
-          flush()
+          flushLineBuffer()
         }
       } else {
-        flush()
+        flushLineBuffer()
       }
       macroNode = nil
     }
