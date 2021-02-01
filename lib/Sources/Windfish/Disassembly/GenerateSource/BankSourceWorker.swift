@@ -63,114 +63,8 @@ extension Disassembler {
 
         if let instruction = router.instruction(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) {
           stepForward(with: instruction, &lineGroup, isLabeled)
-
         } else {
-          try! flushMacro(lastAddress: writeContext.pc)
-
-          lineBuffer.append(contentsOf: lineGroup)
-          flush()
-
-          let initialType = router.disassemblyType(at: Cartridge.Location(address: writeContext.pc, bank: initialBank))
-
-          // Accumulate bytes until the next instruction or transfer of control.
-          var accumulator: [UInt8] = []
-          let initialPc = writeContext.pc
-          var global: Configuration.Global?
-          repeat {
-            if writeContext.pc < 0x4000 {
-              global = context.global(at: writeContext.pc)
-            }
-            accumulator.append(context.cartridgeData[Cartridge.Location(address: writeContext.pc, bank: initialBank).index])
-            writeContext.pc += 1
-          } while writeContext.pc < end
-            && router.instruction(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) == nil
-            && router.label(at: Cartridge.Location(address:writeContext.pc, bank: initialBank)) == nil
-            && router.disassemblyType(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) == initialType
-            && global == nil
-
-          let globalValue: String?
-          let globalData: Data?
-          if let global = global,
-             let dataType = global.dataType,
-             let type = dataTypes[dataType],
-             let value = type.namedValues[accumulator.last!] {
-            globalValue = value
-            globalData = Data([accumulator.removeLast()])
-          } else {
-            globalValue = nil
-            globalData = nil
-          }
-
-          var chunkPc = initialPc
-          switch initialType {
-          case .text:
-            let lineLength = context.lineLengthOfText(at: Cartridge.Location(address: initialPc, bank: initialBank)) ?? 36
-            for chunk in accumulator.chunked(into: lineLength) {
-              lines.append(textLine(for: chunk, characterMap: characterMap, address: chunkPc))
-              chunkPc += LR35902.Address(chunk.count)
-            }
-          case .jumpTable:
-            for (index, pair) in accumulator.chunked(into: 2).enumerated() {
-              let address = (LR35902.Address(pair[1]) << 8) | LR35902.Address(pair[0])
-              let jumpLocation: String
-              let effectiveBank: Cartridge.Bank
-              if let changedBank = router.bankChange(at: Cartridge.Location(address: chunkPc, bank: initialBank)) {
-                effectiveBank = changedBank
-              } else {
-                effectiveBank = writeContext.bank
-              }
-              if let label = router.label(at: Cartridge.Location(address:address, bank: effectiveBank)) {
-                jumpLocation = label
-              } else {
-                jumpLocation = "$\(address.hexString)"
-              }
-              let bytes = context.cartridgeData[Cartridge.Location(address: chunkPc, bank: initialBank).index..<(Cartridge.Location(address: chunkPc, bank: initialBank) + 2).index]
-              lines.append(Line(semantic: .jumpTable(jumpLocation, index), address: chunkPc, data: bytes))
-              chunkPc += LR35902.Address(pair.count)
-            }
-            break
-          case .code:
-            // This should not happen; it means that there is some overlap in interpretation of instructions causing us
-            // to parse an instruction mid-instruction. Fall through to treating this as unknown data, but log a
-            // warning.
-            print("Instruction overlap detected at \(initialBank.hexString):\(initialPc.hexString)")
-            fallthrough
-          case .unknown:
-            for chunk in accumulator.chunked(into: 8) {
-              lines.append(Line(semantic: .unknown(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
-              chunkPc += LR35902.Address(chunk.count)
-            }
-          case .data:
-            for chunk in accumulator.chunked(into: 8) {
-              lines.append(Line(semantic: .data(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
-              chunkPc += LR35902.Address(chunk.count)
-            }
-          case .image2bpp:
-            lines.append(Line(semantic: .imagePlaceholder(format: .twoBitsPerPixel), address: chunkPc, data: Data(accumulator)))
-            for chunk in accumulator.chunked(into: 8) {
-              lines.append(Line(semantic: .image2bpp(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
-              chunkPc += LR35902.Address(chunk.count)
-            }
-          case .image1bpp:
-            lines.append(Line(semantic: .imagePlaceholder(format: .oneBitPerPixel), address: chunkPc, data: Data(accumulator)))
-            for chunk in accumulator.chunked(into: 8) {
-              lines.append(Line(semantic: .image1bpp(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
-              chunkPc += LR35902.Address(chunk.count)
-            }
-          case .ram:
-            preconditionFailure()
-          }
-
-          if let global = global,
-             let dataTypeName = global.dataType,
-             let dataType = dataTypes[dataTypeName],
-             let globalValue = globalValue {
-            lines.append(Line(semantic: .global(RGBDS.Statement(representingBytesWithConstant: globalValue), dataTypeName: dataTypeName, dataType: dataType), address: chunkPc, data: globalData))
-          }
-
-          lineBuffer.append(Line(semantic: .emptyAndCollapsible))
-          lineBufferAddress = writeContext.pc
-          writeContext.bank = initialBank
+          flushNonCodeBlock(lineGroup, end, dataTypes, characterMap)
         }
       }
 
@@ -248,6 +142,115 @@ extension Disassembler {
         lineBufferAddress = writeContext.pc - instructionWidth
         macroNode = child
       }
+    }
+
+    private func flushNonCodeBlock(_ lineGroup: [Disassembler.Line], _ end: LR35902.Address, _ dataTypes: [String : Disassembler.Configuration.Datatype], _ characterMap: [UInt8 : String]) {
+      try! flushMacro(lastAddress: writeContext.pc)
+
+      lineBuffer.append(contentsOf: lineGroup)
+      flush()
+
+      let initialType = router.disassemblyType(at: Cartridge.Location(address: writeContext.pc, bank: initialBank))
+
+      // Accumulate bytes until the next instruction or transfer of control.
+      var accumulator: [UInt8] = []
+      let initialPc = writeContext.pc
+      var global: Configuration.Global?
+      repeat {
+        if writeContext.pc < 0x4000 {
+          global = context.global(at: writeContext.pc)
+        }
+        accumulator.append(context.cartridgeData[Cartridge.Location(address: writeContext.pc, bank: initialBank).index])
+        writeContext.pc += 1
+      } while writeContext.pc < end
+        && router.instruction(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) == nil
+        && router.label(at: Cartridge.Location(address:writeContext.pc, bank: initialBank)) == nil
+        && router.disassemblyType(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) == initialType
+        && global == nil
+
+      let globalValue: String?
+      let globalData: Data?
+      if let global = global,
+         let dataType = global.dataType,
+         let type = dataTypes[dataType],
+         let value = type.namedValues[accumulator.last!] {
+        globalValue = value
+        globalData = Data([accumulator.removeLast()])
+      } else {
+        globalValue = nil
+        globalData = nil
+      }
+
+      var chunkPc = initialPc
+      switch initialType {
+      case .text:
+        let lineLength = context.lineLengthOfText(at: Cartridge.Location(address: initialPc, bank: initialBank)) ?? 36
+        for chunk in accumulator.chunked(into: lineLength) {
+          lines.append(textLine(for: chunk, characterMap: characterMap, address: chunkPc))
+          chunkPc += LR35902.Address(chunk.count)
+        }
+      case .jumpTable:
+        for (index, pair) in accumulator.chunked(into: 2).enumerated() {
+          let address = (LR35902.Address(pair[1]) << 8) | LR35902.Address(pair[0])
+          let jumpLocation: String
+          let effectiveBank: Cartridge.Bank
+          if let changedBank = router.bankChange(at: Cartridge.Location(address: chunkPc, bank: initialBank)) {
+            effectiveBank = changedBank
+          } else {
+            effectiveBank = writeContext.bank
+          }
+          if let label = router.label(at: Cartridge.Location(address:address, bank: effectiveBank)) {
+            jumpLocation = label
+          } else {
+            jumpLocation = "$\(address.hexString)"
+          }
+          let bytes = context.cartridgeData[Cartridge.Location(address: chunkPc, bank: initialBank).index..<(Cartridge.Location(address: chunkPc, bank: initialBank) + 2).index]
+          lines.append(Line(semantic: .jumpTable(jumpLocation, index), address: chunkPc, data: bytes))
+          chunkPc += LR35902.Address(pair.count)
+        }
+        break
+      case .code:
+        // This should not happen; it means that there is some overlap in interpretation of instructions causing us
+        // to parse an instruction mid-instruction. Fall through to treating this as unknown data, but log a
+        // warning.
+        print("Instruction overlap detected at \(initialBank.hexString):\(initialPc.hexString)")
+        fallthrough
+      case .unknown:
+        for chunk in accumulator.chunked(into: 8) {
+          lines.append(Line(semantic: .unknown(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
+          chunkPc += LR35902.Address(chunk.count)
+        }
+      case .data:
+        for chunk in accumulator.chunked(into: 8) {
+          lines.append(Line(semantic: .data(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
+          chunkPc += LR35902.Address(chunk.count)
+        }
+      case .image2bpp:
+        lines.append(Line(semantic: .imagePlaceholder(format: .twoBitsPerPixel), address: chunkPc, data: Data(accumulator)))
+        for chunk in accumulator.chunked(into: 8) {
+          lines.append(Line(semantic: .image2bpp(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
+          chunkPc += LR35902.Address(chunk.count)
+        }
+      case .image1bpp:
+        lines.append(Line(semantic: .imagePlaceholder(format: .oneBitPerPixel), address: chunkPc, data: Data(accumulator)))
+        for chunk in accumulator.chunked(into: 8) {
+          lines.append(Line(semantic: .image1bpp(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
+          chunkPc += LR35902.Address(chunk.count)
+        }
+      case .ram:
+        preconditionFailure()
+      }
+
+      if let global = global,
+         let dataTypeName = global.dataType,
+         let dataType = dataTypes[dataTypeName],
+         let globalValue = globalValue {
+        lines.append(Line(semantic: .global(RGBDS.Statement(representingBytesWithConstant: globalValue), dataTypeName: dataTypeName, dataType: dataType), address: chunkPc, data: globalData))
+      }
+
+      lineBuffer.append(Line(semantic: .emptyAndCollapsible))
+      lineBufferAddress = writeContext.pc
+      writeContext.bank = initialBank
     }
 
     // MARK: - Managing the line buffer
