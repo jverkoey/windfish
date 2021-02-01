@@ -15,7 +15,6 @@ extension Disassembler {
       /** Like an empty line, but contiguous blocks of these lines will compact into a single empty line. */
       case emptyAndCollapsible
 
-      case macroComment(comment: String)
       case preComment(comment: String)
       case label(labelName: String)
       case section(Cartridge.Bank)
@@ -73,7 +72,6 @@ extension Disassembler {
         } else {
           return "SECTION \"ROM Bank \(bank.hexString)\", ROMX[$4000], BANK[$\(bank.hexString)]"
         }
-      case let .macroComment(comment):         return "; \(comment)"
 
       case let .preComment(comment):           return line(comment: comment)
 

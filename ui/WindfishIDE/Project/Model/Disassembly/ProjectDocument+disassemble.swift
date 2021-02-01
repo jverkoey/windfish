@@ -186,7 +186,6 @@ extension ProjectDocument {
           case .empty: fallthrough
           case .emptyAndCollapsible:
             break // Do nothing.
-          case .macroComment: fallthrough
           case .preComment:
             accumulator.append(NSAttributedString(string: line.asString(detailedComments: false),
                                                   attributes: commentAttributes))
