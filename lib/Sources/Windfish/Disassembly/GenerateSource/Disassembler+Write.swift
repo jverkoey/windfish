@@ -95,14 +95,8 @@ extension Disassembler {
       sources["variables.asm"] = variablesSource
       gameAsm += "INCLUDE \"variables.asm\"\n"
     }
-
-    let characterMap = configuration.allMappedCharacters()
-    if !characterMap.isEmpty {
-      let asm = characterMap.sorted { $0.key < $1.key }.map { value, string in
-        "charmap \"\(string)\", $\(value.hexString)"
-      }.joined(separator: "\n")
-
-      sources["charmap.asm"] = .charmap(content: asm)
+    if let characterMapSource = createCharacterMapSource() {
+      sources["charmap.asm"] = characterMapSource
       gameAsm += "INCLUDE \"charmap.asm\"\n"
     }
 
@@ -119,6 +113,7 @@ extension Disassembler {
     // attributes to the string by simply mapping tokens to attributes.
 
     let dataTypes = configuration.allDatatypes()
+    let characterMap = configuration.allMappedCharacters()
     var macrosAsm: String? = nil
     var macrosToWrite: [(macro: Disassembler.Configuration.Macro, arguments: [Int: String], rawArguments: [Int: String],
                       instructions: [(LR35902.Instruction, Statement)])] = []
