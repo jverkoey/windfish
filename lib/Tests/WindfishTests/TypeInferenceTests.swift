@@ -222,9 +222,9 @@ jr   z, #2
                     .init(
                       name: "macro",
                       macroLines: [
-                        .arg(spec: .ld(.a, .imm16addr), argument: 1),
+                        .arg(spec: .ld(.a, .imm16addr), number: 1),
                         .instruction(.init(spec: .and(.a))),
-                        .arg(spec: .jr(.z, .simm8), argument: 2),
+                        .arg(spec: .jr(.z, .simm8), number: 2),
                       ],
                       validArgumentValues: nil
                     )
@@ -246,9 +246,9 @@ jr   z, #2
                     .init(
                       name: "macro",
                       macroLines: [
-                        .arg(spec: .ld(.a, .ffimm8addr), argument: 1),
+                        .arg(spec: .ld(.a, .ffimm8addr), number: 1),
                         .instruction(.init(spec: .and(.a))),
-                        .arg(spec: .jr(.z, .simm8), argument: 2),
+                        .arg(spec: .jr(.z, .simm8), number: 2),
                       ],
                       validArgumentValues: nil
                     )
@@ -306,7 +306,7 @@ inc [hl]
                 .init(
                   name: "plusPlusHL",
                   macroLines: [
-                    .arg(spec: .ld(.hl, .imm16), argument: 1),
+                    .arg(spec: .ld(.hl, .imm16), number: 1),
                     .instruction(.init(spec: .inc(.hladdr)))
                   ],
                   validArgumentValues: nil
@@ -444,7 +444,7 @@ call #1
                       macroLines: [
                         .arg(spec: .ld(.a, .imm8), argumentText: "bank(\\1)"),
                         .instruction(.init(spec: .ld(.imm16addr, .a), immediate: .imm16(0x2100))),
-                        .arg(spec: .call(nil, .imm16), argument: 1)
+                        .arg(spec: .call(nil, .imm16), number: 1)
                       ],
                       validArgumentValues: [
                         1: IndexSet(integersIn: 0x4000..<0x8000)
@@ -476,8 +476,6 @@ SECTION "ROM Bank 00", ROM0[$00]
     if case let .macros(content) = macrosSource {
       XCTAssertEqual(content, """
 
-; Arguments:
-; - 1 type: nil: valid values in $4000..<$8000
 callcb: MACRO
     ld   a, bank(\\1)
     ld   [$2100], a
