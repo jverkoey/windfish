@@ -17,11 +17,13 @@ extension Disassembler {
       self.bank = bank
       self.router = router
       self.disassembler = disassembler
+      self.initialBank = max(1, bank)
     }
 
     var macrosUsed: [Disassembler.EncounteredMacro] = []
     var lines: [Line] = []
 
+    private let initialBank: Cartridge.Bank
     private var lineBufferAddress: LR35902.Address = 0
     private var lineBuffer: [Line] = []
     private var macroNode: Configuration.MacroNode? = nil
@@ -36,8 +38,6 @@ extension Disassembler {
       writeContext = (pc: LR35902.Address((self.bank == 0) ? 0x0000 : 0x4000), bank: max(1, self.bank))
       let cartridgeSize = context.cartridgeData.count
       let end: LR35902.Address = (self.bank == 0) ? (cartridgeSize < 0x4000 ? LR35902.Address(truncatingIfNeeded: cartridgeSize) : 0x4000) : 0x8000
-
-      let initialBank = max(1, self.bank)
 
       lineBufferAddress = writeContext.pc
       lineBuffer.append(Line(semantic: .emptyAndCollapsible))
@@ -62,72 +62,7 @@ extension Disassembler {
         }
 
         if let instruction = router.instruction(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) {
-          if let bankChange = router.bankChange(at: Cartridge.Location(address: writeContext.pc, bank: writeContext.bank)) {
-            writeContext.bank = bankChange
-          }
-
-          // Write the instruction as assembly.
-          let index = Cartridge.Location(address: writeContext.pc, bank: initialBank)
-          let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!.total
-          let bytes = context.cartridgeData[index.index..<(index + instructionWidth).index]
-          let instructionScope = router.labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank))
-          let context = RGBDSDisassembler.Context(
-            address: writeContext.pc,
-            bank: writeContext.bank,
-            disassembly: disassembler,
-            argumentString: nil
-          )
-          lineGroup.append(Line(semantic: .instruction(instruction, RGBDSDisassembler.statement(for: instruction, with: context)),
-                                address: writeContext.pc,
-                                bank: writeContext.bank,
-                                scope: instructionScope.sorted().joined(separator: ", "),
-                                data: bytes))
-
-          writeContext.pc += instructionWidth
-
-          // TODO: Start a macro descent for every instruction.
-
-          if let child = initialCheckMacro(instruction: instruction) {
-            flush()
-            lineBufferAddress = writeContext.pc - instructionWidth
-            macroNode = child
-          } else if let child = self.followUpCheckMacro(instruction: instruction, isLabeled: isLabeled) {
-            macroNode = child
-          } else {
-            let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!.total
-            try! flushMacro(lastAddress: writeContext.pc - instructionWidth)
-          }
-
-          // Handle context changes.
-          switch instruction.spec {
-          case .jp(let condition, _), .jr(let condition, _):
-            let instructionScope = router.labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank))
-            let scope = instructionScope.sorted().joined(separator: ", ")
-            lineGroup.append(Line(semantic: .emptyAndCollapsible, scope: scope))
-            if condition == nil {
-              writeContext.bank = initialBank
-            }
-          case .ret(let condition):
-            lineGroup.append(Line(semantic: .empty))
-            if condition == nil {
-              lineGroup.append(Line(semantic: .emptyAndCollapsible))
-              writeContext.bank = initialBank
-            }
-          case .reti:
-            lineGroup.append(Line(semantic: .empty))
-            lineGroup.append(Line(semantic: .emptyAndCollapsible))
-            writeContext.bank = initialBank
-          default:
-            break
-          }
-
-          lineBuffer.append(contentsOf: lineGroup)
-
-          // Immediately start looking for the next macro.
-          if let child = initialCheckMacro(instruction: instruction) {
-            lineBufferAddress = writeContext.pc - instructionWidth
-            macroNode = child
-          }
+          stepForward(with: instruction, &lineGroup, isLabeled)
 
         } else {
           try! flushMacro(lastAddress: writeContext.pc)
@@ -242,6 +177,77 @@ extension Disassembler {
       try! flushMacro(lastAddress: writeContext.pc)
 
       flush()
+    }
+
+    // MARK: - Generating source
+
+    private func stepForward(with instruction: LR35902.Instruction, _ lineGroup: inout [Disassembler.Line], _ isLabeled: Bool) {
+      if let bankChange = router.bankChange(at: Cartridge.Location(address: writeContext.pc, bank: writeContext.bank)) {
+        writeContext.bank = bankChange
+      }
+
+      // Write the instruction as assembly.
+      let index = Cartridge.Location(address: writeContext.pc, bank: initialBank)
+      let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!.total
+      let bytes = context.cartridgeData[index.index..<(index + instructionWidth).index]
+      let instructionScope = router.labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank))
+      let context = RGBDSDisassembler.Context(
+        address: writeContext.pc,
+        bank: writeContext.bank,
+        disassembly: disassembler,
+        argumentString: nil
+      )
+      lineGroup.append(Line(semantic: .instruction(instruction, RGBDSDisassembler.statement(for: instruction, with: context)),
+                            address: writeContext.pc,
+                            bank: writeContext.bank,
+                            scope: instructionScope.sorted().joined(separator: ", "),
+                            data: bytes))
+
+      writeContext.pc += instructionWidth
+
+      // TODO: Start a macro descent for every instruction.
+
+      if let child = initialCheckMacro(instruction: instruction) {
+        flush()
+        lineBufferAddress = writeContext.pc - instructionWidth
+        macroNode = child
+      } else if let child = self.followUpCheckMacro(instruction: instruction, isLabeled: isLabeled) {
+        macroNode = child
+      } else {
+        let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!.total
+        try! flushMacro(lastAddress: writeContext.pc - instructionWidth)
+      }
+
+      // Handle context changes.
+      switch instruction.spec {
+      case .jp(let condition, _), .jr(let condition, _):
+        let instructionScope = router.labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank))
+        let scope = instructionScope.sorted().joined(separator: ", ")
+        lineGroup.append(Line(semantic: .emptyAndCollapsible, scope: scope))
+        if condition == nil {
+          writeContext.bank = initialBank
+        }
+      case .ret(let condition):
+        lineGroup.append(Line(semantic: .empty))
+        if condition == nil {
+          lineGroup.append(Line(semantic: .emptyAndCollapsible))
+          writeContext.bank = initialBank
+        }
+      case .reti:
+        lineGroup.append(Line(semantic: .empty))
+        lineGroup.append(Line(semantic: .emptyAndCollapsible))
+        writeContext.bank = initialBank
+      default:
+        break
+      }
+
+      lineBuffer.append(contentsOf: lineGroup)
+
+      // Immediately start looking for the next macro.
+      if let child = initialCheckMacro(instruction: instruction) {
+        lineBufferAddress = writeContext.pc - instructionWidth
+        macroNode = child
+      }
     }
 
     // MARK: - Managing the line buffer
