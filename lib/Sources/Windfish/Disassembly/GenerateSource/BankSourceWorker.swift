@@ -18,11 +18,15 @@ extension Disassembler {
       self.router = router
       self.disassembler = disassembler
       self.initialBank = max(1, bank)
+
+      let cartridgeSize = context.cartridgeData.count
+      self.endAddress = (bank == 0) ? (cartridgeSize < 0x4000 ? LR35902.Address(truncatingIfNeeded: cartridgeSize) : 0x4000) : 0x8000
     }
 
     var macrosUsed: [Disassembler.EncounteredMacro] = []
     var lines: [Line] = []
 
+    private let endAddress: LR35902.Address
     private let initialBank: Cartridge.Bank
     private var lineBufferAddress: LR35902.Address = 0
     private var lineBuffer: [Line] = []
@@ -30,25 +34,22 @@ extension Disassembler {
     private var writeContext: (pc: LR35902.Address, bank: Cartridge.Bank) = (pc: 0, bank: 0)
 
     func generateSource() {
+      writeContext = (pc: LR35902.Address((self.bank == 0) ? 0x0000 : 0x4000), bank: max(1, self.bank))
+      lineBufferAddress = writeContext.pc
+
       let dataTypes = context.allDatatypes()
       let characterMap = context.allMappedCharacters()
 
-      lines.append(Line(semantic: .section(self.bank)))
-
-      writeContext = (pc: LR35902.Address((self.bank == 0) ? 0x0000 : 0x4000), bank: max(1, self.bank))
-      let cartridgeSize = context.cartridgeData.count
-      let end: LR35902.Address = (self.bank == 0) ? (cartridgeSize < 0x4000 ? LR35902.Address(truncatingIfNeeded: cartridgeSize) : 0x4000) : 0x8000
-
-      lineBufferAddress = writeContext.pc
+      lines.append(Line(semantic: .section(bank)))
       lineBuffer.append(Line(semantic: .emptyAndCollapsible))
 
-      while writeContext.pc < end {
+      while writeContext.pc < endAddress {
         var lineGroup: [Line] = []
         let isLabeled = checkPreamble(&lineGroup)
         if let instruction = router.instruction(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) {
-          stepForward(with: instruction, &lineGroup, isLabeled)
+          flush(instruction: instruction, &lineGroup, isLabeled)
         } else {
-          flushNonCodeBlock(lineGroup, end, dataTypes, characterMap)
+          flushNonCodeBlock(lineGroup, dataTypes, characterMap)
         }
       }
 
@@ -78,7 +79,7 @@ extension Disassembler {
       return true
     }
 
-    private func stepForward(with instruction: LR35902.Instruction, _ lineGroup: inout [Disassembler.Line], _ isLabeled: Bool) {
+    private func flush(instruction: LR35902.Instruction, _ lineGroup: inout [Disassembler.Line], _ isLabeled: Bool) {
       if let bankChange = router.bankChange(at: Cartridge.Location(address: writeContext.pc, bank: writeContext.bank)) {
         writeContext.bank = bankChange
       }
@@ -147,7 +148,7 @@ extension Disassembler {
       }
     }
 
-    private func flushNonCodeBlock(_ lineGroup: [Disassembler.Line], _ end: LR35902.Address, _ dataTypes: [String : Disassembler.Configuration.Datatype], _ characterMap: [UInt8 : String]) {
+    private func flushNonCodeBlock(_ lineGroup: [Disassembler.Line], _ dataTypes: [String : Disassembler.Configuration.Datatype], _ characterMap: [UInt8 : String]) {
       try! flushMacro(lastAddress: writeContext.pc)
 
       lineBuffer.append(contentsOf: lineGroup)
@@ -165,7 +166,7 @@ extension Disassembler {
         }
         accumulator.append(context.cartridgeData[Cartridge.Location(address: writeContext.pc, bank: initialBank).index])
         writeContext.pc += 1
-      } while writeContext.pc < end
+      } while writeContext.pc < endAddress
         && router.instruction(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) == nil
         && router.label(at: Cartridge.Location(address:writeContext.pc, bank: initialBank)) == nil
         && router.disassemblyType(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) == initialType
