@@ -144,8 +144,8 @@ extension Disassembler.BankWorker {
     // For any existing scope that intersects this range:
     // 1. Shorten it if it begins before the range.
     // 2. Delete it if it begins within the range.
-    var mutatedScopes: Set<Range<Cartridge.Location>> = contiguousScopes
-    for scope: Range<Cartridge.Location> in contiguousScopes {
+    var mutatedScopes: Set<Range<Cartridge.Location>> = _contiguousScopes
+    for scope: Range<Cartridge.Location> in _contiguousScopes {
       guard scope.overlaps(range) else {
         continue
       }
@@ -154,6 +154,6 @@ extension Disassembler.BankWorker {
         mutatedScopes.insert(scope.lowerBound..<range.lowerBound)
       }
     }
-    contiguousScopes = mutatedScopes
+    _contiguousScopes = mutatedScopes
   }
 }

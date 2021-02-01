@@ -31,8 +31,10 @@ extension Disassembler {
     }
 
     func finish() {
+      // Wait for all scheduled runs to conclude.
       workGroup.wait()
 
+      // Post-process the disassembly by sharding rungroups out to banks and determining scopes.
       var bankedRunGroups: [Cartridge.Bank: [RunGroup]] = [:]
       for bankWorker: BankWorker in bankWorkers {
         for run: Run in bankWorker.runs {
@@ -41,7 +43,6 @@ extension Disassembler {
           }
         }
       }
-
       for bankWorker: BankWorker in bankWorkers {
         guard let runGroups = bankedRunGroups[bankWorker.bank] else {
           continue
@@ -49,6 +50,7 @@ extension Disassembler {
         bankWorker.rewriteRunGroups(runGroups)
       }
 
+      // Wait for scope rewriting to conclude.
       workGroup.wait()
 
       disassembling = false
@@ -339,6 +341,13 @@ extension Disassembler {
         for runGroup in runGroups {
           self.rewriteRunGroup(runGroup)
         }
+
+        self.contiguousScopes = [:]
+        for range: Range<Cartridge.Location> in self._contiguousScopes {
+          for location: Cartridge.Location in range {
+            self.contiguousScopes[location, default: Set()].insert(range.lowerBound)
+          }
+        }
       }
     }
 
@@ -383,7 +392,8 @@ extension Disassembler {
     var transfers: [Cartridge.Location: Set<Cartridge.Location>] = [:]
 
     /** Tracks ranges of code that represent contiguous scopes of instructions. */
-    var contiguousScopes: Set<Range<Cartridge.Location>> = Set<Range<Cartridge.Location>>()
+    var _contiguousScopes: Set<Range<Cartridge.Location>> = Set<Range<Cartridge.Location>>()
+    var contiguousScopes: [Cartridge.Location: Set<Cartridge.Location>] = [:]
 
     /** Hints to the disassembler that a given location should be represented by a specific data type. */
     var typeAtLocation: [Cartridge.Location: String] = [:]

@@ -124,7 +124,7 @@ extension CallStackViewController: EmulationObservers {
           // Let's look for the closest label then.
           return $0
         }
-        let scopeNames = scopes.map { $0.label }.sorted().joined(separator: ", ")
+        let scopeNames = scopes.sorted().joined(separator: ", ")
         return CallStack(address: $0.address, bank: $0.bank, label: scopeNames)
       }
     } else {

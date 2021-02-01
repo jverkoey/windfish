@@ -40,13 +40,13 @@ extension Disassembler.BankWorker {
       return nil
     }
 
-    let scopes: Set<Range<Cartridge.Location>> = contiguousScopes(at: location)
-    if let firstScope: Range<Cartridge.Location> = scopes.filter({ (scope: Range<Cartridge.Location>) -> Bool in
-      scope.lowerBound != location // Ignore ourself.
-    }).min(by: { (scope1: Range<Cartridge.Location>, scope2: Range<Cartridge.Location>) -> Bool in
-      scope1.lowerBound < scope2.lowerBound
+    let scopes: Set<Cartridge.Location> = contiguousScopes(at: location)
+    if let firstScope: Cartridge.Location = scopes.filter({ (scopeStartLocation: Cartridge.Location) -> Bool in
+      scopeStartLocation != location // Ignore ourself.
+    }).min(by: { (scope1: Cartridge.Location, scope2: Cartridge.Location) -> Bool in
+      scope1 < scope2
     }) {
-      if let firstScopeLabel: String = label(at: firstScope.lowerBound)?.components(separatedBy: ".").first {
+      if let firstScopeLabel: String = label(at: firstScope)?.components(separatedBy: ".").first {
         return firstScopeLabel + "." + name
       }
     }
