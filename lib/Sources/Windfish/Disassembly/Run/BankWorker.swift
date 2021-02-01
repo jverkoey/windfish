@@ -315,7 +315,7 @@ extension Disassembler {
     var instructionMap: [LR35902.Address: LR35902.Instruction] = [:]
 
     /** Locations that can transfer control (jp/call) to a specific location. */
-    var transfers: [Cartridge.Location: Set<Cartridge.Location>] = [:]
+    var transfers: [LR35902.Address: Set<Cartridge.Location>] = [:]
 
     /** Tracks ranges of code that represent contiguous scopes of instructions. */
     var _contiguousScopes: Set<Range<Cartridge.Location>> = Set<Range<Cartridge.Location>>()

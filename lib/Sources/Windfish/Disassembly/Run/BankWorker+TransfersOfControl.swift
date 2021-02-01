@@ -13,7 +13,7 @@ extension Disassembler.BankRouter {
 extension Disassembler.BankWorker {
   /** Get all of the transfers of control to the given location. */
   func transfersOfControl(at location: Cartridge.Location) -> Set<Cartridge.Location>? {
-    return transfers[location]
+    return transfers[location.address]
   }
 
   /** Register a new transfer of control to a given location from another location. */
@@ -25,7 +25,7 @@ extension Disassembler.BankWorker {
     }
 
     assert(toLocation.bankIndex == bank)
-    transfers[toLocation, default: Set()].insert(fromLocation)
+    transfers[toLocation.address, default: Set()].insert(fromLocation)
 
     // Tag the label type at this address
     if labelTypes[toLocation.address] == nil

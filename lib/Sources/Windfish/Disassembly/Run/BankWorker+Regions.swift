@@ -136,7 +136,7 @@ extension Disassembler.BankWorker {
     // Remove any labels, instructions, and transfers of control in this range.
     for location: Cartridge.Location in range.dropFirst() {
       deleteInstruction(at: location)
-      transfers[location] = nil
+      transfers[location.address] = nil
       labelTypes[location.address] = nil
       bankChanges[location.address] = nil
     }
