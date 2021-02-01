@@ -51,7 +51,7 @@ extension Disassembler {
         }
       }
 
-      try! flushMacro(lastAddress: writeContext.pc)
+      flushMacro(lastAddress: writeContext.pc)
 
       flush()
     }
@@ -111,7 +111,7 @@ extension Disassembler {
         macroNode = child
       } else {
         let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!.total
-        try! flushMacro(lastAddress: writeContext.pc - instructionWidth)
+        flushMacro(lastAddress: writeContext.pc - instructionWidth)
       }
 
       // Handle context changes.
@@ -147,7 +147,7 @@ extension Disassembler {
     }
 
     private func flushNonCodeBlock(_ lineGroup: [Disassembler.Line], _ dataTypes: [String : Disassembler.Configuration.Datatype], _ characterMap: [UInt8 : String]) {
-      try! flushMacro(lastAddress: writeContext.pc)
+      flushMacro(lastAddress: writeContext.pc)
 
       lineBuffer.append(contentsOf: lineGroup)
       flush()
@@ -290,7 +290,7 @@ extension Disassembler {
       return child
     }
 
-    private func flushMacro(lastAddress: LR35902.Address) throws -> Void {
+    private func flushMacro(lastAddress: LR35902.Address) -> Void {
       // Is this the beginning of a macro?
       guard let macroNodeIterator = macroNode else {
         return
@@ -416,7 +416,7 @@ extension Disassembler {
 
 private func extractArgs(from statement: RGBDS.Statement, using spec: LR35902.Instruction.Spec, argument: Int) -> [Int: String] {
   var args: [Int: String] = [:]
-  try! spec.visit { operand, _ in
+  try? spec.visit { operand, _ in
     guard let operand = operand else {
       return
     }
