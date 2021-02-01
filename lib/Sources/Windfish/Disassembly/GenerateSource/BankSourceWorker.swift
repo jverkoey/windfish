@@ -43,24 +43,8 @@ extension Disassembler {
       lineBuffer.append(Line(semantic: .emptyAndCollapsible))
 
       while writeContext.pc < end {
-        var isLabeled = false
         var lineGroup: [Line] = []
-        if let preComment = context.preComment(at: Cartridge.Location(address: writeContext.pc, bank: writeContext.bank)) {
-          lineGroup.append(Line(semantic: .emptyAndCollapsible))
-          lineGroup.append(Line(semantic: .preComment(comment: preComment)))
-        }
-        if let label = router.label(at: Cartridge.Location(address:writeContext.pc, bank: initialBank)) {
-          if let transfersOfControl = router.transfersOfControl(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) {
-            lineGroup.append(Line(semantic: .transferOfControl(transfersOfControl, label), address: writeContext.pc, bank: writeContext.bank))
-          } else {
-            let instructionScope = router.labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank))
-            let scope = instructionScope.sorted().joined(separator: ", ")
-            lineGroup.append(Line(semantic: .emptyAndCollapsible, address: writeContext.pc, bank: writeContext.bank, scope: scope))
-            lineGroup.append(Line(semantic: .label(labelName: label), address: writeContext.pc, bank: writeContext.bank, scope: scope))
-          }
-          isLabeled = true
-        }
-
+        let isLabeled = checkPreamble(&lineGroup)
         if let instruction = router.instruction(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) {
           stepForward(with: instruction, &lineGroup, isLabeled)
         } else {
@@ -74,6 +58,25 @@ extension Disassembler {
     }
 
     // MARK: - Generating source
+
+    private func checkPreamble(_ lineGroup: inout [Disassembler.Line]) -> Bool {
+      if let preComment = context.preComment(at: Cartridge.Location(address: writeContext.pc, bank: writeContext.bank)) {
+        lineGroup.append(Line(semantic: .emptyAndCollapsible))
+        lineGroup.append(Line(semantic: .preComment(comment: preComment)))
+      }
+      guard let label = router.label(at: Cartridge.Location(address:writeContext.pc, bank: initialBank)) else {
+        return false
+      }
+      if let transfersOfControl = router.transfersOfControl(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) {
+        lineGroup.append(Line(semantic: .transferOfControl(transfersOfControl, label), address: writeContext.pc, bank: writeContext.bank))
+      } else {
+        let instructionScope = router.labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: initialBank))
+        let scope = instructionScope.sorted().joined(separator: ", ")
+        lineGroup.append(Line(semantic: .emptyAndCollapsible, address: writeContext.pc, bank: writeContext.bank, scope: scope))
+        lineGroup.append(Line(semantic: .label(labelName: label), address: writeContext.pc, bank: writeContext.bank, scope: scope))
+      }
+      return true
+    }
 
     private func stepForward(with instruction: LR35902.Instruction, _ lineGroup: inout [Disassembler.Line], _ isLabeled: Bool) {
       if let bankChange = router.bankChange(at: Cartridge.Location(address: writeContext.pc, bank: writeContext.bank)) {
