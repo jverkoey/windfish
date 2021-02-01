@@ -47,7 +47,7 @@ public final class Statement {
   }
 
   /** Initializes the statement as a data representation of the given bytes. */
-  public convenience init(representingBytes bytes: [UInt8]) {
+  public convenience init(representingBytes bytes: Data) {
     self.init(opcode: "db", operands: bytes.map { "$\($0.hexString)" })
   }
 

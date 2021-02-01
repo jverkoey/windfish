@@ -141,7 +141,7 @@ class StatementTests: XCTestCase {
   // MARK: - Data statements
 
   func testDataStatement() throws {
-    let statement = try XCTUnwrap(Statement(representingBytes: [0x00, 0xfa]))
+    let statement = try XCTUnwrap(Statement(representingBytes: Data([0x00, 0xfa])))
 
     XCTAssertEqual(statement.opcode, "db")
     XCTAssertEqual(statement.operands, ["$00", "$FA"])

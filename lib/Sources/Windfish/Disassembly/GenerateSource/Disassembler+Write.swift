@@ -13,6 +13,14 @@ extension Array {
   }
 }
 
+extension Data {
+  public func chunked(into size: Int) -> [Data] {
+    return stride(from: startIndex, to: startIndex + count, by: size).map {
+      self[$0 ..< Swift.min($0 + size, startIndex + count)]
+    }
+  }
+}
+
 private func stringWithNewline(_ string: String) -> String {
   return string + "\n"
 }
@@ -25,10 +33,10 @@ func prettify(_ label: String) -> String {
   return ".\(parts.last!)"
 }
 
-func textLine(for bytes: [UInt8], characterMap: [UInt8: String], address: LR35902.Address) -> Disassembler.Line {
+func textLine(for bytes: Data, characterMap: [UInt8: String], address: LR35902.Address) -> Disassembler.Line {
   return Disassembler.Line(semantic: .text(RGBDS.Statement(withAscii: bytes, characterMap: characterMap)),
                            address: address,
-                           data: Data(bytes))
+                           data: bytes)
 }
 
 extension Disassembler {

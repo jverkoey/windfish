@@ -9,7 +9,7 @@ private func asciiString(for asciiCodes: ContiguousArray<UInt8>, characterMap: [
 
 extension Statement {
   /** Creates an RGBDS assembly statement representing the given bytes as a db-compatible string. */
-  public convenience init(withAscii asciiCodes: [UInt8], characterMap: [UInt8: String]) {
+  public convenience init(withAscii asciiCodes: Data, characterMap: [UInt8: String]) {
     var operands: [String] = []
     var buffer = ContiguousArray<UInt8>()
 

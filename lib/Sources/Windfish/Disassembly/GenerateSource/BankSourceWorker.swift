@@ -158,14 +158,12 @@ extension Disassembler {
       let initialType = router.disassemblyType(at: Cartridge.Location(address: writeContext.pc, bank: bank))
 
       // Accumulate bytes until the next instruction or transfer of control.
-      var accumulator: [UInt8] = []
-      let initialPc = writeContext.pc
+      let initialLocation: Cartridge.Location = Cartridge.Location(address: writeContext.pc, bank: bank)
       var global: Configuration.Global?
       repeat {
         if writeContext.pc < 0x4000 {
           global = context.global(at: writeContext.pc)
         }
-        accumulator.append(context.cartridgeData[Cartridge.Location(address: writeContext.pc, bank: bank).index])
         writeContext.pc += 1
       } while writeContext.pc < endAddress
         && router.instruction(at: Cartridge.Location(address: writeContext.pc, bank: bank)) == nil
@@ -173,30 +171,32 @@ extension Disassembler {
         && router.disassemblyType(at: Cartridge.Location(address: writeContext.pc, bank: bank)) == initialType
         && global == nil
 
+      var dataSlice: Data = context.cartridgeData[initialLocation.index..<Cartridge.Location(address: writeContext.pc, bank: bank).index]
+
       let globalValue: String?
       let globalData: Data?
       if let global = global,
          let dataType = global.dataType,
          let type = dataTypes[dataType],
-         let value = type.namedValues[accumulator.last!] {
+         let value = type.namedValues[dataSlice.last!] {
         globalValue = value
-        globalData = Data([accumulator.removeLast()])
+        globalData = Data([dataSlice.removeLast()])
       } else {
         globalValue = nil
         globalData = nil
       }
 
-      var chunkPc = initialPc
+      var chunkPc = initialLocation.address
       switch initialType {
       case .text:
-        let lineLength = context.lineLengthOfText(at: Cartridge.Location(address: initialPc, bank: bank)) ?? 36
-        for chunk in accumulator.chunked(into: lineLength) {
+        let lineLength = context.lineLengthOfText(at: Cartridge.Location(address: initialLocation.address, bank: bank)) ?? 36
+        for chunk in dataSlice.chunked(into: lineLength) {
           lines.append(textLine(for: chunk, characterMap: characterMap, address: chunkPc))
           chunkPc += LR35902.Address(chunk.count)
         }
       case .jumpTable:
-        for (index, pair) in accumulator.chunked(into: 2).enumerated() {
-          let address = (LR35902.Address(pair[1]) << 8) | LR35902.Address(pair[0])
+        for (index, pair) in dataSlice.chunked(into: 2).enumerated() {
+          let address = (LR35902.Address(pair[pair.startIndex + 1]) << 8) | LR35902.Address(pair[pair.startIndex])
           let jumpLocation: String
           let effectiveBank: Cartridge.Bank
           if let changedBank = router.bankChange(at: Cartridge.Location(address: chunkPc, bank: bank)) {
@@ -218,28 +218,28 @@ extension Disassembler {
         // This should not happen; it means that there is some overlap in interpretation of instructions causing us
         // to parse an instruction mid-instruction. Fall through to treating this as unknown data, but log a
         // warning.
-        print("Instruction overlap detected at \(bank.hexString):\(initialPc.hexString)")
+        print("Instruction overlap detected at \(bank.hexString):\(initialLocation.address.hexString)")
         fallthrough
       case .unknown:
-        for chunk in accumulator.chunked(into: 8) {
-          lines.append(Line(semantic: .unknown(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
+        for chunk in dataSlice.chunked(into: 8) {
+          lines.append(Line(semantic: .unknown(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: chunk))
           chunkPc += LR35902.Address(chunk.count)
         }
       case .data:
-        for chunk in accumulator.chunked(into: 8) {
-          lines.append(Line(semantic: .data(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
+        for chunk in dataSlice.chunked(into: 8) {
+          lines.append(Line(semantic: .data(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: chunk))
           chunkPc += LR35902.Address(chunk.count)
         }
       case .image2bpp:
-        lines.append(Line(semantic: .imagePlaceholder(format: .twoBitsPerPixel), address: chunkPc, data: Data(accumulator)))
-        for chunk in accumulator.chunked(into: 8) {
-          lines.append(Line(semantic: .image2bpp(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
+        lines.append(Line(semantic: .imagePlaceholder(format: .twoBitsPerPixel), address: chunkPc, data: dataSlice))
+        for chunk in dataSlice.chunked(into: 8) {
+          lines.append(Line(semantic: .image2bpp(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: chunk))
           chunkPc += LR35902.Address(chunk.count)
         }
       case .image1bpp:
-        lines.append(Line(semantic: .imagePlaceholder(format: .oneBitPerPixel), address: chunkPc, data: Data(accumulator)))
-        for chunk in accumulator.chunked(into: 8) {
-          lines.append(Line(semantic: .image1bpp(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: Data(chunk)))
+        lines.append(Line(semantic: .imagePlaceholder(format: .oneBitPerPixel), address: chunkPc, data: dataSlice))
+        for chunk in dataSlice.chunked(into: 8) {
+          lines.append(Line(semantic: .image1bpp(RGBDS.Statement(representingBytes: chunk)), address: chunkPc, data: chunk))
           chunkPc += LR35902.Address(chunk.count)
         }
       case .ram:
