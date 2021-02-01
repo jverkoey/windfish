@@ -7,6 +7,7 @@ extension Disassembler {
     let context: DisassemblerContext
     let bank: Cartridge.Bank
     let router: BankRouter
+    let disassemblyWorker: BankWorker
 
     // TODO: Separate disassembler artifacts from the disassembler itself. This is only used by RGBDSDisassembler so
     // that it can use the artifacts when generating the statement.
@@ -16,6 +17,7 @@ extension Disassembler {
       self.context = context
       self.bank = bank
       self.router = router
+      self.disassemblyWorker = router.bankWorkers[Int(truncatingIfNeeded: bank)]
       self.disassembler = disassembler
 
       let cartridgeSize = context.cartridgeData.count
@@ -157,12 +159,16 @@ extension Disassembler {
         }
         writeContext.pc += 1
 
-        locationIterator = Cartridge.Location(address: writeContext.pc, bank: bank)
+        locationIterator = currentLocation
       } while writeContext.pc < endAddress
-        && router.instruction(at: locationIterator) == nil
-        && router.label(at: locationIterator) == nil
-        && router.disassemblyType(at: locationIterator) == initialType
+        && disassemblyWorker.instruction(at: locationIterator) == nil
+        && disassemblyWorker.label(at: locationIterator) == nil
+        && disassemblyWorker.type(at: locationIterator) == initialType
         && global == nil
+    }
+
+    private var currentLocation: Cartridge.Location {
+      return Cartridge.Location(address: writeContext.pc, bank: bank)
     }
 
     private func flushNonCodeBlock(_ lineGroup: [Disassembler.Line], _ dataTypes: [String : Disassembler.Configuration.Datatype], _ characterMap: [UInt8 : String]) {
@@ -171,7 +177,7 @@ extension Disassembler {
       lineBuffer.append(contentsOf: lineGroup)
       flushLineBuffer()
 
-      let initialType = router.disassemblyType(at: Cartridge.Location(address: writeContext.pc, bank: bank))
+      let initialType = router.disassemblyType(at: currentLocation)
 
       // Accumulate bytes until the next instruction or transfer of control.
       let initialLocation: Cartridge.Location = Cartridge.Location(address: writeContext.pc, bank: bank)

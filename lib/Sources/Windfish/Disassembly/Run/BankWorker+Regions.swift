@@ -101,10 +101,10 @@ extension Disassembler.BankWorker {
   /** Deletes an instruction from a specific location and clears any code-related information in its footprint. */
   func deleteInstruction(at location: Cartridge.Location) {
     assert(location.bankIndex == bank)
-    guard let instruction: LR35902.Instruction = instructionMap[location] else {
+    guard let instruction: LR35902.Instruction = instructionMap[location.address] else {
       return
     }
-    instructionMap[location] = nil
+    instructionMap[location.address] = nil
 
     clearCode(in: location..<(location + LR35902.InstructionSet.widths[instruction.spec]!.total))
   }

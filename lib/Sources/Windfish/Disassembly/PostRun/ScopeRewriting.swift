@@ -108,7 +108,7 @@ extension Disassembler.BankWorker {
 
   private func inferReturns(in scope: Range<Cartridge.Location>, tocs: [(destination: Cartridge.Location, tocs: Set<Cartridge.Location>)]) {
     for (destination, _) in tocs {
-      guard instructionMap[destination]?.spec.category == .ret else {
+      guard instructionMap[destination.address]?.spec.category == .ret else {
         continue
       }
       labelTypes[destination] = .returnTransfer
@@ -122,7 +122,7 @@ extension Disassembler.BankWorker {
         guard scope.contains(location) && element.destination < location else {
           continue
         }
-        switch instructionMap[location]?.spec {
+        switch instructionMap[location.address]?.spec {
         case .jr(let condition, _) where condition != nil,
              .jp(let condition, _) where condition != nil:
           accumulator.append((location, element.destination))
@@ -138,7 +138,7 @@ extension Disassembler.BankWorker {
     let loops = backwardTocs.filter { (source: Cartridge.Location, destination: Cartridge.Location) -> Bool in
       let loopRange = (destination..<source)
       let tocsWithinLoop: [LR35902.Instruction] = tocs.flatMap { (destination: Cartridge.Location, tocs: Set<Cartridge.Location>) -> [LR35902.Instruction] in
-        tocs.filter { loopRange.contains($0) }.compactMap { instructionMap[$0] }
+        tocs.filter { loopRange.contains($0) }.compactMap { instructionMap[$0.address] }
       }
       return !tocsWithinLoop.contains(where: { (instruction: LR35902.Instruction) -> Bool in
         switch instruction.spec {
@@ -166,7 +166,7 @@ extension Disassembler.BankWorker {
         guard scope.contains(location) && element.destination > location else {
           continue
         }
-        switch instructionMap[location]?.spec {
+        switch instructionMap[location.address]?.spec {
         case .jr(let condition, _) where condition != nil,
              .jp(let condition, _) where condition != nil:
           accumulator.append((location, element.destination))

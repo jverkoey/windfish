@@ -62,7 +62,7 @@ extension Disassembler.BankWorker {
 
     let index: Int = location.index
     // Don't return labels that point to the middle of instructions.
-    if instructionMap[location] == nil && code.contains(index) {
+    if instructionMap[location.address] == nil && code.contains(index) {
       return false
     }
     // Don't return labels that point to the middle of data.

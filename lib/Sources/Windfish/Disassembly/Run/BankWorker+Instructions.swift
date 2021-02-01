@@ -21,13 +21,13 @@ extension Disassembler.BankWorker {
     guard code.contains(location.index) else {
       return nil
     }
-    return instructionMap[location]
+    return instructionMap[location.address]
   }
 
   /** Register an instruction at the given location. */
   func register(instruction: LR35902.Instruction, at location: Cartridge.Location) {
     assert(location.bankIndex == bank)
-    guard instructionMap[location] == nil else {
+    guard instructionMap[location.address] == nil else {
       return
     }
     // Don't register instructions in the middle of existing instructions.
@@ -42,7 +42,7 @@ extension Disassembler.BankWorker {
       deleteInstruction(at: clearLocation)
     }
 
-    instructionMap[location] = instruction
+    instructionMap[location.address] = instruction
     // Set the code bit for the instruction's footprint.
     registerRegion(range: instructionRange, as: .code)
   }

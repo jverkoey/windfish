@@ -385,8 +385,8 @@ extension Disassembler {
     /** All locations that represent code. */
     var text = IndexSet()
 
-    /** Which instruction exists at a specific location. */
-    var instructionMap: [Cartridge.Location: LR35902.Instruction] = [:]
+    /** Which instruction exists at a specific address. */
+    var instructionMap: [LR35902.Address: LR35902.Instruction] = [:]
 
     /** Locations that can transfer control (jp/call) to a specific location. */
     var transfers: [Cartridge.Location: Set<Cartridge.Location>] = [:]
