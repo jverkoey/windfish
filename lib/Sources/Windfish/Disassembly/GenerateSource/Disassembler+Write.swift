@@ -85,41 +85,10 @@ extension Disassembler {
 
     sources["Makefile"] = createMakefile()
 
-    // TODO: Source should be generated in a tokenized fashion, such that there is a String representing the source and
-    // an array of tokens representing a range and a set of attributes. This will enable the Windfish UI to associate
-    // attributes to the string by simply mapping tokens to attributes.
-
     var gameAsm = ""
 
-    let dataTypes = configuration.allDatatypes()
-    if !dataTypes.isEmpty {
-      var asm = String()
-
-      for dataType in dataTypes.sorted(by: { $0.0 < $1.0 }) {
-        guard !dataType.value.namedValues.isEmpty else {
-          continue
-        }
-        asm += "; Type: \(dataType.key)\n"
-        let namedValues = dataType.value.namedValues.sorted(by: { $0.key < $1.key })
-        let longestVariable = namedValues.reduce(0) { (currentMax, next) in
-          max(currentMax, next.value.count)
-        }
-        asm += namedValues.map {
-          let name = $0.value.padding(toLength: longestVariable, withPad: " ", startingAt: 0)
-          let value: String
-          switch dataType.value.representation {
-          case .binary:
-            value = "%\($0.key.binaryString)"
-          case .decimal:
-            value = "\($0.key)"
-          case .hexadecimal:
-            value = "$\($0.key.hexString)"
-          }
-          return "\(name) EQU \(value)"
-        }.joined(separator: "\n")
-        asm += "\n\n"
-      }
-      sources["datatypes.asm"] = .datatypes(content: asm)
+    if let dataTypesSource = createDataTypesSource() {
+      sources["datatypes.asm"] = dataTypesSource
       gameAsm += "INCLUDE \"datatypes.asm\"\n"
     }
 
@@ -151,6 +120,11 @@ extension Disassembler {
 
     let log = OSLog(subsystem: "com.featherless.windfish", category: "PointsOfInterest")
 
+    // TODO: Source should be generated in a tokenized fashion, such that there is a String representing the source and
+    // an array of tokens representing a range and a set of attributes. This will enable the Windfish UI to associate
+    // attributes to the string by simply mapping tokens to attributes.
+
+    let dataTypes = configuration.allDatatypes()
     var macrosAsm: String? = nil
     var macrosToWrite: [(macro: Disassembler.Configuration.Macro, arguments: [Int: String], rawArguments: [Int: String],
                       instructions: [(LR35902.Instruction, Statement)])] = []
