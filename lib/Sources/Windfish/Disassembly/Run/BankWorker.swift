@@ -322,7 +322,7 @@ extension Disassembler {
     var contiguousScopes: [Cartridge.Location: Set<Cartridge.Location>] = [:]
 
     /** Hints to the disassembler that a given location should be represented by a specific data type. */
-    var typeAtLocation: [Cartridge.Location: String] = [:]
+    var typeAtLocation: [LR35902.Address: String] = [:]
 
     /** Bank changes that occur at a specific location. */
     var bankChanges: [LR35902.Address: Cartridge.Bank] = [:]

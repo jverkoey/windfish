@@ -80,7 +80,7 @@ extension Disassembler.BankWorker {
            .or(.imm8),
            .xor(.imm8),
            .and(.imm8):
-        guard self.typeAtLocation[currentLocation] == nil else {
+        guard self.typeAtLocation[currentLocation.address] == nil else {
           break
         }
         guard let registerTraces: [LR35902.RegisterTrace] = cpu.registerTraces[.a],
@@ -98,7 +98,7 @@ extension Disassembler.BankWorker {
         }
         // TODO: This previously had a (!type.namedValues.isEmpty || type.representation == .hexadecimal) check
         // Why was it necessary?
-        self.typeAtLocation[currentLocation] = dataType
+        self.typeAtLocation[currentLocation.address] = dataType
 
       default:
         break
@@ -293,8 +293,8 @@ extension Disassembler.BankWorker {
         switch trace {
         case .loadImmediateFromSourceLocation(.cartridge(let location)),
              .mutationWithImmediateAtSourceLocation(.cartridge(let location)):
-          if self.typeAtLocation[location] == nil {
-            self.typeAtLocation[location] = dataType
+          if self.typeAtLocation[location.address] == nil {
+            self.typeAtLocation[location.address] = dataType
           }
         default:
           break

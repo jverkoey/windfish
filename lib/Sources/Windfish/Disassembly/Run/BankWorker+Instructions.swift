@@ -10,7 +10,7 @@ extension Disassembler.BankRouter {
 
   /** Registers a range as a specific region category. Will clear any existing regions in the range. */
   public func type(at location: Cartridge.Location) -> String? {
-    return bankWorkers[Int(truncatingIfNeeded: location.bankIndex)].typeAtLocation[location]
+    return bankWorkers[Int(truncatingIfNeeded: location.bankIndex)].typeAtLocation[location.address]
   }
 }
 
