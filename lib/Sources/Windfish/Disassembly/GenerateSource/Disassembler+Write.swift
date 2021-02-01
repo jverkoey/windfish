@@ -81,6 +81,8 @@ func textLine(for bytes: [UInt8], characterMap: [UInt8: String], address: LR3590
 
 extension Disassembler {
   public func generateSource() throws -> (Source, Statistics) {
+    let log = OSLog(subsystem: "com.featherless.windfish", category: "PointsOfInterest")
+
     var sources: [String: Source.FileDescription] = [:]
 
     sources["Makefile"] = createMakefile()
@@ -100,13 +102,9 @@ extension Disassembler {
       gameAsm += "INCLUDE \"charmap.asm\"\n"
     }
 
-    var instructionsDecoded: ContiguousArray<Int> = ContiguousArray<Int>(repeating: 0, count: Int(truncatingIfNeeded: numberOfBanks))
-
     let linesAsString: ([Line]) -> String = { lines in
       return lines.map { $0.asString(detailedComments: false) }.joined(separator: "\n")
     }
-
-    let log = OSLog(subsystem: "com.featherless.windfish", category: "PointsOfInterest")
 
     // TODO: Source should be generated in a tokenized fashion, such that there is a String representing the source and
     // an array of tokens representing a range and a set of attributes. This will enable the Windfish UI to associate
@@ -329,8 +327,6 @@ extension Disassembler {
         }
 
         if let instruction = lastBankRouter!.instruction(at: Cartridge.Location(address: writeContext.pc, bank: initialBank)) {
-          instructionsDecoded[Int(truncatingIfNeeded: bankToWrite)] += 1
-
           if let bankChange = lastBankRouter!.bankChange(at: Cartridge.Location(address: writeContext.pc, bank: writeContext.bank)) {
             writeContext.bank = bankChange
           }
@@ -618,7 +614,7 @@ extension Disassembler {
       accumulator[bank] = Double(disassembledBankLocations.count * 100) / Double(Cartridge.bankSize)
     }
     let statistics = Statistics(
-      instructionsDecoded: instructionsDecoded.reduce(0, +),
+      instructionsDecoded: lastBankRouter!.bankWorkers.map { $0.instructionMap.count }.reduce(0, +),
       percent: Double(disassembledLocations.count * 100) / Double(cartridgeSize),
       bankPercents: bankPercents
     )
