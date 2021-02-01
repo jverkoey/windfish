@@ -32,15 +32,8 @@ extension Disassembler {
 
         let argumentString: String?
         switch line {
-        case let .arg(_, argumentOrNil, argumentText):
-          if let argumentText = argumentText {
-            argumentString = argumentText
-          } else if let argument = argumentOrNil {
-            argumentString = "\\\(argument)"
-          } else {
-            argumentString = nil
-          }
-        case let .any(_, argument: argumentOrNil, argumentText: argumentText):
+        case let .arg(_, argumentOrNil, argumentText),
+             let .any(_, argument: argumentOrNil, argumentText: argumentText):
           if let argumentText = argumentText {
             argumentString = argumentText
           } else if let argument = argumentOrNil {
