@@ -58,6 +58,13 @@ public protocol InstructionSet {
    */
   static var opcodeStrings: [SpecType: String] { get }
 
+  /**
+   A cached map of specifications to their mirror representations.
+
+   This is typically implemented by returning the result of `computeAllMirrors()`.
+   */
+  static var mirrors: [SpecType: Mirror] { get }
+
   /** Returns the data representation of an instruction. */
   static func data(representing instruction: InstructionType) -> Data
 }
@@ -98,7 +105,7 @@ extension InstructionSet {
   }
 
   /**
-   Calculates the opcode bytes for every instruction in this set.
+   Calculates the opcode bytes for every instruction specification in this set.
 
    Assumes that each instruction specification's opcode byte corresponds to its index in its corresponding instruction
    table.
@@ -110,7 +117,7 @@ extension InstructionSet {
   }
 
   /**
-   Calculates the opcode string for every instruction in this set.
+   Calculates the opcode string for every instruction specification in this set.
 
    Assumes that the name of the enum case in the specification's enum definition is exactly the opcode's string
    representation.
@@ -118,6 +125,18 @@ extension InstructionSet {
   public static func computeAllOpcodeStrings() -> [SpecType: String] {
     return allSpecs().reduce(into: [:]) { accumulator, spec in
       accumulator[spec] = computeOpcodeString(for: spec)
+    }
+  }
+
+  /** Creates the mirror for every instruction specification in this set. */
+  public static func computeAllMirrors() -> [SpecType: Mirror] {
+    return allSpecs().reduce(into: [:]) { accumulator, spec in
+      let mirror: Mirror = Mirror(reflecting: spec)
+      if let subSpec: SpecType = mirror.children.first?.value as? SpecType {
+        accumulator[spec] = Mirror(reflecting: subSpec)
+      } else {
+        accumulator[spec] = mirror
+      }
     }
   }
 }

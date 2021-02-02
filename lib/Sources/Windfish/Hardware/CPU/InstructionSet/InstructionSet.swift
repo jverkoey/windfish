@@ -297,5 +297,9 @@ extension LR35902 {
     public static var opcodeStrings: [SpecType : String] = {
       return computeAllOpcodeStrings()
     }()
+
+    public static var mirrors: [SpecType : Mirror] = {
+      return computeAllMirrors()
+    }()
   }
 }

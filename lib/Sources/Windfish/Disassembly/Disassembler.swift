@@ -129,6 +129,13 @@ public final class Disassembler {
   var lastBankRouter: BankRouter?
 
   public func disassemble() {
+    // The pre-computed instruction set lookup tables aren't thread-safe, so we pre-load them all here.
+    let _ = LR35902.InstructionSet.prefixTables
+    let _ = LR35902.InstructionSet.widths
+    let _ = LR35902.InstructionSet.opcodeBytes
+    let _ = LR35902.InstructionSet.opcodeStrings
+    let _ = LR35902.InstructionSet.mirrors
+
     let log = OSLog(subsystem: "com.featherless.windfish", category: "PointsOfInterest")
     let signpostID = OSSignpostID(log: log)
     os_signpost(.begin, log: log, name: "Disassembler", signpostID: signpostID, "%{public}s", "disassemble")

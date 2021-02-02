@@ -72,7 +72,7 @@ extension RGBDSDisassembler {
    - Parameter spec: The spec being used to extract the operands. May be a nested spec of the instruction's spec.
    */
   private static func operands(for instruction: LR35902.Instruction, spec: LR35902.Instruction.Spec, with context: Context?) -> [String]? {
-    let mirror = Mirror(reflecting: spec)
+    let mirror = LR35902.InstructionSet.mirrors[spec]!
     guard let operandReflection = mirror.children.first else {
       return nil  // This specification has no operands.
     }
