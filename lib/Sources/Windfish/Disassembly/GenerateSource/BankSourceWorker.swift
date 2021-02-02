@@ -309,122 +309,123 @@ extension Disassembler {
       guard let macroNodeIterator = macroNode else {
         return
       }
-      // No further nodes to be traversed; is this the end of a macro?
-      if !macroNodeIterator.macros.isEmpty {
-        let instructions = lineBuffer.compactMap { thisLine -> (LR35902.Instruction, RGBDS.Statement)? in
-          if case let .instruction(instruction, assembly) = thisLine.semantic {
-            return (instruction, assembly)
-          } else {
-            return nil
-          }
-        }
-
-        let macros: [(macro: Disassembler.Configuration.Macro, arguments: [Int: String], rawArguments: [Int: String])] = macroNodeIterator.macros.compactMap { macro in
-          // Extract the arguments.
-          var anyArgumentMismatches = false
-          let arguments: [Int: String] = zip(macro.macroLines, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
-            guard case let .arg(spec, argumentOrNil, _) = zipped.0,
-                  let argument = argumentOrNil else {
-              return iter
-            }
-            let args = extractArgs(from: zipped.1.1, using: spec, argument: Int(argument))
-            return iter.merging(args, uniquingKeysWith: { first, second in
-              if first != second {
-                anyArgumentMismatches = true
-              }
-              return first
-            })
-          })
-          if anyArgumentMismatches {
-            return nil
-          }
-
-          // Arguments without any label replacements.
-          let rawArguments: [Int: String] = zip(macro.macroLines, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
-            guard case let .arg(spec, argumentOrNil, _) = zipped.0,
-                  let argument = argumentOrNil else {
-              return iter
-            }
-            let statement = RGBDSDisassembler.statement(for: zipped.1.0)
-            let args = extractArgs(from: statement, using: spec, argument: Int(argument))
-            return iter.merging(args, uniquingKeysWith: { first, second in
-              if first != second {
-                anyArgumentMismatches = true
-              }
-              return first
-            })
-          })
-          if anyArgumentMismatches {
-            return nil
-          }
-
-          return (macro: macro, arguments: arguments, rawArguments: rawArguments)
-        }
-
-        var validMacros = macros.filter { macro in
-          guard let validArgumentValues = macro.macro.validArgumentValues else {
-            return true
-          }
-          let firstInvalidArgument = macro.rawArguments.first { argumentNumber, argumentValue in
-            guard validArgumentValues[argumentNumber] != nil else {
-              return false
-            }
-            if argumentValue.hasPrefix("$") {
-              let number = Int(LR35902.Address(argumentValue.dropFirst(), radix: 16)!)
-              return !validArgumentValues[argumentNumber]!.contains(number)
-            } else if argumentValue.hasPrefix("[$") && argumentValue.hasSuffix("]") {
-              let number = Int(LR35902.Address(argumentValue.dropFirst(2).dropLast(), radix: 16)!)
-              return !validArgumentValues[argumentNumber]!.contains(number)
-            }
-            preconditionFailure("Unhandled.")
-          }
-          return firstInvalidArgument == nil
-        }
-
-        if validMacros.count > 1 {
-          // Try filtering to macros that have validation.
-          validMacros = validMacros.filter { macro in
-            macro.macro.validArgumentValues != nil
-          }
-        }
-
-        precondition(validMacros.count <= 1, "More than one macro matched.")
-
-        if let macro = validMacros.first {
-          macrosUsed.append((macro: macro.macro, arguments: macro.arguments, rawArguments: macro.rawArguments))
-
-          let lowerBound = Cartridge.Location(address: lineBufferAddress, bank: writeContext.bank)
-          let upperBound = Cartridge.Location(address: lastAddress, bank: writeContext.bank)
-          let bytes = context.cartridgeData[lowerBound.index..<upperBound.index]
-
-          let macroArgs = macro.arguments.keys.sorted().map { macro.arguments[$0]! }
-
-          let firstInstruction = lineBuffer.firstIndex { line in if case .instruction = line.semantic { return true } else { return false} }!
-          let lastInstruction = lineBuffer.lastIndex { line in if case .instruction = line.semantic { return true } else { return false} }!
-          let bank: Cartridge.Bank
-          if case .instruction = lineBuffer[lastInstruction].semantic {
-            bank = lineBuffer[lastInstruction].bank!
-          } else {
-            bank = writeContext.bank
-          }
-          let macroScopes = router.labeledContiguousScope(at: Cartridge.Location(address: lineBufferAddress, bank: bank))
-          let statement = RGBDS.Statement(opcode: macro.macro.name, operands: macroArgs)
-          lineBuffer.replaceSubrange(firstInstruction...lastInstruction,
-                                          with: [Line(semantic: .macro(statement),
-                                                      address: lineBufferAddress,
-                                                      bank: bank,
-                                                      scope: macroScopes,
-                                                      data: bytes)])
-          lineBufferAddress = writeContext.pc
-        } else {
-          flushLineBuffer()
-        }
-      } else {
-        flushLineBuffer()
+      defer {
+        macroNode = nil
       }
-      macroNode = nil
-    }
+      // No further nodes to be traversed; is this the end of a macro?
+      guard !macroNodeIterator.macros.isEmpty else {
+        flushLineBuffer()
+        return
+      }
+      let instructions: [(instruction: LR35902.Instruction, statement: Statement)] = lineBuffer.compactMap { thisLine -> (LR35902.Instruction, Statement)? in
+        guard case let .instruction(instruction, assembly) = thisLine.semantic else {
+          return nil
+        }
+        return (instruction: instruction, statement: assembly)
+      }
 
+      let macros: [(macro: Disassembler.Configuration.Macro, arguments: [Int: String], rawArguments: [Int: String])] = macroNodeIterator.macros.compactMap { macro in
+        // Extract the arguments.
+        var anyArgumentMismatches = false
+        let arguments: [Int: String] = zip(macro.macroLines, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
+          guard case let .arg(spec, argumentOrNil, _) = zipped.0,
+                let argument = argumentOrNil else {
+            return iter
+          }
+          let args = extractArgs(from: zipped.1.statement, using: spec, argument: Int(argument))
+          return iter.merging(args, uniquingKeysWith: { first, second in
+            if first != second {
+              anyArgumentMismatches = true
+            }
+            return first
+          })
+        })
+        if anyArgumentMismatches {
+          return nil
+        }
+
+        // Arguments without any label replacements.
+        let rawArguments: [Int: String] = zip(macro.macroLines, instructions).reduce([:], { (iter, zipped) -> [Int: String] in
+          guard case let .arg(spec, argumentOrNil, _) = zipped.0,
+                let argument = argumentOrNil else {
+            return iter
+          }
+          let statement = RGBDSDisassembler.statement(for: zipped.1.instruction)
+          let args = extractArgs(from: statement, using: spec, argument: Int(argument))
+          return iter.merging(args, uniquingKeysWith: { first, second in
+            if first != second {
+              anyArgumentMismatches = true
+            }
+            return first
+          })
+        })
+        if anyArgumentMismatches {
+          return nil
+        }
+
+        return (macro: macro, arguments: arguments, rawArguments: rawArguments)
+      }
+
+      var validMacros = macros.filter { macro in
+        guard let validArgumentValues = macro.macro.validArgumentValues else {
+          return true
+        }
+        let firstInvalidArgument = macro.rawArguments.first { argumentNumber, argumentValue in
+          guard validArgumentValues[argumentNumber] != nil else {
+            return false
+          }
+          if argumentValue.hasPrefix("$") {
+            let number = Int(LR35902.Address(argumentValue.dropFirst(), radix: 16)!)
+            return !validArgumentValues[argumentNumber]!.contains(number)
+          } else if argumentValue.hasPrefix("[$") && argumentValue.hasSuffix("]") {
+            let number = Int(LR35902.Address(argumentValue.dropFirst(2).dropLast(), radix: 16)!)
+            return !validArgumentValues[argumentNumber]!.contains(number)
+          }
+          preconditionFailure("Unhandled.")
+        }
+        return firstInvalidArgument == nil
+      }
+
+      if validMacros.count > 1 {
+        // Try filtering to macros that have validation.
+        validMacros = validMacros.filter { macro in
+          macro.macro.validArgumentValues != nil
+        }
+      }
+
+      precondition(validMacros.count <= 1, "More than one macro matched.")
+
+      guard let macro = validMacros.first else {
+        flushLineBuffer()
+        return
+      }
+
+      macrosUsed.append((macro: macro.macro, arguments: macro.arguments, rawArguments: macro.rawArguments))
+
+      let lowerBound = Cartridge.Location(address: lineBufferAddress, bank: writeContext.bank)
+      let upperBound = Cartridge.Location(address: lastAddress, bank: writeContext.bank)
+      let bytes = context.cartridgeData[lowerBound.index..<upperBound.index]
+
+      let macroArgs = macro.arguments.keys.sorted().map { macro.arguments[$0]! }
+
+      let firstInstruction = lineBuffer.firstIndex { line in if case .instruction = line.semantic { return true } else { return false} }!
+      let lastInstruction = lineBuffer.lastIndex { line in if case .instruction = line.semantic { return true } else { return false} }!
+      let bank: Cartridge.Bank
+      if case .instruction = lineBuffer[lastInstruction].semantic {
+        bank = lineBuffer[lastInstruction].bank!
+      } else {
+        bank = writeContext.bank
+      }
+      let macroScopes = router.labeledContiguousScope(at: Cartridge.Location(address: lineBufferAddress, bank: bank))
+      let statement = RGBDS.Statement(opcode: macro.macro.name, operands: macroArgs)
+      lineBuffer.replaceSubrange(firstInstruction...lastInstruction,
+                                 with: [Line(semantic: .macro(statement),
+                                             address: lineBufferAddress,
+                                             bank: bank,
+                                             scope: macroScopes,
+                                             data: bytes)])
+      lineBufferAddress = writeContext.pc
+    }
   }
 }
 
