@@ -47,7 +47,7 @@ extension Disassembler.BankWorker {
       scope1 < scope2
     }) {
       if let firstScopeLabel: String = label(at: firstScope)?.components(separatedBy: ".").first {
-        return firstScopeLabel + "." + name
+        return "\(firstScopeLabel).\(name)"
       }
     }
 

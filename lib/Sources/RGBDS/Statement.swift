@@ -41,9 +41,6 @@ public final class Statement {
       formattedOpcode = opcode
     }
     self.formattedOpcode = formattedOpcode
-    self.tokenizedString = Statement.createTokenizedString(opcode: opcode, operands: operands)
-    self.formattedString = Statement.createFormattedString(opcode: opcode, formattedOpcode: formattedOpcode,
-                                                           operands: operands)
   }
 
   /** Initializes the statement as a data representation of the given bytes. */
