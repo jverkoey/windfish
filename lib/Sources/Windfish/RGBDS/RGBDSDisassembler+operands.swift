@@ -72,14 +72,13 @@ extension RGBDSDisassembler {
    - Parameter spec: The spec being used to extract the operands. May be a nested spec of the instruction's spec.
    */
   private static func operands(for instruction: LR35902.Instruction, spec: LR35902.Instruction.Spec, with context: Context?) -> [String]? {
-    let mirror = LR35902.InstructionSet.mirrors[spec]!
-    guard let operandReflection = mirror.children.first else {
-      return nil  // This specification has no operands.
+    // Note that the argumentTypes value is a doubly-boxed-optional, so we unbox the first optional here. We then check
+    // whether the value is .none in the switch statement below.
+    guard let argumentTypes: Any = LR35902.InstructionSet.reflectedArgumentTypes[spec] else {
+      return nil
     }
-
     // This switch is a glorified if/else statement, so the most frequent combinations of operands are evaluated first.
-    switch operandReflection.value {
-
+    switch argumentTypes {
     case let tuple as (LR35902.Instruction.Numeric, LR35902.Instruction.Numeric):
       return [
         operand(for: instruction, operand: tuple.0, with: context),

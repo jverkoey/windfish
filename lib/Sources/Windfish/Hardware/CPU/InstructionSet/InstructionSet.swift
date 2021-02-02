@@ -298,8 +298,8 @@ extension LR35902 {
       return computeAllOpcodeStrings()
     }()
 
-    public static var mirrors: [SpecType : Mirror] = {
-      return computeAllMirrors()
+    public static var reflectedArgumentTypes: [SpecType : Any] = {
+      return computeAllReflectedArgumentTypes()
     }()
   }
 }

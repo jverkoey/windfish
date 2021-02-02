@@ -134,7 +134,7 @@ public final class Disassembler {
     let _ = LR35902.InstructionSet.widths
     let _ = LR35902.InstructionSet.opcodeBytes
     let _ = LR35902.InstructionSet.opcodeStrings
-    let _ = LR35902.InstructionSet.mirrors
+    let _ = LR35902.InstructionSet.reflectedArgumentTypes
 
     let log = OSLog(subsystem: "com.featherless.windfish", category: "PointsOfInterest")
     let signpostID = OSSignpostID(log: log)

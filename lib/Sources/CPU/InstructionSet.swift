@@ -59,11 +59,11 @@ public protocol InstructionSet {
   static var opcodeStrings: [SpecType: String] { get }
 
   /**
-   A cached map of specifications to their mirror representations.
+   A cached map of specifications to their reflected argument representations.
 
-   This is typically implemented by returning the result of `computeAllMirrors()`.
+   This is typically implemented by returning the result of `computeAllReflectedArgumentTypes()`.
    */
-  static var mirrors: [SpecType: Mirror] { get }
+  static var reflectedArgumentTypes: [SpecType: Any] { get }
 
   /** Returns the data representation of an instruction. */
   static func data(representing instruction: InstructionType) -> Data
@@ -129,13 +129,13 @@ extension InstructionSet {
   }
 
   /** Creates the mirror for every instruction specification in this set. */
-  public static func computeAllMirrors() -> [SpecType: Mirror] {
+  public static func computeAllReflectedArgumentTypes() -> [SpecType: Any] {
     return allSpecs().reduce(into: [:]) { accumulator, spec in
       let mirror: Mirror = Mirror(reflecting: spec)
       if let subSpec: SpecType = mirror.children.first?.value as? SpecType {
-        accumulator[spec] = Mirror(reflecting: subSpec)
+        accumulator[spec] = Mirror(reflecting: subSpec).children.first?.value
       } else {
-        accumulator[spec] = mirror
+        accumulator[spec] = mirror.children.first?.value
       }
     }
   }
