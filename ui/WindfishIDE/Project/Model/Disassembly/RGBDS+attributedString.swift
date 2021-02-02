@@ -10,15 +10,15 @@ extension RGBDS.Statement {
                         operandAttributes: [NSAttributedString.Key : Any],
                         regionLookup: [String: Region],
                         scope: String?) -> NSAttributedString {
-    let string = NSMutableAttributedString()
+    let string = NSMutableAttributedString(string: formattedOpcode)
     string.beginEditing()
-    if let spec = context as? LR35902.Instruction.Spec,
-       let documentation = opcodeDocumentation[spec] {
+    if let spec: LR35902.Instruction.Spec = context as? LR35902.Instruction.Spec,
+       let documentation: String = opcodeDocumentation[spec] {
       var attributesWithDocs = opcodeAttributes
       attributesWithDocs[.toolTip] = documentation
-      string.append(NSAttributedString(string: formattedOpcode, attributes: attributesWithDocs))
+      string.setAttributes(attributesWithDocs, range: NSRange(location: 0, length: string.length))
     } else {
-      string.append(NSAttributedString(string: formattedOpcode, attributes: opcodeAttributes))
+      string.setAttributes(opcodeAttributes, range: NSRange(location: 0, length: string.length))
     }
     if !operands.isEmpty {
       string.append(NSAttributedString(string: " ", attributes: attributes))
