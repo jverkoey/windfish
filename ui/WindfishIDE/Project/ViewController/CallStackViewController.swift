@@ -119,13 +119,11 @@ extension CallStackViewController: EmulationObservers {
     }.reversed()
     if let disassembly = project.disassemblyResults?.disassembly {
       stackTrace = stack.map {
-        let scopes = disassembly.labeledContiguousScopes(at: Cartridge.Location(address: $0.address, bank: $0.bank))
-        if scopes.isEmpty {
+        guard let scope: String = disassembly.labeledContiguousScope(at: Cartridge.Location(address: $0.address, bank: $0.bank)) else {
           // Let's look for the closest label then.
           return $0
         }
-        let scopeNames = scopes.sorted().joined(separator: ", ")
-        return CallStack(address: $0.address, bank: $0.bank, label: scopeNames)
+        return CallStack(address: $0.address, bank: $0.bank, label: scope)
       }
     } else {
       stackTrace = stack

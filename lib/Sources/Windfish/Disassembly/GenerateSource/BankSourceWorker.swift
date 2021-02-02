@@ -63,19 +63,18 @@ extension Disassembler {
     private func checkPreamble(_ lineGroup: inout [Disassembler.Line]) -> Bool {
       let writeLocation: Cartridge.Location = Cartridge.Location(address: writeContext.pc, bank: bank)
 
-      if let preComment = context.preComment(at: writeLocation) {
+      if let preComment: String = context.preComment(at: writeLocation) {
         lineGroup.append(Line(semantic: .emptyAndCollapsible))
         lineGroup.append(Line(semantic: .preComment(comment: preComment)))
       }
 
-      guard let label = router.label(at: writeLocation) else {
+      guard let label: String = router.label(at: writeLocation) else {
         return false
       }
-      if let transfersOfControl = router.transfersOfControl(at: writeLocation) {
+      if let transfersOfControl: Set<Cartridge.Location> = router.transfersOfControl(at: writeLocation) {
         lineGroup.append(Line(semantic: .transferOfControl(transfersOfControl, label), address: writeContext.pc, bank: bank))
       } else {
-        let instructionScope = router.labeledContiguousScopes(at: writeLocation)
-        let scope = instructionScope.sorted().joined(separator: ", ")
+        let scope: String? = router.labeledContiguousScope(at: writeLocation)
         lineGroup.append(Line(semantic: .emptyAndCollapsible, address: writeContext.pc, bank: writeContext.bank, scope: scope))
         lineGroup.append(Line(semantic: .label(labelName: label), address: writeContext.pc, bank: writeContext.bank, scope: scope))
       }
@@ -91,7 +90,7 @@ extension Disassembler {
       let index = Cartridge.Location(address: writeContext.pc, bank: bank)
       let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!.total
       let bytes = context.cartridgeData[index.index..<(index + instructionWidth).index]
-      let instructionScope = router.labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: bank))
+      let instructionScope = router.labeledContiguousScope(at: Cartridge.Location(address: writeContext.pc, bank: bank))
       let context = RGBDSDisassembler.Context(
         address: writeContext.pc,
         bank: writeContext.bank,
@@ -101,7 +100,7 @@ extension Disassembler {
       lineGroup.append(Line(semantic: .instruction(instruction, RGBDSDisassembler.statement(for: instruction, with: context)),
                             address: writeContext.pc,
                             bank: writeContext.bank,
-                            scope: instructionScope.sorted().joined(separator: ", "),
+                            scope: instructionScope,
                             data: bytes))
 
       writeContext.pc += instructionWidth
@@ -122,8 +121,7 @@ extension Disassembler {
       // Handle context changes.
       switch instruction.spec {
       case .jp(let condition, _), .jr(let condition, _):
-        let instructionScope = router.labeledContiguousScopes(at: Cartridge.Location(address: writeContext.pc, bank: bank))
-        let scope = instructionScope.sorted().joined(separator: ", ")
+        let scope = router.labeledContiguousScope(at: Cartridge.Location(address: writeContext.pc, bank: bank))
         lineGroup.append(Line(semantic: .emptyAndCollapsible, scope: scope))
         if condition == nil {
           writeContext.bank = bank
@@ -409,13 +407,13 @@ extension Disassembler {
           } else {
             bank = writeContext.bank
           }
-          let macroScopes = router.labeledContiguousScopes(at: Cartridge.Location(address: lineBufferAddress, bank: bank))
+          let macroScopes = router.labeledContiguousScope(at: Cartridge.Location(address: lineBufferAddress, bank: bank))
           let statement = RGBDS.Statement(opcode: macro.macro.name, operands: macroArgs)
           lineBuffer.replaceSubrange(firstInstruction...lastInstruction,
                                           with: [Line(semantic: .macro(statement),
                                                       address: lineBufferAddress,
                                                       bank: bank,
-                                                      scope: macroScopes.sorted().joined(separator: ", "),
+                                                      scope: macroScopes,
                                                       data: bytes)])
           lineBufferAddress = writeContext.pc
         } else {

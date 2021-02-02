@@ -161,7 +161,7 @@ public final class Disassembler {
   }
 
   /** Returns the label at the given location, if any. */
-  public func labeledContiguousScopes(at location: Cartridge.Location) -> [String] {
-    return lastBankRouter!.labeledContiguousScopes(at: location)
+  public func labeledContiguousScope(at location: Cartridge.Location) -> String? {
+    return lastBankRouter!.labeledContiguousScope(at: location)
   }
 }

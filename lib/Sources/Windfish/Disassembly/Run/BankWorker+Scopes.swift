@@ -2,8 +2,8 @@ import Foundation
 
 extension Disassembler.BankRouter {
   /** Returns the label at the given location, if any. */
-  public func labeledContiguousScopes(at location: Cartridge.Location) -> [String] {
-    return bankWorkers[Int(truncatingIfNeeded: location.bankIndex)].labeledContiguousScopes(at: location)
+  public func labeledContiguousScope(at location: Cartridge.Location) -> String? {
+    return bankWorkers[Int(truncatingIfNeeded: location.bankIndex)].labeledContiguousScope(at: location)
   }
 }
 
@@ -16,18 +16,14 @@ extension Disassembler.BankWorker {
   }
 
   /** Returns all labeled scopes that intersect with the given location. */
-  func labeledContiguousScopes(at location: Cartridge.Location) -> [String] {
+  func labeledContiguousScope(at location: Cartridge.Location) -> String? {
     assert(location.bankIndex == bank)
     assert(_contiguousScopes.isEmpty || !contiguousScopes.isEmpty)
-    guard let scopeStarts: Set<Cartridge.Location> = contiguousScopes[location] else {
-      return []
+    guard let scopeStarts: Set<Cartridge.Location> = contiguousScopes[location],
+          let firstScopeLocation: Cartridge.Location = scopeStarts.sorted().first else {
+      return nil
     }
-    return scopeStarts.compactMap { (scopeStart: Cartridge.Location) -> String? in
-      guard let label: String = label(at: scopeStart) else {
-        return nil
-      }
-      return label
-    }
+    return label(at: firstScopeLocation)
   }
 
   /** Registers a new contiguous scope at the given range. */
