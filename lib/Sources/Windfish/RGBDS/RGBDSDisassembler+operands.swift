@@ -306,14 +306,14 @@ extension RGBDSDisassembler {
     return RGBDS.asHexString(imm16)
   }
 
-  private static func addressLabel(_ context: Context, address immediate: (UInt16)) -> String? {
+  private static func addressLabel(_ context: Context, address immediate: LR35902.Address) -> String? {
     // TODO: Why do we always assume that if there's an argument string that we should return it here?
-    if let argumentString = context.argumentString {
+    if let argumentString: String = context.argumentString {
       return argumentString
     }
 
-    if let label = context.disassembly.lastBankRouter?.label(at: Cartridge.Location(address:immediate, bank: context.bank)) {
-      if let scope = context.disassembly.lastBankRouter?.labeledContiguousScope(at: Cartridge.Location(address: context.address, bank: context.bank)),
+    if let label: String = context.disassembly.lastBankRouter?.label(at: Cartridge.Location(address: immediate, bank: context.bank)) {
+      if let scope: String = context.disassembly.lastBankRouter?.labeledContiguousScope(at: Cartridge.Location(address: context.address, bank: context.bank)),
           label.starts(with: "\(scope).") {
         return label.replacingOccurrences(of: "\(scope).", with: ".")
       }
