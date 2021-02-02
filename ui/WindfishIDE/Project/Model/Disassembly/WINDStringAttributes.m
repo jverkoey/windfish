@@ -6,7 +6,7 @@
   NSDictionary<NSAttributedStringKey, id> *_attributes;
 }
 
-+ (NSFont *)font {
++ (NSFont *)font __attribute__((objc_direct)) {
   return [NSFont monospacedSystemFontOfSize: 11 weight: NSFontWeightRegular];
 }
 
@@ -52,6 +52,14 @@
 
 - (void)addToAttributedString:(nonnull NSMutableAttributedString *)string atRange:(NSRange)range {
   [string addAttributes:_attributes range:range];
+}
+
+@end
+
+@implementation NSMutableAttributedString (WindfishPerformance)
+
+- (void)wind_addAttribute:(nonnull NSAttributedStringKey)name value:(nullable id)value range:(NSRange)range {
+  [self addAttribute:name value:value range:range];
 }
 
 @end

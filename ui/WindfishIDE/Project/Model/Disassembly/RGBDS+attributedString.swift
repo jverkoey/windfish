@@ -8,23 +8,22 @@ extension RGBDS.Statement {
   func attributedString(attributes: WINDStringAttributes,
                         opcodeAttributes: WINDStringAttributes,
                         operandAttributes: WINDStringAttributes,
-                        regionLookup: [String: Region],
-                        scope: String?) -> NSAttributedString {
+                        regionLookup: [String: Region]) -> NSAttributedString {
     let string: NSMutableAttributedString = NSMutableAttributedString(string: formattedString)
-    string.beginEditing()
     opcodeAttributes.add(to: string, at: opcodeRange)
     if let spec: LR35902.Instruction.Spec = context as? LR35902.Instruction.Spec,
        let documentation: String = opcodeDocumentation[spec] {
-      string.addAttribute(.toolTip, value: documentation, range: opcodeRange)
+      string.wind_addAttribute(.toolTip, value: documentation, range: opcodeRange)
     }
-    for element: (operand: String, range: NSRange) in zip(operands, operandRanges) {
-      operandAttributes.add(to: string, at: element.range)
-      if regionLookup[element.operand] != nil {
-        string.addAttribute(.link, value: "windfish://jumpto/\(element.operand)", range: element.range)
-        string.addAttribute(.toolTip, value: "Jump to \(element.operand)", range: element.range)
+    for index in 0..<operands.count {
+      let operand: String = operands[index]
+      let range: NSRange = operandRanges[index]
+      operandAttributes.add(to: string, at: range)
+      if regionLookup[operand] != nil {
+        string.wind_addAttribute(.link, value: "windfish://jumpto/\(operand)", range: range)
+        string.wind_addAttribute(.toolTip, value: "Jump to \(operand)", range: range)
       }
     }
-    string.endEditing()
     return string
   }
 }

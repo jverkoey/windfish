@@ -192,8 +192,7 @@ extension ProjectDocument {
             accumulator.append(assembly.attributedString(attributes: baseAttributes,
                                                          opcodeAttributes: opcodeAttributes,
                                                          operandAttributes: operandAttributes,
-                                                         regionLookup: regionLookup,
-                                                         scope: line.scope))
+                                                         regionLookup: regionLookup))
             accumulator.append(commentAttributes.attributedString(with: " ; \(UInt8(truncatingIfNeeded: index).hexString)"))
           case let .text(assembly): fallthrough
           case let .data(assembly): fallthrough
@@ -207,15 +206,13 @@ extension ProjectDocument {
             accumulator.append(assembly.attributedString(attributes: baseAttributes,
                                                          opcodeAttributes: opcodeAttributes,
                                                          operandAttributes: operandAttributes,
-                                                         regionLookup: regionLookup,
-                                                         scope: line.scope))
+                                                         regionLookup: regionLookup))
           case let .macro(assembly):
             accumulator.append(NSAttributedString(string: "    "))
             accumulator.append(assembly.attributedString(attributes: baseAttributes,
                                                          opcodeAttributes: macroNameAttributes,
                                                          operandAttributes: operandAttributes,
-                                                         regionLookup: regionLookup,
-                                                         scope: line.scope))
+                                                         regionLookup: regionLookup))
 
           case let .imagePlaceholder(format):
             switch format {
