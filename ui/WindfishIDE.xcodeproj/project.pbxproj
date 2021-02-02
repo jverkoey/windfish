@@ -19,6 +19,7 @@
 		662B37B025B2A59D00C5E690 /* CallStackViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662B37AF25B2A59D00C5E690 /* CallStackViewController.swift */; };
 		662B37C225B2ADFE00C5E690 /* SameboyBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 662B37C125B2ADFE00C5E690 /* SameboyBridge.m */; };
 		662B380A25B3668700C5E690 /* VRAMWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662B380925B3668700C5E690 /* VRAMWindowController.swift */; };
+		6636A1B225C914890089F2F8 /* WINDStringAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 6636A1B125C914890089F2F8 /* WINDStringAttributes.m */; };
 		66472ED7258E7F7600A03CD4 /* SourceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66472ED6258E7F7600A03CD4 /* SourceView.swift */; };
 		664833E12598558D00B955F4 /* CPUFlagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664833E02598558D00B955F4 /* CPUFlagsView.swift */; };
 		665198C125ABEA7F0075C3FC /* LCDViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665198C025ABEA7F0075C3FC /* LCDViewController.swift */; };
@@ -326,6 +327,8 @@
 		662B37C025B2ADFE00C5E690 /* SameboyBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SameboyBridge.h; sourceTree = "<group>"; };
 		662B37C125B2ADFE00C5E690 /* SameboyBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SameboyBridge.m; sourceTree = "<group>"; };
 		662B380925B3668700C5E690 /* VRAMWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VRAMWindowController.swift; sourceTree = "<group>"; };
+		6636A1B025C914890089F2F8 /* WINDStringAttributes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WINDStringAttributes.h; sourceTree = "<group>"; };
+		6636A1B125C914890089F2F8 /* WINDStringAttributes.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WINDStringAttributes.m; sourceTree = "<group>"; };
 		66472ED6258E7F7600A03CD4 /* SourceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceView.swift; sourceTree = "<group>"; };
 		664833E02598558D00B955F4 /* CPUFlagsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUFlagsView.swift; sourceTree = "<group>"; };
 		665198C025ABEA7F0075C3FC /* LCDViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LCDViewController.swift; sourceTree = "<group>"; };
@@ -611,6 +614,8 @@
 				665198F325ABF95E0075C3FC /* DisassemblyResults.swift */,
 				6651990825ABF9F60075C3FC /* ProjectDocument+disassemble.swift */,
 				6651991225ABFA840075C3FC /* RGBDS+attributedString.swift */,
+				6636A1B025C914890089F2F8 /* WINDStringAttributes.h */,
+				6636A1B125C914890089F2F8 /* WINDStringAttributes.m */,
 			);
 			path = Disassembly;
 			sourceTree = "<group>";
@@ -1185,6 +1190,7 @@
 				6651990E25ABFA380075C3FC /* ProjectDocument+importSymbols.swift in Sources */,
 				6651991325ABFA840075C3FC /* RGBDS+attributedString.swift in Sources */,
 				66521DA9257C996B0088C97B /* SourceRulerView.swift in Sources */,
+				6636A1B225C914890089F2F8 /* WINDStringAttributes.m in Sources */,
 				66C617C6257F04D600E372BA /* RegionInspectorViewController.swift in Sources */,
 				66C617EC257F30C200E372BA /* GlobalEditorViewController.swift in Sources */,
 				665198DD25ABF8FC0075C3FC /* DataType.swift in Sources */,

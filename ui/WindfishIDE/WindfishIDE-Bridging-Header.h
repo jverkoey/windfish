@@ -4,3 +4,5 @@
 // slowdowns on iterative builds (15+ seconds): https://bugs.swift.org/browse/SR-14061
 #import "JoyKit/JoyKit.h"
 #import "Cocoa/GBImageView.h"
+
+#import "WINDStringAttributes.h"

@@ -30,6 +30,21 @@ public final class Statement {
   /** Optional context that may be associated with this statement, typically an instruction specification.*/
   public var context: Any?
 
+  /** The range of the opcode within formattedString. */
+  public private(set) lazy var opcodeRange: NSRange = {
+    NSMakeRange(0, opcode.count)
+  }()
+
+  /** The range of each operand within formattedString. */
+  public private(set) lazy var operandRanges: [NSRange] = {
+    var operandStartLocation: Int = formattedOpcode.count + 1
+    return operands.map { (operand: String) -> NSRange in
+      let range = NSMakeRange(operandStartLocation, operand.count)
+      operandStartLocation += operand.count + 2
+      return range
+    }
+  }()
+
   /** Initializes the statement with an opcode and operands. */
   public init(opcode: String, operands: [String] = []) {
     self.opcode = opcode

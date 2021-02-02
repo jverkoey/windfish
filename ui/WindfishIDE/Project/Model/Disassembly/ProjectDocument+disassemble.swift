@@ -142,23 +142,11 @@ extension ProjectDocument {
 
       let commentColor = NSColor.systemGreen
       let labelColor = NSColor.systemOrange
-      let baseAttributes: [NSAttributedString.Key : Any] = [
-        .foregroundColor: NSColor.textColor,
-        .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
-      ]
-      let opcodeAttributes: [NSAttributedString.Key : Any] = [
-        .foregroundColor: NSColor.systemGreen,
-        .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
-      ]
-      let macroNameAttributes: [NSAttributedString.Key : Any] = [
-        .foregroundColor: NSColor.systemBrown,
-        .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
-      ]
-      let commentAttributes: [NSAttributedString.Key : Any] = [
-        .foregroundColor: commentColor,
-        .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
-      ]
-      let operandAttributes: [NSAttributedString.Key : Any] = baseAttributes
+      let baseAttributes: WINDStringAttributes = WINDStringAttributes.base()
+      let opcodeAttributes: WINDStringAttributes = WINDStringAttributes.opcode()
+      let macroNameAttributes: WINDStringAttributes = WINDStringAttributes.macro()
+      let commentAttributes: WINDStringAttributes = WINDStringAttributes.comment()
+      let operandAttributes: WINDStringAttributes = baseAttributes
 
       let bankSources: [Cartridge.Bank: (String, [Disassembler.Line])] = disassembledSource.sources.reduce(into: [:], {
         (accumulator: inout [Cartridge.Bank: (String, [Disassembler.Line])],
@@ -187,8 +175,7 @@ extension ProjectDocument {
           case .emptyAndCollapsible:
             break // Do nothing.
           case .preComment:
-            accumulator.append(NSAttributedString(string: line.asString(detailedComments: false),
-                                                  attributes: commentAttributes))
+            accumulator.append(commentAttributes.attributedString(with: line.asString(detailedComments: false)))
           case .label: fallthrough
           case .transferOfControl:
             accumulator.append(NSAttributedString(string: line.asString(detailedComments: false), attributes: [
@@ -198,18 +185,16 @@ extension ProjectDocument {
           case .section: fallthrough
           case .macroDefinition: fallthrough
           case .macroTerminator:
-            accumulator.append(NSAttributedString(string: line.asString(detailedComments: false),
-                                                  attributes: baseAttributes))
+            accumulator.append(baseAttributes.attributedString(with: line.asString(detailedComments: false)))
           case let .jumpTable(jumpLocation, index):
             let assembly = RGBDS.Statement(opcode: "dw", operands: [jumpLocation])
-            accumulator.append(NSAttributedString(string: "    ", attributes: baseAttributes))
+            accumulator.append(NSAttributedString(string: "    "))
             accumulator.append(assembly.attributedString(attributes: baseAttributes,
                                                          opcodeAttributes: opcodeAttributes,
                                                          operandAttributes: operandAttributes,
                                                          regionLookup: regionLookup,
                                                          scope: line.scope))
-            accumulator.append(NSAttributedString(string: " ; \(UInt8(truncatingIfNeeded: index).hexString)",
-                                                  attributes: commentAttributes))
+            accumulator.append(commentAttributes.attributedString(with: " ; \(UInt8(truncatingIfNeeded: index).hexString)"))
           case let .text(assembly): fallthrough
           case let .data(assembly): fallthrough
           case let .unknown(assembly): fallthrough
@@ -218,14 +203,14 @@ extension ProjectDocument {
           case let .image2bpp(assembly): fallthrough
           case let .macroInstruction(_, assembly): fallthrough
           case let .instruction(_, assembly):
-            accumulator.append(NSAttributedString(string: "    ", attributes: baseAttributes))
+            accumulator.append(NSAttributedString(string: "    "))
             accumulator.append(assembly.attributedString(attributes: baseAttributes,
                                                          opcodeAttributes: opcodeAttributes,
                                                          operandAttributes: operandAttributes,
                                                          regionLookup: regionLookup,
                                                          scope: line.scope))
           case let .macro(assembly):
-            accumulator.append(NSAttributedString(string: "    ", attributes: baseAttributes))
+            accumulator.append(NSAttributedString(string: "    "))
             accumulator.append(assembly.attributedString(attributes: baseAttributes,
                                                          opcodeAttributes: macroNameAttributes,
                                                          operandAttributes: operandAttributes,
