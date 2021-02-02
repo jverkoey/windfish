@@ -98,6 +98,10 @@ struct SimpleCPU {
     static var opcodeStrings: [Instruction.Spec : String] = {
       return computeAllOpcodeStrings()
     }()
+
+    public static var reflectedArgumentTypes: [SpecType : Any] = {
+      return computeAllReflectedArgumentTypes()
+    }()
   }
 }
 
