@@ -45,7 +45,7 @@ public final class Statement {
 
   /** Initializes the statement as a data representation of the given bytes. */
   public convenience init(representingBytes bytes: Data) {
-    self.init(opcode: "db", operands: bytes.map { "$\($0.hexString)" })
+    self.init(opcode: "db", operands: bytes.map { RGBDS.asHexString($0) })
   }
 
   /** Initializes the statement as a data representation using a named constant. */

@@ -39,6 +39,20 @@ public func asHexString<T: FixedWidthInteger>(_ imm: T) -> String {
   return NumericPrefix.hexadecimal + imm.hexString
 }
 
+private var hexStringsUInt8: [String] = {
+  return (UInt8.min...UInt8.max).map { NumericPrefix.hexadecimal + $0.hexString }
+}()
+
+/**
+ Returns the given immediate as a hexadecimal representation in RGBDS assembly.
+
+ This is a specialized variation of asHexString that uses a cached lookup table of hex strings in order to improve
+ performance.
+ */
+public func asHexString(_ imm: UInt8) -> String {
+  return hexStringsUInt8[Int(truncatingIfNeeded: imm)]
+}
+
 /** Returns the given immediate as a hexadecimal address representation in RGBDS assembly. */
 public func asHexAddressString<T: FixedWidthInteger>(_ imm: T) -> String {
   return "[" + asHexString(imm) + "]"
