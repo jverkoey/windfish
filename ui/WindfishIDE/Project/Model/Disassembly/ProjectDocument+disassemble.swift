@@ -140,7 +140,6 @@ extension ProjectDocument {
         })
       }
 
-      let commentColor = NSColor.systemGreen
       let labelColor = NSColor.systemOrange
       let baseAttributes: WINDStringAttributes = WINDStringAttributes.base()
       let opcodeAttributes: WINDStringAttributes = WINDStringAttributes.opcode()
@@ -160,6 +159,8 @@ extension ProjectDocument {
 
       let log = OSLog(subsystem: "com.featherless.windfish", category: "PointsOfInterest")
 
+      // TODO: Generate attributed text for the currently selected bank immediately and then kick off the other banks
+      // once done so that we can return from disassembly faster.
       var bankTextStorage: [Cartridge.Bank: NSAttributedString] = [:]
       let q = DispatchQueue(label: "sync queue")
       DispatchQueue.concurrentPerform(iterations: Int(truncatingIfNeeded: disassembly.numberOfBanks)) { (index: Int) in
