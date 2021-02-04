@@ -4,7 +4,7 @@ extension Disassembler {
   private func getROMData(bank: Cartridge.Bank, startAddress: LR35902.Address, endAddress: LR35902.Address) -> [UInt8] {
     let startLocation = Cartridge.Location(address: startAddress, bank: bank)
     let endLocation = Cartridge.Location(address: endAddress, bank: bank)
-    return [UInt8](self.cartridgeData[startLocation.index..<endLocation.index])
+    return [UInt8](self.configuration.cartridgeData[startLocation.index..<endLocation.index])
   }
 
   func prepareScriptContext() {

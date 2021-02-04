@@ -163,7 +163,7 @@ extension ProjectDocument {
       // once done so that we can return from disassembly faster.
       var bankTextStorage: [Cartridge.Bank: NSAttributedString] = [:]
       let q = DispatchQueue(label: "sync queue")
-      DispatchQueue.concurrentPerform(iterations: Int(truncatingIfNeeded: disassembly.numberOfBanks)) { (index: Int) in
+      DispatchQueue.concurrentPerform(iterations: disassembly.mutableConfiguration.numberOfBanks) { (index: Int) in
         let signpostID = OSSignpostID(log: log)
         os_signpost(.begin, log: log, name: "Generate attributed string", signpostID: signpostID, "%{public}d", index)
 
@@ -353,7 +353,8 @@ extension ProjectDocument {
       }
 
       DispatchQueue.main.async {
-        self.project.metadata?.numberOfBanks = disassembly.numberOfBanks
+        // TODO: Delete the metadata altogether; there's no need to store this to disk.
+        self.project.metadata?.numberOfBanks = Cartridge.Bank(truncatingIfNeeded: disassembly.mutableConfiguration.numberOfBanks)
         self.project.metadata?.bankMap = bankMap
         self.project.disassemblyResults = DisassemblyResults(
           files: disassemblyFiles,

@@ -40,11 +40,12 @@ extension Disassembler {
 
   public final class MutableConfiguration: Configuration {
     let cartridgeData: Data
-    let numberOfBanks: Int
+    public let numberOfBanks: Int
 
-    init(cartridgeData: Data, numberOfBanks: Int) {
+    init(cartridgeData: Data) {
       self.cartridgeData = cartridgeData
-      self.numberOfBanks = numberOfBanks
+      let cartridgeSize: Int = cartridgeData.count
+      self.numberOfBanks = (cartridgeSize + 0x4000 - 1) / 0x4000
     }
 
     /** Ranges of executable regions that should be disassembled. */

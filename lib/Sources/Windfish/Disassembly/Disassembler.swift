@@ -21,14 +21,8 @@ public final class Disassembler {
     return mutableConfiguration
   }
 
-  let cartridgeData: Data
-  let cartridgeSize: Cartridge.Length
-  public let numberOfBanks: Cartridge.Bank
   public init(data: Data) {
-    self.cartridgeData = data
-    self.cartridgeSize = Cartridge.Length(data.count)
-    self.numberOfBanks = Cartridge.Bank(truncatingIfNeeded: (cartridgeSize + 0x4000 - 1) / 0x4000)
-    self.mutableConfiguration = MutableConfiguration(cartridgeData: data, numberOfBanks: Int(truncatingIfNeeded: numberOfBanks))
+    self.mutableConfiguration = MutableConfiguration(cartridgeData: data)
   }
 
   var lastBankRouter: BankRouter?
@@ -49,7 +43,7 @@ public final class Disassembler {
       a.lowerBound < b.lowerBound
     }) {
       let run = Run(from: range.lowerBound.address, selectedBank: range.lowerBound.bank, upTo: range.upperBound.address,
-                    numberOfBanks: Int(truncatingIfNeeded: numberOfBanks))
+                    numberOfBanks: configuration.numberOfBanks)
       lastBankRouter!.schedule(run: run)
     }
 

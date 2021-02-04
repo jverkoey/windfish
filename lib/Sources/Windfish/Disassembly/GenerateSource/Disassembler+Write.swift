@@ -80,7 +80,7 @@ extension Disassembler {
 
     var macrosToWrite: [Disassembler.EncounteredMacro] = []
     let q = DispatchQueue(label: "sync queue")
-    DispatchQueue.concurrentPerform(iterations: Int(truncatingIfNeeded: numberOfBanks)) { (index: Int) in
+    DispatchQueue.concurrentPerform(iterations: configuration.numberOfBanks) { (index: Int) in
       let signpostID = OSSignpostID(log: log)
       os_signpost(.begin, log: log, name: "Generate source", signpostID: signpostID, "%{public}d", index)
 
@@ -102,22 +102,22 @@ extension Disassembler {
       gameAsm += "INCLUDE \"macros.asm\"\n"
     }
 
-    gameAsm += ((UInt8(0)..<UInt8(numberOfBanks))
+    gameAsm += ((UInt8(0)..<UInt8(truncatingIfNeeded: configuration.numberOfBanks))
                   .map { "INCLUDE \"bank_\($0.hexString).asm\"" }
                   .joined(separator: "\n") + "\n")
 
     sources["game.asm"] = .game(content: gameAsm)
 
     let disassembledLocations = self.lastBankRouter!.disassembledLocations()
-    let bankPercents: [Cartridge.Bank: Double] = (0..<numberOfBanks).reduce(into: [:]) { accumulator, bank in
+    let bankPercents: [Cartridge.Bank: Double] = (0..<configuration.numberOfBanks).reduce(into: [:]) { accumulator, bank in
       let disassembledBankLocations = disassembledLocations.intersection(
         IndexSet(integersIn: (Int(bank) * Int(Cartridge.bankSize))..<(Int(bank + 1) * Int(Cartridge.bankSize)))
       )
-      accumulator[bank] = Double(disassembledBankLocations.count * 100) / Double(Cartridge.bankSize)
+      accumulator[Cartridge.Bank(truncatingIfNeeded: bank)] = Double(disassembledBankLocations.count * 100) / Double(Cartridge.bankSize)
     }
     let statistics = Statistics(
       instructionsDecoded: lastBankRouter!.bankWorkers.map { $0.instructionMap.count }.reduce(0, +),
-      percent: Double(disassembledLocations.count * 100) / Double(cartridgeSize),
+      percent: Double(disassembledLocations.count * 100) / Double(configuration.cartridgeData.count),
       bankPercents: bankPercents
     )
 
