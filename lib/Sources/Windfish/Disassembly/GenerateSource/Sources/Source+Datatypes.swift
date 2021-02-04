@@ -2,7 +2,7 @@ import Foundation
 import RGBDS
 
 extension Disassembler {
-  private typealias DatatypeElement = Dictionary<String, Configuration.Datatype>.Element
+  private typealias DatatypeElement = Dictionary<String, MutableConfiguration.Datatype>.Element
 
   func createDataTypesSource() -> Source.FileDescription? {
     let dataTypes = configuration.allDatatypes()

@@ -1,6 +1,6 @@
 import Foundation
 
-extension Disassembler.Configuration {
+extension Disassembler.MutableConfiguration {
   public struct Datatype: Equatable {
     public let namedValues: [UInt8: String]
     public let interpretation: Interpretation
@@ -23,7 +23,7 @@ extension Disassembler.Configuration {
     return dataTypes[name] != nil
   }
 
-  func datatype(named name: String) -> Disassembler.Configuration.Datatype? {
+  func datatype(named name: String) -> Disassembler.MutableConfiguration.Datatype? {
     return dataTypes[name]
   }
 

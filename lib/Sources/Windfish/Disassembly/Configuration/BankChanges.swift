@@ -1,6 +1,6 @@
 import Foundation
 
-extension Disassembler.Configuration {
+extension Disassembler.MutableConfiguration {
   func bankChange(at location: Cartridge.Location) -> Cartridge.Bank? {
     return bankChanges[location]
   }

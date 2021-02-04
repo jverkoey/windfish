@@ -88,7 +88,7 @@ extension Disassembler.BankWorker {
                 guard case .loadFromAddress(let address) = trace else {
                   return nil
                 }
-                guard let global: Disassembler.Configuration.Global = self.context.global(at: address),
+                guard let global: Disassembler.MutableConfiguration.Global = self.context.global(at: address),
                       let dataType: String = global.dataType else {
                   return nil
                 }

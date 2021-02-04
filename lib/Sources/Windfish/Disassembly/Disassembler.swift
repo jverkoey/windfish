@@ -14,46 +14,10 @@ extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {
   }
 }
 
-// TODO: Rename something like "ConfigurationInput".
-protocol DisassemblerContext: class {
-  var cartridgeData: Data { get }
-  var numberOfBanks: Int { get }
-
-  func allPotentialCode() -> Set<Range<Cartridge.Location>>
-  func allPotentialText() -> Set<Range<Cartridge.Location>>
-  func allPotentialData() -> Set<Range<Cartridge.Location>>
-
-  func preComment(at location: Cartridge.Location) -> String?
-
-  func allDataFormats() -> [Disassembler.Configuration.DataFormat: IndexSet]
-  func formatOfData(at location: Cartridge.Location) -> Disassembler.Configuration.DataFormat?
-
-  func datatypeExists(named name: String) -> Bool
-  func datatype(named name: String) -> Disassembler.Configuration.Datatype?
-  func allDatatypes() -> [String: Disassembler.Configuration.Datatype]
-
-  func shouldTerminateLinearSweep(at location: Cartridge.Location) -> Bool
-
-  func global(at address: LR35902.Address) -> Disassembler.Configuration.Global?
-  func allGlobals() -> [LR35902.Address: Disassembler.Configuration.Global]
-
-  func allScripts() -> [String: Disassembler.Configuration.Script]
-
-  func allMappedCharacters() -> [UInt8: String]
-
-  func macroTreeRoot() -> Disassembler.Configuration.MacroNode
-
-  func label(at location: Cartridge.Location) -> String?
-
-  func lineLengthOfText(at location: Cartridge.Location) -> Int?
-
-  func bankChange(at location: Cartridge.Location) -> Cartridge.Bank?
-}
-
 /// A class that owns and manages disassembly information for a given ROM.
 public final class Disassembler {
-  public let mutableConfiguration: Configuration
-  var configuration: DisassemblerContext {
+  public let mutableConfiguration: MutableConfiguration
+  var configuration: Configuration {
     return mutableConfiguration
   }
 
@@ -64,7 +28,7 @@ public final class Disassembler {
     self.cartridgeData = data
     self.cartridgeSize = Cartridge.Length(data.count)
     self.numberOfBanks = Cartridge.Bank(truncatingIfNeeded: (cartridgeSize + 0x4000 - 1) / 0x4000)
-    self.mutableConfiguration = Configuration(cartridgeData: data, numberOfBanks: Int(truncatingIfNeeded: numberOfBanks))
+    self.mutableConfiguration = MutableConfiguration(cartridgeData: data, numberOfBanks: Int(truncatingIfNeeded: numberOfBanks))
   }
 
   var lastBankRouter: BankRouter?

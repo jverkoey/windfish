@@ -2,7 +2,7 @@ import Foundation
 
 import RGBDS
 
-extension Disassembler.Configuration {
+extension Disassembler.MutableConfiguration {
   /** A representation of a macro. */
   final class Macro {
     /** The name by which the macro is invoked in the generated assembly. */

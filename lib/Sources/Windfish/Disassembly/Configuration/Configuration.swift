@@ -1,9 +1,44 @@
 import Foundation
 
+protocol Configuration: class {
+  var cartridgeData: Data { get }
+  var numberOfBanks: Int { get }
+
+  func allPotentialCode() -> Set<Range<Cartridge.Location>>
+  func allPotentialText() -> Set<Range<Cartridge.Location>>
+  func allPotentialData() -> Set<Range<Cartridge.Location>>
+
+  func preComment(at location: Cartridge.Location) -> String?
+
+  func allDataFormats() -> [Disassembler.MutableConfiguration.DataFormat: IndexSet]
+  func formatOfData(at location: Cartridge.Location) -> Disassembler.MutableConfiguration.DataFormat?
+
+  func datatypeExists(named name: String) -> Bool
+  func datatype(named name: String) -> Disassembler.MutableConfiguration.Datatype?
+  func allDatatypes() -> [String: Disassembler.MutableConfiguration.Datatype]
+
+  func shouldTerminateLinearSweep(at location: Cartridge.Location) -> Bool
+
+  func global(at address: LR35902.Address) -> Disassembler.MutableConfiguration.Global?
+  func allGlobals() -> [LR35902.Address: Disassembler.MutableConfiguration.Global]
+
+  func allScripts() -> [String: Disassembler.MutableConfiguration.Script]
+
+  func allMappedCharacters() -> [UInt8: String]
+
+  func macroTreeRoot() -> Disassembler.MutableConfiguration.MacroNode
+
+  func label(at location: Cartridge.Location) -> String?
+
+  func lineLengthOfText(at location: Cartridge.Location) -> Int?
+
+  func bankChange(at location: Cartridge.Location) -> Cartridge.Bank?
+}
+
 /// A class that owns and manages disassembly information for a given ROM.
 extension Disassembler {
 
-  public final class Configuration: DisassemblerContext {
+  public final class MutableConfiguration: Configuration {
     let cartridgeData: Data
     let numberOfBanks: Int
 

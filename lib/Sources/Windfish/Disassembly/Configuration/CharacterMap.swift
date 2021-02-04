@@ -1,6 +1,6 @@
 import Foundation
 
-extension Disassembler.Configuration {
+extension Disassembler.MutableConfiguration {
   func allMappedCharacters() -> [UInt8: String] {
     return characterMap
   }

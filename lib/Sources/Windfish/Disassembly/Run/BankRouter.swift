@@ -3,13 +3,13 @@ import CPU
 
 extension Disassembler {
   final class BankRouter {
-    private let context: DisassemblerContext
+    private let context: Configuration
     private var disassembling: Bool = false
 
     let bankWorkers: ContiguousArray<BankWorker>
     let workGroup = DispatchGroup()
 
-    init(numberOfBanks: Int, context: DisassemblerContext) {
+    init(numberOfBanks: Int, context: Configuration) {
       self.context = context
       bankWorkers = ContiguousArray<BankWorker>((0..<numberOfBanks).map({ (index: Int) -> BankWorker in
         BankWorker(bank: Cartridge.Bank(truncatingIfNeeded: index), context: context)

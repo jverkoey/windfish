@@ -4,7 +4,7 @@ import RGBDS
 
 extension Disassembler {
   final class BankSourceWorker {
-    let context: DisassemblerContext
+    let context: Configuration
     let bank: Cartridge.Bank
     let router: BankRouter
     let disassemblyWorker: BankWorker
@@ -13,7 +13,7 @@ extension Disassembler {
     // that it can use the artifacts when generating the statement.
     let disassembler: Disassembler
 
-    init(context: DisassemblerContext, bank: Cartridge.Bank, router: BankRouter, disassembler: Disassembler) {
+    init(context: Configuration, bank: Cartridge.Bank, router: BankRouter, disassembler: Disassembler) {
       self.context = context
       self.bank = bank
       self.router = router
@@ -30,7 +30,7 @@ extension Disassembler {
     private let endAddress: LR35902.Address
     private var lineBufferAddress: LR35902.Address = 0
     private var lineBuffer: [Line] = []
-    private var macroNode: Configuration.MacroNode? = nil
+    private var macroNode: MutableConfiguration.MacroNode? = nil
     private var writeContext: (pc: LR35902.Address, bank: Cartridge.Bank) = (pc: 0, bank: 0)
 
     func generateSource() {
@@ -149,7 +149,7 @@ extension Disassembler {
       }
     }
 
-    private func advanceToNextBlock(_ initialLocation: Cartridge.Location, _ global: inout Disassembler.Configuration.Global?, _ initialType: Disassembler.BankWorker.ByteType) {
+    private func advanceToNextBlock(_ initialLocation: Cartridge.Location, _ global: inout Disassembler.MutableConfiguration.Global?, _ initialType: Disassembler.BankWorker.ByteType) {
       var locationIterator: Cartridge.Location = initialLocation
       repeat {
         if writeContext.pc < 0x4000 {
@@ -169,7 +169,7 @@ extension Disassembler {
       return Cartridge.Location(address: writeContext.pc, bank: bank)
     }
 
-    private func flushNonCodeBlock(_ lineGroup: [Disassembler.Line], _ dataTypes: [String : Disassembler.Configuration.Datatype], _ characterMap: [UInt8 : String]) {
+    private func flushNonCodeBlock(_ lineGroup: [Disassembler.Line], _ dataTypes: [String : Disassembler.MutableConfiguration.Datatype], _ characterMap: [UInt8 : String]) {
       flushMacro(lastAddress: writeContext.pc)
 
       lineBuffer.append(contentsOf: lineGroup)
@@ -179,7 +179,7 @@ extension Disassembler {
 
       // Accumulate bytes until the next instruction or transfer of control.
       let initialLocation: Cartridge.Location = Cartridge.Location(address: writeContext.pc, bank: bank)
-      var global: Configuration.Global?
+      var global: MutableConfiguration.Global?
       advanceToNextBlock(initialLocation, &global, initialType)
 
       var dataSlice: Data = context.cartridgeData[initialLocation.index..<Cartridge.Location(address: writeContext.pc, bank: bank).index]
@@ -280,9 +280,9 @@ extension Disassembler {
 
     // MARK: - Handling macros
 
-    private func initialCheckMacro(instruction: LR35902.Instruction) -> Configuration.MacroNode? {
-      let asInstruction = Configuration.MacroTreeEdge.instruction(instruction)
-      let asAny = Configuration.MacroTreeEdge.arg(instruction.spec)
+    private func initialCheckMacro(instruction: LR35902.Instruction) -> MutableConfiguration.MacroNode? {
+      let asInstruction = MutableConfiguration.MacroTreeEdge.instruction(instruction)
+      let asAny = MutableConfiguration.MacroTreeEdge.arg(instruction.spec)
       guard macroNode == nil,
             let child = context.macroTreeRoot().children[asInstruction] ?? context.macroTreeRoot().children[asAny] else {
         return nil
@@ -290,13 +290,13 @@ extension Disassembler {
       return child
     }
 
-    private func followUpCheckMacro(instruction: LR35902.Instruction, isLabeled: Bool) -> Configuration.MacroNode? {
+    private func followUpCheckMacro(instruction: LR35902.Instruction, isLabeled: Bool) -> MutableConfiguration.MacroNode? {
       // Is this the beginning of a macro?
       guard let macroNodeIterator = macroNode else {
         return nil
       }
-      let asInstruction = Configuration.MacroTreeEdge.instruction(instruction)
-      let asArg = Configuration.MacroTreeEdge.arg(instruction.spec)
+      let asInstruction = MutableConfiguration.MacroTreeEdge.instruction(instruction)
+      let asArg = MutableConfiguration.MacroTreeEdge.arg(instruction.spec)
       // Only descend the tree if we're not a label.
       guard !isLabeled, let child = macroNodeIterator.children[asInstruction] ?? macroNodeIterator.children[asArg] else {
         return nil
@@ -324,7 +324,7 @@ extension Disassembler {
         return (instruction: instruction, statement: assembly)
       }
 
-      let macros: [(macro: Disassembler.Configuration.Macro, arguments: [Int: String], rawArguments: [Int: String])] = macroNodeIterator.macros.compactMap { macro in
+      let macros: [(macro: Disassembler.MutableConfiguration.Macro, arguments: [Int: String], rawArguments: [Int: String])] = macroNodeIterator.macros.compactMap { macro in
         // Extract the arguments.
         var anyArgumentMismatches = false
         let arguments: [Int: String] = zip(macro.macroLines, instructions).reduce([:], { (iter, zipped) -> [Int: String] in

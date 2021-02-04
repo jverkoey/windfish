@@ -1,6 +1,6 @@
 import Foundation
 
-extension Disassembler.Configuration {
+extension Disassembler.MutableConfiguration {
   func shouldTerminateLinearSweep(at location: Cartridge.Location) -> Bool {
     return softTerminators[location] != nil
   }

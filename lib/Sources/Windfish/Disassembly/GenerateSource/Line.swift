@@ -31,7 +31,7 @@ extension Disassembler {
       case text(RGBDS.Statement)
       case jumpTable(String, Int)
       case unknown(RGBDS.Statement)
-      case global(RGBDS.Statement, dataTypeName: String, dataType: Configuration.Datatype)
+      case global(RGBDS.Statement, dataTypeName: String, dataType: MutableConfiguration.Datatype)
     }
 
     init(semantic: Semantic, address: LR35902.Address? = nil, bank: Cartridge.Bank? = nil, scope: String? = nil, data: Data? = nil) {

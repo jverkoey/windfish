@@ -4,11 +4,11 @@ import RGBDS
 
 extension Disassembler {
   typealias EncounteredMacro = (
-    macro: Disassembler.Configuration.Macro,
+    macro: Disassembler.MutableConfiguration.Macro,
     arguments: [Int: String],
     rawArguments: [Int: String]
   )
-  private typealias DatatypeElement = Dictionary<String, Configuration.Datatype>.Element
+  private typealias DatatypeElement = Dictionary<String, MutableConfiguration.Datatype>.Element
 
   func createMacrosSource(macrosToWrite: [EncounteredMacro]) -> Source.FileDescription? {
     guard !macrosToWrite.isEmpty else {

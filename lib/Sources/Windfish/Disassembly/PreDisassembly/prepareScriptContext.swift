@@ -50,7 +50,7 @@ extension Disassembler {
       print(value.hexString)
     }
 
-    let scripts: [String: Configuration.Script] = configuration.allScripts()
+    let scripts: [String: MutableConfiguration.Script] = configuration.allScripts()
     for script in scripts.values {
       script.context.setObject(getROMData, forKeyedSubscript: "getROMData" as NSString)
       script.context.setObject(registerText, forKeyedSubscript: "registerText" as NSString)

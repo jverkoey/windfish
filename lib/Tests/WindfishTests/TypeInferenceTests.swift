@@ -1,14 +1,14 @@
 import XCTest
 @testable import Windfish
 
-extension Disassembler.Configuration.Macro: Equatable {
-  public static func == (lhs: Disassembler.Configuration.Macro, rhs: Disassembler.Configuration.Macro) -> Bool {
+extension Disassembler.MutableConfiguration.Macro: Equatable {
+  public static func == (lhs: Disassembler.MutableConfiguration.Macro, rhs: Disassembler.MutableConfiguration.Macro) -> Bool {
     return lhs.name == rhs.name && lhs.validArgumentValues == rhs.validArgumentValues && lhs.macroLines == rhs.macroLines
   }
 }
 
-extension Disassembler.Configuration.MacroNode: Equatable {
-  public static func == (lhs: Disassembler.Configuration.MacroNode, rhs: Disassembler.Configuration.MacroNode) -> Bool {
+extension Disassembler.MutableConfiguration.MacroNode: Equatable {
+  public static func == (lhs: Disassembler.MutableConfiguration.MacroNode, rhs: Disassembler.MutableConfiguration.MacroNode) -> Bool {
     return lhs.macros == rhs.macros && lhs.children == rhs.children
   }
 
@@ -210,13 +210,13 @@ jr   z, #2
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
-    let tree = Disassembler.Configuration.MacroNode(
+    let tree = Disassembler.MutableConfiguration.MacroNode(
       children: [
-        .arg(.ld(.a, .imm16addr)): Disassembler.Configuration.MacroNode(
+        .arg(.ld(.a, .imm16addr)): Disassembler.MutableConfiguration.MacroNode(
           children: [
-            .instruction(.init(spec: .and(.a))): Disassembler.Configuration.MacroNode(
+            .instruction(.init(spec: .and(.a))): Disassembler.MutableConfiguration.MacroNode(
               children: [
-                .arg(.jr(.z, .simm8)): Disassembler.Configuration.MacroNode(
+                .arg(.jr(.z, .simm8)): Disassembler.MutableConfiguration.MacroNode(
                   children: [:],
                   macros: [
                     .init(
@@ -236,11 +236,11 @@ jr   z, #2
           ],
           macros: []
         ),
-        .arg(.ld(.a, .ffimm8addr)): Disassembler.Configuration.MacroNode(
+        .arg(.ld(.a, .ffimm8addr)): Disassembler.MutableConfiguration.MacroNode(
           children: [
-            .instruction(.init(spec: .and(.a))): Disassembler.Configuration.MacroNode(
+            .instruction(.init(spec: .and(.a))): Disassembler.MutableConfiguration.MacroNode(
               children: [
-                .arg(.jr(.z, .simm8)): Disassembler.Configuration.MacroNode(
+                .arg(.jr(.z, .simm8)): Disassembler.MutableConfiguration.MacroNode(
                   children: [:],
                   macros: [
                     .init(
@@ -296,11 +296,11 @@ inc [hl]
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
-    XCTAssertEqual(disassembly.configuration.macroTreeRoot(), Disassembler.Configuration.MacroNode(
+    XCTAssertEqual(disassembly.configuration.macroTreeRoot(), Disassembler.MutableConfiguration.MacroNode(
       children: [
-        .arg(.ld(.hl, .imm16)): Disassembler.Configuration.MacroNode(
+        .arg(.ld(.hl, .imm16)): Disassembler.MutableConfiguration.MacroNode(
           children: [
-            .instruction(.init(spec: .inc(.hladdr))): Disassembler.Configuration.MacroNode(
+            .instruction(.init(spec: .inc(.hladdr))): Disassembler.MutableConfiguration.MacroNode(
               children: [:],
               macros: [
                 .init(
@@ -430,13 +430,13 @@ call #1
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
 
-    XCTAssertEqual(disassembly.configuration.macroTreeRoot(), Disassembler.Configuration.MacroNode(
+    XCTAssertEqual(disassembly.configuration.macroTreeRoot(), Disassembler.MutableConfiguration.MacroNode(
       children: [
-        .arg(.ld(.a, .imm8)): Disassembler.Configuration.MacroNode(
+        .arg(.ld(.a, .imm8)): Disassembler.MutableConfiguration.MacroNode(
           children: [
-            .instruction(.init(spec: .ld(.imm16addr, .a), immediate: .imm16(0x2100))): Disassembler.Configuration.MacroNode(
+            .instruction(.init(spec: .ld(.imm16addr, .a), immediate: .imm16(0x2100))): Disassembler.MutableConfiguration.MacroNode(
               children: [
-                .arg(.call(nil, .imm16)): Disassembler.Configuration.MacroNode(
+                .arg(.call(nil, .imm16)): Disassembler.MutableConfiguration.MacroNode(
                   children: [:],
                   macros:[
                     .init(

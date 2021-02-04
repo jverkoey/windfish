@@ -5,7 +5,7 @@ extension Disassembler {
   final class BankWorker {
     // Initialization data
     let bank: Cartridge.Bank
-    let context: DisassemblerContext
+    let context: Configuration
     private let cartridgeSize: Int
     private let memory: DisassemblerMemory
 
@@ -13,11 +13,11 @@ extension Disassembler {
     let queue: DispatchQueue
     var runs: [Run] = []
 
-    private let linearSweepDidSteps: [Configuration.Script]
-    private let linearSweepWillStarts: [Configuration.Script]
-    private let linearSweepScripts: [Configuration.Script]
+    private let linearSweepDidSteps: [MutableConfiguration.Script]
+    private let linearSweepWillStarts: [MutableConfiguration.Script]
+    private let linearSweepScripts: [MutableConfiguration.Script]
 
-    init(bank: Cartridge.Bank, context: DisassemblerContext) {
+    init(bank: Cartridge.Bank, context: Configuration) {
       self.bank = bank
       self.context = context
       self.cartridgeSize = context.cartridgeData.count
@@ -28,11 +28,11 @@ extension Disassembler {
                                  autoreleaseFrequency: .workItem,
                                  target: nil)
 
-      let scripts: [String: Configuration.Script] = context.allScripts()
-      var linearSweepDidSteps: [Configuration.Script] = []
-      var linearSweepWillStarts: [Configuration.Script] = []
-      var linearSweepScripts: [Configuration.Script] = []
-      for script: Configuration.Script in scripts.values {
+      let scripts: [String: MutableConfiguration.Script] = context.allScripts()
+      var linearSweepDidSteps: [MutableConfiguration.Script] = []
+      var linearSweepWillStarts: [MutableConfiguration.Script] = []
+      var linearSweepScripts: [MutableConfiguration.Script] = []
+      for script: MutableConfiguration.Script in scripts.values {
         var hasLinearSweepEvent: Bool = false
         let copiedScript = script.copy()
         if script.linearSweepDidStep != nil {

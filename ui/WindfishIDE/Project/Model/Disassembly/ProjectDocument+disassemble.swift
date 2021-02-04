@@ -29,7 +29,7 @@ extension ProjectDocument {
         let mappingDict = dataType.mappings.reduce(into: [:]) { accumulator, mapping in
           accumulator[mapping.value] = mapping.name
         }
-        let representation: Disassembler.Configuration.Datatype.Representation
+        let representation: Disassembler.MutableConfiguration.Datatype.Representation
         switch dataType.representation {
         case DataType.Representation.binary:
           representation = .binary

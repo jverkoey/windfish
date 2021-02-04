@@ -60,7 +60,7 @@ extension Disassembler {
    */
   class func trace(range: Range<Cartridge.Location>,
                    cpu: LR35902 = LR35902(),
-                   context: DisassemblerContext,
+                   context: Configuration,
                    router: BankRouter,
                    step: ((LR35902.Instruction, Cartridge.Location, LR35902) -> Void)? = nil) {
     let bank: Cartridge.Bank = range.lowerBound.bank

@@ -1,7 +1,7 @@
 import Foundation
 import JavaScriptCore
 
-extension Disassembler.Configuration {
+extension Disassembler.MutableConfiguration {
   final class Script {
     init(source: String) {
       self.source = source

@@ -1,6 +1,6 @@
 import Foundation
 
-extension Disassembler.Configuration {
+extension Disassembler.MutableConfiguration {
   final class Global {
     let name: String
     let dataType: String?
@@ -15,11 +15,11 @@ extension Disassembler.Configuration {
     }
   }
 
-  func allGlobals() -> [LR35902.Address: Disassembler.Configuration.Global] {
+  func allGlobals() -> [LR35902.Address: Disassembler.MutableConfiguration.Global] {
     return globals
   }
 
-  func global(at address: LR35902.Address) -> Disassembler.Configuration.Global? {
+  func global(at address: LR35902.Address) -> Disassembler.MutableConfiguration.Global? {
     return globals[address]
   }
 
