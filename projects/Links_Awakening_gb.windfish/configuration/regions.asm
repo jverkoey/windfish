@@ -64,6 +64,8 @@ setRegion: ; [Function] $00:$28AD [0]
 
 initializeBGDAT0: ; [Function] $00:$28A8 [0]
 
+copyHLToDE: ; [Function] $00:$28C5 [0]
+
 tile_link_walking: ; [Image (2bpp)] $0C:$4000 [64]
 
 tile_sword_vert: ; [Image (2bpp)] $0C:$4040 [32]
@@ -89,3 +91,17 @@ DMARoutine: ; [Region] $01:$7D27 [10]
 copyDMARoutine: ; [Function] $01:$7D19 [0]
 
 copyInstructions: ; [Label] $01:$7D20 [0]
+
+resetHardware: ; [Label] $01:$40CE [0]
+
+tile_0C_4160: ; [Image (2bpp)] $0C:$4160 [32]
+
+tile_0c_4180: ; [Image (2bpp)] $0C:$4180 [32]
+
+tile_0C_41A0: ; [Image (2bpp)] $0C:$41A0 [32]
+
+tile_0C_41C0: ; [Image (2bpp)] $0C:$41C0 [32]
+
+tile_0C_41E0: ; [Image (2bpp)] $0C:$41E0 [32]
+
+tile_fairy: ; [Image (2bpp)] $0C:$4200 [32]

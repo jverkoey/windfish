@@ -83,7 +83,7 @@ toc_01_40C2:
     call toc_01_5B94
     call toc_01_2985
     call toc_01_5F1A
-toc_01_40C2.toc_01_40CE:
+toc_01_40C2.resetHardware:
     assign [gbLCDC], LCDCF_BG_DISPLAY | LCDCF_OBJ_16_16 | LCDCF_OBJ_DISPLAY | LCDCF_ON | LCDCF_TILEMAP_9C00
     ld   [wLCDCStash], a
     assign [gbWX], 7

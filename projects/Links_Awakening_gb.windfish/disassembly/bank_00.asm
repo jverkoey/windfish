@@ -83,7 +83,7 @@ toc_01_007A:
     ld   de, $89A0
 toc_01_007A.toc_01_0080:
     ld   bc, $0030
-    call toc_01_28C5
+    call copyHLToDE
     clear [hNeedsUpdatingBGTiles]
     ld   [hBGTilesLoadingStage], a
 toc_01_007A.toc_01_008B:
@@ -169,7 +169,7 @@ main:
     changebank $01
     call copyDMARoutine
     call $FFC0
-    call toc_01_40C2.toc_01_40CE
+    call toc_01_40C2.resetHardware
     call JumpTable_2B6B_00
     assign [gbSTAT], STATF_LYC | STATF_LYCF
     assign [gbLYC], 79
@@ -791,7 +791,7 @@ toc_01_05C0:
 
 toc_01_05C0.else_01_062E:
     ld   bc, $0040
-    call toc_01_28C5
+    call copyHLToDE
 toc_01_05C0.else_01_0634:
     ld   a, [hBGTilesLoadingStage]
     inc  a
@@ -833,7 +833,7 @@ toc_01_05C0.else_01_0643:
     ld   l, $00
     add  hl, bc
     ld   bc, $0040
-    call toc_01_28C5
+    call copyHLToDE
     ld   a, [hBGTilesLoadingStage]
     inc  a
     ld   [hBGTilesLoadingStage], a
@@ -898,7 +898,7 @@ toc_01_05C0.else_01_0688:
     pop  de
     pop  hl
     ld   bc, $0040
-    call toc_01_28C5
+    call copyHLToDE
     ld   a, [hEnemiesTilesLoadingStage]
     inc  a
     ld   [hEnemiesTilesLoadingStage], a
@@ -961,7 +961,7 @@ toc_01_05C0.else_01_06F4:
     pop  de
     pop  hl
     ld   bc, $0040
-    call toc_01_28C5
+    call copyHLToDE
     ld   a, [$C10F]
     inc  a
     ld   [$C10F], a
@@ -1002,7 +1002,7 @@ toc_01_0783:
     ld   l, a
     changebank $0C
     ld   bc, $0040
-    call toc_01_28C5
+    call copyHLToDE
     ifEq [hNeedsUpdatingBGTiles], $0A, .else_01_07B5
 
     cp   $0D
@@ -1094,7 +1094,7 @@ toc_01_07C9.else_01_0813:
     ld   hl, $7E00
     add  hl, bc
     ld   bc, $0040
-    call toc_01_28C5
+    call copyHLToDE
     ld   a, [hBGTilesLoadingStage]
     inc  a
     ld   [hBGTilesLoadingStage], a
@@ -1180,7 +1180,7 @@ toc_01_08AC:
 toc_01_08C6:
     changebank $0C
     ld   bc, $0040
-    call toc_01_28C5
+    call copyHLToDE
     changebank $01
     ret
 
@@ -3549,7 +3549,7 @@ toc_01_1A6B.else_01_1A87:
     rl   b
     add  hl, bc
     ld   bc, $0040
-    jp   toc_01_28C5
+    jp   copyHLToDE
 
     db   $20, $60, $A0, $E0, $E0, $E0, $A0, $60
 
@@ -3578,7 +3578,7 @@ toc_01_1AA9:
     ld   a, [$D009]
     ld   d, a
     ld   bc, $0020
-    call toc_01_28C5
+    call copyHLToDE
 toc_01_1AA9.return_01_1ADE:
     ret
 
@@ -3747,7 +3747,7 @@ JumpTable_1BCD_00.toc_01_1BE5:
     ld   de, $96C0
 JumpTable_1BCD_00.toc_01_1BE8:
     ld   bc, $0040
-    call toc_01_28C5
+    call copyHLToDE
     jp   JumpTable_1C5A_00.else_01_1CCC
 
 JumpTable_1BF1_00:
@@ -4005,7 +4005,7 @@ toc_01_1D5C.toc_01_1D7B:
     add  hl, de
     pop  de
     ld   bc, $0040
-    call toc_01_28C5
+    call copyHLToDE
     clear [$FFA5]
     changebank $0C
     ret
@@ -4115,7 +4115,7 @@ toc_01_1DEE.toc_01_1E3E:
     ldi  a, [hl]
     ld   h, [hl]
     ld   l, a
-    jp   toc_01_28C5
+    jp   copyHLToDE
 
 toc_01_1DEE.else_01_1E47:
     jp   JumpTable_1C5A_00.else_01_1CCC
@@ -4123,7 +4123,7 @@ toc_01_1DEE.else_01_1E47:
 toc_01_1E4A:
     ld   bc, $0040
 toc_01_1E4A.toc_01_1E4D:
-    call toc_01_28C5
+    call copyHLToDE
 toc_01_1E4A.toc_01_1E50:
     clear [$FFA5]
     changebank $0C
@@ -5727,19 +5727,19 @@ initializeBGDAT0.loopSetRegion:
 
 toc_01_28B9:
     ld   [$2100], a
-    call toc_01_28C5
+    call copyHLToDE
     changebank $01
     ret
 
 
-toc_01_28C5:
+copyHLToDE:
     ldi  a, [hl]
     ld   [de], a
     inc  de
     dec  bc
     ld   a, b
     or   c
-    jr   nz, toc_01_28C5
+    jr   nz, copyHLToDE
 
     ret
 
@@ -6001,56 +6001,56 @@ JumpTable_29FA_00:
     ld   hl, $6800
     ld   de, $9000
     ld   bc, $0800
-    call toc_01_28C5
+    call copyHLToDE
     ld   hl, $7000
     ld   de, $8800
     ld   bc, $0800
-    jp   toc_01_28C5
+    jp   copyHLToDE
 
 JumpTable_2A17_00:
     call JumpTable_2A26_00
     ld   de, $8400
     ld   hl, $7600
     ld   bc, $0100
-    jp   toc_01_28C5
+    jp   copyHLToDE
 
 JumpTable_2A26_00:
     changebank $13
     ld   hl, $4000
     ld   de, $8000
     ld   bc, $1800
-    call toc_01_28C5
+    call copyHLToDE
     changebank $0C
     ld   hl, $57E0
     ld   de, $97F0
     ld   bc, $0010
-    call toc_01_28C5
+    call copyHLToDE
     changebank $12
     ld   hl, $7500
     ld   de, $8000
     ld   bc, $0040
-    call toc_01_28C5
+    call copyHLToDE
     ld   de, $8D00
     ld   hl, $7500
     ld   bc, $0200
-    jp   toc_01_28C5
+    jp   copyHLToDE
 
 JumpTable_2A65_00:
     changebank $0C
     ld   hl, $5000
     ld   de, $9000
     ld   bc, $0800
-    call toc_01_28C5
+    call copyHLToDE
     changebank $12
     ld   hl, $6000
     ld   de, $8000
     ld   bc, $0800
-    call toc_01_28C5
+    call copyHLToDE
     changebank $0F
     ld   hl, $6000
     ld   de, $8800
     ld   bc, $0800
-    jp   toc_01_28C5
+    jp   copyHLToDE
 
 JumpTable_2A98_00:
     ld   hl, $4000
@@ -6066,11 +6066,11 @@ JumpTable_2AA2_00.toc_01_2AA5:
     changebank $13
     ld   de, $8000
     ld   bc, $0800
-    call toc_01_28C5
+    call copyHLToDE
     ld   hl, $5800
     ld   de, $8800
     ld   bc, $1000
-    jp   toc_01_28C5
+    jp   copyHLToDE
 
 JumpTable_2ABF_00:
     call toc_01_0844
@@ -6082,13 +6082,13 @@ JumpTable_2ABF_00:
     ld   hl, $6600
     ld   de, $8000
     ld   bc, $0080
-    call toc_01_28C5
+    call copyHLToDE
     call toc_01_0844
     changebank $0C
     ld   hl, $4220
     ld   de, $8100
     ld   bc, $0020
-    jp   toc_01_28C5
+    jp   copyHLToDE
 
 JumpTable_2AF2_00:
     ld   hl, $7800
@@ -6102,16 +6102,16 @@ JumpTable_2AF7_00.toc_01_2AFC:
     ld   [$2100], a
     ld   de, $8000
     ld   bc, $0800
-    call toc_01_28C5
+    call copyHLToDE
     changebank $13
     ld   hl, $7000
     ld   de, $8800
     ld   bc, $0800
-    call toc_01_28C5
+    call copyHLToDE
     ld   hl, $6800
     ld   de, $9000
     ld   bc, $0800
-    jp   toc_01_28C5
+    jp   copyHLToDE
 
 toc_01_2B25:
     push bc
@@ -6159,16 +6159,16 @@ JumpTable_2B6B_00:
     ld   hl, $4000
     ld   de, $8000
     ld   bc, $0400
-    call toc_01_28C5
+    call copyHLToDE
     call_changebank $0C
     ld   hl, $4800
     ld   de, $8800
     ld   bc, $1000
-    call toc_01_28C5
+    call copyHLToDE
     ld   hl, $47A0
     ld   de, $8E00
     ld   bc, $0020
-    call toc_01_28C5
+    call copyHLToDE
     call_changebank $01
     ret
 
@@ -6179,12 +6179,12 @@ JumpTable_2B9F_00:
     ld   hl, $4000
     ld   de, $8800
     ld   bc, $0400
-    call toc_01_28C5
+    call copyHLToDE
     call_changebank $0F
     ld   hl, $5000
     ld   de, $9000
     ld   bc, $0800
-    jp   toc_01_28C5
+    jp   copyHLToDE
 
 JumpTable_2BC4_00:
     call_changebank $01
@@ -6199,11 +6199,11 @@ JumpTable_2BC4_00:
     call_changebank $0D
     ld   de, $9100
     ld   bc, $0100
-    call toc_01_28C5
+    call copyHLToDE
     ld   hl, $4000
     ld   de, $9200
     ld   bc, $0600
-    call toc_01_28C5
+    call copyHLToDE
     changebank $01
     pop  de
     push de
@@ -6214,12 +6214,12 @@ JumpTable_2BC4_00:
     call toc_01_07C0
     ld   de, $9200
     ld   bc, $0200
-    call toc_01_28C5
+    call copyHLToDE
     changebank $0C
     ld   hl, $47C0
     ld   de, $DCC0
     ld   bc, $0040
-    call toc_01_28C5
+    call copyHLToDE
     call toc_01_2CA1
     changebank $01
     pop  de
@@ -6230,7 +6230,7 @@ JumpTable_2BC4_00:
     call_changebank $12
     ld   de, $8F00
     ld   bc, $0100
-    call toc_01_28C5
+    call copyHLToDE
     ld   hl, $7D00
     ifLt [$FFF7], $0A, .else_01_2C4A
 
@@ -6239,7 +6239,7 @@ JumpTable_2BC4_00:
 JumpTable_2BC4_00.else_01_2C4A:
     ld   de, $8C00
     ld   bc, $0300
-    call toc_01_28C5
+    call copyHLToDE
 JumpTable_2BC4_00.toc_01_2C53:
     ifNot [$DB4B], .else_01_2C5C
 
@@ -6266,11 +6266,11 @@ JumpTable_2C7E_00:
     ld   hl, $5200
     ld   de, $9200
     ld   bc, $0600
-    call toc_01_28C5
+    call copyHLToDE
     ld   hl, $4C00
     ld   de, $8C00
     ld   bc, $0400
-    call toc_01_28C5
+    call copyHLToDE
     call toc_01_2CA1
     jp   JumpTable_2BC4_00.toc_01_2C53
 
@@ -6281,11 +6281,11 @@ toc_01_2CA1:
     ld   hl, $4800
     ld   de, $8800
     ld   bc, $0800
-    call toc_01_28C5
+    call copyHLToDE
     ld   hl, $4200
     ld   de, $8200
     ld   bc, $0100
-    call toc_01_28C5
+    call copyHLToDE
     ret
 
 
@@ -6294,34 +6294,34 @@ JumpTable_2CC2_00:
     ld   hl, $7D31
     ld   de, $8700
     ld   bc, $0080
-    call toc_01_28C5
+    call copyHLToDE
     call_changebank $10
     ld   hl, $5400
     ld   de, $8000
     ld   bc, $0600
-    call toc_01_28C5
+    call copyHLToDE
     ld   hl, $4000
     ld   de, $8800
     ld   bc, $1000
-    jp   toc_01_28C5
+    jp   copyHLToDE
 
 JumpTable_2CF0_00:
     call_changebank $0F
     ld   hl, $4900
     ld   de, $8800
     ld   bc, $0700
-    jp   toc_01_28C5
+    jp   copyHLToDE
 
 JumpTable_2D01_00:
     call_changebank $0C
     ld   hl, $7800
     ld   de, $8F00
     ld   bc, $0800
-    call toc_01_28C5
+    call copyHLToDE
     ld   hl, $5000
     ld   de, $8200
     ld   bc, $0100
-    jp   toc_01_28C5
+    jp   copyHLToDE
 
 JumpTable_2D1E_00:
     ld   hl, $7000
@@ -6337,36 +6337,36 @@ JumpTable_2D28_00.toc_01_2D2B:
     call_changebank $10
     ld   de, $9000
     ld   bc, $0800
-    jp   toc_01_28C5
+    jp   copyHLToDE
 
 JumpTable_2D39_00:
     changebank $13
     ld   hl, $7C00
     ld   de, $8C00
     ld   bc, $0400
-    call toc_01_28C5
+    call copyHLToDE
     ld   hl, $6800
     ld   de, $9000
     ld   bc, $0400
-    jp   toc_01_28C5
+    jp   copyHLToDE
 
 JumpTable_2D56_00:
     call_changebank $10
     ld   hl, $6700
     ld   de, $8400
     ld   bc, $0400
-    call toc_01_28C5
+    call copyHLToDE
     ld   hl, $6000
     ld   de, $9000
     ld   bc, $0600
-    jp   toc_01_28C5
+    jp   copyHLToDE
 
 JumpTable_2D73_00:
     call_changebank $0F
     ld   hl, $4400
     ld   de, $8800
     ld   bc, $0500
-    jp   toc_01_28C5
+    jp   copyHLToDE
 
     db   $00, $11, $0E, $12
 
@@ -6447,7 +6447,7 @@ JumpTable_2D88_00.toc_01_2DD8:
     ld   hl, $4000
     add  hl, bc
     ld   bc, $0100
-    call toc_01_28C5
+    call copyHLToDE
     ld   a, [$FFD7]
     inc  a
     cp   $04
@@ -6475,7 +6475,7 @@ JumpTable_2D88_00.else_01_2E32:
 JumpTable_2D88_00.else_01_2E38:
     ld   de, $9000
     ld   bc, $0800
-    call toc_01_28C5
+    call copyHLToDE
     ret
 
 
@@ -6486,7 +6486,7 @@ JumpTable_2D88_00.else_01_2E42:
     add  a, $50
     ld   h, a
     ld   bc, $0100
-    call toc_01_28C5
+    call copyHLToDE
 JumpTable_2D88_00.return_01_2E54:
     ret
 
@@ -6499,7 +6499,7 @@ JumpTable_2D88_00.else_01_2E55:
     ld   h, a
     ld   l, $00
     ld   bc, $0200
-    call toc_01_28C5
+    call copyHLToDE
 JumpTable_2D88_00.return_01_2E6B:
     ret
 
@@ -8993,7 +8993,7 @@ toc_01_3FBD:
     ld   hl, $5919
     ld   de, $8460
     ld   bc, $0010
-    call toc_01_28C5
+    call copyHLToDE
     ld   hl, $5929
     jr   toc_01_3FD3.toc_01_3FE7
 
@@ -9002,12 +9002,12 @@ toc_01_3FD3:
     ld   hl, $5939
     ld   de, $8460
     ld   bc, $0010
-    call toc_01_28C5
+    call copyHLToDE
     ld   hl, $5949
 toc_01_3FD3.toc_01_3FE7:
     ld   de, $8480
     ld   bc, $0010
-    call toc_01_28C5
+    call copyHLToDE
     clear [$FFA5]
     changebank $0C
     jp   JumpTable_1C5A_00.else_01_1CCC

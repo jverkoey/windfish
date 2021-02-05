@@ -4992,7 +4992,7 @@ toc_02_6A9B:
 toc_02_6A9B.else_02_6AC3:
     ld   de, $D480
     ld   bc, $0040
-    call toc_01_28C5
+    call copyHLToDE
     ld   d, $00
     ld   e, $00
 toc_02_6A9B.toc_02_6AD0:
