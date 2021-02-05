@@ -286,7 +286,7 @@ toc_01_4420:
     ld   bc, $0E21
     ld   b, a
     ld   a, $08
-    call toc_01_05CF
+    call cbcallWithoutInterrupts
     ret
 
 

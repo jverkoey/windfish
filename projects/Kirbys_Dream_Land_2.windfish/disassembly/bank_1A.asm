@@ -62,7 +62,7 @@ initialize:
     assign [$DA28], $C2
     assign [$DA10], $C3
     ld   hl, $0342
-    call toc_01_0604
+    call stashHL
     ld   hl, $DA13
     ld   a, $C3
     ldi  [hl], a

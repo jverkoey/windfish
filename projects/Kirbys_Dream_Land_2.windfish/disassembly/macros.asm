@@ -1,4 +1,10 @@
 
+_ifZero: MACRO
+    ld   a, \1
+    and  a
+    jr   nz, \2
+    ENDM
+
 assign: MACRO
     ld   a, \2
     ld   \1, a
@@ -20,10 +26,27 @@ clear: MACRO
     ld   \1, a
     ENDM
 
+copyFromTo: MACRO
+    ld   a, \1
+    ld   \2, a
+    ENDM
+
 ifEq: MACRO
     ld   a, \1
     cp   \2
     jr   nz, \3
+    ENDM
+
+ifGte: MACRO
+    ld   a, \1
+    cp   \2
+    jr   nc, \3
+    ENDM
+
+ifNe: MACRO
+    ld   a, \1
+    cp   \2
+    jr   z, \3
     ENDM
 
 ifNotZero: MACRO

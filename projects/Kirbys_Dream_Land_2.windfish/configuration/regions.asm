@@ -58,6 +58,12 @@ copyHLToFF30: ; [Label] $00:$3001 [0]
 
 loop: ; [Label] $00:$3006 [0]
 
+stashHL: ; [Label] $00:$0604 [0]
+
+cbcallWithoutInterrupts: ; [Label] $00:$05CF [0]
+
+loadBank: ; [Label] $00:$05DD [0]
+
 initialize: ; [Function] $1A:$4000 [0]
 
 waitForVBlank: ; [Label] $1A:$4003 [0]
@@ -69,6 +75,8 @@ initializeHardware: ; [Function] $1E:$4232 [0]
 toc_07_57BC: ; [Function] $07:$57BC [0]
 
 toc_07_401D: ; [Function] $07:$401D [0]
+
+toc_08_4062: ; [Function] $08:$4062 [0]
 
 data_446E: ; [Data] $1E:$446E [48]
 
