@@ -148,6 +148,8 @@ verifySaveFiles: ; [Label] $01:$460F [0]
 
 createDebugSave: ; [Label] $00:$4628 [0]
 
+waitForRenderRequest: ; [Label] $00:$03CE [0]
+
 loop: ; [Label] $1F:$400C [0]
 
 _clearD300: ; [Label] $1F:$4009 [0]

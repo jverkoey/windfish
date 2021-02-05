@@ -185,7 +185,7 @@ main:
 
 .toc_01_01A6:
     assign [hIsRenderingFrame], true
-    ifNotZero [$C500], .else_01_01BE
+    ifNotZero [wAlternateBackgroundEnabled], .else_01_01BE
 
     ifNe [wGameMode], GAMEMODE_WORLD, .else_01_01BE
 
@@ -195,20 +195,18 @@ main:
     jr   .toc_01_01C4
 
 .else_01_01BE:
-    ld   hl, $C156
+    ld   hl, wScreenShakeVertical
     ld   a, [hBaseScrollY]
     add  a, [hl]
 .toc_01_01C4:
     ld   [gbSCY], a
     ld   a, [hBaseScrollX]
-    ld   hl, $C155
+    ld   hl, wScreenShakeHorizontal
     add  a, [hl]
     ld   hl, $C1BF
     add  a, [hl]
     ld   [gbSCX], a
-    ld   a, [wTileMapToLoad]
-    and  a
-    jr   nz, .else_01_01DF
+    _ifZero [wTileMapToLoad], .else_01_01DF
 
     ifEq [$D6FF], $00, .else_01_0209
 
@@ -423,9 +421,7 @@ main:
 
     ifNotZero [DEBUG_TOOL1], .else_01_03AA
 
-    ld   a, [$D6FC]
-    and  a
-    jr   nz, .else_01_038A
+    _ifZero [$D6FC], .else_01_038A
 
     ld   a, [hPressedButtonsMask]
     and  J_DOWN | J_LEFT | J_RIGHT | J_UP
@@ -447,9 +443,7 @@ main:
     jr   .else_01_03BD
 
 .else_01_03A4:
-    ld   a, [$D6FC]
-    and  a
-    jr   nz, .else_01_03BD
+    _ifZero [$D6FC], .else_01_03BD
 
 .else_01_03AA:
     call_changebank $01
@@ -463,8 +457,8 @@ main:
     changebank $0C
     clear [hIsRenderingFrame]
     halt
-.loop_01_03CE:
-    ifNotZero [hNeedsRenderingFrame], .loop_01_03CE
+.waitForRenderRequest:
+    ifNotZero [hNeedsRenderingFrame], .waitForRenderRequest
 
     clear [hNeedsRenderingFrame]
     jp   .toc_01_01A6
@@ -677,9 +671,7 @@ vblank:
     jr   .else_01_05B6
 
 .else_01_0566:
-    ld   a, [wTileMapToLoad]
-    and  a
-    jr   nz, .else_01_05B6
+    _ifZero [wTileMapToLoad], .else_01_05B6
 
     copyFromTo [hNeedsUpdatingBGTiles], [$FFE8]
     ld   hl, hNeedsUpdatingEnemiesTiles
@@ -1102,9 +1094,7 @@ toc_01_07C9:
 toc_01_0844:
     changebank $1F
     call toc_1F_4006
-    ld   a, [$FFF3]
-    and  a
-    jr   nz, .return_01_0876
+    _ifZero [$FFF3], .return_01_0876
 
     ifNotZero [$C10B], .else_01_0866
 
@@ -1205,17 +1195,13 @@ toc_01_08E2:
 
 toc_01_08EC:
     push af
-    ld   a, [$C18F]
-    and  a
-    jr   nz, .else_01_0907
+    _ifZero [$C18F], .else_01_0907
 
     ld   [$C1CF], a
     inc  a
     ld   [$C18F], a
     ld   [$C5A6], a
-    ld   a, [$C19D]
-    and  a
-    jr   nz, .else_01_0907
+    _ifZero [$C19D], .else_01_0907
 
     assign [$FFF2], $02
 .else_01_0907:
@@ -1574,9 +1560,7 @@ JumpTable_0B40_00:
 
 JumpTable_0B53_00:
     call_changebank $02
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .else_01_0B9A
+    _ifZero [wDialogState], .else_01_0B9A
 
     ld   hl, $FFB4
     ld   a, [hl]
@@ -1585,9 +1569,7 @@ JumpTable_0B53_00:
 
     ifNe [wWYStash], 128, .else_01_0B80
 
-    ld   a, [$C14F]
-    and  a
-    jr   nz, .else_01_0B80
+    _ifZero [$C14F], .else_01_0B80
 
     dec  [hl]
     jr   nz, .else_01_0B80
@@ -1596,9 +1578,7 @@ JumpTable_0B53_00:
     call toc_01_5FA6
     call toc_01_07C0
 .else_01_0B80:
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .else_01_0B9A
+    _ifZero [wDialogState], .else_01_0B9A
 
     ifNotZero [$C1BC], .else_01_0B9A
 
@@ -1688,9 +1668,7 @@ toc_01_0C40:
     ld   [$C145], a
     ifNotZero [$C1A9], toc_01_0C8C
 
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .else_01_0C7A
+    _ifZero [wDialogState], .else_01_0C7A
 
     ld   hl, $C1AA
     dec  [hl]
@@ -2149,9 +2127,7 @@ toc_01_0F76:
     ld   hl, $C480
     add  hl, de
     ld   [hl], $03
-    ld   a, [$FFF9]
-    and  a
-    jr   nz, .else_01_0FD6
+    _ifZero [$FFF9], .else_01_0FD6
 
     assign [$FFF2], $09
     jr   .toc_01_0FDB
@@ -2529,9 +2505,7 @@ toc_01_122F:
     ld   a, [hl]
     ld   [$FFF4], a
     call toc_01_1283
-    ld   a, [$C146]
-    and  a
-    jr   nz, .else_01_1269
+    _ifZero [$C146], .else_01_1269
 
     call toc_01_093B
     call toc_01_1495
@@ -2584,9 +2558,7 @@ toc_01_12B6:
     and  a
     ret  nz
 
-    ld   a, [$C14A]
-    and  a
-    jr   nz, .else_01_12C7
+    _ifZero [$C14A], .else_01_12C7
 
     ld   a, [$C16A]
     cp   $05
@@ -2677,9 +2649,7 @@ toc_01_12B6:
     ld   a, c
     ld   [$FFF1], a
     call toc_01_20A6
-    ld   a, [$C14A]
-    and  a
-    jr   nz, .else_01_135A
+    _ifZero [$C14A], .else_01_135A
 
     ifNe [$C16A], $05, .else_01_135A
 
@@ -3155,9 +3125,7 @@ JumpTable_15B3_00:
 .else_01_16AD:
     ld   a, e
     ld   [$DBAE], a
-    ld   a, [$FFE6]
-    and  a
-    jr   nz, .else_01_16D3
+    _ifZero [$FFE6], .else_01_16D3
 
     clear [$D47C]
     ifGte [$FFF7], $0A, .else_01_16D3
@@ -3175,13 +3143,9 @@ JumpTable_15B3_00:
     ld   a, [hl]
     ld   [$DB9E], a
     pop  hl
-    ld   a, [$FFF9]
-    and  a
-    jr   nz, .else_01_172E
+    _ifZero [$FFF9], .else_01_172E
 
-    ld   a, [$FFE4]
-    and  a
-    jr   nz, .return_01_172D
+    _ifZero [$FFE4], .return_01_172D
 
     ifNotZero [$DBA5], .else_01_1716
 
@@ -3460,18 +3424,12 @@ toc_01_19EF:
 .else_01_1A27:
     ifEq [$C15C], $01, .else_01_1A63
 
-    ld   a, [hLinkWalksSlow]
-    and  a
-    jr   nz, .else_01_1A39
+    _ifZero [hLinkWalksSlow], .else_01_1A39
 
-    ld   a, [$C144]
-    and  a
-    jr   nz, .else_01_1A5E
+    _ifZero [$C144], .else_01_1A5E
 
 .else_01_1A39:
-    ld   a, [$C15A]
-    and  a
-    jr   nz, .else_01_1A44
+    _ifZero [$C15A], .else_01_1A44
 
     ld   hl, $48BE
     jr   .toc_01_1A66
@@ -3572,9 +3530,7 @@ toc_01_1AA9:
 .else_01_1ADF:
     ifNe [wGameMode], GAMEMODE_CREDITS, .else_01_1AEC
 
-    ld   a, [$FFA5]
-    and  a
-    jr   nz, .else_01_1B1B
+    _ifZero [$FFA5], .else_01_1B1B
 
     ret
 
@@ -4323,9 +4279,7 @@ toc_01_1E7B:
     and  %00110000
     jr   z, .else_01_1FFD
 
-    ld   a, [$FFF9]
-    and  a
-    jr   nz, .else_01_1FC8
+    _ifZero [$FFF9], .else_01_1FC8
 
     ifNe [hLinkDirection], DIRECTION_UP, .else_01_1FFD
 
@@ -4419,9 +4373,7 @@ toc_01_1E7B:
     cp   $20
     jr   z, .else_01_2081
 
-    ld   a, [$DBA5]
-    and  a
-    jr   nz, .return_01_207B
+    _ifZero [$DBA5], .return_01_207B
 
     ifEq [$FFD7], $5C, .else_01_208F
 
@@ -4765,9 +4717,7 @@ JumpTable_2253_00:
 
 
 JumpTable_2295_00:
-    ld   a, [$C1AB]
-    and  a
-    jr   nz, .return_01_22AF
+    _ifZero [$C1AB], .return_01_22AF
 
     ld   a, [$FFCC]
     and  %00110000
@@ -5167,9 +5117,7 @@ JumpTable_2521_00:
     cp   $FE
     jp   z, JumpTable_23B5_00.toc_01_2421
 
-    ld   a, [$C1CC]
-    and  a
-    jr   nz, .else_01_2542
+    _ifZero [$C1CC], .else_01_2542
 
     inc  a
     ld   [$C1CC], a
@@ -5555,9 +5503,7 @@ toc_01_27CA:
 
 
 toc_01_27D2:
-    ld   a, [$FFBC]
-    and  a
-    jr   nz, .else_01_27DF
+    _ifZero [$FFBC], .else_01_27DF
 
     changebank $1F
     call toc_1F_4003
@@ -5583,9 +5529,7 @@ toc_01_27ED:
 
 
 toc_01_27FE:
-    ld   a, [$C124]
-    and  a
-    jr   nz, .return_01_2838
+    _ifZero [$C124], .return_01_2838
 
     assign [gbP1], JOYPAD_BUTTONS
     ld   a, [gbP1]
@@ -5738,9 +5682,7 @@ toc_01_28CE:
     inc  de
     call toc_01_28F2
 .toc_01_28D8:
-    ld   a, [$C124]
-    and  a
-    jr   nz, .else_01_28ED
+    _ifZero [$C124], .else_01_28ED
 
 .toc_01_28DE:
     ld   a, [de]
@@ -5948,9 +5890,7 @@ toc_01_29B8:
     jp   toc_01_07C0
 
 toc_01_29C5:
-    ld   a, [$C5AC]
-    and  a
-    jr   nz, .return_01_29CF
+    _ifZero [$C5AC], .return_01_29CF
 
     assign [$FFF4], $2D
 .return_01_29CF:
@@ -6367,9 +6307,7 @@ JumpTable_2D88_00:
 
     ifNotZero [$DBA5], .else_01_2DB4
 
-    ld   a, [$FFF9]
-    and  a
-    jr   nz, .else_01_2DD7
+    _ifZero [$FFF9], .else_01_2DD7
 
     ifEq [$FFF7], $14, .else_01_2DD7
 
@@ -6771,9 +6709,7 @@ toc_01_2ED7:
     ld   c, a
     ld   a, [hl]
     ld   b, a
-    ld   a, [$DBA5]
-    and  a
-    jr   nz, .else_01_307D
+    _ifZero [$DBA5], .else_01_307D
 
 .toc_01_3072:
     ifLt [$FFF6], $80, .else_01_307D
@@ -6860,9 +6796,7 @@ toc_01_30DC:
     inc  bc
     ld   a, [$FFF8]
     ld   e, a
-    ld   a, [$DBA5]
-    and  a
-    jr   nz, toc_01_310D
+    _ifZero [$DBA5], toc_01_310D
 
     ld   a, [bc]
     sub  a, $F5
@@ -8047,9 +7981,7 @@ toc_01_3843:
 
     assign [$FFF3], $10
 .else_01_3851:
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .else_01_3864
+    _ifZero [wDialogState], .else_01_3864
 
     copyFromTo [$C111], [$C1A8]
     and  a
@@ -8086,9 +8018,7 @@ toc_01_3843:
     ld   [$C147], a
     ld   [$C5A8], a
     ld   [$D45E], a
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .else_01_38AB
+    _ifZero [wDialogState], .else_01_38AB
 
     ld   [$C1AD], a
 .else_01_38AB:
@@ -8140,9 +8070,7 @@ toc_01_38DD:
     call_changebank $19
     ifNe [$FFEB], $6A, .else_01_3902
 
-    ld   a, [hLinkWalksSlow]
-    and  a
-    jr   nz, .else_01_3908
+    _ifZero [hLinkWalksSlow], .else_01_3908
 
 .else_01_3902:
     ifNe [$FFEA], $07, .else_01_3910
@@ -8396,7 +8324,7 @@ toc_01_3C3B:
     ld   a, [$FFEC]
     ld   [de], a
     inc  de
-    ld   a, [$C155]
+    ld   a, [wScreenShakeHorizontal]
     ld   c, a
     ld   a, [$FFED]
     and  %00100000
@@ -8440,7 +8368,7 @@ toc_01_3C3B:
     ld   a, [$FFEC]
     ld   [de], a
     inc  de
-    ld   a, [$C155]
+    ld   a, [wScreenShakeHorizontal]
     ld   c, a
     ld   a, [$FFED]
     and  %00100000
@@ -8508,7 +8436,7 @@ toc_01_3CD0:
 .else_01_3CF5:
     ld   [de], a
     inc  de
-    ld   a, [$C155]
+    ld   a, [wScreenShakeHorizontal]
     ld   h, a
     ld   a, [$FFEE]
     add  a, $04
@@ -8563,7 +8491,7 @@ toc_01_3D26:
     inc  hl
     inc  de
     push bc
-    ld   a, [$C155]
+    ld   a, [wScreenShakeHorizontal]
     ld   c, a
     ld   a, [$FFEE]
     add  a, [hl]

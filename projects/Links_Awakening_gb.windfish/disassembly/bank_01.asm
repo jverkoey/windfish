@@ -158,11 +158,9 @@ toc_01_4184:
     db   $10, $10, $10, $10
 
 JumpTable_41C5_01:
-    clear [$C155]
-    ld   [$C156], a
-    ld   a, [$FFB7]
-    and  a
-    jr   nz, .else_01_4219
+    clear [wScreenShakeHorizontal]
+    ld   [wScreenShakeVertical], a
+    _ifZero [$FFB7], .else_01_4219
 
     assign [$FFB7], $10
     assign [$FF9C], $01
@@ -240,9 +238,7 @@ JumpTable_4253_01:
     db   $00, $04, $08, $0C, $10, $0C, $08, $04
 
 JumpTable_427F_01:
-    ld   a, [$FFB7]
-    and  a
-    jr   nz, .return_01_428D
+    _ifZero [$FFB7], .return_01_428D
 
     incAddr $FF9C
     assign [$D368], $03
@@ -410,9 +406,7 @@ JumpTable_433F_01:
     cp   $06
     jr   nz, .else_01_4393
 
-    ld   a, [$FFF9]
-    and  a
-    jr   nz, .else_01_43AD
+    _ifZero [$FFF9], .else_01_43AD
 
 .else_01_4393:
     call toc_01_5357
@@ -1125,9 +1119,7 @@ JumpTable_5018_01:
 
 toc_01_512A:
     clear [$FFF9]
-    ld   a, [$DB5A]
-    and  a
-    jr   nz, .else_01_5141
+    _ifZero [$DB5A], .else_01_5141
 
     ld   a, [$DB5B]
     ld   e, a
@@ -1175,9 +1167,7 @@ toc_01_512A:
     ld   [$DB8F], a
     ld   [$DB92], a
     ld   [$DB91], a
-    ld   a, [$DB6F]
-    and  a
-    jr   nz, .else_01_51A0
+    _ifZero [$DB6F], .else_01_51A0
 
     assign [$DB6F], $16
     assign [$DB70], $50
@@ -1767,9 +1757,7 @@ toc_01_5B6E:
 
 
 toc_01_5B94:
-    ld   a, [$DB5A]
-    and  a
-    jr   nz, .else_01_5BA8
+    _ifZero [$DB5A], .else_01_5BA8
 
     ld   a, [$DB5B]
     ld   e, a
@@ -2013,9 +2001,7 @@ toc_01_5D03:
 
     ifNe [$C173], $4F, .else_01_5D61
 
-    ld   a, [$C112]
-    and  a
-    jr   nz, .else_01_5D61
+    _ifZero [$C112], .else_01_5D61
 
     inc  hl
     inc  hl
@@ -2114,9 +2100,7 @@ toc_01_5D6B:
     cp   $02
     jr   nz, .else_01_5E37
 
-    ld   a, [$DBA5]
-    and  a
-    jr   nz, .else_01_5E37
+    _ifZero [$DBA5], .else_01_5E37
 
     ifLt [$FFF6], $40, .else_01_5E37
 
@@ -2375,9 +2359,7 @@ toc_01_5F62:
 toc_01_5FA6:
     ifNe [$C11C], $00, .return_01_5FBA
 
-    ld   a, [$C17B]
-    and  a
-    jr   nz, .return_01_5FBA
+    _ifZero [$C17B], .return_01_5FBA
 
     ld   a, [$FFF7]
     add  a, $56
@@ -2387,9 +2369,7 @@ toc_01_5FA6:
 
 
 toc_01_5FBB:
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .else_01_5FCB
+    _ifZero [wDialogState], .else_01_5FCB
 
     ifNotZero [$C3C7], .else_01_5FCB
 
@@ -3879,9 +3859,7 @@ toc_01_780F:
     ld   a, h
     ld   a, h
     ld   a, h
-    ld   a, [$D00A]
-    and  a
-    jr   nz, .else_01_7A51
+    _ifZero [$D00A], .else_01_7A51
 
     assign [$D00B], $F4
     assign [$D00C], $9B
@@ -4327,9 +4305,7 @@ toc_01_7EE8:
     ld   de, $9822
     ld   bc, $0000
 .toc_01_7EEE:
-    ld   a, [$C5A2]
-    and  a
-    jr   nz, .else_01_7F06
+    _ifZero [$C5A2], .else_01_7F06
 
     ifEq [wGameMode], GAMEMODE_CREDITS, .else_01_7F06
 

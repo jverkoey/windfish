@@ -457,9 +457,7 @@ toc_1E_43BB:
 
 toc_1E_4440:
     push hl
-    ld   a, [$D371]
-    and  a
-    jr   nz, .else_1E_444F
+    _ifZero [$D371], .else_1E_444F
 
     clear [gbAUD3ENA]
     ld   l, e
@@ -1140,9 +1138,7 @@ toc_1E_476D:
     jp   .else_1E_478F
 
 toc_1E_47F1:
-    ld   a, [$D31B]
-    and  a
-    jr   nz, .else_1E_4818
+    _ifZero [$D31B], .else_1E_4818
 
     ifNotZero [$D317], .else_1E_4818
 

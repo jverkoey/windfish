@@ -2001,7 +2001,7 @@ toc_17_78B3:
     jr   nz, .else_17_7901
 
     push hl
-    ld   hl, $C155
+    ld   hl, wScreenShakeHorizontal
     ld   a, [$FFEE]
     sub  a, [hl]
     pop  hl

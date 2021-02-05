@@ -18,7 +18,13 @@ wIntroBGYOffset EQU $C106
 
 wNameIndex EQU $C108
 
+wScreenShakeHorizontal EQU $C155
+
+wScreenShakeVertical EQU $C156
+
 wDialogState EQU $C19F
+
+wAlternateBackgroundEnabled EQU $C500
 
 wLCDCStash EQU $D6FD
 

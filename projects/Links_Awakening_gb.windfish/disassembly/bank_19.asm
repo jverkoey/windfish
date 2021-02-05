@@ -50,9 +50,7 @@ JumpTable_4070_19:
     jr   z, .else_19_411C
 
 .else_19_40AD:
-    ld   a, [$C3CF]
-    and  a
-    jr   nz, .else_19_411C
+    _ifZero [$C3CF], .else_19_411C
 
     assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_GRAB_SLASH
     ld   [$C3CF], a
@@ -1443,9 +1441,7 @@ JumpTable_5829_19:
 
 toc_19_58D7:
     call toc_01_093B.toc_01_0942
-    ld   a, [$C146]
-    and  a
-    jr   nz, .else_19_58F3
+    _ifZero [$C146], .else_19_58F3
 
     assign [$C13E], $02
     call toc_19_795A
@@ -1634,9 +1630,7 @@ toc_19_5CA9:
     db   $CE, $5C, $EC, $5C
 
 JumpTable_5CBC_19:
-    ld   a, [$FFB7]
-    and  a
-    jr   nz, .return_19_5CC9
+    _ifZero [$FFB7], .return_19_5CC9
 
     assign [$FF9C], $01
     assign [$FFF2], $25
@@ -1822,7 +1816,7 @@ JumpTable_6158_19:
     call toc_01_0891
     jr   nz, .else_19_6176
 
-    ld   [$C155], a
+    ld   [wScreenShakeHorizontal], a
     call toc_01_3B87
     assign [$FFF2], $2E
     call JumpTable_3B8D_00
@@ -1852,10 +1846,10 @@ JumpTable_6158_19:
     and  %00000100
     jr   z, .else_19_6194
 
-    ld   e, $FE
+    ld   e, 254
 .else_19_6194:
     ld   a, e
-    ld   [$C155], a
+    ld   [wScreenShakeHorizontal], a
     ret
 
 
@@ -2026,10 +2020,10 @@ JumpTable_65EA_19:
     and  %00000100
     jr   z, .else_19_6619
 
-    ld   e, $FE
+    ld   e, 254
 .else_19_6619:
     ld   a, e
-    ld   [$C155], a
+    ld   [wScreenShakeHorizontal], a
     call toc_01_088C
     ret  nz
 
@@ -2886,9 +2880,7 @@ toc_19_755F:
 toc_19_7697:
     ifNotZero [$C1A5], JumpTable_76B0_19.return_19_76CC
 
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, JumpTable_76B0_19.return_19_76CC
+    _ifZero [wDialogState], JumpTable_76B0_19.return_19_76CC
 
     ld   a, [hFrameCounter]
     and  %00000011

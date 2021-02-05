@@ -272,9 +272,7 @@ JumpTable_415F_04:
     jr   z, .else_04_41F8
 
 .else_04_41D4:
-    ld   a, [$C3CF]
-    and  a
-    jr   nz, .else_04_41F8
+    _ifZero [$C3CF], .else_04_41F8
 
     inc  a
     ld   [$C3CF], a
@@ -1189,9 +1187,7 @@ JumpTable_48D0_04:
     ld   hl, $C240
     add  hl, bc
     ld   [hl], a
-    ld   a, [$FFF0]
-    and  a
-    jr   nz, .else_04_492F
+    _ifZero [$FFF0], .else_04_492F
 
     call toc_04_6DCD
     ld   hl, $C320
@@ -1379,9 +1375,7 @@ JumpTable_4A25_04:
     call toc_01_0891
     ld   [hl], $40
     call toc_01_08D7
-    ld   a, [$C146]
-    and  a
-    jr   nz, .else_04_4A60
+    _ifZero [$C146], .else_04_4A60
 
     call toc_01_0887
     ld   [hl], $14
@@ -1906,9 +1900,7 @@ JumpTable_4EEB_04:
 
     assign [$C157], $18
     assign [$FFF2], $0B
-    ld   a, [$C146]
-    and  a
-    jr   nz, .else_04_4F49
+    _ifZero [$C146], .else_04_4F49
 
     call toc_01_0887
     ld   [hl], $0E
@@ -2067,7 +2059,7 @@ toc_04_504D:
     dw JumpTable_559C_04 ; 03
 
 JumpTable_5080_04:
-    clear [$C155]
+    clear [wScreenShakeHorizontal]
     call toc_01_3F12
     call toc_01_380E
     call toc_04_5438
@@ -2269,7 +2261,7 @@ JumpTable_51F1_04:
     ld   hl, $51EF
     add  hl, de
     ld   a, [hl]
-    ld   [$C155], a
+    ld   [wScreenShakeHorizontal], a
     call toc_01_0887
     jr   nz, .else_04_527C
 
@@ -2577,9 +2569,7 @@ JumpTable_5470_04:
 
     ifEq [$C11C], $06, .return_04_54FA
 
-    ld   a, [hLinkPositionZHigh]
-    and  a
-    jr   nz, .return_04_54FA
+    _ifZero [hLinkPositionZHigh], .return_04_54FA
 
     call toc_04_6DFF
     add  a, $08
@@ -3463,9 +3453,7 @@ JumpTable_5FD5_04:
 
 
 JumpTable_5FE3_04:
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .return_04_600E
+    _ifZero [wDialogState], .return_04_600E
 
     call JumpTable_3B8D_00
     ifNotZero [$C177], .else_04_5FF8
@@ -3496,9 +3484,7 @@ JumpTable_5FE3_04:
 
 
 JumpTable_6016_04:
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .return_04_6022
+    _ifZero [wDialogState], .return_04_6022
 
     call toc_01_3EAD
     call toc_04_67C1
@@ -3986,9 +3972,7 @@ JumpTable_680A_04:
     cp   $52
     jp   nz, .else_04_68A7
 
-    ld   a, [$C146]
-    and  a
-    jr   nz, .else_04_6897
+    _ifZero [$C146], .else_04_6897
 
     call toc_04_6DFF
     add  a, $04
@@ -4756,9 +4740,7 @@ JumpTable_6F69_04:
 
 JumpTable_6FC6_04:
     assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .return_04_7002
+    _ifZero [wDialogState], .return_04_7002
 
     ifEq [$C173], $F8, .else_04_6FDE
 
@@ -4953,9 +4935,7 @@ JumpTable_70FE_04:
     call toc_01_0887
     ret  nz
 
-    ld   a, [$DB73]
-    and  a
-    jr   nz, .else_04_711D
+    _ifZero [$DB73], .else_04_711D
 
     ld   a, [hPressedButtonsMask]
     and  J_A
@@ -5927,9 +5907,7 @@ toc_04_792F:
     cp   $02
     jr   nz, .else_04_793F
 
-    ld   a, [$C5A9]
-    and  a
-    jr   nz, .else_04_7989
+    _ifZero [$C5A9], .else_04_7989
 
     jr   .else_04_7990
 
@@ -6145,9 +6123,7 @@ JumpTable_7A60_04:
 
 
 JumpTable_7A66_04:
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .return_04_7A6F
+    _ifZero [wDialogState], .return_04_7A6F
 
     call JumpTable_78E1_04.toc_04_78F1
 .return_04_7A6F:
@@ -6155,9 +6131,7 @@ JumpTable_7A66_04:
 
 
 JumpTable_7A70_04:
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .return_04_7AAA
+    _ifZero [wDialogState], .return_04_7AAA
 
     ld   a, $CA
     call toc_01_3C01
@@ -6190,9 +6164,7 @@ JumpTable_7AAB_04:
     call toc_01_0891
     jr   nz, .return_04_7AC3
 
-    ld   a, [$DB5A]
-    and  a
-    jr   nz, .return_04_7AC3
+    _ifZero [$DB5A], .return_04_7AC3
 
     ld   [$DB46], a
     ld   [$C50A], a

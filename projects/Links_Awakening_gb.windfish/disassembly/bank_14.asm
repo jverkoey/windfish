@@ -618,9 +618,7 @@ toc_14_523C:
 
     copyFromTo [hNextDefaultMusicTrack], [$D368]
 .else_14_5267:
-    ld   a, [$DBA5]
-    and  a
-    jr   nz, .else_14_528C
+    _ifZero [$DBA5], .else_14_528C
 
     copyFromTo [$FFF6], [$DB54]
     ifLt [$FFF6], $F0, .else_14_528C
@@ -680,9 +678,9 @@ toc_14_523C:
     ret  z
 
     ld   a, [hl]
-    ld   hl, $C155
+    ld   hl, wScreenShakeHorizontal
     ld   [hl], b
-    cp   $20
+    cp   32
     jr   c, .return_14_52FA
 
     rla
@@ -690,8 +688,8 @@ toc_14_523C:
     nop
     nop
     and  %00000100
-    sub  a, $02
-    ld   [$C155], a
+    sub  a, 2
+    ld   [wScreenShakeHorizontal], a
     assign [$DB97], $CC
     ld   [$DB99], a
     assign [$DB98], $0C
@@ -1054,9 +1052,7 @@ toc_14_55AA:
     db   $06, $00, $04
 
 toc_14_5822:
-    ld   a, [$C124]
-    and  a
-    jr   nz, .else_14_582F
+    _ifZero [$C124], .else_14_582F
 
     ifNe [$C11C], $06, .else_14_583B
 
@@ -1221,9 +1217,7 @@ toc_14_591F:
 
 
 toc_14_5924:
-    ld   a, [$C3C9]
-    and  a
-    jr   nz, .else_14_5935
+    _ifZero [$C3C9], .else_14_5935
 
     ifEq [$C11C], $03, toc_14_591F
 
@@ -1233,9 +1227,7 @@ toc_14_5924:
 .else_14_5935:
     ifEq [wGameMode], GAMEMODE_CREDITS, .else_14_595A
 
-    ld   a, [$C3CB]
-    and  a
-    jr   nz, .else_14_595A
+    _ifZero [$C3CB], .else_14_595A
 
     ifEq [hLinkAnimationState], LINK_ANIMATION_STATE_GOT_ITEM, .else_14_595A
 
@@ -1313,11 +1305,11 @@ toc_14_59B0:
     ld   hl, $59A0
     add  hl, de
     ld   a, [hl]
-    ld   [$C155], a
+    ld   [wScreenShakeHorizontal], a
     ld   hl, $59A8
     add  hl, de
     ld   a, [hl]
-    ld   [$C156], a
+    ld   [wScreenShakeVertical], a
 .return_14_59DD:
     ret
 

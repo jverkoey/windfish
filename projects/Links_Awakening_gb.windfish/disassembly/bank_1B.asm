@@ -426,9 +426,7 @@ toc_1B_4333:
     ld   [$D336], a
     ld   a, d
     ld   [$D337], a
-    ld   a, [$D371]
-    and  a
-    jr   nz, .else_1B_434A
+    _ifZero [$D371], .else_1B_434A
 
     clear [gbAUD3ENA]
     ld   l, e
@@ -1120,9 +1118,7 @@ toc_1B_4670:
     jp   .else_1B_4692
 
 toc_1B_46F9:
-    ld   a, [$D31B]
-    and  a
-    jr   nz, .else_1B_4720
+    _ifZero [$D31B], .else_1B_4720
 
     ifNotZero [$D317], .else_1B_4720
 

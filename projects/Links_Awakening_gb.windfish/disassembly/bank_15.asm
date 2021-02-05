@@ -2253,9 +2253,7 @@ toc_15_79A5:
     and  a
     jr   z, .return_15_79F4
 
-    ld   a, [$FFF9]
-    and  a
-    jr   nz, .return_15_79F4
+    _ifZero [$FFF9], .return_15_79F4
 
     ld   hl, $C340
     add  hl, bc

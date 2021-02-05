@@ -644,9 +644,7 @@ JumpTable_4CFF_18:
     ld   a, $78
     jr   z, .else_18_4D1D
 
-    ld   a, [$FFE8]
-    and  a
-    jr   nz, .else_18_4D20
+    _ifZero [$FFE8], .else_18_4D20
 
     ld   a, [$DB0E]
     cp   $0B
@@ -1035,9 +1033,7 @@ JumpTable_553D_18:
     add  hl, de
     inc  [hl]
 .else_18_5571:
-    ld   a, [$DB73]
-    and  a
-    jr   nz, .else_18_5582
+    _ifZero [$DB73], .else_18_5582
 
     call toc_18_7CF5
     jr   nc, .return_18_5581

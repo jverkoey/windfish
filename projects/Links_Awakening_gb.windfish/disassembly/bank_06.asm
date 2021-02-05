@@ -42,9 +42,7 @@ JumpTable_4068_06:
     and  %00010000
     jr   z, .else_06_4084
 
-    ld   a, [$DB15]
-    and  a
-    jr   nz, .else_06_40A1
+    _ifZero [$DB15], .else_06_40A1
 
 .else_06_4084:
     ld   a, [$FFF8]
@@ -957,9 +955,7 @@ JumpTable_4802_06:
     call toc_01_3BD5
     jr   nc, .return_06_486A
 
-    ld   a, [$C19B]
-    and  a
-    jr   nz, .return_06_486A
+    _ifZero [$C19B], .return_06_486A
 
     ifNe [$DB00], $03, .else_06_4838
 
@@ -977,9 +973,7 @@ JumpTable_4802_06:
     jr   z, .return_06_486A
 
 .else_06_4845:
-    ld   a, [$C3CF]
-    and  a
-    jr   nz, .return_06_486A
+    _ifZero [$C3CF], .return_06_486A
 
     call JumpTable_3B8D_00
     ld   [hl], $02
@@ -1098,9 +1092,7 @@ JumpTable_48F5_06:
     add  hl, bc
     ld   [hl], $92
 .toc_06_4904:
-    ld   a, [$FFE8]
-    and  a
-    jr   nz, .else_06_4924
+    _ifZero [$FFE8], .else_06_4924
 
     ld   hl, $C2A0
     add  hl, bc
@@ -1344,9 +1336,7 @@ JumpTable_49EE_06:
     cp   $90
     jr   nz, .else_06_4ABB
 
-    ld   a, [$FFE8]
-    and  a
-    jr   nz, .else_06_4A9F
+    _ifZero [$FFE8], .else_06_4A9F
 
     ld   hl, $C290
     add  hl, de
@@ -2430,9 +2420,7 @@ JumpTable_55B8_06:
     assign [$FFF2], $0B
     call toc_01_0891
     ld   [hl], $30
-    ld   a, [$C146]
-    and  a
-    jr   nz, .else_06_55DE
+    _ifZero [$C146], .else_06_55DE
 
     call toc_01_088C
     ld   [hl], $40
@@ -2999,13 +2987,9 @@ toc_06_59A3:
     dw JumpTable_5BA8_06 ; 03
 
 JumpTable_5B79_06:
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .return_06_5BA7
+    _ifZero [wDialogState], .return_06_5BA7
 
-    ld   a, [$C177]
-    and  a
-    jr   nz, .else_06_5B9A
+    _ifZero [$C177], .else_06_5B9A
 
     assign [$DB0E], $03
     assign [$FFA5], $0D
@@ -3028,9 +3012,7 @@ JumpTable_5B79_06:
 
 
 JumpTable_5BA8_06:
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .return_06_5BB5
+    _ifZero [wDialogState], .return_06_5BB5
 
     call toc_01_0898
     call JumpTable_3B8D_00
@@ -3422,9 +3404,7 @@ JumpTable_5FA8_06:
     call toc_06_5F74
     ret  nc
 
-    ld   a, [$DB0D]
-    and  a
-    jr   nz, .else_06_5FCA
+    _ifZero [$DB0D], .else_06_5FCA
 
     ld   hl, $C2B0
     add  hl, bc
@@ -3454,9 +3434,7 @@ JumpTable_5FA8_06:
 JumpTable_5FE5_06:
     ifZero [wDialogState], toc_06_6061.return_06_606F
 
-    ld   a, [$C177]
-    and  a
-    jr   nz, toc_06_6061
+    _ifZero [$C177], toc_06_6061
 
     ld   hl, $C2B0
     add  hl, bc
@@ -3532,9 +3510,7 @@ toc_06_6061:
 
 
 JumpTable_6070_06:
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .return_06_6078
+    _ifZero [wDialogState], .return_06_6078
 
     jr   toc_06_6029
 
@@ -3546,13 +3522,9 @@ JumpTable_6079_06:
     call toc_01_0891
     ret  nz
 
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .else_06_609C
+    _ifZero [wDialogState], .else_06_609C
 
-    ld   a, [$C5A9]
-    and  a
-    jr   nz, .else_06_6098
+    _ifZero [$C5A9], .else_06_6098
 
     assign [$DB93], $FF
     ld   a, $9A
@@ -5044,9 +5016,7 @@ JumpTable_706F_06:
     cp   $18
     jr   nc, .return_06_70BD
 
-    ld   a, [hLinkDirection]
-    and  a
-    jr   nz, .return_06_70BD
+    _ifZero [hLinkDirection], .return_06_70BD
 
     ifNotZero [$C133], .return_06_70BD
 
@@ -5166,9 +5136,7 @@ JumpTable_70CE_06:
 JumpTable_716D_06:
     xor  a
     call JumpTable_70CE_06.toc_06_714D
-    ld   a, [$C17F]
-    and  a
-    jr   nz, .return_06_7192
+    _ifZero [$C17F], .return_06_7192
 
     clear [hLinkAnimationState]
     ld   hl, $D401

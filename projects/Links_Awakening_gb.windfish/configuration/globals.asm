@@ -36,7 +36,13 @@ wIntroBGYOffset EQU $C106 ; [decimal]
 
 wNameIndex EQU $C108 ; [decimal]
 
+wScreenShakeHorizontal EQU $C155 ; [decimal]
+
+wScreenShakeVertical EQU $C156 ; [decimal]
+
 wDialogState EQU $C19F ; [binary]
+
+wAlternateBackgroundEnabled EQU $C500 ; [bool]
 
 wLCDCStash EQU $D6FD ; [LCDCF]
 

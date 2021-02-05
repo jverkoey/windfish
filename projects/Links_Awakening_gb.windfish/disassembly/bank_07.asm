@@ -554,9 +554,7 @@ JumpTable_4A04_07:
 
 .else_07_4A21:
     ld   e, $D4
-    ld   a, [$DB73]
-    and  a
-    jr   nz, .else_07_4A34
+    _ifZero [$DB73], .else_07_4A34
 
     ld   e, $CE
     ifNe [$DB0E], $07, .else_07_4A34
@@ -1550,9 +1548,7 @@ JumpTable_5E42_07:
     call toc_01_3BD5
     jr   nc, .return_07_5EB4
 
-    ld   a, [$C19B]
-    and  a
-    jr   nz, .return_07_5EB4
+    _ifZero [$C19B], .return_07_5EB4
 
     ifNe [$DB00], $03, .else_07_5E78
 
@@ -1570,9 +1566,7 @@ JumpTable_5E42_07:
     jr   z, .return_07_5EB4
 
 .else_07_5E85:
-    ld   a, [$C3CF]
-    and  a
-    jr   nz, .return_07_5EB4
+    _ifZero [$C3CF], .return_07_5EB4
 
     inc  a
     ld   [$C3CF], a
@@ -2711,9 +2705,7 @@ toc_07_764B:
     call toc_01_3BD5
     jr   nc, .return_07_769B
 
-    ld   a, [$C19B]
-    and  a
-    jr   nz, .return_07_769B
+    _ifZero [$C19B], .return_07_769B
 
     ifNe [$DB00], $03, .else_07_7665
 
@@ -2731,9 +2723,7 @@ toc_07_764B:
     jr   z, .return_07_769B
 
 .else_07_7672:
-    ld   a, [$C3CF]
-    and  a
-    jr   nz, .return_07_769B
+    _ifZero [$C3CF], .return_07_769B
 
     inc  a
     ld   [$C3CF], a
@@ -2934,9 +2924,7 @@ JumpTable_789D_07:
     db   $00, $03, $02
 
 toc_07_794D:
-    ld   a, [$C502]
-    and  a
-    jr   nz, .else_07_7975
+    _ifZero [$C502], .else_07_7975
 
     call toc_07_7D35
     add  a, $30

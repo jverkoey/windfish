@@ -803,9 +803,7 @@ JumpTable_475B_05:
     dw JumpTable_4898_05.JumpTable_48C0_05 ; 04
 
 JumpTable_4803_05:
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .return_05_4844
+    _ifZero [wDialogState], .return_05_4844
 
     ifNotZero [$DB4B], .else_05_483B
 
@@ -870,13 +868,9 @@ JumpTable_4851_05:
 
 
 JumpTable_4863_05:
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .return_05_4897
+    _ifZero [wDialogState], .return_05_4897
 
-    ld   a, [$C10B]
-    and  a
-    jr   nz, .else_05_4879
+    _ifZero [$C10B], .else_05_4879
 
     copyFromTo [hDefaultMusicTrack], [$D368]
     assign [$C10B], INTERACTIVE_MOTION_LOCKED_GRAB_SLASH
@@ -1317,9 +1311,7 @@ JumpTable_4C09_05:
 
 
 JumpTable_4C32_05:
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .return_05_4C45
+    _ifZero [wDialogState], .return_05_4C45
 
     call toc_01_0891
     ld   [hl], $80
@@ -1378,9 +1370,7 @@ JumpTable_4C89_05:
     ld   a, $C5
     call toc_01_2185
 .else_05_4CAC:
-    ld   a, [$DB73]
-    and  a
-    jr   nz, .else_05_4CE0
+    _ifZero [$DB73], .else_05_4CE0
 
     ret
 
@@ -1463,13 +1453,9 @@ JumpTable_4C89_05:
 
 
 JumpTable_4D26_05:
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .return_05_4D49
+    _ifZero [wDialogState], .return_05_4D49
 
-    ld   a, [$C177]
-    and  a
-    jr   nz, .else_05_4D40
+    _ifZero [$C177], .else_05_4D40
 
     assign [$DB0E], $04
     assign [$FFA5], $0D
@@ -1824,14 +1810,10 @@ JumpTable_4FBD_05:
 
 
 JumpTable_508C_05:
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .return_05_50B5
+    _ifZero [wDialogState], .return_05_50B5
 
     call JumpTable_3B8D_00
-    ld   a, [$C177]
-    and  a
-    jr   nz, .else_05_50A6
+    _ifZero [$C177], .else_05_50A6
 
     assign [$D368], $10
     call toc_01_0891
@@ -2056,9 +2038,7 @@ toc_05_5261:
     dw JumpTable_530F_05 ; 02
 
 JumpTable_52CA_05:
-    ld   a, [$D477]
-    and  a
-    jr   nz, JumpTable_530F_05
+    _ifZero [$D477], JumpTable_530F_05
 
     call toc_05_544C
     jr   nc, .return_05_52DD
@@ -2071,9 +2051,7 @@ JumpTable_52CA_05:
 
 
 JumpTable_52DE_05:
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .return_05_5308
+    _ifZero [wDialogState], .return_05_5308
 
     call JumpTable_3B8D_00
     ifNotZero [$C177], .else_05_52EF
@@ -2587,9 +2565,7 @@ JumpTable_56A8_05:
     add  hl, bc
     ld   a, [hl]
     inc  [hl]
-    ld   a, [$C157]
-    and  a
-    jr   nz, .return_05_56D5
+    _ifZero [$C157], .return_05_56D5
 
     ld   hl, $C240
     add  hl, bc
@@ -3474,9 +3450,7 @@ JumpTable_5D84_05:
 .else_05_5D9D:
     call JumpTable_5BF2_05.else_05_5BFE
     call JumpTable_5BF2_05.else_05_5BFE
-    ld   a, [$FF9C]
-    and  a
-    jr   nz, .else_05_5DD1
+    _ifZero [$FF9C], .else_05_5DD1
 
     ifNotZero [$C146], .else_05_5DD1
 
@@ -3709,9 +3683,7 @@ JumpTable_5EF1_05:
 
     ld   a, $01
     call toc_01_3B87
-    ld   a, [$C13E]
-    and  a
-    jr   nz, .return_05_5F32
+    _ifZero [$C13E], .return_05_5F32
 
     call toc_01_3BB4
     ifNotZero [$C13E], .return_05_5F32
@@ -5765,9 +5737,7 @@ JumpTable_700B_05:
     cp   16
     jr   nc, .return_05_71E9
 
-    ld   a, [$C11C]
-    and  a
-    jr   nz, .return_05_71E9
+    _ifZero [$C11C], .return_05_71E9
 
     call toc_01_3B93
     ld   a, $18
@@ -5985,9 +5955,7 @@ JumpTable_7348_05:
     and  a
     jr   z, .else_05_739C
 
-    ld   a, [$DBC7]
-    and  a
-    jr   nz, .else_05_739C
+    _ifZero [$DBC7], .else_05_739C
 
     ld   hl, $C210
     add  hl, de

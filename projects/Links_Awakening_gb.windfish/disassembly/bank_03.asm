@@ -378,9 +378,7 @@ JumpTable_490A_03:
 .else_03_4945:
     ifNotZero [$DBA5], .else_03_495D
 
-    ld   a, [$D478]
-    and  a
-    jr   nz, .else_03_4960
+    _ifZero [$D478], .else_03_4960
 
     ld   hl, $C430
     add  hl, bc
@@ -894,13 +892,9 @@ JumpTable_4C86_03:
 .else_03_4CA9:
     ifNotZero [DEBUG_TOOL1], JumpTable_4CEC_03
 
-    ld   a, [$DB4F]
-    and  a
-    jr   nz, JumpTable_4CEC_03
+    _ifZero [$DB4F], JumpTable_4CEC_03
 
-    ld   a, [$DB50]
-    and  a
-    jr   nz, .else_03_4CC4
+    _ifZero [$DB50], .else_03_4CC4
 
     ld   [$DB96], a
     assign [wGameMode], GAMEMODE_CREDITS
@@ -923,9 +917,7 @@ JumpTable_4CCB_03:
 
 
 JumpTable_4CD8_03:
-    ld   a, [$DBA5]
-    and  a
-    jr   nz, JumpTable_4CEC_03
+    _ifZero [$DBA5], JumpTable_4CEC_03
 
     ld   a, [$D477]
     and  a
@@ -944,9 +936,7 @@ JumpTable_4CEC_03:
     add  hl, bc
     ld   [hl], $03
 .JumpTable_4CF2_03:
-    ld   a, [$DB44]
-    and  a
-    jr   nz, .else_03_4CFD
+    _ifZero [$DB44], .else_03_4CFD
 
     ld   a, $1C
     call JumpTable_4BA4_03.toc_03_4BAD
@@ -1248,9 +1238,7 @@ JumpTable_4EBC_03:
     jr   z, .else_03_4F27
 
 .else_03_4EEA:
-    ld   a, [$C3CF]
-    and  a
-    jr   nz, .else_03_4F27
+    _ifZero [$C3CF], .else_03_4F27
 
     ld   hl, $C340
     add  hl, bc
@@ -1475,9 +1463,7 @@ JumpTable_5028_03:
 
 JumpTable_5032_03:
     call toc_03_4FCA
-    ld   a, [$DBA5]
-    and  a
-    jr   nz, toc_03_5061
+    _ifZero [$DBA5], toc_03_5061
 
 .JumpTable_503B_03:
     ld   de, $C220
@@ -1884,9 +1870,7 @@ toc_03_52BE:
 .else_03_52DF:
     ifEq [$FFF6], $C7, .else_03_52EB
 
-    ld   a, [$DBA5]
-    and  a
-    jr   nz, .else_03_52EF
+    _ifZero [$DBA5], .else_03_52EF
 
 .else_03_52EB:
     assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
@@ -2362,9 +2346,7 @@ toc_03_562F:
     ld   hl, $C480
     add  hl, de
     ld   [hl], $03
-    ld   a, [$FFF9]
-    and  a
-    jr   nz, .else_03_5739
+    _ifZero [$FFF9], .else_03_5739
 
     ld   hl, $C3A0
     add  hl, de
@@ -2906,9 +2888,7 @@ JumpTable_5B05_03:
     call toc_01_3C3B
     clear [$C1AB]
     call toc_03_5B75
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .return_03_5B3B
+    _ifZero [wDialogState], .return_03_5B3B
 
     ifNe [$DB5C], $04, .else_03_5B38
 
@@ -2929,9 +2909,7 @@ JumpTable_5B3C_03:
     call toc_03_5A62
     ld   de, $5A98
     call toc_01_3C3B
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .return_03_5B52
+    _ifZero [wDialogState], .return_03_5B52
 
     assign [hNeedsUpdatingBGTiles], $05
     call JumpTable_3B8D_00
@@ -3306,13 +3284,9 @@ JumpTable_5F01_03:
     db   $20, $28, $29, $2A, $2B, $2C, $2D, $2E
 
 JumpTable_5F38_03:
-    ld   a, [$D369]
-    and  a
-    jr   nz, .else_03_5F58
+    _ifZero [$D369], .else_03_5F58
 
-    ld   a, [wDialogState]
-    and  a
-    jr   nz, .else_03_5F58
+    _ifZero [wDialogState], .else_03_5F58
 
     ld   a, [$FFF7]
     ld   e, a
@@ -3549,9 +3523,7 @@ toc_03_60CC:
     xor  a
 .else_03_6165:
     ld   [hl], a
-    ld   a, [$FFF9]
-    and  a
-    jr   nz, toc_03_60CC.return_03_6178
+    _ifZero [$FFF9], toc_03_60CC.return_03_6178
 
     ld   hl, $C250
     add  hl, bc
@@ -3872,9 +3844,7 @@ JumpTable_6421_03:
 
 
 JumpTable_6472_03:
-    ld   a, [$DB4E]
-    and  a
-    jr   nz, .else_03_648D
+    _ifZero [$DB4E], .else_03_648D
 
     assign [$D368], $0F
     ld   [$C167], a
@@ -4109,9 +4079,7 @@ toc_03_6723:
 
     call toc_03_6B4F
 .else_03_672F:
-    ld   a, [$FFF9]
-    and  a
-    jr   nz, .return_03_673C
+    _ifZero [$FFF9], .return_03_673C
 
     ld   a, [hl]
     and  %00001100
@@ -4286,9 +4254,7 @@ toc_03_6B5E:
     db   $08, $40, $40
 
 toc_03_6B96:
-    ld   a, [$FFF9]
-    and  a
-    jr   nz, .else_03_6BA7
+    _ifZero [$FFF9], .else_03_6BA7
 
     call toc_03_7F30
     ld   hl, $C320
@@ -4354,9 +4320,7 @@ toc_03_6B96:
 toc_03_6BF9:
     ifGte [$C11C], $02, .return_03_6C76
 
-    ld   a, [hLinkPositionZHigh]
-    and  a
-    jr   nz, .return_03_6C76
+    _ifZero [hLinkPositionZHigh], .return_03_6C76
 
     ld   hl, $FFEE
     ld   a, [hLinkPositionX]
@@ -4442,9 +4406,7 @@ toc_03_6C87:
     jp   nc, .else_03_6CE7
 
 .toc_03_6C8E:
-    ld   a, [hLinkPositionZHigh]
-    and  a
-    jr   nz, toc_03_6BF9.return_03_6C76
+    _ifZero [hLinkPositionZHigh], toc_03_6BF9.return_03_6C76
 
 .toc_03_6C93:
     ifGte [$C11C], $02, toc_03_6BF9.return_03_6C76
@@ -4545,13 +4507,9 @@ toc_03_6C87:
 
     ifNotZero [$C146], toc_03_6C87.else_03_6D59
 
-    ld   a, [$FFB7]
-    and  a
-    jr   nz, toc_03_6C87.else_03_6D37
+    _ifZero [$FFB7], toc_03_6C87.else_03_6D37
 
-    ld   a, [$FFF9]
-    and  a
-    jr   nz, toc_03_6C87.else_03_6D31
+    _ifZero [$FFF9], toc_03_6C87.else_03_6D31
 
     ld   a, [hLinkPositionZLow]
     xor  %10000000
@@ -4571,9 +4529,7 @@ toc_03_6C87:
     call toc_01_0891
     ld   [hl], $30
     assign [$FFF3], $0E
-    ld   a, [$FFF9]
-    and  a
-    jr   nz, toc_03_6C87.else_03_6D54
+    _ifZero [$FFF9], toc_03_6C87.else_03_6D54
 
     assign [hLinkPositionZLow], $10
     ret
@@ -4655,9 +4611,7 @@ toc_03_6C87:
     jr   c, toc_03_6C87.else_03_6DF4
 
     clear [$D47C]
-    ld   a, [$C1BE]
-    and  a
-    jr   nz, toc_03_6C87.else_03_6DF4
+    _ifZero [$C1BE], toc_03_6C87.else_03_6DF4
 
     ifEq [hDefaultMusicTrack], MUSIC_OWL, toc_03_6C87.else_03_6DF2
 
@@ -4686,9 +4640,7 @@ toc_03_6C87:
     ld   a, $18
 .else_03_6E17:
     call toc_03_7569
-    ld   a, [$FFF9]
-    and  a
-    jr   nz, toc_03_6E23
+    _ifZero [$FFF9], toc_03_6E23
 
 .else_03_6E1F:
     scf
@@ -5030,9 +4982,7 @@ JumpTable_7017_03:
 
 
 JumpTable_701D_03:
-    ld   a, [$C121]
-    and  a
-    jr   nz, .else_03_7029
+    _ifZero [$C121], .else_03_7029
 
     returnIfGte [$C16A], $04
 
@@ -5098,9 +5048,7 @@ JumpTable_7059_03:
     cp   $5B
     jr   nz, .else_03_70D1
 
-    ld   a, [$FFE8]
-    and  a
-    jr   nz, .else_03_70C0
+    _ifZero [$FFE8], .else_03_70C0
 
     ld   hl, $C2B0
     add  hl, bc
@@ -5317,9 +5265,7 @@ JumpTable_7059_03:
     and  a
     jr   nz, .else_03_7219
 
-    ld   a, [$C121]
-    and  a
-    jr   nz, .else_03_7219
+    _ifZero [$C121], .else_03_7219
 
     pop  af
     ret
@@ -5846,9 +5792,7 @@ toc_03_75A6:
     cp   $3F
     jr   nz, .else_03_76B0
 
-    ld   a, [$DBA5]
-    and  a
-    jr   nz, .else_03_76B0
+    _ifZero [$DBA5], .else_03_76B0
 
     ld   hl, $C290
     add  hl, de
@@ -6017,9 +5961,7 @@ toc_03_75A6:
 
     ifNe [$FFEB], $00, .else_03_7793
 
-    ld   a, [$FFF0]
-    and  a
-    jr   nz, .else_03_7796
+    _ifZero [$FFF0], .else_03_7796
 
 .else_03_7793:
     call toc_01_3F7A.else_01_3FB7
@@ -6199,9 +6141,7 @@ toc_03_7892:
 
     ifEq [$FFD7], $03, .else_03_7972
 
-    ld   a, [$FFF9]
-    and  a
-    jr   nz, .else_03_793C
+    _ifZero [$FFF9], .else_03_793C
 
     ld   hl, $C320
     add  hl, bc
@@ -6377,9 +6317,7 @@ toc_03_7892:
     jr   c, .else_03_7A5C
 
     copyFromTo [hObjectUnderEntity], [$C503]
-    ld   a, [$FFBE]
-    and  a
-    jr   nz, .else_03_7A5C
+    _ifZero [$FFBE], .else_03_7A5C
 
     ld   hl, $C200
     add  hl, bc
@@ -6402,9 +6340,7 @@ toc_03_7892:
     jr   c, .return_03_7A83
 
     copyFromTo [hObjectUnderEntity], [$C50D]
-    ld   a, [$FFBE]
-    and  a
-    jr   nz, .return_03_7A83
+    _ifZero [$FFBE], .return_03_7A83
 
     ld   hl, $C210
     add  hl, bc
@@ -6636,9 +6572,7 @@ toc_03_7ACC:
     and  %00000011
     jr   z, .else_03_7C27
 
-    ld   a, [$DBA5]
-    and  a
-    jr   nz, .else_03_7C16
+    _ifZero [$DBA5], .else_03_7C16
 
     ld   a, [hFrameCounter]
     and  %00000001

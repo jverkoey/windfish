@@ -5,6 +5,12 @@ _ifNotZero: MACRO
     jp   z, \2
     ENDM
 
+_ifZero: MACRO
+    ld   a, \1
+    and  a
+    jr   nz, \2
+    ENDM
+
 assign: MACRO
     ld   a, \2
     ld   \1, a
