@@ -324,7 +324,7 @@ final class SourceRulerView: NSRulerView {
         switch semantic {
         case .instruction: fallthrough
         case .global: fallthrough
-        case .macroInstruction:
+        case .macro:
           NSColor.systemGreen.set()
           shortLineRect.fill()
 
