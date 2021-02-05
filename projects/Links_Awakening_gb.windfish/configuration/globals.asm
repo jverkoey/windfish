@@ -126,9 +126,9 @@ gbOBP0 EQU $FF48 ; [hex]
 
 gbOBP1 EQU $FF49 ; [hex]
 
-gbWY EQU $FF4A ; [hex]
+gbWY EQU $FF4A ; [decimal]
 
-gbWX EQU $FF4B ; [hex]
+gbWX EQU $FF4B ; [decimal]
 
 gbKEY1 EQU $FF4D ; [hex]
 

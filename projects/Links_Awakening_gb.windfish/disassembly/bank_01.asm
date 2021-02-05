@@ -86,8 +86,8 @@ toc_01_40C2:
 toc_01_40C2.toc_01_40CE:
     assign [gbLCDC], LCDCF_BG_DISPLAY | LCDCF_OBJ_16_16 | LCDCF_OBJ_DISPLAY | LCDCF_ON | LCDCF_TILEMAP_9C00
     ld   [$D6FD], a
-    assign [gbWX], $07
-    assign [$DB9A], $80
+    assign [gbWX], 7
+    assign [$DB9A], 128
     ld   [gbWY], a
     assign [hVolumeRight], $07
     assign [hVolumeLeft], $70
@@ -1548,7 +1548,7 @@ JumpTable_55FD_01.loop_01_563B:
 
 JumpTable_55FD_01.toc_01_5643:
     assign [$DB9A], $80
-    assign [gbWX], $06
+    assign [gbWX], 6
     assign [$C150], $08
     clear [$C14F]
 JumpTable_55FD_01.return_01_5655:
