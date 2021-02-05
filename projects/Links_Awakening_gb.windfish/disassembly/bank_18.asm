@@ -2888,7 +2888,7 @@ toc_18_7D61:
     or   [hl]
     jr   nz, .else_18_7D81
 
-    ifNotZero [$C124], .return_18_7D82
+    ifNotZero [wRoomTransitionState], .return_18_7D82
 
 .else_18_7D81:
     pop  af

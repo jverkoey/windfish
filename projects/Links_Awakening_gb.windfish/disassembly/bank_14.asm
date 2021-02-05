@@ -771,7 +771,7 @@ toc_14_5388:
     ld   [$FFF5], a
     ifNe [wGameMode], GAMEMODE_WORLD_MAP, .else_14_53E1
 
-    ld   a, [$C124]
+    ld   a, [wRoomTransitionState]
     ld   hl, $C14F
     or   [hl]
     ld   hl, wDialogState
@@ -1052,7 +1052,7 @@ toc_14_55AA:
     db   $06, $00, $04
 
 toc_14_5822:
-    _ifZero [$C124], .else_14_582F
+    _ifZero [wRoomTransitionState], .else_14_582F
 
     ifEq [$C11C], $06, .else_14_583B
 
@@ -1246,7 +1246,7 @@ toc_14_5924:
 
 toc_14_5964:
     ld   hl, $C17B
-    ld   a, [$C124]
+    ld   a, [wRoomTransitionState]
     or   [hl]
     jr   nz, .return_14_599F
 

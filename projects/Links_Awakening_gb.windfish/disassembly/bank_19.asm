@@ -2665,7 +2665,7 @@ JumpTable_70DD_19:
     db   $30, $3C, $48
 
 toc_19_755F:
-    ifGte [$C124], $03, .else_19_7567
+    ifGte [wRoomTransitionState], 3, .else_19_7567
 
     ret
 
@@ -3060,7 +3060,7 @@ toc_19_789B:
     or   [hl]
     jr   nz, .else_19_78BB
 
-    ifNotZero [$C124], .return_19_78BC
+    ifNotZero [wRoomTransitionState], .return_19_78BC
 
 .else_19_78BB:
     pop  af

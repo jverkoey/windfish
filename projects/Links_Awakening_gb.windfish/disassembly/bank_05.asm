@@ -6642,7 +6642,7 @@ toc_05_7965:
     or   [hl]
     jr   nz, .else_05_7985
 
-    ifNotZero [$C124], .return_05_7986
+    ifNotZero [wRoomTransitionState], .return_05_7986
 
 .else_05_7985:
     pop  af

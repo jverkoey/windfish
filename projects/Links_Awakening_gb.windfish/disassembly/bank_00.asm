@@ -411,7 +411,7 @@ main:
     copyFromTo [$DB98], [gbOBP0]
     copyFromTo [$DB99], [gbOBP1]
     call toc_01_0844
-    call toc_01_27FE
+    call checkJoypad
     ld   a, [hNeedsUpdatingBGTiles]
     ld   hl, hNeedsUpdatingEnemiesTiles
     or   [hl]
@@ -1467,7 +1467,7 @@ toc_01_0A90:
     ld   a, [wDialogState]
     ld   hl, $C167
     or   [hl]
-    ld   hl, $C124
+    ld   hl, wRoomTransitionState
     or   [hl]
     jr   nz, .else_01_0ACE
 
@@ -1749,7 +1749,7 @@ toc_01_0C8C:
 .else_01_0CF2:
     ifZero [wDialogState], toc_01_149B
 
-    ifZero [$C124], toc_01_0D49
+    ifZero [wRoomTransitionState], toc_01_0D49
 
     ifNe [$C11C], $07, .else_01_0D32
 
@@ -2880,7 +2880,7 @@ toc_01_149B:
     jr   nz, .else_01_151B
 
     ld   hl, wDialogState
-    ld   a, [$C124]
+    ld   a, [wRoomTransitionState]
     or   [hl]
     jr   nz, .else_01_151B
 
@@ -3539,7 +3539,7 @@ toc_01_1AA9:
 
     ifZero [$C14F], JumpTable_1C5A_00.else_01_1CCC
 
-    ld   hl, $C124
+    ld   hl, wRoomTransitionState
     ld   a, [$D601]
     or   [hl]
     jp   nz, JumpTable_1C5A_00.else_01_1CCC
@@ -5458,9 +5458,9 @@ toc_01_2686:
 
 
 .toc_01_2797:
-    ld   a, [$C124]
+    ld   a, [wRoomTransitionState]
     inc  a
-    ld   [$C124], a
+    ld   [wRoomTransitionState], a
     ret
 
 
@@ -5522,8 +5522,8 @@ toc_01_27ED:
     ret
 
 
-toc_01_27FE:
-    _ifZero [$C124], .return_01_2838
+checkJoypad:
+    _ifZero [wRoomTransitionState], .return_01_2838
 
     assign [gbP1], JOYPAD_BUTTONS
     ld   a, [gbP1]
@@ -5676,7 +5676,7 @@ toc_01_28CE:
     inc  de
     call toc_01_28F2
 .toc_01_28D8:
-    _ifZero [$C124], .else_01_28ED
+    _ifZero [wRoomTransitionState], .else_01_28ED
 
 .toc_01_28DE:
     ld   a, [de]
@@ -8529,7 +8529,7 @@ toc_01_3D26:
 
 toc_01_3D87:
     push hl
-    ifNotZero [$C124], .else_01_3DAD
+    ifNotZero [wRoomTransitionState], .else_01_3DAD
 
     ld   a, [$FFEE]
     dec  a
@@ -8779,7 +8779,7 @@ toc_01_3ED9:
 
 toc_01_3F12:
     ld   hl, $C14F
-    ld   a, [$C124]
+    ld   a, [wRoomTransitionState]
     or   [hl]
     ret  nz
 

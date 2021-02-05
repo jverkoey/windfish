@@ -262,7 +262,7 @@ toc_02_426E:
     call toc_01_149B
     call toc_02_431F
     call toc_02_49C5
-    _ifZero [$C124], .return_02_42FC
+    _ifZero [wRoomTransitionState], .return_02_42FC
 
     copyFromTo [$C137], [$C16A]
     cp   $05
@@ -1799,7 +1799,7 @@ toc_02_52ED:
     cp   $FF
     jr   nz, .loop_02_52F1
 
-    _ifZero [$C124], .return_02_5332
+    _ifZero [wRoomTransitionState], .return_02_5332
 
     ifNotZero [$FFAC], .return_02_5332
 
@@ -1855,7 +1855,7 @@ toc_02_52ED:
 
 toc_02_535D:
     push af
-    _ifZero [$C124], .else_02_5372
+    _ifZero [wRoomTransitionState], .else_02_5372
 
     ld   hl, $C520
     add  hl, bc
@@ -2384,7 +2384,7 @@ toc_02_571B:
 
 toc_02_5731:
     ld   hl, wDialogState
-    ld   a, [$C124]
+    ld   a, [wRoomTransitionState]
     or   [hl]
     ld   hl, $C14F
     or   [hl]
@@ -3350,7 +3350,7 @@ toc_02_5DD5:
 
     ifZero [wDialogState], .else_02_5EDC
 
-    ifZero [$C124], .return_02_5EF1
+    ifZero [wRoomTransitionState], .return_02_5EF1
 
     ifZero [$C14F], .else_02_5E83
 
@@ -5840,7 +5840,7 @@ toc_02_6FB1:
 .else_02_7120:
     ld   a, e
     ld   [$C125], a
-    assign [$C124], $01
+    assign [wRoomTransitionState], 1
     clear [$C14B]
     ld   [$C121], a
     ld   [$C14A], a
@@ -6896,7 +6896,7 @@ toc_02_77FA:
     ifNe [$C11C], $02, .return_02_7871
 
 .toc_02_787D:
-    ld   a, [$C124]
+    ld   a, [wRoomTransitionState]
     ld   hl, wDialogState
     or   [hl]
     jp   nz, .else_02_7980
@@ -6906,7 +6906,7 @@ toc_02_77FA:
     _ifZero [$DBA5], .else_02_7899
 
     ld   a, c
-    cp   $61
+    cp   97
     jp   z, .else_02_796A
 
     jr   .else_02_78A7
@@ -7204,7 +7204,7 @@ toc_02_77FA:
 .else_02_7AB1:
     _ifNotZero [$DBA5], .return_02_7B28
 
-    _ifZero [$C124], .return_02_7B28
+    _ifZero [wRoomTransitionState], .return_02_7B28
 
     ifEq [hObjectUnderEntity], 170, .else_02_7AF6
 
@@ -7300,12 +7300,12 @@ toc_02_7B37:
     db   $04, $FC, $00, $00, $00, $00, $FC, $04
 
 toc_02_7B74:
-    ld   a, [$C124]
-    cp   $00
+    ld   a, [wRoomTransitionState]
+    cp   0
     jp   z, toc_02_7C5D
 
     push af
-    cp   $03
+    cp   3
     jp   c, .else_02_7C50
 
     ld   a, [$C125]
@@ -7349,7 +7349,7 @@ toc_02_7B74:
 .else_02_7BC9:
     call toc_01_1495
     ld   [hLinkPositionZLow], a
-    ld   [$C124], a
+    ld   [wRoomTransitionState], a
     copyFromTo [hLinkPositionX], [$DBB1]
     copyFromTo [hLinkPositionY], [$DBB2]
     ifEq [$C125], $03, .else_02_7C06
@@ -7595,9 +7595,9 @@ JumpTable_7C7E_02:
     ld   a, c
     ld   [hDefaultMusicTrack], a
 .else_02_7D99:
-    ld   a, [$C124]
+    ld   a, [wRoomTransitionState]
     inc  a
-    ld   [$C124], a
+    ld   [wRoomTransitionState], a
     ret
 
 
@@ -7719,7 +7719,7 @@ toc_02_7E6E:
 toc_02_7EAA:
     ld   a, [hFrameCounter]
     and  %00000000
-    ld   hl, $C124
+    ld   hl, wRoomTransitionState
     or   [hl]
     ld   hl, $C1A9
     or   [hl]

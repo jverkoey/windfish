@@ -3940,7 +3940,7 @@ toc_06_64DF:
     or   [hl]
     jr   nz, .else_06_64FF
 
-    ifNotZero [$C124], .return_06_6500
+    ifNotZero [wRoomTransitionState], .return_06_6500
 
 .else_06_64FF:
     pop  af

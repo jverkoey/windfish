@@ -1527,7 +1527,7 @@ JumpTable_55FD_01:
     ld   a, $07
 .else_01_5633:
     ld   [wTileMapToLoad], a
-    ld   hl, $C124
+    ld   hl, wRoomTransitionState
     ld   e, $00
 .loop_01_563B:
     xor  a

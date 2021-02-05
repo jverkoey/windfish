@@ -3149,7 +3149,7 @@ toc_07_7C76:
     or   [hl]
     jr   nz, .else_07_7C96
 
-    ifNotZero [$C124], .return_07_7C97
+    ifNotZero [wRoomTransitionState], .return_07_7C97
 
 .else_07_7C96:
     pop  af

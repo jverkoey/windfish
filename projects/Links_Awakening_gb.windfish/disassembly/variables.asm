@@ -18,6 +18,8 @@ wIntroBGYOffset EQU $C106
 
 wNameIndex EQU $C108
 
+wRoomTransitionState EQU $C124
+
 wScreenShakeHorizontal EQU $C155
 
 wScreenShakeVertical EQU $C156

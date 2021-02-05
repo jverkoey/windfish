@@ -36,6 +36,8 @@ wIntroBGYOffset EQU $C106 ; [decimal]
 
 wNameIndex EQU $C108 ; [decimal]
 
+wRoomTransitionState EQU $C124 ; [decimal]
+
 wScreenShakeHorizontal EQU $C155 ; [decimal]
 
 wScreenShakeVertical EQU $C156 ; [decimal]
