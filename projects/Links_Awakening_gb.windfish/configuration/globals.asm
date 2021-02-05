@@ -40,6 +40,8 @@ wScreenShakeHorizontal EQU $C155 ; [decimal]
 
 wScreenShakeVertical EQU $C156 ; [decimal]
 
+wTransitionGfx EQU $C17F ; [decimal]
+
 wDialogState EQU $C19F ; [binary]
 
 wAlternateBackgroundEnabled EQU $C500 ; [bool]
@@ -48,7 +50,11 @@ wLCDCStash EQU $D6FD ; [LCDCF]
 
 wTileMapToLoad EQU $D6FE ; [hex]
 
+wBGMapToLoad EQU $D6FF ; [decimal]
+
 wGameMode EQU $DB95 ; [GAMEMODE]
+
+wGameplaySubtype EQU $DB96 ; [decimal]
 
 wWYStash EQU $DB9A ; [decimal]
 

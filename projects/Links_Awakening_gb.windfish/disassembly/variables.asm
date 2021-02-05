@@ -22,6 +22,8 @@ wScreenShakeHorizontal EQU $C155
 
 wScreenShakeVertical EQU $C156
 
+wTransitionGfx EQU $C17F
+
 wDialogState EQU $C19F
 
 wAlternateBackgroundEnabled EQU $C500
@@ -30,7 +32,11 @@ wLCDCStash EQU $D6FD
 
 wTileMapToLoad EQU $D6FE
 
+wBGMapToLoad EQU $D6FF
+
 wGameMode EQU $DB95
+
+wGameplaySubtype EQU $DB96
 
 wWYStash EQU $DB9A
 

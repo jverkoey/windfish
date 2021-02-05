@@ -896,7 +896,7 @@ JumpTable_4C86_03:
 
     _ifZero [$DB50], .else_03_4CC4
 
-    ld   [$DB96], a
+    ld   [wGameplaySubtype], a
     assign [wGameMode], GAMEMODE_CREDITS
     ret
 
@@ -4483,15 +4483,15 @@ toc_03_6C87:
     ld   a, [hLinkAnimationState]
     sub  a, LINK_ANIMATION_STATE_HOLD_SWIMMING_2
     cp   LINK_ANIMATION_STATE_UNKNOWN_02
-    jr   c, toc_03_6C87.loop_03_6CE5
+    jr   c, .loop_03_6CE5
 
 .toc_03_6CF1:
-    ifNe [$FFEB], $AC, toc_03_6C87.else_03_6D15
+    ifNe [$FFEB], $AC, .else_03_6D15
 
     call toc_03_7EBB
     ld   a, e
     cp   $02
-    jr   nz, toc_03_6C87.else_03_6D59
+    jr   nz, .else_03_6D59
 
     call JumpTable_3B8D_00
     ld   [hl], $05

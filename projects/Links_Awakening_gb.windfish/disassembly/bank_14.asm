@@ -706,8 +706,8 @@ toc_14_523C:
     db   $00, $00, $00
 
 toc_14_5326:
-    ld   a, [$DB96]
-    cp   $07
+    ld   a, [wGameplaySubtype]
+    cp   7
     ret  nz
 
     ld   a, [$C16B]
@@ -728,7 +728,7 @@ toc_14_5326:
 
     ifEq [wWYStash], 0, .else_14_535D
 
-    ld   hl, $C17F
+    ld   hl, wTransitionGfx
     ld   a, [wDialogState]
     or   [hl]
     jr   nz, .else_14_535D

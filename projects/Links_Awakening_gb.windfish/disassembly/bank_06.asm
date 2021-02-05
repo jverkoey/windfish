@@ -5046,7 +5046,7 @@ JumpTable_70CE_06:
     call toc_01_0891
     jr   nz, .else_06_70EC
 
-    assign [$C17F], $01
+    assign [wTransitionGfx], 1
     clear [$C180]
     assign [$C3CA], $08
     call JumpTable_3B8D_00
@@ -5136,7 +5136,7 @@ JumpTable_70CE_06:
 JumpTable_716D_06:
     xor  a
     call JumpTable_70CE_06.toc_06_714D
-    _ifZero [$C17F], .return_06_7192
+    _ifZero [wTransitionGfx], .return_06_7192
 
     clear [hLinkAnimationState]
     ld   hl, $D401

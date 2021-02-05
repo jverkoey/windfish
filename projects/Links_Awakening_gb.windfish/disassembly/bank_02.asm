@@ -1037,7 +1037,7 @@ toc_02_49C5:
     clear [$C167]
     ifNe [$DB4A], $01, .return_02_4A7F
 
-    assign [$C17F], $02
+    assign [wTransitionGfx], 2
     clear [$C180]
     ld   [$C16B], a
     ld   [$C16C], a

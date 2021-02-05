@@ -1,7 +1,7 @@
 SECTION "ROM Bank 01", ROMX[$4000], BANK[$01]
 
 toc_01_4000:
-    ld   a, [$DB96]
+    ld   a, [wGameplaySubtype]
     jumptable
     dw JumpTable_4010_01 ; 00
     dw JumpTable_4041_01 ; 01
@@ -35,7 +35,7 @@ JumpTable_4041_01:
     jp   JumpTable_4434_01.toc_01_4445
 
 JumpTable_404D_01:
-    assign [$D6FF], $0D
+    assign [wBGMapToLoad], 13
     assign [wWYStash], 255
     clear [hBaseScrollX]
     ld   [hBaseScrollY], a
@@ -225,7 +225,7 @@ JumpTable_4249_01:
 
 JumpTable_4253_01:
     assign [$DB97], $E4
-    assign [$D6FF], $0A
+    assign [wBGMapToLoad], 10
     assign [wWYStash], 255
     clear [hBaseScrollX]
     ld   [hBaseScrollY], a
@@ -340,7 +340,7 @@ toc_01_42E6:
 
 
 toc_01_431E:
-    ld   a, [$DB96]
+    ld   a, [wGameplaySubtype]
     jumptable
     dw JumpTable_433F_01 ; 00
     dw JumpTable_43B3_01 ; 01
@@ -410,12 +410,12 @@ JumpTable_433F_01:
 
 .else_01_4393:
     call toc_01_5357
-    assign [$D6FF], $07
+    assign [wBGMapToLoad], 7
     ret
 
 
 .else_01_439C:
-    assign [$D6FF], $02
+    assign [wBGMapToLoad], 2
     call toc_01_27ED
     ld   hl, hFrameCounter
     or   [hl]
@@ -425,7 +425,7 @@ JumpTable_433F_01:
 
 
 .else_01_43AD:
-    assign [$D6FF], $09
+    assign [wBGMapToLoad], 9
     ret
 
 
@@ -499,7 +499,7 @@ JumpTable_4434_01:
     ld   [hNeedsUpdatingEnemiesTiles], a
     assign [wTileMapToLoad], $09
 .toc_01_4445:
-    incAddr $DB96
+    incAddr wGameplaySubtype
     ret
 
 
@@ -607,7 +607,7 @@ toc_01_44BC:
     call enableRAM
     copyFromTo [$AB67], [$DC05]
     assign [wGameMode], GAMEMODE_FILE_SELECT
-    clear [$DB96]
+    clear [wGameplaySubtype]
     clear [hBaseScrollY]
     ld   [hBaseScrollX], a
     assign [$DB97], $00
@@ -746,7 +746,7 @@ verifySaveFile:
 
 toc_01_4711:
     call toc_01_5B6E
-    ld   a, [$DB96]
+    ld   a, [wGameplaySubtype]
     jumptable
     db   $2C, $47, $38, $47, $40, $47, $49, $47
     db   $4F, $47, $92, $47, $F6, $47, $28, $48
@@ -836,7 +836,7 @@ toc_01_48B0:
     db   $A1, $85, $A4, $0A, $A8, $C3, $2A, $51
 
 toc_01_494B:
-    ld   a, [$DB96]
+    ld   a, [wGameplaySubtype]
     jumptable
     db   $55, $49, $68, $49, $86, $49, $CD, $45
     db   $44, $3E, $08, $EA, $FE, $D6, $AF, $EA
@@ -924,7 +924,7 @@ toc_01_494B:
 
 toc_01_4BE6:
     call toc_01_5B6E
-    ld   a, [$DB96]
+    ld   a, [wGameplaySubtype]
     jumptable
     db   $FD, $4B, $0C, $4C, $14, $4C, $20, $4C
     db   $29, $4C, $2F, $4C, $AE, $4C, $13, $4D
@@ -1001,7 +1001,7 @@ toc_01_4BE6:
     db   $19, $7E, $E1, $22, $AF, $77, $C9
 
 toc_01_4E34:
-    ld   a, [$DB96]
+    ld   a, [wGameplaySubtype]
     jumptable
     db   $46, $4E, $5B, $4E, $63, $4E, $81, $4E
     db   $9F, $4E, $65, $4F, $6F, $50, $3E, $08
@@ -1158,7 +1158,7 @@ toc_01_512A:
 
 .else_01_516A:
     assign [wGameMode], GAMEMODE_WORLD
-    clear [$DB96]
+    clear [wGameplaySubtype]
     clear [$C11C]
     ld   [$FF9C], a
     ld   [$DB93], a
@@ -1190,7 +1190,7 @@ toc_01_512A:
     assign [hLinkAnimationState], LINK_ANIMATION_STATE_STANDING_UP
     assign [hLinkDirection], DIRECTION_UP
 .else_01_51D7:
-    assign [$D6FF], $02
+    assign [wBGMapToLoad], 2
     ret
 
 
@@ -1453,7 +1453,7 @@ toc_01_5461:
 
 toc_01_546E:
     clear [$C3C0]
-    ld   a, [$DB96]
+    ld   a, [wGameplaySubtype]
     jumptable
     db   $82, $54, $FE, $54, $07, $55, $10, $55
     db   $21, $55, $FD, $55, $CD, $CC, $1C, $CD
@@ -1518,7 +1518,7 @@ JumpTable_55FD_01:
     assign [hVolumeLeft], $70
     assign [wGameMode], GAMEMODE_WORLD
     ld   [$FFBC], a
-    assign [$DB96], $02
+    assign [wGameplaySubtype], 2
     ld   a, [$DBA5]
     and  a
     ld   a, $06
@@ -2300,7 +2300,7 @@ toc_01_5ED7:
 toc_01_5F1A:
     call toc_01_27D2
     clear [wGameMode]
-    ld   [$DB96], a
+    ld   [wGameplaySubtype], a
     ld   [$DB98], a
     ld   [$DB99], a
     ld   [$DB97], a
@@ -2381,7 +2381,7 @@ toc_01_5FBB:
     dec  a
     ld   [$C3C4], a
 .else_01_5FD5:
-    ld   a, [$DB96]
+    ld   a, [wGameplaySubtype]
     jumptable
     db   $F5, $5F, $17, $60, $23, $60, $5A, $61
     db   $8D, $61, $A8, $61, $C6, $61, $DD, $61
@@ -2560,7 +2560,7 @@ toc_01_5FBB:
     db   $E0, $99, $C9
 
 toc_01_654C:
-    ld   a, [$DB96]
+    ld   a, [wGameplaySubtype]
     jumptable
     db   $64, $65, $91, $65, $AE, $65, $E0, $65
     db   $F6, $65, $FD, $55, $1A, $66, $3E, $66
@@ -2642,7 +2642,7 @@ toc_01_654C:
     db   $CD, $26, $3D, $C9
 
 toc_01_67BC:
-    ld   a, [$DB96]
+    ld   a, [wGameplaySubtype]
     jumptable
     db   $CC, $67, $F3, $67, $0B, $68, $1D, $68
     db   $36, $68, $FD, $55, $3E, $01, $EA, $67
@@ -2940,11 +2940,11 @@ toc_01_6E3E:
     jr   z, toc_01_6EAD
 
     call toc_01_27D2
-    ifEq [$DB96], $0B, .else_01_6E90
+    ifEq [wGameplaySubtype], 11, .else_01_6E90
 
     assign [hButtonsInactiveDelay], 40
-    assign [$D6FF], $11
-    assign [$DB96], $0D
+    assign [wBGMapToLoad], 17
+    assign [wGameplaySubtype], 13
     clear [$C280]
     ld   [$C281], a
     ld   [$C282], a
@@ -2973,7 +2973,7 @@ toc_01_6EA4:
 
 
 toc_01_6EAD:
-    ifGte [$DB96], $05, .else_01_6ECD
+    ifGte [wGameplaySubtype], 5, .else_01_6ECD
 
     ifNotZero [$D000], .else_01_6EBE
 
@@ -2990,7 +2990,7 @@ toc_01_6EAD:
     ld   a, [hl]
     ld   [$DB97], a
 .else_01_6ECD:
-    ld   a, [$DB96]
+    ld   a, [wGameplaySubtype]
     jumptable
     db   $ED, $6E, $11, $6F, $19, $6F, $84, $6F
     db   $8A, $70, $D4, $70, $0D, $71, $75, $71

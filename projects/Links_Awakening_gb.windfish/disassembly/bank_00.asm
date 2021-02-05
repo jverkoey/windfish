@@ -208,7 +208,7 @@ main:
     ld   [gbSCX], a
     _ifZero [wTileMapToLoad], .else_01_01DF
 
-    ifEq [$D6FF], $00, .else_01_0209
+    ifEq [wBGMapToLoad], 0, .else_01_0209
 
 .else_01_01DF:
     ifEq [wGameMode], GAMEMODE_MARIN_BEACH, .else_01_01F5
@@ -219,7 +219,7 @@ main:
     cp   GAMEMODE_WORLD
     jr   nz, .else_01_01FB
 
-    ifGte [$DB96], $07, .else_01_01FB
+    ifGte [wGameplaySubtype], 7, .else_01_01FB
 
 .else_01_01F5:
     call toc_01_0844
@@ -243,12 +243,12 @@ main:
     incAddr hFrameCounter
     ifNe [wGameMode], GAMEMODE_INTRO, .else_01_0230
 
-    ifLt [$DB96], $08, .else_01_0230
+    ifLt [wGameplaySubtype], 8, .else_01_0230
 
     changebank $01
     call toc_01_6DB7
 .else_01_0230:
-    _ifNotZero [$C17F], .else_01_0352
+    _ifNotZero [wTransitionGfx], .else_01_0352
 
     inc  a
     jr   nz, .else_01_0245
@@ -269,11 +269,11 @@ main:
     cp   $C0
     jr   nz, .else_01_026C
 
-    ifNe [$C17F], $02, .else_01_0262
+    ifNe [wTransitionGfx], 2, .else_01_0262
 
     call toc_14_541B
 .else_01_0262:
-    clear [$C17F]
+    clear [wTransitionGfx]
     ld   [$C3CA], a
     jp   .else_01_0352
 
@@ -297,7 +297,7 @@ main:
     add  a, e
     ld   e, a
     ld   d, $00
-    ifEq [$C17F], $03, .else_01_02A8
+    ifEq [wTransitionGfx], 3, .else_01_02A8
 
     ld   hl, $546A
     add  hl, de
@@ -330,7 +330,7 @@ main:
     nop
     and  %11100000
     ld   e, a
-    ifNe [$C17F], $03, .else_01_02D4
+    ifNe [wTransitionGfx], 3, .else_01_02D4
 
     ld   a, e
     xor  %11100000
@@ -367,7 +367,7 @@ main:
     jp   z, .else_01_033E
 
     ld   c, $00
-    ifEq [$C17F], $01, .else_01_0313
+    ifEq [wTransitionGfx], 1, .else_01_0313
 
     inc  c
 .else_01_0313:
@@ -473,7 +473,7 @@ toc_01_03E2:
     push de
     ifNe [wGameMode], GAMEMODE_CREDITS, .else_01_0400
 
-    ifNe [$DB96], $05, .else_01_03F9
+    ifNe [wGameplaySubtype], 5, .else_01_03F9
 
     ld   a, [$D000]
     jr   .toc_01_03FB
@@ -497,7 +497,7 @@ toc_01_03E2:
     ld   hl, hBaseScrollX
     add  a, [hl]
     ld   [gbSCX], a
-    ifLt [$DB96], $06, .else_01_042C
+    ifLt [wGameplaySubtype], 6, .else_01_042C
 
     ld   hl, $03DE
     add  hl, de
@@ -605,7 +605,7 @@ toc_01_04F5:
     call setupLCD
     ld   hl, $0457
     ld   b, $00
-    ld   a, [$D6FF]
+    ld   a, [wBGMapToLoad]
     sla  a
     ld   c, a
     add  hl, bc
@@ -618,7 +618,7 @@ toc_01_04F5:
     call toc_01_28CE.toc_01_28DE
     changebank $0C
 .toc_01_0516:
-    clear [$D6FF]
+    clear [wBGMapToLoad]
     ld   [wTileMapToLoad], a
     copyFromTo [wLCDCStash], [gbLCDC]
 .JumpTable_0522_00:
@@ -1459,7 +1459,7 @@ toc_01_0A90:
     cp   GAMEMODE_WORLD
     jr   nz, .else_01_0AA2
 
-    ifNe [$DB96], $07, .else_01_0ACE
+    ifNe [wGameplaySubtype], 7, .else_01_0ACE
 
 .else_01_0AA2:
     ifNe [$C16B], $04, .else_01_0ACE
@@ -1476,7 +1476,7 @@ toc_01_0A90:
     clear [$C16B]
     ld   [$C16C], a
     ld   [wDialogState], a
-    ld   [$DB96], a
+    ld   [wGameplaySubtype], a
     assign [wGameMode], GAMEMODE_FILE_SAVE
 .else_01_0ACE:
     ld   a, [wGameMode]
@@ -1730,7 +1730,7 @@ toc_01_0C8C:
 
     clear [$C16B]
     ld   [$C16C], a
-    ld   [$DB96], a
+    ld   [wGameplaySubtype], a
     assign [wGameMode], GAMEMODE_WORLD_MAP
     changebank $02
     call toc_02_77FA.else_02_781B
@@ -3026,7 +3026,7 @@ JumpTable_15B3_00:
 .else_01_1606:
     copyFromTo [$FFF9], [$FFE4]
     assign [wGameMode], GAMEMODE_WORLD
-    clear [$DB96]
+    clear [wGameplaySubtype]
     ld   [$C3CB], a
     ld   [$FFF9], a
     ld   hl, $D401
@@ -3203,7 +3203,7 @@ JumpTable_1732_00:
 
     clear [$D474]
     assign [$C180], $30
-    assign [$C17F], $03
+    assign [wTransitionGfx], 3
     assign [$C16B], $04
     jr   .toc_01_175A
 

@@ -210,8 +210,8 @@ toc_17_46A6:
     sub  a, 5
     ld   [gbSCY], a
     ld   [$FFE8], a
-    ld   a, [$C17F]
-    cp   $FE
+    ld   a, [wTransitionGfx]
+    cp   254
     ret  z
 
     ld   a, [$C180]
@@ -312,7 +312,7 @@ toc_17_482A:
 
     ifNotZero [DEBUG_TOOL2], .else_17_483A
 
-    clear [$DB96]
+    clear [wGameplaySubtype]
 .else_17_483A:
     ld   a, [$FFCC]
     and  %00000011
@@ -355,7 +355,7 @@ toc_17_482A:
     dec  a
     ld   [$D013], a
 .else_17_4887:
-    ld   a, [$DB96]
+    ld   a, [wGameplaySubtype]
     jumptable
     dw JumpTable_493D_17 ; 00
 
@@ -402,7 +402,7 @@ JumpTable_493D_17:
     db   $D0, $3E, $04, $EA, $6B, $C1, $C9
 
 toc_17_49B2:
-    incAddr $DB96
+    incAddr wGameplaySubtype
     ret
 
 
@@ -1050,9 +1050,9 @@ toc_17_5CC1:
     res  1, [hl]
     ld   hl, wLCDCStash
     set  2, [hl]
-    incAddr $DB96
+    incAddr wGameplaySubtype
     ld   a, [hl]
-    cp   $09
+    cp   9
     jr   nz, .return_17_5D00
 
     ld   [hl], $00
