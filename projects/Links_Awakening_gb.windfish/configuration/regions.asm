@@ -153,3 +153,5 @@ loop: ; [Label] $1F:$400C [0]
 _clearD300: ; [Label] $1F:$4009 [0]
 
 clearD300: ; [Label] $1F:$4000 [0]
+
+return: ; [Label] $1F:$7FED [0]

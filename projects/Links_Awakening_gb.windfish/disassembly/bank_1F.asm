@@ -2261,11 +2261,11 @@ toc_1F_7F80:
     ld   [$D370], a
     clear [$FFF3]
 .else_1F_7FE2:
-    ifNotZero [$FFF4], .return_1F_7FED
+    ifNotZero [$FFF4], .return
 
     ld   [$D378], a
     clear [$FFF4]
-.return_1F_7FED:
+.return:
     ret
 
 
