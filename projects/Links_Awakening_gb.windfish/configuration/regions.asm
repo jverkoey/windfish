@@ -105,3 +105,27 @@ tile_0C_41C0: ; [Image (2bpp)] $0C:$41C0 [32]
 tile_0C_41E0: ; [Image (2bpp)] $0C:$41E0 [32]
 
 tile_fairy: ; [Image (2bpp)] $0C:$4200 [32]
+
+tile_0C_4220: ; [Image (2bpp)] $0C:$4220 [32]
+
+tile_0C_4240: ; [Image (2bpp)] $0C:$4240 [32]
+
+tile_0C_4260: ; [Image (2bpp)] $0C:$4260 [32]
+
+tile_0C_4280: ; [Image (2bpp)] $0C:$4280 [32]
+
+tile_sword_up1: ; [Image (2bpp)] $0C:$42A0 [32]
+
+tile_sword_right1: ; [Image (2bpp)] $0C:$42C0 [64]
+
+tile_0C_4300: ; [Image (2bpp)] $0C:$4300 [32]
+
+tile_0C_4320: ; [Image (2bpp)] $0C:$4320 [32]
+
+tile_0C_4340: ; [Image (2bpp)] $0C:$4340 [32]
+
+tile_0C_4360: ; [Image (2bpp)] $0C:$4360 [32]
+
+tile_0C_4380: ; [Image (2bpp)] $0C:$4380 [32]
+
+tile_0C_43A0: ; [Image (2bpp)] $0C:$43A0 [32]
