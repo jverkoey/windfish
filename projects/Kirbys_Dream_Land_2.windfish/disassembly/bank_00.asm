@@ -2747,7 +2747,7 @@ toc_01_2F4B:
     ld   hl, $DDE5
     add  hl, de
     clear [gbAUD3ENA]
-    call toc_01_3001
+    call copyHLToFF30
     assign [gbAUD3ENA], $80
     ld   a, [$CE14]
     set  7, a
@@ -2756,15 +2756,15 @@ toc_01_2F4B:
 .else_01_2FFE:
     jp   .toc_01_2F77
 
-toc_01_3001:
+copyHLToFF30:
     ld   de, $FF30
     ld   c, $10
-.loop_01_3006:
+.loop:
     ldi  a, [hl]
     ld   [de], a
     inc  de
     dec  c
-    jr   nz, .loop_01_3006
+    jr   nz, .loop
 
     ret
 

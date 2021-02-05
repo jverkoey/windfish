@@ -54,14 +54,24 @@ loadBank: ; [Label] $00:$05F3 [0]
 
 cbcall: ; [Label] $00:$05E5 [0]
 
+copyHLToFF30: ; [Label] $00:$3001 [0]
+
+loop: ; [Label] $00:$3006 [0]
+
 initialize: ; [Function] $1A:$4000 [0]
 
 waitForVBlank: ; [Label] $1A:$4003 [0]
 
 DMARoutine: ; [Function] $1A:$40E8 [0]
 
-toc_1E_4232: ; [Function] $1E:$4232 [0]
+initializeHardware: ; [Function] $1E:$4232 [0]
 
 toc_07_57BC: ; [Function] $07:$57BC [0]
 
 toc_07_401D: ; [Function] $07:$401D [0]
+
+data_446E: ; [Data] $1E:$446E [48]
+
+data_5B6F: ; [Data] $1E:$5B6F [198]
+
+setCE06ToAA: ; [Label] $1E:$4268 [0]
