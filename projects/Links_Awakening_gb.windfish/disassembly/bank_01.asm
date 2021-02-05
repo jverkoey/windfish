@@ -634,11 +634,11 @@ toc_01_44BC:
 
 toc_01_460F:
     ld   de, $0000
-    call toc_01_46DD
+    call verifySaveFile
     ld   de, $0385
-    call toc_01_46DD
+    call verifySaveFile
     ld   de, $070A
-    call toc_01_46DD
+    call verifySaveFile
     ifNotZero [DEBUG_TOOL1], .return_01_46DC
 
     ld   e, $00
@@ -705,47 +705,47 @@ toc_01_460F.return_01_46DC:
     ret
 
 
-toc_01_46DD:
+verifySaveFile:
     ld   c, $01
     ld   b, $05
     ld   hl, $A100
     add  hl, de
-toc_01_46DD.loop_01_46E5:
+verifySaveFile.loop_verifySaveFile:
     call enableRAM
     ldi  a, [hl]
     cp   c
-    jr   nz, .else_01_46F3
+    jr   nz, .initializeSaveFile
 
     inc  c
     inc  c
     dec  b
-    jr   nz, .loop_01_46E5
+    jr   nz, .loop_verifySaveFile
 
-    jr   .return_01_4710
+    jr   .return
 
-toc_01_46DD.else_01_46F3:
+verifySaveFile.initializeSaveFile:
     ld   hl, $A100
     add  hl, de
     ld   a, $01
-toc_01_46DD.loop_01_46F9:
+verifySaveFile.loop_initializeSaveFile:
     call enableRAM
     ldi  [hl], a
     inc  a
     inc  a
     cp   $0B
-    jr   c, .loop_01_46F9
+    jr   c, .loop_initializeSaveFile
 
     ld   de, $0380
-toc_01_46DD.loop_01_4706:
+verifySaveFile.clearSaveFile:
     call enableRAM
     xor  a
     ldi  [hl], a
     dec  de
     ld   a, e
     or   d
-    jr   nz, .loop_01_4706
+    jr   nz, .clearSaveFile
 
-toc_01_46DD.return_01_4710:
+verifySaveFile.return:
     ret
 
 

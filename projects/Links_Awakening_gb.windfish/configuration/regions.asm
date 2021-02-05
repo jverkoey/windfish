@@ -131,3 +131,15 @@ tile_0C_4360: ; [Image (2bpp)] $0C:$4360 [32]
 tile_0C_4380: ; [Image (2bpp)] $0C:$4380 [32]
 
 tile_0C_43A0: ; [Image (2bpp)] $0C:$43A0 [32]
+
+loop_initializeSaveFile: ; [Label] $01:$46F9 [0]
+
+initializeSaveFile: ; [Label] $01:$46F3 [0]
+
+loop_verifySaveFile: ; [Label] $01:$46E5 [0]
+
+verifySaveFile: ; [Label] $01:$46DD [0]
+
+return: ; [Label] $01:$4710 [0]
+
+clearSaveFile: ; [Label] $01:$4706 [0]
