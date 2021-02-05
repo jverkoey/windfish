@@ -235,7 +235,7 @@ main.else_01_01FB:
     jp   .else_01_03BD
 
 main.else_01_0209:
-    ld   a, [$D6FD]
+    ld   a, [wLCDCStash]
     and  LCDCF_BG_CHAR_8000 | LCDCF_BG_DISPLAY | LCDCF_BG_TILE_9C00 | LCDCF_OBJ_16_16 | LCDCF_OBJ_DISPLAY | LCDCF_TILEMAP_9C00 | LCDCF_WINDOW_ON
     ld   e, a
     ld   a, [gbLCDC]
@@ -408,7 +408,7 @@ main.else_01_033E:
     jr   .else_01_03BD
 
 main.else_01_0352:
-    copyFromTo [$DB9A], [gbWY]
+    copyFromTo [wWYStash], [gbWY]
     copyFromTo [$DB97], [gbBGP]
     copyFromTo [$DB98], [gbOBP0]
     copyFromTo [$DB99], [gbOBP1]
@@ -626,7 +626,7 @@ toc_01_04F5:
 toc_01_04F5.toc_01_0516:
     clear [$D6FF]
     ld   [wTileMapToLoad], a
-    copyFromTo [$D6FD], [gbLCDC]
+    copyFromTo [wLCDCStash], [gbLCDC]
 toc_01_04F5.JumpTable_0522_00:
     ret
 
@@ -1585,7 +1585,7 @@ JumpTable_0B53_00:
     and  a
     jr   z, .else_01_0B80
 
-    ifNe [$DB9A], $80, .else_01_0B80
+    ifNe [wWYStash], 128, .else_01_0B80
 
     ld   a, [$C14F]
     and  a
@@ -3597,8 +3597,8 @@ toc_01_1AA9.else_01_1AEC:
     cp   $0B
     jp   c, JumpTable_1C5A_00.return_01_1D14
 
-    ld   a, [$DB9A]
-    cp   $80
+    ld   a, [wWYStash]
+    cp   128
     jp   nz, JumpTable_1C5A_00.return_01_1D14
 
     ld   a, [$C14F]

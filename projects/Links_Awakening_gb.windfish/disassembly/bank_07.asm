@@ -3136,7 +3136,7 @@ toc_07_7C23.else_07_7C4F:
     or   [hl]
     jr   nz, .else_07_7C74
 
-    ifNe [$DB9A], $80, .else_07_7C74
+    ifNe [wWYStash], 128, .else_07_7C74
 
     ld   a, [$FFCC]
     and  %00010000

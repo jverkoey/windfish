@@ -3043,7 +3043,7 @@ toc_19_784E.toc_19_7859:
     or   [hl]
     jr   nz, .else_19_7899
 
-    ifNe [$DB9A], $80, .else_19_7899
+    ifNe [wWYStash], 128, .else_19_7899
 
     ld   a, [$FFCC]
     and  %00010000

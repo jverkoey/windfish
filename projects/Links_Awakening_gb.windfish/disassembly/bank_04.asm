@@ -6274,7 +6274,7 @@ toc_04_7B77:
     or   [hl]
     jr   nz, .else_04_7BBA
 
-    ifNe [$DB9A], $80, .else_04_7BBA
+    ifNe [wWYStash], 128, .else_04_7BBA
 
     ld   a, [$FFCC]
     and  %00010000
@@ -6299,7 +6299,7 @@ toc_04_7BBC:
     or   [hl]
     jr   nz, .else_04_7C03
 
-    ifNe [$DB9A], $80, .else_04_7C03
+    ifNe [wWYStash], 128, .else_04_7C03
 
     ld   a, [hLinkPositionX]
     ld   hl, $FFEE

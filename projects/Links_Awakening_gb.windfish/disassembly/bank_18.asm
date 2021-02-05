@@ -2867,7 +2867,7 @@ toc_18_7D0E.else_18_7D3A:
     or   [hl]
     jr   nz, .else_18_7D5F
 
-    ifNe [$DB9A], $80, .else_18_7D5F
+    ifNe [wWYStash], 128, .else_18_7D5F
 
     ld   a, [$FFCC]
     and  %00010000

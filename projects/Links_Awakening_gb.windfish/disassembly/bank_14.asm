@@ -728,7 +728,7 @@ toc_14_5326:
     and  a
     jr   nz, .return_14_5387
 
-    ifEq [$DB9A], $00, .else_14_535D
+    ifEq [wWYStash], 0, .else_14_535D
 
     ld   hl, $C17F
     ld   a, [wDialogState]

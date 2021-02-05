@@ -36,7 +36,7 @@ JumpTable_4041_01:
 
 JumpTable_404D_01:
     assign [$D6FF], $0D
-    assign [$DB9A], $FF
+    assign [wWYStash], 255
     clear [hBaseScrollX]
     ld   [hBaseScrollY], a
     ld   [$C16B], a
@@ -85,9 +85,9 @@ toc_01_40C2:
     call toc_01_5F1A
 toc_01_40C2.toc_01_40CE:
     assign [gbLCDC], LCDCF_BG_DISPLAY | LCDCF_OBJ_16_16 | LCDCF_OBJ_DISPLAY | LCDCF_ON | LCDCF_TILEMAP_9C00
-    ld   [$D6FD], a
+    ld   [wLCDCStash], a
     assign [gbWX], 7
-    assign [$DB9A], 128
+    assign [wWYStash], 128
     ld   [gbWY], a
     assign [hVolumeRight], $07
     assign [hVolumeLeft], $70
@@ -228,7 +228,7 @@ JumpTable_4249_01:
 JumpTable_4253_01:
     assign [$DB97], $E4
     assign [$D6FF], $0A
-    assign [$DB9A], $FF
+    assign [wWYStash], 255
     clear [hBaseScrollX]
     ld   [hBaseScrollY], a
     incAddr $FF9C
@@ -538,7 +538,7 @@ JumpTable_4476_01:
     call JumpTable_55FD_01.toc_01_5643
     ld   a, [gbLCDC]
     or   LCDCF_WINDOW_ON
-    ld   [$D6FD], a
+    ld   [wLCDCStash], a
     ld   [gbLCDC], a
     call JumpTable_4434_01.toc_01_4445
     copyFromTo [$C11C], [$D463]
@@ -1547,7 +1547,7 @@ JumpTable_55FD_01.loop_01_563B:
     jr   nz, .loop_01_563B
 
 JumpTable_55FD_01.toc_01_5643:
-    assign [$DB9A], $80
+    assign [wWYStash], 128
     assign [gbWX], 6
     assign [$C150], $08
     clear [$C14F]
@@ -1960,8 +1960,8 @@ toc_01_5D03:
     ifNot [$C14F], .else_01_5D22
 
     ld   hl, gbRAM
-    ld   a, [$DB9A]
-    add  a, $08
+    ld   a, [wWYStash]
+    add  a, 8
     ld   d, a
     ld   e, $28
 toc_01_5D03.loop_01_5D14:
@@ -1982,7 +1982,7 @@ toc_01_5D03.else_01_5D1A:
 
 
 toc_01_5D03.else_01_5D22:
-    ld   a, [$DB9A]
+    ld   a, [wWYStash]
     and  a
     ret  z
 

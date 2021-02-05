@@ -3453,7 +3453,7 @@ toc_02_5DD5:
     and  %10000000
     jp   z, .else_02_5EC8
 
-    ifEq [$DB9A], $00, .else_02_5E2E
+    ifEq [wWYStash], 0, .else_02_5E2E
 
     ld   a, [$C167]
     and  a
@@ -3537,7 +3537,7 @@ toc_02_5DD5.toc_02_5E97:
 toc_02_5DD5.else_02_5EA4:
     call toc_02_5EF2
     ld   a, [$C150]
-    ld   hl, $DB9A
+    ld   hl, wWYStash
     add  a, [hl]
     ld   [hl], a
     cp   $80
@@ -3555,7 +3555,7 @@ toc_02_5DD5.else_02_5EBF:
 toc_02_5DD5.else_02_5EC5:
     call .toc_02_5E97
 toc_02_5DD5.else_02_5EC8:
-    ifEq [$DB9A], $80, .else_02_5EDC
+    ifEq [wWYStash], 128, .else_02_5EDC
 
     ld   a, [$C14F]
     and  a
@@ -4371,7 +4371,7 @@ toc_02_63F0.else_02_6402:
 
     ld   hl, $C09C
 toc_02_63F0.else_02_6431:
-    ld   a, [$DB9A]
+    ld   a, [wWYStash]
     push hl
     ld   hl, $FFD8
     add  a, [hl]

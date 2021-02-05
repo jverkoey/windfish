@@ -1048,7 +1048,7 @@ toc_17_5CC1:
     call toc_17_4AEB
     ld   hl, gbIE
     res  1, [hl]
-    ld   hl, $D6FD
+    ld   hl, wLCDCStash
     set  2, [hl]
     incAddr $DB96
     ld   a, [hl]

@@ -38,9 +38,13 @@ wNameIndex EQU $C108 ; [decimal]
 
 wDialogState EQU $C19F ; [binary]
 
+wLCDCStash EQU $D6FD ; [LCDCF]
+
 wTileMapToLoad EQU $D6FE ; [hex]
 
 wGameMode EQU $DB95 ; [GAMEMODE]
+
+wWYStash EQU $DB9A ; [decimal]
 
 wCurrentBank EQU $DBAF ; [hex]
 

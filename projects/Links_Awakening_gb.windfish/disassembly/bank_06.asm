@@ -4038,7 +4038,7 @@ toc_06_648C.else_06_64B8:
     or   [hl]
     jr   nz, .else_06_64DD
 
-    ifNe [$DB9A], $80, .else_06_64DD
+    ifNe [wWYStash], 128, .else_06_64DD
 
     ld   a, [$FFCC]
     and  %00010000

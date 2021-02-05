@@ -20,9 +20,13 @@ wNameIndex EQU $C108
 
 wDialogState EQU $C19F
 
+wLCDCStash EQU $D6FD
+
 wTileMapToLoad EQU $D6FE
 
 wGameMode EQU $DB95
+
+wWYStash EQU $DB9A
 
 wCurrentBank EQU $DBAF
 

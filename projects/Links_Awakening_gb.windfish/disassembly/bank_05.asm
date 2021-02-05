@@ -2264,7 +2264,7 @@ toc_05_544C.else_05_5478:
     or   [hl]
     jr   nz, .else_05_549D
 
-    ifNe [$DB9A], $80, .else_05_549D
+    ifNe [wWYStash], 128, .else_05_549D
 
     ld   a, [$FFCC]
     and  %00010000
