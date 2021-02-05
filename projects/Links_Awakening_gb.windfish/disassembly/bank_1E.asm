@@ -1558,7 +1558,7 @@ toc_1E_494D:
     db   $E0, $21, $3E, $80, $E0, $23
 
 toc_1E_4D18:
-    assign [gbAUDTERM], $FF
+    assign [gbAUDTERM], %11111111
     assign [$D355], $03
     clear [$D369]
 .toc_1E_4D25:

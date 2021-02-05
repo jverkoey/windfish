@@ -102,11 +102,11 @@ gbAUD4POLY EQU $FF22 ; [hex]
 
 gbAUD4CONSEC EQU $FF23 ; [hex]
 
-gbAUDVOL EQU $FF24 ; [hex]
+gbAUDVOL EQU $FF24 ; [binary]
 
-gbAUDTERM EQU $FF25 ; [hex]
+gbAUDTERM EQU $FF25 ; [binary]
 
-gbAUDENA EQU $FF26 ; [hex]
+gbAUDENA EQU $FF26 ; [HW_AUDIO_ENABLE]
 
 gbAUD3WAVERAM EQU $FF30 ; [hex]
 

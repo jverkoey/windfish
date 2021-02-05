@@ -1,7 +1,7 @@
 SECTION "ROM Bank 1F", ROMX[$4000], BANK[$1F]
 
 toc_1F_4000:
-    jp   toc_1F_4009
+    jp   clearD300
 
 toc_1F_4003:
     jp   toc_1F_7B17
@@ -9,16 +9,16 @@ toc_1F_4003:
 toc_1F_4006:
     jp   toc_1F_401E
 
-toc_1F_4009:
+clearD300:
     ld   hl, $D300
-.loop_1F_400C:
+.loop:
     ld   [hl], $00
     inc  l
-    jr   nz, .loop_1F_400C
+    jr   nz, .loop
 
-    assign [gbAUDENA], $80
-    assign [gbAUDVOL], $77
-    assign [gbAUDTERM], $FF
+    assign [gbAUDENA], HW_AUDIO_ENABLE
+    assign [gbAUDVOL], %01110111
+    assign [gbAUDTERM], %11111111
     ret
 
 
@@ -2035,7 +2035,7 @@ toc_1F_7A60:
     db   $18, $DA
 
 toc_1F_7B17:
-    assign [gbAUDTERM], $FF
+    assign [gbAUDTERM], %11111111
     assign [$D355], $03
     clear [$D369]
     clear [$D361]
