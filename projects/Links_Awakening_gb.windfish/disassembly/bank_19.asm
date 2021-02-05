@@ -44,14 +44,14 @@ JumpTable_4070_19:
 
     jr   .else_19_411C
 
-JumpTable_4070_19.else_19_40A0:
+.else_19_40A0:
     ifNe [$DB01], $03, .else_19_411C
 
     ld   a, [hPressedButtonsMask]
     and  J_A
     jr   z, .else_19_411C
 
-JumpTable_4070_19.else_19_40AD:
+.else_19_40AD:
     ld   a, [$C3CF]
     and  a
     jr   nz, .else_19_411C
@@ -86,7 +86,7 @@ JumpTable_4070_19.else_19_40AD:
     ifNot [$D47C], .else_19_40F4
 
     ld   e, $03
-JumpTable_4070_19.else_19_40F4:
+.else_19_40F4:
     ld   hl, $C3D0
     add  hl, bc
     inc  [hl]
@@ -107,14 +107,14 @@ JumpTable_4070_19.else_19_40F4:
     ld   [hl], $02
     ld   hl, $FFF3
     ld   [hl], $02
-JumpTable_4070_19.else_19_411C:
+.else_19_411C:
     ld   hl, $C3D0
     add  hl, bc
     ld   [hl], b
     ret
 
 
-JumpTable_4070_19.return_19_4122:
+.return_19_4122:
     ret
 
 
@@ -253,7 +253,7 @@ JumpTable_4499_19:
     ret
 
 
-JumpTable_4499_19.else_19_44A7:
+.else_19_44A7:
     ld   hl, $C2A0
     add  hl, bc
     ld   a, [hl]
@@ -264,7 +264,7 @@ JumpTable_4499_19.else_19_44A7:
     ld   [hl], b
     call toc_19_45A6
     assign [$FFF2], $07
-JumpTable_4499_19.return_19_44BA:
+.return_19_44BA:
     ret
 
 
@@ -343,14 +343,14 @@ JumpTable_4624_19:
     cp   $0D
     jr   nz, .else_19_464A
 
-JumpTable_4624_19.else_19_4641:
+.else_19_4641:
     ld   a, $21
     call toc_01_218E
     call JumpTable_3B8D_00
     ret
 
 
-JumpTable_4624_19.else_19_464A:
+.else_19_464A:
     ld   a, $25
     call toc_01_218E
     call JumpTable_3B8D_00
@@ -494,7 +494,7 @@ JumpTable_4952_19:
     add  a, $30
     ld   [hl], a
     call JumpTable_3B8D_00
-JumpTable_4952_19.else_19_4992:
+.else_19_4992:
     jp   toc_19_49B7
 
     db   $CD, $07, $79, $CD, $9E, $3B, $F0, $E8
@@ -639,7 +639,7 @@ JumpTable_4CBF_19:
     ifEq [wGameMode], GAMEMODE_WORLD_MAP, .else_19_4CCA
 
     clear [$C5A2]
-JumpTable_4CBF_19.else_19_4CCA:
+.else_19_4CCA:
     xor  a
     call toc_01_3B87
     call toc_19_784E
@@ -657,13 +657,13 @@ JumpTable_4CBF_19.else_19_4CCA:
     jr   c, .else_19_4CE5
 
     inc  e
-JumpTable_4CBF_19.else_19_4CE5:
+.else_19_4CE5:
     ifLt [$FFEF], $40, .else_19_4CEF
 
     ld   a, e
     add  a, $04
     ld   e, a
-JumpTable_4CBF_19.else_19_4CEF:
+.else_19_4CEF:
     ld   d, b
     ld   hl, $4CB7
     add  hl, de
@@ -947,14 +947,14 @@ JumpTable_51AD_19:
     call JumpTable_3B8D_00
     jr   .toc_19_5242
 
-JumpTable_51AD_19.else_19_523C:
+.else_19_523C:
     ld   hl, $C3D0
     add  hl, bc
     ld   [hl], b
     ret
 
 
-JumpTable_51AD_19.toc_19_5242:
+.toc_19_5242:
     call toc_19_789B
     assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     ld   [$C167], a
@@ -1013,7 +1013,7 @@ JumpTable_51AD_19.toc_19_5242:
     call toc_19_7A62
     jp   toc_19_79B0
 
-JumpTable_51AD_19.else_19_52B6:
+.else_19_52B6:
     ld   hl, $C250
     add  hl, bc
     ld   [hl], $FC
@@ -1169,7 +1169,7 @@ toc_19_55A9:
 
     cpl
     inc  a
-toc_19_55A9.else_19_55C4:
+.else_19_55C4:
     ld   d, a
     ld   a, [$FFD7]
     bit  7, a
@@ -1177,7 +1177,7 @@ toc_19_55A9.else_19_55C4:
 
     cpl
     inc  a
-toc_19_55A9.else_19_55CD:
+.else_19_55CD:
     cp   d
     jr   nc, .else_19_55DD
 
@@ -1192,7 +1192,7 @@ toc_19_55A9.else_19_55CD:
     ret
 
 
-toc_19_55A9.else_19_55DD:
+.else_19_55DD:
     ld   a, d
     sra  a
     sra  a
@@ -1240,7 +1240,7 @@ JumpTable_5611_19:
     call toc_01_0891
     ld   [hl], $08
     call JumpTable_3B8D_00
-JumpTable_5611_19.return_19_5640:
+.return_19_5640:
     ret
 
 
@@ -1305,7 +1305,7 @@ JumpTable_5721_19:
     ret
 
 
-JumpTable_5721_19.else_19_5752:
+.else_19_5752:
     ld   a, [hFrameCounter]
     and  %00000111
     jr   nz, .return_19_576D
@@ -1321,7 +1321,7 @@ JumpTable_5721_19.else_19_5752:
     add  hl, de
     ld   a, [hl]
     call toc_01_3B87
-JumpTable_5721_19.return_19_576D:
+.return_19_576D:
     ret
 
 
@@ -1364,7 +1364,7 @@ JumpTable_5829_19:
     jr   nc, .else_19_583B
 
     call toc_19_58D7
-JumpTable_5829_19.else_19_583B:
+.else_19_583B:
     ld   a, [hLinkPositionYIncrement]
     and  %10000000
     jr   nz, .else_19_585C
@@ -1381,7 +1381,7 @@ JumpTable_5829_19.else_19_583B:
     ld   [hLinkPositionY], a
     assign [hLinkPositionYIncrement], 2
     assign [$C147], $01
-JumpTable_5829_19.else_19_585C:
+.else_19_585C:
     call toc_19_795A
     add  a, $12
     cp   $24
@@ -1405,7 +1405,7 @@ JumpTable_5829_19.else_19_585C:
     ret
 
 
-JumpTable_5829_19.else_19_587F:
+.else_19_587F:
     ld   a, [$DB01]
     cp   $03
     ret  nz
@@ -1414,7 +1414,7 @@ JumpTable_5829_19.else_19_587F:
     and  %00010000
     ret  z
 
-JumpTable_5829_19.else_19_588A:
+.else_19_588A:
     ld   a, [$C3CF]
     and  a
     ret  nz
@@ -1457,12 +1457,12 @@ toc_19_58D7:
     jr   z, .else_19_58F0
 
     ld   a, 240
-toc_19_58D7.else_19_58F0:
+.else_19_58F0:
     ld   [hLinkPositionXIncrement], a
     ret
 
 
-toc_19_58D7.else_19_58F3:
+.else_19_58F3:
     copyFromTo [hLinkFinalPositionX], [hLinkPositionX]
     ret
 
@@ -1579,7 +1579,7 @@ JumpTable_5B45_19:
     ld   hl, $C380
     add  hl, bc
     ld   [hl], a
-JumpTable_5B45_19.else_19_5B7E:
+.else_19_5B7E:
     ld   hl, $C380
     add  hl, bc
     ld   a, [hl]
@@ -1642,7 +1642,7 @@ JumpTable_5CBC_19:
 
     assign [$FF9C], $01
     assign [$FFF2], $25
-JumpTable_5CBC_19.return_19_5CC9:
+.return_19_5CC9:
     ret
 
 
@@ -1831,12 +1831,12 @@ JumpTable_6158_19:
     ret
 
 
-JumpTable_6158_19.else_19_6176:
+.else_19_6176:
     cp   $A0
     jr   nz, .else_19_617E
 
     assign [$FFF4], $1D
-JumpTable_6158_19.else_19_617E:
+.else_19_617E:
     jr   c, .else_19_618C
 
     and  %00010000
@@ -1844,18 +1844,18 @@ JumpTable_6158_19.else_19_617E:
     jr   z, .else_19_6188
 
     ld   a, $FF
-JumpTable_6158_19.else_19_6188:
+.else_19_6188:
     call toc_01_3B87
     ret
 
 
-JumpTable_6158_19.else_19_618C:
+.else_19_618C:
     ld   e, $01
     and  %00000100
     jr   z, .else_19_6194
 
     ld   e, $FE
-JumpTable_6158_19.else_19_6194:
+.else_19_6194:
     ld   a, e
     ld   [$C155], a
     ret
@@ -2017,19 +2017,19 @@ JumpTable_65EA_19:
 
     ld   hl, $FFF4
     ld   [hl], $2E
-JumpTable_65EA_19.else_19_6607:
+.else_19_6607:
     and  a
     jr   nz, .else_19_6611
 
     assign [$FFF2], $2F
     call JumpTable_3B8D_00
-JumpTable_65EA_19.else_19_6611:
+.else_19_6611:
     ld   e, $01
     and  %00000100
     jr   z, .else_19_6619
 
     ld   e, $FE
-JumpTable_65EA_19.else_19_6619:
+.else_19_6619:
     ld   a, e
     ld   [$C155], a
     call toc_01_088C
@@ -2102,7 +2102,7 @@ toc_19_6705:
     ld   hl, $C2B0
     add  hl, de
     ld   [hl], $01
-toc_19_6705.return_19_6742:
+.return_19_6742:
     ret
 
 
@@ -2146,14 +2146,14 @@ JumpTable_6834_19:
     ifEq [$FFEB], $AA, .else_19_6840
 
     ld   hl, $C250
-JumpTable_6834_19.else_19_6840:
+.else_19_6840:
     add  hl, bc
     ld   [hl], $08
     ld   e, $80
     ifEq [$FFEB], $AA, .else_19_684D
 
     ld   e, $60
-JumpTable_6834_19.else_19_684D:
+.else_19_684D:
     call toc_01_0891
     ld   [hl], e
     call JumpTable_3B8D_00
@@ -2247,10 +2247,10 @@ JumpTable_69D4_19:
     call toc_01_2185
     jp   JumpTable_3B8D_00
 
-JumpTable_69D4_19.else_19_69FB:
+.else_19_69FB:
     ld   a, e
     call toc_01_2185
-JumpTable_69D4_19.else_19_69FF:
+.else_19_69FF:
     ld   a, [hFrameCounter]
     rra
     rra
@@ -2421,7 +2421,7 @@ JumpTable_6E61_19:
     call JumpTable_3B8D_00
     call toc_01_0891
     ld   [hl], $58
-JumpTable_6E61_19.return_19_6E75:
+.return_19_6E75:
     ret
 
 
@@ -2526,7 +2526,7 @@ JumpTable_70DD_19:
     ret
 
 
-JumpTable_70DD_19.else_19_70FC:
+.else_19_70FC:
     call toc_01_0891
     ld   [hl], $A0
     jp   JumpTable_3B8D_00
@@ -2678,7 +2678,7 @@ toc_19_755F:
     ret
 
 
-toc_19_755F.else_19_7567:
+.else_19_7567:
     ld   a, [$C125]
     ld   e, a
     ld   d, $00
@@ -2736,7 +2736,7 @@ toc_19_755F.else_19_7567:
     ld   [hl], a
     jp   .else_19_766F
 
-toc_19_755F.else_19_75CA:
+.else_19_75CA:
     cp   $87
     jr   nz, .else_19_760A
 
@@ -2751,7 +2751,7 @@ toc_19_755F.else_19_75CA:
     ld   a, [hl]
     ld   [$FFE6], a
     ld   a, $06
-toc_19_755F.loop_19_75E1:
+.loop_19_75E1:
     ld   [$FFE8], a
     ld   e, a
     ld   d, b
@@ -2781,7 +2781,7 @@ toc_19_755F.loop_19_75E1:
     dec  a
     jr   nz, .loop_19_75E1
 
-toc_19_755F.else_19_760A:
+.else_19_760A:
     cp   $C1
     jr   nz, .else_19_762E
 
@@ -2789,7 +2789,7 @@ toc_19_755F.else_19_760A:
 
     ld   e, $10
     ld   hl, $D155
-toc_19_755F.loop_19_7619:
+.loop_19_7619:
     ld   a, [$FFD7]
     add  a, [hl]
     ldi  [hl], a
@@ -2798,7 +2798,7 @@ toc_19_755F.loop_19_7619:
 
     ld   e, $10
     ld   hl, $D175
-toc_19_755F.loop_19_7625:
+.loop_19_7625:
     ld   a, [$FFD9]
     add  a, [hl]
     ldi  [hl], a
@@ -2807,7 +2807,7 @@ toc_19_755F.loop_19_7625:
 
     jr   .else_19_766F
 
-toc_19_755F.else_19_762E:
+.else_19_762E:
     cp   $69
     jr   z, .else_19_765F
 
@@ -2823,10 +2823,10 @@ toc_19_755F.else_19_762E:
     and  %00000111
     jr   z, .else_19_766F
 
-toc_19_755F.else_19_7647:
+.else_19_7647:
     ld   e, $06
     ld   hl, $D100
-toc_19_755F.loop_19_764C:
+.loop_19_764C:
     ld   a, [$FFD7]
     add  a, [hl]
     ldi  [hl], a
@@ -2835,14 +2835,14 @@ toc_19_755F.loop_19_764C:
 
     ld   e, $06
     ld   hl, $D110
-toc_19_755F.loop_19_7658:
+.loop_19_7658:
     ld   a, [$FFD9]
     add  a, [hl]
     ldi  [hl], a
     dec  e
     jr   nz, .loop_19_7658
 
-toc_19_755F.else_19_765F:
+.else_19_765F:
     ld   hl, $C2B0
     add  hl, bc
     ld   a, [$FFD7]
@@ -2853,7 +2853,7 @@ toc_19_755F.else_19_765F:
     ld   a, [$FFD9]
     add  a, [hl]
     ld   [hl], a
-toc_19_755F.else_19_766F:
+.else_19_766F:
     ld   a, [$FFF6]
     ld   hl, $C3E0
     add  hl, bc
@@ -2873,7 +2873,7 @@ toc_19_755F.else_19_766F:
     cp   $78
     jr   c, .return_19_7696
 
-toc_19_755F.else_19_768C:
+.else_19_768C:
     ld   a, [$FFEB]
     cp   $A7
     ret  z
@@ -2881,7 +2881,7 @@ toc_19_755F.else_19_768C:
     ld   hl, $C280
     add  hl, bc
     ld   [hl], b
-toc_19_755F.return_19_7696:
+.return_19_7696:
     ret
 
 
@@ -2907,7 +2907,7 @@ JumpTable_76B0_19:
     ldd  a, [hl]
     push af
     ld   c, $07
-JumpTable_76B0_19.loop_19_76BC:
+.loop_19_76BC:
     ldd  a, [hl]
     ld   [de], a
     dec  de
@@ -2924,7 +2924,7 @@ JumpTable_76B0_19.loop_19_76BC:
     dec  de
     ld   a, h
     ld   [de], a
-JumpTable_76B0_19.return_19_76CC:
+.return_19_76CC:
     ret
 
 
@@ -2986,7 +2986,7 @@ toc_19_7800:
     ld   hl, $C28F
     add  hl, de
     ld   [hl], $00
-toc_19_7800.else_19_781F:
+.else_19_781F:
     ld   a, [$C14A]
     ld   e, a
     call toc_01_093B.toc_01_0942
@@ -2996,7 +2996,7 @@ toc_19_7800.else_19_781F:
     ret
 
 
-toc_19_7800.else_19_782C:
+.else_19_782C:
     and  a
     ret
 
@@ -3013,7 +3013,7 @@ toc_19_784E:
     sub  a, [hl]
     add  a, 20
     cp   40
-toc_19_784E.toc_19_7859:
+.toc_19_7859:
     jr   nc, .else_19_7899
 
     ld   a, [hLinkPositionX]
@@ -3053,7 +3053,7 @@ toc_19_784E.toc_19_7859:
     ret
 
 
-toc_19_784E.else_19_7899:
+.else_19_7899:
     and  a
     ret
 
@@ -3072,9 +3072,9 @@ toc_19_789B:
 
     ifNot [$C124], .return_19_78BC
 
-toc_19_789B.else_19_78BB:
+.else_19_78BB:
     pop  af
-toc_19_789B.return_19_78BC:
+.return_19_78BC:
     ret
 
 
@@ -3122,14 +3122,14 @@ toc_19_7914:
     jr   z, .else_19_7936
 
     ld   e, $F0
-toc_19_7914.else_19_7936:
+.else_19_7936:
     swap a
     and  %00001111
     or   e
     rr   d
     adc  [hl]
     ld   [hl], a
-toc_19_7914.return_19_793F:
+.return_19_793F:
     ret
 
 
@@ -3148,7 +3148,7 @@ toc_19_795A:
     jr   z, .else_19_7968
 
     inc  e
-toc_19_795A.else_19_7968:
+.else_19_7968:
     ld   d, a
     ret
 
@@ -3163,7 +3163,7 @@ toc_19_796A:
     jr   nz, .else_19_7978
 
     inc  e
-toc_19_796A.else_19_7978:
+.else_19_7978:
     ld   d, a
     ret
 
@@ -3181,7 +3181,7 @@ toc_19_7989:
 
     cpl
     inc  a
-toc_19_7989.else_19_7996:
+.else_19_7996:
     push af
     call toc_19_796A
     ld   a, e
@@ -3192,7 +3192,7 @@ toc_19_7989.else_19_7996:
 
     cpl
     inc  a
-toc_19_7989.else_19_79A4:
+.else_19_79A4:
     pop  de
     cp   d
     jr   nc, .else_19_79AC
@@ -3200,9 +3200,9 @@ toc_19_7989.else_19_79A4:
     ld   a, [$FFD7]
     jr   .toc_19_79AE
 
-toc_19_7989.else_19_79AC:
+.else_19_79AC:
     ld   a, [$FFD8]
-toc_19_7989.toc_19_79AE:
+.toc_19_79AE:
     ld   e, a
     ret
 
@@ -3249,7 +3249,7 @@ toc_19_7A62:
     jr   c, .else_19_7A77
 
     inc  d
-toc_19_7A62.else_19_7A77:
+.else_19_7A77:
     add  hl, de
     ld   a, [hl]
     or   %00100000

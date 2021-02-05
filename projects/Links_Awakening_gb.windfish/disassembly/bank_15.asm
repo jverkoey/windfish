@@ -107,7 +107,7 @@ JumpTable_40AD_15:
     call JumpTable_3B8D_00
     call toc_01_0891
     ld   [hl], $20
-JumpTable_40AD_15.return_15_40BB:
+.return_15_40BB:
     ret
 
 
@@ -734,7 +734,7 @@ JumpTable_4F6F_15:
     ret
 
 
-JumpTable_4F6F_15.else_15_4FC3:
+.else_15_4FC3:
     ld   hl, $C2A0
     add  hl, bc
     ld   a, [hl]
@@ -752,13 +752,13 @@ JumpTable_4F6F_15.else_15_4FC3:
     ld   [hl], a
     jr   .else_15_4FE3
 
-JumpTable_4F6F_15.else_15_4FDB:
+.else_15_4FDB:
     ld   hl, $C240
     add  hl, bc
     ld   a, [hl]
     xor  %11110000
     ld   [hl], a
-JumpTable_4F6F_15.else_15_4FE3:
+.else_15_4FE3:
     ld   hl, $C290
     add  hl, bc
     ld   a, [hl]
@@ -769,7 +769,7 @@ JumpTable_4F6F_15.else_15_4FE3:
     and  %00101111
     jr   nz, .else_15_501F
 
-JumpTable_4F6F_15.else_15_4FF2:
+.else_15_4FF2:
     xor  a
     ld   hl, $C250
     add  hl, bc
@@ -798,7 +798,7 @@ JumpTable_4F6F_15.else_15_4FF2:
     ld   hl, $C250
     add  hl, bc
     ld   [hl], a
-JumpTable_4F6F_15.else_15_501F:
+.else_15_501F:
     ld   hl, $C290
     add  hl, bc
     xor  a
@@ -2175,7 +2175,7 @@ JumpTable_78ED_15:
     ld   [hl], a
     jp   JumpTable_3B8D_00
 
-JumpTable_78ED_15.else_15_7929:
+.else_15_7929:
     ld   a, $01
     call toc_01_3B87
     ld   a, [hFrameCounter]
@@ -2187,7 +2187,7 @@ JumpTable_78ED_15.else_15_7929:
     ld   a, [hl]
     xor  %00000100
     ld   [hl], a
-JumpTable_78ED_15.return_15_793C:
+.return_15_793C:
     ret
 
 
@@ -2203,7 +2203,7 @@ toc_15_796D:
     add  hl, bc
     ld   a, [hl]
     and  %00001111
-toc_15_796D.toc_15_7974:
+.toc_15_7974:
     sla  a
     sla  a
     ld   e, a
@@ -2213,7 +2213,7 @@ toc_15_796D.toc_15_7974:
     jr   c, .else_15_7983
 
     sub  a, $60
-toc_15_796D.else_15_7983:
+.else_15_7983:
     ld   [$C3C0], a
     ld   a, [$C3C1]
     add  a, e
@@ -2231,7 +2231,7 @@ toc_15_796D.else_15_7983:
     add  hl, de
     ld   a, [hl]
     ld   [$C3C0], a
-toc_15_796D.return_15_79A4:
+.return_15_79A4:
     ret
 
 
@@ -2284,11 +2284,11 @@ toc_15_79A5:
     ld   [hl], b
     ld   a, $01
     call toc_15_796D.toc_15_7974
-toc_15_79A5.return_15_79F4:
+.return_15_79F4:
     ret
 
 
-toc_15_79A5.else_15_79F5:
+.else_15_79F5:
     ifNe [$FFEB], $02, .else_15_7A06
 
     ld   hl, $FFEC
@@ -2297,7 +2297,7 @@ toc_15_79A5.else_15_79F5:
     call .else_15_7A06
     jp   toc_01_3DBA
 
-toc_15_79A5.else_15_7A06:
+.else_15_7A06:
     ld   a, [$C3C0]
     ld   l, a
     ld   h, $00
@@ -2309,7 +2309,7 @@ toc_15_79A5.else_15_7A06:
     jr   z, .else_15_7A1A
 
     ld   e, $10
-toc_15_79A5.else_15_7A1A:
+.else_15_7A1A:
     ld   a, [$FFEC]
     add  a, $0B
     ldi  [hl], a
@@ -2335,7 +2335,7 @@ toc_15_79A5.else_15_7A1A:
     ret
 
 
-toc_15_79A5.else_15_7A3E:
+.else_15_7A3E:
     push bc
     ld   hl, $C3D0
     add  hl, bc
@@ -2354,7 +2354,7 @@ toc_15_79A5.else_15_7A3E:
     rla
     and  %00100000
     ld   c, a
-toc_15_79A5.else_15_7A57:
+.else_15_7A57:
     ld   a, [$C3C0]
     ld   l, a
     ld   h, $00
@@ -2454,14 +2454,14 @@ toc_15_7B99:
     jr   z, .else_15_7BBB
 
     ld   e, $F0
-toc_15_7B99.else_15_7BBB:
+.else_15_7BBB:
     swap a
     and  %00001111
     or   e
     rr   d
     adc  [hl]
     ld   [hl], a
-toc_15_7B99.return_15_7BC4:
+.return_15_7BC4:
     ret
 
 
@@ -2480,7 +2480,7 @@ toc_15_7BDF:
     jr   z, .else_15_7BED
 
     inc  e
-toc_15_7BDF.else_15_7BED:
+.else_15_7BED:
     ld   d, a
     ret
 
@@ -2495,7 +2495,7 @@ toc_15_7BEF:
     jr   nz, .else_15_7BFD
 
     inc  e
-toc_15_7BEF.else_15_7BFD:
+.else_15_7BFD:
     ld   d, a
     ret
 

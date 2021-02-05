@@ -49,7 +49,7 @@ toc_02_4146:
     ret
 
 
-toc_02_4146.else_02_414F:
+.else_02_414F:
     ld   d, $1D
     ifNotZero [$DB4E], .else_02_418C
 
@@ -83,11 +83,11 @@ toc_02_4146.else_02_414F:
     ld   a, $21
     jr   .toc_02_4191
 
-toc_02_4146.else_02_418C:
+.else_02_418C:
     clear [$D46C]
-toc_02_4146.else_02_4190:
+.else_02_4190:
     ld   a, d
-toc_02_4146.toc_02_4191:
+.toc_02_4191:
     ld   e, a
     ld   d, $00
     ld   [hDefaultMusicTrack], a
@@ -102,14 +102,14 @@ toc_02_4146.toc_02_4191:
     and  a
     jr   nz, .return_02_41B9
 
-toc_02_4146.else_02_41A6:
+.else_02_41A6:
     ifNot [$D47C], .return_02_41B9
 
     assign [$D368], MUSIC_ACTIVE_POWER_UP
     ld   [$FFBD], a
     ld   [hNextDefaultMusicTrack], a
     clear [$C1CF]
-toc_02_4146.return_02_41B9:
+.return_02_41B9:
     ret
 
 
@@ -138,7 +138,7 @@ toc_02_41BA:
     add  hl, de
     ld   a, [$FFDF]
     ld   [hl], a
-toc_02_41BA.else_02_41E4:
+.else_02_41E4:
     pop  bc
     ret
 
@@ -166,22 +166,22 @@ toc_02_41E6:
     ret
 
 
-toc_02_41E6.else_02_4214:
+.else_02_4214:
     assign [$C166], $D0
     assign [$FFF3], $0B
     ret
 
 
-toc_02_41E6.else_02_421E:
+.else_02_421E:
     assign [$C166], $BB
     assign [$FFF3], $0A
     ret
 
 
-toc_02_41E6.else_02_4228:
+.else_02_4228:
     assign [$C166], $D0
     assign [$FFF3], $15
-toc_02_41E6.return_02_4231:
+.return_02_4231:
     ret
 
 
@@ -219,7 +219,7 @@ toc_02_423B:
     ld   hl, $C250
     add  hl, de
     ld   [hl], a
-toc_02_423B.return_02_426D:
+.return_02_426D:
     ret
 
 
@@ -228,23 +228,23 @@ toc_02_426E:
 
     dec  a
     ld   [$C14C], a
-toc_02_426E.else_02_4278:
+.else_02_4278:
     ifNot [$C1C4], .else_02_4282
 
     dec  a
     ld   [$C1C4], a
-toc_02_426E.else_02_4282:
+.else_02_4282:
     ifNot [$C1C0], .else_02_428C
 
     dec  a
     ld   [$C1C0], a
-toc_02_426E.else_02_428C:
+.else_02_428C:
     call toc_02_4353
     ifNot [$C16E], .else_02_4299
 
     dec  a
     ld   [$C16E], a
-toc_02_426E.else_02_4299:
+.else_02_4299:
     ifNe [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING, .else_02_42AE
 
     clear [hLinkInteractiveMotionBlocked]
@@ -254,7 +254,7 @@ toc_02_426E.else_02_4299:
     call toc_02_49C5
     jp   toc_02_77FA
 
-toc_02_426E.else_02_42AE:
+.else_02_42AE:
     call toc_01_19EF
     clear [hLinkInteractiveMotionBlocked]
     call toc_01_1E73
@@ -287,11 +287,11 @@ toc_02_426E.else_02_42AE:
     jr   nz, .return_02_42FC
 
     assign [$FFF2], $04
-toc_02_426E.return_02_42FC:
+.return_02_42FC:
     ret
 
 
-toc_02_426E.else_02_42FD:
+.else_02_42FD:
     ifEq [$C1AD], $01, .else_02_431A
 
     ifNe [$C122], $28, .else_02_431A
@@ -302,9 +302,9 @@ toc_02_426E.else_02_42FD:
 
     assign [$C121], $20
     assign [$FFF4], $03
-toc_02_426E.else_02_431A:
+.else_02_431A:
     clear [$C122]
-toc_02_426E.return_02_431E:
+.return_02_431E:
     ret
 
 
@@ -313,7 +313,7 @@ toc_02_431F:
 
     ld   [hLinkAnimationState], a
     assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_GRAB_SLASH
-toc_02_431F.return_02_432C:
+.return_02_432C:
     ret
 
 
@@ -338,7 +338,7 @@ toc_02_4331:
     ret
 
 
-toc_02_4331.else_02_434E:
+.else_02_434E:
     clear [$C19B]
     ret
 
@@ -354,7 +354,7 @@ toc_02_4353:
     ret
 
 
-toc_02_4353.else_02_4362:
+.else_02_4362:
     copyFromTo [$DBAE], [$D46B]
     call toc_02_446A
     ld   a, [hLinkPositionZHigh]
@@ -365,7 +365,7 @@ toc_02_4353.else_02_4362:
     and  a
     jp   nz, .else_02_445C
 
-toc_02_4353.else_02_4376:
+.else_02_4376:
     ifNot [$C14A], .else_02_43A9
 
     ld   a, [$FFCC]
@@ -380,20 +380,20 @@ toc_02_4353.else_02_4376:
     cp   [hl]
     jr   nz, .else_02_439B
 
-toc_02_4353.else_02_438E:
+.else_02_438E:
     ld   a, [$C120]
     add  a, $02
     ld   [$C120], a
     call toc_01_145D
     jr   .else_02_440A
 
-toc_02_4353.else_02_439B:
+.else_02_439B:
     ld   [$C19A], a
     ld   a, [$C199]
     add  a, $0C
     ld   [$C199], a
     call toc_01_093B
-toc_02_4353.else_02_43A9:
+.else_02_43A9:
     ld   a, [$C146]
     and  a
     jr   nz, .else_02_440A
@@ -402,7 +402,7 @@ toc_02_4353.else_02_43A9:
     ifNe [$D47C], $01, .else_02_43BA
 
     ld   e, $10
-toc_02_4353.else_02_43BA:
+.else_02_43BA:
     ld   a, [hPressedButtonsMask]
     and  J_DOWN | J_LEFT | J_RIGHT | J_UP
     or   e
@@ -422,7 +422,7 @@ toc_02_4353.else_02_43BA:
     sla  [hl]
     ld   hl, hLinkPositionYIncrement
     sla  [hl]
-toc_02_4353.else_02_43E0:
+.else_02_43E0:
     ld   a, e
     and  J_DOWN | J_LEFT | J_RIGHT | J_UP
     ld   e, a
@@ -442,16 +442,16 @@ toc_02_4353.else_02_43E0:
     jr   nz, .else_02_43FD
 
     ld   [hLinkDirection], a
-toc_02_4353.else_02_43FD:
+.else_02_43FD:
     jr   .else_02_440A
 
-toc_02_4353.else_02_43FF:
+.else_02_43FF:
     ld   a, [$C14B]
     and  a
     jr   nz, .else_02_440A
 
     assign [$C120], $07
-toc_02_4353.else_02_440A:
+.else_02_440A:
     ld   e, $03
     ld   a, [$C117]
     and  a
@@ -466,7 +466,7 @@ toc_02_4353.else_02_440A:
     and  a
     jr   nz, .else_02_4448
 
-toc_02_4353.else_02_4427:
+.else_02_4427:
     ld   a, [hLinkWalksSlow]
     and  a
     jr   nz, .else_02_4448
@@ -487,29 +487,29 @@ toc_02_4353.else_02_4427:
     ifLt [$C1BB], $18, .else_02_4448
 
     ld   e, $07
-toc_02_4353.else_02_4448:
+.else_02_4448:
     ld   a, [hFrameCounter]
     and  e
     jr   nz, .else_02_445C
 
     jr   .else_02_4454
 
-toc_02_4353.else_02_444F:
+.else_02_444F:
     ld   a, [hFrameCounter]
     and  [hl]
     jr   z, .return_02_4469
 
-toc_02_4353.else_02_4454:
+.else_02_4454:
     ld   a, [$C14F]
     and  a
     ret  nz
 
     call toc_01_20D6
-toc_02_4353.else_02_445C:
+.else_02_445C:
     copyFromTo [$C11F], [$C130]
     clear [$C11F]
     call toc_02_6FB1
-toc_02_4353.return_02_4469:
+.return_02_4469:
     ret
 
 
@@ -528,12 +528,12 @@ toc_02_446A:
     clear [hLinkPositionYIncrement]
     jr   .else_02_448C
 
-toc_02_446A.else_02_4489:
+.else_02_4489:
     clear [hLinkPositionXIncrement]
-toc_02_446A.else_02_448C:
+.else_02_448C:
     pop  af
     call toc_01_149B
-toc_02_446A.return_02_4490:
+.return_02_4490:
     ret
 
 
@@ -562,11 +562,11 @@ toc_02_4497:
 
     ifNe [$C1AD], $80, .else_02_44CD
 
-toc_02_4497.else_02_44C8:
+.else_02_44C8:
     call toc_01_1495
     jr   .else_02_450D
 
-toc_02_4497.else_02_44CD:
+.else_02_44CD:
     ld   a, [hPressedButtonsMask]
     and  J_LEFT | J_RIGHT
     jr   z, .else_02_44EC
@@ -584,11 +584,11 @@ toc_02_4497.else_02_44CD:
     jr   nz, .else_02_44E7
 
     ld   e, 255
-toc_02_4497.else_02_44E7:
+.else_02_44E7:
     ld   a, [hLinkPositionXIncrement]
     add  a, e
     ld   [hLinkPositionXIncrement], a
-toc_02_4497.else_02_44EC:
+.else_02_44EC:
     ld   a, [hPressedButtonsMask]
     rra
     rra
@@ -608,17 +608,17 @@ toc_02_4497.else_02_44EC:
     jr   nz, .else_02_4508
 
     ld   e, 255
-toc_02_4497.else_02_4508:
+.else_02_4508:
     ld   a, [hLinkPositionYIncrement]
     add  a, e
     ld   [hLinkPositionYIncrement], a
-toc_02_4497.else_02_450D:
+.else_02_450D:
     ifNot [hLinkPositionZHigh], .else_02_4516
 
     and  %10000000
     jr   z, .return_02_4556
 
-toc_02_4497.else_02_4516:
+.else_02_4516:
     call toc_01_093B.toc_01_0942
     ld   [hLinkPositionZHigh], a
     ld   [$C149], a
@@ -647,11 +647,11 @@ toc_02_4497.else_02_4516:
     jr   z, .return_02_4556
 
     assign [$FFF4], $07
-toc_02_4497.return_02_4556:
+.return_02_4556:
     ret
 
 
-toc_02_4497.else_02_4557:
+.else_02_4557:
     copyFromTo [hLinkPositionY], [$FFD8]
     copyFromTo [hLinkPositionX], [$FFD7]
     assign [$FFF2], $0E
@@ -737,7 +737,7 @@ toc_02_46B4:
 
     ld   hl, $C121
     dec  [hl]
-toc_02_46B4.else_02_46F0:
+.else_02_46F0:
     ifNotZero [$C121], toc_02_4738.else_02_485E
 
     rla
@@ -767,13 +767,13 @@ toc_02_4716:
     jr   nz, .else_02_472C
 
     assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_GRAB_SLASH
-toc_02_4716.else_02_472C:
+.else_02_472C:
     assign [$C137], $03
     jp   toc_02_4738.toc_02_47D4
 
 toc_02_4734:
     call toc_02_4738.toc_02_47D4
-toc_02_4734.return_02_4737:
+.return_02_4737:
     ret
 
 
@@ -793,7 +793,7 @@ toc_02_4738:
     ret
 
 
-toc_02_4738.else_02_474F:
+.else_02_474F:
     ifNe [$C146], $01, .else_02_478C
 
     ld   a, [$C3CF]
@@ -825,7 +825,7 @@ toc_02_4738.else_02_474F:
     ld   a, [$C152]
     inc  a
     ld   [$C152], a
-toc_02_4738.else_02_478C:
+.else_02_478C:
     ld   a, [$C121]
     and  a
     jp   nz, toc_02_46B4
@@ -845,7 +845,7 @@ toc_02_4738.else_02_478C:
     jr   nz, .else_02_47B6
 
     assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_GRAB_SLASH
-toc_02_4738.else_02_47B6:
+.else_02_47B6:
     ld   a, [$C138]
     and  a
     jr   nz, .else_02_47D0
@@ -861,10 +861,10 @@ toc_02_4738.else_02_47B6:
     ld   hl, $4658
     add  hl, bc
     ld   a, [hl]
-toc_02_4738.else_02_47D0:
+.else_02_47D0:
     dec  a
     ld   [$C138], a
-toc_02_4738.toc_02_47D4:
+.toc_02_47D4:
     ld   hl, $C137
     ld   a, [hLinkDirection]
     ld   e, a
@@ -886,7 +886,7 @@ toc_02_4738.toc_02_47D4:
     jr   z, .else_02_47F7
 
     ld   [hLinkAnimationState], a
-toc_02_4738.else_02_47F7:
+.else_02_47F7:
     ld   hl, $45F9
     add  hl, bc
     ld   a, [hl]
@@ -915,7 +915,7 @@ toc_02_4738.else_02_47F7:
     and  %00000001
     jr   nz, .else_02_485A
 
-toc_02_4738.else_02_482B:
+.else_02_482B:
     ld   a, [$C13A]
     add  a, [hl]
     ld   hl, hLinkPositionX
@@ -937,12 +937,12 @@ toc_02_4738.else_02_482B:
     ld   a, [hl]
     ld   [$C143], a
     assign [$C5B0], $01
-toc_02_4738.else_02_485A:
+.else_02_485A:
     call toc_01_12AE
     ret
 
 
-toc_02_4738.else_02_485E:
+.else_02_485E:
     clear [$C1AC]
     ld   a, [$C14A]
     and  a
@@ -951,7 +951,7 @@ toc_02_4738.else_02_485E:
     clear [$C137]
     ld   [$C16A], a
     ld   [$C121], a
-toc_02_4738.return_02_4872:
+.return_02_4872:
     ret
 
 
@@ -1029,7 +1029,7 @@ toc_02_49C5:
 
     jr   .toc_02_4A1B
 
-toc_02_49C5.else_02_4A02:
+.else_02_4A02:
     ifEq [$D465], $47, .else_02_4A29
 
     ld   a, [$FFCC]
@@ -1039,7 +1039,7 @@ toc_02_49C5.else_02_4A02:
     clear [$C166]
     ld   [$C167], a
     assign [$C5A3], $03
-toc_02_49C5.toc_02_4A1B:
+.toc_02_4A1B:
     ld   a, [$D461]
     ld   e, a
     ld   d, b
@@ -1048,10 +1048,10 @@ toc_02_49C5.toc_02_4A1B:
     ld   [hl], $00
     jp   toc_01_27BD
 
-toc_02_49C5.else_02_4A29:
+.else_02_4A29:
     jr   .else_02_4A80
 
-toc_02_49C5.else_02_4A2B:
+.else_02_4A2B:
     call toc_01_1495
     call toc_01_093B
     ld   hl, $C166
@@ -1070,7 +1070,7 @@ toc_02_49C5.else_02_4A2B:
     call toc_01_218E
     jr   .else_02_4A61
 
-toc_02_49C5.else_02_4A51:
+.else_02_4A51:
     ld   a, [$DB49]
     and  a
     jr   nz, .else_02_4A61
@@ -1081,7 +1081,7 @@ toc_02_49C5.else_02_4A51:
     ret
 
 
-toc_02_49C5.else_02_4A61:
+.else_02_4A61:
     clear [$C167]
     ifNe [$DB4A], $01, .return_02_4A7F
 
@@ -1090,11 +1090,11 @@ toc_02_49C5.else_02_4A61:
     ld   [$C16B], a
     ld   [$C16C], a
     assign [$FFF2], $2C
-toc_02_49C5.return_02_4A7F:
+.return_02_4A7F:
     ret
 
 
-toc_02_49C5.else_02_4A80:
+.else_02_4A80:
     ld   a, [$C5A4]
     inc  a
     ld   [$C5A4], a
@@ -1105,14 +1105,14 @@ toc_02_49C5.else_02_4A80:
     ld   a, [$C5A5]
     xor  %00000001
     ld   [$C5A5], a
-toc_02_49C5.else_02_4A97:
+.else_02_4A97:
     ld   a, [$C5A5]
     ld   e, LINK_ANIMATION_STATE_UNKNOWN_75
     and  a
     jr   nz, .else_02_4AA0
 
     inc  e
-toc_02_49C5.else_02_4AA0:
+.else_02_4AA0:
     ld   a, e
     ld   [hLinkAnimationState], a
     assign [$C167], $02
@@ -1152,7 +1152,7 @@ toc_02_49C5.else_02_4AA0:
     ld   hl, $C3D0
     add  hl, de
     ld   [hl], $40
-toc_02_49C5.return_02_4AEF:
+.return_02_4AEF:
     ret
 
 
@@ -1167,7 +1167,7 @@ toc_02_4AF8:
 
     call toc_01_0F34.toc_01_0F3F
     assign [$C5B0], $01
-toc_02_4AF8.else_02_4B13:
+.else_02_4B13:
     ld   hl, hLinkInteractiveMotionBlocked
     ld   [hl], $01
     call toc_01_1495
@@ -1183,7 +1183,7 @@ toc_02_4AF8.else_02_4B13:
     push af
     call toc_02_4B77
     pop  af
-toc_02_4AF8.else_02_4B34:
+.else_02_4B34:
     cp   $18
     jr   nz, .else_02_4B58
 
@@ -1197,13 +1197,13 @@ toc_02_4AF8.else_02_4B34:
 
     ld   a, $79
     call toc_01_218E
-toc_02_4AF8.else_02_4B50:
+.else_02_4B50:
     clear [$C1C7]
     ld   [$C1AC], a
     ret
 
 
-toc_02_4AF8.else_02_4B58:
+.else_02_4B58:
     rra
     rra
     rra
@@ -1219,7 +1219,7 @@ toc_02_4AF8.else_02_4B58:
     add  hl, de
     ld   a, [hl]
     ld   [hLinkAnimationState], a
-toc_02_4AF8.return_02_4B6E:
+.return_02_4B6E:
     ret
 
 
@@ -1231,7 +1231,7 @@ toc_02_4B77:
 
     assign [$C1C7], $02
     call toc_02_4B85
-toc_02_4B77.return_02_4B84:
+.return_02_4B84:
     ret
 
 
@@ -1274,7 +1274,7 @@ toc_02_4B85:
     ld   a, $07
     jr   .toc_02_4BDD
 
-toc_02_4B85.else_02_4BC8:
+.else_02_4BC8:
     ld   a, $6A
     ldi  [hl], a
     ld   a, $7A
@@ -1289,7 +1289,7 @@ toc_02_4B85.else_02_4BC8:
     ld   a, $6B
     ldi  [hl], a
     ld   a, $7B
-toc_02_4B85.toc_02_4BDD:
+.toc_02_4BDD:
     ldi  [hl], a
     ld   a, $00
     ldi  [hl], a
@@ -1303,7 +1303,7 @@ toc_02_4B85.toc_02_4BDD:
     jr   nc, .else_02_4BF2
 
     ld   a, $2D
-toc_02_4B85.else_02_4BF2:
+.else_02_4BF2:
     call toc_01_3C01
     jr   c, .return_02_4C34
 
@@ -1342,7 +1342,7 @@ toc_02_4B85.else_02_4BF2:
     ld   hl, $C240
     add  hl, bc
     ld   [hl], a
-toc_02_4B85.return_02_4C34:
+.return_02_4C34:
     ret
 
 
@@ -1413,15 +1413,15 @@ toc_02_4C35:
 
     jr   .toc_02_4CA8
 
-toc_02_4C35.else_02_4CA2:
+.else_02_4CA2:
     ifNe [$FFD7], $05, .else_02_4CAA
 
-toc_02_4C35.toc_02_4CA8:
+.toc_02_4CA8:
     and  a
     ret
 
 
-toc_02_4C35.else_02_4CAA:
+.else_02_4CAA:
     scf
     ret
 
@@ -1620,7 +1620,7 @@ toc_02_514B:
     jr   c, .else_02_5158
 
     add  a, $04
-toc_02_514B.else_02_5158:
+.else_02_5158:
     ld   e, a
     ld   d, $00
     ld   hl, $5123
@@ -1656,12 +1656,12 @@ toc_02_514B.else_02_5158:
 
     ld   a, [hl]
     ld   [de], a
-toc_02_514B.else_02_5199:
+.else_02_5199:
     ifEq [$FFDA], $FF, .else_02_51A1
 
     ld   a, [hl]
     ld   [bc], a
-toc_02_514B.else_02_51A1:
+.else_02_51A1:
     inc  de
     inc  bc
     ld   a, [$FFD8]
@@ -1748,7 +1748,7 @@ toc_02_51EB:
     call toc_01_0953
     jp   .else_02_5258
 
-toc_02_51EB.else_02_5236:
+.else_02_5236:
     ld   a, $06
     call toc_01_3C01
     jr   c, .else_02_5258
@@ -1768,7 +1768,7 @@ toc_02_51EB.else_02_5236:
     ld   hl, $C210
     add  hl, de
     ld   [hl], a
-toc_02_51EB.else_02_5258:
+.else_02_5258:
     pop  de
     pop  bc
     ret
@@ -1787,7 +1787,7 @@ toc_02_5260:
     jr   c, .else_02_526B
 
     ld   a, $3C
-toc_02_5260.else_02_526B:
+.else_02_526B:
     call toc_01_3C01
     jr   c, .else_02_5282
 
@@ -1800,7 +1800,7 @@ toc_02_5260.else_02_526B:
     ld   hl, $C310
     add  hl, de
     ld   [hl], $70
-toc_02_5260.else_02_5282:
+.else_02_5282:
     pop  bc
     ret
 
@@ -1816,7 +1816,7 @@ toc_02_529A:
 
     dec  a
     ld   [$C134], a
-toc_02_529A.else_02_52AB:
+.else_02_52AB:
     ld   a, [hPressedButtonsMask]
     and  J_B
     jr   z, toc_02_52ED
@@ -1836,7 +1836,7 @@ toc_02_529A.else_02_52AB:
 toc_02_52ED:
     ld   b, $00
     ld   c, $0F
-toc_02_52ED.loop_02_52F1:
+.loop_02_52F1:
     ld   a, c
     ld   [$C123], a
     ld   hl, $C510
@@ -1846,7 +1846,7 @@ toc_02_52ED.loop_02_52F1:
     jr   z, .else_02_5300
 
     call toc_02_535D
-toc_02_52ED.else_02_5300:
+.else_02_5300:
     dec  c
     ld   a, c
     cp   $FF
@@ -1875,15 +1875,15 @@ toc_02_52ED.else_02_5300:
     cp   12
     jr   c, .return_02_5332
 
-toc_02_52ED.else_02_532D:
+.else_02_532D:
     ld   a, [$FFAC]
     inc  a
     ld   [$FFAC], a
-toc_02_52ED.return_02_5332:
+.return_02_5332:
     ret
 
 
-toc_02_52ED.else_02_5333:
+.else_02_5333:
     ld   a, [hLinkPositionZHigh]
     and  a
     jr   nz, .return_02_535C
@@ -1908,7 +1908,7 @@ toc_02_52ED.else_02_5333:
 
     call toc_01_0915
     clear [$FFAC]
-toc_02_52ED.return_02_535C:
+.return_02_535C:
     ret
 
 
@@ -1929,9 +1929,9 @@ toc_02_535D:
     ld   [$FFD7], a
     jr   nz, .else_02_5375
 
-toc_02_535D.else_02_5372:
+.else_02_5372:
     call toc_02_56C5.else_02_56DB
-toc_02_535D.else_02_5375:
+.else_02_5375:
     pop  af
     dec  a
     jumptable
@@ -1980,7 +1980,7 @@ JumpTable_53D2_02:
     jr   z, .else_02_53F3
 
     ld   hl, $53B2
-JumpTable_53D2_02.else_02_53F3:
+.else_02_53F3:
     jp   JumpTable_5619_02.toc_02_562E
 
     db   $F8, $00, $08, $10, $6C, $6E, $6E, $6C
@@ -1997,7 +1997,7 @@ JumpTable_5402_02:
     pop  de
     push bc
     ld   c, $04
-JumpTable_5402_02.loop_02_5414:
+.loop_02_5414:
     ld   a, [$FFD8]
     ld   [de], a
     inc  de
@@ -2036,25 +2036,25 @@ JumpTable_543D_02:
 
     ld   hl, $C167
     ld   [hl], b
-JumpTable_543D_02.else_02_5452:
+.else_02_5452:
     cp   $DE
     jr   nz, .else_02_545B
 
     call toc_02_525B
     ld   a, $DE
-JumpTable_543D_02.else_02_545B:
+.else_02_545B:
     cp   $A0
     jr   nz, .else_02_5464
 
     ld   hl, $FFF4
     ld   [hl], $2A
-JumpTable_543D_02.else_02_5464:
+.else_02_5464:
     cp   $0A
     jr   nz, .else_02_546F
 
     assign [$C5AF], $50
     ld   a, $0A
-JumpTable_543D_02.else_02_546F:
+.else_02_546F:
     cp   $20
     jr   c, .else_02_5483
 
@@ -2066,13 +2066,13 @@ JumpTable_543D_02.else_02_546F:
     jr   z, .else_02_547E
 
     ld   e, $FE
-JumpTable_543D_02.else_02_547E:
+.else_02_547E:
     ld   a, e
     ld   [$C155], a
     ret
 
 
-JumpTable_543D_02.else_02_5483:
+.else_02_5483:
     and  %00001111
     cp   $08
     jp   nz, .return_02_54F9
@@ -2098,7 +2098,7 @@ JumpTable_543D_02.else_02_5483:
 
     assign [hSwordIntersectedAreaX], $60
     ld   a, $10
-JumpTable_543D_02.else_02_54AF:
+.else_02_54AF:
     ld   [hSwordIntersectedAreaY], a
     call toc_01_2839
     ld   a, [$D600]
@@ -2137,10 +2137,10 @@ JumpTable_543D_02.else_02_54AF:
     ifNe [$FFF6], $B5, .else_02_54F3
 
     ld   hl, $D727
-JumpTable_543D_02.else_02_54F3:
+.else_02_54F3:
     ld   [hl], $E3
     assign [$FFF2], $23
-JumpTable_543D_02.return_02_54F9:
+.return_02_54F9:
     ret
 
 
@@ -2198,14 +2198,14 @@ JumpTable_5550_02:
     add  hl, bc
     add  a, [hl]
     ld   [hl], a
-JumpTable_5550_02.else_02_5572:
+.else_02_5572:
     call toc_02_56C5
     push bc
     ld   c, $3A
     ifGte [$FFD7], $07, .else_02_5580
 
     ld   c, $3C
-JumpTable_5550_02.else_02_5580:
+.else_02_5580:
     ld   a, [$C3C0]
     ld   e, a
     ld   d, $00
@@ -2288,12 +2288,12 @@ JumpTable_5619_02:
     jp   z, toc_02_566C
 
     ld   hl, $55F1
-JumpTable_5619_02.toc_02_5627:
+.toc_02_5627:
     ld   a, [$FFD7]
     and  %00001000
     ld   e, a
     ld   d, $00
-JumpTable_5619_02.toc_02_562E:
+.toc_02_562E:
     add  hl, de
     push hl
     ld   a, [$C3C0]
@@ -2360,12 +2360,12 @@ JumpTable_5699_02:
     call toc_02_5C92
     jr   .else_02_56B7
 
-JumpTable_5699_02.else_02_56B0:
+.else_02_56B0:
     cp   $04
     jr   nz, .else_02_56B7
 
     call toc_02_5D00
-JumpTable_5699_02.else_02_56B7:
+.else_02_56B7:
     ld   a, [$FFD7]
     rla
     and  %00011000
@@ -2389,12 +2389,12 @@ toc_02_56C5:
     cp   $A8
     jr   c, .return_02_56E1
 
-toc_02_56C5.else_02_56DB:
+.else_02_56DB:
     ld   hl, $C510
     add  hl, bc
     xor  a
     ld   [hl], a
-toc_02_56C5.return_02_56E1:
+.return_02_56E1:
     ret
 
 
@@ -2410,7 +2410,7 @@ toc_02_56EA:
     jr   c, .else_02_56F9
 
     sub  a, $60
-toc_02_56EA.else_02_56F9:
+.else_02_56F9:
     ld   [$C3C0], a
     ld   a, [$C3C1]
     add  a, e
@@ -2428,13 +2428,13 @@ toc_02_56EA.else_02_56F9:
     add  hl, de
     ld   a, [hl]
     ld   [$C3C0], a
-toc_02_56EA.return_02_571A:
+.return_02_571A:
     ret
 
 
 toc_02_571B:
     ld   a, [hLinkPositionY]
-toc_02_571B.toc_02_571D:
+.toc_02_571D:
     ld   [$FFD8], a
     copyFromTo [hLinkPositionX], [$FFD7]
     assign [$FFF2], $0E
@@ -2465,19 +2465,19 @@ toc_02_5731:
     call toc_02_5871
     jr   .return_02_575D
 
-toc_02_5731.else_02_575A:
+.else_02_575A:
     call toc_02_59E1
-toc_02_5731.return_02_575D:
+.return_02_575D:
     ret
 
 
-toc_02_5731.else_02_575E:
+.else_02_575E:
     ifNot [$C18C], .else_02_5793
 
     ld   e, $03
     ld   a, [$C18A]
     ld   c, a
-toc_02_5731.loop_02_576A:
+.loop_02_576A:
     inc  e
     ld   a, e
     cp   $08
@@ -2500,12 +2500,12 @@ toc_02_5731.loop_02_576A:
     ret
 
 
-toc_02_5731.else_02_578E:
+.else_02_578E:
     clear [$C18C]
     ret
 
 
-toc_02_5731.else_02_5793:
+.else_02_5793:
     ld   a, [$C18D]
     and  a
     jr   nz, .else_02_579A
@@ -2513,11 +2513,11 @@ toc_02_5731.else_02_5793:
     ret
 
 
-toc_02_5731.else_02_579A:
+.else_02_579A:
     ld   e, $03
     ld   a, [$C18B]
     ld   c, a
-toc_02_5731.loop_02_57A0:
+.loop_02_57A0:
     inc  e
     ld   a, e
     cp   $08
@@ -2539,7 +2539,7 @@ toc_02_5731.loop_02_57A0:
     ret
 
 
-toc_02_5731.else_02_57C5:
+.else_02_57C5:
     clear [$C18D]
     ret
 
@@ -2579,14 +2579,14 @@ toc_02_5871:
     jr   z, .else_02_588B
 
     xor  a
-toc_02_5871.loop_02_5883:
+.loop_02_5883:
     add  a, $04
     ld   e, a
     ld   d, $00
     dec  c
     jr   nz, .loop_02_5883
 
-toc_02_5871.else_02_588B:
+.else_02_588B:
     ld   hl, $5812
     ld   a, [$C189]
     ld   c, a
@@ -2597,7 +2597,7 @@ toc_02_5871.else_02_588B:
     add  hl, bc
     add  a, [hl]
     ld   [hSwordIntersectedAreaX], a
-toc_02_5871.toc_02_589D:
+.toc_02_589D:
     ld   hl, $5824
     ld   a, [$FFE3]
     ld   c, a
@@ -2617,7 +2617,7 @@ toc_02_5871.toc_02_589D:
 
     inc  de
     inc  de
-toc_02_5871.else_02_58BD:
+.else_02_58BD:
     ld   a, [$D600]
     ld   c, a
     ld   b, $00
@@ -2650,7 +2650,7 @@ toc_02_5871.else_02_58BD:
     assign [$FFE3], $09
     jp   .toc_02_589D
 
-toc_02_5871.else_02_58F1:
+.else_02_58F1:
     xor  a
     inc  hl
     ld   [hl], a
@@ -2662,7 +2662,7 @@ toc_02_5871.else_02_58F1:
     ret
 
 
-toc_02_5871.else_02_5904:
+.else_02_5904:
     ld   a, [$FFE5]
     and  a
     jr   nz, .else_02_5919
@@ -2677,7 +2677,7 @@ toc_02_5871.else_02_5904:
     dec  de
     jp   .toc_02_589D
 
-toc_02_5871.else_02_5919:
+.else_02_5919:
     clear [$C188]
     ld   [$C1A8], a
     clear [$FFE5]
@@ -2691,7 +2691,7 @@ toc_02_5871.else_02_5919:
     ld   a, c
     and  %00000111
     ld   c, a
-toc_02_5871.toc_02_5934:
+.toc_02_5934:
     ld   hl, $5836
     add  hl, bc
     ld   a, [hl]
@@ -2715,7 +2715,7 @@ toc_02_5871.toc_02_5934:
     ld   c, a
     jr   .toc_02_5934
 
-toc_02_5871.else_02_5957:
+.else_02_5957:
     call toc_02_5987
     push hl
     pop  bc
@@ -2762,7 +2762,7 @@ toc_02_5987:
     jr   c, .else_02_599F
 
     inc  d
-toc_02_5987.else_02_599F:
+.else_02_599F:
     add  hl, de
     ret
 
@@ -2790,14 +2790,14 @@ toc_02_59E1:
 
     ld   c, a
     xor  a
-toc_02_59E1.loop_02_59F6:
+.loop_02_59F6:
     add  a, $04
     ld   e, a
     ld   d, $00
     dec  c
     jr   nz, .loop_02_59F6
 
-toc_02_59E1.else_02_59FE:
+.else_02_59FE:
     ld   hl, $59BD
     ld   a, [$C189]
     ld   c, a
@@ -2808,7 +2808,7 @@ toc_02_59E1.else_02_59FE:
     add  hl, bc
     add  a, [hl]
     ld   [hSwordIntersectedAreaX], a
-toc_02_59E1.toc_02_5A10:
+.toc_02_5A10:
     ld   hl, $59C5
     ld   a, [$FFE3]
     ld   c, a
@@ -2839,7 +2839,7 @@ toc_02_59E1.toc_02_5A10:
 
     copyFromTo [hLinkPositionX], [$DBB1]
     copyFromTo [hLinkPositionY], [$DBB2]
-toc_02_59E1.else_02_5A4C:
+.else_02_5A4C:
     push de
     call toc_01_2839
     pop  de
@@ -2847,7 +2847,7 @@ toc_02_59E1.else_02_5A4C:
 
     inc  de
     inc  de
-toc_02_59E1.else_02_5A58:
+.else_02_5A58:
     ld   a, [$D600]
     ld   c, a
     ld   b, $00
@@ -2880,7 +2880,7 @@ toc_02_59E1.else_02_5A58:
     assign [$FFE3], $04
     jp   .toc_02_5A10
 
-toc_02_59E1.else_02_5A8C:
+.else_02_5A8C:
     xor  a
     inc  hl
     ld   [hl], a
@@ -2892,7 +2892,7 @@ toc_02_59E1.else_02_5A8C:
     ret
 
 
-toc_02_59E1.else_02_5A9F:
+.else_02_5A9F:
     ld   a, [$FFE5]
     and  a
     jr   nz, .else_02_5AB4
@@ -2907,7 +2907,7 @@ toc_02_59E1.else_02_5A9F:
     dec  de
     jp   .toc_02_5A10
 
-toc_02_59E1.else_02_5AB4:
+.else_02_5AB4:
     clear [$C188]
     ld   [$C1A8], a
     clear [$FFE5]
@@ -2919,7 +2919,7 @@ toc_02_59E1.else_02_5AB4:
     add  hl, bc
     ld   a, [hl]
     ld   [$FFD7], a
-toc_02_59E1.toc_02_5ACD:
+.toc_02_5ACD:
     ld   hl, $59D1
     add  hl, bc
     ld   a, [hl]
@@ -2943,12 +2943,12 @@ toc_02_59E1.toc_02_5ACD:
     ld   c, a
     jr   .toc_02_5ACD
 
-toc_02_59E1.else_02_5AF0:
+.else_02_5AF0:
     ld   hl, $D800
     ifNot [$DBA5], .else_02_5AFC
 
     ld   hl, $D900
-toc_02_59E1.else_02_5AFC:
+.else_02_5AFC:
     ld   a, [$FFF6]
     ld   e, a
     ld   d, $00
@@ -2993,7 +2993,7 @@ JumpTable_5B3F_02:
     call toc_02_5B75
     ld   c, $0F
     ld   b, $00
-JumpTable_5B3F_02.loop_02_5B46:
+.loop_02_5B46:
     ld   hl, $C340
     add  hl, bc
     ld   a, [hl]
@@ -3017,7 +3017,7 @@ JumpTable_5B3F_02.loop_02_5B46:
     or   %00000010
     ld   [hl], a
     assign [$FFF4], $13
-JumpTable_5B3F_02.else_02_5B6E:
+.else_02_5B6E:
     dec  c
     ld   a, c
     cp   $FF
@@ -3037,7 +3037,7 @@ toc_02_5B75:
     ret
 
 
-toc_02_5B75.else_02_5B86:
+.else_02_5B86:
     pop  af
     ret
 
@@ -3065,14 +3065,14 @@ JumpTable_5BAF_02:
     assign [$FFD7], $88
     assign [$FFD8], $20
     ld   a, $04
-JumpTable_5BAF_02.toc_02_5BBC:
+.toc_02_5BBC:
     call toc_01_0953
     call toc_02_5987
     ld   a, [hl]
     or   %00010000
     ld   [hl], a
     ld   [$FFF8], a
-JumpTable_5BAF_02.return_02_5BC8:
+.return_02_5BC8:
     ret
 
 
@@ -3085,7 +3085,7 @@ JumpTable_5BC9_02:
     or   %00010000
     ld   [hl], a
     ld   [$FFF8], a
-JumpTable_5BC9_02.else_02_5BDB:
+.else_02_5BDB:
     call toc_02_5260
     ret
 
@@ -3100,13 +3100,13 @@ JumpTable_5BDF_02:
     and  %00000001
     jr   nz, .return_02_5C3C
 
-JumpTable_5BDF_02.JumpTable_5BED_02:
+.JumpTable_5BED_02:
     ld   a, [$C190]
     and  a
     jr   nz, .else_02_5BF6
 
     call toc_02_5C3D
-JumpTable_5BDF_02.else_02_5BF6:
+.else_02_5BF6:
     ifNot [$C18F], .return_02_5C3C
 
     ifNe [$C18E], $C1, .else_02_5C2A
@@ -3129,17 +3129,17 @@ JumpTable_5BDF_02.else_02_5BF6:
     jr   c, .else_02_5C23
 
     inc  d
-JumpTable_5BDF_02.else_02_5C23:
+.else_02_5C23:
     add  hl, de
     set  5, [hl]
     assign [$FFF2], $1B
-JumpTable_5BDF_02.else_02_5C2A:
+.else_02_5C2A:
     ifNot [$C190], .return_02_5C3C
 
     clear [$C18E]
     assign [$C18C], $01
     call toc_02_525B
-JumpTable_5BDF_02.return_02_5C3C:
+.return_02_5C3C:
     ret
 
 
@@ -3162,7 +3162,7 @@ toc_02_5C3D:
     ld   [$C190], a
     assign [$C111], $04
     assign [$FFF4], $10
-toc_02_5C3D.return_02_5C64:
+.return_02_5C64:
     ret
 
 
@@ -3186,9 +3186,9 @@ JumpTable_5C69_02:
     ld   a, $40
     jr   .toc_02_5C8A
 
-JumpTable_5C69_02.else_02_5C88:
+.else_02_5C88:
     ld   a, $30
-JumpTable_5C69_02.toc_02_5C8A:
+.toc_02_5C8A:
     ld   [$FFD8], a
     ld   a, $03
     call toc_01_0953
@@ -3211,9 +3211,9 @@ toc_02_5C92:
     ld   a, $30
     jr   .toc_02_5CAC
 
-toc_02_5C92.else_02_5CAA:
+.else_02_5CAA:
     ld   a, $20
-toc_02_5C92.toc_02_5CAC:
+.toc_02_5CAC:
     ld   [hSwordIntersectedAreaY], a
     assign [hSwordIntersectedAreaX], $80
     swap a
@@ -3237,7 +3237,7 @@ toc_02_5C92.toc_02_5CAC:
     add  a, $0A
     ld   [$D600], a
     ld   de, $5C65
-toc_02_5C92.toc_02_5CDB:
+.toc_02_5CDB:
     ld   a, [$FFCF]
     ldi  [hl], a
     ld   a, [$FFD0]
@@ -3331,9 +3331,9 @@ JumpTable_5D64_02:
     ld   a, [$DAE8]
     jr   .toc_02_5D72
 
-JumpTable_5D64_02.else_02_5D6F:
+.else_02_5D6F:
     ld   a, [$D9FF]
-JumpTable_5D64_02.toc_02_5D72:
+.toc_02_5D72:
     and  %00100000
     jp   nz, toc_01_08EC
 
@@ -3359,7 +3359,7 @@ JumpTable_5D81_02:
 JumpTable_5D89_02:
     ld   c, $00
     ld   hl, $DBB6
-JumpTable_5D89_02.loop_02_5D8E:
+.loop_02_5D8E:
     ldi  a, [hl]
     cp   c
     jr   nz, .return_02_5D9B
@@ -3370,14 +3370,14 @@ JumpTable_5D89_02.loop_02_5D8E:
     jr   nz, .loop_02_5D8E
 
     call toc_01_08EC
-JumpTable_5D89_02.return_02_5D9B:
+.return_02_5D9B:
     ret
 
 
 JumpTable_5D9C_02:
     ld   c, $0F
     ld   b, $00
-JumpTable_5D9C_02.loop_02_5DA0:
+.loop_02_5DA0:
     ld   hl, $C280
     add  hl, bc
     ld   a, [hl]
@@ -3390,7 +3390,7 @@ JumpTable_5D9C_02.loop_02_5DA0:
     and  %00000010
     jr   z, .return_02_5DCC
 
-JumpTable_5D9C_02.else_02_5DB1:
+.else_02_5DB1:
     dec  c
     ld   a, c
     cp   $FF
@@ -3404,10 +3404,10 @@ JumpTable_5D9C_02.else_02_5DB1:
     and  a
     jr   nz, .return_02_5DCC
 
-JumpTable_5D9C_02.else_02_5DC9:
+.else_02_5DC9:
     jp   toc_01_08EC
 
-JumpTable_5D9C_02.return_02_5DCC:
+.return_02_5DCC:
     ret
 
 
@@ -3418,7 +3418,7 @@ toc_02_5DCD:
 
     ld   a, [hl]
     ld   [de], a
-toc_02_5DCD.else_02_5DD3:
+.else_02_5DD3:
     inc  hl
     ret
 
@@ -3467,7 +3467,7 @@ toc_02_5DD5:
     inc  a
     jp   z, .else_02_5EC8
 
-toc_02_5DD5.else_02_5E2E:
+.else_02_5E2E:
     ld   a, [$C1B5]
     ld   hl, $C1B8
     or   [hl]
@@ -3475,7 +3475,7 @@ toc_02_5DD5.else_02_5E2E:
     or   [hl]
     jp   nz, .else_02_5EC8
 
-toc_02_5DD5.toc_02_5E3C:
+.toc_02_5E3C:
     assign [$C14F], $01
     ld   [$C151], a
     assign [$FFF2], $12
@@ -3501,19 +3501,19 @@ toc_02_5DD5.toc_02_5E3C:
 
     call toc_02_6A9B
     ld   a, UPDATE_BG_TILES_DUNGEON_MINIMAP
-toc_02_5DD5.else_02_5E76:
+.else_02_5E76:
     ld   [hNeedsUpdatingBGTiles], a
     ret
 
 
-toc_02_5DD5.else_02_5E79:
+.else_02_5E79:
     assign [hVolumeRight], $07
     assign [hVolumeLeft], $70
     pop  af
     ret
 
 
-toc_02_5DD5.else_02_5E83:
+.else_02_5E83:
     ld   a, [$C151]
     and  a
     jr   nz, .else_02_5EA4
@@ -3524,9 +3524,9 @@ toc_02_5DD5.else_02_5E83:
 
     call toc_02_631F
     incAddr $C151
-toc_02_5DD5.else_02_5E96:
+.else_02_5E96:
     pop  af
-toc_02_5DD5.toc_02_5E97:
+.toc_02_5E97:
     call toc_02_77FA.else_02_781B
     call toc_01_149B.toc_01_149E
     call JumpTable_1C5A_00.else_01_1CCC
@@ -3534,7 +3534,7 @@ toc_02_5DD5.toc_02_5E97:
     ret
 
 
-toc_02_5DD5.else_02_5EA4:
+.else_02_5EA4:
     call toc_02_5EF2
     ld   a, [$C150]
     ld   hl, wWYStash
@@ -3548,13 +3548,13 @@ toc_02_5DD5.else_02_5EA4:
 
     assign [hVolumeRight], $03
     assign [hVolumeLeft], $30
-toc_02_5DD5.else_02_5EBF:
+.else_02_5EBF:
     clear [$C14F]
     jr   .else_02_5EC8
 
-toc_02_5DD5.else_02_5EC5:
+.else_02_5EC5:
     call .toc_02_5E97
-toc_02_5DD5.else_02_5EC8:
+.else_02_5EC8:
     ifEq [wWYStash], 128, .else_02_5EDC
 
     ld   a, [$C14F]
@@ -3563,9 +3563,9 @@ toc_02_5DD5.else_02_5EC8:
 
     call toc_02_645E
     call toc_02_63F0
-toc_02_5DD5.else_02_5EDB:
+.else_02_5EDB:
     pop  af
-toc_02_5DD5.else_02_5EDC:
+.else_02_5EDC:
     ld   a, [wDialogState]
     and  %01111111
     jr   z, .else_02_5EEB
@@ -3576,10 +3576,10 @@ toc_02_5DD5.else_02_5EDC:
     cp   %00001101
     jr   nz, .return_02_5EF1
 
-toc_02_5DD5.else_02_5EEB:
+.else_02_5EEB:
     call toc_02_5F09
     call toc_02_601A
-toc_02_5DD5.return_02_5EF1:
+.return_02_5EF1:
     ret
 
 
@@ -3594,7 +3594,7 @@ toc_02_5EF2:
     ld   a, [$C154]
     dec  a
     ld   [$C154], a
-toc_02_5EF2.return_02_5F08:
+.return_02_5F08:
     ret
 
 
@@ -3614,7 +3614,7 @@ toc_02_5F09:
     ret
 
 
-toc_02_5F09.else_02_5F1B:
+.else_02_5F1B:
     ld   hl, $DB8F
     ld   a, [$DB90]
     or   [hl]
@@ -3635,7 +3635,7 @@ toc_02_5F09.else_02_5F1B:
     jr   c, .else_02_5F3F
 
     ld   a, $09
-toc_02_5F09.else_02_5F3F:
+.else_02_5F3F:
     ld   e, a
     ld   a, [$DB90]
     sub  a, e
@@ -3658,9 +3658,9 @@ toc_02_5F09.else_02_5F3F:
     assign [$DB5E], $99
     clear [$DB8F]
     ld   [$DB90], a
-toc_02_5F09.else_02_5F71:
+.else_02_5F71:
     call toc_02_5FD1
-toc_02_5F09.else_02_5F74:
+.else_02_5F74:
     ld   hl, $DB91
     ld   a, [$DB92]
     or   [hl]
@@ -3681,7 +3681,7 @@ toc_02_5F09.else_02_5F74:
     jr   c, .else_02_5F98
 
     ld   a, $09
-toc_02_5F09.else_02_5F98:
+.else_02_5F98:
     ld   e, a
     ld   a, [$DB92]
     sub  a, e
@@ -3708,9 +3708,9 @@ toc_02_5F09.else_02_5F98:
     ld   [$DB5E], a
     ld   [$DB91], a
     ld   [$DB92], a
-toc_02_5F09.else_02_5FCD:
+.else_02_5FCD:
     call toc_02_5FD1
-toc_02_5F09.return_02_5FD0:
+.return_02_5FD0:
     ret
 
 
@@ -3776,9 +3776,9 @@ toc_02_601A:
     ld   a, $30
     ld   hl, $FFF3
     ld   [hl], $04
-toc_02_601A.else_02_6042:
+.else_02_6042:
     ld   [$C110], a
-toc_02_601A.else_02_6045:
+.else_02_6045:
     ld   a, [hFrameCounter]
     and  %00000001
     jr   z, .return_02_60A5
@@ -3794,7 +3794,7 @@ toc_02_601A.else_02_6045:
     ifLt [$DB5B], $0F, .else_02_6064
 
     ld   a, $0E
-toc_02_601A.else_02_6064:
+.else_02_6064:
     sla  a
     sla  a
     sla  a
@@ -3806,7 +3806,7 @@ toc_02_601A.else_02_6064:
     clear [$DB93]
     jr   .else_02_6088
 
-toc_02_601A.else_02_6077:
+.else_02_6077:
     inc  a
     ld   [$DB5A], a
     and  %00000111
@@ -3814,10 +3814,10 @@ toc_02_601A.else_02_6077:
     jr   nz, .else_02_6085
 
     assign [$FFF3], $06
-toc_02_601A.else_02_6085:
+.else_02_6085:
     jp   toc_02_6117
 
-toc_02_601A.else_02_6088:
+.else_02_6088:
     ifNot [$DB94], .return_02_60A5
 
     dec  a
@@ -3826,15 +3826,15 @@ toc_02_601A.else_02_6088:
 
     dec  a
     ld   [$DB5A], a
-toc_02_601A.else_02_609C:
+.else_02_609C:
     call toc_02_6117
     ifNot [$DB5A], .else_02_60A6
 
-toc_02_601A.return_02_60A5:
+.return_02_60A5:
     ret
 
 
-toc_02_601A.else_02_60A6:
+.else_02_60A6:
     ifNot [$DB0D], .return_02_6101
 
     dec  a
@@ -3868,7 +3868,7 @@ toc_02_601A.else_02_60A6:
     ret
 
 
-toc_02_601A.else_02_60E7:
+.else_02_60E7:
     ld   a, $7F
     ldi  [hl], a
     ld   a, $9C
@@ -3887,7 +3887,7 @@ toc_02_601A.else_02_60E7:
     ret
 
 
-toc_02_601A.return_02_6101:
+.return_02_6101:
     ret
 
 
@@ -3906,7 +3906,7 @@ toc_02_6117:
     push de
     ld   bc, $6102
     ld   e, $15
-toc_02_6117.loop_02_612C:
+.loop_02_612C:
     ld   a, [bc]
     inc  bc
     ldi  [hl], a
@@ -3924,7 +3924,7 @@ toc_02_6117.loop_02_612C:
     ifNot [$DB5A], .else_02_6165
 
     ld   [$FFD7], a
-toc_02_6117.toc_02_6145:
+.toc_02_6145:
     ld   a, [$FFD7]
     sub  a, $08
     ld   [$FFD7], a
@@ -3940,10 +3940,10 @@ toc_02_6117.toc_02_6145:
     ld   a, l
     add  a, $03
     ld   l, a
-toc_02_6117.else_02_615A:
+.else_02_615A:
     jr   .toc_02_6145
 
-toc_02_6117.else_02_615C:
+.else_02_615C:
     add  a, $08
     jr   z, .else_02_6165
 
@@ -3951,14 +3951,14 @@ toc_02_6117.else_02_615C:
     ldi  [hl], a
     jr   .toc_02_616E
 
-toc_02_6117.else_02_6165:
+.else_02_6165:
     ld   a, [$DB5B]
     cp   c
     jr   z, .return_02_617A
 
     ld   a, $CD
     ldi  [hl], a
-toc_02_6117.toc_02_616E:
+.toc_02_616E:
     inc  c
     ld   a, c
     cp   $07
@@ -3967,10 +3967,10 @@ toc_02_6117.toc_02_616E:
     ld   a, l
     add  a, $03
     ld   l, a
-toc_02_6117.else_02_6178:
+.else_02_6178:
     jr   .else_02_6165
 
-toc_02_6117.return_02_617A:
+.return_02_617A:
     ret
 
 
@@ -3993,7 +3993,7 @@ toc_02_61E7:
     ld   c, $01
     ld   b, $00
     ld   e, $FF
-toc_02_61E7.loop_02_61ED:
+.loop_02_61ED:
     ld   a, [DEBUG_TOOL2]
     and  a
     ret  nz
@@ -4117,7 +4117,7 @@ toc_02_6273:
     dec  a
     jr   z, .else_02_62CA
 
-toc_02_6273.loop_02_628C:
+.loop_02_628C:
     ld   a, [de]
     inc  de
     ldi  [hl], a
@@ -4127,17 +4127,17 @@ toc_02_6273.loop_02_628C:
     ret
 
 
-toc_02_6273.else_02_6293:
+.else_02_6293:
     ld   a, [$DB43]
     jr   .toc_02_62A0
 
-toc_02_6273.else_02_6298:
+.else_02_6298:
     ld   a, [$DB44]
     jr   .toc_02_62A0
 
-toc_02_6273.else_02_629D:
+.else_02_629D:
     ld   a, [$DB4E]
-toc_02_6273.toc_02_62A0:
+.toc_02_62A0:
     add  a, $B0
     ld   c, a
     ld   a, [de]
@@ -4149,7 +4149,7 @@ toc_02_6273.toc_02_62A0:
     ret
 
 
-toc_02_6273.else_02_62AA:
+.else_02_62AA:
     ld   a, [$DB4B]
     and  a
     jr   nz, .loop_02_628C
@@ -4157,7 +4157,7 @@ toc_02_6273.else_02_62AA:
     ld   a, [$DB4C]
     jr   .toc_02_62D2
 
-toc_02_6273.else_02_62B5:
+.else_02_62B5:
     ifNotZero [$DB49], .loop_02_628C
 
     ld   a, [$DB4A]
@@ -4170,13 +4170,13 @@ toc_02_6273.else_02_62B5:
     ret
 
 
-toc_02_6273.else_02_62CA:
+.else_02_62CA:
     ld   a, [$DB45]
     jr   .toc_02_62D2
 
-toc_02_6273.else_02_62CF:
+.else_02_62CF:
     ld   a, [$DB4D]
-toc_02_6273.toc_02_62D2:
+.toc_02_62D2:
     push af
     and  %00001111
     add  a, $B0
@@ -4204,7 +4204,7 @@ toc_02_631F:
     ld   hl, $D601
     ld   bc, $62E3
     ld   e, $33
-toc_02_631F.loop_02_6327:
+.loop_02_6327:
     ld   a, [bc]
     inc  bc
     ldi  [hl], a
@@ -4213,7 +4213,7 @@ toc_02_631F.loop_02_6327:
 
     ld   de, $DB0C
     ld   bc, $0000
-toc_02_631F.loop_02_6333:
+.loop_02_6333:
     ld   a, c
     cp   $02
     jr   nz, .else_02_633F
@@ -4223,7 +4223,7 @@ toc_02_631F.loop_02_6333:
     ld   a, c
     jr   nz, .else_02_635F
 
-toc_02_631F.else_02_633F:
+.else_02_633F:
     cp   $04
     jr   nz, .else_02_6357
 
@@ -4234,9 +4234,9 @@ toc_02_631F.else_02_633F:
     ld   de, $DBCC
     jr   .else_02_6357
 
-toc_02_631F.else_02_6354:
+.else_02_6354:
     ld   de, $DB11
-toc_02_631F.else_02_6357:
+.else_02_6357:
     ld   a, [de]
     cp   $FF
     jr   z, .else_02_635F
@@ -4244,7 +4244,7 @@ toc_02_631F.else_02_6357:
     and  a
     jr   nz, .else_02_637E
 
-toc_02_631F.else_02_635F:
+.else_02_635F:
     push de
     ld   hl, $6316
     add  hl, bc
@@ -4267,9 +4267,9 @@ toc_02_631F.else_02_635F:
     ld   a, $7F
     ldi  [hl], a
     ld   [hl], a
-toc_02_631F.else_02_637D:
+.else_02_637D:
     pop  de
-toc_02_631F.else_02_637E:
+.else_02_637E:
     inc  de
     inc  c
     ld   a, c
@@ -4290,7 +4290,7 @@ toc_02_631F.else_02_637E:
     and  %00001111
     add  a, $B0
     ldi  [hl], a
-toc_02_631F.else_02_63A0:
+.else_02_63A0:
     ld   hl, $D601
     ld   de, $0031
     add  hl, de
@@ -4302,16 +4302,16 @@ toc_02_631F.else_02_63A0:
 
     jr   .toc_02_63C5
 
-toc_02_631F.else_02_63BB:
+.else_02_63BB:
     ifNot [$DB15], .else_02_63C8
 
     cp   $06
     jr   nc, .else_02_63C8
 
-toc_02_631F.toc_02_63C5:
+.toc_02_63C5:
     add  a, $B0
     ld   [hl], a
-toc_02_631F.else_02_63C8:
+.else_02_63C8:
     assign [$D600], $32
     ret
 
@@ -4328,10 +4328,10 @@ toc_02_63E6:
 
 toc_02_63F0:
     ld   d, $0C
-toc_02_63F0.toc_02_63F2:
+.toc_02_63F2:
     ld   hl, $DB00
     ld   e, $00
-toc_02_63F0.loop_02_63F7:
+.loop_02_63F7:
     ldi  a, [hl]
     cp   $01
     jr   z, .else_02_6402
@@ -4344,7 +4344,7 @@ toc_02_63F0.loop_02_63F7:
     ret
 
 
-toc_02_63F0.else_02_6402:
+.else_02_6402:
     ld   d, $00
     ld   hl, $63CE
     add  hl, de
@@ -4370,7 +4370,7 @@ toc_02_63F0.else_02_6402:
     ifNot [$C1B5], .else_02_6431
 
     ld   hl, $C09C
-toc_02_63F0.else_02_6431:
+.else_02_6431:
     ld   a, [wWYStash]
     push hl
     ld   hl, $FFD8
@@ -4383,7 +4383,7 @@ toc_02_63F0.else_02_6431:
     ldi  [hl], a
     ld   a, $50
     ldi  [hl], a
-toc_02_63F0.else_02_6444:
+.else_02_6444:
     ld   a, $01
     call toc_01_3DD0
     ret
@@ -4423,7 +4423,7 @@ toc_02_645E:
     ld   a, h
     sub  a, $08
     ld   h, a
-toc_02_645E.else_02_6492:
+.else_02_6492:
     ld   a, [$DBB0]
     and  %00010000
     jr   z, .else_02_64A6
@@ -4436,7 +4436,7 @@ toc_02_645E.else_02_6492:
     ld   a, l
     add  a, $08
     ld   l, a
-toc_02_645E.else_02_64A6:
+.else_02_64A6:
     ld   a, h
     ld   [gbRAM], a
     ld   a, l
@@ -4445,9 +4445,9 @@ toc_02_645E.else_02_64A6:
     ld   a, [hFrameCounter]
     rla
     and  %00010000
-toc_02_645E.else_02_64B8:
+.else_02_64B8:
     ld   [$C003], a
-toc_02_645E.else_02_64BB:
+.else_02_64BB:
     call toc_02_6505
     call toc_02_6742
     ld   a, [$C159]
@@ -4474,7 +4474,7 @@ toc_02_645E.else_02_64BB:
     ld   [$C00A], a
     assign [$C007], $30
     assign [$C00B], $10
-toc_02_645E.return_02_64FC:
+.return_02_64FC:
     ret
 
 
@@ -4508,9 +4508,9 @@ toc_02_6505:
     jr   nc, .else_02_6537
 
     ld   a, $09
-toc_02_6505.else_02_6537:
+.else_02_6537:
     ld   [$DBA3], a
-toc_02_6505.else_02_653A:
+.else_02_653A:
     ld   a, [$FFCC]
     srl  a
     srl  a
@@ -4530,9 +4530,9 @@ toc_02_6505.else_02_653A:
     jr   nc, .else_02_655B
 
     ld   a, $09
-toc_02_6505.else_02_655B:
+.else_02_655B:
     ld   [$DBA3], a
-toc_02_6505.else_02_655E:
+.else_02_655E:
     ld   a, [hPressedButtonsMask]
     and  J_DOWN | J_LEFT | J_RIGHT | J_UP
     jr   z, .else_02_656E
@@ -4542,7 +4542,7 @@ toc_02_6505.else_02_655E:
     jr   nz, .else_02_656E
 
     clear [$C159]
-toc_02_6505.else_02_656E:
+.else_02_656E:
     ifNot [$C1B5], .else_02_658A
 
     ld   a, [$C1B8]
@@ -4557,7 +4557,7 @@ toc_02_6505.else_02_656E:
     assign [$C1BA], $01
     jr   .else_02_65B7
 
-toc_02_6505.else_02_658A:
+.else_02_658A:
     ld   a, [$DBA3]
     ld   hl, $C1B6
     cp   [hl]
@@ -4580,14 +4580,14 @@ toc_02_6505.else_02_658A:
     ld   a, $01
     jr   .toc_02_65C3
 
-toc_02_6505.else_02_65B7:
+.else_02_65B7:
     ifNot [$C1B5], .else_02_65C6
 
     assign [$C1B9], $10
     xor  a
-toc_02_6505.toc_02_65C3:
+.toc_02_65C3:
     ld   [$C1B5], a
-toc_02_6505.else_02_65C6:
+.else_02_65C6:
     ld   hl, $C1B9
     ld   a, [$C1B8]
     or   [hl]
@@ -4618,19 +4618,19 @@ toc_02_6505.else_02_65C6:
     assign [$C1B5], $01
     jr   .else_02_6613
 
-toc_02_6505.else_02_6604:
+.else_02_6604:
     ifNot [$C1B5], .else_02_6613
 
     clear [$C1B5]
     assign [$C1B9], $10
-toc_02_6505.else_02_6613:
+.else_02_6613:
     ld   c, $01
     ld   b, $00
     ld   e, $00
     call toc_02_61E7.loop_02_61ED
     jr   .toc_02_666A
 
-toc_02_6505.else_02_661E:
+.else_02_661E:
     ld   a, [$FFCC]
     and  %00100000
     jr   z, .return_02_667B
@@ -4656,17 +4656,17 @@ toc_02_6505.else_02_661E:
     assign [$C1B5], $01
     jr   .else_02_6661
 
-toc_02_6505.else_02_6652:
+.else_02_6652:
     ifNot [$C1B5], .else_02_6661
 
     clear [$C1B5]
     assign [$C1B9], $10
-toc_02_6505.else_02_6661:
+.else_02_6661:
     ld   c, $00
     ld   b, $00
     ld   e, $FF
     call toc_02_61E7.loop_02_61ED
-toc_02_6505.toc_02_666A:
+.toc_02_666A:
     assign [$FFF2], $13
     ld   a, [$DBA3]
     add  a, $02
@@ -4675,7 +4675,7 @@ toc_02_6505.toc_02_666A:
     dec  a
     ld   e, a
     call toc_02_61E7.loop_02_61ED
-toc_02_6505.return_02_667B:
+.return_02_667B:
     ret
 
 
@@ -4719,30 +4719,30 @@ toc_02_6742:
     clear [$C1BA]
     jp   toc_02_5DD5.toc_02_5E3C
 
-toc_02_6742.return_02_6760:
+.return_02_6760:
     ret
 
 
-toc_02_6742.else_02_6761:
+.else_02_6761:
     cpl
     jr   .toc_02_676E
 
-toc_02_6742.else_02_6764:
+.else_02_6764:
     ifNot [$C1B8], .else_02_6774
 
     dec  a
     ld   [$C1B8], a
-toc_02_6742.toc_02_676E:
+.toc_02_676E:
     rra
     rra
     and  %00000011
     jr   .toc_02_677D
 
-toc_02_6742.else_02_6774:
+.else_02_6774:
     ifNotZero [$C1B5], .return_02_684A
 
     ld   a, $00
-toc_02_6742.toc_02_677D:
+.toc_02_677D:
     ld   [$C1B7], a
     ld   a, [$C1B7]
     ld   d, $00
@@ -4759,7 +4759,7 @@ toc_02_6742.toc_02_677D:
     ld   de, $C018
     ld   c, $0C
     ld   b, $04
-toc_02_6742.loop_02_679D:
+.loop_02_679D:
     ldi  a, [hl]
     add  a, $30
     ld   [de], a
@@ -4782,17 +4782,17 @@ toc_02_6742.loop_02_679D:
 
     jr   .else_02_67CD
 
-toc_02_6742.else_02_67B8:
+.else_02_67B8:
     ld   b, $04
     jr   .toc_02_67C2
 
-toc_02_6742.else_02_67BC:
+.else_02_67BC:
     ld   b, $02
     jr   .toc_02_67C2
 
-toc_02_6742.else_02_67C0:
+.else_02_67C0:
     ld   b, $01
-toc_02_6742.toc_02_67C2:
+.toc_02_67C2:
     ld   a, [$DB49]
     and  b
     jr   nz, .else_02_67CD
@@ -4801,7 +4801,7 @@ toc_02_6742.toc_02_67C2:
     ld   a, $20
     ld   [de], a
     inc  de
-toc_02_6742.else_02_67CD:
+.else_02_67CD:
     ldi  a, [hl]
     ld   [de], a
     inc  de
@@ -4814,7 +4814,7 @@ toc_02_6742.else_02_67CD:
     and  %01000001
     jr   z, .else_02_67F8
 
-toc_02_6742.loop_02_67E0:
+.loop_02_67E0:
     ld   hl, $DB4A
     ld   a, [hl]
     inc  a
@@ -4822,7 +4822,7 @@ toc_02_6742.loop_02_67E0:
     jr   nz, .else_02_67EA
 
     xor  a
-toc_02_6742.else_02_67EA:
+.else_02_67EA:
     ld   [hl], a
     ld   e, a
     ld   d, $00
@@ -4832,12 +4832,12 @@ toc_02_6742.else_02_67EA:
     and  [hl]
     jr   z, .loop_02_67E0
 
-toc_02_6742.else_02_67F8:
+.else_02_67F8:
     ld   a, [$FFCC]
     and  %00000010
     jr   z, .else_02_6817
 
-toc_02_6742.loop_02_67FE:
+.loop_02_67FE:
     ld   hl, $DB4A
     ld   a, [hl]
     dec  a
@@ -4845,7 +4845,7 @@ toc_02_6742.loop_02_67FE:
     jr   c, .else_02_6809
 
     ld   a, $02
-toc_02_6742.else_02_6809:
+.else_02_6809:
     ld   [hl], a
     ld   e, a
     ld   d, $00
@@ -4855,14 +4855,14 @@ toc_02_6742.else_02_6809:
     and  [hl]
     jr   z, .loop_02_67FE
 
-toc_02_6742.else_02_6817:
+.else_02_6817:
     ld   a, [$DB4A]
     ld   a, [$FFCC]
     and  %01000011
     jr   z, .else_02_6823
 
     call toc_02_6505.toc_02_666A
-toc_02_6742.else_02_6823:
+.else_02_6823:
     ld   hl, $C010
     ld   a, $38
     ldi  [hl], a
@@ -4888,7 +4888,7 @@ toc_02_6742.else_02_6823:
     ld   a, $28
     ldi  [hl], a
     ld   [hl], $20
-toc_02_6742.return_02_684A:
+.return_02_684A:
     ret
 
 
@@ -4989,13 +4989,13 @@ toc_02_6A9B:
     jr   z, .else_02_6AC3
 
     ld   hl, $6A4B
-toc_02_6A9B.else_02_6AC3:
+.else_02_6AC3:
     ld   de, $D480
     ld   bc, $0040
     call copyHLToDE
     ld   d, $00
     ld   e, $00
-toc_02_6A9B.toc_02_6AD0:
+.toc_02_6AD0:
     ld   hl, $D480
     add  hl, de
     ld   a, [hl]
@@ -5008,13 +5008,13 @@ toc_02_6A9B.toc_02_6AD0:
     cp   $EE
     jr   nz, .else_02_6AE9
 
-toc_02_6A9B.else_02_6AE1:
+.else_02_6AE1:
     ld   a, [$DBCD]
     and  a
     jr   nz, .else_02_6AF4
 
     ld   [hl], $EF
-toc_02_6A9B.else_02_6AE9:
+.else_02_6AE9:
     ld   a, [$DBCC]
     and  a
     jr   nz, .else_02_6AF4
@@ -5022,7 +5022,7 @@ toc_02_6A9B.else_02_6AE9:
     ld   [hl], $7D
     jp   .else_02_6B3E
 
-toc_02_6A9B.else_02_6AF4:
+.else_02_6AF4:
     push de
     call toc_01_2B25
     push de
@@ -5051,7 +5051,7 @@ toc_02_6A9B.else_02_6AF4:
     cp   $ED
     jr   nz, .else_02_6B31
 
-toc_02_6A9B.else_02_6B1C:
+.else_02_6B1C:
     push de
     push af
     call toc_01_2B25
@@ -5061,14 +5061,14 @@ toc_02_6A9B.else_02_6B1C:
     jr   nz, .else_02_6B2A
 
     ld   e, $10
-toc_02_6A9B.else_02_6B2A:
+.else_02_6B2A:
     ld   a, [hl]
     and  e
     pop  de
     cp   $00
     jr   z, .else_02_6B3E
 
-toc_02_6A9B.else_02_6B31:
+.else_02_6B31:
     ld   hl, $D480
     add  hl, de
     ld   [hl], c
@@ -5077,7 +5077,7 @@ toc_02_6A9B.else_02_6B31:
     jr   nz, .else_02_6B3E
 
     ld   [hl], $7D
-toc_02_6A9B.else_02_6B3E:
+.else_02_6B3E:
     inc  e
     ld   a, e
     cp   $40
@@ -5110,7 +5110,7 @@ JumpTable_6B60_02:
 
 JumpTable_6B65_02:
     ld   hl, $9D0F
-JumpTable_6B65_02.toc_02_6B68:
+.toc_02_6B68:
     ld   e, $04
     jr   toc_02_6BB8.toc_02_6BBD
 
@@ -5138,7 +5138,7 @@ JumpTable_6B86_02:
 
 JumpTable_6B8B_02:
     ld   hl, $9DAF
-JumpTable_6B8B_02.toc_02_6B8E:
+.toc_02_6B8E:
     ld   e, $24
     jr   toc_02_6BB8.toc_02_6BBD
 
@@ -5166,17 +5166,17 @@ JumpTable_6BAC_02:
 
 JumpTable_6BB1_02:
     ld   hl, $9D0A
-JumpTable_6BB1_02.toc_02_6BB4:
+.toc_02_6BB4:
     ld   e, $00
     jr   toc_02_6BB8.toc_02_6BBD
 
 toc_02_6BB8:
     ld   hl, $9DAA
     ld   e, $20
-toc_02_6BB8.toc_02_6BBD:
+.toc_02_6BBD:
     ld   c, $00
     ld   d, c
-toc_02_6BB8.loop_02_6BC0:
+.loop_02_6BC0:
     push hl
     ld   hl, $D480
     add  hl, de
@@ -5204,7 +5204,7 @@ toc_02_6BB8.loop_02_6BC0:
     ld   h, a
     jr   .loop_02_6BC0
 
-toc_02_6BB8.return_02_6BE2:
+.return_02_6BE2:
     ret
 
 
@@ -5221,7 +5221,7 @@ toc_02_6BEF:
     cp   INTERACTIVE_MOTION_LOCKED_TALKING
     jr   z, .return_02_6C1B
 
-toc_02_6BEF.else_02_6BFF:
+.else_02_6BFF:
     ifNot [$C13E], .else_02_6C1C
 
     dec  a
@@ -5233,11 +5233,11 @@ toc_02_6BEF.else_02_6BFF:
     ld   a, [hLinkPositionYIncrement]
     add  a, 3
     ld   [hLinkPositionYIncrement], a
-toc_02_6BEF.return_02_6C1B:
+.return_02_6C1B:
     ret
 
 
-toc_02_6BEF.else_02_6C1C:
+.else_02_6C1C:
     ld   a, [$FF9C]
     jumptable
     dw JumpTable_6D3A_02 ; 00
@@ -5262,7 +5262,7 @@ JumpTable_6C48_02:
     ret
 
 
-JumpTable_6C48_02.else_02_6C63:
+.else_02_6C63:
     ifNotZero [$DB0C], toc_02_77FA.else_02_79D9
 
     ld   hl, hLinkDirection
@@ -5290,7 +5290,7 @@ JumpTable_6C48_02.else_02_6C63:
 
     dec  [hl]
     dec  [hl]
-JumpTable_6C48_02.else_02_6C94:
+.else_02_6C94:
     ld   hl, $6C35
     add  hl, de
     ld   a, [hl]
@@ -5304,7 +5304,7 @@ JumpTable_6C48_02.else_02_6C94:
 
     dec  [hl]
     dec  [hl]
-JumpTable_6C48_02.else_02_6CA6:
+.else_02_6CA6:
     incAddr $C120
     ld   a, [hPressedButtonsMask]
     and  J_LEFT | J_RIGHT
@@ -5316,7 +5316,7 @@ JumpTable_6C48_02.else_02_6CA6:
     add  hl, de
     ld   a, [hl]
     ld   [hLinkDirection], a
-JumpTable_6C48_02.else_02_6CBA:
+.else_02_6CBA:
     call toc_01_20D6
     call toc_02_6FB1
     ld   a, [$C14F]
@@ -5331,11 +5331,11 @@ JumpTable_6C48_02.else_02_6CBA:
     ld   a, $01
     jr   .toc_02_6CD4
 
-JumpTable_6C48_02.else_02_6CD3:
+.else_02_6CD3:
     xor  a
-JumpTable_6C48_02.toc_02_6CD4:
+.toc_02_6CD4:
     ld   [$FF9C], a
-JumpTable_6C48_02.else_02_6CD6:
+.else_02_6CD6:
     call JumpTable_6D3A_02.return_02_6E8F
     ret
 
@@ -5368,7 +5368,7 @@ JumpTable_6CDA_02:
     jr   z, .else_02_6D10
 
     incAddr $C120
-JumpTable_6CDA_02.else_02_6D10:
+.else_02_6D10:
     call toc_01_20D6
     call toc_02_6FB1
     ld   a, [$C14F]
@@ -5383,18 +5383,18 @@ JumpTable_6CDA_02.else_02_6D10:
     ld   a, $02
     jr   .toc_02_6D2A
 
-JumpTable_6CDA_02.else_02_6D29:
+.else_02_6D29:
     xor  a
-JumpTable_6CDA_02.toc_02_6D2A:
+.toc_02_6D2A:
     ld   [$FF9C], a
-JumpTable_6CDA_02.else_02_6D2C:
+.else_02_6D2C:
     call JumpTable_6D3A_02.return_02_6E8F
     ld   a, [$C133]
     and  %00001000
     jr   z, .return_02_6D39
 
     clear [$FF9C]
-JumpTable_6CDA_02.return_02_6D39:
+.return_02_6D39:
     ret
 
 
@@ -5417,7 +5417,7 @@ JumpTable_6D3A_02:
     and  %00000100
     jp   nz, toc_01_0909
 
-JumpTable_6D3A_02.else_02_6D5D:
+.else_02_6D5D:
     ifNot [$C14A], .else_02_6D85
 
     ld   a, [$FFCC]
@@ -5430,13 +5430,13 @@ JumpTable_6D3A_02.else_02_6D5D:
     call toc_01_145D
     jp   .else_02_6E14
 
-JumpTable_6D3A_02.else_02_6D77:
+.else_02_6D77:
     ld   [$C19A], a
     ld   a, [$C199]
     add  a, $0C
     ld   [$C199], a
     call toc_01_093B
-JumpTable_6D3A_02.else_02_6D85:
+.else_02_6D85:
     ld   a, [$C147]
     and  a
     jr   nz, .else_02_6DCD
@@ -5450,14 +5450,14 @@ JumpTable_6D3A_02.else_02_6D85:
     jr   nz, .else_02_6D9D
 
     assign [$C146], $01
-JumpTable_6D3A_02.else_02_6D9D:
+.else_02_6D9D:
     assign [$C120], $0A
     ifNot [hLinkPositionXIncrement], .else_02_6DAC
 
     rlca
     and  %00000001
     ld   [hLinkDirection], a
-JumpTable_6D3A_02.else_02_6DAC:
+.else_02_6DAC:
     ld   a, [hPressedButtonsMask]
     and  J_LEFT | J_RIGHT
     jr   z, .else_02_6DCB
@@ -5475,14 +5475,14 @@ JumpTable_6D3A_02.else_02_6DAC:
     jr   nz, .else_02_6DC6
 
     ld   e, 255
-JumpTable_6D3A_02.else_02_6DC6:
+.else_02_6DC6:
     ld   a, [hLinkPositionXIncrement]
     add  a, e
     ld   [hLinkPositionXIncrement], a
-JumpTable_6D3A_02.else_02_6DCB:
+.else_02_6DCB:
     jr   .else_02_6E14
 
-JumpTable_6D3A_02.else_02_6DCD:
+.else_02_6DCD:
     ifNot [$C146], .else_02_6DE3
 
     assign [$FFF4], $07
@@ -5490,7 +5490,7 @@ JumpTable_6D3A_02.else_02_6DCD:
     ld   [$C146], a
     ld   [$C152], a
     ld   [$C153], a
-JumpTable_6D3A_02.else_02_6DE3:
+.else_02_6DE3:
     ld   a, [hPressedButtonsMask]
     and  J_LEFT | J_RIGHT
     ld   e, a
@@ -5512,17 +5512,17 @@ JumpTable_6D3A_02.else_02_6DE3:
 
     ld   a, e
     ld   [hLinkDirection], a
-JumpTable_6D3A_02.else_02_6E04:
+.else_02_6E04:
     incAddr $C120
     jr   .else_02_6E14
 
-JumpTable_6D3A_02.else_02_6E0A:
+.else_02_6E0A:
     ld   a, [$C14B]
     and  a
     jr   nz, .else_02_6E14
 
     clear [$C120]
-JumpTable_6D3A_02.else_02_6E14:
+.else_02_6E14:
     ld   a, [$C137]
     and  a
     jr   nz, .else_02_6E1F
@@ -5531,7 +5531,7 @@ JumpTable_6D3A_02.else_02_6E14:
     and  a
     jr   nz, .else_02_6E35
 
-JumpTable_6D3A_02.else_02_6E1F:
+.else_02_6E1F:
     call toc_01_20D6
     ld   hl, hLinkDirection
     ld   a, [hPressedButtonsMask]
@@ -5540,12 +5540,12 @@ JumpTable_6D3A_02.else_02_6E1F:
     jr   nz, .else_02_6E2F
 
     ld   [hl], $02
-JumpTable_6D3A_02.else_02_6E2F:
+.else_02_6E2F:
     cp   J_DOWN
     jr   nz, .else_02_6E35
 
     ld   [hl], $03
-JumpTable_6D3A_02.else_02_6E35:
+.else_02_6E35:
     call toc_02_6FB1
     ld   a, [$C14F]
     and  a
@@ -5566,22 +5566,22 @@ JumpTable_6D3A_02.else_02_6E35:
 
     ld   a, $02
     call toc_02_571B
-JumpTable_6D3A_02.else_02_6E58:
+.else_02_6E58:
     assign [hLinkPositionYIncrement], 4
     clear [hLinkPositionXIncrement]
-JumpTable_6D3A_02.else_02_6E5F:
+.else_02_6E5F:
     ld   a, $02
     jr   .toc_02_6E6B
 
-JumpTable_6D3A_02.else_02_6E63:
+.else_02_6E63:
     ld   a, [hPressedButtonsMask]
     and  J_DOWN | J_UP
     jr   z, .else_02_6E6D
 
     ld   a, $01
-JumpTable_6D3A_02.toc_02_6E6B:
+.toc_02_6E6B:
     ld   [$FF9C], a
-JumpTable_6D3A_02.else_02_6E6D:
+.else_02_6E6D:
     ld   hl, hLinkPositionYIncrement
     ld   a, [hl]
     sub  a, 64
@@ -5597,14 +5597,14 @@ JumpTable_6D3A_02.else_02_6E6D:
     ifEq [$DB00], $0A, .else_02_6E89
 
     ld   e, $10
-JumpTable_6D3A_02.else_02_6E89:
+.else_02_6E89:
     ld   a, [hPressedButtonsMask]
     and  e
     jr   nz, .return_02_6E8F
 
-JumpTable_6D3A_02.else_02_6E8E:
+.else_02_6E8E:
     inc  [hl]
-JumpTable_6D3A_02.return_02_6E8F:
+.return_02_6E8F:
     ret
 
 
@@ -5624,7 +5624,7 @@ toc_02_6E9F:
     jr   z, .else_02_6EBA
 
     inc  c
-toc_02_6E9F.else_02_6EBA:
+.else_02_6EBA:
     call toc_02_6F6B
     ifNe [hObjectUnderEntity], 138, .else_02_6ED2
 
@@ -5636,11 +5636,11 @@ toc_02_6E9F.else_02_6EBA:
     ld   [$C5A6], a
     ld   a, $51
     call toc_01_2197
-toc_02_6E9F.else_02_6ED2:
+.else_02_6ED2:
     ifNe [hObjectUnderEntity], 255, .else_02_6EDB
 
     call toc_02_6F6B.else_02_6FA5
-toc_02_6E9F.else_02_6EDB:
+.else_02_6EDB:
     ld   c, $02
     ld   a, [hLinkPositionYIncrement]
     and  a
@@ -5648,7 +5648,7 @@ toc_02_6E9F.else_02_6EDB:
     jr   nz, .else_02_6EE5
 
     inc  c
-toc_02_6E9F.else_02_6EE5:
+.else_02_6EE5:
     call toc_02_6F6B
     ld   a, [hLinkPositionYIncrement]
     and  %10000000
@@ -5671,12 +5671,12 @@ toc_02_6E9F.else_02_6EE5:
     cp   102
     jr   z, .else_02_6F11
 
-toc_02_6E9F.else_02_6F0A:
+.else_02_6F0A:
     ld   a, [$C133]
     and  %00001000
     jr   z, .else_02_6F24
 
-toc_02_6E9F.else_02_6F11:
+.else_02_6F11:
     ld   a, [$C133]
     or   %00001000
     ld   [$C133], a
@@ -5685,13 +5685,13 @@ toc_02_6E9F.else_02_6F11:
     and  %11110000
     add  a, 0
     ld   [hLinkPositionY], a
-toc_02_6E9F.else_02_6F24:
+.else_02_6F24:
     ld   a, [$C133]
     and  %00000100
     jr   z, .else_02_6F2F
 
     copyFromTo [hLinkFinalPositionY], [hLinkPositionY]
-toc_02_6E9F.else_02_6F2F:
+.else_02_6F2F:
     ld   a, [$C133]
     and  %00000011
     jr   z, .return_02_6F6A
@@ -5718,7 +5718,7 @@ toc_02_6E9F.else_02_6F2F:
     ret
 
 
-toc_02_6E9F.return_02_6F6A:
+.return_02_6F6A:
     ret
 
 
@@ -5758,13 +5758,13 @@ toc_02_6F6B:
     cp   $01
     jr   nz, .return_02_6FB0
 
-toc_02_6F6B.else_02_6FA5:
+.else_02_6FA5:
     ld   hl, $6E90
     add  hl, bc
     ld   a, [$C133]
     or   [hl]
     ld   [$C133], a
-toc_02_6F6B.return_02_6FB0:
+.return_02_6FB0:
     ret
 
 
@@ -5783,12 +5783,12 @@ toc_02_6FB1:
     cp   $EC
     jr   nz, .else_02_6FD5
 
-toc_02_6FB1.else_02_6FCE:
+.else_02_6FCE:
     ld   a, [hLinkPositionY]
     cp   44
     jp   c, toc_01_0909
 
-toc_02_6FB1.else_02_6FD5:
+.else_02_6FD5:
     ld   e, $02
     ifLt [hLinkPositionY], 12, .else_02_6FF2
 
@@ -5805,7 +5805,7 @@ toc_02_6FB1.else_02_6FD5:
 
     jp   .else_02_7142
 
-toc_02_6FB1.else_02_6FF2:
+.else_02_6FF2:
     ld   a, [$FFF9]
     and  a
     jr   nz, .else_02_700D
@@ -5823,7 +5823,7 @@ toc_02_6FB1.else_02_6FF2:
 
     jp   toc_01_0909
 
-toc_02_6FB1.else_02_700D:
+.else_02_700D:
     ld   a, [$FFF6]
     cp   $E8
     jp   z, .else_02_7098
@@ -5850,17 +5850,17 @@ toc_02_6FB1.else_02_700D:
 
     ifNot [$C280], .else_02_7098
 
-toc_02_6FB1.else_02_703C:
+.else_02_703C:
     copyFromTo [hLinkFinalPositionY], [hLinkPositionY]
     clear [hLinkPositionYIncrement]
     jp   .else_02_7142
 
-toc_02_6FB1.else_02_7046:
+.else_02_7046:
     ifEq [$FF9C], $02, .else_02_7098
 
     jp   toc_01_0909
 
-toc_02_6FB1.else_02_704F:
+.else_02_704F:
     copyFromTo [hLinkFinalPositionX], [hLinkPositionX]
     clear [hLinkPositionXIncrement]
     ifNot [$FFF9], .else_02_7098
@@ -5896,7 +5896,7 @@ toc_02_6FB1.else_02_704F:
 
     jr   .else_02_7098
 
-toc_02_6FB1.else_02_708D:
+.else_02_708D:
     cp   $C1
     jr   nz, .else_02_7098
 
@@ -5904,7 +5904,7 @@ toc_02_6FB1.else_02_708D:
     cp   80
     jp   nc, .else_02_7142
 
-toc_02_6FB1.else_02_7098:
+.else_02_7098:
     call toc_01_094A
     ld   a, [$C181]
     cp   $50
@@ -5929,7 +5929,7 @@ toc_02_6FB1.else_02_7098:
     and  a
     jp   nz, .else_02_7146
 
-toc_02_6FB1.else_02_70C4:
+.else_02_70C4:
     ld   a, [$C14A]
     and  a
     jr   nz, .else_02_70D0
@@ -5938,7 +5938,7 @@ toc_02_6FB1.else_02_70C4:
     and  a
     jr   nz, .else_02_7146
 
-toc_02_6FB1.else_02_70D0:
+.else_02_70D0:
     ld   a, [$C13E]
     ld   hl, $C157
     or   [hl]
@@ -5964,7 +5964,7 @@ toc_02_6FB1.else_02_70D0:
     cp   e
     jr   z, .else_02_7108
 
-toc_02_6FB1.else_02_70FA:
+.else_02_70FA:
     ld   a, [hPressedButtonsMask]
     rra
     rra
@@ -5976,7 +5976,7 @@ toc_02_6FB1.else_02_70FA:
     cp   e
     jr   nz, .else_02_7146
 
-toc_02_6FB1.else_02_7108:
+.else_02_7108:
     ifNe [$FFF6], $E8, .else_02_7120
 
     ifEq [$FFF7], $1F, .else_02_7120
@@ -5985,7 +5985,7 @@ toc_02_6FB1.else_02_7108:
 
     clear [$C1BF]
     ld   [gbSCX], a
-toc_02_6FB1.else_02_7120:
+.else_02_7120:
     ld   a, e
     ld   [$C125], a
     assign [$C124], $01
@@ -5996,16 +5996,16 @@ toc_02_6FB1.else_02_7120:
 
     assign [$C146], $02
     assign [hLinkPositionZHigh], $08
-toc_02_6FB1.else_02_7142:
+.else_02_7142:
     call toc_02_7180
     ret
 
 
-toc_02_6FB1.else_02_7146:
+.else_02_7146:
     call toc_01_1495
     ld   [$C13E], a
     call toc_02_7180
-toc_02_6FB1.return_02_714F:
+.return_02_714F:
     ret
 
 
@@ -6028,7 +6028,7 @@ toc_02_7180:
     ret
 
 
-toc_02_7180.else_02_7192:
+.else_02_7192:
     clear [$C133]
     ifEq [hLinkPositionYIncrement], 0, toc_02_7203.else_02_721A
 
@@ -6039,14 +6039,14 @@ toc_02_7180.else_02_7192:
 
     dec  e
     inc  bc
-toc_02_7180.else_02_71A6:
+.else_02_71A6:
     ld   a, e
     ld   [$FFE3], a
     ld   e, $02
     ld   a, [bc]
     ld   c, a
     ld   b, $00
-toc_02_7180.loop_02_71AF:
+.loop_02_71AF:
     push de
     push bc
     call toc_02_726A
@@ -6077,12 +6077,12 @@ toc_02_7180.loop_02_71AF:
 
 toc_02_71E6:
     assign [$FFF2], $08
-toc_02_71E6.toc_02_71EA:
+.toc_02_71EA:
     ld   a, [hLinkPositionX]
     and  %11110000
     add  a, 8
     ld   [hLinkPositionX], a
-toc_02_71E6.toc_02_71F2:
+.toc_02_71F2:
     assign [$C11C], $02
     clear [$FF9C]
     ld   a, [hLinkPositionY]
@@ -6103,7 +6103,7 @@ toc_02_7203:
     add  a, [hl]
     ld   [hLinkPositionX], a
     copyFromTo [hLinkFinalPositionY], [hLinkPositionY]
-toc_02_7203.else_02_721A:
+.else_02_721A:
     ifEq [hLinkPositionXIncrement], 0, .else_02_7259
 
     ld   e, $00
@@ -6113,14 +6113,14 @@ toc_02_7203.else_02_721A:
 
     inc  e
     inc  bc
-toc_02_7203.else_02_722A:
+.else_02_722A:
     ld   a, e
     ld   [$FFE3], a
     ld   e, $02
     ld   a, [bc]
     ld   c, a
     ld   b, $00
-toc_02_7203.loop_02_7233:
+.loop_02_7233:
     push de
     push bc
     call toc_02_726A
@@ -6144,13 +6144,13 @@ toc_02_7203.loop_02_7233:
     add  a, [hl]
     ld   [hLinkPositionY], a
     copyFromTo [hLinkFinalPositionX], [hLinkPositionX]
-toc_02_7203.else_02_7259:
+.else_02_7259:
     ld   a, [$C133]
     and  a
     jr   nz, .else_02_7262
 
     ld   [$C1C3], a
-toc_02_7203.else_02_7262:
+.else_02_7262:
     call toc_02_7769
     ret
 
@@ -6242,13 +6242,13 @@ toc_02_726A:
     ld   e, $33
     jr   .toc_02_7304
 
-toc_02_726A.else_02_72FB:
+.else_02_72FB:
     cp   $8C
     jr   nz, .else_02_7321
 
     ld   a, [$DB13]
     ld   e, $34
-toc_02_726A.toc_02_7304:
+.toc_02_7304:
     and  a
     jr   z, .else_02_737C
 
@@ -6257,9 +6257,9 @@ toc_02_726A.toc_02_7304:
     call toc_01_27D2
     jr   .toc_02_7315
 
-toc_02_726A.else_02_7312:
+.else_02_7312:
     call toc_02_525B
-toc_02_726A.toc_02_7315:
+.toc_02_7315:
     ld   a, $28
     call toc_01_3C01
     ld   hl, $C2C0
@@ -6267,7 +6267,7 @@ toc_02_726A.toc_02_7315:
     inc  [hl]
     jr   .toc_02_736A
 
-toc_02_726A.else_02_7321:
+.else_02_7321:
     cp   $2B
     jr   nz, .else_02_733C
 
@@ -6284,7 +6284,7 @@ toc_02_726A.else_02_7321:
     dec  [hl]
     jr   .toc_02_736A
 
-toc_02_726A.else_02_733C:
+.else_02_733C:
     cp   $B5
     jr   nz, .else_02_734B
 
@@ -6295,13 +6295,13 @@ toc_02_726A.else_02_733C:
 
     jr   .toc_02_7353
 
-toc_02_726A.else_02_734B:
+.else_02_734B:
     ld   a, [$DB11]
     and  a
     ld   e, $30
     jr   z, .else_02_737C
 
-toc_02_726A.toc_02_7353:
+.toc_02_7353:
     copyFromTo [hLinkPositionY], [$FFD8]
     copyFromTo [hLinkPositionX], [$FFD7]
     ld   a, $09
@@ -6309,7 +6309,7 @@ toc_02_726A.toc_02_7353:
     ld   [hl], $DF
     assign [$C111], $DF
     call toc_01_27D2
-toc_02_726A.toc_02_736A:
+.toc_02_736A:
     ld   hl, $D800
     ld   a, [$FFF6]
     ld   e, a
@@ -6319,22 +6319,22 @@ toc_02_726A.toc_02_736A:
     or   %00010000
     ld   [hl], a
     ld   [$FFF8], a
-toc_02_726A.else_02_7379:
+.else_02_7379:
     jp   .else_02_75B1
 
-toc_02_726A.else_02_737C:
+.else_02_737C:
     ld   a, e
     call toc_02_77C4
     jp   .else_02_75B1
 
-toc_02_726A.else_02_7383:
+.else_02_7383:
     ifNe [hObjectUnderEntity], 219, .else_02_7391
 
     ld   a, [$C11C]
     cp   $01
     jp   z, .else_02_75B1
 
-toc_02_726A.else_02_7391:
+.else_02_7391:
     ld   a, [$FFE4]
     cp   $D0
     jp   c, .else_02_741D
@@ -6359,7 +6359,7 @@ toc_02_726A.else_02_7391:
 
     jr   .else_02_73C3
 
-toc_02_726A.else_02_73B6:
+.else_02_73B6:
     cp   $01
     jr   nz, .else_02_73C3
 
@@ -6368,7 +6368,7 @@ toc_02_726A.else_02_73B6:
     cp   $08
     jp   nc, .else_02_771C
 
-toc_02_726A.else_02_73C3:
+.else_02_73C3:
     ld   d, $00
     ld   a, [hLinkDirection]
     cp   e
@@ -6397,7 +6397,7 @@ toc_02_726A.else_02_73C3:
     cp   $0C
     jp   c, .else_02_75B1
 
-toc_02_726A.else_02_73F3:
+.else_02_73F3:
     call toc_01_093B.toc_01_0942
     ld   hl, $7178
     add  hl, de
@@ -6411,11 +6411,11 @@ toc_02_726A.else_02_73F3:
     assign [$C146], $01
     assign [$C10A], $01
     assign [$FFF2], $08
-toc_02_726A.else_02_7416:
+.else_02_7416:
     clear [$C191]
     jp   .else_02_75B1
 
-toc_02_726A.else_02_741D:
+.else_02_741D:
     cp   $90
     jp   c, .else_02_749D
 
@@ -6439,7 +6439,7 @@ toc_02_726A.else_02_741D:
 
     jr   .toc_02_7450
 
-toc_02_726A.else_02_7441:
+.else_02_7441:
     ld   hl, $C1E0
     add  hl, de
     ld   e, [hl]
@@ -6449,7 +6449,7 @@ toc_02_726A.else_02_7441:
     cp   8
     jp   nc, .else_02_75B1
 
-toc_02_726A.toc_02_7450:
+.toc_02_7450:
     ld   a, [$C188]
     and  a
     jp   nz, .else_02_75B1
@@ -6462,7 +6462,7 @@ toc_02_726A.toc_02_7450:
     ld   [$DBD0], a
     jr   .else_02_7485
 
-toc_02_726A.else_02_746A:
+.else_02_746A:
     cp   $98
     jr   z, .else_02_7477
 
@@ -6470,7 +6470,7 @@ toc_02_726A.else_02_746A:
 
     jp   .else_02_75B1
 
-toc_02_726A.else_02_7477:
+.else_02_7477:
     ld   a, [$DBCF]
     and  a
     jr   nz, .else_02_7485
@@ -6479,7 +6479,7 @@ toc_02_726A.else_02_7477:
     call toc_02_77BE
     jp   .else_02_75B1
 
-toc_02_726A.else_02_7485:
+.else_02_7485:
     ld   a, [$FFE4]
     sub  a, $90
     ld   [$C189], a
@@ -6490,7 +6490,7 @@ toc_02_726A.else_02_7485:
     call toc_02_525B
     jp   .else_02_75B1
 
-toc_02_726A.else_02_749D:
+.else_02_749D:
     cp   $7C
     jp   c, .else_02_771C
 
@@ -6500,9 +6500,9 @@ toc_02_726A.else_02_749D:
     cp   $7D
     jr   nz, .else_02_74AC
 
-toc_02_726A.else_02_74A9:
+.else_02_74A9:
     call toc_02_7723
-toc_02_726A.else_02_74AC:
+.else_02_74AC:
     pop  af
     cp   $90
     jp   nc, .else_02_771C
@@ -6534,7 +6534,7 @@ toc_02_726A.else_02_74AC:
 
     jp   .else_02_771C
 
-toc_02_726A.else_02_74DA:
+.else_02_74DA:
     ld   a, [$C11C]
     cp   $02
     jp   z, .else_02_770F
@@ -6551,7 +6551,7 @@ toc_02_726A.else_02_74DA:
     call toc_02_71E6
     jp   .else_02_770F
 
-toc_02_726A.else_02_74F9:
+.else_02_74F9:
     ld   a, [$C15C]
     and  a
     jp   nz, .else_02_770F
@@ -6569,7 +6569,7 @@ toc_02_726A.else_02_74F9:
 
     ifNot [$DB73], .else_02_7566
 
-toc_02_726A.else_02_751C:
+.else_02_751C:
     ifEq [$FFF6], $D3, .else_02_753E
 
     cp   $24
@@ -6593,14 +6593,14 @@ toc_02_726A.else_02_751C:
     cp   $0E
     jr   nz, .else_02_7566
 
-toc_02_726A.else_02_753E:
+.else_02_753E:
     ifNe [$DB79], $01, .else_02_754D
 
     ld   a, $12
     call toc_02_77C4
     jp   .else_02_770F
 
-toc_02_726A.else_02_754D:
+.else_02_754D:
     clear [$DB47]
     assign [$C3C9], $98
     call toc_01_2185
@@ -6610,7 +6610,7 @@ toc_02_726A.else_02_754D:
     call toc_01_0915.toc_01_092A
     jp   .else_02_770F
 
-toc_02_726A.else_02_7566:
+.else_02_7566:
     ld   a, [$C13E]
     and  a
     jp   nz, .else_02_770F
@@ -6621,7 +6621,7 @@ toc_02_726A.else_02_7566:
 
     jp   toc_01_0909
 
-toc_02_726A.else_02_7577:
+.else_02_7577:
     ld   a, [$D6F9]
     and  a
     jp   nz, .else_02_771C
@@ -6642,13 +6642,13 @@ toc_02_726A.else_02_7577:
 
     jp   .else_02_771C
 
-toc_02_726A.else_02_759A:
+.else_02_759A:
     ld   hl, $C11F
     ld   [hl], $01
     cp   $0A
     jp   z, .else_02_771C
 
-toc_02_726A.else_02_75A4:
+.else_02_75A4:
     ld   a, [$FFDB]
     and  %00001111
     cp   $06
@@ -6657,7 +6657,7 @@ toc_02_726A.else_02_75A4:
     cp   $0B
     jp   c, .else_02_771C
 
-toc_02_726A.else_02_75B1:
+.else_02_75B1:
     ifNe [hObjectUnderEntity], 105, .else_02_75C8
 
     ld   hl, $FFE3
@@ -6669,9 +6669,9 @@ toc_02_726A.else_02_75B1:
     and  a
     jr   nz, .else_02_75C8
 
-toc_02_726A.else_02_75C5:
+.else_02_75C5:
     call toc_02_77FA.else_02_78B5
-toc_02_726A.else_02_75C8:
+.else_02_75C8:
     ld   hl, $FFE3
     ld   a, [hLinkDirection]
     cp   [hl]
@@ -6701,14 +6701,14 @@ toc_02_726A.else_02_75C8:
     cp   136
     jr   nz, .else_02_75FD
 
-toc_02_726A.else_02_75F5:
+.else_02_75F5:
     ld   a, [$C14A]
     and  a
     jr   nz, .else_02_7634
 
     jr   .else_02_7626
 
-toc_02_726A.else_02_75FD:
+.else_02_75FD:
     cp   $DE
     jr   nz, .else_02_760B
 
@@ -6719,7 +6719,7 @@ toc_02_726A.else_02_75FD:
     ld   e, $8C
     jr   .else_02_7626
 
-toc_02_726A.else_02_760B:
+.else_02_760B:
     cp   $20
     jr   nz, .else_02_7634
 
@@ -6732,7 +6732,7 @@ toc_02_726A.else_02_760B:
     jr   nz, .else_02_7634
 
     ld   e, $8D
-toc_02_726A.else_02_7626:
+.else_02_7626:
     ld   a, [$C5A6]
     and  a
     jr   nz, .else_02_7634
@@ -6741,7 +6741,7 @@ toc_02_726A.else_02_7626:
     ld   [$C5A6], a
     ld   a, e
     call toc_02_77BE
-toc_02_726A.else_02_7634:
+.else_02_7634:
     ld   a, [$C14A]
     and  a
     jr   nz, .else_02_766A
@@ -6766,13 +6766,13 @@ toc_02_726A.else_02_7634:
     assign [$C16D], $0C
     jp   .else_02_770F
 
-toc_02_726A.else_02_766A:
+.else_02_766A:
     ld   a, [$C15B]
     and  a
     jr   nz, .else_02_7675
 
     assign [$C144], $03
-toc_02_726A.else_02_7675:
+.else_02_7675:
     ld   a, [$FFF7]
     and  a
     ld   a, [hObjectUnderEntity]
@@ -6787,7 +6787,7 @@ toc_02_726A.else_02_7675:
     cp   79
     jp   nz, .else_02_76DB
 
-toc_02_726A.else_02_7689:
+.else_02_7689:
     ifNotZero [$C14A], .else_02_770F
 
     ld   a, [$FFDB]
@@ -6830,7 +6830,7 @@ toc_02_726A.else_02_7689:
     ld   [hl], $C4
     jr   .else_02_771C
 
-toc_02_726A.else_02_76DB:
+.else_02_76DB:
     ld   e, $20
     cp   $C5
     jr   nz, .else_02_76E9
@@ -6839,7 +6839,7 @@ toc_02_726A.else_02_76DB:
 
     jr   .else_02_770F
 
-toc_02_726A.else_02_76E9:
+.else_02_76E9:
     ifNot [$DBA5], .else_02_770F
 
     ifEq [hObjectUnderEntity], 222, .else_02_76FB
@@ -6847,9 +6847,9 @@ toc_02_726A.else_02_76E9:
     cp   167
     jr   nz, .else_02_770F
 
-toc_02_726A.else_02_76F9:
+.else_02_76F9:
     ld   e, $40
-toc_02_726A.else_02_76FB:
+.else_02_76FB:
     ld   a, [$C191]
     inc  a
     ld   [$C191], a
@@ -6860,7 +6860,7 @@ toc_02_726A.else_02_76FB:
     ld   [$FFE8], a
     clear [$C191]
     call toc_02_51EB
-toc_02_726A.else_02_770F:
+.else_02_770F:
     ld   hl, $7164
     add  hl, bc
     ld   a, [$C133]
@@ -6870,7 +6870,7 @@ toc_02_726A.else_02_770F:
     ret
 
 
-toc_02_726A.else_02_771C:
+.else_02_771C:
     clear [$C191]
     scf
     ccf
@@ -6883,7 +6883,7 @@ toc_02_7723:
     cp   178
     jr   nz, .else_02_774F
 
-toc_02_7723.else_02_772D:
+.else_02_772D:
     ld   a, [$FFDC]
     and  %00001111
     cp   $06
@@ -6900,7 +6900,7 @@ toc_02_7723.else_02_772D:
     ret
 
 
-toc_02_7723.else_02_774F:
+.else_02_774F:
     cp   $C1
     jr   z, .else_02_775F
 
@@ -6913,13 +6913,13 @@ toc_02_7723.else_02_774F:
     cp   $BC
     jr   nz, .return_02_7768
 
-toc_02_7723.else_02_775F:
+.else_02_775F:
     ld   a, [$FFDC]
     and  %00001111
     cp   $0C
     jp   nc, toc_01_0909
 
-toc_02_7723.return_02_7768:
+.return_02_7768:
     ret
 
 
@@ -6938,7 +6938,7 @@ toc_02_7769:
     cp   $0C
     jr   nz, .return_02_77BD
 
-toc_02_7769.else_02_7788:
+.else_02_7788:
     call toc_01_093B
     ld   a, [hLinkPositionXIncrement]
     cpl
@@ -6961,7 +6961,7 @@ toc_02_7769.else_02_7788:
     ld   [$C158], a
     assign [$FFF2], $0B
     call toc_01_1594
-toc_02_7769.return_02_77BD:
+.return_02_77BD:
     ret
 
 
@@ -7008,7 +7008,7 @@ toc_02_77FA:
     ld   a, [$C13B]
     add  a, $04
     ld   [$C13B], a
-toc_02_77FA.else_02_7809:
+.else_02_7809:
     ifNot [$C1A4], .else_02_7847
 
     ld   hl, $C146
@@ -7017,7 +7017,7 @@ toc_02_77FA.else_02_7809:
     jr   nz, .else_02_781B
 
     call toc_01_1495
-toc_02_77FA.else_02_781B:
+.else_02_781B:
     call toc_02_77D2
     ld   c, $04
     ifEq [$D463], $01, .else_02_7842
@@ -7039,14 +7039,14 @@ toc_02_77FA.else_02_781B:
     jr   nz, .return_02_7846
 
     ld   c, $FD
-toc_02_77FA.else_02_7842:
+.else_02_7842:
     ld   a, c
     ld   [$C13B], a
-toc_02_77FA.return_02_7846:
+.return_02_7846:
     ret
 
 
-toc_02_77FA.else_02_7847:
+.else_02_7847:
     copyFromTo [$FFFA], [$FFFB]
     ld   a, [$C17B]
     and  a
@@ -7071,15 +7071,15 @@ toc_02_77FA.else_02_7847:
     ld   a, $26
     ldi  [hl], a
     ld   [hl], $00
-toc_02_77FA.return_02_7871:
+.return_02_7871:
     ret
 
 
-toc_02_77FA.else_02_7872:
+.else_02_7872:
     clear [$D475]
     ifEq [$C11C], $02, .return_02_7871
 
-toc_02_77FA.toc_02_787D:
+.toc_02_787D:
     ld   a, [$C124]
     ld   hl, wDialogState
     or   [hl]
@@ -7097,7 +7097,7 @@ toc_02_77FA.toc_02_787D:
 
     jr   .else_02_78A7
 
-toc_02_77FA.else_02_7899:
+.else_02_7899:
     ld   a, c
     cp   $4C
     jr   nz, .else_02_78A7
@@ -7108,7 +7108,7 @@ toc_02_77FA.else_02_7899:
     cp   12
     jr   nc, .else_02_78B5
 
-toc_02_77FA.else_02_78A7:
+.else_02_78A7:
     call toc_01_29DB
     ld   [$C181], a
     and  a
@@ -7117,7 +7117,7 @@ toc_02_77FA.else_02_78A7:
     cp   224
     jr   nz, .else_02_78F5
 
-toc_02_77FA.else_02_78B5:
+.else_02_78B5:
     ld   a, [$DBC7]
     and  a
     jr   nz, .return_02_78F4
@@ -7140,18 +7140,18 @@ toc_02_77FA.else_02_78B5:
     ld   a, [hLinkPositionZHigh]
     add  a, $02
     ld   [hLinkPositionZHigh], a
-toc_02_77FA.else_02_78DE:
+.else_02_78DE:
     assign [$C13E], $10
     assign [$DBC7], $30
     ld   a, [$DB94]
     add  a, $04
     ld   [$DB94], a
     assign [$FFF3], $03
-toc_02_77FA.return_02_78F4:
+.return_02_78F4:
     ret
 
 
-toc_02_77FA.else_02_78F5:
+.else_02_78F5:
     ld   a, [$C181]
     cp   $FF
     jp   z, .else_02_7A5C
@@ -7161,14 +7161,14 @@ toc_02_77FA.else_02_78F5:
 
     jp   toc_02_7E6E
 
-toc_02_77FA.else_02_7904:
+.else_02_7904:
     cp   $51
     jr   z, .else_02_790C
 
     cp   $50
     jr   nz, .else_02_7980
 
-toc_02_77FA.else_02_790C:
+.else_02_790C:
     call toc_01_093B
     assign [$C11F], $07
     incAddr $C1BB
@@ -7187,7 +7187,7 @@ toc_02_77FA.else_02_790C:
     jr   z, .else_02_7932
 
     ld   a, $01
-toc_02_77FA.else_02_7932:
+.else_02_7932:
     ld   hl, hLinkPositionX
     add  a, [hl]
     ld   [hl], a
@@ -7200,7 +7200,7 @@ toc_02_77FA.else_02_7932:
     jr   nz, .else_02_7947
 
     ld   a, $01
-toc_02_77FA.else_02_7947:
+.else_02_7947:
     ld   hl, hLinkPositionY
     add  a, [hl]
     ld   [hl], a
@@ -7221,17 +7221,17 @@ toc_02_77FA.else_02_7947:
     ld   a, [hLinkPositionY]
     add  a, 3
     ld   [hLinkPositionY], a
-toc_02_77FA.else_02_796A:
+.else_02_796A:
     assign [$C11C], $06
     call toc_01_093B
     ld   [$C198], a
     copyFromTo [$C181], [$DBCB]
     assign [$FFF3], $0C
-toc_02_77FA.return_02_797F:
+.return_02_797F:
     ret
 
 
-toc_02_77FA.else_02_7980:
+.else_02_7980:
     ld   hl, gbRAM
     ifNe [$C181], $08, .else_02_7995
 
@@ -7240,7 +7240,7 @@ toc_02_77FA.else_02_7980:
     ld   [$C13B], a
     jp   .else_02_7A5C
 
-toc_02_77FA.else_02_7995:
+.else_02_7995:
     cp   $09
     jr   nz, .else_02_79A4
 
@@ -7249,19 +7249,19 @@ toc_02_77FA.else_02_7995:
     ld   [$C13B], a
     jp   .else_02_7A5C
 
-toc_02_77FA.else_02_79A4:
+.else_02_79A4:
     cp   $0B
     jr   z, .else_02_79AC
 
     cp   $07
     jr   nz, .else_02_7A10
 
-toc_02_77FA.else_02_79AC:
+.else_02_79AC:
     ifNot [hLinkWalksSlow], .else_02_79B4
 
     jp   toc_02_7EAA
 
-toc_02_77FA.else_02_79B4:
+.else_02_79B4:
     ifEq [$C1AD], $80, .else_02_7A10
 
     ifEq [$C11C], $08, .return_02_7A0F
@@ -7278,7 +7278,7 @@ toc_02_77FA.else_02_79B4:
     and  a
     jr   nz, .else_02_79F2
 
-toc_02_77FA.else_02_79D9:
+.else_02_79D9:
     assign [$FFB7], $50
     assign [$C11C], $08
     copyFromTo [hObjectUnderEntity], [$FF9C]
@@ -7289,7 +7289,7 @@ toc_02_77FA.else_02_79D9:
     ret
 
 
-toc_02_77FA.else_02_79F2:
+.else_02_79F2:
     assign [$C11C], $01
     clear [$FF9C]
     call toc_01_1495
@@ -7304,11 +7304,11 @@ toc_02_77FA.else_02_79F2:
     add  hl, de
     ld   a, [hl]
     ld   [hLinkPositionYIncrement], a
-toc_02_77FA.return_02_7A0F:
+.return_02_7A0F:
     ret
 
 
-toc_02_77FA.else_02_7A10:
+.else_02_7A10:
     cp   $06
     jp   z, toc_02_7B37
 
@@ -7350,16 +7350,16 @@ toc_02_77FA.else_02_7A10:
     jr   z, .else_02_7A54
 
     assign [$FFF2], $0E
-toc_02_77FA.else_02_7A54:
+.else_02_7A54:
     ld   a, [$C13B]
     add  a, $02
     ld   [$C13B], a
-toc_02_77FA.else_02_7A5C:
+.else_02_7A5C:
     clear [$C1BB]
     ifNe [$C11C], $01, .else_02_7A6C
 
     assign [$C11C], $00
-toc_02_77FA.else_02_7A6C:
+.else_02_7A6C:
     ifNe [$C181], $04, .else_02_7AA3
 
     ifLt [hObjectUnderEntity], 219, .else_02_7AA3
@@ -7388,12 +7388,12 @@ toc_02_77FA.else_02_7A6C:
     ret
 
 
-toc_02_77FA.else_02_7AA3:
+.else_02_7AA3:
     ifNot [$D6F9], .else_02_7AB1
 
     assign [$FFF4], $07
     clear [$D6F9]
-toc_02_77FA.else_02_7AB1:
+.else_02_7AB1:
     ifNotZero [$DBA5], .return_02_7B28
 
     ld   a, [$C124]
@@ -7419,14 +7419,14 @@ toc_02_77FA.else_02_7AB1:
 
     ld   hl, $D879
     set  4, [hl]
-toc_02_77FA.else_02_7AED:
+.else_02_7AED:
     ld   a, [$C13B]
     add  a, $FD
     ld   [$C13B], a
     ret
 
 
-toc_02_77FA.else_02_7AF6:
+.else_02_7AF6:
     clear [$C1CA]
     ld   a, [$FFFA]
     ld   hl, $FFFB
@@ -7453,9 +7453,9 @@ toc_02_77FA.else_02_7AF6:
     assign [$FFF4], $2B
     jp   toc_02_4CAC
 
-toc_02_77FA.else_02_7B26:
+.else_02_7B26:
     ld   [hl], $00
-toc_02_77FA.return_02_7B28:
+.return_02_7B28:
     ret
 
 
@@ -7542,7 +7542,7 @@ toc_02_7B74:
 
     call toc_01_27A8
     clear [hNextMusicTrackToFadeInto]
-toc_02_7B74.else_02_7BC9:
+.else_02_7BC9:
     call toc_01_1495
     ld   [hLinkPositionZLow], a
     ld   [$C124], a
@@ -7562,18 +7562,18 @@ toc_02_7B74.else_02_7BC9:
 
     ifNot [$C133], .else_02_7C06
 
-toc_02_7B74.else_02_7BFD:
+.else_02_7BFD:
     ld   a, [$C17B]
     and  a
     jr   nz, .else_02_7C06
 
     call toc_02_71E6.toc_02_71EA
-toc_02_7B74.else_02_7C06:
+.else_02_7C06:
     ifNot [$C169], .else_02_7C12
 
     ld   [$FFF2], a
     clear [$C169]
-toc_02_7B74.else_02_7C12:
+.else_02_7C12:
     call toc_01_3819
     assign [hAnimatedTilesFrameCount], 255
     ld   a, [$DBA5]
@@ -7587,7 +7587,7 @@ toc_02_7B74.else_02_7C12:
     jr   c, .else_02_7C2A
 
     inc  d
-toc_02_7B74.else_02_7C2A:
+.else_02_7C2A:
     ld   a, [$FFF6]
     ld   e, a
     call toc_01_29B8
@@ -7602,7 +7602,7 @@ toc_02_7B74.else_02_7C2A:
     cp   $80
     ret  nz
 
-toc_02_7B74.else_02_7C40:
+.else_02_7C40:
     ld   a, [$DBCD]
     and  a
     ret  z
@@ -7615,7 +7615,7 @@ toc_02_7B74.else_02_7C40:
     ret
 
 
-toc_02_7B74.else_02_7C50:
+.else_02_7C50:
     pop  af
     dec  a
     jumptable
@@ -7668,13 +7668,13 @@ JumpTable_7C7E_02:
     clear [$C5AA]
     jp   .else_02_7D25
 
-JumpTable_7C7E_02.else_02_7CBD:
+.else_02_7CBD:
     ld   a, e
     cp   $07
     jp   nz, .else_02_7D25
 
     assign [$C169], $02
-JumpTable_7C7E_02.else_02_7CC8:
+.else_02_7CC8:
     clear [$C5AA]
     ld   hl, $7DDE
     add  hl, bc
@@ -7687,12 +7687,12 @@ JumpTable_7C7E_02.else_02_7CC8:
     ifNe [$DBAE], $1D, .else_02_7CE7
 
     assign [$DBAE], $35
-JumpTable_7C7E_02.else_02_7CE7:
+.else_02_7CE7:
     ld   a, [hl]
     ld   hl, $DBAE
     jr   .toc_02_7D0C
 
-JumpTable_7C7E_02.else_02_7CED:
+.else_02_7CED:
     ifNot [$C10C], .else_02_7D04
 
     ld   a, c
@@ -7704,14 +7704,14 @@ JumpTable_7C7E_02.else_02_7CED:
     ld   hl, $FFF6
     jr   .toc_02_7D0D
 
-JumpTable_7C7E_02.else_02_7D04:
+.else_02_7D04:
     ld   hl, $7DDA
     add  hl, bc
     ld   a, [hl]
     ld   hl, $FFF6
-JumpTable_7C7E_02.toc_02_7D0C:
+.toc_02_7D0C:
     add  a, [hl]
-JumpTable_7C7E_02.toc_02_7D0D:
+.toc_02_7D0D:
     ld   [hl], a
     cp   $41
     jr   nz, .else_02_7D25
@@ -7726,7 +7726,7 @@ JumpTable_7C7E_02.toc_02_7D0D:
 
     set  6, [hl]
     assign [$C169], $02
-JumpTable_7C7E_02.else_02_7D25:
+.else_02_7D25:
     call toc_01_2ED7
     call toc_01_36E6
     call JumpTable_1C5A_00.else_01_1CCC
@@ -7740,12 +7740,12 @@ JumpTable_7C7E_02.else_02_7D25:
     jr   z, .else_02_7D45
 
     ld   a, MUSIC_ACTIVE_POWER_UP
-JumpTable_7C7E_02.else_02_7D45:
+.else_02_7D45:
     ld   [hNextMusicTrackToFadeInto], a
     call toc_01_27CA
     jr   .else_02_7D99
 
-JumpTable_7C7E_02.else_02_7D4C:
+.else_02_7D4C:
     ld   a, [$DBA5]
     and  a
     jr   nz, .else_02_7D99
@@ -7773,7 +7773,7 @@ JumpTable_7C7E_02.else_02_7D4C:
     and  a
     jr   nz, .else_02_7D8D
 
-JumpTable_7C7E_02.else_02_7D77:
+.else_02_7D77:
     ifNot [$D47C], .else_02_7D90
 
     ifEq [$FFBD], $49, .else_02_7D96
@@ -7784,17 +7784,17 @@ JumpTable_7C7E_02.else_02_7D77:
     ret
 
 
-JumpTable_7C7E_02.else_02_7D8D:
+.else_02_7D8D:
     ld   a, c
     ld   [$FFBD], a
-JumpTable_7C7E_02.else_02_7D90:
+.else_02_7D90:
     ld   a, c
     ld   [hNextMusicTrackToFadeInto], a
     call toc_01_27CA
-JumpTable_7C7E_02.else_02_7D96:
+.else_02_7D96:
     ld   a, c
     ld   [hDefaultMusicTrack], a
-JumpTable_7C7E_02.else_02_7D99:
+.else_02_7D99:
     ld   a, [$C124]
     inc  a
     ld   [$C124], a
@@ -7806,7 +7806,7 @@ JumpTable_7DA1_02:
     ifNe [$D6FA], $02, .else_02_7DAF
 
     assign [$FFBB], $02
-JumpTable_7DA1_02.else_02_7DAF:
+.else_02_7DAF:
     jp   JumpTable_7C7E_02.else_02_7D99
 
     db   $00, $00, $02, $02, $14, $0C, $00, $00
@@ -7950,10 +7950,10 @@ toc_02_7EAA:
     ld   e, $00
     jr   .else_02_7EE7
 
-toc_02_7EAA.else_02_7EE4:
+.else_02_7EE4:
     sub  a, $E7
     ld   e, a
-toc_02_7EAA.else_02_7EE7:
+.else_02_7EE7:
     ld   d, $00
     ld   hl, $7E9A
     add  hl, de
@@ -7965,7 +7965,7 @@ toc_02_7EAA.else_02_7EE7:
     ld   [hLinkPositionYIncrement], a
     call toc_01_20D6
     call toc_02_7180
-toc_02_7EAA.return_02_7EFD:
+.return_02_7EFD:
     ret
 
 

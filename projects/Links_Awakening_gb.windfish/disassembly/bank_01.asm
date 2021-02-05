@@ -25,7 +25,7 @@ JumpTable_4010_01:
     ld   [$C1B9], a
     ld   [$C1B5], a
     assign [wTileMapToLoad], $0F
-JumpTable_4010_01.return_01_4040:
+.return_01_4040:
     ret
 
 
@@ -48,7 +48,7 @@ JumpTable_4065_01:
     ifNe [$C16B], $04, .return_01_4072
 
     call JumpTable_4434_01.toc_01_4445
-JumpTable_4065_01.return_01_4072:
+.return_01_4072:
     ret
 
 
@@ -68,7 +68,7 @@ JumpTable_4073_01:
 
     clear [$C50A]
     ld   [$C116], a
-JumpTable_4073_01.return_01_409E:
+.return_01_409E:
     ret
 
 
@@ -83,7 +83,7 @@ toc_01_40C2:
     call toc_01_5B94
     call toc_01_2985
     call toc_01_5F1A
-toc_01_40C2.resetHardware:
+.resetHardware:
     assign [gbLCDC], LCDCF_BG_DISPLAY | LCDCF_OBJ_16_16 | LCDCF_OBJ_DISPLAY | LCDCF_ON | LCDCF_TILEMAP_9C00
     ld   [wLCDCStash], a
     assign [gbWX], 7
@@ -91,7 +91,7 @@ toc_01_40C2.resetHardware:
     ld   [gbWY], a
     assign [hVolumeRight], $07
     assign [hVolumeLeft], $70
-toc_01_40C2.return_01_40E8:
+.return_01_40E8:
     ret
 
 
@@ -108,7 +108,7 @@ toc_01_40EB:
     inc  a
     and  %00000001
     ld   [hl], a
-toc_01_40EB.else_01_40FC:
+.else_01_40FC:
     ld   e, [hl]
     ld   d, $00
     ld   hl, $40E9
@@ -181,7 +181,7 @@ JumpTable_41C5_01:
 
     assign [$DB57], $99
     assign [$DB58], $09
-JumpTable_41C5_01.else_01_4202:
+.else_01_4202:
     clear [$C1BF]
     ld   [$D415], a
     ld   [$D47C], a
@@ -192,7 +192,7 @@ JumpTable_41C5_01.else_01_4202:
     ret
 
 
-JumpTable_41C5_01.else_01_4219:
+.else_01_4219:
     rra
     rra
     rra
@@ -246,7 +246,7 @@ JumpTable_427F_01:
 
     incAddr $FF9C
     assign [$D368], $03
-JumpTable_427F_01.return_01_428D:
+.return_01_428D:
     ret
 
 
@@ -264,13 +264,13 @@ JumpTable_428E_01:
     ld   [$DBD1], a
     jr   .toc_01_42AA
 
-JumpTable_428E_01.else_01_42A7:
+.else_01_42A7:
     call toc_01_5B94
-JumpTable_428E_01.toc_01_42AA:
+.toc_01_42AA:
     xor  a
     ld   hl, $C280
     ld   e, $10
-JumpTable_428E_01.loop_01_42B0:
+.loop_01_42B0:
     ldi  [hl], a
     dec  e
     jr   nz, .loop_01_42B0
@@ -290,10 +290,10 @@ JumpTable_428E_01.loop_01_42B0:
     ret
 
 
-JumpTable_428E_01.else_01_42DC:
+.else_01_42DC:
     call toc_01_5B94
     call toc_01_5F1A
-JumpTable_428E_01.return_01_42E2:
+.return_01_42E2:
     ret
 
 
@@ -312,9 +312,9 @@ toc_01_42E6:
     jr   nz, .else_01_42F9
 
     xor  a
-toc_01_42E6.else_01_42F9:
+.else_01_42F9:
     ld   [hl], a
-toc_01_42E6.else_01_42FA:
+.else_01_42FA:
     ld   a, [$FFCC]
     and  %00000100
     jr   z, .else_01_4309
@@ -325,9 +325,9 @@ toc_01_42E6.else_01_42FA:
     jr   nz, .else_01_4308
 
     ld   a, $02
-toc_01_42E6.else_01_4308:
+.else_01_4308:
     ld   [hl], a
-toc_01_42E6.else_01_4309:
+.else_01_4309:
     ld   e, [hl]
     ld   d, $00
     ld   hl, $42E3
@@ -374,20 +374,20 @@ JumpTable_433F_01:
     add  hl, de
     ld   de, $DBCC
     ld   c, $05
-JumpTable_433F_01.loop_01_435F:
+.loop_01_435F:
     ld   a, [$FFF7]
     cp   $0A
     ifEq [$FFF7], $08, .else_01_436B
 
     jr   c, .else_01_436E
 
-JumpTable_433F_01.else_01_436B:
+.else_01_436B:
     xor  a
     jr   z, .else_01_436F
 
-JumpTable_433F_01.else_01_436E:
+.else_01_436E:
     ldi  a, [hl]
-JumpTable_433F_01.else_01_436F:
+.else_01_436F:
     ld   [de], a
     inc  de
     dec  c
@@ -414,13 +414,13 @@ JumpTable_433F_01.else_01_436F:
     and  a
     jr   nz, .else_01_43AD
 
-JumpTable_433F_01.else_01_4393:
+.else_01_4393:
     call toc_01_5357
     assign [$D6FF], $07
     ret
 
 
-JumpTable_433F_01.else_01_439C:
+.else_01_439C:
     assign [$D6FF], $02
     call toc_01_27ED
     ld   hl, hFrameCounter
@@ -430,7 +430,7 @@ JumpTable_433F_01.else_01_439C:
     ret
 
 
-JumpTable_433F_01.else_01_43AD:
+.else_01_43AD:
     assign [$D6FF], $09
     ret
 
@@ -448,7 +448,7 @@ JumpTable_43B3_01:
     jr   z, .else_01_43DA
 
     assign [$C146], $02
-JumpTable_43B3_01.else_01_43DA:
+.else_01_43DA:
     assign [$C125], $04
     call toc_01_2ED7
     call toc_01_36E6
@@ -463,7 +463,7 @@ JumpTable_43B3_01.else_01_43DA:
     jr   c, .else_01_43FE
 
     inc  d
-JumpTable_43B3_01.else_01_43FE:
+.else_01_43FE:
     ld   a, [$FFF6]
     ld   e, a
     call toc_01_29B8
@@ -478,7 +478,7 @@ JumpTable_43B3_01.else_01_43FE:
     cp   $80
     jr   nz, .else_01_4426
 
-JumpTable_43B3_01.else_01_4415:
+.else_01_4415:
     ifNot [$DBCD], .else_01_4426
 
     ld   a, [$FFF8]
@@ -486,14 +486,14 @@ JumpTable_43B3_01.else_01_4415:
     jr   nz, .else_01_4426
 
     assign [$D462], $0C
-JumpTable_43B3_01.else_01_4426:
+.else_01_4426:
     ld   a, [$DBA5]
     and  a
     ld   a, $06
     jr   nz, .else_01_4430
 
     ld   a, $07
-JumpTable_43B3_01.else_01_4430:
+.else_01_4430:
     ld   [wTileMapToLoad], a
     ret
 
@@ -504,7 +504,7 @@ JumpTable_4434_01:
     clear [hNeedsUpdatingBGTiles]
     ld   [hNeedsUpdatingEnemiesTiles], a
     assign [wTileMapToLoad], $09
-JumpTable_4434_01.toc_01_4445:
+.toc_01_4445:
     incAddr $DB96
     ret
 
@@ -517,7 +517,7 @@ JumpTable_444A_01:
     ifNot [$C1CB], .else_01_4464
 
     assign [$FFA5], $03
-JumpTable_444A_01.else_01_4464:
+.else_01_4464:
     call JumpTable_4434_01.toc_01_4445
     ret
 
@@ -551,7 +551,7 @@ JumpTable_4476_01:
     assign [$DB98], $1C
     assign [$DB99], $E4
     assign [$C16B], $04
-JumpTable_4476_01.else_01_44B2:
+.else_01_44B2:
     jp   toc_01_27BD
 
     db   $F0, $CC, $E6, $90, $CA, $CB, $45
@@ -645,7 +645,7 @@ verifySaveFiles:
     ld   e, $00
     ld   d, $00
     ld   bc, $A405
-verifySaveFiles.loop_01_462F:
+.loop_01_462F:
     ld   hl, $45CC
     add  hl, de
     ldi  a, [hl]
@@ -662,7 +662,7 @@ verifySaveFiles.loop_01_462F:
     ld   hl, $A46A
     ld   e, $09
     ld   a, $02
-verifySaveFiles.loop_01_4652:
+.loop_01_4652:
     ldi  [hl], a
     dec  e
     jr   nz, .loop_01_4652
@@ -697,12 +697,12 @@ verifySaveFiles.loop_01_4652:
     ld   hl, $A105
     ld   a, $80
     ld   e, $00
-verifySaveFiles.loop_01_46D8:
+.loop_01_46D8:
     ldi  [hl], a
     dec  e
     jr   nz, .loop_01_46D8
 
-verifySaveFiles.return_01_46DC:
+.return_01_46DC:
     ret
 
 
@@ -711,7 +711,7 @@ verifySaveFile:
     ld   b, $05
     ld   hl, $A100
     add  hl, de
-verifySaveFile.loop_verifySaveFile:
+.loop_verifySaveFile:
     call enableRAM
     ldi  a, [hl]
     cp   c
@@ -724,11 +724,11 @@ verifySaveFile.loop_verifySaveFile:
 
     jr   .return
 
-verifySaveFile.initializeSaveFile:
+.initializeSaveFile:
     ld   hl, $A100
     add  hl, de
     ld   a, $01
-verifySaveFile.loop_initializeSaveFile:
+.loop_initializeSaveFile:
     call enableRAM
     ldi  [hl], a
     inc  a
@@ -737,7 +737,7 @@ verifySaveFile.loop_initializeSaveFile:
     jr   c, .loop_initializeSaveFile
 
     ld   de, $0380
-verifySaveFile.clearSaveFile:
+.clearSaveFile:
     call enableRAM
     xor  a
     ldi  [hl], a
@@ -746,7 +746,7 @@ verifySaveFile.clearSaveFile:
     or   d
     jr   nz, .clearSaveFile
 
-verifySaveFile.return:
+.return:
     ret
 
 
@@ -1079,7 +1079,7 @@ JumpTable_5018_01:
     ld   a, $00
     ldi  [hl], a
     pop  af
-JumpTable_5018_01.JumpTable_5023_01:
+.JumpTable_5023_01:
     ldi  [hl], a
     ld   a, $60
     ldi  [hl], a
@@ -1136,7 +1136,7 @@ toc_01_512A:
     add  hl, de
     ld   a, [hl]
     ld   [$DB5A], a
-toc_01_512A.else_01_5141:
+.else_01_5141:
     ld   hl, $DBD1
     ld   a, [hl]
     ld   [hl], $00
@@ -1154,7 +1154,7 @@ toc_01_512A.else_01_5141:
     ld   b, [hl]
     ld   hl, $D800
     ld   de, $0380
-toc_01_512A.loop_01_515F:
+.loop_01_515F:
     call enableRAM
     ld   a, [bc]
     inc  bc
@@ -1164,7 +1164,7 @@ toc_01_512A.loop_01_515F:
     or   d
     jr   nz, .loop_01_515F
 
-toc_01_512A.else_01_516A:
+.else_01_516A:
     assign [wGameMode], GAMEMODE_WORLD
     clear [$DB96]
     clear [$C11C]
@@ -1182,7 +1182,7 @@ toc_01_512A.else_01_516A:
     assign [$DB6F], $16
     assign [$DB70], $50
     assign [$DB71], $27
-toc_01_512A.else_01_51A0:
+.else_01_51A0:
     ifNot [$DB62], .else_01_51DD
 
     ld   [$DB9D], a
@@ -1199,12 +1199,12 @@ toc_01_512A.else_01_51A0:
 
     assign [hLinkAnimationState], LINK_ANIMATION_STATE_STANDING_UP
     assign [hLinkDirection], DIRECTION_UP
-toc_01_512A.else_01_51D7:
+.else_01_51D7:
     assign [$D6FF], $02
     ret
 
 
-toc_01_512A.else_01_51DD:
+.else_01_51DD:
     assign [$DB78], $30
     assign [$DB77], $30
     assign [$DB76], $20
@@ -1266,7 +1266,7 @@ toc_01_5357:
     ld   hl, $532E
     ld   de, $D650
     ld   c, $29
-toc_01_5357.loop_01_535F:
+.loop_01_535F:
     ldi  a, [hl]
     inc  de
     ld   [de], a
@@ -1289,7 +1289,7 @@ toc_01_5357.loop_01_535F:
     and  a
     jr   z, .else_01_5389
 
-toc_01_5357.loop_01_537E:
+.loop_01_537E:
     ld   a, c
     add  a, $04
     ld   c, a
@@ -1299,9 +1299,9 @@ toc_01_5357.loop_01_537E:
     jr   nz, .loop_01_537E
 
     ld   b, $00
-toc_01_5357.else_01_5389:
+.else_01_5389:
     pop  hl
-toc_01_5357.loop_01_538A:
+.loop_01_538A:
     push hl
     ld   hl, $521E
     add  hl, bc
@@ -1348,7 +1348,7 @@ toc_01_5357.loop_01_538A:
     and  a
     jr   z, .else_01_5430
 
-toc_01_5357.loop_01_53D2:
+.loop_01_53D2:
     ld   b, $00
     ld   a, c
     add  a, $08
@@ -1373,11 +1373,11 @@ toc_01_5357.loop_01_53D2:
     ld   b, $00
     jr   .loop_01_5406
 
-toc_01_5357.else_01_53F5:
+.else_01_53F5:
     ld   a, [$DBB0]
     and  %00000011
     ld   e, a
-toc_01_5357.loop_01_53FB:
+.loop_01_53FB:
     ld   b, $00
     ld   a, c
     add  a, $0B
@@ -1387,7 +1387,7 @@ toc_01_5357.loop_01_53FB:
     and  a
     jr   nz, .loop_01_53FB
 
-toc_01_5357.loop_01_5406:
+.loop_01_5406:
     push hl
     ld   hl, $525E
     add  hl, bc
@@ -1414,7 +1414,7 @@ toc_01_5357.loop_01_5406:
     cp   $FF
     jr   nz, .loop_01_5406
 
-toc_01_5357.else_01_5430:
+.else_01_5430:
     xor  a
     ld   b, a
     ld   c, a
@@ -1423,7 +1423,7 @@ toc_01_5357.else_01_5430:
     jr   z, .else_01_543B
 
     inc  bc
-toc_01_5357.else_01_543B:
+.else_01_543B:
     push hl
     ld   hl, $532A
     add  hl, bc
@@ -1535,11 +1535,11 @@ JumpTable_55FD_01:
     jr   nz, .else_01_5633
 
     ld   a, $07
-JumpTable_55FD_01.else_01_5633:
+.else_01_5633:
     ld   [wTileMapToLoad], a
     ld   hl, $C124
     ld   e, $00
-JumpTable_55FD_01.loop_01_563B:
+.loop_01_563B:
     xor  a
     ldi  [hl], a
     inc  e
@@ -1547,12 +1547,12 @@ JumpTable_55FD_01.loop_01_563B:
     cp   $0C
     jr   nz, .loop_01_563B
 
-JumpTable_55FD_01.toc_01_5643:
+.toc_01_5643:
     assign [wWYStash], 128
     assign [gbWX], 6
     assign [$C150], $08
     clear [$C14F]
-JumpTable_55FD_01.return_01_5655:
+.return_01_5655:
     ret
 
 
@@ -1739,7 +1739,7 @@ toc_01_5B6E:
     ld   b, $01
     ld   c, $00
     ld   hl, $DB80
-toc_01_5B6E.loop_01_5B7A:
+.loop_01_5B7A:
     ldi  a, [hl]
     and  a
     jr   z, .else_01_5B81
@@ -1747,19 +1747,19 @@ toc_01_5B6E.loop_01_5B7A:
     ld   a, [de]
     or   b
     ld   [de], a
-toc_01_5B6E.else_01_5B81:
+.else_01_5B81:
     inc  c
     ld   a, c
     cp   $05
     jr   nz, .else_01_5B89
 
     ld   b, $02
-toc_01_5B6E.else_01_5B89:
+.else_01_5B89:
     cp   $0A
     jr   nz, .else_01_5B8F
 
     ld   b, $04
-toc_01_5B6E.else_01_5B8F:
+.else_01_5B8F:
     cp   $0F
     jr   nz, .loop_01_5B7A
 
@@ -1778,7 +1778,7 @@ toc_01_5B94:
     add  hl, de
     ld   a, [hl]
     ld   [$DB5A], a
-toc_01_5B94.else_01_5BA8:
+.else_01_5BA8:
     call toc_01_27E2
     ld   a, [$DBA6]
     sla  a
@@ -1791,7 +1791,7 @@ toc_01_5B94.else_01_5BA8:
     ld   l, a
     ld   bc, $D800
     ld   de, $0380
-toc_01_5B94.loop_01_5BC0:
+.loop_01_5BC0:
     call enableRAM
     ld   a, [bc]
     inc  bc
@@ -1821,14 +1821,14 @@ toc_01_5BCF:
     add  hl, de
     ld   de, $DBCC
     ld   c, $05
-toc_01_5BCF.loop_01_5BEE:
+.loop_01_5BEE:
     ld   a, [de]
     inc  de
     ldi  [hl], a
     dec  c
     jr   nz, .loop_01_5BEE
 
-toc_01_5BCF.else_01_5BF4:
+.else_01_5BF4:
     pop  bc
     ret
 
@@ -1896,7 +1896,7 @@ toc_01_5C61:
     ld   c, $06
     ld   a, [$FFF6]
     ld   hl, $CE81
-toc_01_5C61.loop_01_5C68:
+.loop_01_5C68:
     cp   [hl]
     jr   z, .return_01_5C8C
 
@@ -1910,7 +1910,7 @@ toc_01_5C61.loop_01_5C68:
     jr   nz, .else_01_5C78
 
     xor  a
-toc_01_5C61.else_01_5C78:
+.else_01_5C78:
     ld   [$CE80], a
     ld   e, a
     ld   d, $00
@@ -1922,7 +1922,7 @@ toc_01_5C61.else_01_5C78:
     ld   hl, $CF00
     add  hl, de
     ld   [hl], $00
-toc_01_5C61.return_01_5C8C:
+.return_01_5C8C:
     ret
 
 
@@ -1946,7 +1946,7 @@ toc_01_5CF0:
     ld   b, $28
     xor  a
     ld   hl, gbRAM
-toc_01_5CF0.loop_01_5CFB:
+.loop_01_5CFB:
     ldi  [hl], a
     inc  hl
     inc  hl
@@ -1965,13 +1965,13 @@ toc_01_5D03:
     add  a, 8
     ld   d, a
     ld   e, $28
-toc_01_5D03.loop_01_5D14:
+.loop_01_5D14:
     ld   a, [hl]
     cp   d
     jr   c, .else_01_5D1A
 
     ld   [hl], $00
-toc_01_5D03.else_01_5D1A:
+.else_01_5D1A:
     inc  hl
     inc  hl
     inc  hl
@@ -1982,7 +1982,7 @@ toc_01_5D03.else_01_5D1A:
     ret
 
 
-toc_01_5D03.else_01_5D22:
+.else_01_5D22:
     ld   a, [wWYStash]
     and  a
     ret  z
@@ -1997,10 +1997,10 @@ toc_01_5D03.else_01_5D22:
     jr   z, .else_01_5D37
 
     ld   d, $58
-toc_01_5D03.else_01_5D37:
+.else_01_5D37:
     ld   e, $1F
     ld   hl, $C024
-toc_01_5D03.loop_01_5D3C:
+.loop_01_5D3C:
     ld   a, [hl]
     cp   d
     ld   a, [wDialogState]
@@ -2008,7 +2008,7 @@ toc_01_5D03.loop_01_5D3C:
     jr   nz, .else_01_5D46
 
     ccf
-toc_01_5D03.else_01_5D46:
+.else_01_5D46:
     jr   c, .else_01_5D63
 
     ifNe [$C173], $4F, .else_01_5D61
@@ -2027,9 +2027,9 @@ toc_01_5D03.else_01_5D46:
     cp   $A0
     jr   c, .else_01_5D63
 
-toc_01_5D03.else_01_5D61:
+.else_01_5D61:
     ld   [hl], $00
-toc_01_5D03.else_01_5D63:
+.else_01_5D63:
     inc  hl
     inc  hl
     inc  hl
@@ -2067,12 +2067,12 @@ toc_01_5D6B:
     cp   $B1
     ret  z
 
-toc_01_5D6B.else_01_5D8B:
+.else_01_5D8B:
     ifNe [$DB7B], $01, .else_01_5DCC
 
     ld   e, $0F
     ld   d, $00
-toc_01_5D6B.loop_01_5D96:
+.loop_01_5D96:
     ld   hl, $C3A0
     add  hl, de
     ld   a, [hl]
@@ -2086,7 +2086,7 @@ toc_01_5D6B.loop_01_5D96:
     jr   z, .else_01_5DA8
 
     ld   [hl], d
-toc_01_5D6B.else_01_5DA8:
+.else_01_5DA8:
     dec  e
     ld   a, e
     cp   $FF
@@ -2108,7 +2108,7 @@ toc_01_5D6B.else_01_5DA8:
     ld   hl, $C210
     add  hl, de
     ld   [hl], a
-toc_01_5D6B.else_01_5DCC:
+.else_01_5DCC:
     ifEq [$DB79], $01, .else_01_5DFB
 
     cp   $02
@@ -2129,16 +2129,16 @@ toc_01_5D6B.else_01_5DCC:
     xor  a
     jr   .toc_01_5DF6
 
-toc_01_5D6B.else_01_5DF4:
+.else_01_5DF4:
     ld   a, $01
-toc_01_5D6B.toc_01_5DF6:
+.toc_01_5DF6:
     ld   [$DB79], a
     jr   .else_01_5E37
 
-toc_01_5D6B.else_01_5DFB:
+.else_01_5DFB:
     ld   e, $0F
     ld   d, $00
-toc_01_5D6B.loop_01_5DFF:
+.loop_01_5DFF:
     ld   hl, $C3A0
     add  hl, de
     ld   a, [hl]
@@ -2152,7 +2152,7 @@ toc_01_5D6B.loop_01_5DFF:
     jr   z, .else_01_5E11
 
     ld   [hl], d
-toc_01_5D6B.else_01_5E11:
+.else_01_5E11:
     dec  e
     ld   a, e
     cp   $FF
@@ -2174,12 +2174,12 @@ toc_01_5D6B.else_01_5E11:
     add  hl, de
     inc  [hl]
     assign [$FFF2], $2D
-toc_01_5D6B.else_01_5E37:
+.else_01_5E37:
     ifNotZero [$DB73], toc_01_5ED7
 
     ld   e, $0F
     ld   d, $00
-toc_01_5D6B.loop_01_5E42:
+.loop_01_5E42:
     ld   hl, $C3A0
     add  hl, de
     ld   a, [hl]
@@ -2193,7 +2193,7 @@ toc_01_5D6B.loop_01_5E42:
     jr   z, .else_01_5E54
 
     ld   [hl], d
-toc_01_5D6B.else_01_5E54:
+.else_01_5E54:
     dec  e
     ld   a, e
     cp   $FF
@@ -2236,7 +2236,7 @@ toc_01_5D6B.else_01_5E54:
     ld   hl, $C300
     add  hl, de
     ld   [hl], $79
-toc_01_5D6B.else_01_5EAF:
+.else_01_5EAF:
     ld   a, [hLinkDirection]
     ld   hl, $D1B5
     call toc_01_5ED0
@@ -2252,13 +2252,13 @@ toc_01_5D6B.else_01_5EAF:
     add  hl, de
     add  a, 16
     ld   [hl], a
-toc_01_5D6B.return_01_5ECF:
+.return_01_5ECF:
     ret
 
 
 toc_01_5ED0:
     ld   c, $10
-toc_01_5ED0.loop_01_5ED2:
+.loop_01_5ED2:
     ldi  [hl], a
     dec  c
     jr   nz, .loop_01_5ED2
@@ -2275,7 +2275,7 @@ toc_01_5ED7:
 
     ld   e, $0F
     ld   d, $00
-toc_01_5ED7.loop_01_5EE7:
+.loop_01_5EE7:
     ld   hl, $C3A0
     add  hl, de
     ld   a, [hl]
@@ -2289,7 +2289,7 @@ toc_01_5ED7.loop_01_5EE7:
     jr   z, .else_01_5EF9
 
     ld   [hl], d
-toc_01_5ED7.else_01_5EF9:
+.else_01_5EF9:
     dec  e
     ld   a, e
     cp   $FF
@@ -2309,7 +2309,7 @@ toc_01_5ED7.else_01_5EF9:
     ld   hl, $C310
     add  hl, de
     ld   [hl], a
-toc_01_5ED7.return_01_5F19:
+.return_01_5F19:
     ret
 
 
@@ -2382,7 +2382,7 @@ toc_01_5FA6:
     ld   a, [$FFF7]
     add  a, $56
     call toc_01_2197
-toc_01_5FA6.return_01_5FBA:
+.return_01_5FBA:
     ret
 
 
@@ -2395,12 +2395,12 @@ toc_01_5FBB:
 
     dec  a
     ld   [$C3C7], a
-toc_01_5FBB.else_01_5FCB:
+.else_01_5FCB:
     ifNot [$C3C4], .else_01_5FD5
 
     dec  a
     ld   [$C3C4], a
-toc_01_5FBB.else_01_5FD5:
+.else_01_5FD5:
     ld   a, [$DB96]
     jumptable
     db   $F5, $5F, $17, $60, $23, $60, $5A, $61
@@ -2872,9 +2872,9 @@ toc_01_6DB7:
     jr   c, .else_01_6DCF
 
     ld   a, $10
-toc_01_6DB7.else_01_6DCF:
+.else_01_6DCF:
     ld   [$C17E], a
-toc_01_6DB7.else_01_6DD2:
+.else_01_6DD2:
     ld   a, [$C17E]
     ld   e, a
     ld   hl, $6DA6
@@ -2887,15 +2887,15 @@ toc_01_6DB7.else_01_6DD2:
     ldi  a, [hl]
     ld   b, [hl]
     ld   c, a
-toc_01_6DB7.loop_01_6DE6:
+.loop_01_6DE6:
     ifNe [gbLY], 16, .loop_01_6DE6
 
-toc_01_6DB7.loop_01_6DEC:
+.loop_01_6DEC:
     ld   a, [gbSTAT]
     and  STATF_OAM | STATF_VB
     jr   nz, .loop_01_6DEC
 
-toc_01_6DB7.loop_01_6DF2:
+.loop_01_6DF2:
     ld   a, [$C17D]
     inc  a
     ld   [$C17D], a
@@ -2917,7 +2917,7 @@ toc_01_6DB7.loop_01_6DF2:
     assign [gbBGP], $55
     jr   .loop_01_6DEC
 
-toc_01_6DB7.else_01_6E15:
+.else_01_6E15:
     ld   hl, $0000
     add  hl, de
     add  hl, bc
@@ -2927,7 +2927,7 @@ toc_01_6DB7.else_01_6E15:
     ld   [gbSCY], a
     jr   .loop_01_6DEC
 
-toc_01_6DB7.else_01_6E23:
+.else_01_6E23:
     copyFromTo [hBaseScrollY], [gbSCY]
     copyFromTo [$DB97], [gbBGP]
     ret
@@ -2941,7 +2941,7 @@ toc_01_6E2D:
     push af
     assign [$FFF2], $0A
     pop  af
-toc_01_6E2D.return_01_6E39:
+.return_01_6E39:
     ret
 
 
@@ -2954,7 +2954,7 @@ toc_01_6E3E:
     ld   [hButtonsInactiveDelay], a
     jr   toc_01_6EAD
 
-toc_01_6E3E.else_01_6E48:
+.else_01_6E48:
     ld   a, [$FFCC]
     and  %10000000
     jr   z, toc_01_6EAD
@@ -2979,7 +2979,7 @@ toc_01_6E3E.else_01_6E48:
     call toc_01_7B11
     jr   toc_01_6EA4
 
-toc_01_6E3E.else_01_6E90:
+.else_01_6E90:
     jp   toc_01_44BC
 
     db   $AF, $EA, $96, $DB, $E0, $96, $E0, $97
@@ -2999,7 +2999,7 @@ toc_01_6EAD:
 
     dec  a
     ld   [$D000], a
-toc_01_6EAD.else_01_6EBE:
+.else_01_6EBE:
     rra
     nop
     and  %00000011
@@ -3009,7 +3009,7 @@ toc_01_6EAD.else_01_6EBE:
     add  hl, de
     ld   a, [hl]
     ld   [$DB97], a
-toc_01_6EAD.else_01_6ECD:
+.else_01_6ECD:
     ld   a, [$DB96]
     jumptable
     db   $ED, $6E, $11, $6F, $19, $6F, $84, $6F
@@ -3885,7 +3885,7 @@ toc_01_780F:
 
     assign [$D00B], $F4
     assign [$D00C], $9B
-toc_01_780F.else_01_7A51:
+.else_01_7A51:
     ld   a, [$D00A]
     ld   e, a
     ld   d, $00
@@ -3911,7 +3911,7 @@ toc_01_780F.else_01_7A51:
     ldi  [hl], a
     ld   a, $13
     ldi  [hl], a
-toc_01_780F.loop_01_7A7E:
+.loop_01_7A7E:
     push hl
     ld   hl, $77C1
     add  hl, de
@@ -3966,7 +3966,7 @@ toc_01_7B11:
     ifNot [$D00F], .else_01_7B2D
 
     ld   hl, $7AAC
-toc_01_7B11.else_01_7B2D:
+.else_01_7B2D:
     add  hl, de
     ldi  a, [hl]
     ld   h, [hl]
@@ -3975,7 +3975,7 @@ toc_01_7B11.else_01_7B2D:
     ifNot [$D00F], .else_01_7B3D
 
     ld   de, $9300
-toc_01_7B11.else_01_7B3D:
+.else_01_7B3D:
     ld   a, [hFrameCounter]
     and  %00000011
     sla  a
@@ -4023,7 +4023,7 @@ toc_01_7BC5:
     ret
 
 
-toc_01_7BC5.else_01_7BD6:
+.else_01_7BD6:
     call toc_01_7BFA
     clear [hNeedsUpdatingBGTiles]
     ld   [hBGTilesLoadingStage], a
@@ -4043,11 +4043,11 @@ toc_01_7BFA:
 toc_01_7C00:
     ld   c, $04
     ld   e, $00
-toc_01_7C00.toc_01_7C04:
+.toc_01_7C04:
     ld   a, c
     ld   [$FFE0], a
     ld   d, $00
-toc_01_7C00.loop_01_7C09:
+.loop_01_7C09:
     clear [$FFD7]
     ld   [$FFD8], a
     ld   [$FFD9], a
@@ -4076,7 +4076,7 @@ toc_01_7C00.loop_01_7C09:
     pop  hl
     jr   .toc_01_7C58
 
-toc_01_7C00.else_01_7C3A:
+.else_01_7C3A:
     ld   c, $00
     ld   b, c
     ld   hl, $7BDF
@@ -4096,7 +4096,7 @@ toc_01_7C00.else_01_7C3A:
     inc  a
     ld   [$FFDA], a
     pop  hl
-toc_01_7C00.toc_01_7C58:
+.toc_01_7C58:
     ld   a, [$FFD7]
     ld   [hl], a
     call toc_01_7C79
@@ -4170,7 +4170,7 @@ toc_01_7C87:
 
 toc_01_7CDE:
     ld   bc, $7CB5
-toc_01_7CDE.toc_01_7CE1:
+.toc_01_7CE1:
     ld   a, [bc]
     cp   $FF
     jr   z, .return_01_7CF2
@@ -4183,21 +4183,21 @@ toc_01_7CDE.toc_01_7CE1:
     inc  bc
     jr   .toc_01_7CE1
 
-toc_01_7CDE.return_01_7CF2:
+.return_01_7CF2:
     ret
 
 
 toc_01_7CF3:
     ld   bc, $0400
     ld   hl, gbBGDAT0
-toc_01_7CF3.loop_01_7CF9:
+.loop_01_7CF9:
     ld   e, $00
     ld   a, l
     and  %00100000
     jr   z, .else_01_7D01
 
     inc  e
-toc_01_7CF3.else_01_7D01:
+.else_01_7D01:
     ld   d, $AE
     ld   a, l
     and  %00000001
@@ -4205,14 +4205,14 @@ toc_01_7CF3.else_01_7D01:
     jr   z, .else_01_7D0A
 
     inc  d
-toc_01_7CF3.else_01_7D0A:
+.else_01_7D0A:
     ld   a, l
     and  %00011111
     cp   $14
     jr   nc, .else_01_7D12
 
     ld   [hl], d
-toc_01_7CF3.else_01_7D12:
+.else_01_7D12:
     inc  hl
     dec  bc
     ld   a, b
@@ -4226,7 +4226,7 @@ copyDMARoutine:
     ld   c, $C0
     ld   b, $0A
     ld   hl, $7D27
-copyDMARoutine.copyInstructions:
+.copyInstructions:
     ldi  a, [hl]
     ld   [$ff00+c], a
     inc  c
@@ -4239,7 +4239,7 @@ copyDMARoutine.copyInstructions:
 DMARoutine:
     assign [gbDMA], $C0
     ld   a, $28
-DMARoutine.loop_01_7D2D:
+.loop_01_7D2D:
     dec  a
     jr   nz, .loop_01_7D2D
 
@@ -4286,7 +4286,7 @@ toc_01_7DC1:
     ifNot [$FFF9], .return_01_7DE7
 
     ld   [hl], $7F
-toc_01_7DC1.return_01_7DE7:
+.return_01_7DE7:
     ret
 
 
@@ -4326,7 +4326,7 @@ toc_01_7DC1.return_01_7DE7:
 toc_01_7EE8:
     ld   de, $9822
     ld   bc, $0000
-toc_01_7EE8.toc_01_7EEE:
+.toc_01_7EEE:
     ld   a, [$C5A2]
     and  a
     jr   nz, .else_01_7F06
@@ -4340,11 +4340,11 @@ toc_01_7EE8.toc_01_7EEE:
     ld   a, $2C
     jr   z, .else_01_7F0B
 
-toc_01_7EE8.else_01_7F06:
+.else_01_7F06:
     ld   hl, $7DE8
     add  hl, bc
     ld   a, [hl]
-toc_01_7EE8.else_01_7F0B:
+.else_01_7F0B:
     ld   [de], a
     inc  c
     jr   z, .return_01_7F23
@@ -4362,10 +4362,10 @@ toc_01_7EE8.else_01_7F0B:
     ld   a, d
     adc  $00
     ld   d, a
-toc_01_7EE8.else_01_7F21:
+.else_01_7F21:
     jr   .toc_01_7EEE
 
-toc_01_7EE8.return_01_7F23:
+.return_01_7F23:
     ret
 
 

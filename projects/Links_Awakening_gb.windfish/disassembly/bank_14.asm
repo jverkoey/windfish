@@ -604,12 +604,12 @@ toc_14_523C:
     jr   nz, .else_14_524C
 
     assign [$FFF3], $1B
-toc_14_523C.else_14_524C:
+.else_14_524C:
     ifNot [$C502], .else_14_5256
 
     dec  a
     ld   [$C502], a
-toc_14_523C.else_14_5256:
+.else_14_5256:
     ifNot [$C5AF], .else_14_5267
 
     dec  a
@@ -617,7 +617,7 @@ toc_14_523C.else_14_5256:
     jr   nz, .else_14_5267
 
     copyFromTo [hNextDefaultMusicTrack], [$D368]
-toc_14_523C.else_14_5267:
+.else_14_5267:
     ld   a, [$DBA5]
     and  a
     jr   nz, .else_14_528C
@@ -635,9 +635,9 @@ toc_14_523C.else_14_5267:
 
     assign [$FFF4], $0F
     xor  a
-toc_14_523C.else_14_5289:
+.else_14_5289:
     ld   [$C114], a
-toc_14_523C.else_14_528C:
+.else_14_528C:
     ld   a, [$DB5B]
     ld   e, a
     ld   d, b
@@ -649,7 +649,7 @@ toc_14_523C.else_14_528C:
     jr   nz, .else_14_529E
 
     inc  a
-toc_14_523C.else_14_529E:
+.else_14_529E:
     ld   [$C5A9], a
     ld   a, [$C5AC]
     inc  a
@@ -657,7 +657,7 @@ toc_14_523C.else_14_529E:
     jr   nz, .else_14_52AA
 
     xor  a
-toc_14_523C.else_14_52AA:
+.else_14_52AA:
     ld   [$C5AC], a
     ld   a, [hFrameCounter]
     and  %00111111
@@ -667,7 +667,7 @@ toc_14_523C.else_14_52AA:
 
     inc  a
     ld   [$DB47], a
-toc_14_523C.else_14_52BE:
+.else_14_52BE:
     ld   a, [$D464]
     and  a
     ret  z
@@ -696,7 +696,7 @@ toc_14_523C.else_14_52BE:
     ld   [$DB99], a
     assign [$DB98], $0C
     assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
-toc_14_523C.return_14_52FA:
+.return_14_52FA:
     ret
 
 
@@ -736,7 +736,7 @@ toc_14_5326:
     jr   nz, .else_14_535D
 
     copyFromTo [$C3CD], [$FFD7]
-toc_14_5326.else_14_535D:
+.else_14_535D:
     ld   a, [$C3CC]
     ld   e, a
     ld   a, [hFrameCounter]
@@ -762,9 +762,9 @@ toc_14_5326.else_14_535D:
 
     inc  [hl]
     inc  [hl]
-toc_14_5326.else_14_5386:
+.else_14_5386:
     dec  [hl]
-toc_14_5326.return_14_5387:
+.return_14_5387:
     ret
 
 
@@ -786,12 +786,12 @@ toc_14_5388:
     jr   z, .else_14_53AB
 
     dec  [hl]
-toc_14_5388.else_14_53AB:
+.else_14_53AB:
     call toc_01_088C
     jr   z, .else_14_53B1
 
     dec  [hl]
-toc_14_5388.else_14_53B1:
+.else_14_53B1:
     ld   hl, $C300
     add  hl, bc
     ld   a, [hl]
@@ -799,7 +799,7 @@ toc_14_5388.else_14_53B1:
     jr   z, .else_14_53BA
 
     dec  [hl]
-toc_14_5388.else_14_53BA:
+.else_14_53BA:
     ld   hl, $C480
     add  hl, bc
     ld   a, [hl]
@@ -807,7 +807,7 @@ toc_14_5388.else_14_53BA:
     jr   z, .else_14_53C3
 
     dec  [hl]
-toc_14_5388.else_14_53C3:
+.else_14_53C3:
     ld   a, [hFrameCounter]
     and  %00000011
     jr   nz, .else_14_53CF
@@ -816,7 +816,7 @@ toc_14_5388.else_14_53C3:
     jr   z, .else_14_53CF
 
     dec  [hl]
-toc_14_5388.else_14_53CF:
+.else_14_53CF:
     ld   hl, $C420
     add  hl, bc
     ld   a, [hl]
@@ -824,7 +824,7 @@ toc_14_5388.else_14_53CF:
     jr   z, .else_14_53D8
 
     dec  [hl]
-toc_14_5388.else_14_53D8:
+.else_14_53D8:
     sla  a
     sla  a
     and  %00010000
@@ -832,7 +832,7 @@ toc_14_5388.else_14_53D8:
     ret
 
 
-toc_14_5388.else_14_53E1:
+.else_14_53E1:
     clear [$FFED]
     ret
 
@@ -862,7 +862,7 @@ toc_14_541B:
     add  hl, de
     ld   e, $05
     ld   bc, $D401
-toc_14_541B.loop_14_5443:
+.loop_14_5443:
     ldi  a, [hl]
     ld   [bc], a
     inc  bc
@@ -872,7 +872,7 @@ toc_14_541B.loop_14_5443:
     ret
 
 
-toc_14_541B.else_14_544A:
+.else_14_544A:
     clear [$D401]
     ld   [$D402], a
     assign [$D403], $45
@@ -928,7 +928,7 @@ toc_14_541B.else_14_544A:
 toc_14_55AA:
     ld   e, $0F
     ld   d, $00
-toc_14_55AA.loop_14_55AE:
+.loop_14_55AE:
     ld   hl, $C280
     add  hl, de
     ld   a, [hl]
@@ -974,7 +974,7 @@ toc_14_55AA.loop_14_55AE:
     ld   hl, $C2F0
     add  hl, de
     ld   [hl], $18
-toc_14_55AA.else_14_55F8:
+.else_14_55F8:
     dec  e
     ld   a, e
     cp   $FF
@@ -1060,13 +1060,13 @@ toc_14_5822:
 
     ifNe [$C11C], $06, .else_14_583B
 
-toc_14_5822.else_14_582F:
+.else_14_582F:
     ifEq [$FFEB], $A8, .else_14_583B
 
     call .toc_14_587E
     jp   toc_01_3DAF
 
-toc_14_5822.else_14_583B:
+.else_14_583B:
     ifNot [$C5AE], .else_14_5846
 
     dec  a
@@ -1074,7 +1074,7 @@ toc_14_5822.else_14_583B:
     ret
 
 
-toc_14_5822.else_14_5846:
+.else_14_5846:
     ld   a, [$C15C]
     cp   $01
     jp   nz, .return_14_591E
@@ -1083,7 +1083,7 @@ toc_14_5822.else_14_5846:
     ifNe [$FFEB], $02, .else_14_5858
 
     ld   d, $02
-toc_14_5822.else_14_5858:
+.else_14_5858:
     ld   e, $10
     ld   a, [$DB00]
     cp   d
@@ -1092,13 +1092,13 @@ toc_14_5822.else_14_5858:
     sla  e
     jr   .else_14_586C
 
-toc_14_5822.else_14_5864:
+.else_14_5864:
     ld   a, [$DB01]
     cp   d
     jr   z, .else_14_586C
 
     ld   e, $30
-toc_14_5822.else_14_586C:
+.else_14_586C:
     ld   a, [$FFCC]
     and  e
     jp   z, .return_14_591E
@@ -1109,7 +1109,7 @@ toc_14_5822.else_14_586C:
     ld   [hl], a
     ld   hl, $FFF2
     ld   [hl], $08
-toc_14_5822.toc_14_587E:
+.toc_14_587E:
     ld   hl, $C280
     add  hl, bc
     ld   [hl], $05
@@ -1119,7 +1119,7 @@ toc_14_5822.toc_14_587E:
     ld   [hl], $A0
     jr   .else_14_58E4
 
-toc_14_5822.else_14_5891:
+.else_14_5891:
     ld   hl, $C280
     add  hl, bc
     cp   $D6
@@ -1156,13 +1156,13 @@ toc_14_5822.else_14_5891:
     add  a, $30
     ld   [hl], a
     pop  hl
-toc_14_5822.else_14_58C8:
+.else_14_58C8:
     ld   [hl], $05
     call JumpTable_3B8D_00
     ld   [hl], $02
     jr   toc_14_5822.else_14_58E4
 
-toc_14_5822.else_14_58D1:
+.else_14_58D1:
     cp   $92
     jr   nz, toc_14_5822.else_14_58DE
 
@@ -1171,23 +1171,23 @@ toc_14_5822.else_14_58D1:
     ld   [hl], $03
     jr   toc_14_5822.else_14_58E4
 
-toc_14_5822.else_14_58DE:
+.else_14_58DE:
     cp   $05
     jr   z, toc_14_5822.else_14_58E4
 
     ld   [hl], $08
-toc_14_5822.else_14_58E4:
+.else_14_58E4:
     ld   e, b
     ifNot [$FFF9], toc_14_5822.else_14_58EC
 
     ld   e, $08
-toc_14_5822.else_14_58EC:
+.else_14_58EC:
     ifNe [$FFEB], $02, toc_14_5822.else_14_58F6
 
     ld   a, e
     add  a, $04
     ld   e, a
-toc_14_5822.else_14_58F6:
+.else_14_58F6:
     ld   a, [hLinkDirection]
     add  a, e
     ld   e, a
@@ -1211,7 +1211,7 @@ toc_14_5822.else_14_58F6:
     add  hl, bc
     ld   [hl], a
     assign [$C19B], $0C
-toc_14_5822.return_14_591E:
+.return_14_591E:
     ret
 
 
@@ -1230,7 +1230,7 @@ toc_14_5924:
     cp   $04
     jr   z, toc_14_591F
 
-toc_14_5924.else_14_5935:
+.else_14_5935:
     ifEq [wGameMode], GAMEMODE_CREDITS, .else_14_595A
 
     ld   a, [$C3CB]
@@ -1243,7 +1243,7 @@ toc_14_5924.else_14_5935:
     assign [$DB97], $E4
     ld   [$DB99], a
     assign [$DB98], $1C
-toc_14_5924.else_14_595A:
+.else_14_595A:
     ld   a, [$D601]
     and  a
     ret  nz
@@ -1270,13 +1270,13 @@ toc_14_5964:
     ld   [hLinkPositionX], a
     jr   .toc_14_5996
 
-toc_14_5964.else_14_5982:
+.else_14_5982:
     ld   a, [hLinkPositionX]
     dec  a
     ld   [hLinkPositionX], a
     jr   .toc_14_5996
 
-toc_14_5964.else_14_5989:
+.else_14_5989:
     ld   a, [hLinkPositionY]
     sub  a, 22
     cp   94
@@ -1285,10 +1285,10 @@ toc_14_5964.else_14_5989:
     ld   a, [hLinkPositionY]
     dec  a
     ld   [hLinkPositionY], a
-toc_14_5964.toc_14_5996:
+.toc_14_5996:
     assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_GRAB_SLASH
     assign [$C111], $02
-toc_14_5964.return_14_599F:
+.return_14_599F:
     ret
 
 
@@ -1300,7 +1300,7 @@ toc_14_59B0:
 
     dec  a
     ld   [$C178], a
-toc_14_59B0.else_14_59BA:
+.else_14_59BA:
     ifNot [$C157], .return_14_59DD
 
     dec  a
@@ -1318,7 +1318,7 @@ toc_14_59B0.else_14_59BA:
     add  hl, de
     ld   a, [hl]
     ld   [$C156], a
-toc_14_59B0.return_14_59DD:
+.return_14_59DD:
     ret
 
 
@@ -1358,13 +1358,13 @@ toc_14_59DE:
     ld   a, $17
     jp   .toc_14_5AE4
 
-toc_14_59DE.else_14_5A1D:
+.else_14_5A1D:
     cp   $D3
     jr   nz, .else_14_5A24
 
     jp   .toc_14_5AE9
 
-toc_14_59DE.else_14_5A24:
+.else_14_5A24:
     ifNotZero [$DBA5], .else_14_5A9F
 
     ifNot [$FFF9], .else_14_5A6B
@@ -1402,7 +1402,7 @@ toc_14_59DE.else_14_5A24:
     ld   a, $7E
     jp   .toc_14_5AE4
 
-toc_14_59DE.else_14_5A6B:
+.else_14_5A6B:
     ld   [hl], $0D
     call toc_01_2839
     ld   hl, $D601
@@ -1434,7 +1434,7 @@ toc_14_59DE.else_14_5A6B:
     ld   a, $13
     jr   .toc_14_5AE4
 
-toc_14_59DE.else_14_5A9F:
+.else_14_5A9F:
     ifNe [hObjectUnderEntity], 32, .else_14_5AB2
 
     ifEq [$FFF6], $52, .else_14_5AAF
@@ -1442,10 +1442,10 @@ toc_14_59DE.else_14_5A9F:
     cp   $04
     jr   nz, .else_14_5AB2
 
-toc_14_59DE.else_14_5AAF:
+.else_14_5AAF:
     jp   .toc_14_5B0C
 
-toc_14_59DE.else_14_5AB2:
+.else_14_5AB2:
     ld   [hl], $04
     call toc_01_2839
     ld   hl, $D601
@@ -1475,14 +1475,14 @@ toc_14_59DE.else_14_5AB2:
     ld   a, $7F
     ldi  [hl], a
     ld   a, $5A
-toc_14_59DE.toc_14_5AE4:
+.toc_14_5AE4:
     ldi  [hl], a
     ld   a, $00
     ldi  [hl], a
     ret
 
 
-toc_14_59DE.toc_14_5AE9:
+.toc_14_5AE9:
     ifEq [$FFF6], $75, .else_14_5AFB
 
     cp   $07
@@ -1494,7 +1494,7 @@ toc_14_59DE.toc_14_5AE9:
     cp   $4A
     jr   nz, .else_14_5B69
 
-toc_14_59DE.else_14_5AFB:
+.else_14_5AFB:
     ld   hl, $D711
     add  hl, de
     push hl
@@ -1505,7 +1505,7 @@ toc_14_59DE.else_14_5AFB:
     add  hl, de
     set  4, [hl]
     pop  hl
-toc_14_59DE.toc_14_5B0C:
+.toc_14_5B0C:
     ld   [hl], $C6
     call toc_01_2839
     ld   hl, $D601
@@ -1558,7 +1558,7 @@ toc_14_59DE.toc_14_5B0C:
     ret
 
 
-toc_14_59DE.else_14_5B69:
+.else_14_5B69:
     ld   hl, $D711
     add  hl, de
     ld   [hl], $E8

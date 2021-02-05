@@ -26,7 +26,7 @@ JumpTable_402D_18:
 
     jp   toc_18_42B6
 
-JumpTable_402D_18.else_18_404A:
+.else_18_404A:
     ifGte [hLinkPositionY], 76, .else_18_407C
 
     assign [hLinkPositionY], 76
@@ -34,7 +34,7 @@ JumpTable_402D_18.else_18_404A:
     call toc_01_093B
     ld   e, $0B
     ld   hl, $DB00
-JumpTable_402D_18.loop_18_405F:
+.loop_18_405F:
     ldi  a, [hl]
     cp   $09
     jr   z, .else_18_4074
@@ -51,11 +51,11 @@ JumpTable_402D_18.loop_18_405F:
     ret
 
 
-JumpTable_402D_18.else_18_4074:
+.else_18_4074:
     ld   a, $DC
     call toc_18_4088
     call JumpTable_3B8D_00
-JumpTable_402D_18.else_18_407C:
+.else_18_407C:
     ld   a, [hFrameCounter]
     rra
     rra
@@ -203,13 +203,13 @@ JumpTable_4394_18:
     jr   z, .else_18_43B3
 
     inc  e
-JumpTable_4394_18.else_18_43B3:
+.else_18_43B3:
     ld   a, e
     call toc_01_3B87
     ret
 
 
-JumpTable_4394_18.return_18_43B8:
+.return_18_43B8:
     ret
 
 
@@ -282,7 +282,7 @@ JumpTable_4553_18:
     ret
 
 
-JumpTable_4553_18.else_18_4565:
+.else_18_4565:
     ifLt [hLinkPositionX], 48, .else_18_457A
 
     assign [hLinkPositionX], 47
@@ -290,7 +290,7 @@ JumpTable_4553_18.else_18_4565:
     ld   a, $85
     call toc_01_2185
     call JumpTable_3B8D_00
-JumpTable_4553_18.else_18_457A:
+.else_18_457A:
     ld   a, [hFrameCounter]
     rra
     rra
@@ -439,7 +439,7 @@ JumpTable_4968_18:
     ld   a, [hl]
     sub  a, $10
     ld   [hl], a
-JumpTable_4968_18.else_18_4976:
+.else_18_4976:
     call JumpTable_3B8D_00
     ret
 
@@ -493,7 +493,7 @@ JumpTable_4A0C_18:
     ret
 
 
-JumpTable_4A0C_18.else_18_4A37:
+.else_18_4A37:
     call toc_01_0891
     call toc_01_27ED
     and  %01111111
@@ -560,14 +560,14 @@ JumpTable_4BA7_18:
     call toc_01_2185
     jp   JumpTable_3B8D_00
 
-JumpTable_4BA7_18.else_18_4BBB:
+.else_18_4BBB:
     ld   a, $66
     jr   c, .else_18_4BC1
 
     ld   a, $6B
-JumpTable_4BA7_18.else_18_4BC1:
+.else_18_4BC1:
     call toc_01_2185
-JumpTable_4BA7_18.return_18_4BC4:
+.return_18_4BC4:
     ret
 
 
@@ -594,14 +594,14 @@ JumpTable_4C08_18:
     call toc_01_2185
     jp   JumpTable_3B8D_00
 
-JumpTable_4C08_18.else_18_4C1C:
+.else_18_4C1C:
     ld   a, $33
     jr   c, .else_18_4C22
 
     ld   a, $39
-JumpTable_4C08_18.else_18_4C22:
+.else_18_4C22:
     call toc_01_2185
-JumpTable_4C08_18.return_18_4C25:
+.return_18_4C25:
     ret
 
 
@@ -656,20 +656,20 @@ JumpTable_4CFF_18:
     jr   c, .else_18_4D1D
 
     ld   a, $5F
-JumpTable_4CFF_18.else_18_4D1D:
+.else_18_4D1D:
     jp   toc_01_2185
 
-JumpTable_4CFF_18.else_18_4D20:
+.else_18_4D20:
     ifNe [$DB0E], $0A, .else_18_4D2F
 
     ld   a, $5C
     call toc_01_2185
     jp   JumpTable_3B8D_00
 
-JumpTable_4CFF_18.else_18_4D2F:
+.else_18_4D2F:
     ld   a, $5B
     call toc_01_2185
-JumpTable_4CFF_18.return_18_4D34:
+.return_18_4D34:
     ret
 
 
@@ -716,10 +716,10 @@ JumpTable_4DEE_18:
 
     call JumpTable_3B8D_00
     ld   e, $2B
-JumpTable_4DEE_18.else_18_4E06:
+.else_18_4E06:
     ld   a, e
     call toc_01_2185
-JumpTable_4DEE_18.return_18_4E0A:
+.return_18_4E0A:
     ret
 
 
@@ -755,7 +755,7 @@ JumpTable_4E68_18:
     cp   [hl]
     jp   z, toc_18_7E76
 
-JumpTable_4E68_18.return_18_4E80:
+.return_18_4E80:
     ret
 
 
@@ -921,7 +921,7 @@ JumpTable_52D4_18:
     ret
 
 
-JumpTable_52D4_18.else_18_52F6:
+.else_18_52F6:
     cp   $48
     ret  nz
 
@@ -1036,7 +1036,7 @@ JumpTable_553D_18:
     ld   hl, $C2B0
     add  hl, de
     inc  [hl]
-JumpTable_553D_18.else_18_5571:
+.else_18_5571:
     ld   a, [$DB73]
     and  a
     jr   nz, .else_18_5582
@@ -1046,11 +1046,11 @@ JumpTable_553D_18.else_18_5571:
 
     ld   a, $E0
     call toc_01_2185
-JumpTable_553D_18.return_18_5581:
+.return_18_5581:
     ret
 
 
-JumpTable_553D_18.else_18_5582:
+.else_18_5582:
     call toc_18_7E20
     add  a, $13
     cp   $26
@@ -1228,10 +1228,10 @@ JumpTable_58B3_18:
 
 toc_18_59B8:
     ld   a, $00
-toc_18_59B8.toc_18_59BA:
+.toc_18_59BA:
     ld   e, $10
     ld   hl, $D1B5
-toc_18_59B8.loop_18_59BF:
+.loop_18_59BF:
     ldi  [hl], a
     dec  e
     jr   nz, .loop_18_59BF
@@ -1449,7 +1449,7 @@ JumpTable_5F22_18:
     ld   a, $35
     call toc_01_218E
     call JumpTable_3B8D_00
-JumpTable_5F22_18.return_18_5F3E:
+.return_18_5F3E:
     ret
 
 
@@ -1459,7 +1459,7 @@ toc_18_5F3F:
     and  %10000000
     ret  z
 
-toc_18_5F3F.else_18_5F47:
+.else_18_5F47:
     ld   a, [hFrameCounter]
     and  %00111111
     jr   nz, .return_18_5F53
@@ -1467,7 +1467,7 @@ toc_18_5F3F.else_18_5F47:
     ld   hl, $C320
     add  hl, bc
     ld   [hl], $10
-toc_18_5F3F.return_18_5F53:
+.return_18_5F53:
     ret
 
 
@@ -1550,7 +1550,7 @@ JumpTable_60F1_18:
     call toc_01_087C
     pop  bc
     call JumpTable_3B8D_00
-JumpTable_60F1_18.return_18_6122:
+.return_18_6122:
     ret
 
 
@@ -1755,7 +1755,7 @@ toc_18_6594:
     jr   nz, .else_18_659F
 
     assign [$FFF4], $0A
-toc_18_6594.else_18_659F:
+.else_18_659F:
     call toc_01_0891
     ld   [hl], $00
     ld   hl, $C3D0
@@ -1791,11 +1791,11 @@ JumpTable_65C8_18:
     call toc_01_3B87
     call toc_01_0891
     ld   [hl], $01
-JumpTable_65C8_18.return_18_65E7:
+.return_18_65E7:
     ret
 
 
-JumpTable_65C8_18.else_18_65E8:
+.else_18_65E8:
     call toc_01_27ED
     and  %00000011
     jp   z, toc_18_6706
@@ -2144,7 +2144,7 @@ JumpTable_6F76_18:
     ld   [hl], $20
     call toc_01_3DAF
     call JumpTable_3B8D_00
-JumpTable_6F76_18.return_18_6F83:
+.return_18_6F83:
     ret
 
 
@@ -2268,7 +2268,7 @@ JumpTable_71DF_18:
 
     ld   a, $10
     call toc_01_3C25
-JumpTable_71DF_18.else_18_7211:
+.else_18_7211:
     ld   hl, $FFEE
     ld   a, [hLinkPositionX]
     sub  a, [hl]
@@ -2285,7 +2285,7 @@ JumpTable_71DF_18.else_18_7211:
 
     incAddr $D201
     call JumpTable_3B8D_00
-JumpTable_71DF_18.else_18_7230:
+.else_18_7230:
     pop  af
     ld   [hLinkPositionY], a
     pop  af
@@ -2497,7 +2497,7 @@ JumpTable_774B_18:
     ld   hl, $C250
     add  hl, bc
     ld   [hl], a
-JumpTable_774B_18.else_18_7770:
+.else_18_7770:
     call toc_18_7DCD
     call toc_01_3B9E
     ld   hl, $C2B0
@@ -2517,9 +2517,9 @@ JumpTable_774B_18.else_18_7770:
     add  a, $7C
     inc  [hl]
     call toc_01_218E
-JumpTable_774B_18.else_18_7793:
+.else_18_7793:
     ld   hl, $7727
-JumpTable_774B_18.else_18_7796:
+.else_18_7796:
     ld   a, [hFrameCounter]
     rra
     rra
@@ -2588,9 +2588,9 @@ JumpTable_7838_18:
 
     ld   a, $0A
     call toc_01_3C25
-JumpTable_7838_18.else_18_786C:
+.else_18_786C:
     call JumpTable_3B8D_00
-JumpTable_7838_18.else_18_786F:
+.else_18_786F:
     ld   hl, $C3D0
     add  hl, bc
     ld   a, [hl]
@@ -2633,7 +2633,7 @@ JumpTable_7838_18.else_18_786F:
     call toc_01_3C25
     pop  bc
     assign [$FFF2], $08
-JumpTable_7838_18.else_18_78BA:
+.else_18_78BA:
     call toc_18_7E4F
     ld   a, [hLinkDirection]
     xor  DIRECTION_LEFT
@@ -2673,7 +2673,7 @@ JumpTable_7838_18.else_18_78BA:
     ret
 
 
-JumpTable_7838_18.else_18_78FE:
+.else_18_78FE:
     call toc_01_3BB4
     ld   a, [hFrameCounter]
     rra
@@ -2834,7 +2834,7 @@ toc_18_7D0E:
     sub  a, [hl]
     add  a, 20
     cp   40
-toc_18_7D0E.toc_18_7D19:
+.toc_18_7D19:
     jr   nc, .else_18_7D5F
 
     ld   a, [hLinkPositionX]
@@ -2855,7 +2855,7 @@ toc_18_7D0E.toc_18_7D19:
     pop  de
     jr   nz, .else_18_7D5F
 
-toc_18_7D0E.else_18_7D3A:
+.else_18_7D3A:
     ld   hl, $C1AD
     ld   [hl], $01
     ld   a, [wDialogState]
@@ -2877,7 +2877,7 @@ toc_18_7D0E.else_18_7D3A:
     ret
 
 
-toc_18_7D0E.else_18_7D5F:
+.else_18_7D5F:
     and  a
     ret
 
@@ -2896,9 +2896,9 @@ toc_18_7D61:
 
     ifNot [$C124], .return_18_7D82
 
-toc_18_7D61.else_18_7D81:
+.else_18_7D81:
     pop  af
-toc_18_7D61.return_18_7D82:
+.return_18_7D82:
     ret
 
 
@@ -2915,7 +2915,7 @@ toc_18_7D61.return_18_7D82:
 
 toc_18_7DCD:
     call toc_18_7DDA
-toc_18_7DCD.toc_18_7DD0:
+.toc_18_7DD0:
     push bc
     ld   a, c
     add  a, $10
@@ -2948,14 +2948,14 @@ toc_18_7DDA:
     jr   z, .else_18_7DFC
 
     ld   e, $F0
-toc_18_7DDA.else_18_7DFC:
+.else_18_7DFC:
     swap a
     and  %00001111
     or   e
     rr   d
     adc  [hl]
     ld   [hl], a
-toc_18_7DDA.return_18_7E05:
+.return_18_7E05:
     ret
 
 
@@ -2974,7 +2974,7 @@ toc_18_7E20:
     jr   z, .else_18_7E2E
 
     inc  e
-toc_18_7E20.else_18_7E2E:
+.else_18_7E2E:
     ld   d, a
     ret
 
@@ -2989,7 +2989,7 @@ toc_18_7E30:
     jr   nz, .else_18_7E3E
 
     inc  e
-toc_18_7E30.else_18_7E3E:
+.else_18_7E3E:
     ld   d, a
     ret
 
@@ -3003,7 +3003,7 @@ toc_18_7E40:
     jr   nz, .else_18_7E4D
 
     inc  e
-toc_18_7E40.else_18_7E4D:
+.else_18_7E4D:
     ld   d, a
     ret
 
@@ -3018,7 +3018,7 @@ toc_18_7E4F:
 
     cpl
     inc  a
-toc_18_7E4F.else_18_7E5C:
+.else_18_7E5C:
     push af
     call toc_18_7E30
     ld   a, e
@@ -3029,7 +3029,7 @@ toc_18_7E4F.else_18_7E5C:
 
     cpl
     inc  a
-toc_18_7E4F.else_18_7E6A:
+.else_18_7E6A:
     pop  de
     cp   d
     jr   nc, .else_18_7E72
@@ -3037,9 +3037,9 @@ toc_18_7E4F.else_18_7E6A:
     ld   a, [$FFD7]
     jr   .toc_18_7E74
 
-toc_18_7E4F.else_18_7E72:
+.else_18_7E72:
     ld   a, [$FFD8]
-toc_18_7E4F.toc_18_7E74:
+.toc_18_7E74:
     ld   e, a
     ret
 

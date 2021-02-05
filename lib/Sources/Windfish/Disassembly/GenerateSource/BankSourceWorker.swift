@@ -68,7 +68,7 @@ extension Disassembler {
         lineGroup.append(Line(semantic: .preComment(comment: preComment)))
       }
 
-      guard let label: String = router.label(at: writeLocation) else {
+      guard let label: String = router.label(at: writeLocation, includeScope: false) else {
         return false
       }
       if let transfersOfControl: Set<Cartridge.Location> = router.transfersOfControl(at: writeLocation) {

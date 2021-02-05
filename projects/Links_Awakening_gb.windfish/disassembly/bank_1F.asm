@@ -11,7 +11,7 @@ toc_1F_4006:
 
 toc_1F_4009:
     ld   hl, $D300
-toc_1F_4009.loop_1F_400C:
+.loop_1F_400C:
     ld   [hl], $00
     inc  l
     jr   nz, .loop_1F_400C
@@ -105,19 +105,19 @@ toc_1F_4204:
     and  a
     jp   nz, toc_1F_53E6
 
-toc_1F_4204.else_1F_4216:
+.else_1F_4216:
     ld   a, [hl]
     ld   hl, $4100
     jr   .toc_1F_4223
 
-toc_1F_4204.else_1F_421C:
+.else_1F_421C:
     inc  hl
     ld   a, [hl]
     and  a
     ret  z
 
     ld   hl, $4182
-toc_1F_4204.toc_1F_4223:
+.toc_1F_4223:
     call toc_1F_7A60
     ld   de, $D390
     ld   bc, $D394
@@ -709,19 +709,19 @@ toc_1F_53ED:
     and  a
     jp   nz, toc_1F_6385
 
-toc_1F_53ED.else_1F_53FF:
+.else_1F_53FF:
     ld   a, [hl]
     ld   hl, $541B
     jr   .toc_1F_540C
 
-toc_1F_53ED.else_1F_5405:
+.else_1F_5405:
     inc  hl
     ld   a, [hl]
     and  a
     ret  z
 
     ld   hl, $5461
-toc_1F_53ED.toc_1F_540C:
+.toc_1F_540C:
     call toc_1F_7A60
     ld   de, $D392
     ld   bc, $D396
@@ -1289,20 +1289,20 @@ toc_1F_64E8:
     ld   hl, $63EC
     jr   .toc_1F_6504
 
-toc_1F_64E8.else_1F_64FC:
+.else_1F_64FC:
     inc  hl
     ld   a, [hl]
     and  a
     jr   z, .else_1F_650E
 
     ld   hl, $646A
-toc_1F_64E8.toc_1F_6504:
+.toc_1F_6504:
     call toc_1F_7A60
     ld   de, $D393
     ld   bc, $D398
     jp   hl
 
-toc_1F_64E8.else_1F_650E:
+.else_1F_650E:
     ld   a, [$C50E]
     and  a
     ret  z
@@ -2226,12 +2226,12 @@ toc_1F_7F80:
 
     dec  a
     ld   [hVolumeRight], a
-toc_1F_7F80.else_1F_7F95:
+.else_1F_7F95:
     ifNot [hVolumeLeft], .else_1F_7F9E
 
     sub  a, $10
     ld   [hVolumeLeft], a
-toc_1F_7F80.else_1F_7F9E:
+.else_1F_7F9E:
     ifNot [hMusicFadeInTimer], .else_1F_7FBE
 
     sub  a, 1
@@ -2243,12 +2243,12 @@ toc_1F_7F80.else_1F_7F9E:
 
     inc  a
     ld   [hVolumeRight], a
-toc_1F_7F80.else_1F_7FB4:
+.else_1F_7FB4:
     ifGte [hVolumeLeft], $70, .else_1F_7FBE
 
     add  a, $10
     ld   [hVolumeLeft], a
-toc_1F_7F80.else_1F_7FBE:
+.else_1F_7FBE:
     ld   hl, hVolumeRight
     ld   a, [gbAUDVOL]
     and  %11111000
@@ -2261,17 +2261,17 @@ toc_1F_7F80.else_1F_7FBE:
 
     ld   [$D360], a
     clear [$FFF2]
-toc_1F_7F80.else_1F_7FD7:
+.else_1F_7FD7:
     ifNot [$FFF3], .else_1F_7FE2
 
     ld   [$D370], a
     clear [$FFF3]
-toc_1F_7F80.else_1F_7FE2:
+.else_1F_7FE2:
     ifNot [$FFF4], .return_1F_7FED
 
     ld   [$D378], a
     clear [$FFF4]
-toc_1F_7F80.return_1F_7FED:
+.return_1F_7FED:
     ret
 
 

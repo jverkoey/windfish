@@ -16,7 +16,7 @@ toc_1B_401E:
     jr   nz, toc_1B_4031
 
     call toc_1B_4037
-toc_1B_401E.toc_1B_4028:
+.toc_1B_4028:
     call toc_1B_4481
     ret
 
@@ -45,12 +45,12 @@ toc_1B_4037:
     ret
 
 
-toc_1B_4037.else_1B_4048:
+.else_1B_4048:
     assign [$D379], $01
     ld   hl, $4060
     jp   toc_1B_406A
 
-toc_1B_4037.else_1B_4053:
+.else_1B_4053:
     ld   a, [de]
     dec  a
     ld   [de], a
@@ -66,7 +66,7 @@ toc_1B_4037.else_1B_4053:
 toc_1B_406A:
     ld   b, $04
     ld   c, $20
-toc_1B_406A.loop_1B_406E:
+.loop_1B_406E:
     ldi  a, [hl]
     ld   [$ff00+c], a
     inc  c
@@ -106,7 +106,7 @@ toc_1B_40B7:
 toc_1B_40C6:
     push bc
     ld   c, $30
-toc_1B_40C6.loop_1B_40C9:
+.loop_1B_40C9:
     ldi  a, [hl]
     ld   [$ff00+c], a
     inc  c
@@ -168,24 +168,24 @@ toc_1B_411B:
 
     jr   .toc_1B_4144
 
-toc_1B_411B.else_1B_412F:
+.else_1B_412F:
     cp   $21
     jr   nc, .else_1B_4136
 
     jp   toc_1B_402C
 
-toc_1B_411B.else_1B_4136:
+.else_1B_4136:
     cp   $31
     jr   nc, .else_1B_413D
 
     jp   toc_1B_402C
 
-toc_1B_411B.else_1B_413D:
+.else_1B_413D:
     cp   $41
     jp   nc, toc_1B_402C
 
     add  a, $E0
-toc_1B_411B.toc_1B_4144:
+.toc_1B_4144:
     dec  hl
     ldi  [hl], a
     ld   b, a
@@ -236,7 +236,7 @@ toc_1B_421D:
     ld   h, a
     push bc
     ld   c, $30
-toc_1B_421D.loop_1B_4236:
+.loop_1B_4236:
     ldi  a, [hl]
     ld   [$ff00+c], a
     inc  c
@@ -252,7 +252,7 @@ toc_1B_421D.loop_1B_4236:
 toc_1B_4247:
     ld   a, [$D369]
     ld   hl, $415D
-toc_1B_4247.toc_1B_424D:
+.toc_1B_424D:
     dec  a
     jr   z, .else_1B_4258
 
@@ -264,7 +264,7 @@ toc_1B_4247.toc_1B_424D:
     inc  hl
     jr   .toc_1B_424D
 
-toc_1B_4247.else_1B_4258:
+.else_1B_4258:
     ld   bc, $D355
     ldi  a, [hl]
     ld   [bc], a
@@ -325,7 +325,7 @@ toc_1B_4275:
     jr   z, .else_1B_4299
 
     inc  c
-toc_1B_4275.else_1B_4299:
+.else_1B_4299:
     ld   a, [bc]
     ld   [gbAUDTERM], a
     ret
@@ -376,7 +376,7 @@ toc_1B_42AE:
     jr   z, .else_1B_42D0
 
     call toc_1B_40D3
-toc_1B_42AE.else_1B_42D0:
+.else_1B_42D0:
     call toc_1B_4DBC.toc_1B_4DC9
     ld   de, $D300
     ld   b, $00
@@ -406,7 +406,7 @@ toc_1B_42AE.else_1B_42D0:
     call toc_1B_429D
     ld   bc, $0410
     ld   hl, $D312
-toc_1B_42AE.loop_1B_4320:
+.loop_1B_4320:
     ld   [hl], $01
     ld   a, c
     add  a, l
@@ -434,7 +434,7 @@ toc_1B_4333:
     ld   l, e
     ld   h, d
     call toc_1B_40C6
-toc_1B_4333.else_1B_434A:
+.else_1B_434A:
     pop  hl
     jr   toc_1B_434D.toc_1B_4377
 
@@ -466,7 +466,7 @@ toc_1B_434D:
     cp   $03
     jr   z, toc_1B_4333
 
-toc_1B_434D.toc_1B_4377:
+.toc_1B_4377:
     call toc_1B_437D
     jp   toc_1B_4481.toc_1B_44A3
 
@@ -477,7 +477,7 @@ toc_1B_437D:
     ldd  a, [hl]
     ld   d, a
     inc  de
-toc_1B_437D.toc_1B_4383:
+.toc_1B_4383:
     ld   a, e
     ldi  [hl], a
     ld   a, d
@@ -522,7 +522,7 @@ toc_1B_439C:
     jr   nz, .else_1B_43B3
 
     assign [gbAUD3LEVEL], $40
-toc_1B_439C.else_1B_43B3:
+.else_1B_43B3:
     push hl
     ld   a, l
     add  a, $09
@@ -542,7 +542,7 @@ toc_1B_439C.else_1B_43B3:
     push hl
     call toc_1B_46F9
     pop  hl
-toc_1B_439C.toc_1B_43CD:
+.toc_1B_43CD:
     dec  l
     dec  l
     jp   toc_1B_4481.toc_1B_4650
@@ -553,7 +553,7 @@ toc_1B_43D2:
     dec  l
     dec  l
     call toc_1B_4389
-toc_1B_43D2.toc_1B_43D9:
+.toc_1B_43D9:
     ld   a, l
     add  a, $04
     ld   e, a
@@ -568,7 +568,7 @@ toc_1B_43D2.toc_1B_43D9:
     inc  l
     jp   toc_1B_4481.toc_1B_44A1
 
-toc_1B_43D2.else_1B_43ED:
+.else_1B_43ED:
     dec  l
     push hl
     call toc_1B_4389
@@ -584,7 +584,7 @@ toc_1B_43D2.else_1B_43ED:
     ldd  [hl], a
     jr   .toc_1B_43D9
 
-toc_1B_43D2.else_1B_4404:
+.else_1B_4404:
     ld   a, [$D3CA]
     cp   $0F
     jp   z, toc_1B_4757
@@ -614,7 +614,7 @@ toc_1B_4433:
     call toc_1B_437D
     call toc_1B_4392
     ld   [$D300], a
-toc_1B_4433.toc_1B_443C:
+.toc_1B_443C:
     call toc_1B_437D
     jr   toc_1B_4481.toc_1B_44A3
 
@@ -674,7 +674,7 @@ toc_1B_4465:
     ldd  [hl], a
     jr   toc_1B_4481.toc_1B_44A3
 
-toc_1B_4465.else_1B_447E:
+.else_1B_447E:
     pop  hl
     jr   toc_1B_4433.toc_1B_443C
 
@@ -691,7 +691,7 @@ toc_1B_4481:
     call toc_1B_4275
     assign [$D350], $01
     ld   hl, $D310
-toc_1B_4481.toc_1B_4497:
+.toc_1B_4497:
     inc  l
     ldi  a, [hl]
     and  a
@@ -700,10 +700,10 @@ toc_1B_4481.toc_1B_4497:
     dec  [hl]
     jp   nz, toc_1B_439C
 
-toc_1B_4481.toc_1B_44A1:
+.toc_1B_44A1:
     inc  l
     inc  l
-toc_1B_4481.toc_1B_44A3:
+.toc_1B_44A3:
     call toc_1B_4392
     cp   $00
     jp   z, toc_1B_43D2
@@ -774,7 +774,7 @@ toc_1B_4481.toc_1B_44A3:
     ld   a, d
     jr   .toc_1B_4531
 
-toc_1B_4481.else_1B_450C:
+.else_1B_450C:
     ld   e, a
     ld   a, d
     push af
@@ -788,13 +788,13 @@ toc_1B_4481.else_1B_450C:
     jr   c, .else_1B_451D
 
     add  a, d
-toc_1B_4481.else_1B_451D:
+.else_1B_451D:
     ld   c, a
     and  a
     jr   nz, .else_1B_4523
 
     ld   c, $02
-toc_1B_4481.else_1B_4523:
+.else_1B_4523:
     ld   de, $D350
     ld   a, [de]
     dec  a
@@ -804,13 +804,13 @@ toc_1B_4481.else_1B_4523:
     add  hl, de
     ld   [hl], c
     pop  af
-toc_1B_4481.toc_1B_4531:
+.toc_1B_4531:
     pop  hl
     dec  l
     ldi  [hl], a
     call toc_1B_437D
     call toc_1B_4392
-toc_1B_4481.else_1B_453A:
+.else_1B_453A:
     ifEq [$D350], $04, .else_1B_4579
 
     push de
@@ -835,7 +835,7 @@ toc_1B_4481.else_1B_453A:
     ld   a, $01
     ld   [de], a
     clear [$D39F]
-toc_1B_4481.else_1B_456A:
+.else_1B_456A:
     ld   de, $D3D9
     ld   a, [de]
     and  a
@@ -844,9 +844,9 @@ toc_1B_4481.else_1B_456A:
     ld   a, $01
     ld   [de], a
     clear [$D3DA]
-toc_1B_4481.else_1B_4578:
+.else_1B_4578:
     pop  de
-toc_1B_4481.else_1B_4579:
+.else_1B_4579:
     ld   c, b
     ld   b, $00
     call toc_1B_437D
@@ -875,11 +875,11 @@ toc_1B_4481.else_1B_4579:
     jr   z, .else_1B_45A6
 
     ld   h, $FF
-toc_1B_4481.else_1B_45A6:
+.else_1B_45A6:
     add  hl, bc
     ld   b, h
     ld   c, l
-toc_1B_4481.else_1B_45A9:
+.else_1B_45A9:
     ld   hl, $4934
     add  hl, bc
     ldi  a, [hl]
@@ -890,12 +890,12 @@ toc_1B_4481.else_1B_45A9:
     pop  hl
     jp   .toc_1B_45EC
 
-toc_1B_4481.else_1B_45B6:
+.else_1B_45B6:
     ld   [hl], $01
     pop  hl
     jr   .toc_1B_45EC
 
-toc_1B_4481.else_1B_45BB:
+.else_1B_45BB:
     push hl
     ld   a, c
     cp   $FF
@@ -904,7 +904,7 @@ toc_1B_4481.else_1B_45BB:
     ld   de, $D346
     ld   hl, $49C6
     add  hl, bc
-toc_1B_4481.loop_1B_45C8:
+.loop_1B_45C8:
     ldi  a, [hl]
     ld   [de], a
     inc  e
@@ -917,7 +917,7 @@ toc_1B_4481.loop_1B_45C8:
     ld   b, $00
     jr   .toc_1B_461A
 
-toc_1B_4481.else_1B_45D9:
+.else_1B_45D9:
     ld   a, [$D34F]
     bit  7, a
     jp   nz, .else_1B_464B
@@ -926,7 +926,7 @@ toc_1B_4481.else_1B_45D9:
     call toc_1B_4037
     jp   .else_1B_464B
 
-toc_1B_4481.toc_1B_45EC:
+.toc_1B_45EC:
     push hl
     ld   b, $00
     ifEq [$D350], $01, .else_1B_4617
@@ -943,7 +943,7 @@ toc_1B_4481.toc_1B_45EC:
     ld   [$ff00+c], a
     ld   a, $80
     ld   [$ff00+c], a
-toc_1B_4481.else_1B_4608:
+.else_1B_4608:
     inc  c
     inc  l
     inc  l
@@ -954,14 +954,14 @@ toc_1B_4481.else_1B_4608:
     ld   d, $00
     jr   .toc_1B_4621
 
-toc_1B_4481.else_1B_4613:
+.else_1B_4613:
     ld   c, $16
     jr   .toc_1B_461A
 
-toc_1B_4481.else_1B_4617:
+.else_1B_4617:
     ld   c, $10
     inc  c
-toc_1B_4481.toc_1B_461A:
+.toc_1B_461A:
     inc  l
     inc  l
     ldi  a, [hl]
@@ -969,7 +969,7 @@ toc_1B_4481.toc_1B_461A:
     inc  l
     ldi  a, [hl]
     ld   d, a
-toc_1B_4481.toc_1B_4621:
+.toc_1B_4621:
     push hl
     inc  l
     inc  l
@@ -978,7 +978,7 @@ toc_1B_4481.toc_1B_4621:
     jr   z, .else_1B_462A
 
     ld   e, $08
-toc_1B_4481.else_1B_462A:
+.else_1B_462A:
     inc  l
     inc  l
     ld   [hl], $00
@@ -992,7 +992,7 @@ toc_1B_4481.else_1B_462A:
     cp   $03
     jp   z, toc_1B_421D
 
-toc_1B_4481.toc_1B_463D:
+.toc_1B_463D:
     ld   a, d
     or   b
     ld   [$ff00+c], a
@@ -1006,13 +1006,13 @@ toc_1B_4481.toc_1B_463D:
     ld   a, [hl]
     or   %10000000
     ld   [$ff00+c], a
-toc_1B_4481.else_1B_464B:
+.else_1B_464B:
     pop  hl
     dec  l
     ldd  a, [hl]
     ldd  [hl], a
     dec  l
-toc_1B_4481.toc_1B_4650:
+.toc_1B_4650:
     ld   de, $D350
     ld   a, [de]
     cp   $04
@@ -1025,7 +1025,7 @@ toc_1B_4481.toc_1B_4650:
     ld   l, a
     jp   .toc_1B_4497
 
-toc_1B_4481.else_1B_4661:
+.else_1B_4661:
     incAddr $D31E
     incAddr $D32E
     incAddr $D33E
@@ -1060,7 +1060,7 @@ toc_1B_4670:
     cp   $03
     jr   z, .else_1B_46D4
 
-toc_1B_4670.else_1B_4692:
+.else_1B_4692:
     ld   a, [$D350]
     cp   $04
     jp   z, toc_1B_466E
@@ -1083,7 +1083,7 @@ toc_1B_4670.else_1B_4692:
     ld   c, $1D
     jp   toc_1B_47D0
 
-toc_1B_4670.else_1B_46BB:
+.else_1B_46BB:
     ld   a, [$D350]
     cp   $03
     jp   nz, toc_1B_466E
@@ -1098,7 +1098,7 @@ toc_1B_4670.else_1B_46BB:
 
     jp   toc_1B_466E
 
-toc_1B_4670.else_1B_46D4:
+.else_1B_46D4:
     inc  l
     ldi  a, [hl]
     ld   e, a
@@ -1144,7 +1144,7 @@ toc_1B_46F9:
     jr   nz, .else_1B_4720
 
     call toc_1B_4744
-toc_1B_46F9.else_1B_4720:
+.else_1B_4720:
     ld   a, [$D32B]
     and  a
     ret  nz
@@ -1195,7 +1195,7 @@ toc_1B_4757:
 
 toc_1B_4763:
     ld   a, $01
-toc_1B_4763.toc_1B_4765:
+.toc_1B_4765:
     ld   [$D3CD], a
     call toc_1B_437D
     jp   toc_1B_4481.toc_1B_44A3
@@ -1206,7 +1206,7 @@ toc_1B_476E:
 
 toc_1B_4771:
     ld   a, $01
-toc_1B_4771.toc_1B_4773:
+.toc_1B_4773:
     ld   [$D39E], a
     call toc_1B_437D
     jp   toc_1B_4481.toc_1B_44A3
@@ -1241,7 +1241,7 @@ toc_1B_4782:
     jp   nz, toc_1B_466E
 
     assign [$D39E], $02
-toc_1B_4782.else_1B_47AF:
+.else_1B_47AF:
     ld   a, b
     ld   [$ff00+c], a
     jp   toc_1B_466E
@@ -1257,7 +1257,7 @@ toc_1B_47B8:
     ld   de, $D3B6
     call toc_1B_4807
     ld   a, $01
-toc_1B_47B8.toc_1B_47C0:
+.toc_1B_47C0:
     ld   [de], a
     call toc_1B_437D
     jp   toc_1B_4481.toc_1B_44A3
@@ -1279,13 +1279,13 @@ toc_1B_47D0:
     pop  hl
     push hl
     call toc_1B_47EB
-toc_1B_47D0.toc_1B_47DC:
+.toc_1B_47DC:
     ld   hl, $FF9C
     add  hl, de
     call toc_1B_47F6
     jp   toc_1B_466E
 
-toc_1B_47D0.else_1B_47E6:
+.else_1B_47E6:
     call toc_1B_4810
     jr   .toc_1B_47DC
 
@@ -1355,7 +1355,7 @@ toc_1B_481D:
     and  a
     jp   z, toc_1B_4670.else_1B_4692
 
-toc_1B_481D.toc_1B_4835:
+.toc_1B_4835:
     dec  e
     ld   a, [de]
     sub  a, $19
@@ -1379,14 +1379,14 @@ toc_1B_481D.toc_1B_4835:
     call toc_1B_47F6
     jp   toc_1B_4670.else_1B_4692
 
-toc_1B_481D.else_1B_4856:
+.else_1B_4856:
     dec  e
     ld   a, $19
     ld   [de], a
     inc  e
     jr   .toc_1B_4835
 
-toc_1B_481D.else_1B_485D:
+.else_1B_485D:
     ld   a, $01
     ld   [de], a
     jr   .toc_1B_4835
@@ -1408,7 +1408,7 @@ toc_1B_488A:
     cp   $21
     jr   z, .else_1B_48B8
 
-toc_1B_488A.toc_1B_4899:
+.toc_1B_4899:
     dec  e
     ld   a, [de]
     sla  a
@@ -1431,7 +1431,7 @@ toc_1B_488A.toc_1B_4899:
     call toc_1B_47F6
     jp   toc_1B_4670.else_1B_4692
 
-toc_1B_488A.else_1B_48B8:
+.else_1B_48B8:
     dec  e
     ld   a, $01
     ld   [de], a
@@ -1624,7 +1624,7 @@ toc_1B_4DBC:
     assign [gbAUDTERM], $FF
     assign [$D355], $03
     clear [$D369]
-toc_1B_4DBC.toc_1B_4DC9:
+.toc_1B_4DC9:
     clear [$D361]
     ld   [$D371], a
     ld   [$D31F], a

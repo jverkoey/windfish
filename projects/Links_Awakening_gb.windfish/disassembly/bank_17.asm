@@ -32,7 +32,7 @@ toc_17_4060:
     ld   c, [hl]
     xor  a
     ld   d, a
-toc_17_4060.loop_17_407B:
+.loop_17_407B:
     ld   [$FFD9], a
     sla  a
     ld   e, a
@@ -223,13 +223,13 @@ toc_17_46A6:
     ldi  [hl], a
     ldi  [hl], a
     ldi  [hl], a
-toc_17_46A6.loop_17_46D5:
+.loop_17_46D5:
     ld   a, [gbSTAT]
     and  STATF_OAM | STATF_VB
     jr   nz, .loop_17_46D5
 
     ld   d, $00
-toc_17_46A6.loop_17_46DD:
+.loop_17_46DD:
     ld   a, [$C17E]
     inc  a
     ld   [$C17E], a
@@ -267,7 +267,7 @@ toc_17_46A6.loop_17_46DD:
     ld   [gbSCY], a
     jp   .loop_17_46D5
 
-toc_17_46A6.else_17_4726:
+.else_17_4726:
     clear [gbSCX]
     ret
 
@@ -313,7 +313,7 @@ toc_17_482A:
     ifNot [DEBUG_TOOL2], .else_17_483A
 
     clear [$DB96]
-toc_17_482A.else_17_483A:
+.else_17_483A:
     ld   a, [$FFCC]
     and  %00000011
     jr   z, .else_17_4849
@@ -321,22 +321,22 @@ toc_17_482A.else_17_483A:
     ifNot [DEBUG_TOOL2], .else_17_4849
 
     call toc_17_5CC1
-toc_17_482A.else_17_4849:
+.else_17_4849:
     ifNot [$D006], .else_17_4853
 
     dec  a
     ld   [$D006], a
-toc_17_482A.else_17_4853:
+.else_17_4853:
     ifNot [$D007], .else_17_485D
 
     dec  a
     ld   [$D007], a
-toc_17_482A.else_17_485D:
+.else_17_485D:
     ifNot [$D008], .else_17_4867
 
     dec  a
     ld   [$D008], a
-toc_17_482A.else_17_4867:
+.else_17_4867:
     ld   a, [hFrameCounter]
     and  %00000011
     jr   nz, .else_17_4877
@@ -345,7 +345,7 @@ toc_17_482A.else_17_4867:
 
     dec  a
     ld   [$D009], a
-toc_17_482A.else_17_4877:
+.else_17_4877:
     ld   a, [hFrameCounter]
     and  %00001111
     jr   nz, .else_17_4887
@@ -354,7 +354,7 @@ toc_17_482A.else_17_4877:
 
     dec  a
     ld   [$D013], a
-toc_17_482A.else_17_4887:
+.else_17_4887:
     ld   a, [$DB96]
     jumptable
     dw JumpTable_493D_17 ; 00
@@ -1056,7 +1056,7 @@ toc_17_5CC1:
     jr   nz, .return_17_5D00
 
     ld   [hl], $00
-toc_17_5CC1.return_17_5D00:
+.return_17_5D00:
     ret
 
 
@@ -1984,10 +1984,10 @@ toc_17_78B3:
     jr   z, .else_17_78E2
 
     ld   hl, $7823
-toc_17_78B3.else_17_78E2:
+.else_17_78E2:
     ld   de, $C00C
     ld   c, $00
-toc_17_78B3.loop_17_78E7:
+.loop_17_78E7:
     ld   a, c
     and  %00000011
     cp   $00
@@ -1996,7 +1996,7 @@ toc_17_78B3.loop_17_78E7:
     ld   a, [$FFEC]
     jr   .toc_17_78FE
 
-toc_17_78B3.else_17_78F2:
+.else_17_78F2:
     cp   $01
     jr   nz, .else_17_7901
 
@@ -2005,13 +2005,13 @@ toc_17_78B3.else_17_78F2:
     ld   a, [$FFEE]
     sub  a, [hl]
     pop  hl
-toc_17_78B3.toc_17_78FE:
+.toc_17_78FE:
     add  a, [hl]
     jr   .toc_17_7902
 
-toc_17_78B3.else_17_7901:
+.else_17_7901:
     ld   a, [hl]
-toc_17_78B3.toc_17_7902:
+.toc_17_7902:
     ld   [de], a
     inc  hl
     inc  de
@@ -2020,7 +2020,7 @@ toc_17_78B3.toc_17_7902:
     cp   b
     jr   nz, .loop_17_78E7
 
-toc_17_78B3.else_17_790A:
+.else_17_790A:
     pop  bc
     ret
 
@@ -2101,7 +2101,7 @@ toc_17_7B07:
     jr   z, .else_17_7B16
 
     inc  e
-toc_17_7B07.else_17_7B16:
+.else_17_7B16:
     ld   d, $00
     ifEq [wGameMode], GAMEMODE_CREDITS, .else_17_7B37
 
@@ -2115,7 +2115,7 @@ toc_17_7B07.else_17_7B16:
     ret
 
 
-toc_17_7B07.else_17_7B37:
+.else_17_7B37:
     ld   hl, $7B05
     add  hl, de
     ld   a, [hl]
@@ -2137,7 +2137,7 @@ toc_17_7B57:
     jr   z, .else_17_7B61
 
     inc  e
-toc_17_7B57.else_17_7B61:
+.else_17_7B61:
     ld   d, $00
     ifEq [wGameMode], GAMEMODE_CREDITS, .else_17_7B8F
 
@@ -2151,7 +2151,7 @@ toc_17_7B57.else_17_7B61:
     jr   z, .else_17_7B7C
 
     inc  e
-toc_17_7B57.else_17_7B7C:
+.else_17_7B7C:
     ld   hl, $7B55
     add  hl, de
     ld   a, [hl]
@@ -2161,7 +2161,7 @@ toc_17_7B57.else_17_7B7C:
     ret
 
 
-toc_17_7B57.else_17_7B8F:
+.else_17_7B8F:
     ld   hl, $7B53
     add  hl, de
     ld   a, [hl]
@@ -2174,7 +2174,7 @@ toc_17_7B57.else_17_7B8F:
     jr   z, .else_17_7BA5
 
     inc  e
-toc_17_7B57.else_17_7BA5:
+.else_17_7BA5:
     ld   hl, $7B55
     add  hl, de
     ld   a, [hl]

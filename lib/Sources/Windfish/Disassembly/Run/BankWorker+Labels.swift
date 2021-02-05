@@ -3,11 +3,11 @@ import Foundation
 extension Disassembler.BankRouter {
 
   /** Returns the label at the given location, if any. */
-  func label(at location: Cartridge.Location) -> String? {
+  func label(at location: Cartridge.Location, includeScope: Bool = true) -> String? {
     guard location.bankIndex < bankWorkers.count else {
       return nil
     }
-    return bankWorkers[Int(truncatingIfNeeded: location.bankIndex)].label(at: location)
+    return bankWorkers[Int(truncatingIfNeeded: location.bankIndex)].label(at: location, includeScope: includeScope)
   }
 }
 
@@ -20,7 +20,7 @@ extension Disassembler.BankWorker {
   }
 
   /** Returns the label at the given location, if any. */
-  func label(at location: Cartridge.Location) -> String? {
+  func label(at location: Cartridge.Location, includeScope: Bool = true) -> String? {
     assert(location.bankIndex == bank)
     guard canShowLabel(at: location) else {
       return nil
@@ -47,7 +47,11 @@ extension Disassembler.BankWorker {
       scope1 < scope2
     }) {
       if let firstScopeLabel: String = label(at: firstScope)?.components(separatedBy: ".").first {
-        return "\(firstScopeLabel).\(name)"
+        if includeScope {
+          return "\(firstScopeLabel).\(name)"
+        } else {
+          return ".\(name)"
+        }
       }
     }
 
