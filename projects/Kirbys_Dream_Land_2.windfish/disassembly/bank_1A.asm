@@ -63,7 +63,7 @@ initialize:
     assign [$DA10], $C3
     ld   hl, $0342
     call stashHL
-    ld   hl, $DA13
+    ld   hl, wLCDInterruptTrampoline
     ld   a, $C3
     ldi  [hl], a
     ld   a, $42

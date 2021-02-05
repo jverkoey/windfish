@@ -64,6 +64,12 @@ cbcallWithoutInterrupts: ; [Label] $00:$05CF [0]
 
 loadBank: ; [Label] $00:$05DD [0]
 
+LCDInterruptTrampolineReturn: ; [Function] $00:$0342 [0]
+
+toc_00_030C: ; [Function] $00:$030C [0]
+
+wait: ; [Label] $00:$0318 [0]
+
 initialize: ; [Function] $1A:$4000 [0]
 
 waitForVBlank: ; [Label] $1A:$4003 [0]

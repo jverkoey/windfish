@@ -383,11 +383,26 @@ toc_01_028A:
     db   $2E, $DA, $2A, $E0, $42, $7E, $E0, $43
     db   $21, $14, $DA, $3E, $C4, $22, $36, $02
     db   $FA, $2A, $DA, $E0, $45, $C3, $9F, $02
-    db   $F5, $E5, $C5, $D5, $FA, $2D, $DA, $21
-    db   $43, $FF, $06, $0F, $00, $05, $20, $FC
-    db   $77, $C3, $9F, $02, $F5, $E5, $C5, $D5
-    db   $3E, $00, $21, $43, $FF, $06, $0F, $00
-    db   $05, $20, $FC, $77, $C3, $9F, $02
+
+toc_00_030C:
+    push af
+    push hl
+    push bc
+    push de
+    ld   a, [$DA2D]
+    ld   hl, gbSCX
+    ld   b, $0F
+.wait:
+    nop
+    dec  b
+    jr   nz, .wait
+
+    ld   [hl], a
+    jp   toc_01_028A.toc_01_029F
+
+    db   $F5, $E5, $C5, $D5, $3E, $00, $21, $43
+    db   $FF, $06, $0F, $00, $05, $20, $FC, $77
+    db   $C3, $9F, $02
 
 toc_01_0333:
     assign [$DA0D], $01
@@ -397,7 +412,9 @@ toc_01_0333:
 
     jp   toc_01_028A.toc_01_029F
 
-    db   $C9
+LCDInterruptTrampolineReturn:
+    ret
+
 
 toc_01_0343:
     ld   hl, $DA0C
