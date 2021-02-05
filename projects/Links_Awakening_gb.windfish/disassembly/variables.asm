@@ -30,6 +30,10 @@ wAlternateBackgroundEnabled EQU $C500
 
 wActiveJingle EQU $D360
 
+wActiveWaveSfx EQU $D370
+
+wActiveNoiseSfx EQU $D378
+
 wLCDCStash EQU $D6FD
 
 wTileMapToLoad EQU $D6FE

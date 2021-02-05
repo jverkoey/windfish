@@ -21,8 +21,8 @@ toc_1E_401E:
 .toc_1E_402B:
     clear [wActiveJingle]
     ld   [$D368], a
-    ld   [$D370], a
-    ld   [$D378], a
+    ld   [wActiveWaveSfx], a
+    ld   [wActiveNoiseSfx], a
     ret
 
 
@@ -33,9 +33,9 @@ toc_1E_401E:
 
 toc_1E_403F:
     ld   de, $D393
-    ld   hl, $D378
+    ld   hl, wActiveNoiseSfx
     ldi  a, [hl]
-    cp   $01
+    cp   1
     jr   z, .else_1E_4050
 
     ld   a, [hl]
@@ -943,7 +943,7 @@ toc_1E_457C:
     bit  7, a
     jp   nz, .else_1E_4748
 
-    assign [$D378], $01
+    assign [wActiveNoiseSfx], 1
     call toc_1E_403F
     jp   .else_1E_4748
 

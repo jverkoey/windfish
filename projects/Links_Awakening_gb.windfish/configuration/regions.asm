@@ -157,3 +157,11 @@ _clearD300: ; [Label] $1F:$4009 [0]
 clearD300: ; [Label] $1F:$4000 [0]
 
 return: ; [Label] $1F:$7FED [0]
+
+checkActiveJingleParameters: ; [Label] $1F:$421C [0]
+
+checkParameters: ; [Label] $1F:$5405 [0]
+
+checkNoiseSfx: ; [Label] $1F:$64E8 [0]
+
+checkParameters: ; [Label] $1F:$64FC [0]

@@ -25,10 +25,10 @@ _clearD300:
 toc_1F_401E:
     call toc_1F_4204
     call toc_1F_53ED
-    call toc_1F_64E8
+    call checkNoiseSfx
     clear [wActiveJingle]
-    ld   [$D370], a
-    ld   [$D378], a
+    ld   [wActiveWaveSfx], a
+    ld   [wActiveNoiseSfx], a
     ret
 
 
@@ -93,7 +93,7 @@ toc_1F_401E:
     db   $3D, $53
 
 toc_1F_4204:
-    ifNotZeroAtAddress wActiveJingle, .else_1F_421C
+    ifNotZeroAtAddress wActiveJingle, .checkActiveJingleParameters
 
     cp   1
     jr   z, .else_1F_4216
@@ -105,7 +105,7 @@ toc_1F_4204:
     ld   hl, $4100
     jr   .toc_1F_4223
 
-.else_1F_421C:
+.checkActiveJingleParameters:
     inc  hl
     ld   a, [hl]
     and  a
@@ -692,9 +692,9 @@ toc_1F_53E6:
     jp   toc_1F_4204
 
 toc_1F_53ED:
-    ifNotZeroAtAddress $D370, .else_1F_5405
+    ifNotZeroAtAddress wActiveWaveSfx, .checkParameters
 
-    cp   $14
+    cp   20
     jr   z, .else_1F_53FF
 
     ifZero [$D3C8], toc_1F_6385
@@ -704,7 +704,7 @@ toc_1F_53ED:
     ld   hl, $541B
     jr   .toc_1F_540C
 
-.else_1F_5405:
+.checkParameters:
     inc  hl
     ld   a, [hl]
     and  a
@@ -1217,7 +1217,7 @@ toc_1F_53ED:
     db   $8D, $7A
 
 toc_1F_6385:
-    clear [$D370]
+    clear [wActiveWaveSfx]
     jp   toc_1F_53ED
 
     db   $8C, $EF, $FE, $C8, $84, $21, $12, $48
@@ -1265,8 +1265,8 @@ toc_1F_6385:
     db   $2C, $77, $8C, $77, $03, $7A, $E8, $77
     db   $07, $79, $5D, $79
 
-toc_1F_64E8:
-    ifNotZeroAtAddress $D378, .else_1F_64FC
+checkNoiseSfx:
+    ifNotZeroAtAddress wActiveNoiseSfx, .checkParameters
 
     ifZero [$D3C9], toc_1F_7A28
 
@@ -1274,7 +1274,7 @@ toc_1F_64E8:
     ld   hl, $63EC
     jr   .toc_1F_6504
 
-.else_1F_64FC:
+.checkParameters:
     inc  hl
     ld   a, [hl]
     and  a
@@ -1292,8 +1292,8 @@ toc_1F_64E8:
     and  a
     ret  z
 
-    assign [$D378], $1E
-    jr   toc_1F_64E8
+    assign [wActiveNoiseSfx], 30
+    jr   checkNoiseSfx
 
     db   $3E, $01, $EA, $79, $D3, $21, $2F, $65
     db   $C3, $87, $7A, $AF, $EA, $79, $D3, $21
@@ -1971,8 +1971,8 @@ toc_1F_64E8:
     db   $02, $0E, $22, $C3, $8D, $7A
 
 toc_1F_7A28:
-    clear [$D378]
-    jp   toc_1F_64E8
+    clear [wActiveNoiseSfx]
+    jp   checkNoiseSfx
 
     db   $FA, $78, $D3, $EA, $79, $D3, $21, $2F
     db   $D3, $CB, $FE, $3E, $01, $EA, $C9, $D3
@@ -2249,12 +2249,12 @@ toc_1F_7F80:
 .else_1F_7FD7:
     ifNotZero [$FFF3], .else_1F_7FE2
 
-    ld   [$D370], a
+    ld   [wActiveWaveSfx], a
     clear [$FFF3]
 .else_1F_7FE2:
     ifNotZero [$FFF4], .return
 
-    ld   [$D378], a
+    ld   [wActiveNoiseSfx], a
     clear [$FFF4]
 .return:
     ret

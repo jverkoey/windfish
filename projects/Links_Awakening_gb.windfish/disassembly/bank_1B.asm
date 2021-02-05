@@ -33,9 +33,9 @@ toc_1B_4031:
 
 toc_1B_4037:
     ld   de, $D393
-    ld   hl, $D378
+    ld   hl, wActiveNoiseSfx
     ldi  a, [hl]
-    cp   $01
+    cp   1
     jr   z, .else_1B_4048
 
     ld   a, [hl]
@@ -920,7 +920,7 @@ toc_1B_4481:
     bit  7, a
     jp   nz, .else_1B_464B
 
-    assign [$D378], $01
+    assign [wActiveNoiseSfx], 1
     call toc_1B_4037
     jp   .else_1B_464B
 

@@ -48,6 +48,10 @@ wAlternateBackgroundEnabled EQU $C500 ; [bool]
 
 wActiveJingle EQU $D360 ; [decimal]
 
+wActiveWaveSfx EQU $D370 ; [decimal]
+
+wActiveNoiseSfx EQU $D378 ; [decimal]
+
 wLCDCStash EQU $D6FD ; [LCDCF]
 
 wTileMapToLoad EQU $D6FE ; [hex]
