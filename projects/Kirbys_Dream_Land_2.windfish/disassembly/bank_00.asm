@@ -515,9 +515,9 @@ cbcall:
 
 toc_01_0604:
     ld   a, l
-    ld   [$DA11], a
+    ld   [wStashL], a
     ld   a, h
-    ld   [$DA12], a
+    ld   [wStashH], a
     ret
 
 

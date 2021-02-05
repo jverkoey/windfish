@@ -75,3 +75,13 @@ data_446E: ; [Data] $1E:$446E [48]
 data_5B6F: ; [Data] $1E:$5B6F [198]
 
 setCE06ToAA: ; [Label] $1E:$4268 [0]
+
+toc_1F_4232: ; [Function] $1F:$4232 [0]
+
+clearCE56: ; [Label] $1F:$4242 [0]
+
+memcpy4281_to_CE2E: ; [Label] $1F:$424E [0]
+
+data_1F_4281: ; [Data] $1F:$4281 [20]
+
+data_1E_4343: ; [Label] $1E:$4343 [20]

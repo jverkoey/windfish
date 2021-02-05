@@ -22,6 +22,10 @@ gbCARTRAM EQU $A000 ; [hex]
 
 gbRAM EQU $C000 ; [hex]
 
+wStashL EQU $DA11 ; [decimal]
+
+wStashH EQU $DA12 ; [decimal]
+
 gbOAMRAM EQU $FE00 ; [hex]
 
 gbP1 EQU $FF00 ; [JOYPAD]
