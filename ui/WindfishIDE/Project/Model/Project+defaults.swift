@@ -116,6 +116,12 @@ extension Project {
                                               DataType.Mapping(name: "IE_SERIALIO", value: 0b0000_1000),
                                               DataType.Mapping(name: "IE_PIN1013TRANSITION", value: 0b0001_0000),
                                             ]))
+    configuration.dataTypes.append(DataType(name: "HW_AUDIO_ENABLE",
+                                            representation: DataType.Representation.binary,
+                                            interpretation: DataType.Interpretation.bitmask,
+                                            mappings: [
+                                              DataType.Mapping(name: "HW_AUDIO_ENABLE", value: 0b1000_0000),
+                                            ]))
     configuration.dataTypes.append(DataType(name: "LCDCF",
                                             representation: DataType.Representation.binary,
                                             interpretation: DataType.Interpretation.bitmask,
@@ -204,9 +210,9 @@ extension Project {
       Global(name: "gbAUD4ENV", address: 0xff21, dataType: "hex"),
       Global(name: "gbAUD4POLY", address: 0xff22, dataType: "hex"),
       Global(name: "gbAUD4CONSEC", address: 0xff23, dataType: "hex"),
-      Global(name: "gbAUDVOL", address: 0xff24, dataType: "hex"),
-      Global(name: "gbAUDTERM", address: 0xff25, dataType: "hex"),
-      Global(name: "gbAUDENA", address: 0xff26, dataType: "hex"),
+      Global(name: "gbAUDVOL", address: 0xff24, dataType: "binary"),
+      Global(name: "gbAUDTERM", address: 0xff25, dataType: "binary"),
+      Global(name: "gbAUDENA", address: 0xff26, dataType: "HW_AUDIO_ENABLE"),
       Global(name: "gbAUD3WAVERAM", address: 0xff30, dataType: "hex"),
       Global(name: "gbLCDC", address: 0xff40, dataType: "LCDCF"),
       Global(name: "gbSTAT", address: 0xff41, dataType: "STATF"),
