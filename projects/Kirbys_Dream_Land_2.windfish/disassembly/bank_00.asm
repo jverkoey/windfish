@@ -195,7 +195,7 @@ toc_01_0159:
     ld   hl, gbLCDC
     res  7, [hl]
     clear [$FFB5]
-    jp   toc_01_028A.toc_01_029F
+    jp   toc_00_022B.toc_01_029F
 
 .else_01_016F:
     ld   a, [$DA0F]
@@ -338,20 +338,70 @@ toc_01_0159:
     reti
 
 
-    db   $7D, $B8, $28, $0F, $5E, $2C, $56, $2C
-    db   $4E, $2C, $7E, $12, $2C, $13, $0D, $20
-    db   $F9, $18, $ED, $F3, $B8, $28, $03, $FB
-    db   $18, $EA, $61, $01, $2B, $02, $C5, $F5
-    db   $E5, $D5, $31, $18, $DA, $E1, $F9, $FA
-    db   $29, $DA, $E0, $45, $21, $14, $DA, $FA
-    db   $16, $DA, $22, $FA, $17, $DA, $77, $21
-    db   $40, $FF, $FA, $2B, $DA, $B7, $28, $04
-    db   $CB, $8E, $18, $02, $CB, $CE, $F0, $0F
-    db   $E6, $FD, $E0, $0F, $F0, $FF, $E6, $FE
-    db   $E0, $FF, $FB, $CD, $10, $DA, $AF, $EA
-    db   $0F, $DA, $3E, $01, $EA, $0C, $DA
+toc_00_022B:
+    ld   a, l
+    cp   b
+    jr   z, .else_01_023E
 
-toc_01_028A:
+.toc_01_022F:
+    ld   e, [hl]
+    inc  l
+    ld   d, [hl]
+    inc  l
+    ld   c, [hl]
+    inc  l
+.loop_01_0235:
+    ld   a, [hl]
+    ld   [de], a
+    inc  l
+    inc  de
+    dec  c
+    jr   nz, .loop_01_0235
+
+    jr   toc_00_022B
+
+.else_01_023E:
+    di
+    cp   b
+    jr   z, .else_01_0245
+
+    ei
+    jr   .toc_01_022F
+
+.else_01_0245:
+    ld   h, c
+    ld   bc, $022B
+    push bc
+    push af
+    push hl
+    push de
+    ld   sp, $DA18
+    pop  hl
+    ld   sp, hl
+    copyFromTo [$DA29], [gbLYC]
+    ld   hl, $DA14
+    ld   a, [$DA16]
+    ldi  [hl], a
+    ld   a, [$DA17]
+    ld   [hl], a
+    ld   hl, gbLCDC
+    ld   a, [$DA2B]
+    or   a
+    jr   z, .else_01_026F
+
+    res  1, [hl]
+    jr   .toc_01_0271
+
+.else_01_026F:
+    set  1, [hl]
+.toc_01_0271:
+    mask [gbIF], %11111101
+    mask [gbIE], IE_LCDC | IE_PIN1013TRANSITION | IE_SERIALIO | IE_TIMEROVERFLOW | %11100000
+    ei
+    call $DA10
+    clear [$DA0F]
+    assign [$DA0C], $01
+.toc_01_028A:
     ld   a, [hLastBank]
     push af
     ld   a, $00
@@ -398,7 +448,7 @@ toc_00_030C:
     jr   nz, .wait
 
     ld   [hl], a
-    jp   toc_01_028A.toc_01_029F
+    jp   toc_00_022B.toc_01_029F
 
     db   $F5, $E5, $C5, $D5, $3E, $00, $21, $43
     db   $FF, $06, $0F, $00, $05, $20, $FC, $77
@@ -408,9 +458,9 @@ toc_01_0333:
     assign [$DA0D], $01
     ld   a, [gbLCDC]
     bit  7, a
-    jp   z, toc_01_028A
+    jp   z, toc_00_022B.toc_01_028A
 
-    jp   toc_01_028A.toc_01_029F
+    jp   toc_00_022B.toc_01_029F
 
 LCDInterruptTrampolineReturn:
     ret

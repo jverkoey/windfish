@@ -66,6 +66,12 @@ incAddr: MACRO
     inc  [hl]
     ENDM
 
+mask: MACRO
+    ld   a, \1
+    and  \2
+    ld   \1, a
+    ENDM
+
 memcpyFromTo: MACRO
     ld   hl, \1
     ld   de, \2
