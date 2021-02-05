@@ -64,7 +64,7 @@ JumpTable_4073_01:
     call JumpTable_4434_01.toc_01_4445
     clear [$C16B]
     ld   [$C16C], a
-    ifNot [$DBA5], .return_01_409E
+    ifNotZero [$DBA5], .return_01_409E
 
     clear [$C50A]
     ld   [$C116], a
@@ -361,7 +361,7 @@ toc_01_431E:
 JumpTable_433F_01:
     call toc_01_27D2
     call JumpTable_4434_01.toc_01_4445
-    ifNot [$DBA5], .else_01_439C
+    ifNotZero [$DBA5], .else_01_439C
 
     ld   a, [$FFF7]
     ld   e, a
@@ -454,7 +454,7 @@ JumpTable_43B3_01:
     call toc_01_36E6
     call toc_01_5D6B
     assign [hAnimatedTilesFrameCount], 255
-    ifNot [$DBA5], .else_01_4426
+    ifNotZero [$DBA5], .else_01_4426
 
     ld   d, a
     ifGte [$FFF7], $1A, .else_01_43FE
@@ -479,7 +479,7 @@ JumpTable_43B3_01:
     jr   nz, .else_01_4426
 
 .else_01_4415:
-    ifNot [$DBCD], .else_01_4426
+    ifNotZero [$DBCD], .else_01_4426
 
     ld   a, [$FFF8]
     and  %00010000
@@ -511,10 +511,10 @@ JumpTable_4434_01:
 
 JumpTable_444A_01:
     assign [wTileMapToLoad], $01
-    ifNot [$D6FA], .else_01_4464
+    ifNotZero [$D6FA], .else_01_4464
 
     assign [$D6F8], $05
-    ifNot [$C1CB], .else_01_4464
+    ifNotZero [$C1CB], .else_01_4464
 
     assign [$FFA5], $03
 .else_01_4464:
@@ -545,7 +545,7 @@ JumpTable_4476_01:
     assign [$C11C], $04
     clear [$C16B]
     ld   [$C16C], a
-    ifNot [$C3CB], .else_01_44B2
+    ifNotZero [$C3CB], .else_01_44B2
 
     copyFromTo [$C5AD], [$DB97]
     assign [$DB98], $1C
@@ -639,7 +639,7 @@ verifySaveFiles:
     call verifySaveFile
     ld   de, $070A
     call verifySaveFile
-    ifNotZero [DEBUG_TOOL1], .return_01_46DC
+    _ifNotZero [DEBUG_TOOL1], .return_01_46DC
 
 .createDebugSave:
     ld   e, $00
@@ -1183,7 +1183,7 @@ toc_01_512A:
     assign [$DB70], $50
     assign [$DB71], $27
 .else_01_51A0:
-    ifNot [$DB62], .else_01_51DD
+    ifNotZero [$DB62], .else_01_51DD
 
     ld   [$DB9D], a
     copyFromTo [$DB63], [$DB9E]
@@ -1807,7 +1807,7 @@ toc_01_5B94:
 
 toc_01_5BCF:
     push bc
-    ifNot [$DBA5], .else_01_5BF4
+    ifNotZero [$DBA5], .else_01_5BF4
 
     ifGte [$FFF7], $0A, .else_01_5BF4
 
@@ -1958,7 +1958,7 @@ toc_01_5CF0:
 
 
 toc_01_5D03:
-    ifNot [$C14F], .else_01_5D22
+    ifNotZero [$C14F], .else_01_5D22
 
     ld   hl, gbRAM
     ld   a, [wWYStash]
@@ -2041,7 +2041,7 @@ toc_01_5D03:
 
 
 toc_01_5D6B:
-    ifNot [$DBA5], .else_01_5D8B
+    ifNotZero [$DBA5], .else_01_5D8B
 
     ld   a, [$FFF9]
     and  a
@@ -2175,7 +2175,7 @@ toc_01_5D6B:
     inc  [hl]
     assign [$FFF2], $2D
 .else_01_5E37:
-    ifNotZero [$DB73], toc_01_5ED7
+    _ifNotZero [$DB73], toc_01_5ED7
 
     ld   e, $0F
     ld   d, $00
@@ -2240,7 +2240,7 @@ toc_01_5D6B:
     ld   a, [hLinkDirection]
     ld   hl, $D1B5
     call toc_01_5ED0
-    ifNot [$DB10], .return_01_5ECF
+    ifNotZero [$DB10], .return_01_5ECF
 
     ld   a, [hLinkPositionX]
     ld   hl, $C200
@@ -2391,12 +2391,12 @@ toc_01_5FBB:
     and  a
     jr   nz, .else_01_5FCB
 
-    ifNot [$C3C7], .else_01_5FCB
+    ifNotZero [$C3C7], .else_01_5FCB
 
     dec  a
     ld   [$C3C7], a
 .else_01_5FCB:
-    ifNot [$C3C4], .else_01_5FD5
+    ifNotZero [$C3C4], .else_01_5FD5
 
     dec  a
     ld   [$C3C4], a
@@ -2948,7 +2948,7 @@ toc_01_6E2D:
     db   $C6, $C2, $C0, $C2
 
 toc_01_6E3E:
-    ifNot [hButtonsInactiveDelay], .else_01_6E48
+    ifNotZero [hButtonsInactiveDelay], .else_01_6E48
 
     dec  a
     ld   [hButtonsInactiveDelay], a
@@ -2995,7 +2995,7 @@ toc_01_6EA4:
 toc_01_6EAD:
     ifGte [$DB96], $05, .else_01_6ECD
 
-    ifNot [$D000], .else_01_6EBE
+    ifNotZero [$D000], .else_01_6EBE
 
     dec  a
     ld   [$D000], a
@@ -3963,7 +3963,7 @@ toc_01_7B11:
     add  hl, de
     ld   e, [hl]
     ld   hl, $7AA4
-    ifNot [$D00F], .else_01_7B2D
+    ifNotZero [$D00F], .else_01_7B2D
 
     ld   hl, $7AAC
 .else_01_7B2D:
@@ -3972,7 +3972,7 @@ toc_01_7B11:
     ld   h, [hl]
     ld   l, a
     ld   de, $8900
-    ifNot [$D00F], .else_01_7B3D
+    ifNotZero [$D00F], .else_01_7B3D
 
     ld   de, $9300
 .else_01_7B3D:
@@ -4270,7 +4270,7 @@ toc_01_7DC1:
     and  a
     ret  nz
 
-    ifNot [$DBA5], .return_01_7DE7
+    ifNotZero [$DBA5], .return_01_7DE7
 
     ifGte [$FFF7], $08, .return_01_7DE7
 
@@ -4283,7 +4283,7 @@ toc_01_7DC1:
     ld   h, [hl]
     ld   l, a
     ld   [hl], $A3
-    ifNot [$FFF9], .return_01_7DE7
+    ifNotZero [$FFF9], .return_01_7DE7
 
     ld   [hl], $7F
 .return_01_7DE7:

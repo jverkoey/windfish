@@ -225,7 +225,7 @@ toc_1B_411B:
     db   $00, $00, $01, $00, $FF, $FF, $00, $00
 
 toc_1B_421D:
-    ifNotZero [$D3E7], toc_1B_4481.toc_1B_463D
+    _ifNotZero [$D3E7], toc_1B_4481.toc_1B_463D
 
     clear [gbAUD3ENA]
     ld   [$D3E7], a
@@ -867,7 +867,7 @@ toc_1B_4481:
     jr   z, .else_1B_45B6
 
     ld   [hl], $00
-    ifNot [$D300], .else_1B_45A9
+    ifNotZero [$D300], .else_1B_45A9
 
     ld   l, a
     ld   h, $00
@@ -1088,13 +1088,9 @@ toc_1B_4670:
     cp   $03
     jp   nz, toc_1B_466E
 
-    ld   a, [$D39E]
-    and  a
-    jp   nz, toc_1B_4782
+    ifZero [$D39E], toc_1B_4782
 
-    ld   a, [$D3D9]
-    and  a
-    jp   nz, toc_1B_490A
+    ifZero [$D3D9], toc_1B_490A
 
     jp   toc_1B_466E
 
@@ -1128,7 +1124,7 @@ toc_1B_46F9:
     and  a
     jr   nz, .else_1B_4720
 
-    ifNot [$D317], .else_1B_4720
+    ifNotZero [$D317], .else_1B_4720
 
     and  %00001111
     ld   b, a

@@ -67,7 +67,7 @@ JumpTable_40B2_05:
 
 
 JumpTable_40E9_05:
-    ifNot [$DB56], .else_05_413A
+    ifNotZero [$DB56], .else_05_413A
 
     cp   $80
     jr   z, .else_05_40FD
@@ -89,7 +89,7 @@ JumpTable_40E9_05:
     cp   32
     jr   nc, .else_05_412A
 
-    ifNot [$C133], .else_05_412A
+    ifNotZero [$C133], .else_05_412A
 
     assign [$D368], $10
     ld   a, $6C
@@ -182,7 +182,7 @@ JumpTable_4183_05:
 .else_05_41B4:
     call toc_01_0891
     ld   [hl], $28
-    ifNot [$DB56], .else_05_41C3
+    ifNotZero [$DB56], .else_05_41C3
 
     call toc_05_42A0
     ret
@@ -207,7 +207,7 @@ JumpTable_41D4_05:
     call JumpTable_3B8D_00
     ld   [hl], b
 .else_05_41DF:
-    ifNot [$FFE8], .else_05_41EA
+    ifNotZero [$FFE8], .else_05_41EA
 
     ld   hl, $C320
     add  hl, bc
@@ -234,7 +234,7 @@ JumpTable_41F1_05:
     call toc_01_0891
     ld   [hl], $10
 .else_05_420C:
-    ifNot [$DB56], .return_05_4215
+    ifNotZero [$DB56], .return_05_4215
 
     call toc_05_433E
 .return_05_4215:
@@ -249,7 +249,7 @@ JumpTable_4216_05:
     and  %00111111
     add  a, $30
     ld   [hl], a
-    ifNot [$DB56], .else_05_422B
+    ifNotZero [$DB56], .else_05_422B
 
     ld   [hl], $10
 .else_05_422B:
@@ -623,7 +623,7 @@ JumpTable_462E_05:
 JumpTable_466F_05:
     call toc_05_79D1
     call toc_01_3B9E
-    ifNot [$FFE8], .else_05_4691
+    ifNotZero [$FFE8], .else_05_4691
 
     call toc_01_0891
     jr   nz, .else_05_4686
@@ -807,7 +807,7 @@ JumpTable_4803_05:
     and  a
     jr   nz, .return_05_4844
 
-    ifNot [$DB4B], .else_05_483B
+    ifNotZero [$DB4B], .else_05_483B
 
     call toc_05_544C
     ld   a, e
@@ -1290,7 +1290,7 @@ JumpTable_4B32_05:
     dw JumpTable_4D26_05 ; 04
 
 JumpTable_4C09_05:
-    ifNot [$DB44], .else_05_4C15
+    ifNotZero [$DB44], .else_05_4C15
 
     call JumpTable_3B8D_00
     ld   [hl], $03
@@ -1360,7 +1360,7 @@ JumpTable_4C48_05:
 
 
 JumpTable_4C89_05:
-    ifNot [$DB48], .else_05_4CCE
+    ifNotZero [$DB48], .else_05_4CCE
 
     cp   $01
     jr   z, .else_05_4CB9
@@ -1543,9 +1543,7 @@ JumpTable_4D26_05:
 JumpTable_4EC3_05:
     ifGte [$FFF6], $C0, .else_05_4ED0
 
-    ld   a, [$C3C8]
-    and  a
-    jp   nz, .return_05_4F83
+    ifZero [$C3C8], .return_05_4F83
 
 .else_05_4ED0:
     call toc_05_544C
@@ -1593,7 +1591,7 @@ JumpTable_4EC3_05:
     ld   [hl], $10
     ld   d, $2F
     ld   e, $03
-    ifNot [$DB48], .else_05_4F5E
+    ifNotZero [$DB48], .else_05_4F5E
 
     ld   e, $06
     cp   $02
@@ -2078,7 +2076,7 @@ JumpTable_52DE_05:
     jr   nz, .return_05_5308
 
     call JumpTable_3B8D_00
-    ifNot [$C177], .else_05_52EF
+    ifNotZero [$C177], .else_05_52EF
 
     ld   [hl], b
     ret
@@ -2203,7 +2201,7 @@ toc_05_5409:
 
     call toc_01_094A
     call toc_01_093B.toc_01_0942
-    ifNot [$C1A6], .return_05_542B
+    ifNotZero [$C1A6], .return_05_542B
 
     ld   e, a
     ld   d, b
@@ -2840,7 +2838,7 @@ toc_05_5959:
     cp   $01
     jr   nz, .loop_05_5964
 
-    ifNot [$D478], .else_05_5998
+    ifNotZero [$D478], .else_05_5998
 
     call_changebank $05
     call JumpTable_5A16_05.toc_05_5A3F
@@ -3402,7 +3400,7 @@ JumpTable_5CEA_05:
     ld   hl, $C210
     add  hl, bc
     ld   [hl], a
-    ifNot [$FF9C], .else_05_5D28
+    ifNotZero [$FF9C], .else_05_5D28
 
     ld   a, [hLinkPositionY]
     ld   [hl], a
@@ -3480,7 +3478,7 @@ JumpTable_5D84_05:
     and  a
     jr   nz, .else_05_5DD1
 
-    ifNot [$C146], .else_05_5DD1
+    ifNotZero [$C146], .else_05_5DD1
 
     ld   hl, $C380
     add  hl, bc
@@ -3716,7 +3714,7 @@ JumpTable_5EF1_05:
     jr   nz, .return_05_5F32
 
     call toc_01_3BB4
-    ifNot [$C13E], .return_05_5F32
+    ifNotZero [$C13E], .return_05_5F32
 
     assign [$C13E], $10
     ld   hl, $C380
@@ -3902,7 +3900,7 @@ toc_05_613F:
     ld   a, $0A
     call toc_01_3DD0
     ld   e, $00
-    ifNot [$FFF1], .else_05_6175
+    ifNotZero [$FFF1], .else_05_6175
 
     ld   e, $04
 .else_05_6175:
@@ -5476,7 +5474,7 @@ JumpTable_6D95_05:
 
 JumpTable_700B_05:
     call toc_01_0887
-    ifNot [$D200], .else_05_7016
+    ifNotZero [$D200], .else_05_7016
 
     ld   [hl], $20
 .else_05_7016:
@@ -5888,7 +5886,7 @@ JumpTable_7285_05:
     and  DIRECTION_UP
     jp   z, .return_05_7347
 
-    ifNotZero [$C1A6], .return_05_7347
+    _ifNotZero [$C1A6], .return_05_7347
 
     dec  a
     ld   [$D202], a
@@ -6200,7 +6198,7 @@ toc_05_74B4:
     ld   hl, $C200
     add  hl, de
     ld   [hl], a
-    ifNot [$FFF9], .else_05_74DC
+    ifNotZero [$FFF9], .else_05_74DC
 
     ld   hl, $C250
     add  hl, bc
@@ -6609,7 +6607,7 @@ toc_05_78D2:
     call toc_01_3C3B
     ifGte [$FFF0], $04, .else_05_7948
 
-    ifNot [$FFF1], .else_05_7945
+    ifNotZero [$FFF1], .else_05_7945
 
     clear [$FFF1]
     call toc_01_3BEB
@@ -6676,7 +6674,7 @@ toc_05_7965:
     or   [hl]
     jr   nz, .else_05_7985
 
-    ifNot [$C124], .return_05_7986
+    ifNotZero [$C124], .return_05_7986
 
 .else_05_7985:
     pop  af

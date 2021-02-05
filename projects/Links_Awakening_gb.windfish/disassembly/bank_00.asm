@@ -178,14 +178,14 @@ main:
     changebank $01
     call verifySaveFiles
     changebank $1F
-    call toc_1F_4000
+    call clearD300
     assign [hButtonsInactiveDelay], 24
     ei
     jp   .else_01_03BD
 
 .toc_01_01A6:
     assign [hIsRenderingFrame], true
-    ifNot [$C500], .else_01_01BE
+    ifNotZero [$C500], .else_01_01BE
 
     ifNe [wGameMode], GAMEMODE_WORLD, .else_01_01BE
 
@@ -250,7 +250,7 @@ main:
     changebank $01
     call toc_01_6DB7
 .else_01_0230:
-    ifNotZero [$C17F], .else_01_0352
+    _ifNotZero [$C17F], .else_01_0352
 
     inc  a
     jr   nz, .else_01_0245
@@ -421,7 +421,7 @@ main:
     or   [hl]
     jr   nz, .else_01_03BD
 
-    ifNot [DEBUG_TOOL1], .else_01_03AA
+    ifNotZero [DEBUG_TOOL1], .else_01_03AA
 
     ld   a, [$D6FC]
     and  a
@@ -464,7 +464,7 @@ main:
     clear [hIsRenderingFrame]
     halt
 .loop_01_03CE:
-    ifNot [hNeedsRenderingFrame], .loop_01_03CE
+    ifNotZero [hNeedsRenderingFrame], .loop_01_03CE
 
     clear [hNeedsRenderingFrame]
     jp   .toc_01_01A6
@@ -562,7 +562,7 @@ toc_01_03E2:
     db   $AD, $59
 
 LoadMapData:
-    ifNot [wTileMapToLoad], toc_01_04F5
+    ifNotZero [wTileMapToLoad], toc_01_04F5
 
     push af
     call setupLCD
@@ -639,9 +639,7 @@ vblank:
     push de
     push hl
     di
-    ld   a, [hIsRenderingFrame]
-    and  a
-    jp   nz, .else_01_05B6
+    ifZero [hIsRenderingFrame], .else_01_05B6
 
     ld   a, [wDialogState]
     and  %01111111
@@ -668,7 +666,7 @@ vblank:
     cp   $0B
     jr   nz, .else_01_0566
 
-    ifNot [$C172], .else_01_0561
+    ifNotZero [$C172], .else_01_0561
 
     dec  a
     ld   [$C172], a
@@ -700,7 +698,7 @@ vblank:
     jr   .else_01_05B6
 
 .else_01_058B:
-    ifNot [$FFBB], .else_01_05A3
+    ifNotZero [$FFBB], .else_01_05A3
 
     dec  a
     ld   [$FFBB], a
@@ -731,7 +729,7 @@ vblank:
 
 
 toc_01_05C0:
-    ifNotZero [hNeedsUpdatingBGTiles], .else_01_0688
+    _ifNotZero [hNeedsUpdatingBGTiles], .else_01_0688
 
     cp   $07
     jp   z, .else_01_0760
@@ -751,7 +749,7 @@ toc_01_05C0:
     cp   $08
     jp   nc, toc_01_0783
 
-    ifNot [$DBA5], .else_01_0643
+    ifNotZero [$DBA5], .else_01_0643
 
     ld   a, [hNeedsUpdatingBGTiles]
     cp   UPDATE_BG_TILES_DUNGEON_MINIMAP
@@ -782,7 +780,7 @@ toc_01_05C0:
     add  a, $50
     ld   h, a
     add  hl, bc
-    ifNot [$FFBB], .else_01_062E
+    ifNotZero [$FFBB], .else_01_062E
 
     ld   a, [hBGTilesLoadingStage]
     dec  a
@@ -847,7 +845,7 @@ toc_01_05C0:
 
 
 .else_01_0688:
-    ifNot [hNeedsUpdatingEnemiesTiles], .else_01_06F4
+    ifNotZero [hNeedsUpdatingEnemiesTiles], .else_01_06F4
 
     ld   a, [$C197]
     ld   e, a
@@ -1108,7 +1106,7 @@ toc_01_0844:
     and  a
     jr   nz, .return_01_0876
 
-    ifNot [$C10B], .else_01_0866
+    ifNotZero [$C10B], .else_01_0866
 
     cp   $02
     jr   nz, .else_01_0863
@@ -1236,7 +1234,7 @@ toc_01_090F:
 toc_01_0915:
     ifNe [$D401], $01, toc_01_0909
 
-    ifNot [$DBA5], toc_01_0909
+    ifNotZero [$DBA5], toc_01_0909
 
     assign [$FFBC], $01
 .toc_01_0926:
@@ -1324,7 +1322,7 @@ toc_01_0993:
 
 toc_01_09AA:
     changebank $08
-    ifNot [$DBA5], .else_01_09DC
+    ifNotZero [$DBA5], .else_01_09DC
 
     ld   a, [$FFF6]
     ld   e, a
@@ -1428,7 +1426,7 @@ toc_01_09AA:
     sla  e
     rl   d
     ld   hl, $4540
-    ifNot [$DBA5], .else_01_0A59
+    ifNotZero [$DBA5], .else_01_0A59
 
     ld   hl, $4788
 .else_01_0A59:
@@ -1446,7 +1444,7 @@ toc_01_09AA:
     jr   z, .else_01_0A85
 
     ld   [bc], a
-    ifNot [$FFD7], .else_01_0A7A
+    ifNotZero [$FFD7], .else_01_0A7A
 
     ld   a, d
     ld   [$C10D], a
@@ -1602,7 +1600,7 @@ JumpTable_0B53_00:
     and  a
     jr   nz, .else_01_0B9A
 
-    ifNot [$C1BC], .else_01_0B9A
+    ifNotZero [$C1BC], .else_01_0B9A
 
     ld   hl, hLinkInteractiveMotionBlocked
     ld   [hl], $02
@@ -1643,7 +1641,7 @@ JumpTable_0B53_00:
     ld   [$C1A4], a
     ld   [$C15C], a
     ld   [$C1AE], a
-    ifNot [$C144], .else_01_0BF5
+    ifNotZero [$C144], .else_01_0BF5
 
     dec  a
     ld   [$C144], a
@@ -1688,7 +1686,7 @@ toc_01_0C40:
     ld   hl, hLinkPositionZHigh
     sub  a, [hl]
     ld   [$C145], a
-    ifNot [$C1A9], toc_01_0C8C
+    ifNotZero [$C1A9], toc_01_0C8C
 
     ld   a, [wDialogState]
     and  a
@@ -1767,23 +1765,19 @@ toc_01_0C8C:
 .else_01_0CDE:
     clear [$D45F]
 .else_01_0CE2:
-    ifNot [$FFB7], .else_01_0CEA
+    ifNotZero [$FFB7], .else_01_0CEA
 
     dec  a
     ld   [$FFB7], a
 .else_01_0CEA:
-    ifNot [$FFB6], .else_01_0CF2
+    ifNotZero [$FFB6], .else_01_0CF2
 
     dec  a
     ld   [$FFB6], a
 .else_01_0CF2:
-    ld   a, [wDialogState]
-    and  a
-    jp   nz, toc_01_149B
+    ifZero [wDialogState], toc_01_149B
 
-    ld   a, [$C124]
-    and  a
-    jp   nz, toc_01_0D49
+    ifZero [$C124], toc_01_0D49
 
     ifEq [$C11C], $07, .else_01_0D32
 
@@ -1843,7 +1837,7 @@ toc_01_0D68:
     or   [hl]
     ret  nz
 
-    ifNot [$C14A], .else_01_0DAD
+    ifNotZero [$C14A], .else_01_0DAD
 
     ifEq [$DB01], $01, .else_01_0D9B
 
@@ -1872,15 +1866,11 @@ toc_01_0D68:
     clear [$C15B]
     ld   [$C15A], a
 .toc_01_0DB4:
-    ld   a, [$C117]
-    and  a
-    jp   nz, toc_01_0E7F.return_01_0ED0
+    ifZero [$C117], toc_01_0E7F.return_01_0ED0
 
-    ld   a, [$C15C]
-    and  a
-    jp   nz, toc_01_0E7F.return_01_0ED0
+    ifZero [$C15C], toc_01_0E7F.return_01_0ED0
 
-    ifNot [$C137], .else_01_0DD3
+    ifNotZero [$C137], .else_01_0DD3
 
     cp   $03
     jr   nz, .else_01_0DD3
@@ -1888,9 +1878,7 @@ toc_01_0D68:
     ifGte [$C138], $03, .else_01_0DD9
 
 .else_01_0DD3:
-    ld   a, [hLinkInteractiveMotionBlocked]
-    and  a
-    jp   nz, toc_01_0E7F.return_01_0ED0
+    ifZero [hLinkInteractiveMotionBlocked], toc_01_0E7F.return_01_0ED0
 
 .else_01_0DD9:
     ifNe [$DB00], $08, .else_01_0DEF
@@ -2123,7 +2111,7 @@ toc_01_0F34:
 toc_01_0F76:
     returnIfGte [$C14E], $01
 
-    ifNotZero [$DB4D], toc_01_08AC
+    _ifNotZero [$DB4D], toc_01_08AC
 
     sub  a, $01
     daa
@@ -2135,7 +2123,7 @@ toc_01_0F76:
     ld   hl, $C2F0
     add  hl, de
     ld   [hl], $10
-    ifNotZero [$C1C0], .else_01_0FAC
+    _ifNotZero [$C1C0], .else_01_0FAC
 
     clear [$C1C0]
     ld   a, [$C1C2]
@@ -2275,7 +2263,7 @@ toc_01_1079:
     ifGte [$C14D], $02, .return_01_10EA
 
     assign [$C14C], $10
-    ifNotZero [$DB45], toc_01_08AC
+    _ifNotZero [$DB45], toc_01_08AC
 
     sub  a, $01
     daa
@@ -2287,7 +2275,7 @@ toc_01_1079:
 
     ld   a, e
     ld   [$C1C2], a
-    ifNot [$C1C0], .else_01_10BD
+    ifNotZero [$C1C0], .else_01_10BD
 
     ld   a, [$C1C1]
     ld   c, a
@@ -2398,7 +2386,7 @@ toc_01_1151:
     and  a
     ret  nz
 
-    ifNot [$DB4B], .else_01_116B
+    ifNotZero [$DB4B], .else_01_116B
 
     ld   a, [hLinkPositionZHigh]
     and  a
@@ -2410,7 +2398,7 @@ toc_01_1151:
 
 
 .else_01_116B:
-    ifNotZero [$DB4C], toc_01_08AC
+    _ifNotZero [$DB4C], toc_01_08AC
 
     ld   a, $08
     call toc_01_3C01
@@ -2481,7 +2469,7 @@ toc_01_11D1:
     clear [$C152]
     ld   [$C153], a
     assign [$FFF2], $0D
-    ifNot [$FFF9], .else_01_120F
+    ifNotZero [$FFF9], .else_01_120F
 
     call .else_01_120F
     ld   a, [hPressedButtonsMask]
@@ -2605,7 +2593,7 @@ toc_01_12B6:
     ret  z
 
 .else_01_12C7:
-    ifNot [$C121], .else_01_12D4
+    ifNotZero [$C121], .else_01_12D4
 
     ld   a, [$C136]
     add  a, $04
@@ -2802,7 +2790,7 @@ toc_01_13C9:
     db   $20, $E0, $00, $00, $00, $00, $E0, $20
 
 toc_01_140C:
-    ifNot [$FFF9], .else_01_141A
+    ifNotZero [$FFF9], .else_01_141A
 
     ld   a, [$FF9C]
     and  a
@@ -2890,7 +2878,7 @@ toc_01_149B:
     cp   $01
     ret  z
 
-    ifNot [$C16A], .else_01_14E2
+    ifNotZero [$C16A], .else_01_14E2
 
     ld   bc, $C010
     ld   a, [$C145]
@@ -3031,7 +3019,7 @@ toc_01_1594:
 
 JumpTable_15B3_00:
     call toc_01_780F
-    ifNot [$C3C9], .else_01_15C3
+    ifNotZero [$C3C9], .else_01_15C3
 
     clear [$C3C9]
     jp   toc_01_0909
@@ -3055,7 +3043,7 @@ JumpTable_15B3_00:
     dec  e
     jr   nz, .loop_01_15E2
 
-    ifNot [$C509], .else_01_1606
+    ifNotZero [$C509], .else_01_1606
 
     push af
     call_changebank $04
@@ -3125,7 +3113,7 @@ JumpTable_15B3_00:
     ld   [$FFF6], a
     jr   nz, .else_01_1677
 
-    ifNot [$FFE6], .else_01_1675
+    ifNotZero [$FFE6], .else_01_1675
 
     clear [$D47C]
 .else_01_1675:
@@ -3195,7 +3183,7 @@ JumpTable_15B3_00:
     and  a
     jr   nz, .return_01_172D
 
-    ifNot [$DBA5], .else_01_1716
+    ifNotZero [$DBA5], .else_01_1716
 
     ifGte [$FFF7], $0A, .else_01_1716
 
@@ -3247,7 +3235,7 @@ JumpTable_15B3_00:
 
 JumpTable_1732_00:
     call toc_01_780F
-    ifNot [$D474], .else_01_1750
+    ifNotZero [$D474], .else_01_1750
 
     clear [$D474]
     assign [$C180], $30
@@ -3265,7 +3253,7 @@ JumpTable_1732_00:
     ld   a, $00
 .else_01_1763:
     ld   [$C11C], a
-    ifNot [$D47E], .return_01_1775
+    ifNotZero [$D47E], .return_01_1775
 
     clear [$D47E]
     ld   a, $36
@@ -3455,14 +3443,14 @@ toc_01_19EF:
     ld   hl, $48F6
     ifNe [$C11C], $01, .else_01_1A17
 
-    ifNot [$FF9C], .else_01_1A15
+    ifNotZero [$FF9C], .else_01_1A15
 
     ld   hl, $48FE
 .else_01_1A15:
     jr   .toc_01_1A66
 
 .else_01_1A17:
-    ifNot [$FFF9], .else_01_1A27
+    ifNotZero [$FFF9], .else_01_1A27
 
     ifNe [$FF9C], $02, .else_01_1A27
 
@@ -3495,7 +3483,7 @@ toc_01_19EF:
 
     ld   hl, $48D6
 .else_01_1A4E:
-    ifNot [$C15B], .else_01_1A5C
+    ifNotZero [$C15B], .else_01_1A5C
 
     ld   a, l
     add  a, $08
@@ -3559,9 +3547,7 @@ toc_01_1AA9:
     cp   GAMEMODE_INTRO
     jr   nz, .else_01_1ADF
 
-    ld   a, [$D601]
-    and  a
-    jp   nz, .return_01_1ADE
+    ifZero [$D601], .return_01_1ADE
 
     ld   a, [hFrameCounter]
     and  %00001111
@@ -3601,22 +3587,20 @@ toc_01_1AA9:
     cp   128
     jp   nz, JumpTable_1C5A_00.return_01_1D14
 
-    ld   a, [$C14F]
-    and  a
-    jp   nz, JumpTable_1C5A_00.else_01_1CCC
+    ifZero [$C14F], JumpTable_1C5A_00.else_01_1CCC
 
     ld   hl, $C124
     ld   a, [$D601]
     or   [hl]
     jp   nz, JumpTable_1C5A_00.else_01_1CCC
 
-    ifNot [$D6F8], .else_01_1B16
+    ifNotZero [$D6F8], .else_01_1B16
 
     call toc_01_1DEE
     jp   JumpTable_1C5A_00.else_01_1CCC
 
 .else_01_1B16:
-    ifNot [$FFA5], .else_01_1B66
+    ifNotZero [$FFA5], .else_01_1B66
 
 .else_01_1B1B:
     cp   $01
@@ -4251,7 +4235,7 @@ toc_01_1E7B:
     cp   $D4
     jr   z, .else_01_1F5B
 
-    ifNot [$DB73], .else_01_1F42
+    ifNotZero [$DB73], .else_01_1F42
 
     ld   a, $78
     call toc_01_218E
@@ -4860,7 +4844,7 @@ JumpTable_22CE_00:
 
 JumpTable_2320_00:
     changebank $1C
-    ifNot [$C172], .else_01_2330
+    ifNotZero [$C172], .else_01_2330
 
     dec  a
     ld   [$C172], a
@@ -5079,7 +5063,7 @@ toc_01_2449:
 .else_01_247C:
     ld   [wNameIndex], a
     ld   hl, $DB4F
-    ifNot [$DB6E], .else_01_248B
+    ifNotZero [$DB6E], .else_01_248B
 
     ld   hl, $2444
 .else_01_248B:
@@ -5440,7 +5424,7 @@ toc_01_2686:
     sla  c
     rl   b
     ld   hl, $498C
-    ifNot [$DBA5], .else_01_2715
+    ifNotZero [$DBA5], .else_01_2715
 
     ld   hl, $4D60
 .else_01_2715:
@@ -6241,11 +6225,11 @@ JumpTable_2BC4_00:
     ld   bc, $0300
     call copyHLToDE
 .toc_01_2C53:
-    ifNot [$DB4B], .else_01_2C5C
+    ifNotZero [$DB4B], .else_01_2C5C
 
     call toc_01_1D54
 .else_01_2C5C:
-    ifNot [$DBA5], .else_01_2C68
+    ifNotZero [$DBA5], .else_01_2C68
 
     ifLt [$FFF7], $0A, .else_01_2C72
 
@@ -6381,7 +6365,7 @@ JumpTable_2D88_00:
     and  a
     jr   nz, .else_01_2DD7
 
-    ifNot [$DBA5], .else_01_2DB4
+    ifNotZero [$DBA5], .else_01_2DB4
 
     ld   a, [$FFF9]
     and  a
@@ -6413,7 +6397,7 @@ JumpTable_2D88_00:
     ld   a, $DD
     jr   nz, .else_01_2DD5
 
-    ifNot [$DB73], .else_01_2DD7
+    ifNotZero [$DB73], .else_01_2DD7
 
     ld   a, $8F
 .else_01_2DD5:
@@ -6454,10 +6438,10 @@ JumpTable_2D88_00:
     jp   nz, .loop_01_2D89
 
     ld   de, $9000
-    ifNot [$DBA5], .else_01_2E55
+    ifNotZero [$DBA5], .else_01_2E55
 
     changebank $0D
-    ifNot [$FFF9], .else_01_2E42
+    ifNotZero [$FFF9], .else_01_2E42
 
     ld   hl, $7000
     ifEq [$FFF7], $06, .else_01_2E38
@@ -6521,7 +6505,7 @@ JumpTable_2E6C_00:
     sla  c
     rl   b
     ld   hl, $498C
-    ifNot [$DBA5], .else_01_2E94
+    ifNotZero [$DBA5], .else_01_2E94
 
     ld   hl, $4D60
 .else_01_2E94:
@@ -6601,7 +6585,7 @@ toc_01_2ED7:
     ld   [$C3CD], a
     assign [$D401], $FF
     ld   [$C50F], a
-    ifNot [$DBA5], .else_01_2F90
+    ifNotZero [$DBA5], .else_01_2F90
 
     changebank $14
     ld   [$FFE8], a
@@ -6664,7 +6648,7 @@ toc_01_2ED7:
     ld   e, a
     ld   d, $00
     ld   hl, $D800
-    ifNot [$DBA5], .else_01_2FAE
+    ifNotZero [$DBA5], .else_01_2FAE
 
     ld   hl, $D900
     ifGte [$FFF7], $1A, .else_01_2FAE
@@ -6689,7 +6673,7 @@ toc_01_2ED7:
     ld   b, $00
     sla  c
     rl   b
-    ifNot [$DBA5], .else_01_3002
+    ifNotZero [$DBA5], .else_01_3002
 
     changebank $0A
     ld   [$FFE8], a
@@ -6802,7 +6786,7 @@ toc_01_2ED7:
 
     ld   [hAnimatedTilesGroup], a
     inc  bc
-    ifNot [$DBA5], .else_01_309B
+    ifNotZero [$DBA5], .else_01_309B
 
     ld   a, [bc]
     and  %00001111
@@ -7282,7 +7266,7 @@ toc_01_31FD:
     push af
 .else_01_3307:
     ld   d, $00
-    ifNot [$FFD7], .else_01_332D
+    ifNotZero [$FFD7], .else_01_332D
 
     dec  bc
     ld   a, [bc]
@@ -7339,7 +7323,7 @@ JumpTable_3338_00:
     ld   d, $00
     ld   hl, $D700
     add  hl, de
-    ifNot [$FFD7], .else_01_3369
+    ifNotZero [$FFD7], .else_01_3369
 
     and  %00001111
     ld   e, a
@@ -7819,7 +7803,7 @@ JumpTable_369E_00:
 
     ifNe [$FFF6], $D3, .else_01_36B7
 
-    ifNot [$DB46], .else_01_36B7
+    ifNotZero [$DB46], .else_01_36B7
 
     jp   JumpTable_3568_00
 
@@ -7867,7 +7851,7 @@ toc_01_36E6:
     sla  c
     rl   b
     ld   hl, $4000
-    ifNot [$DBA5], .else_01_3747
+    ifNotZero [$DBA5], .else_01_3747
 
     ifNe [$FFF7], $06, .else_01_3738
 
@@ -8626,7 +8610,7 @@ toc_01_3D26:
 
 toc_01_3D87:
     push hl
-    ifNot [$C124], .else_01_3DAD
+    ifNotZero [$C124], .else_01_3DAD
 
     ld   a, [$FFEE]
     dec  a
@@ -8880,7 +8864,7 @@ toc_01_3F12:
     or   [hl]
     ret  nz
 
-    ifNot [$C165], .else_01_3F25
+    ifNotZero [$C165], .else_01_3F25
 
     dec  a
     ld   [$C165], a

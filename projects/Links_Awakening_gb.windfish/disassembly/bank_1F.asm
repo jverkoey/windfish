@@ -1,7 +1,7 @@
 SECTION "ROM Bank 1F", ROMX[$4000], BANK[$1F]
 
-toc_1F_4000:
-    jp   clearD300
+clearD300:
+    jp   _clearD300
 
 toc_1F_4003:
     jp   toc_1F_7B17
@@ -9,7 +9,7 @@ toc_1F_4003:
 toc_1F_4006:
     jp   toc_1F_401E
 
-clearD300:
+_clearD300:
     ld   hl, $D300
 .loop:
     ld   [hl], $00
@@ -101,9 +101,7 @@ toc_1F_4204:
     cp   $01
     jr   z, .else_1F_4216
 
-    ld   a, [$D3C6]
-    and  a
-    jp   nz, toc_1F_53E6
+    ifZero [$D3C6], toc_1F_53E6
 
 .else_1F_4216:
     ld   a, [hl]
@@ -705,9 +703,7 @@ toc_1F_53ED:
     cp   $14
     jr   z, .else_1F_53FF
 
-    ld   a, [$D3C8]
-    and  a
-    jp   nz, toc_1F_6385
+    ifZero [$D3C8], toc_1F_6385
 
 .else_1F_53FF:
     ld   a, [hl]
@@ -1281,9 +1277,7 @@ toc_1F_64E8:
     and  a
     jr   z, .else_1F_64FC
 
-    ld   a, [$D3C9]
-    and  a
-    jp   nz, toc_1F_7A28
+    ifZero [$D3C9], toc_1F_7A28
 
     ld   a, [hl]
     ld   hl, $63EC
@@ -2215,24 +2209,24 @@ toc_1F_7B17:
     db   $FF, $FF, $FF, $FF
 
 toc_1F_7F80:
-    ifNot [hMusicFadeOutTimer], .else_1F_7F9E
+    ifNotZero [hMusicFadeOutTimer], .else_1F_7F9E
 
     sub  a, 1
     ld   [hMusicFadeOutTimer], a
     and  %00000011
     jr   nz, .else_1F_7F9E
 
-    ifNot [hVolumeRight], .else_1F_7F95
+    ifNotZero [hVolumeRight], .else_1F_7F95
 
     dec  a
     ld   [hVolumeRight], a
 .else_1F_7F95:
-    ifNot [hVolumeLeft], .else_1F_7F9E
+    ifNotZero [hVolumeLeft], .else_1F_7F9E
 
     sub  a, $10
     ld   [hVolumeLeft], a
 .else_1F_7F9E:
-    ifNot [hMusicFadeInTimer], .else_1F_7FBE
+    ifNotZero [hMusicFadeInTimer], .else_1F_7FBE
 
     sub  a, 1
     ld   [hMusicFadeInTimer], a
@@ -2257,17 +2251,17 @@ toc_1F_7F80:
     and  %10001111
     or   [hl]
     ld   [gbAUDVOL], a
-    ifNot [$FFF2], .else_1F_7FD7
+    ifNotZero [$FFF2], .else_1F_7FD7
 
     ld   [$D360], a
     clear [$FFF2]
 .else_1F_7FD7:
-    ifNot [$FFF3], .else_1F_7FE2
+    ifNotZero [$FFF3], .else_1F_7FE2
 
     ld   [$D370], a
     clear [$FFF3]
 .else_1F_7FE2:
-    ifNot [$FFF4], .return_1F_7FED
+    ifNotZero [$FFF4], .return_1F_7FED
 
     ld   [$D378], a
     clear [$FFF4]

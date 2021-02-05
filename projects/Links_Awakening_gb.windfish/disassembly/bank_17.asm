@@ -310,7 +310,7 @@ toc_17_482A:
     and  %00001100
     jr   z, .else_17_483A
 
-    ifNot [DEBUG_TOOL2], .else_17_483A
+    ifNotZero [DEBUG_TOOL2], .else_17_483A
 
     clear [$DB96]
 .else_17_483A:
@@ -318,21 +318,21 @@ toc_17_482A:
     and  %00000011
     jr   z, .else_17_4849
 
-    ifNot [DEBUG_TOOL2], .else_17_4849
+    ifNotZero [DEBUG_TOOL2], .else_17_4849
 
     call toc_17_5CC1
 .else_17_4849:
-    ifNot [$D006], .else_17_4853
+    ifNotZero [$D006], .else_17_4853
 
     dec  a
     ld   [$D006], a
 .else_17_4853:
-    ifNot [$D007], .else_17_485D
+    ifNotZero [$D007], .else_17_485D
 
     dec  a
     ld   [$D007], a
 .else_17_485D:
-    ifNot [$D008], .else_17_4867
+    ifNotZero [$D008], .else_17_4867
 
     dec  a
     ld   [$D008], a
@@ -341,7 +341,7 @@ toc_17_482A:
     and  %00000011
     jr   nz, .else_17_4877
 
-    ifNot [$D009], .else_17_4877
+    ifNotZero [$D009], .else_17_4877
 
     dec  a
     ld   [$D009], a
@@ -350,7 +350,7 @@ toc_17_482A:
     and  %00001111
     jr   nz, .else_17_4887
 
-    ifNot [$D013], .else_17_4887
+    ifNotZero [$D013], .else_17_4887
 
     dec  a
     ld   [$D013], a

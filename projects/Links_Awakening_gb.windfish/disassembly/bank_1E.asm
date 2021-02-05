@@ -166,9 +166,7 @@ toc_1E_4137:
 
 toc_1E_4163:
     ld   b, a
-    ld   a, [$D3CE]
-    and  a
-    jp   nz, toc_1E_401E.toc_1E_402B
+    ifZero [$D3CE], toc_1E_401E.toc_1E_402B
 
     ld   a, b
     cp   $FF
@@ -262,7 +260,7 @@ toc_1E_4163:
     db   $00, $00, $01, $00, $FF, $FF, $00, $00
 
 toc_1E_432A:
-    ifNotZero [$D3E7], toc_1E_457C.toc_1E_473A
+    _ifNotZero [$D3E7], toc_1E_457C.toc_1E_473A
 
     clear [gbAUD3ENA]
     ld   [$D3E7], a
@@ -711,9 +709,7 @@ toc_1E_457C:
     and  a
     ret  z
 
-    ld   a, [$D3CE]
-    and  a
-    jp   nz, toc_1E_401E.toc_1E_402B
+    ifZero [$D3CE], toc_1E_401E.toc_1E_402B
 
     call toc_1E_4382
     assign [$D350], $01
@@ -894,7 +890,7 @@ toc_1E_457C:
     jr   z, .else_1E_46B3
 
     ld   [hl], $00
-    ifNot [$D300], .else_1E_46A6
+    ifNotZero [$D300], .else_1E_46A6
 
     ld   l, a
     ld   h, $00
@@ -1115,13 +1111,9 @@ toc_1E_476D:
     cp   $03
     jp   nz, toc_1E_476B
 
-    ld   a, [$D39E]
-    and  a
-    jp   nz, toc_1E_487D
+    ifZero [$D39E], toc_1E_487D
 
-    ld   a, [$D3D9]
-    and  a
-    jp   nz, toc_1E_48BE
+    ifZero [$D3D9], toc_1E_48BE
 
     jp   toc_1E_476B
 
@@ -1152,7 +1144,7 @@ toc_1E_47F1:
     and  a
     jr   nz, .else_1E_4818
 
-    ifNot [$D317], .else_1E_4818
+    ifNotZero [$D317], .else_1E_4818
 
     and  %00001111
     ld   b, a

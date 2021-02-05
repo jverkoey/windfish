@@ -1,4 +1,10 @@
 
+_ifNotZero: MACRO
+    ld   a, \1
+    and  a
+    jp   z, \2
+    ENDM
+
 assign: MACRO
     ld   a, \2
     ld   \1, a
@@ -48,16 +54,16 @@ ifNe: MACRO
     jr   nz, \3
     ENDM
 
-ifNot: MACRO
+ifNotZero: MACRO
     ld   a, \1
     and  a
     jr   z, \2
     ENDM
 
-ifNotZero: MACRO
+ifZero: MACRO
     ld   a, \1
     and  a
-    jp   z, \2
+    jp   nz, \2
     ENDM
 
 incAddr: MACRO

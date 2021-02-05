@@ -397,7 +397,7 @@ JumpTable_471D_07:
     ld   hl, $C210
     add  hl, bc
     ld   [hl], $80
-    ifNot [$C130], .return_07_4735
+    ifNotZero [$C130], .return_07_4735
 
     call JumpTable_3B8D_00
 .return_07_4735:
@@ -725,9 +725,7 @@ JumpTable_4B9A_07:
     ld   [hl], a
 .else_07_4BE0:
     call toc_07_7CE2
-    ld   a, [$D202]
-    and  a
-    jp   nz, JumpTable_3B8D_00
+    ifZero [$D202], JumpTable_3B8D_00
 
     ret
 
@@ -1886,7 +1884,7 @@ JumpTable_64C0_07:
     db   $AF, $C3, $87, $3B
 
 toc_07_650E:
-    ifNotZero [hLinkPositionZHigh], toc_01_3BD5
+    _ifNotZero [hLinkPositionZHigh], toc_01_3BD5
 
     cp   $08
     jp   c, toc_01_3BD5
@@ -3059,7 +3057,7 @@ toc_07_7BD0:
 
     call toc_01_094A
     call toc_01_093B.toc_01_0942
-    ifNot [$C1A6], .else_07_7BF2
+    ifNotZero [$C1A6], .else_07_7BF2
 
     ld   e, a
     ld   d, b
@@ -3163,7 +3161,7 @@ toc_07_7C76:
     or   [hl]
     jr   nz, .else_07_7C96
 
-    ifNot [$C124], .return_07_7C97
+    ifNotZero [$C124], .return_07_7C97
 
 .else_07_7C96:
     pop  af

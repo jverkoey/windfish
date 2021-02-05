@@ -190,9 +190,7 @@ JumpTable_4394_18:
     add  hl, bc
     ld   [hl], a
     call JumpTable_3B8D_00
-    ld   a, [$D215]
-    and  a
-    jp   nz, .return_18_43B8
+    ifZero [$D215], .return_18_43B8
 
     ld   hl, $C3D0
     add  hl, bc
@@ -1454,7 +1452,7 @@ JumpTable_5F22_18:
 
 
 toc_18_5F3F:
-    ifNot [$FFE8], .else_18_5F47
+    ifNotZero [$FFE8], .else_18_5F47
 
     and  %10000000
     ret  z
@@ -2650,7 +2648,7 @@ JumpTable_7838_18:
     cp   $40
     jr   nc, .else_18_78FE
 
-    ifNot [$C137], .else_18_78FE
+    ifNotZero [$C137], .else_18_78FE
 
     call JumpTable_3B8D_00
     ld   [hl], $02
@@ -2894,7 +2892,7 @@ toc_18_7D61:
     or   [hl]
     jr   nz, .else_18_7D81
 
-    ifNot [$C124], .return_18_7D82
+    ifNotZero [$C124], .return_18_7D82
 
 .else_18_7D81:
     pop  af

@@ -102,7 +102,7 @@ toc_15_4000:
     db   $BC, $40, $D2, $40
 
 JumpTable_40AD_15:
-    ifNot [$C1CB], .return_15_40BB
+    ifNotZero [$C1CB], .return_15_40BB
 
     call JumpTable_3B8D_00
     call toc_01_0891

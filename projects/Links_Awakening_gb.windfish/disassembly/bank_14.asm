@@ -597,7 +597,7 @@ JumpTable_5021_14:
     db   $48, $50, $58, $60, $68, $70
 
 toc_14_523C:
-    ifNot [$D462], .else_14_524C
+    ifNotZero [$D462], .else_14_524C
 
     dec  a
     ld   [$D462], a
@@ -605,12 +605,12 @@ toc_14_523C:
 
     assign [$FFF3], $1B
 .else_14_524C:
-    ifNot [$C502], .else_14_5256
+    ifNotZero [$C502], .else_14_5256
 
     dec  a
     ld   [$C502], a
 .else_14_5256:
-    ifNot [$C5AF], .else_14_5267
+    ifNotZero [$C5AF], .else_14_5267
 
     dec  a
     ld   [$C5AF], a
@@ -716,7 +716,7 @@ toc_14_5326:
     cp   $04
     ret  nz
 
-    ifNot [$C3CB], .return_14_5387
+    ifNotZero [$C3CB], .return_14_5387
 
     clear [$FFD7]
     ld   d, a
@@ -848,7 +848,7 @@ toc_14_5388:
 toc_14_541B:
     assign [$D474], $01
     assign [$C11C], $03
-    ifNot [$DBA5], .else_14_544A
+    ifNotZero [$DBA5], .else_14_544A
 
     ifGte [$FFF7], $0A, .else_14_544A
 
@@ -1067,7 +1067,7 @@ toc_14_5822:
     jp   toc_01_3DAF
 
 .else_14_583B:
-    ifNot [$C5AE], .else_14_5846
+    ifNotZero [$C5AE], .else_14_5846
 
     dec  a
     ld   [$C5AE], a
@@ -1178,7 +1178,7 @@ toc_14_5822:
     ld   [hl], $08
 .else_14_58E4:
     ld   e, b
-    ifNot [$FFF9], toc_14_5822.else_14_58EC
+    ifNotZero [$FFF9], toc_14_5822.else_14_58EC
 
     ld   e, $08
 .else_14_58EC:
@@ -1296,12 +1296,12 @@ toc_14_5964:
     db   $00, $00, $00, $00, $00, $02, $00, $FE
 
 toc_14_59B0:
-    ifNot [$C178], .else_14_59BA
+    ifNotZero [$C178], .else_14_59BA
 
     dec  a
     ld   [$C178], a
 .else_14_59BA:
-    ifNot [$C157], .return_14_59DD
+    ifNotZero [$C157], .return_14_59DD
 
     dec  a
     ld   [$C157], a
@@ -1365,9 +1365,9 @@ toc_14_59DE:
     jp   .toc_14_5AE9
 
 .else_14_5A24:
-    ifNotZero [$DBA5], .else_14_5A9F
+    _ifNotZero [$DBA5], .else_14_5A9F
 
-    ifNot [$FFF9], .else_14_5A6B
+    ifNotZero [$FFF9], .else_14_5A6B
 
     ifNe [hObjectUnderEntity], 138, .else_14_5A6B
 

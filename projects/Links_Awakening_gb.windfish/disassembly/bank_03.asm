@@ -376,7 +376,7 @@ JumpTable_490A_03:
     jr   z, toc_03_4902
 
 .else_03_4945:
-    ifNot [$DBA5], .else_03_495D
+    ifNotZero [$DBA5], .else_03_495D
 
     ld   a, [$D478]
     and  a
@@ -807,9 +807,7 @@ JumpTable_4C06_03:
     cp   $01
     jr   nz, .else_03_4C24
 
-    ld   a, [$DB4B]
-    and  a
-    jp   nz, toc_01_3F7A.else_01_3FB7
+    ifZero [$DB4B], toc_01_3F7A.else_01_3FB7
 
 .else_03_4C24:
     ld   hl, $C310
@@ -843,9 +841,7 @@ JumpTable_4C46_03:
     ld   hl, $C310
     add  hl, bc
     ld   [hl], $10
-    ld   a, [$C5A9]
-    and  a
-    jp   nz, toc_01_3F7A.else_01_3FB7
+    ifZero [$C5A9], toc_01_3F7A.else_01_3FB7
 
     ld   a, $0C
 .toc_03_4C55:
@@ -862,9 +858,7 @@ JumpTable_4C61_03:
     jp   toc_01_3F7A.else_01_3FB7
 
 .else_03_4C71:
-    ld   a, [$DB56]
-    and  a
-    jp   nz, toc_01_3F7A.else_01_3FB7
+    ifZero [$DB56], toc_01_3F7A.else_01_3FB7
 
 .return_03_4C78:
     ret
@@ -887,11 +881,9 @@ JumpTable_4C7E_03:
 JumpTable_4C86_03:
     ifLt [$FFF6], $C0, .else_03_4CA9
 
-    ifNotZero [$DB74], toc_01_3F7A.else_01_3FB7
+    _ifNotZero [$DB74], toc_01_3F7A.else_01_3FB7
 
-    ld   a, [$DB73]
-    and  a
-    jp   nz, toc_01_3F7A.else_01_3FB7
+    ifZero [$DB73], toc_01_3F7A.else_01_3FB7
 
     inc  a
     ld   [$C3C8], a
@@ -900,7 +892,7 @@ JumpTable_4C86_03:
     ld   [$FFBD], a
     call toc_01_27CA
 .else_03_4CA9:
-    ifNot [DEBUG_TOOL1], JumpTable_4CEC_03
+    ifNotZero [DEBUG_TOOL1], JumpTable_4CEC_03
 
     ld   a, [$DB4F]
     and  a
@@ -1412,7 +1404,7 @@ toc_03_4FCA:
     ld   hl, $C2D0
     add  hl, bc
     ld   [hl], $01
-    ifNot [$DBA5], .else_03_4FDC
+    ifNotZero [$DBA5], .else_03_4FDC
 
 .JumpTable_4FD6_03:
     ld   hl, $C2D0
@@ -1805,7 +1797,7 @@ JumpTable_520D_03:
     assign [$FFF4], $11
     ld   de, $5209
     ld   b, $C6
-    ifNot [$DBA5], .else_03_5256
+    ifNotZero [$DBA5], .else_03_5256
 
     ld   de, $51FD
     ld   b, $0D
@@ -1923,7 +1915,7 @@ toc_03_52BE:
     call toc_01_3F7A.else_01_3FB7
     ld   de, $5205
     ld   b, $C4
-    ifNot [$DBA5], .else_03_5321
+    ifNotZero [$DBA5], .else_03_5321
 
     ld   de, $5201
     ld   b, $A6
@@ -2240,51 +2232,198 @@ JumpTable_557E_03:
     db   $00, $00, $03, $00, $01, $01, $01, $00
     db   $01, $01, $01, $01, $01, $00, $00, $00
     db   $01, $00, $2E, $2D, $38, $2F, $2E, $2D
-    db   $38, $37, $F0, $EB, $FE, $23, $20, $0D
-    db   $21, $B0, $C2, $09, $7E, $A7, $28, $05
-    db   $3E, $31, $C3, $D0, $56, $21, $E0, $C4
-    db   $09, $7E, $FE, $FF, $C8, $A7, $C2, $D0
-    db   $56, $FA, $71, $D4, $3C, $EA, $71, $D4
-    db   $FE, $0C, $38, $16, $AF, $EA, $71, $D4
-    db   $FA, $BE, $C1, $21, $7C, $D4, $B6, $21
-    db   $F9, $FF, $B6, $20, $05, $3E, $34, $C3
-    db   $D0, $56, $21, $D0, $C4, $09, $50, $5E
-    db   $21, $7F, $48, $19, $7E, $A7, $C8, $5F
-    db   $16, $1E, $FA, $5B, $DB, $FE, $07, $38
-    db   $08, $16, $23, $FE, $0B, $38, $02, $16
-    db   $28, $21, $15, $D4, $34, $7E, $BA, $38
-    db   $12, $70, $FA, $BE, $C1, $21, $F9, $FF
-    db   $B6, $21, $7C, $D4, $B6, $20, $04, $3E
-    db   $33, $18, $28, $50, $21, $0A, $56, $FA
-    db   $63, $C1, $A7, $28, $03, $21, $18, $56
-    db   $19, $CD, $ED, $27, $A6, $C0, $21, $FC
-    db   $55, $19, $7E, $FE, $FF, $20, $0C, $CD
-    db   $ED, $27, $E6, $07, $5F, $50, $21, $27
-    db   $56, $19, $7E, $CD, $F8, $64, $D8, $21
-    db   $B0, $C2, $09, $7E, $21, $B0, $C2, $19
-    db   $77, $F0, $D7, $21, $00, $C2, $19, $77
-    db   $F0, $D8, $21, $10, $C2, $19, $77, $21
-    db   $50, $C4, $19, $36, $80, $21, $F0, $C2
-    db   $19, $36, $18, $21, $80, $C4, $19, $36
-    db   $03, $F0, $F9, $A7, $20, $36, $21, $A0
-    db   $C3, $19, $7E, $FE, $30, $20, $0C, $F0
-    db   $EB, $FE, $88, $20, $06, $21, $B0, $C3
-    db   $19, $36, $03, $FE, $3C, $20, $15, $F0
-    db   $F6, $FE, $58, $28, $04, $FE, $5A, $20
-    db   $0B, $C5, $D5, $D5, $C1, $3E, $10, $CD
-    db   $99, $7E, $D1, $C1, $21, $20, $C3, $19
-    db   $36, $18, $18, $06, $21, $50, $C2, $19
-    db   $36, $EC, $21, $10, $C3, $09, $7E, $21
-    db   $10, $C3, $19, $77, $C9, $01, $08, $08
-    db   $10, $01, $04, $04, $0A, $37, $37, $37
-    db   $01, $39, $39, $39, $01, $3B, $3B, $3B
-    db   $01, $3D, $3D, $3D, $01, $10, $10, $08
-    db   $00, $F0, $F0, $F8, $00, $00, $00, $00
-    db   $00, $FF, $FF, $FF, $FF, $00, $00, $00
+    db   $38, $37
+
+toc_03_562F:
+    ifNe [$FFEB], $23, .else_03_5642
+
+    ld   hl, $C2B0
+    add  hl, bc
+    ld   a, [hl]
+    and  a
+    jr   z, .else_03_5642
+
+    ld   a, $31
+    jp   .else_03_56D0
+
+.else_03_5642:
+    ld   hl, $C4E0
+    add  hl, bc
+    ld   a, [hl]
+    cp   $FF
+    ret  z
+
+    and  a
+    jp   nz, .else_03_56D0
+
+    ld   a, [$D471]
+    inc  a
+    ld   [$D471], a
+    cp   $0C
+    jr   c, .else_03_566F
+
+    clear [$D471]
+    ld   a, [$C1BE]
+    ld   hl, $D47C
+    or   [hl]
+    ld   hl, $FFF9
+    or   [hl]
+    jr   nz, .else_03_566F
+
+    ld   a, $34
+    jp   .else_03_56D0
+
+.else_03_566F:
+    ld   hl, $C4D0
+    add  hl, bc
+    ld   d, b
+    ld   e, [hl]
+    ld   hl, $487F
+    add  hl, de
+    ld   a, [hl]
+    and  a
+    ret  z
+
+    ld   e, a
+    ld   d, $1E
+    ifLt [$DB5B], $07, .else_03_568E
+
+    ld   d, $23
+    cp   $0B
+    jr   c, .else_03_568E
+
+    ld   d, $28
+.else_03_568E:
+    incAddr $D415
+    ld   a, [hl]
+    cp   d
+    jr   c, .else_03_56A8
+
+    ld   [hl], b
+    ld   a, [$C1BE]
+    ld   hl, $FFF9
+    or   [hl]
+    ld   hl, $D47C
+    or   [hl]
+    jr   nz, .else_03_56A8
+
+    ld   a, $33
+    jr   .else_03_56D0
+
+.else_03_56A8:
+    ld   d, b
+    ld   hl, $560A
+    ifNotZero [$C163], .else_03_56B5
+
+    ld   hl, $5618
+.else_03_56B5:
+    add  hl, de
+    call toc_01_27ED
+    and  [hl]
+    ret  nz
+
+    ld   hl, $55FC
+    add  hl, de
+    ld   a, [hl]
+    cp   $FF
+    jr   nz, .else_03_56D0
+
+    call toc_01_27ED
+    and  %00000111
+    ld   e, a
+    ld   d, b
+    ld   hl, $5627
+    add  hl, de
+    ld   a, [hl]
+.else_03_56D0:
+    call toc_03_64F8
+    ret  c
+
+    ld   hl, $C2B0
+    add  hl, bc
+    ld   a, [hl]
+    ld   hl, $C2B0
+    add  hl, de
+    ld   [hl], a
+    ld   a, [$FFD7]
+    ld   hl, $C200
+    add  hl, de
+    ld   [hl], a
+    ld   a, [$FFD8]
+    ld   hl, $C210
+    add  hl, de
+    ld   [hl], a
+    ld   hl, $C450
+    add  hl, de
+    ld   [hl], $80
+    ld   hl, $C2F0
+    add  hl, de
+    ld   [hl], $18
+    ld   hl, $C480
+    add  hl, de
+    ld   [hl], $03
+    ld   a, [$FFF9]
+    and  a
+    jr   nz, .else_03_5739
+
+    ld   hl, $C3A0
+    add  hl, de
+    ld   a, [hl]
+    cp   $30
+    jr   nz, .else_03_5718
+
+    ifNe [$FFEB], $88, .else_03_5718
+
+    ld   hl, $C3B0
+    add  hl, de
+    ld   [hl], $03
+.else_03_5718:
+    cp   $3C
+    jr   nz, .else_03_5731
+
+    ifEq [$FFF6], $58, .else_03_5726
+
+    cp   $5A
+    jr   nz, .else_03_5731
+
+.else_03_5726:
+    push bc
+    push de
+    push de
+    pop  bc
+    ld   a, $10
+    call toc_03_7E99
+    pop  de
+    pop  bc
+.else_03_5731:
+    ld   hl, $C320
+    add  hl, de
+    ld   [hl], $18
+    jr   .toc_03_573F
+
+.else_03_5739:
+    ld   hl, $C250
+    add  hl, de
+    ld   [hl], $EC
+.toc_03_573F:
+    ld   hl, $C310
+    add  hl, bc
+    ld   a, [hl]
+    ld   hl, $C310
+    add  hl, de
+    ld   [hl], a
+    ret
+
+
+    db   $01, $08, $08, $10, $01, $04, $04, $0A
+    db   $37, $37, $37, $01, $39, $39, $39, $01
+    db   $3B, $3B, $3B, $01, $3D, $3D, $3D, $01
+    db   $10, $10, $08, $00, $F0, $F0, $F8, $00
+    db   $00, $00, $00, $00, $FF, $FF, $FF, $FF
     db   $00, $00, $00, $00, $00, $00, $00, $00
-    db   $00, $00, $00, $08, $00, $00, $00, $08
-    db   $0E, $00, $00, $08, $0E, $00, $00, $08
-    db   $0E, $00, $00, $00, $0E
+    db   $00, $00, $00, $00, $00, $00, $08, $00
+    db   $00, $00, $08, $0E, $00, $00, $08, $0E
+    db   $00, $00, $08, $0E, $00, $00, $00, $0E
 
 JumpTable_5792_03:
     copyFromTo [$FFEB], [$C5A8]
@@ -2372,7 +2511,7 @@ toc_03_57EF:
     ld   hl, $C210
     add  hl, bc
     ld   [hl], a
-    ifNot [$FFF9], .else_03_5831
+    ifNotZero [$FFF9], .else_03_5831
 
     push hl
     ld   hl, $5781
@@ -2433,7 +2572,7 @@ toc_03_5897:
 .else_03_58B3:
     call toc_03_7F6C
     call toc_03_6E3D
-    ifNot [$FFF0], .else_03_5933
+    ifNotZero [$FFF0], .else_03_5933
 
     call toc_01_0891
     jr   z, .else_03_58F2
@@ -2811,7 +2950,7 @@ JumpTable_5B53_03:
     db   $9E, $00, $9E, $20
 
 toc_03_5B75:
-    ifNot [wDialogState], .return_03_5B94
+    ifNotZero [wDialogState], .return_03_5B94
 
     and  %10000000
     ld   a, $23
@@ -3314,7 +3453,7 @@ toc_03_60CC:
     call toc_03_7EF7
     call toc_03_6B96
     call toc_03_7892
-    ifNot [$FFF9], .else_03_6105
+    ifNotZero [$FFF9], .else_03_6105
 
     ld   hl, $C2A0
     add  hl, bc
@@ -3796,7 +3935,7 @@ JumpTable_64B4_03:
     ld   hl, $D969
     set  4, [hl]
 .else_03_64CD:
-    ifNot [$FFF1], .else_03_64DA
+    ifNotZero [$FFF1], .else_03_64DA
 
     assign [$D368], $10
     jp   toc_03_63F7
@@ -4233,7 +4372,7 @@ toc_03_6BF9:
     cp   12
     jr   nc, .return_03_6C76
 
-    ifNot [$C15B], .else_03_6C77
+    ifNotZero [$C15B], .else_03_6C77
 
     ifNe [$FFEB], $2B, .else_03_6C5D
 
@@ -4404,7 +4543,7 @@ toc_03_6C87:
 .else_03_6D15:
     ifNe [$FFEB], $9F, toc_03_6C87.else_03_6D59
 
-    ifNot [$C146], toc_03_6C87.else_03_6D59
+    ifNotZero [$C146], toc_03_6C87.else_03_6D59
 
     ld   a, [$FFB7]
     and  a
@@ -4462,9 +4601,7 @@ toc_03_6C87:
     cp   $82
     jr   z, toc_03_6C87.else_03_6D79
 
-    ld   a, [$C13E]
-    and  a
-    jp   nz, toc_03_6C87.else_03_6E1F
+    ifZero [$C13E], toc_03_6C87.else_03_6E1F
 
 .else_03_6D79:
     ifNe [$FFEB], $E4, toc_03_6C87.else_03_6D8F
@@ -4510,7 +4647,7 @@ toc_03_6C87:
     ld   [$DB94], a
     assign [$DBC7], $50
     clear [$D471]
-    ifNot [$D47C], toc_03_6C87.else_03_6DF4
+    ifNotZero [$D47C], toc_03_6C87.else_03_6DF4
 
     incAddr $D47A
     ld   a, [hl]
@@ -4592,7 +4729,7 @@ toc_03_6E3D:
     jp   c, JumpTable_7059_03.return_03_73EA
 
 .else_03_6E55:
-    ifNot [$C1AC], .else_03_6E60
+    ifNotZero [$C1AC], .else_03_6E60
 
     dec  a
     cp   c
@@ -4664,9 +4801,7 @@ toc_03_6E3D:
     and  %00100000
     jp   nz, toc_03_6310.toc_03_6336
 
-    ld   a, [$C5B0]
-    and  a
-    jp   nz, toc_03_6FFE
+    ifZero [$C5B0], toc_03_6FFE
 
     copyFromTo [$C14A], [$FFE9]
     call toc_01_093B.toc_01_0942
@@ -4973,7 +5108,7 @@ JumpTable_7059_03:
     cp   $04
     jp   nz, .else_03_70B4
 
-    ifNot [$C14A], .else_03_7113
+    ifNotZero [$C14A], .else_03_7113
 
     ld   hl, $C300
     add  hl, bc
@@ -4982,7 +5117,7 @@ JumpTable_7059_03:
 
 
 .else_03_70B4:
-    ifNot [$C14A], .else_03_70C4
+    ifNotZero [$C14A], .else_03_70C4
 
     call toc_03_6C87.else_03_6DF4
     jp   .else_03_7113
@@ -5907,7 +6042,7 @@ toc_03_75A6:
 toc_03_77A5:
     ifNe [$FFEB], $00, .else_03_77B6
 
-    ifNot [$FFF0], .else_03_77B6
+    ifNotZero [$FFF0], .else_03_77B6
 
     call toc_01_0891
     ld   [hl], $03
@@ -6022,7 +6157,7 @@ toc_03_7892:
     ld   e, $01
     ifEq [hObjectUnderEntity], 103, .else_03_7906
 
-    ifNotZero [$FFDA], .else_03_7A17
+    _ifNotZero [$FFDA], .else_03_7A17
 
     cp   $0B
     jr   z, .toc_03_78C4
@@ -6386,7 +6521,7 @@ toc_03_7ACC:
     jp   .else_03_7C74
 
 .else_03_7B5C:
-    ifNotZero [$FFDA], .else_03_7CA6
+    _ifNotZero [$FFDA], .else_03_7CA6
 
     cp   $0B
     jr   z, .else_03_7B6E
@@ -6555,9 +6690,7 @@ toc_03_7ACC:
     cp   $03
     jr   nz, .else_03_7C59
 
-    ld   a, [$D6F9]
-    and  a
-    jp   nz, .else_03_7CA6
+    ifZero [$D6F9], .else_03_7CA6
 
 .else_03_7C59:
     ifLt [hObjectUnderEntity], 219, .else_03_7C99
@@ -6949,7 +7082,7 @@ toc_03_7F4A:
     or   [hl]
     jr   nz, .else_03_7F6A
 
-    ifNot [$C124], .return_03_7F6B
+    ifNotZero [$C124], .return_03_7F6B
 
 .else_03_7F6A:
     pop  af

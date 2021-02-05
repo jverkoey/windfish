@@ -32,7 +32,7 @@ JumpTable_4068_06:
     call toc_06_648C
     jr   nc, .return_06_40C6
 
-    ifNot [$DB56], .else_06_4078
+    ifNotZero [$DB56], .else_06_4078
 
     ld   e, $2D
     jp   .else_06_40C2
@@ -352,7 +352,7 @@ JumpTable_4278_06:
     ld   [hl], a
     call JumpTable_3B8D_00
 .else_06_42AF:
-    ifNot [$FFE8], .else_06_42BA
+    ifNotZero [$FFE8], .else_06_42BA
 
     ld   hl, $C320
     add  hl, bc
@@ -538,7 +538,7 @@ JumpTable_43D4_06:
     call toc_01_0891
     jr   z, .else_06_4404
 
-    ifNot [$FFE8], .else_06_43F1
+    ifNotZero [$FFE8], .else_06_43F1
 
     ld   hl, $C2B0
     add  hl, bc
@@ -703,7 +703,7 @@ JumpTable_458F_06:
 .else_06_45F4:
     call JumpTable_3B8D_00
 .toc_06_45F7:
-    ifNot [$FFE8], .else_06_4602
+    ifNotZero [$FFE8], .else_06_4602
 
     ld   hl, $C320
     add  hl, bc
@@ -2368,7 +2368,7 @@ JumpTable_554F_06:
 
 
 .else_06_5565:
-    ifNot [$FFE8], .else_06_5584
+    ifNotZero [$FFE8], .else_06_5584
 
     ld   hl, $C320
     add  hl, bc
@@ -2423,7 +2423,7 @@ JumpTable_55A3_06:
 
 JumpTable_55B8_06:
     call toc_06_6501
-    ifNot [$FFE8], .return_06_55E1
+    ifNotZero [$FFE8], .return_06_55E1
 
     assign [$C157], $30
     assign [$C158], $04
@@ -2459,120 +2459,24 @@ JumpTable_55E2_06:
     db   $04, $08, $7A, $00, $04, $10, $7A, $20
     db   $F4, $F8, $70, $00, $F4, $00, $78, $00
     db   $F4, $08, $78, $20, $F4, $10, $70, $20
-    db   $04, $F8, $74, $00, $04
-
-toc_06_5625:
-    nop
-    halt
-    nop
-    inc  b
-    ld   [toc_01_007A], sp
-    inc  b
-    db   $10
-
-    ld   a, d
-.toc_06_562F:
-    jr   nz, toc_06_5625
-
-    ld   hl, sp+$70
-    nop
-    db   $F4
-
-    nop
-    ld   [hl], d
-    nop
-    db   $F4
-
-    ld   [$2072], sp
-    db   $F4, $10
-
-    ld   [hl], b
-    jr   nz, .else_06_5645
-
-    ld   hl, sp+$74
-    nop
-    inc  b
-.else_06_5645:
-    nop
-    halt
-    nop
-    inc  b
-    ld   [$2076], sp
-    inc  b
-    db   $10
-
-    ld   [hl], h
-    jr   nz, .else_06_5645
-
-    ld   hl, sp+$7C
-    nop
-    db   $F4
-
-    nop
-    ld   a, [hl]
-    nop
-    db   $F4
-
-    ld   [$207E], sp
-    db   $F4, $10
-
-    ld   a, h
-    jr   nz, .else_06_5665
-
-    ld   hl, sp+$74
-    nop
-    inc  b
-.else_06_5665:
-    nop
-    halt
-    nop
-    inc  b
-    ld   [$2076], sp
-    inc  b
-    db   $10
-
-    ld   [hl], h
-    jr   nz, .else_06_567D
-
-    ei
-    ld   h, $00
-    inc  c
-    ld   bc, $0026
-    inc  c
-    rlca
-    ld   h, $00
-    inc  c
-.else_06_567D:
-    dec  c
-    ld   h, $00
-    ld   a, [$FFF1]
-    rla
-    rla
-    rla
-    rla
-    rla
-    and  %11100000
-    ld   e, a
-    ld   d, b
-    ld   hl, $55F0
-    add  hl, de
-    ld   c, $08
-    call toc_01_3D26
-    ld   a, $04
-    call toc_01_3DD0
-    ld   hl, $C310
-    add  hl, bc
-    ld   a, [hl]
-    and  a
-    jr   z, .else_06_56AD
-
-    copyFromTo [$FFEF], [$FFEC]
-    ld   hl, $5670
-    ld   c, $04
-    call toc_01_3D26
-.else_06_56AD:
-    jp   toc_01_3DBA
-
+    db   $04, $F8, $74, $00, $04, $00, $76, $00
+    db   $04, $08, $7A, $00, $04, $10, $7A, $20
+    db   $F4, $F8, $70, $00, $F4, $00, $72, $00
+    db   $F4, $08, $72, $20, $F4, $10, $70, $20
+    db   $04, $F8, $74, $00, $04, $00, $76, $00
+    db   $04, $08, $76, $20, $04, $10, $74, $20
+    db   $F4, $F8, $7C, $00, $F4, $00, $7E, $00
+    db   $F4, $08, $7E, $20, $F4, $10, $7C, $20
+    db   $04, $F8, $74, $00, $04, $00, $76, $00
+    db   $04, $08, $76, $20, $04, $10, $74, $20
+    db   $0C, $FB, $26, $00, $0C, $01, $26, $00
+    db   $0C, $07, $26, $00, $0C, $0D, $26, $00
+    db   $F0, $F1, $17, $17, $17, $17, $17, $E6
+    db   $E0, $5F, $50, $21, $F0, $55, $19, $0E
+    db   $08, $CD, $26, $3D, $3E, $04, $CD, $D0
+    db   $3D, $21, $10, $C3, $09, $7E, $A7, $28
+    db   $0C, $F0, $EF, $E0, $EC, $21, $70, $56
+    db   $0E, $04, $CD, $26, $3D, $C3, $BA, $3D
     db   $00, $04, $FC, $08, $F8, $21, $D0, $C2
     db   $09, $7E, $FE, $02, $CA, $5C, $5A, $FE
     db   $00, $20, $1B, $34, $3E, $50, $E0, $B0
@@ -3179,7 +3083,7 @@ JumpTable_5BBE_06:
 JumpTable_5C01_06:
     call toc_06_654B
     call toc_01_3B9E
-    ifNot [$FFE8], .else_06_5C23
+    ifNotZero [$FFE8], .else_06_5C23
 
     call toc_01_0891
     jr   nz, .else_06_5C18
@@ -3548,9 +3452,7 @@ JumpTable_5FA8_06:
     db   $1C, $2A, $07, $07, $00, $00, $00, $00
 
 JumpTable_5FE5_06:
-    ld   a, [wDialogState]
-    and  a
-    jp   nz, toc_06_6061.return_06_606F
+    ifZero [wDialogState], toc_06_6061.return_06_606F
 
     ld   a, [$C177]
     and  a
@@ -3843,7 +3745,7 @@ JumpTable_6224_06:
     cp   $40
     jr   nc, .else_06_6243
 
-    ifNot [$FFE8], .else_06_6243
+    ifNotZero [$FFE8], .else_06_6243
 
     ld   hl, $C320
     add  hl, bc
@@ -3976,7 +3878,7 @@ toc_06_6449:
 
     call toc_01_094A
     call toc_01_093B.toc_01_0942
-    ifNot [$C1A6], .return_06_646B
+    ifNotZero [$C1A6], .return_06_646B
 
     ld   e, a
     ld   d, b
@@ -4066,7 +3968,7 @@ toc_06_64DF:
     or   [hl]
     jr   nz, .else_06_64FF
 
-    ifNot [$C124], .return_06_6500
+    ifNotZero [$C124], .return_06_6500
 
 .else_06_64FF:
     pop  af
@@ -4401,7 +4303,7 @@ JumpTable_679B_06:
     add  hl, bc
     ld   [hl], a
 .else_06_67F2:
-    ifNot [$FFF0], .else_06_67FE
+    ifNotZero [$FFF0], .else_06_67FE
 
     ld   a, [hFrameCounter]
     rra
@@ -4460,7 +4362,7 @@ JumpTable_68E1_06:
     jr   .toc_06_6902
 
 .else_06_68FB:
-    ifNotZero [$DB4E], toc_06_65E5
+    _ifNotZero [$DB4E], toc_06_65E5
 
 .toc_06_6902:
     ld   a, [hDefaultMusicTrack]
@@ -4612,7 +4514,7 @@ JumpTable_69DB_06:
     ld   a, [hl]
     ld   [$D368], a
     ld   [hDefaultMusicTrack], a
-    ifNot [$D47C], .return_06_6A0F
+    ifNotZero [$D47C], .return_06_6A0F
 
     assign [$D368], $49
     ld   [$FFBD], a
@@ -4833,7 +4735,7 @@ JumpTable_6D1F_06:
 
 .else_06_6D4C:
     call toc_06_6558
-    ifNot [$FFE8], .else_06_6D5A
+    ifNotZero [$FFE8], .else_06_6D5A
 
     ld   hl, $C320
     add  hl, bc
@@ -4905,7 +4807,7 @@ JumpTable_6D9A_06:
     cp   $00
     jp   nz, .return_06_6E0B
 
-    ifNot [$FFE8], .else_06_6DF0
+    ifNotZero [$FFE8], .else_06_6DF0
 
     call toc_01_0891
     ld   [hl], $10
@@ -5146,7 +5048,7 @@ JumpTable_706F_06:
     and  a
     jr   nz, .return_06_70BD
 
-    ifNot [$C133], .return_06_70BD
+    ifNotZero [$C133], .return_06_70BD
 
     call JumpTable_3B8D_00
     call toc_01_0891
@@ -5169,9 +5071,7 @@ JumpTable_706F_06:
     db   $98, $42, $98, $50, $99, $90, $99, $82
 
 JumpTable_70CE_06:
-    ld   a, [$C146]
-    and  a
-    jp   nz, .return_06_716C
+    ifZero [$C146], .return_06_716C
 
     call toc_01_0891
     jr   nz, .else_06_70EC
@@ -5492,7 +5392,7 @@ JumpTable_73D7_06:
     call toc_06_742A
     call toc_06_654B
     call toc_01_3B9E
-    ifNot [$FFE8], .else_06_73FC
+    ifNotZero [$FFE8], .else_06_73FC
 
     call toc_01_0891
     jr   nz, .else_06_73F1
@@ -5531,7 +5431,7 @@ JumpTable_7407_06:
     add  hl, bc
     inc  [hl]
 .else_06_7418:
-    ifNot [$FFE8], .else_06_7421
+    ifNotZero [$FFE8], .else_06_7421
 
     call JumpTable_3B8D_00
     ld   [hl], b
@@ -5681,7 +5581,7 @@ JumpTable_751A_06:
     dw JumpTable_75C4_06 ; 02
 
 JumpTable_757A_06:
-    ifNot [$FFE8], .return_06_758D
+    ifNotZero [$FFE8], .return_06_758D
 
     call JumpTable_3B8D_00
     call toc_01_0891
@@ -6219,9 +6119,7 @@ toc_06_7940:
     dw JumpTable_7B4B_06 ; 01
 
 JumpTable_7ACC_06:
-    ld   a, [$C1A2]
-    and  a
-    jp   nz, .else_06_7B45
+    ifZero [$C1A2], .else_06_7B45
 
     call toc_01_0891
     jr   nz, .else_06_7B1B
@@ -6296,7 +6194,7 @@ JumpTable_7ACC_06:
 
 
 JumpTable_7B4B_06:
-    ifNot [$C1A2], .else_06_7B81
+    ifNotZero [$C1A2], .else_06_7B81
 
     ld   hl, $C360
     add  hl, bc
@@ -6614,7 +6512,7 @@ JumpTable_7E0F_06:
 
 JumpTable_7E3C_06:
     call JumpTable_7DC9_06.else_06_7DE6
-    ifNot [$FFE8], .return_06_7E48
+    ifNotZero [$FFE8], .return_06_7E48
 
     call JumpTable_3B8D_00
     ld   [hl], b
@@ -6670,7 +6568,7 @@ JumpTable_7E49_06:
     ld   [hl], a
     assign [$C117], $01
     call toc_01_3B9E
-    ifNot [$FFCC], .return_06_7EAC
+    ifNotZero [$FFCC], .return_06_7EAC
 
     call .toc_06_7EA6
     call .toc_06_7EA6

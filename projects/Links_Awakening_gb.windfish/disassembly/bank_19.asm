@@ -32,9 +32,7 @@ JumpTable_4070_19:
     cp   $30
     jp   nc, .else_19_411C
 
-    ld   a, [$C19B]
-    and  a
-    jp   nz, .else_19_411C
+    ifZero [$C19B], .else_19_411C
 
     ifNe [$DB00], $03, .else_19_40A0
 
@@ -83,7 +81,7 @@ JumpTable_4070_19:
     ifNe [$DB43], $02, .else_19_411C
 
     ld   e, $08
-    ifNot [$D47C], .else_19_40F4
+    ifNotZero [$D47C], .else_19_40F4
 
     ld   e, $03
 .else_19_40F4:
@@ -885,7 +883,7 @@ JumpTable_51AD_19:
     cp   $20
     jr   nc, .else_19_523C
 
-    ifNot [$C133], .else_19_523C
+    ifNotZero [$C133], .else_19_523C
 
     ifNe [hLinkDirection], DIRECTION_UP, .else_19_523C
 
@@ -2785,7 +2783,7 @@ toc_19_755F:
     cp   $C1
     jr   nz, .else_19_762E
 
-    ifNot [$DB73], .else_19_766F
+    ifNotZero [$DB73], .else_19_766F
 
     ld   e, $10
     ld   hl, $D155
@@ -2886,7 +2884,7 @@ toc_19_755F:
 
 
 toc_19_7697:
-    ifNot [$C1A5], JumpTable_76B0_19.return_19_76CC
+    ifNotZero [$C1A5], JumpTable_76B0_19.return_19_76CC
 
     ld   a, [wDialogState]
     and  a
@@ -2973,7 +2971,7 @@ toc_19_7800:
     jr   nc, .else_19_782C
 
     call toc_01_094A
-    ifNot [$C1A6], .else_19_781F
+    ifNotZero [$C1A6], .else_19_781F
 
     ld   e, a
     ld   d, b
@@ -3070,7 +3068,7 @@ toc_19_789B:
     or   [hl]
     jr   nz, .else_19_78BB
 
-    ifNot [$C124], .return_19_78BC
+    ifNotZero [$C124], .return_19_78BC
 
 .else_19_78BB:
     pop  af

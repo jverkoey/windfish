@@ -3468,7 +3468,7 @@ JumpTable_5FE3_04:
     jr   nz, .return_04_600E
 
     call JumpTable_3B8D_00
-    ifNot [$C177], .else_04_5FF8
+    ifNotZero [$C177], .else_04_5FF8
 
     ld   [hl], b
     ld   a, $46
@@ -4696,7 +4696,7 @@ JumpTable_6F69_04:
     and  a
     ret  nz
 
-    ifNot [$DB73], .else_04_6F85
+    ifNotZero [$DB73], .else_04_6F85
 
     ifLt [hLinkPositionX], 108, .else_04_6F85
 
@@ -4733,7 +4733,7 @@ JumpTable_6F69_04:
 
 
 .else_04_6FA9:
-    ifNot [$DB73], .else_04_6FB3
+    ifNotZero [$DB73], .else_04_6FB3
 
     ld   a, $F7
     jr   .else_04_6FBF
@@ -4776,7 +4776,7 @@ JumpTable_6FC6_04:
     jr   .else_04_6FFC
 
 .else_04_6FF1:
-    ifNot [$DB73], .else_04_6FFC
+    ifNotZero [$DB73], .else_04_6FFC
 
     ld   a, $F8
     jp   toc_01_2197
@@ -4790,7 +4790,7 @@ JumpTable_6FC6_04:
 
 
 .else_04_7003:
-    ifNot [$DB73], .else_04_700C
+    ifNotZero [$DB73], .else_04_700C
 
     ld   [$DB74], a
 .else_04_700C:
@@ -4822,7 +4822,7 @@ JumpTable_7026_04:
     ld   a, [hFrameCounter]
     and  %00010000
     ld   [$D202], a
-    ifNot [$DB73], .else_04_708C
+    ifNotZero [$DB73], .else_04_708C
 
     call toc_01_0887
     jr   z, .else_04_704F
@@ -4897,7 +4897,7 @@ JumpTable_70A4_04:
     ld   a, [hFrameCounter]
     and  %00010000
     ld   [$D202], a
-    ifNot [$DB73], .else_04_70C0
+    ifNotZero [$DB73], .else_04_70C0
 
     ld   e, $02
     call JumpTable_7163_04.toc_04_719F
@@ -4921,7 +4921,7 @@ JumpTable_70A4_04:
 
 .else_04_70D7:
     call JumpTable_3B8D_00
-    ifNot [$DB73], .else_04_70E5
+    ifNotZero [$DB73], .else_04_70E5
 
     call toc_01_0887
     ld   [hl], $10
@@ -4974,7 +4974,7 @@ JumpTable_7124_04:
     ld   a, [hFrameCounter]
     and  %00010000
     ld   [$D203], a
-    ifNot [$DB73], .else_04_713B
+    ifNotZero [$DB73], .else_04_713B
 
     jr   .toc_04_7141
 
@@ -5177,7 +5177,7 @@ JumpTable_725C_04:
     ld   hl, $C290
     add  hl, de
     ld   [hl], $02
-    ifNot [$DB73], .return_04_7291
+    ifNotZero [$DB73], .return_04_7291
 
     ld   hl, $C3B0
     add  hl, de
@@ -5203,7 +5203,7 @@ JumpTable_729E_04:
 
 
 toc_04_72A2:
-    ifNot [$DB73], .else_04_72CF
+    ifNotZero [$DB73], .else_04_72CF
 
     ld   a, $FF
     call toc_01_3B87
@@ -5360,7 +5360,7 @@ JumpTable_74BA_04:
 
 
 JumpTable_74C5_04:
-    ifNot [$DB73], .else_04_74CF
+    ifNotZero [$DB73], .else_04_74CF
 
     assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
 .else_04_74CF:
@@ -5421,7 +5421,7 @@ JumpTable_74C5_04:
     db   $44, $43, $42, $41, $3D, $2A
 
 JumpTable_751C_04:
-    ifNot [$DB73], .else_04_7526
+    ifNotZero [$DB73], .else_04_7526
 
     assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
 .else_04_7526:
@@ -5646,7 +5646,7 @@ toc_04_7614:
     db   $0A, $00, $00, $00
 
 JumpTable_7786_04:
-    ifNot [$DB46], .else_04_77C7
+    ifNotZero [$DB46], .else_04_77C7
 
     ld   hl, $C210
     add  hl, bc
@@ -5757,7 +5757,7 @@ toc_04_780F:
     db   $03, $03
 
 JumpTable_7830_04:
-    ifNot [$C509], .else_04_7855
+    ifNotZero [$C509], .else_04_7855
 
     ld   hl, $C380
     add  hl, bc
@@ -5783,7 +5783,7 @@ JumpTable_7830_04:
     and  %00110000
     jr   z, .else_04_78C1
 
-    ifNot [$C509], .else_04_7888
+    ifNotZero [$C509], .else_04_7888
 
     ld   a, [hLinkPositionX]
     add  a, 0
@@ -5843,7 +5843,7 @@ JumpTable_7830_04:
     call toc_04_7B77
     jr   nc, .return_04_78E0
 
-    ifNot [$C509], .else_04_78DB
+    ifNotZero [$C509], .else_04_78DB
 
     dec  a
     ld   e, a
@@ -6227,7 +6227,7 @@ toc_04_7B54:
 
     call toc_01_094A
     call toc_01_093B.toc_01_0942
-    ifNot [$C1A6], .return_04_7B76
+    ifNotZero [$C1A6], .return_04_7B76
 
     ld   e, a
     ld   d, b
@@ -6406,7 +6406,7 @@ JumpTable_7CDA_04:
     db   $05, $05, $04, $03, $02, $02, $02
 
 JumpTable_7D15_04:
-    ifNot [$C14A], .else_04_7D20
+    ifNotZero [$C14A], .else_04_7D20
 
     call JumpTable_3B8D_00
     ld   [hl], b
@@ -6723,7 +6723,7 @@ toc_04_7F1F:
     or   [hl]
     jr   nz, .else_04_7F3F
 
-    ifNot [$C124], .return_04_7F40
+    ifNotZero [$C124], .return_04_7F40
 
 .else_04_7F3F:
     pop  af
