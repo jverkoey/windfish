@@ -143,3 +143,7 @@ verifySaveFile: ; [Label] $01:$46DD [0]
 return: ; [Label] $01:$4710 [0]
 
 clearSaveFile: ; [Label] $01:$4706 [0]
+
+verifySaveFiles: ; [Label] $01:$460F [0]
+
+createDebugSave: ; [Label] $00:$4628 [0]

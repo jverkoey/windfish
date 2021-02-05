@@ -176,7 +176,7 @@ main:
     assign [wCurrentBank], $01
     assign [gbIE], IE_VBLANK
     changebank $01
-    call toc_01_460F
+    call verifySaveFiles
     changebank $1F
     call toc_1F_4000
     assign [hButtonsInactiveDelay], 24

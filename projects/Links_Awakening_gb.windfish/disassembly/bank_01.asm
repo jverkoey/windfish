@@ -632,7 +632,7 @@ toc_01_44BC:
     db   $07, $01, $01, $01, $01, $08, $01, $01
     db   $01, $01, $09
 
-toc_01_460F:
+verifySaveFiles:
     ld   de, $0000
     call verifySaveFile
     ld   de, $0385
@@ -641,10 +641,11 @@ toc_01_460F:
     call verifySaveFile
     ifNotZero [DEBUG_TOOL1], .return_01_46DC
 
+.createDebugSave:
     ld   e, $00
     ld   d, $00
     ld   bc, $A405
-toc_01_460F.loop_01_462F:
+verifySaveFiles.loop_01_462F:
     ld   hl, $45CC
     add  hl, de
     ldi  a, [hl]
@@ -661,7 +662,7 @@ toc_01_460F.loop_01_462F:
     ld   hl, $A46A
     ld   e, $09
     ld   a, $02
-toc_01_460F.loop_01_4652:
+verifySaveFiles.loop_01_4652:
     ldi  [hl], a
     dec  e
     jr   nz, .loop_01_4652
@@ -696,12 +697,12 @@ toc_01_460F.loop_01_4652:
     ld   hl, $A105
     ld   a, $80
     ld   e, $00
-toc_01_460F.loop_01_46D8:
+verifySaveFiles.loop_01_46D8:
     ldi  [hl], a
     dec  e
     jr   nz, .loop_01_46D8
 
-toc_01_460F.return_01_46DC:
+verifySaveFiles.return_01_46DC:
     ret
 
 
