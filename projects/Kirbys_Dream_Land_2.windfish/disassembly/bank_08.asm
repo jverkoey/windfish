@@ -15,27 +15,17 @@ SECTION "ROM Bank 08", ROMX[$4000], BANK[$08]
     db   $FC, $C9
 
 toc_08_4062:
-    ld   hl, $5FE1
-    ld   a, $1E
-    call cbcallWithoutInterrupts
-    ld   hl, $5F68
-    ld   a, $1E
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $1E, $5FE1
+    cbcallNoInterrupts $1E, $5F68
     clear [$DEFF]
-    ld   hl, $7A2D
-    ld   a, $10
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $10, $7A2D
 .loop_08_407E:
-    ld   hl, $5FEE
-    ld   a, $07
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $07, $5FEE
     ld   a, [$DEFF]
     or   a
     jp   nz, toc_08_43F3
 
-    ld   hl, $68D2
-    ld   a, $0F
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $0F, $68D2
     ifNe [$DF0A], $FF, .loop_08_407E
 
     cp   $03
@@ -53,16 +43,10 @@ toc_08_4062:
     ld   hl, $DB39
     ld   [hl], $00
     ld   e, $07
-    ld   hl, $606D
-    ld   a, $1E
-    call cbcallWithoutInterrupts
-    ld   hl, $32FF
-    ld   a, $00
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $1E, $606D
+    cbcallNoInterrupts $00, $32FF
     ld   e, $00
-    ld   hl, $606D
-    ld   a, $1E
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $1E, $606D
     call toc_08_46EF
     cp   $FF
     jr   z, .else_08_40E8
@@ -71,17 +55,11 @@ toc_08_4062:
     jr   nc, .else_08_40E8
 
     ld   e, a
-    ld   hl, $2A2B
-    ld   a, $00
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $00, $2A2B
     assign [$DB38], $01
 .else_08_40E8:
-    ld   hl, $10E6
-    ld   a, $00
-    call cbcallWithoutInterrupts
-    ld   hl, $1166
-    ld   a, $00
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $00, $10E6
+    cbcallNoInterrupts $00, $1166
     ld   a, [$DB60]
     ld   hl, $4278
     add  a, a
@@ -96,9 +74,7 @@ toc_08_4062:
     ld   l, a
 .toc_08_4107:
     call toc_08_44D0
-    ld   hl, $11BE
-    ld   a, $00
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $00, $11BE
     ld   a, [$A082]
     dec  a
     ld   hl, $4123
@@ -196,12 +172,8 @@ toc_08_432C:
     ld   [$A05B], a
     ld   [$DB60], a
     assign [$DD63], $7F
-    ld   hl, $10E6
-    ld   a, $00
-    call cbcallWithoutInterrupts
-    ld   hl, $1166
-    ld   a, $00
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $00, $10E6
+    cbcallNoInterrupts $00, $1166
     jr   toc_08_4370
 
     db   $1E, $04, $21, $80, $42, $3E, $1A, $CD
@@ -239,12 +211,8 @@ toc_08_438C:
     ld   [$A05B], a
     ld   [$DB60], a
     assign [$DB6A], $7F
-    ld   hl, $10E6
-    ld   a, $00
-    call cbcallWithoutInterrupts
-    ld   hl, $1166
-    ld   a, $00
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $00, $10E6
+    cbcallNoInterrupts $00, $1166
     jr   .toc_08_43BD
 
 .toc_08_43BD:
@@ -270,23 +238,17 @@ toc_08_438C:
     jp   toc_08_4062.toc_08_4107
 
 .else_08_43DD:
-    ld   hl, $6C52
-    ld   a, $0E
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $0E, $6C52
     jp   toc_08_4062.loop_08_407E
 
 toc_08_43E8:
-    ld   hl, $655F
-    ld   a, $0E
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $0E, $655F
     jp   toc_08_4062.loop_08_407E
 
 toc_08_43F3:
     assign [$DF0A], $06
     ld   e, $FF
-    ld   hl, $4232
-    ld   a, $1F
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $1F, $4232
     call toc_08_449B
     ld   a, [$DEFF]
     dec  a
@@ -312,12 +274,8 @@ toc_08_43F3:
     assign [$A084], $02
     assign [$DEE3], $0C
     assign [$DEE5], $06
-    ld   hl, $10E6
-    ld   a, $00
-    call cbcallWithoutInterrupts
-    ld   hl, $1166
-    ld   a, $00
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $00, $10E6
+    cbcallNoInterrupts $00, $1166
     ld   hl, $DEDE
     set  6, [hl]
     set  1, [hl]
@@ -344,9 +302,7 @@ toc_08_43F3:
     db   $05, $CD, $37, $04, $C3, $7E, $40
 
 toc_08_449B:
-    ld   hl, $5A7C
-    ld   a, $07
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $07, $5A7C
     assign [$A083], $86
     call toc_08_46CB
     clear [$DB7B]
@@ -357,9 +313,7 @@ toc_08_449B:
     call memset
     assign [$DCFD], $D0
     assign [$DCFE], $DB
-    ld   hl, $6D21
-    ld   a, $0F
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $0F, $6D21
     ret
 
 
@@ -383,9 +337,7 @@ toc_08_44D0:
     ldi  [hl], a
     ld   a, $E4
     ldi  [hl], a
-    ld   hl, $4000
-    ld   a, $08
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $08, $4000
     pop  hl
     ld   a, l
     ld   [$DB36], a
@@ -484,21 +436,11 @@ toc_08_44D0:
     call toc_01_07C4
     assign [$A00B], $08
     ld   [$A009], a
-    ld   hl, $1286
-    ld   a, $00
-    call cbcallWithoutInterrupts
-    ld   hl, $473A
-    ld   a, $08
-    call cbcallWithoutInterrupts
-    ld   hl, $41DC
-    ld   a, $07
-    call cbcallWithoutInterrupts
-    ld   hl, $4584
-    ld   a, $07
-    call cbcallWithoutInterrupts
-    ld   hl, $43A0
-    ld   a, $07
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $00, $1286
+    cbcallNoInterrupts $08, $473A
+    cbcallNoInterrupts $07, $41DC
+    cbcallNoInterrupts $07, $4584
+    cbcallNoInterrupts $07, $43A0
     ifEq [$A07F], $02, .else_08_45E0
 
     ld   a, $10
@@ -518,15 +460,9 @@ toc_08_44D0:
     call toc_01_060D
     assign [$DB74], $01
 .else_08_45F4:
-    ld   hl, $4105
-    ld   a, $07
-    call cbcallWithoutInterrupts
-    ld   hl, $4128
-    ld   a, $07
-    call cbcallWithoutInterrupts
-    ld   hl, $40E2
-    ld   a, $07
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $07, $4105
+    cbcallNoInterrupts $07, $4128
+    cbcallNoInterrupts $07, $40E2
     ld   hl, $DB78
     ld   de, $CD09
     ldi  a, [hl]
@@ -549,9 +485,7 @@ toc_08_44D0:
     assign [$DB75], $01
 .else_08_463C:
     ld   e, $04
-    ld   hl, $424E
-    ld   a, $1A
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $1A, $424E
     ret
 
 
@@ -570,13 +504,9 @@ toc_08_44D0:
     jr   nc, .else_08_4690
 
     ld   e, $01
-    ld   hl, $459C
-    ld   a, $07
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $07, $459C
     ld   e, $02
-    ld   hl, $459C
-    ld   a, $07
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $07, $459C
     ld   a, [$DB3B]
     ld   b, a
     ld   a, [$DB60]
@@ -585,13 +515,9 @@ toc_08_44D0:
 
     ld   [$DB3B], a
     ld   e, $00
-    ld   hl, $459C
-    ld   a, $07
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $07, $459C
     ld   e, $03
-    ld   hl, $459C
-    ld   a, $07
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $07, $459C
 .else_08_4690:
     pop  hl
     jp   .toc_08_4508
@@ -632,9 +558,7 @@ toc_08_44D0:
     jp   .toc_08_4508
 
 toc_08_46CB:
-    ld   hl, $4057
-    ld   a, $08
-    call cbcallWithoutInterrupts
+    cbcallNoInterrupts $08, $4057
     ld   hl, $DEDF
     res  1, [hl]
     assign [$A04C], $0C

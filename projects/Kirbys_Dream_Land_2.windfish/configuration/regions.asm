@@ -93,3 +93,13 @@ memcpy4281_to_CE2E: ; [Label] $1F:$424E [0]
 data_1F_4281: ; [Data] $1F:$4281 [20]
 
 data_1E_4343: ; [Label] $1E:$4343 [20]
+
+toc_1E_5FE1: ; [Function] $1E:$5FE1 [0]
+
+toc_1E_5F68: ; [Function] $1E:$5F68 [0]
+
+toc_07_5FEE: ; [Function] $07:$5FEE [0]
+
+toc_0F_68D2: ; [Function] $0F:$68D2 [0]
+
+toc_10_7A2D: ; [Function] $10:$7A2D [0]

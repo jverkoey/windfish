@@ -16,6 +16,12 @@ cbcall: MACRO
     call cbcall
     ENDM
 
+cbcallNoInterrupts: MACRO
+    ld   hl, \2
+    ld   a, \1
+    call cbcallWithoutInterrupts
+    ENDM
+
 changebank: MACRO
     ld   a, \1
     ld   [$2100], a
@@ -53,6 +59,11 @@ ifNotZero: MACRO
     ld   a, \1
     and  a
     jr   z, \2
+    ENDM
+
+incAddr: MACRO
+    ld   hl, \1
+    inc  [hl]
     ENDM
 
 memcpyFromTo: MACRO
