@@ -182,7 +182,7 @@ HeaderGlobalChecksum:
 main:
     di
     changebank $1A
-    jp   toc_1A_4000
+    jp   initialize
 
 toc_01_0159:
     ld   a, [$FFB5]
@@ -190,14 +190,11 @@ toc_01_0159:
     jr   z, .else_01_016F
 
 .loop_01_015E:
-    ld   a, [gbLY]
-    cp   145
-    jr   nz, .loop_01_015E
+    ifEq [gbLY], 145, .loop_01_015E
 
     ld   hl, gbLCDC
     res  7, [hl]
-    xor  a
-    ld   [$FFB5], a
+    clear [$FFB5]
     jp   toc_01_028A.toc_01_029F
 
 .else_01_016F:
@@ -322,11 +319,9 @@ toc_01_0159:
     ld   sp, $DA25
     pop  hl
     ld   sp, hl
-    xor  a
-    ld   [$DA27], a
+    clear [$DA27]
 .else_01_0210:
-    xor  a
-    ld   [gbLYC], a
+    clear [gbLYC]
     ld   hl, $DA14
     ld   a, $A4
     ldi  [hl], a
@@ -357,13 +352,13 @@ toc_01_0159:
     db   $0F, $DA, $3E, $01, $EA, $0C, $DA
 
 toc_01_028A:
-    ld   a, [$FFA4]
+    ld   a, [hLastBank]
     push af
     ld   a, $00
-    call toc_01_05E5.toc_01_05F3
+    call cbcall.loadBank
     call toc_01_2BFD
     pop  af
-    call toc_01_05E5.toc_01_05F3
+    call cbcall.loadBank
     ld   a, [gbIE]
     or   IE_VBLANK
     ld   [gbIE], a
@@ -395,8 +390,7 @@ toc_01_028A:
     db   $05, $20, $FC, $77, $C3, $9F, $02
 
 toc_01_0333:
-    ld   a, $01
-    ld   [$DA0D], a
+    assign [$DA0D], $01
     ld   a, [gbLCDC]
     bit  7, a
     jp   z, toc_01_028A
@@ -487,32 +481,32 @@ toc_01_0333:
     db   $21, $06, $F1, $18, $0E
 
 toc_01_05CF:
-    ld   [$FF96], a
-    ld   a, [$FFA4]
+    ld   [hDesiredBankChange], a
+    ld   a, [hLastBank]
     push af
-    ld   a, [$FF96]
+    ld   a, [hDesiredBankChange]
     call .toc_01_05DD
     call toc_01_0620
     pop  af
 .toc_01_05DD:
     di
     ld   [$2100], a
-    ld   [$FFA4], a
+    ld   [hLastBank], a
     ei
     ret
 
 
-toc_01_05E5:
-    ld   [$FF96], a
-    ld   a, [$FFA4]
+cbcall:
+    ld   [hDesiredBankChange], a
+    ld   a, [hLastBank]
     push af
-    ld   a, [$FF96]
-    call .toc_01_05F3
+    ld   a, [hDesiredBankChange]
+    call .loadBank
     call toc_01_0620
     pop  af
-.toc_01_05F3:
+.loadBank:
     ld   [$2100], a
-    ld   [$FFA4], a
+    ld   [hLastBank], a
     ret
 
 
@@ -534,26 +528,26 @@ toc_01_0604:
 toc_01_0620:
     jp   hl
 
-toc_01_0621:
+memcpy:
     inc  b
     inc  c
-    jr   .toc_01_0628
+    jr   .startCopying
 
-.loop_01_0625:
+.copy:
     ldi  a, [hl]
     ld   [de], a
     inc  de
-.toc_01_0628:
+.startCopying:
     dec  c
-    jr   nz, .loop_01_0625
+    jr   nz, .copy
 
     dec  b
-    jr   nz, .loop_01_0625
+    jr   nz, .copy
 
     ret
 
 
-toc_01_062F:
+memset:
     inc  b
     inc  c
     jr   .toc_01_0634
@@ -1699,8 +1693,7 @@ toc_01_10DE:
 
 toc_01_293E:
     push af
-    xor  a
-    ld   [$FF87], a
+    clear [$FF87]
     push de
     push hl
     ld   a, b
@@ -1835,24 +1828,74 @@ toc_01_293E:
     db   $E5, $C5, $D5, $F0, $A4, $EA, $37, $DD
     db   $08, $35, $DD, $FA, $34, $DD, $CD, $F3
     db   $05, $31, $32, $DD, $E1, $F9, $C3, $9F
-    db   $02, $21, $2D, $DD, $36, $01, $C9, $21
-    db   $8A, $CE, $09, $36, $24, $AF, $21, $92
-    db   $CE, $09, $77, $21, $9A, $CE, $09, $77
-    db   $21, $A2, $CE, $09, $77, $21, $AA, $CE
-    db   $09, $77, $21, $B2, $CE, $09, $77, $21
-    db   $F5, $2B, $09, $7E, $21, $BA, $CE, $09
-    db   $77, $13, $1A, $21, $5A, $CE, $09, $77
-    db   $13, $1A, $21, $62, $CE, $09, $77, $13
-    db   $1A, $CB, $2F, $CB, $2F, $C6, $F0, $6F
-    db   $26, $2B, $30, $01, $24, $7E, $21, $4A
-    db   $CE, $09, $77, $21, $52, $CE, $09, $36
-    db   $01, $21, $82, $CE, $09, $36, $01, $C9
+    db   $02, $21, $2D, $DD, $36, $01, $C9
+
+toc_01_2B97:
+    ld   hl, $CE8A
+    add  hl, bc
+    ld   [hl], $24
+    xor  a
+    ld   hl, $CE92
+    add  hl, bc
+    ld   [hl], a
+    ld   hl, $CE9A
+    add  hl, bc
+    ld   [hl], a
+    ld   hl, $CEA2
+    add  hl, bc
+    ld   [hl], a
+    ld   hl, $CEAA
+    add  hl, bc
+    ld   [hl], a
+    ld   hl, $CEB2
+    add  hl, bc
+    ld   [hl], a
+    ld   hl, $2BF5
+    add  hl, bc
+    ld   a, [hl]
+    ld   hl, $CEBA
+    add  hl, bc
+    ld   [hl], a
+    inc  de
+    ld   a, [de]
+    ld   hl, $CE5A
+    add  hl, bc
+    ld   [hl], a
+    inc  de
+    ld   a, [de]
+    ld   hl, $CE62
+    add  hl, bc
+    ld   [hl], a
+    inc  de
+    ld   a, [de]
+    sra  a
+    sra  a
+    add  a, $F0
+    ld   l, a
+    ld   h, $2B
+    jr   nc, .else_01_2BDD
+
+    inc  h
+.else_01_2BDD:
+    ld   a, [hl]
+    ld   hl, $CE4A
+    add  hl, bc
+    ld   [hl], a
+    ld   hl, $CE52
+    add  hl, bc
+    ld   [hl], $01
+    ld   hl, $CE82
+    add  hl, bc
+    ld   [hl], $01
+    ret
+
+
     db   $00, $05, $FF, $0F, $0A, $10, $20, $30
     db   $40, $50, $60, $70, $80
 
 toc_01_2BFD:
     ld   a, $1F
-    call toc_01_05E5.toc_01_05F3
+    call cbcall.loadBank
     ld   b, $07
 .loop_01_2C04:
     ld   h, $CE
@@ -1912,7 +1955,7 @@ toc_01_2BFD:
     jr   nz, .else_01_2C52
 
     ld   a, $1E
-    call toc_01_05E5.toc_01_05F3
+    call cbcall.loadBank
 .else_01_2C52:
     dec  b
     bit  7, b
@@ -2703,11 +2746,9 @@ toc_01_2F4B:
     ld   d, $00
     ld   hl, $DDE5
     add  hl, de
-    xor  a
-    ld   [gbAUD3ENA], a
+    clear [gbAUD3ENA]
     call toc_01_3001
-    ld   a, $80
-    ld   [gbAUD3ENA], a
+    assign [gbAUD3ENA], $80
     ld   a, [$CE14]
     set  7, a
     ld   [gbAUD3HIGH], a

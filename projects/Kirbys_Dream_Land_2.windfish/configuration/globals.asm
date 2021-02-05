@@ -138,4 +138,8 @@ gbPCM12 EQU $FF76 ; [hex]
 
 gbPCM34 EQU $FF77 ; [hex]
 
+hDesiredBankChange EQU $FF96 ; [decimal]
+
+hLastBank EQU $FFA4 ; [decimal]
+
 gbIE EQU $FFFF ; [HW_IE]

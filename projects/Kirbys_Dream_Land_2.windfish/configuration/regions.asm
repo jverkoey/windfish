@@ -41,3 +41,27 @@ HeaderComplementCheck: ; [Label] $00:$014D [0]
 HeaderGlobalChecksum: ; [Label] $00:$014E [0]
 
 main: ; [Label] $00:$0150 [0]
+
+memset: ; [Function] $00:$062F [0]
+
+memcpy: ; [Function] $00:$0621 [0]
+
+startCopying: ; [Label] $00:$0628 [0]
+
+copy: ; [Label] $00:$0625 [0]
+
+loadBank: ; [Label] $00:$05F3 [0]
+
+cbcall: ; [Label] $00:$05E5 [0]
+
+initialize: ; [Function] $1A:$4000 [0]
+
+waitForVBlank: ; [Label] $1A:$4003 [0]
+
+DMARoutine: ; [Function] $1A:$40E8 [0]
+
+toc_1E_4232: ; [Function] $1E:$4232 [0]
+
+toc_07_57BC: ; [Function] $07:$57BC [0]
+
+toc_07_401D: ; [Function] $07:$401D [0]
