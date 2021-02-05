@@ -991,7 +991,7 @@ toc_01_0708:
     ld   [$FF97], a
     ld   a, d
     ld   [$FF98], a
-.loop_01_070E:
+.dequeuNextPixel:
     ld   a, [hl]
     cp   $FF
     ret  z
@@ -1042,7 +1042,7 @@ toc_01_0708:
     jr   nz, .else_01_074A
 
     dec  b
-    jp   z, .loop_01_070E
+    jp   z, .dequeuNextPixel
 
 .else_01_074A:
     ldi  a, [hl]
@@ -1052,17 +1052,17 @@ toc_01_0708:
 
 .else_01_074F:
     ldi  a, [hl]
-.toc_01_0750:
+.whilePixelsRemain:
     dec  c
-    jr   nz, .else_01_0757
+    jr   nz, .paintPixel
 
     dec  b
-    jp   z, .loop_01_070E
+    jp   z, .dequeuNextPixel
 
-.else_01_0757:
+.paintPixel:
     ld   [de], a
     inc  de
-    jr   .toc_01_0750
+    jr   .whilePixelsRemain
 
 .else_01_075B:
     dec  c
@@ -1083,7 +1083,7 @@ toc_01_0708:
 .else_01_076A:
     inc  hl
     inc  hl
-    jr   .loop_01_070E
+    jr   .dequeuNextPixel
 
 .else_01_076E:
     ldi  a, [hl]
@@ -1092,7 +1092,7 @@ toc_01_0708:
     jr   nz, .else_01_0776
 
     dec  b
-    jp   z, .loop_01_070E
+    jp   z, .dequeuNextPixel
 
 .else_01_0776:
     ld   [de], a
@@ -1170,7 +1170,7 @@ toc_01_0708:
     pop  hl
     inc  hl
     inc  hl
-    jp   .loop_01_070E
+    jp   .dequeuNextPixel
 
 toc_01_07C4:
     ld   [$FF84], a

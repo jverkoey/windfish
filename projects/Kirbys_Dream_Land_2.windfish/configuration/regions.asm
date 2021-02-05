@@ -72,6 +72,12 @@ wait: ; [Label] $00:$0318 [0]
 
 toc_00_022B: ; [Function] $00:$022B [0]
 
+paintPixel: ; [Label] $00:$0757 [0]
+
+whilePixelsRemain: ; [Label] $00:$0750 [0]
+
+dequeuNextPixel: ; [Label] $00:$070E [0]
+
 initialize: ; [Function] $1A:$4000 [0]
 
 waitForVBlank: ; [Label] $1A:$4003 [0]
