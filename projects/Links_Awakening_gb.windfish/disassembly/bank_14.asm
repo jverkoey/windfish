@@ -661,7 +661,7 @@ toc_14_523C:
     and  %00111111
     jr   nz, .else_14_52BE
 
-    ifEq [$DB47], $FF, .else_14_52BE
+    ifNe [$DB47], $FF, .else_14_52BE
 
     inc  a
     ld   [$DB47], a
@@ -726,7 +726,7 @@ toc_14_5326:
     and  a
     jr   nz, .return_14_5387
 
-    ifEq [wWYStash], 0, .else_14_535D
+    ifNe [wWYStash], 0, .else_14_535D
 
     ld   hl, wTransitionGfx
     ld   a, [wDialogState]
@@ -769,7 +769,7 @@ toc_14_5326:
 toc_14_5388:
     clear [$FFBE]
     ld   [$FFF5], a
-    ifEq [wGameMode], GAMEMODE_WORLD_MAP, .else_14_53E1
+    ifNe [wGameMode], GAMEMODE_WORLD_MAP, .else_14_53E1
 
     ld   a, [$C124]
     ld   hl, $C14F
@@ -1054,10 +1054,10 @@ toc_14_55AA:
 toc_14_5822:
     _ifZero [$C124], .else_14_582F
 
-    ifNe [$C11C], $06, .else_14_583B
+    ifEq [$C11C], $06, .else_14_583B
 
 .else_14_582F:
-    ifEq [$FFEB], $A8, .else_14_583B
+    ifNe [$FFEB], $A8, .else_14_583B
 
     call .toc_14_587E
     jp   toc_01_3DAF
@@ -1076,7 +1076,7 @@ toc_14_5822:
     jp   nz, .return_14_591E
 
     ld   d, $03
-    ifNe [$FFEB], $02, .else_14_5858
+    ifEq [$FFEB], $02, .else_14_5858
 
     ld   d, $02
 .else_14_5858:
@@ -1109,7 +1109,7 @@ toc_14_5822:
     ld   hl, $C280
     add  hl, bc
     ld   [hl], $05
-    ifNe [$FFEB], $02, .else_14_5891
+    ifEq [$FFEB], $02, .else_14_5891
 
     call toc_01_0891
     ld   [hl], $A0
@@ -1178,7 +1178,7 @@ toc_14_5822:
 
     ld   e, $08
 .else_14_58EC:
-    ifNe [$FFEB], $02, toc_14_5822.else_14_58F6
+    ifEq [$FFEB], $02, toc_14_5822.else_14_58F6
 
     ld   a, e
     add  a, $04
@@ -1219,17 +1219,17 @@ toc_14_591F:
 toc_14_5924:
     _ifZero [$C3C9], .else_14_5935
 
-    ifEq [$C11C], $03, toc_14_591F
+    ifNe [$C11C], $03, toc_14_591F
 
     cp   $04
     jr   z, toc_14_591F
 
 .else_14_5935:
-    ifEq [wGameMode], GAMEMODE_CREDITS, .else_14_595A
+    ifNe [wGameMode], GAMEMODE_CREDITS, .else_14_595A
 
     _ifZero [$C3CB], .else_14_595A
 
-    ifEq [hLinkAnimationState], LINK_ANIMATION_STATE_GOT_ITEM, .else_14_595A
+    ifNe [hLinkAnimationState], LINK_ANIMATION_STATE_GOT_ITEM, .else_14_595A
 
     assign [$C16B], $04
     assign [$DB97], $E4
@@ -1317,7 +1317,7 @@ toc_14_59B0:
 toc_14_59DE:
     ld   hl, $D711
     add  hl, de
-    ifNe [hObjectUnderEntity], 142, .else_14_5A1D
+    ifEq [hObjectUnderEntity], 142, .else_14_5A1D
 
     ld   [hl], $AA
     call toc_01_2839
@@ -1361,7 +1361,7 @@ toc_14_59DE:
 
     ifNotZero [$FFF9], .else_14_5A6B
 
-    ifNe [hObjectUnderEntity], 138, .else_14_5A6B
+    ifEq [hObjectUnderEntity], 138, .else_14_5A6B
 
     ld   [hl], $04
     call toc_01_2839
@@ -1427,9 +1427,9 @@ toc_14_59DE:
     jr   .toc_14_5AE4
 
 .else_14_5A9F:
-    ifNe [hObjectUnderEntity], 32, .else_14_5AB2
+    ifEq [hObjectUnderEntity], 32, .else_14_5AB2
 
-    ifEq [$FFF6], $52, .else_14_5AAF
+    ifNe [$FFF6], $52, .else_14_5AAF
 
     cp   $04
     jr   nz, .else_14_5AB2
@@ -1475,7 +1475,7 @@ toc_14_59DE:
 
 
 .toc_14_5AE9:
-    ifEq [$FFF6], $75, .else_14_5AFB
+    ifNe [$FFF6], $75, .else_14_5AFB
 
     cp   $07
     jr   z, .else_14_5AFB

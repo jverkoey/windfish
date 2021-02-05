@@ -486,7 +486,7 @@ JumpTable_4A0C_18:
     add  hl, bc
     ld   [hl], a
     call toc_18_646E
-    ifEq [$FFDA], $07, .else_18_4A37
+    ifNe [$FFDA], $07, .else_18_4A37
 
     ret
 
@@ -552,7 +552,7 @@ JumpTable_4BA7_18:
     call toc_18_7D02
     jr   nc, .return_18_4BC4
 
-    ifNe [$DB0E], $08, .else_18_4BBB
+    ifEq [$DB0E], $08, .else_18_4BBB
 
     ld   a, $67
     call toc_01_2185
@@ -586,7 +586,7 @@ JumpTable_4C08_18:
     call toc_18_7D02
     jr   nc, .return_18_4C25
 
-    ifNe [$DB0E], $09, .else_18_4C1C
+    ifEq [$DB0E], $09, .else_18_4C1C
 
     ld   a, $34
     call toc_01_2185
@@ -656,7 +656,7 @@ JumpTable_4CFF_18:
     jp   toc_01_2185
 
 .else_18_4D20:
-    ifNe [$DB0E], $0A, .else_18_4D2F
+    ifEq [$DB0E], $0A, .else_18_4D2F
 
     ld   a, $5C
     call toc_01_2185
@@ -906,7 +906,7 @@ JumpTable_52D4_18:
     add  hl, bc
     ld   [hl], $0C
     call toc_18_7DDA
-    ifNe [$FFEE], $20, .else_18_52F6
+    ifEq [$FFEE], $20, .else_18_52F6
 
     ld   a, $01
     call toc_18_59B8.toc_18_59BA
@@ -2839,7 +2839,7 @@ toc_18_7D0E:
     jr   nc, .else_18_7D5F
 
     inc  e
-    ifEq [$FFEB], $C4, .else_18_7D3A
+    ifNe [$FFEB], $C4, .else_18_7D3A
 
     push de
     call toc_18_7E4F
@@ -2861,7 +2861,7 @@ toc_18_7D0E:
     or   [hl]
     jr   nz, .else_18_7D5F
 
-    ifNe [wWYStash], 128, .else_18_7D5F
+    ifEq [wWYStash], 128, .else_18_7D5F
 
     ld   a, [$FFCC]
     and  %00010000
@@ -2877,9 +2877,9 @@ toc_18_7D0E:
 
 
 toc_18_7D61:
-    ifNe [$FFEA], $05, .else_18_7D81
+    ifEq [$FFEA], $05, .else_18_7D81
 
-    ifEq [wGameMode], GAMEMODE_WORLD_MAP, .else_18_7D81
+    ifNe [wGameMode], GAMEMODE_WORLD_MAP, .else_18_7D81
 
     ld   hl, $C1A8
     ld   a, [wDialogState]

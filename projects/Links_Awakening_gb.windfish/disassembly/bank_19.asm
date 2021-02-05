@@ -34,7 +34,7 @@ JumpTable_4070_19:
 
     ifZero [$C19B], .else_19_411C
 
-    ifNe [$DB00], $03, .else_19_40A0
+    ifEq [$DB00], $03, .else_19_40A0
 
     ld   a, [hPressedButtonsMask]
     and  J_B
@@ -43,7 +43,7 @@ JumpTable_4070_19:
     jr   .else_19_411C
 
 .else_19_40A0:
-    ifNe [$DB01], $03, .else_19_411C
+    ifEq [$DB01], $03, .else_19_411C
 
     ld   a, [hPressedButtonsMask]
     and  J_A
@@ -76,7 +76,7 @@ JumpTable_4070_19:
     ld   a, [hl]
     ld   [$C13B], a
     incAddr hLinkAnimationState
-    ifNe [$DB43], $02, .else_19_411C
+    ifEq [$DB43], $02, .else_19_411C
 
     ld   e, $08
     ifNotZero [$D47C], .else_19_40F4
@@ -334,7 +334,7 @@ JumpTable_4624_19:
     call toc_19_784E.toc_19_7859
     ret  nc
 
-    ifEq [$DB7D], $00, .else_19_4641
+    ifNe [$DB7D], $00, .else_19_4641
 
     cp   $0D
     jr   nz, .else_19_464A
@@ -632,7 +632,7 @@ JumpTable_4A3D_19:
     db   $0C, $0D
 
 JumpTable_4CBF_19:
-    ifEq [wGameMode], GAMEMODE_WORLD_MAP, .else_19_4CCA
+    ifNe [wGameMode], GAMEMODE_WORLD_MAP, .else_19_4CCA
 
     clear [$C5A2]
 .else_19_4CCA:
@@ -883,7 +883,7 @@ JumpTable_51AD_19:
 
     ifNotZero [$C133], .else_19_523C
 
-    ifNe [hLinkDirection], DIRECTION_UP, .else_19_523C
+    ifEq [hLinkDirection], DIRECTION_UP, .else_19_523C
 
     ld   hl, $C3D0
     add  hl, bc
@@ -1392,7 +1392,7 @@ JumpTable_5829_19:
     and  a
     ret  nz
 
-    ifNe [$DB00], $03, .else_19_587F
+    ifEq [$DB00], $03, .else_19_587F
 
     ld   a, [$FFCC]
     and  %00100000
@@ -2135,14 +2135,14 @@ toc_19_6705:
 
 JumpTable_6834_19:
     ld   hl, $C240
-    ifEq [$FFEB], $AA, .else_19_6840
+    ifNe [$FFEB], $AA, .else_19_6840
 
     ld   hl, $C250
 .else_19_6840:
     add  hl, bc
     ld   [hl], $08
     ld   e, $80
-    ifEq [$FFEB], $AA, .else_19_684D
+    ifNe [$FFEB], $AA, .else_19_684D
 
     ld   e, $60
 .else_19_684D:
@@ -2233,7 +2233,7 @@ JumpTable_69D4_19:
     jr   nz, .else_19_69FB
 
     ld   e, $C6
-    ifNe [$DB0E], $03, .else_19_69FB
+    ifEq [$DB0E], $03, .else_19_69FB
 
     ld   a, $C7
     call toc_01_2185
@@ -2714,7 +2714,7 @@ toc_19_755F:
     rr   d
     adc  [hl]
     ld   [hl], a
-    ifNe [$FFEB], $7F, .else_19_75CA
+    ifEq [$FFEB], $7F, .else_19_75CA
 
     ld   hl, $C440
     add  hl, bc
@@ -2809,7 +2809,7 @@ toc_19_755F:
     cp   $6D
     jr   nz, .else_19_766F
 
-    ifNe [$DB56], $01, .else_19_7647
+    ifEq [$DB56], $01, .else_19_7647
 
     ld   a, [hFrameCounter]
     and  %00000111
@@ -3033,7 +3033,7 @@ toc_19_784E:
     or   [hl]
     jr   nz, .else_19_7899
 
-    ifNe [wWYStash], 128, .else_19_7899
+    ifEq [wWYStash], 128, .else_19_7899
 
     ld   a, [$FFCC]
     and  %00010000
@@ -3049,9 +3049,9 @@ toc_19_784E:
 
 
 toc_19_789B:
-    ifNe [$FFEA], $05, .else_19_78BB
+    ifEq [$FFEA], $05, .else_19_78BB
 
-    ifEq [wGameMode], GAMEMODE_WORLD_MAP, .else_19_78BB
+    ifNe [wGameMode], GAMEMODE_WORLD_MAP, .else_19_78BB
 
     ld   hl, $C1A8
     ld   a, [wDialogState]

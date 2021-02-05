@@ -390,7 +390,7 @@ toc_1E_43B5:
 
 
 toc_1E_43BB:
-    ifEq [$D379], $05, .else_1E_43DD
+    ifNe [$D379], $05, .else_1E_43DD
 
     cp   $0C
     jr   z, .else_1E_43DD
@@ -540,7 +540,7 @@ toc_1E_449E:
     jr   toc_1E_44A1.toc_1E_44D2
 
 toc_1E_44A1:
-    ifNe [$D350], $03, .else_1E_44B8
+    ifEq [$D350], $03, .else_1E_44B8
 
     ld   a, [$D338]
     bit  7, a
@@ -832,7 +832,7 @@ toc_1E_457C:
     call toc_1E_4482
     call toc_1E_4497
 .else_1E_4637:
-    ifEq [$D350], $04, .else_1E_4676
+    ifNe [$D350], $04, .else_1E_4676
 
     push de
     ld   de, $D3B0
@@ -846,7 +846,7 @@ toc_1E_457C:
     inc  e
     xor  a
     ld   [de], a
-    ifNe [$D350], $03, .else_1E_4675
+    ifEq [$D350], $03, .else_1E_4675
 
     ld   de, $D39E
     ld   a, [de]
@@ -950,7 +950,7 @@ toc_1E_457C:
 .toc_1E_46E9:
     push hl
     ld   b, $00
-    ifEq [$D350], $01, .else_1E_4714
+    ifNe [$D350], $01, .else_1E_4714
 
     cp   $02
     jr   z, .else_1E_4710

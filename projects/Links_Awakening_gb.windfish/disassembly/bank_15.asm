@@ -2236,7 +2236,7 @@ toc_15_796D:
 
 
 toc_15_79A5:
-    ifEq [$FFEA], $07, .return_15_79F4
+    ifNe [$FFEA], $07, .return_15_79F4
 
     ld   hl, $C470
     add  hl, bc
@@ -2287,7 +2287,7 @@ toc_15_79A5:
 
 
 .else_15_79F5:
-    ifNe [$FFEB], $02, .else_15_7A06
+    ifEq [$FFEB], $02, .else_15_7A06
 
     ld   hl, $FFEC
     dec  [hl]

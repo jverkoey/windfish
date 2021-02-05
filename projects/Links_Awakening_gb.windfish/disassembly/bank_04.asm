@@ -256,7 +256,7 @@ JumpTable_415F_04:
     jr   nc, .else_04_41F8
 
     call toc_01_093B.toc_01_0942
-    ifNe [$DB00], $03, .else_04_41C7
+    ifEq [$DB00], $03, .else_04_41C7
 
     ld   a, [hPressedButtonsMask]
     and  J_B
@@ -265,7 +265,7 @@ JumpTable_415F_04:
     jr   .else_04_41F8
 
 .else_04_41C7:
-    ifNe [$DB01], $03, .else_04_41F8
+    ifEq [$DB01], $03, .else_04_41F8
 
     ld   a, [hPressedButtonsMask]
     and  J_A
@@ -399,7 +399,7 @@ toc_04_429C:
 
 JumpTable_42D2_04:
     call toc_04_46EC
-    ifEq [$FFEA], $05, toc_04_4309
+    ifNe [$FFEA], $05, toc_04_4309
 
     ld   hl, $C420
     add  hl, bc
@@ -446,7 +446,7 @@ toc_04_4309:
     add  hl, bc
     ld   a, [hl]
     ld   [$D001], a
-    ifEq [$FFF0], $05, .else_04_4325
+    ifNe [$FFF0], $05, .else_04_4325
 
     call toc_01_3BBF
 .else_04_4325:
@@ -973,7 +973,7 @@ toc_04_4627:
     db   $74, $00, $74, $20
 
 toc_04_46EC:
-    ifNe [$FFF0], $05, .else_04_4706
+    ifEq [$FFF0], $05, .else_04_4706
 
     ld   a, [hFrameCounter]
     and  %00000001
@@ -1318,7 +1318,7 @@ JumpTable_49D4_04:
     dw JumpTable_4A78_04 ; 03
 
 JumpTable_49E5_04:
-    ifNe [$C157], $05, .else_04_49F3
+    ifEq [$C157], $05, .else_04_49F3
 
     call JumpTable_3B8D_00
     assign [$FFF2], $08
@@ -2567,7 +2567,7 @@ JumpTable_5470_04:
     cp   $03
     jr   nz, .return_04_54FA
 
-    ifEq [$C11C], $06, .return_04_54FA
+    ifNe [$C11C], $06, .return_04_54FA
 
     _ifZero [hLinkPositionZHigh], .return_04_54FA
 
@@ -2620,7 +2620,7 @@ JumpTable_5470_04:
 
 JumpTable_550B_04:
     ld   de, $54FB
-    ifNe [$FFF7], $01, .else_04_5517
+    ifEq [$FFF7], $01, .else_04_5517
 
     ld   de, $5503
 .else_04_5517:
@@ -4076,7 +4076,7 @@ toc_04_68D0:
     ld   a, $10
     call toc_01_3C30
     ld   e, $00
-    ifNe [$FFEB], $52, .else_04_6917
+    ifEq [$FFEB], $52, .else_04_6917
 
     inc  e
 .else_04_6917:
@@ -4742,7 +4742,7 @@ JumpTable_6FC6_04:
     assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     _ifZero [wDialogState], .return_04_7002
 
-    ifEq [$C173], $F8, .else_04_6FDE
+    ifNe [$C173], $F8, .else_04_6FDE
 
     ifGte [$C177], $01, .else_04_6FF1
 
@@ -5119,9 +5119,9 @@ JumpTable_7200_04:
     ld   [hLinkPositionY], a
     pop  af
     ld   [hLinkPositionX], a
-    ifNe [$D204], $18, .return_04_725B
+    ifEq [$D204], $18, .return_04_725B
 
-    ifNe [$D205], $16, .return_04_725B
+    ifEq [$D205], $16, .return_04_725B
 
     call toc_01_0891
     ld   [hl], $C0
@@ -5461,7 +5461,7 @@ JumpTable_751C_04:
     ret  nz
 
     ld   [hl], $18
-    ifNe [$FFF1], $00, .else_04_758D
+    ifEq [$FFF1], $00, .else_04_758D
 
     assign [$DB0E], $01
     call toc_01_0898
@@ -5639,7 +5639,7 @@ JumpTable_7786_04:
     ld   [hl], $03
     assign [hLinkInteractiveMotionBlocked], INTERACTIVE_MOTION_LOCKED_TALKING
     ld   [$C167], a
-    ifNe [$C16B], $04, .return_04_77C6
+    ifEq [$C16B], $04, .return_04_77C6
 
     ld   a, [hLinkPositionY]
     sub  a, 1
@@ -5745,7 +5745,7 @@ JumpTable_7830_04:
     and  %00000001
     jr   z, .else_04_7855
 
-    ifNe [$C11C], $00, .else_04_7855
+    ifEq [$C11C], $00, .else_04_7855
 
     ifLt [hLinkPositionY], 123, .else_04_7855
 
@@ -5757,7 +5757,7 @@ JumpTable_7830_04:
 .else_04_7855:
     ifGte [hLinkPositionY], 72, .else_04_78C1
 
-    ifNe [hLinkDirection], DIRECTION_UP, .else_04_78C1
+    ifEq [hLinkDirection], DIRECTION_UP, .else_04_78C1
 
     ld   a, [$FFCC]
     and  %00110000
@@ -5848,7 +5848,7 @@ JumpTable_78E1_04:
     and  a
     ret  nz
 
-    ifEq [$C177], $00, toc_04_792F
+    ifNe [$C177], $00, toc_04_792F
 
     cp   $02
     jr   z, .else_04_7908
@@ -6246,7 +6246,7 @@ toc_04_7B77:
     or   [hl]
     jr   nz, .else_04_7BBA
 
-    ifNe [wWYStash], 128, .else_04_7BBA
+    ifEq [wWYStash], 128, .else_04_7BBA
 
     ld   a, [$FFCC]
     and  %00010000
@@ -6271,7 +6271,7 @@ toc_04_7BBC:
     or   [hl]
     jr   nz, .else_04_7C03
 
-    ifNe [wWYStash], 128, .else_04_7C03
+    ifEq [wWYStash], 128, .else_04_7C03
 
     ld   a, [hLinkPositionX]
     ld   hl, $FFEE
@@ -6683,10 +6683,10 @@ JumpTable_7EF0_04:
     db   $AE, $77, $C9
 
 toc_04_7F1F:
-    ifNe [$FFEA], $05, .else_04_7F3F
+    ifEq [$FFEA], $05, .else_04_7F3F
 
 .toc_04_7F25:
-    ifEq [wGameMode], GAMEMODE_WORLD_MAP, .else_04_7F3F
+    ifNe [wGameMode], GAMEMODE_WORLD_MAP, .else_04_7F3F
 
     ld   hl, $C1A8
     ld   a, [wDialogState]

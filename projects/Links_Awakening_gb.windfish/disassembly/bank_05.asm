@@ -1365,7 +1365,7 @@ JumpTable_4C89_05:
     ld   a, $DD
     jr   nz, .else_05_4CB5
 
-    ifNe [$DB0E], $03, .else_05_4CB3
+    ifEq [$DB0E], $03, .else_05_4CB3
 
     ld   a, $C5
     call toc_01_2185
@@ -1408,7 +1408,7 @@ JumpTable_4C89_05:
 
 
 .toc_05_4CD9:
-    ifNe [$DB48], $01, .return_05_4D25
+    ifEq [$DB48], $01, .return_05_4D25
 
 .else_05_4CE0:
     ld   hl, $C3D0
@@ -1694,9 +1694,9 @@ JumpTable_4FBD_05:
     push bc
     call toc_01_087C
     pop  bc
-    ifNe [$D211], $07, .else_05_4FEB
+    ifEq [$D211], $07, .else_05_4FEB
 
-    ifNe [$D210], $E8, .else_05_4FEB
+    ifEq [$D210], $E8, .else_05_4FEB
 
     ld   a, $16
     call toc_01_2197
@@ -1721,7 +1721,7 @@ JumpTable_4FBD_05:
     adc  $00
     ld   [$D211], a
     ld   d, a
-    ifNe [$D211], $07, .else_05_5018
+    ifEq [$D211], $07, .else_05_5018
 
     ifLt [$D210], $E0, .else_05_5018
 
@@ -2166,7 +2166,7 @@ JumpTable_53D6_05:
     ld   hl, $C310
     add  hl, bc
     ld   [hl], b
-    ifNe [$C11C], $02, .else_05_5407
+    ifEq [$C11C], $02, .else_05_5407
 
     ld   a, [hLinkPositionZHigh]
     ld   [hl], a
@@ -2218,7 +2218,7 @@ toc_05_544C:
     jr   nc, .else_05_549D
 
     inc  e
-    ifEq [$FFEB], $6D, .else_05_5478
+    ifNe [$FFEB], $6D, .else_05_5478
 
     push de
     call toc_05_7A44
@@ -2240,7 +2240,7 @@ toc_05_544C:
     or   [hl]
     jr   nz, .else_05_549D
 
-    ifNe [wWYStash], 128, .else_05_549D
+    ifEq [wWYStash], 128, .else_05_549D
 
     ld   a, [$FFCC]
     and  %00010000
@@ -2272,7 +2272,7 @@ toc_05_549F:
 JumpTable_54B8_05:
     call toc_01_3F12
     call toc_05_580E
-    ifEq [$FFEA], $05, toc_05_5500
+    ifNe [$FFEA], $05, toc_05_5500
 
     ld   [$C1C6], a
     ld   hl, $C2C0
@@ -2871,7 +2871,7 @@ toc_05_59D6:
 
 JumpTable_59D7_05:
     call toc_05_5A99
-    ifNe [$FFEA], $05, toc_05_59D6
+    ifEq [$FFEA], $05, toc_05_59D6
 
     ld   a, $02
 .loop_05_59E2:
@@ -3003,7 +3003,7 @@ JumpTable_5AAB_05:
 
     call toc_05_7965
     call toc_01_08E2
-    ifEq [$FFF0], $0E, .else_05_5AF7
+    ifNe [$FFF0], $0E, .else_05_5AF7
 
     ld   hl, $C420
     add  hl, bc
@@ -3646,7 +3646,7 @@ JumpTable_5E82_05:
     call JumpTable_3B8D_00
     ld   [hl], $07
     call toc_01_0891
-    ifNe [$D205], $04, .else_05_5ED8
+    ifEq [$D205], $04, .else_05_5ED8
 
     ld   [hl], $10
     ret
@@ -5528,7 +5528,7 @@ JumpTable_700B_05:
     or   [hl]
     jr   nz, .else_05_70A8
 
-    ifNe [$FFF0], $03, .else_05_70A8
+    ifEq [$FFF0], $03, .else_05_70A8
 
     ld   hl, $C390
     add  hl, bc
@@ -6630,10 +6630,10 @@ toc_05_78D2:
 
 
 toc_05_7965:
-    ifNe [$FFEA], $05, .else_05_7985
+    ifEq [$FFEA], $05, .else_05_7985
 
 .toc_05_796B:
-    ifEq [wGameMode], GAMEMODE_WORLD_MAP, .else_05_7985
+    ifNe [wGameMode], GAMEMODE_WORLD_MAP, .else_05_7985
 
     ld   hl, $C1A8
     ld   a, [wDialogState]

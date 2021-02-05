@@ -39,7 +39,7 @@ copyFromTo: MACRO
 ifEq: MACRO
     ld   a, \1
     cp   \2
-    jr   z, \3
+    jr   nz, \3
     ENDM
 
 ifGte: MACRO
@@ -57,7 +57,7 @@ ifLt: MACRO
 ifNe: MACRO
     ld   a, \1
     cp   \2
-    jr   nz, \3
+    jr   z, \3
     ENDM
 
 ifNotZero: MACRO

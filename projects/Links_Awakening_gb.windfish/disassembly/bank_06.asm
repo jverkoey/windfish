@@ -458,7 +458,7 @@ JumpTable_4321_06:
 .else_06_4358:
     dec  [hl]
 .else_06_4359:
-    ifEq [hLinkAnimationState], LINK_ANIMATION_STATE_NO_UPDATE, .else_06_43C6
+    ifNe [hLinkAnimationState], LINK_ANIMATION_STATE_NO_UPDATE, .else_06_43C6
 
     call toc_06_659E
     ld   hl, $C380
@@ -957,7 +957,7 @@ JumpTable_4802_06:
 
     _ifZero [$C19B], .return_06_486A
 
-    ifNe [$DB00], $03, .else_06_4838
+    ifEq [$DB00], $03, .else_06_4838
 
     ld   a, [$FFCC]
     and  %00100000
@@ -966,7 +966,7 @@ JumpTable_4802_06:
     jr   .return_06_486A
 
 .else_06_4838:
-    ifNe [$DB01], $03, .return_06_486A
+    ifEq [$DB01], $03, .return_06_486A
 
     ld   a, [$FFCC]
     and  %00010000
@@ -2021,7 +2021,7 @@ JumpTable_521C_06:
     cp   $30
     jr   nc, .else_06_5253
 
-    ifNe [$C11C], $00, .else_06_5253
+    ifEq [$C11C], $00, .else_06_5253
 
     call JumpTable_3B8D_00
     call toc_01_0891
@@ -2221,7 +2221,7 @@ JumpTable_53F9_06:
     cp   $88
     ret  z
 
-    ifEq [$FFEB], $89, .else_06_541B
+    ifNe [$FFEB], $89, .else_06_541B
 
     cp   $8E
     jr   z, .else_06_541B
@@ -3147,7 +3147,7 @@ JumpTable_5C01_06:
     dw JumpTable_5E7F_06 ; 03
 
 JumpTable_5DAE_06:
-    ifNe [$FFF6], $58, .else_06_5DEE
+    ifEq [$FFF6], $58, .else_06_5DEE
 
     ld   a, [$C50C]
     ld   e, a
@@ -3390,7 +3390,7 @@ JumpTable_5F82_06:
     ld   hl, $C2B0
     add  hl, bc
     ld   [hl], a
-    ifNe [$DB75], $07, .else_06_5FA4
+    ifEq [$DB75], $07, .else_06_5FA4
 
     inc  [hl]
     inc  [hl]
@@ -3591,7 +3591,7 @@ JumpTable_6135_06:
     cp   $04
     ret  nz
 
-    ifNe [$FFEB], $71, .else_06_6159
+    ifEq [$FFEB], $71, .else_06_6159
 
     ld   a, $20
     call toc_01_218E
@@ -3890,7 +3890,7 @@ toc_06_648C:
     jr   nc, .else_06_64DD
 
     inc  e
-    ifEq [$FFEB], $78, .else_06_64B8
+    ifNe [$FFEB], $78, .else_06_64B8
 
     push de
     call toc_06_65BE
@@ -3912,7 +3912,7 @@ toc_06_648C:
     or   [hl]
     jr   nz, .else_06_64DD
 
-    ifNe [wWYStash], 128, .else_06_64DD
+    ifEq [wWYStash], 128, .else_06_64DD
 
     ld   a, [$FFCC]
     and  %00010000
@@ -3928,10 +3928,10 @@ toc_06_648C:
 
 
 toc_06_64DF:
-    ifNe [$FFEA], $05, .else_06_64FF
+    ifEq [$FFEA], $05, .else_06_64FF
 
 .toc_06_64E5:
-    ifEq [wGameMode], GAMEMODE_WORLD_MAP, .else_06_64FF
+    ifNe [wGameMode], GAMEMODE_WORLD_MAP, .else_06_64FF
 
     ld   hl, $C1A8
     ld   a, [wDialogState]
@@ -4320,7 +4320,7 @@ JumpTable_679B_06:
     dw JumpTable_69DB_06 ; 04
 
 JumpTable_68E1_06:
-    ifNe [$FFF6], $F2, .else_06_68FB
+    ifEq [$FFF6], $F2, .else_06_68FB
 
     assign [hDefaultMusicTrack], MUSIC_SWORD_SEARCH
     returnIfLt [hLinkPositionY], 68
@@ -4344,7 +4344,7 @@ JumpTable_68E1_06:
     assign [$D368], MUSIC_OWL
     ld   [hDefaultMusicTrack], a
     ld   [$FFBD], a
-    ifEq [$FFF6], $16, .else_06_6920
+    ifNe [$FFF6], $16, .else_06_6920
 
     cp   $36
     jr   z, .else_06_6920
@@ -4422,7 +4422,7 @@ JumpTable_6982_06:
     and  a
     ret  nz
 
-    ifNe [$FFF6], $06, .else_06_69A0
+    ifEq [$FFF6], $06, .else_06_69A0
 
     ld   a, $CD
     call toc_01_2197
@@ -4440,7 +4440,7 @@ JumpTable_6982_06:
 
 JumpTable_69B1_06:
     call toc_06_64DF
-    ifEq [$FFF6], $06, .else_06_69C2
+    ifNe [$FFF6], $06, .else_06_69C2
 
     call toc_01_0891
     jr   nz, toc_06_69CD
@@ -5060,7 +5060,7 @@ JumpTable_70CE_06:
     and  %00011111
     jr   nz, .else_06_7107
 
-    ifEq [$C16B], $02, .else_06_7107
+    ifNe [$C16B], $02, .else_06_7107
 
     assign [$C16C], $03
     push bc
@@ -5412,7 +5412,7 @@ JumpTable_7407_06:
 
 
 toc_06_742A:
-    ifNe [$C137], $02, .return_06_7466
+    ifEq [$C137], $02, .return_06_7466
 
     call toc_06_659E
     add  a, $18
@@ -6095,7 +6095,7 @@ JumpTable_7ACC_06:
     call toc_01_088C
     jr   nz, .else_06_7B2C
 
-    ifEq [$C137], $03, .else_06_7B04
+    ifNe [$C137], $03, .else_06_7B04
 
     call toc_01_27ED
     xor  c

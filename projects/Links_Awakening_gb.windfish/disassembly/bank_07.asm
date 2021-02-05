@@ -99,7 +99,7 @@ JumpTable_40C1_07:
     and  a
     ret  nz
 
-    ifNe [$DB00], $03, .else_07_413A
+    ifEq [$DB00], $03, .else_07_413A
 
     ld   a, [$FFCC]
     and  %00100000
@@ -216,7 +216,7 @@ JumpTable_42D7_07:
     call toc_07_7C23
     jr   nc, .else_07_42F9
 
-    ifNe [$DB0E], $0B, .else_07_42EB
+    ifEq [$DB0E], $0B, .else_07_42EB
 
     ld   a, $E8
     call toc_01_2185
@@ -546,7 +546,7 @@ JumpTable_4A04_07:
     and  %00110000
     jr   nz, .else_07_4A34
 
-    ifNe [$DB0E], $06, .else_07_4A21
+    ifEq [$DB0E], $06, .else_07_4A21
 
     ld   a, $CF
     call toc_07_4A74
@@ -557,7 +557,7 @@ JumpTable_4A04_07:
     _ifZero [$DB73], .else_07_4A34
 
     ld   e, $CE
-    ifNe [$DB0E], $07, .else_07_4A34
+    ifEq [$DB0E], $07, .else_07_4A34
 
     ld   e, $D2
 .else_07_4A34:
@@ -600,7 +600,7 @@ toc_07_4A74:
     db   $10, $4B, $18, $4B, $3E, $4B, $3F, $4B
 
 JumpTable_4ABD_07:
-    ifNe [$DB7F], $02, .else_07_4AD8
+    ifEq [$DB7F], $02, .else_07_4AD8
 
     ld   hl, $C210
     add  hl, bc
@@ -1145,7 +1145,7 @@ JumpTable_5130_07:
     db   $73, $59
 
 JumpTable_563B_07:
-    ifNe [$DB56], $01, .else_07_5671
+    ifEq [$DB56], $01, .else_07_5671
 
     ld   hl, $C420
     add  hl, bc
@@ -1181,7 +1181,7 @@ JumpTable_563B_07:
     call toc_07_7C23
     jr   nc, .else_07_568E
 
-    ifNe [$DB0E], $04, .else_07_5689
+    ifEq [$DB0E], $04, .else_07_5689
 
     ld   a, $65
     call .toc_07_5668
@@ -1550,7 +1550,7 @@ JumpTable_5E42_07:
 
     _ifZero [$C19B], .return_07_5EB4
 
-    ifNe [$DB00], $03, .else_07_5E78
+    ifEq [$DB00], $03, .else_07_5E78
 
     ld   a, [$FFCC]
     and  %00100000
@@ -1559,7 +1559,7 @@ JumpTable_5E42_07:
     jr   .return_07_5EB4
 
 .else_07_5E78:
-    ifNe [$DB01], $03, .return_07_5EB4
+    ifEq [$DB01], $03, .return_07_5EB4
 
     ld   a, [$FFCC]
     and  %00010000
@@ -1570,7 +1570,7 @@ JumpTable_5E42_07:
 
     inc  a
     ld   [$C3CF], a
-    ifEq [$FFEA], $07, .return_07_5EB4
+    ifNe [$FFEA], $07, .return_07_5EB4
 
     call JumpTable_3B8D_00
     ld   [hl], $02
@@ -2707,7 +2707,7 @@ toc_07_764B:
 
     _ifZero [$C19B], .return_07_769B
 
-    ifNe [$DB00], $03, .else_07_7665
+    ifEq [$DB00], $03, .else_07_7665
 
     ld   a, [$FFCC]
     and  %00100000
@@ -2716,7 +2716,7 @@ toc_07_764B:
     jr   .return_07_769B
 
 .else_07_7665:
-    ifNe [$DB01], $03, .return_07_769B
+    ifEq [$DB01], $03, .return_07_769B
 
     ld   a, [$FFCC]
     and  %00010000
@@ -3100,7 +3100,7 @@ toc_07_7C23:
     jr   nc, .else_07_7C74
 
     inc  e
-    ifEq [$FFEB], $B5, .else_07_7C4F
+    ifNe [$FFEB], $B5, .else_07_7C4F
 
     push de
     call toc_07_7D55
@@ -3122,7 +3122,7 @@ toc_07_7C23:
     or   [hl]
     jr   nz, .else_07_7C74
 
-    ifNe [wWYStash], 128, .else_07_7C74
+    ifEq [wWYStash], 128, .else_07_7C74
 
     ld   a, [$FFCC]
     and  %00010000
@@ -3138,9 +3138,9 @@ toc_07_7C23:
 
 
 toc_07_7C76:
-    ifNe [$FFEA], $05, .else_07_7C96
+    ifEq [$FFEA], $05, .else_07_7C96
 
-    ifEq [wGameMode], GAMEMODE_WORLD_MAP, .else_07_7C96
+    ifNe [wGameMode], GAMEMODE_WORLD_MAP, .else_07_7C96
 
     ld   a, [wDialogState]
     ld   hl, $C1A8

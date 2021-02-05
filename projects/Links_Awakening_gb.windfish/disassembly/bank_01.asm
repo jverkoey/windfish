@@ -14,7 +14,7 @@ JumpTable_4010_01:
     call JumpTable_1C5A_00.else_01_1CCC
     call toc_01_0B22
     call toc_01_1776
-    ifNe [$C16B], $04, .return_01_4040
+    ifEq [$C16B], $04, .return_01_4040
 
     assign [hVolumeRight], $03
     assign [hVolumeLeft], $30
@@ -45,7 +45,7 @@ JumpTable_404D_01:
 
 JumpTable_4065_01:
     call toc_01_17C3
-    ifNe [$C16B], $04, .return_01_4072
+    ifEq [$C16B], $04, .return_01_4072
 
     call JumpTable_4434_01.toc_01_4445
 .return_01_4072:
@@ -59,7 +59,7 @@ JumpTable_4073_01:
     jr   z, toc_01_40C2.return_01_40E8
 
     assign [$FFF2], $13
-    ifEq [$C13F], $01, toc_01_40C2
+    ifNe [$C13F], $01, toc_01_40C2
 
     call JumpTable_4434_01.toc_01_4445
     clear [$C16B]
@@ -252,7 +252,7 @@ JumpTable_428E_01:
     and  %10110000
     jr   z, .return_01_42E2
 
-    ifEq [$C13F], $01, .else_01_42DC
+    ifNe [$C13F], $01, .else_01_42DC
 
     cp   $00
     jr   z, .else_01_42A7
@@ -373,7 +373,7 @@ JumpTable_433F_01:
 .loop_01_435F:
     ld   a, [$FFF7]
     cp   $0A
-    ifEq [$FFF7], $08, .else_01_436B
+    ifNe [$FFF7], $08, .else_01_436B
 
     jr   c, .else_01_436E
 
@@ -1507,7 +1507,7 @@ toc_01_546E:
 
 JumpTable_55FD_01:
     call toc_01_1776
-    ifNe [$C16B], $04, .return_01_5655
+    ifEq [$C16B], $04, .return_01_5655
 
     clear [$C50A]
     ld   [$C116], a
@@ -1999,7 +1999,7 @@ toc_01_5D03:
 .else_01_5D46:
     jr   c, .else_01_5D63
 
-    ifNe [$C173], $4F, .else_01_5D61
+    ifEq [$C173], $4F, .else_01_5D61
 
     _ifZero [$C112], .else_01_5D61
 
@@ -2054,7 +2054,7 @@ toc_01_5D6B:
     ret  z
 
 .else_01_5D8B:
-    ifNe [$DB7B], $01, .else_01_5DCC
+    ifEq [$DB7B], $01, .else_01_5DCC
 
     ld   e, $0F
     ld   d, $00
@@ -2095,7 +2095,7 @@ toc_01_5D6B:
     add  hl, de
     ld   [hl], a
 .else_01_5DCC:
-    ifEq [$DB79], $01, .else_01_5DFB
+    ifNe [$DB79], $01, .else_01_5DFB
 
     cp   $02
     jr   nz, .else_01_5E37
@@ -2211,9 +2211,9 @@ toc_01_5D6B:
     ld   hl, $C2F0
     add  hl, de
     ld   [hl], $0C
-    ifNe [$FFF6], $A4, .else_01_5EAF
+    ifEq [$FFF6], $A4, .else_01_5EAF
 
-    ifNe [$FFF7], $11, .else_01_5EAF
+    ifEq [$FFF7], $11, .else_01_5EAF
 
     assign [$FFF2], $08
     ld   [$C167], a
@@ -2255,7 +2255,7 @@ toc_01_5ED7:
     cp   $A7
     ret  z
 
-    ifNe [$DB56], $01, .return_01_5F19
+    ifEq [$DB56], $01, .return_01_5F19
 
     ld   e, $0F
     ld   d, $00
@@ -2357,7 +2357,7 @@ toc_01_5F62:
 
 
 toc_01_5FA6:
-    ifNe [$C11C], $00, .return_01_5FBA
+    ifEq [$C11C], $00, .return_01_5FBA
 
     _ifZero [$C17B], .return_01_5FBA
 
@@ -2868,7 +2868,7 @@ toc_01_6DB7:
     ld   b, [hl]
     ld   c, a
 .loop_01_6DE6:
-    ifNe [gbLY], 16, .loop_01_6DE6
+    ifEq [gbLY], 16, .loop_01_6DE6
 
 .loop_01_6DEC:
     ld   a, [gbSTAT]
@@ -2940,7 +2940,7 @@ toc_01_6E3E:
     jr   z, toc_01_6EAD
 
     call toc_01_27D2
-    ifEq [wGameplaySubtype], 11, .else_01_6E90
+    ifNe [wGameplaySubtype], 11, .else_01_6E90
 
     assign [hButtonsInactiveDelay], 40
     assign [wBGMapToLoad], 17
@@ -4307,7 +4307,7 @@ toc_01_7EE8:
 .toc_01_7EEE:
     _ifZero [$C5A2], .else_01_7F06
 
-    ifEq [wGameMode], GAMEMODE_CREDITS, .else_01_7F06
+    ifNe [wGameMode], GAMEMODE_CREDITS, .else_01_7F06
 
     ld   hl, $D800
     add  hl, bc

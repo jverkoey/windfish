@@ -1966,7 +1966,7 @@ toc_17_78B3:
     add  hl, de
     ld   b, [hl]
     ld   hl, $7623
-    ifEq [$FFF1], $05, .else_17_790A
+    ifNe [$FFF1], $05, .else_17_790A
 
     and  a
     jr   z, .else_17_78E2
@@ -2103,7 +2103,7 @@ toc_17_7B07:
     inc  e
 .else_17_7B16:
     ld   d, $00
-    ifEq [wGameMode], GAMEMODE_CREDITS, .else_17_7B37
+    ifNe [wGameMode], GAMEMODE_CREDITS, .else_17_7B37
 
     ld   hl, $7B05
     add  hl, de
@@ -2139,7 +2139,7 @@ toc_17_7B57:
     inc  e
 .else_17_7B61:
     ld   d, $00
-    ifEq [wGameMode], GAMEMODE_CREDITS, .else_17_7B8F
+    ifNe [wGameMode], GAMEMODE_CREDITS, .else_17_7B8F
 
     ld   hl, $7B53
     add  hl, de
