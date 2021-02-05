@@ -66,6 +66,13 @@ ifNotZero: MACRO
     jr   z, \2
     ENDM
 
+ifNotZeroAtAddress: MACRO
+    ld   hl, \1
+    ld   a, [hl]
+    and  a
+    jr   z, \2
+    ENDM
+
 ifZero: MACRO
     ld   a, \1
     and  a

@@ -1562,10 +1562,7 @@ JumpTable_0B53_00:
     call_changebank $02
     _ifZero [wDialogState], .else_01_0B9A
 
-    ld   hl, $FFB4
-    ld   a, [hl]
-    and  a
-    jr   z, .else_01_0B80
+    ifNotZeroAtAddress $FFB4, .else_01_0B80
 
     ifNe [wWYStash], 128, .else_01_0B80
 
@@ -1591,10 +1588,7 @@ JumpTable_0B53_00:
     jp   toc_01_0909
 
 .else_01_0B9A:
-    ld   hl, $DBC7
-    ld   a, [hl]
-    and  a
-    jr   z, .else_01_0BA2
+    ifNotZeroAtAddress $DBC7, .else_01_0BA2
 
     dec  [hl]
 .else_01_0BA2:
@@ -7971,10 +7965,7 @@ toc_01_3831:
     db   $00, $08, $10, $18
 
 toc_01_3843:
-    ld   hl, $C5A7
-    ld   a, [hl]
-    and  a
-    jr   z, .else_01_3851
+    ifNotZeroAtAddress $C5A7, .else_01_3851
 
     dec  [hl]
     jr   nz, .else_01_3851

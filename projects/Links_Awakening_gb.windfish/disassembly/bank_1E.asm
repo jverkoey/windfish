@@ -19,7 +19,7 @@ toc_1E_401E:
 .toc_1E_4028:
     call toc_1E_457C
 .toc_1E_402B:
-    clear [$D360]
+    clear [wActiveJingle]
     ld   [$D368], a
     ld   [$D370], a
     ld   [$D378], a

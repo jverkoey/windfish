@@ -28,6 +28,8 @@ wDialogState EQU $C19F
 
 wAlternateBackgroundEnabled EQU $C500
 
+wActiveJingle EQU $D360
+
 wLCDCStash EQU $D6FD
 
 wTileMapToLoad EQU $D6FE

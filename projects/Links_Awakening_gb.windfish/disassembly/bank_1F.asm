@@ -26,7 +26,7 @@ toc_1F_401E:
     call toc_1F_4204
     call toc_1F_53ED
     call toc_1F_64E8
-    clear [$D360]
+    clear [wActiveJingle]
     ld   [$D370], a
     ld   [$D378], a
     ret
@@ -93,12 +93,9 @@ toc_1F_401E:
     db   $3D, $53
 
 toc_1F_4204:
-    ld   hl, $D360
-    ld   a, [hl]
-    and  a
-    jr   z, .else_1F_421C
+    ifNotZeroAtAddress wActiveJingle, .else_1F_421C
 
-    cp   $01
+    cp   1
     jr   z, .else_1F_4216
 
     ifZero [$D3C6], toc_1F_53E6
@@ -691,14 +688,11 @@ toc_1F_4204:
     db   $7A
 
 toc_1F_53E6:
-    clear [$D360]
+    clear [wActiveJingle]
     jp   toc_1F_4204
 
 toc_1F_53ED:
-    ld   hl, $D370
-    ld   a, [hl]
-    and  a
-    jr   z, .else_1F_5405
+    ifNotZeroAtAddress $D370, .else_1F_5405
 
     cp   $14
     jr   z, .else_1F_53FF
@@ -1272,10 +1266,7 @@ toc_1F_6385:
     db   $07, $79, $5D, $79
 
 toc_1F_64E8:
-    ld   hl, $D378
-    ld   a, [hl]
-    and  a
-    jr   z, .else_1F_64FC
+    ifNotZeroAtAddress $D378, .else_1F_64FC
 
     ifZero [$D3C9], toc_1F_7A28
 
@@ -2253,7 +2244,7 @@ toc_1F_7F80:
     ld   [gbAUDVOL], a
     ifNotZero [$FFF2], .else_1F_7FD7
 
-    ld   [$D360], a
+    ld   [wActiveJingle], a
     clear [$FFF2]
 .else_1F_7FD7:
     ifNotZero [$FFF3], .else_1F_7FE2

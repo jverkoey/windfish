@@ -46,6 +46,8 @@ wDialogState EQU $C19F ; [binary]
 
 wAlternateBackgroundEnabled EQU $C500 ; [bool]
 
+wActiveJingle EQU $D360 ; [decimal]
+
 wLCDCStash EQU $D6FD ; [LCDCF]
 
 wTileMapToLoad EQU $D6FE ; [hex]

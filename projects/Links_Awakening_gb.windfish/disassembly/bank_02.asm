@@ -445,10 +445,7 @@ toc_02_4353:
 .else_02_4427:
     _ifZero [hLinkWalksSlow], .else_02_4448
 
-    ld   hl, $C11F
-    ld   a, [hl]
-    and  a
-    jr   z, .else_02_4454
+    ifNotZeroAtAddress $C11F, .else_02_4454
 
     cp   $07
     jr   nz, .else_02_444F
@@ -3509,10 +3506,7 @@ toc_02_5F09:
     or   [hl]
     ret  nz
 
-    ld   hl, $C3CE
-    ld   a, [hl]
-    and  a
-    jr   z, .else_02_5F1B
+    ifNotZeroAtAddress $C3CE, .else_02_5F1B
 
     dec  [hl]
     ret
