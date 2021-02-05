@@ -558,59 +558,59 @@ JumpTable_4476_01.else_01_44B2:
 
 toc_01_44BC:
     ld   [$D47B], a
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$A454], [$DB80]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$A455], [$DB81]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$A456], [$DB82]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$A457], [$DB83]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$A458], [$DB84]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$A45F], [$DC06]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$A460], [$DC09]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$A45C], [$DC00]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$A45D], [$DC01]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$A7D9], [$DB85]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$A7DA], [$DB86]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$A7DB], [$DB87]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$A7DC], [$DB88]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$A7DD], [$DB89]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$A7E4], [$DC07]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$A7E5], [$DC0A]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$A7E1], [$DC02]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$A7E2], [$DC03]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$AB5E], [$DB8A]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$AB5F], [$DB8B]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$AB60], [$DB8C]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$AB61], [$DB8D]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$AB62], [$DB8E]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$AB69], [$DC08]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$AB6A], [$DC0B]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$AB66], [$DC04]
-    call toc_01_27B5
+    call enableRAM
     copyFromTo [$AB67], [$DC05]
     assign [wGameMode], GAMEMODE_FILE_SELECT
     clear [$DB96]
@@ -711,7 +711,7 @@ toc_01_46DD:
     ld   hl, $A100
     add  hl, de
 toc_01_46DD.loop_01_46E5:
-    call toc_01_27B5
+    call enableRAM
     ldi  a, [hl]
     cp   c
     jr   nz, .else_01_46F3
@@ -728,7 +728,7 @@ toc_01_46DD.else_01_46F3:
     add  hl, de
     ld   a, $01
 toc_01_46DD.loop_01_46F9:
-    call toc_01_27B5
+    call enableRAM
     ldi  [hl], a
     inc  a
     inc  a
@@ -737,7 +737,7 @@ toc_01_46DD.loop_01_46F9:
 
     ld   de, $0380
 toc_01_46DD.loop_01_4706:
-    call toc_01_27B5
+    call enableRAM
     xor  a
     ldi  [hl], a
     dec  de
@@ -1154,7 +1154,7 @@ toc_01_512A.else_01_5141:
     ld   hl, $D800
     ld   de, $0380
 toc_01_512A.loop_01_515F:
-    call toc_01_27B5
+    call enableRAM
     ld   a, [bc]
     inc  bc
     ldi  [hl], a
@@ -1791,10 +1791,10 @@ toc_01_5B94.else_01_5BA8:
     ld   bc, $D800
     ld   de, $0380
 toc_01_5B94.loop_01_5BC0:
-    call toc_01_27B5
+    call enableRAM
     ld   a, [bc]
     inc  bc
-    call toc_01_27B5
+    call enableRAM
     ldi  [hl], a
     dec  de
     ld   a, e

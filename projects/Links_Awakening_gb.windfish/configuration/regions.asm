@@ -66,6 +66,8 @@ initializeBGDAT0: ; [Function] $00:$28A8 [0]
 
 copyHLToDE: ; [Function] $00:$28C5 [0]
 
+enableRAM: ; [Label] $00:$27B5 [0]
+
 tile_link_walking: ; [Image (2bpp)] $0C:$4000 [64]
 
 tile_sword_vert: ; [Image (2bpp)] $0C:$4040 [32]

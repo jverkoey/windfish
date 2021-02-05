@@ -5549,7 +5549,7 @@ toc_01_27A8:
     ret
 
 
-toc_01_27B5:
+enableRAM:
     push hl
     ld   hl, $0000
     ld   [hl], $0A
