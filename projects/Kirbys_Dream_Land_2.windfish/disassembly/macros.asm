@@ -5,6 +5,12 @@ __ifNotZero: MACRO
     jr   z, \2
     ENDM
 
+_ifGte: MACRO
+    ld   a, \1
+    cp   \2
+    jp   c, \3
+    ENDM
+
 _ifZero: MACRO
     ld   a, \1
     and  a
@@ -49,7 +55,7 @@ ifEq: MACRO
     jr   nz, \3
     ENDM
 
-ifGte: MACRO
+ifLt: MACRO
     ld   a, \1
     cp   \2
     jr   nc, \3

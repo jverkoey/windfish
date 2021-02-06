@@ -196,9 +196,7 @@ vblankHandler:
     jp   toc_00_022B.toc_01_029F
 
 .else_01_016F:
-    ld   a, [$DA0F]
-    cp   $01
-    jp   c, .else_01_0193
+    _ifGte [$DA0F], $01, .else_01_0193
 
     ld   a, $C0
     jr   z, .else_01_017C

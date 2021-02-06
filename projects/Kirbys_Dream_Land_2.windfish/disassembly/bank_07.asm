@@ -175,7 +175,7 @@ toc_07_4128:
 .else_07_418A:
     ld   a, [$DB6F]
     ld   e, a
-    ifGte [$DB61], $08, .else_07_41AD
+    ifLt [$DB61], $08, .else_07_41AD
 
     ld   a, [$A071]
     or   a
