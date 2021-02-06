@@ -95,7 +95,7 @@ initializeHardware:
     cbcall $1F, $4232
     ld   e, $FF
     call toc_1E_4299
-    call toc_1E_4387
+    call toc_1E_4368.toc_1E_4387
     ld   hl, gbAUD1HIGH
     set  7, [hl]
     ld   hl, gbAUD2HIGH
@@ -249,12 +249,31 @@ toc_1E_4357:
     ret
 
 
-    db   $06, $03, $26, $CE, $3E, $52, $80, $6F
-    db   $7E, $A7, $20, $0B, $3E, $CE, $80, $6F
-    db   $36, $FF, $C6, $FC, $6F, $36, $00, $05
-    db   $CB, $78, $28, $E6, $CD, $57, $43
+toc_1E_4368:
+    ld   b, $03
+.loop_1E_436A:
+    ld   h, $CE
+    ld   a, $52
+    add  a, b
+    ld   l, a
+    ld   a, [hl]
+    and  a
+    jr   nz, .else_1E_437F
 
-toc_1E_4387:
+    ld   a, $CE
+    add  a, b
+    ld   l, a
+    ld   [hl], $FF
+    add  a, $FC
+    ld   l, a
+    ld   [hl], $00
+.else_1E_437F:
+    dec  b
+    bit  7, b
+    jr   z, .loop_1E_436A
+
+    call toc_1E_4357
+.toc_1E_4387:
     ld   de, $CE2E
     ld   a, [$CE03]
     bit  0, a

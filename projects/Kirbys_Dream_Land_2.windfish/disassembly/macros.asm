@@ -49,6 +49,18 @@ copyFromTo: MACRO
     ld   \2, a
     ENDM
 
+ifAddressAtHLNotZero: MACRO
+    ld   a, [hl]
+    and  a
+    jr   z, \1
+    ENDM
+
+ifBEq: MACRO
+    ld   a, \1
+    cp   b
+    jr   nz, \2
+    ENDM
+
 ifEq: MACRO
     ld   a, \1
     cp   \2

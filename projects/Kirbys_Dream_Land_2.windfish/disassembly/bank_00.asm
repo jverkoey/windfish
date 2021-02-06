@@ -3393,9 +3393,7 @@ toc_01_2BFD:
     ld   a, $52
     add  a, b
     ld   l, a
-    ld   a, [hl]
-    and  a
-    jr   z, .else_01_2C48
+    ifAddressAtHLNotZero .else_01_2C48
 
     ld   a, b
     cp   $04
@@ -3441,9 +3439,7 @@ toc_01_2BFD:
     pop  hl
     ld   [hl], e
 .else_01_2C48:
-    ld   a, $04
-    cp   b
-    jr   nz, .else_01_2C52
+    ifBEq $04, .else_01_2C52
 
     ld   a, $1E
     call changeBankAndCall.loadBank
@@ -3452,7 +3448,7 @@ toc_01_2BFD:
     bit  7, b
     jr   z, .loop_01_2C04
 
-    jp   toc_01_4368
+    jp   toc_1E_4368
 
 toc_01_2C5A:
     ld   h, $CE
@@ -3532,9 +3528,7 @@ toc_01_2C5A:
     ld   a, $82
     add  a, b
     ld   l, a
-    ld   a, [hl]
-    and  a
-    jr   z, .else_01_2CC3
+    ifAddressAtHLNotZero .else_01_2CC3
 
     ld   [hl], $01
 .else_01_2CC3:
@@ -3556,9 +3550,7 @@ toc_01_2C5A:
     ld   [hl], $FF
     add  a, $10
     ld   l, a
-    ld   a, [hl]
-    and  a
-    jr   z, .else_01_2CEF
+    ifAddressAtHLNotZero .else_01_2CEF
 
     push bc
     push de
