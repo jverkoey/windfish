@@ -59,6 +59,7 @@ final class CallStackViewController: NSViewController {
     }
     tableView.selectionHighlightStyle = .regular
     tableView.delegate = self
+    tableView.doubleAction = #selector(didDoubleTap(_:))
     containerView.documentView = tableView
     view.addSubview(containerView)
     self.tableView = tableView
@@ -101,6 +102,13 @@ final class CallStackViewController: NSViewController {
     super.viewWillAppear()
 
     project.emulationObservers.add(self)
+  }
+
+  @objc func didDoubleTap(_ sender: Any?) {
+    guard let callStack: CallStack = elementsController.selectedObjects.first as? CallStack else {
+      return
+    }
+    NotificationCenter.default.post(name: .jumpToLocation, object: project, userInfo: ["location": Cartridge.Location(address: callStack.address, bank: callStack.bank)])
   }
 }
 

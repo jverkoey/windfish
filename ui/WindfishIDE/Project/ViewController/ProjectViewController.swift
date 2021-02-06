@@ -23,6 +23,7 @@ final class ProjectViewController: NSViewController {
 
   private var selectedFileDidChangeSubscriber: AnyCancellable?
   private var selectedRegionDidChangeSubscriber: AnyCancellable?
+  private var jumpToLocationSubscriber: AnyCancellable?
   private var didCreateRegionSubscriber: AnyCancellable?
   private var disassembledSubscriber: AnyCancellable?
 
@@ -180,6 +181,15 @@ final class ProjectViewController: NSViewController {
           preconditionFailure()
         }
         self.showRegion(region)
+      })
+
+    jumpToLocationSubscriber = NotificationCenter.default.publisher(for: .jumpToLocation, object: project)
+      .receive(on: RunLoop.main)
+      .sink(receiveValue: { notification in
+        guard let location = notification.userInfo?["location"] as? Cartridge.Location else {
+          preconditionFailure()
+        }
+        self.jumpTo(address: location.address, bank: location.bank, highlight: true)
       })
 
     didCreateRegionSubscriber = NotificationCenter.default.publisher(for: .didCreateRegion, object: project)
