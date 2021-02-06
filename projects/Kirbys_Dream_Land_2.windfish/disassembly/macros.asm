@@ -61,6 +61,13 @@ ifNotZero: MACRO
     jr   z, \2
     ENDM
 
+ifNotZeroAtAddress: MACRO
+    ld   hl, \1
+    ld   a, [hl]
+    and  a
+    jr   z, \2
+    ENDM
+
 incAddr: MACRO
     ld   hl, \1
     inc  [hl]
@@ -83,4 +90,10 @@ plotFromTo: MACRO
     ld   hl, \1
     ld   de, \2
     call decompressHAL
+    ENDM
+
+returnIfGte: MACRO
+    ld   a, \1
+    cp   \2
+    ret  nc
     ENDM

@@ -1564,25 +1564,64 @@ toc_0F_6CEF:
 
     jr   .toc_0F_6D10
 
+toc_0F_6D21:
+    returnIfGte [$DF0A], $03
+
+    ld   de, $BF02
+    cp   $01
+    jr   c, .else_0F_6D36
+
+    ld   de, $BF1E
+    jr   z, .else_0F_6D36
+
+    ld   de, $BF3A
+.else_0F_6D36:
+    ld   hl, $68A4
+.toc_0F_6D39:
+    ldi  a, [hl]
+    or   a
+    jr   z, .else_0F_6D50
+
+    ld   [$FF84], a
+    ldi  a, [hl]
+    ld   c, a
+    ldi  a, [hl]
+    ld   b, a
+.loop_0F_6D43:
+    ld   a, [de]
+    inc  de
+    ld   [bc], a
+    inc  bc
+    ld   a, [$FF84]
+    dec  a
+    ld   [$FF84], a
+    jr   nz, .loop_0F_6D43
+
+    jr   .toc_0F_6D39
+
+.else_0F_6D50:
+    ld   hl, $FFE6
+    add  hl, de
+    ldi  a, [hl]
+    or   [hl]
+    ret  nz
+
+    assign [$A084], $02
+    assign [$A04C], $0C
+    assign [$A072], $06
+    assign [$A05B], $FF
+    ret
+
+
     db   $FA, $0A, $DF, $FE, $03, $D0, $11, $02
     db   $BF, $FE, $01, $38, $08, $11, $1E, $BF
     db   $28, $03, $11, $3A, $BF, $21, $A4, $68
     db   $2A, $B7, $28, $13, $E0, $84, $2A, $4F
-    db   $2A, $47, $1A, $13, $02, $03, $F0, $84
+    db   $2A, $47, $0A, $03, $12, $13, $F0, $84
     db   $3D, $E0, $84, $20, $F5, $18, $E9, $21
-    db   $E6, $FF, $19, $2A, $B6, $C0, $3E, $02
-    db   $EA, $84, $A0, $3E, $0C, $EA, $4C, $A0
-    db   $3E, $06, $EA, $72, $A0, $3E, $FF, $EA
-    db   $5B, $A0, $C9, $FA, $0A, $DF, $FE, $03
-    db   $D0, $11, $02, $BF, $FE, $01, $38, $08
-    db   $11, $1E, $BF, $28, $03, $11, $3A, $BF
-    db   $21, $A4, $68, $2A, $B7, $28, $13, $E0
-    db   $84, $2A, $4F, $2A, $47, $0A, $03, $12
-    db   $13, $F0, $84, $3D, $E0, $84, $20, $F5
-    db   $18, $E9, $21, $E8, $FF, $19, $06, $17
-    db   $E5, $2A, $AE, $23, $05, $20, $FB, $77
-    db   $E1, $06, $18, $2A, $86, $23, $05, $20
-    db   $FB, $77, $C9
+    db   $E8, $FF, $19, $06, $17, $E5, $2A, $AE
+    db   $23, $05, $20, $FB, $77, $E1, $06, $18
+    db   $2A, $86, $23, $05, $20, $FB, $77, $C9
 
 toc_0F_6DB4:
     assign [$FF82], $03

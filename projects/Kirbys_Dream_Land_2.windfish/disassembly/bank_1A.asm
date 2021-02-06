@@ -116,12 +116,41 @@ DMARoutine:
     db   $03, $34, $6F, $6E, $01, $03, $34, $71
     db   $70, $02, $03, $34, $73, $72, $03, $03
     db   $34, $75, $74, $04, $03, $34, $77, $76
-    db   $05, $03, $34, $79, $78, $06, $FA, $ED
-    db   $DE, $B7, $C8, $E1, $7A, $21, $F2, $40
-    db   $87, $85, $6F, $30, $01, $24, $2A, $66
-    db   $6F, $7E, $4F, $11, $0C, $CD, $12, $1C
-    db   $06, $00, $09, $3A, $12, $1C, $0D, $20
-    db   $FA, $18, $30
+    db   $05, $03, $34, $79, $78, $06
+
+toc_1A_41E0:
+    ld   a, [$DEED]
+    or   a
+    ret  z
+
+    pop  hl
+    ld   a, d
+    ld   hl, $40F2
+    add  a, a
+    add  a, l
+    ld   l, a
+    jr   nc, .else_1A_41F0
+
+    inc  h
+.else_1A_41F0:
+    ldi  a, [hl]
+    ld   h, [hl]
+    ld   l, a
+    ld   a, [hl]
+    ld   c, a
+    ld   de, $CD0C
+    ld   [de], a
+    inc  e
+    ld   b, $00
+    add  hl, bc
+.loop_1A_41FD:
+    ldd  a, [hl]
+    ld   [de], a
+    inc  e
+    dec  c
+    jr   nz, .loop_1A_41FD
+
+    jr   toc_1A_4205.toc_1A_4235
 
 toc_1A_4205:
     ld   a, [$DEED]
@@ -165,14 +194,16 @@ toc_1A_4205:
     dec  b
     jr   nz, .loop_1A_422E
 
+.toc_1A_4235:
     assign [$DA34], $0D
     assign [$DA38], $01
     assign [$FF84], $04
-    jp   toc_1A_42C5.toc_1A_42CA
+    jp   toc_1A_42A4.toc_1A_42CA
 
 toc_1A_4246:
     assign [$DA37], $FF
     call toc_1A_4205
+.toc_1A_424E:
     ld   a, e
     ld   [$FF84], a
     ld   a, [$CD00]
@@ -194,21 +225,49 @@ toc_1A_4246:
     dec  c
     jr   nz, .loop_1A_4266
 
-    jr   toc_1A_42C5
+    jr   toc_1A_42A4.toc_1A_42C5
 
     db   $CD, $92, $42, $18, $0D, $CD, $9A, $42
-    db   $18, $08, $CD, $A4, $42, $18, $03, $CD
-    db   $AC, $42, $3E, $01, $EA, $39, $DA, $CD
-    db   $43, $03, $FA, $36, $DA, $B7, $20, $F2
-    db   $C9, $3E, $01, $EA, $37, $DA, $CD, $E0
-    db   $41, $3E, $01, $EA, $35, $DA, $7B, $E0
-    db   $84, $18, $10, $3E, $00, $EA, $37, $DA
-    db   $CD, $E0, $41, $3E, $00, $EA, $35, $DA
-    db   $7B, $E0, $84, $21, $03, $CD, $11, $00
-    db   $CD, $0E, $09, $1A, $1C, $CD, $DD, $42
-    db   $22, $0D, $20, $F7
+    db   $18, $08
 
-toc_1A_42C5:
+toc_1A_427B:
+    call toc_1A_42A4
+    jr   toc_1A_4283
+
+    db   $CD, $AC, $42
+
+toc_1A_4283:
+    assign [$DA39], $01
+    call toc_01_0343
+    ld   a, [$DA36]
+    or   a
+    jr   nz, toc_1A_4283
+
+    ret
+
+
+    db   $3E, $01, $EA, $37, $DA, $CD, $E0, $41
+    db   $3E, $01, $EA, $35, $DA, $7B, $E0, $84
+    db   $18, $10
+
+toc_1A_42A4:
+    assign [$DA37], $00
+    call toc_1A_41E0
+    assign [$DA35], $00
+    ld   a, e
+    ld   [$FF84], a
+    ld   hl, $CD03
+    ld   de, $CD00
+    ld   c, $09
+.loop_1A_42BC:
+    ld   a, [de]
+    inc  e
+    call toc_1A_42DD
+    ldi  [hl], a
+    dec  c
+    jr   nz, .loop_1A_42BC
+
+.toc_1A_42C5:
     assign [$DA34], $03
 .toc_1A_42CA:
     copyFromTo [$FF84], [$DA32]

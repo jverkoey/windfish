@@ -1525,7 +1525,7 @@ toc_1E_5FEB:
 
 toc_1E_6002:
     clear [$FF84]
-    call toc_1E_6039
+    call toc_1E_6035.toc_1E_6039
     ret  z
 
     jp   toc_1E_5DF3
@@ -1547,13 +1547,18 @@ toc_1E_6011:
 
     ld   a, $35
 .else_1E_6028:
-    call toc_1E_6039.toc_1E_6042
+    call toc_1E_6035.toc_1E_6042
     jp   toc_1E_5DF3
 
-    db   $CD, $35, $60, $C8, $C3, $F3, $5D, $3E
-    db   $80, $E0, $84
+toc_1E_602E:
+    call toc_1E_6035
+    ret  z
 
-toc_1E_6039:
+    jp   toc_1E_5DF3
+
+toc_1E_6035:
+    assign [$FF84], $80
+.toc_1E_6039:
     ld   a, [$DEED]
     or   a
     ret  z
