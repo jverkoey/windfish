@@ -1485,9 +1485,7 @@ toc_0E_6C52:
     call toc_01_04AE
     call toc_01_0343
     call toc_01_0357
-    ld   a, [$DF3A]
-    or   a
-    jr   z, .loop_0E_6CCC
+    __ifNotZero [$DF3A], .loop_0E_6CCC
 
     ld   a, [$FFA5]
     bit  0, a

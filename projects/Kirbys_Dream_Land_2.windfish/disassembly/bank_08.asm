@@ -395,9 +395,7 @@ toc_08_44D0:
     jr   .toc_08_4508
 
 .else_08_4521:
-    ld   a, [$DB3A]
-    or   a
-    jr   z, .else_08_4532
+    __ifNotZero [$DB3A], .else_08_4532
 
     clear [$DB3A]
     ldi  a, [hl]

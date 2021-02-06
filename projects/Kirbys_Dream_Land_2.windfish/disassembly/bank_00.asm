@@ -185,12 +185,10 @@ main:
     jp   initialize
 
 vblankHandler:
-    ld   a, [$FFB5]
-    or   a
-    jr   z, .else_01_016F
+    __ifNotZero [$FFB5], .else_01_016F
 
-.loop_01_015E:
-    ifEq [gbLY], 145, .loop_01_015E
+.waitForVBlank:
+    ifEq [gbLY], 145, .waitForVBlank
 
     ld   hl, gbLCDC
     res  7, [hl]
@@ -385,9 +383,7 @@ toc_00_022B:
     ld   a, [$DA17]
     ld   [hl], a
     ld   hl, gbLCDC
-    ld   a, [$DA2B]
-    or   a
-    jr   z, .else_01_026F
+    __ifNotZero [$DA2B], .else_01_026F
 
     res  1, [hl]
     jr   .toc_01_0271
@@ -1485,9 +1481,7 @@ toc_01_08DE:
     db   $C3, $CE, $08
 
 toc_01_0B94:
-    ld   a, [$DA48]
-    or   a
-    jr   z, .else_01_0BA8
+    __ifNotZero [$DA48], .else_01_0BA8
 
     ld   h, a
     ld   l, $01
@@ -1754,9 +1748,7 @@ toc_01_10E6:
     ld   a, [$A05B]
     inc  a
     ld   [$DEE0], a
-    ld   a, [$A071]
-    or   a
-    jr   z, .else_01_111D
+    __ifNotZero [$A071], .else_01_111D
 
     ld   hl, $DEDF
     set  1, [hl]
@@ -1874,9 +1866,7 @@ toc_01_11BE:
 
     assign [$A082], $09
 .else_01_1219:
-    ld   a, [$A082]
-    or   a
-    jr   z, .loop_01_11C6
+    __ifNotZero [$A082], .loop_01_11C6
 
     ret
 
@@ -2068,9 +2058,7 @@ toc_01_1286:
     swap a
 .else_01_1388:
     ld   [$DB5E], a
-    ld   a, [$DB73]
-    or   a
-    jr   z, .else_01_13A3
+    __ifNotZero [$DB73], .else_01_13A3
 
     pop  hl
     ld   a, [$DB60]

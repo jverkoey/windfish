@@ -1,4 +1,10 @@
 
+__ifNotZero: MACRO
+    ld   a, \1
+    or   a
+    jr   z, \2
+    ENDM
+
 _ifZero: MACRO
     ld   a, \1
     and  a

@@ -167,9 +167,7 @@ toc_07_4128:
     ld   a, [hl]
 .else_07_417B:
     ld   [$DB6F], a
-    ld   a, [$DB38]
-    or   a
-    jr   z, .else_07_418A
+    __ifNotZero [$DB38], .else_07_418A
 
     clear [$DB38]
     jr   .return_07_41B5

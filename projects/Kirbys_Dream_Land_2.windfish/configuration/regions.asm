@@ -88,6 +88,8 @@ readLongCommand: ; [Label] $00:$0718 [0]
 
 vblankHandler: ; [Label] $00:$0159 [0]
 
+waitForVBlank: ; [Label] $00:$015E [0]
+
 initialize: ; [Function] $1A:$4000 [0]
 
 waitForVBlank: ; [Label] $1A:$4003 [0]
