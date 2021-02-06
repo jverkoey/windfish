@@ -232,9 +232,8 @@ final class ProjectViewController: NSViewController {
     }) else {
       return
     }
-    self.sidebarViewController.treeController.setSelectionIndexPath(IndexPath(indexes: [0, index]))
 
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+    let jumpToLine: () -> Void = {
       guard let lineIndex = self.project.disassemblyResults?.lineFor(address: address, bank: bank) else {
         return
       }
@@ -258,6 +257,14 @@ final class ProjectViewController: NSViewController {
         let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphGraph, in: textContainer)
         self.sourceViewController.sourceView?.scroll(boundingRect.offsetBy(dx: 0, dy: -containerView.bounds.height / 2).origin)
       }
+    }
+
+    let desiredIndexPath: IndexPath = IndexPath(indexes: [0, index])
+    if self.sidebarViewController.treeController.selectionIndexPath != desiredIndexPath {
+      self.sidebarViewController.treeController.setSelectionIndexPath(desiredIndexPath)
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: jumpToLine)
+    } else {
+      jumpToLine()
     }
   }
 
