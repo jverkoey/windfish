@@ -12,6 +12,7 @@ final class SourceView: NSTextView {
   override init(frame frameRect: NSRect) {
     super.init(frame: frameRect)
 
+    self.isAutomaticQuoteSubstitutionEnabled = false
     self.isVerticallyResizable = true
     self.autoresizingMask = [.width]
     self.textContainer?.containerSize = NSSize(width: frame.width, height: CGFloat.greatestFiniteMagnitude)

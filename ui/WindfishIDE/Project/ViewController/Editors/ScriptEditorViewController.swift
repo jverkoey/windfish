@@ -67,7 +67,6 @@ final class ScriptEditorViewController: NSViewController, TabSelectable {
     self.sourceContainerView = containerView
     self.sourceTextView = textView
 
-    
     let safeAreas: ViewOrLayoutGuide
     if #available(OSX 11.0, *) {
       safeAreas = view.safeAreaLayoutGuide
