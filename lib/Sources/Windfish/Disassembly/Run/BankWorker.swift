@@ -59,7 +59,7 @@ extension Disassembler {
         self.registerBankChange(to: max(1, desiredBank), at: Cartridge.Location(address: address, bank: bank))
         self.currentRun?.selectedBank = desiredBank
       }
-      let registerTransferOfControl: @convention(block) (Cartridge.Bank, LR35902.Address, Cartridge.Bank, LR35902.Address) -> Void = { [weak self] toBank, toAddress, fromBank, fromAddress in
+      let didEncounterTransferOfControl: @convention(block) (Cartridge.Bank, LR35902.Address, Cartridge.Bank, LR35902.Address) -> Void = { [weak self] toBank, toAddress, fromBank, fromAddress in
         guard let self = self,
               let currentRun: Run = self.currentRun,
               let currentInstruction: LR35902.Instruction = self.currentInstruction else {
@@ -77,7 +77,7 @@ extension Disassembler {
       }
       for script in self.linearSweepScripts {
         script.context.setObject(changeBank, forKeyedSubscript: "changeBank" as NSString)
-        script.context.setObject(registerTransferOfControl, forKeyedSubscript: "registerTransferOfControl" as NSString)
+        script.context.setObject(didEncounterTransferOfControl, forKeyedSubscript: "didEncounterTransferOfControl" as NSString)
       }
     }
 

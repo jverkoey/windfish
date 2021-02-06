@@ -23,6 +23,6 @@ function linearSweepDidStep(opcode, immediate, pc, bank) {
       && window[1].opcode == ld_a_imm8
       && window[2].opcode == call_r16
       && window[2].immediate == 0x05CF) {
-    registerTransferOfControl(window[1].immediate, window[0].immediate, bank, pc);
+    didEncounterTransferOfControl(window[1].immediate, window[0].immediate, bank, pc);
   }
 }
