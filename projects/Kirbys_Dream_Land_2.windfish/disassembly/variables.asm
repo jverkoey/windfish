@@ -140,6 +140,8 @@ gbPCM12 EQU $FF76
 
 gbPCM34 EQU $FF77
 
+hDMARegion EQU $FF80
+
 hDesiredBankChange EQU $FF96
 
 hLastBank EQU $FFA4

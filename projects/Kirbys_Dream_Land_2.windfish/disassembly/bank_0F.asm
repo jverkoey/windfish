@@ -1628,7 +1628,7 @@ toc_0F_6DB4:
     ld   hl, $BF00
 .loop_0F_6DBB:
     push hl
-    clear [$FF80]
+    clear [hDMARegion]
     ld   [$FF81], a
     ld   de, $0003
     add  hl, de
@@ -1642,7 +1642,7 @@ toc_0F_6DB4:
     ld   c, $03
     call toc_0F_6DED
     pop  hl
-    ld   a, [$FF80]
+    ld   a, [hDMARegion]
     ldi  [hl], a
     ld   a, [$FF81]
     ldd  [hl], a
@@ -1673,10 +1673,10 @@ toc_0F_6DED:
 
 
 toc_0F_6DFD:
-    ld   a, [$FF80]
+    ld   a, [hDMARegion]
     add  a, c
     daa
-    ld   [$FF80], a
+    ld   [hDMARegion], a
     ld   a, [$FF81]
     adc  $00
     daa

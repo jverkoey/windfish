@@ -5,6 +5,11 @@ __ifNotZero: MACRO
     jr   z, \2
     ENDM
 
+_changebank: MACRO
+    ld   a, \1
+    call changeBankAndCall.loadBank
+    ENDM
+
 _ifGte: MACRO
     ld   a, \1
     cp   \2
@@ -53,6 +58,12 @@ ifAddressAtHLNotZero: MACRO
     ld   a, [hl]
     and  a
     jr   z, \1
+    ENDM
+
+ifAddressAtHLZero: MACRO
+    ld   a, [hl]
+    and  a
+    jr   nz, \1
     ENDM
 
 ifBEq: MACRO

@@ -96,6 +96,8 @@ startDMATransfer: ; [Label] $00:$017C [0]
 
 loadScrollPosition: ; [Label] $00:$018D [0]
 
+doCE82PlusB: ; [Label] $00:$2F31 [0]
+
 initialize: ; [Function] $1A:$4000 [0]
 
 waitForVBlank: ; [Label] $1A:$4003 [0]

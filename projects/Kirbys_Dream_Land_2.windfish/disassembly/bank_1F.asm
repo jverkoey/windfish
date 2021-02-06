@@ -117,9 +117,7 @@ toc_1F_4232:
 .loop_1F_4269:
     ld   hl, $CE52
     add  hl, bc
-    ld   a, [hl]
-    and  a
-    jr   nz, .else_1F_4279
+    ifAddressAtHLZero .else_1F_4279
 
     call toc_01_2B97
     pop  hl

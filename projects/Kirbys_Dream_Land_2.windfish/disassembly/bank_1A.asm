@@ -11,7 +11,7 @@ initialize:
     memsetWithValue gbRAM, $2000, $00
     ld   sp, $E000
     memsetWithValue gbOAMRAM, $0100, $00
-    memsetWithValue $FF80, $007F, $00
+    memsetWithValue hDMARegion, $007F, $00
     memsetWithValue gbCARTRAM, $1C00, $00
     clear [gbIF]
     assign [gbIE], IE_LCDC | IE_TIMEROVERFLOW | IE_VBLANK
@@ -21,8 +21,7 @@ initialize:
     assign [gbSTAT], STATF_LYC
     assign [gbLYC], 255
     ld   [wDesiredLYC], a
-    ld   a, $1A
-    call changeBankAndCall.loadBank
+    _changebank $1A
     memcpyFromTo $40E8, $FF88, $000A
     ld   hl, $DA21
     ld   a, $02

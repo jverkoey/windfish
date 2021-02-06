@@ -402,7 +402,7 @@ toc_07_4259:
 
 toc_07_42BC:
     ld   [$FF84], a
-    ld   [$FF80], a
+    ld   [hDMARegion], a
     call toc_01_15FC
     push hl
     call toc_01_15E3
@@ -468,7 +468,7 @@ toc_07_42BC:
 
     ld   hl, $DA24
 .else_07_4313:
-    ld   a, [$FF80]
+    ld   a, [hDMARegion]
     add  a, [hl]
     ld   [hl], a
     ret
@@ -476,7 +476,7 @@ toc_07_42BC:
 
 toc_07_4318:
     ld   [$FF84], a
-    ld   [$FF80], a
+    ld   [hDMARegion], a
     call toc_01_15FC
     push hl
     call toc_01_15E3
@@ -546,7 +546,7 @@ toc_07_4318:
 
     ld   hl, $DA24
 .else_07_4376:
-    ld   a, [$FF80]
+    ld   a, [hDMARegion]
     add  a, [hl]
     ld   [hl], a
     ret
@@ -669,7 +669,7 @@ toc_07_43CB:
 
 toc_07_441E:
     swap a
-    ld   [$FF80], a
+    ld   [hDMARegion], a
     ld   a, [$DB3E]
     dec  a
     cp   d
@@ -689,11 +689,11 @@ toc_07_441E:
     cp   b
     jr   nc, .else_07_4445
 
-    ld   a, [$FF80]
+    ld   a, [hDMARegion]
     add  a, c
     ret  nc
 
-    ld   [$FF80], a
+    ld   [hDMARegion], a
     inc  b
     ld   c, $00
     jr   .toc_07_4433
@@ -713,7 +713,7 @@ toc_07_441E:
     ldi  a, [hl]
     ld   d, a
     ld   l, [hl]
-    ld   a, [$FF80]
+    ld   a, [hDMARegion]
     add  a, c
     ld   b, $FF
     jr   c, .else_07_4461
@@ -722,7 +722,7 @@ toc_07_441E:
     dec  b
     xor  a
 .else_07_4461:
-    ld   [$FF80], a
+    ld   [hDMARegion], a
     inc  d
     jr   .toc_07_4480
 
@@ -752,7 +752,7 @@ toc_07_441E:
     dec  d
     jr   nz, .loop_07_4466
 
-    ld   a, [$FF80]
+    ld   a, [hDMARegion]
     or   a
     ret  z
 
@@ -766,7 +766,7 @@ toc_07_441E:
 
 toc_07_4493:
     swap a
-    ld   [$FF80], a
+    ld   [hDMARegion], a
     ld   a, [$DB3D]
     dec  a
     cp   b
@@ -786,11 +786,11 @@ toc_07_4493:
     cp   d
     jr   nc, .else_07_44BA
 
-    ld   a, [$FF80]
+    ld   a, [hDMARegion]
     add  a, e
     ret  nc
 
-    ld   [$FF80], a
+    ld   [hDMARegion], a
     inc  d
     ld   e, $00
     jr   .toc_07_44A8
@@ -810,7 +810,7 @@ toc_07_4493:
     ldi  a, [hl]
     ld   b, a
     ld   l, [hl]
-    ld   a, [$FF80]
+    ld   a, [hDMARegion]
     add  a, e
     ld   d, $FF
     jr   c, .else_07_44D6
@@ -819,7 +819,7 @@ toc_07_4493:
     dec  d
     xor  a
 .else_07_44D6:
-    ld   [$FF80], a
+    ld   [hDMARegion], a
     inc  b
     jr   .toc_07_44F5
 
@@ -849,7 +849,7 @@ toc_07_4493:
     dec  b
     jr   nz, .loop_07_44DB
 
-    ld   a, [$FF80]
+    ld   a, [hDMARegion]
     or   a
     ret  z
 

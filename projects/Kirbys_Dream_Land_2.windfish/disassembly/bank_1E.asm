@@ -169,9 +169,7 @@ toc_1E_4299:
 .loop_1E_42F2:
     ld   hl, $CE52
     add  hl, bc
-    ld   a, [hl]
-    and  a
-    jr   nz, .else_1E_4312
+    ifAddressAtHLZero .else_1E_4312
 
     call toc_01_2B97
     ld   hl, sp+$00
@@ -256,9 +254,7 @@ toc_1E_4368:
     ld   a, $52
     add  a, b
     ld   l, a
-    ld   a, [hl]
-    and  a
-    jr   nz, .else_1E_437F
+    ifAddressAtHLZero .else_1E_437F
 
     ld   a, $CE
     add  a, b

@@ -399,8 +399,7 @@ toc_00_022B:
 .toc_01_028A:
     ld   a, [hLastBank]
     push af
-    ld   a, $00
-    call changeBankAndCall.loadBank
+    _changebank $00
     call toc_01_2BFD
     pop  af
     call changeBankAndCall.loadBank
@@ -3386,8 +3385,7 @@ toc_01_2B97:
     db   $40, $50, $60, $70, $80
 
 toc_01_2BFD:
-    ld   a, $1F
-    call changeBankAndCall.loadBank
+    _changebank $1F
     ld   b, $07
 .loop_01_2C04:
     ld   h, $CE
@@ -3421,7 +3419,7 @@ toc_01_2BFD:
     ld   [hl], d
     pop  hl
     ld   [hl], e
-    call toc_01_2F31
+    call doCE82PlusB
     ld   h, $CE
     ld   a, $72
     add  a, b
@@ -3442,8 +3440,7 @@ toc_01_2BFD:
 .else_01_2C48:
     ifBEq $04, .else_01_2C52
 
-    ld   a, $1E
-    call changeBankAndCall.loadBank
+    _changebank $1E
 .else_01_2C52:
     dec  b
     bit  7, b
@@ -4074,7 +4071,7 @@ toc_01_2EF5:
     ret
 
 
-toc_01_2F31:
+doCE82PlusB:
     ld   h, $CE
     ld   a, $82
     add  a, b
