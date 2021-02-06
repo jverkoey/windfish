@@ -234,28 +234,30 @@ final class ProjectViewController: NSViewController {
     }
     self.sidebarViewController.treeController.setSelectionIndexPath(IndexPath(indexes: [0, index]))
 
-    guard let lineIndex = project.disassemblyResults?.lineFor(address: address, bank: bank) else {
-      return
-    }
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+      guard let lineIndex = self.project.disassemblyResults?.lineFor(address: address, bank: bank) else {
+        return
+      }
 
-    guard let analysis = self.sourceViewController.lineAnalysis,
-          let textView = self.sourceViewController.sourceView,
-          let containerView = self.sourceViewController.sourceContainerView,
-          let layoutManager = textView.layoutManager,
-          let textContainer = textView.textContainer,
-          analysis.lineRanges.count > 0 else {
-      return
-    }
+      guard let analysis = self.sourceViewController.lineAnalysis,
+            let textView = self.sourceViewController.sourceView,
+            let containerView = self.sourceViewController.sourceContainerView,
+            let layoutManager = textView.layoutManager,
+            let textContainer = textView.textContainer,
+            analysis.lineRanges.count > 0 else {
+        return
+      }
 
-    if highlight {
-      self.sourceViewController.sourceView?.highlightedLine = lineIndex
-    }
+      if highlight {
+        self.sourceViewController.sourceView?.highlightedLine = lineIndex
+      }
 
-    if analysis.lineRanges.count > lineIndex {
-      let lineRange = analysis.lineRanges[lineIndex]
-      let glyphGraph = layoutManager.glyphRange(forCharacterRange: lineRange, actualCharacterRange: nil)
-      let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphGraph, in: textContainer)
-      self.sourceViewController.sourceView?.scroll(boundingRect.offsetBy(dx: 0, dy: -containerView.bounds.height / 2).origin)
+      if analysis.lineRanges.count > lineIndex {
+        let lineRange = analysis.lineRanges[lineIndex]
+        let glyphGraph = layoutManager.glyphRange(forCharacterRange: lineRange, actualCharacterRange: nil)
+        let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphGraph, in: textContainer)
+        self.sourceViewController.sourceView?.scroll(boundingRect.offsetBy(dx: 0, dy: -containerView.bounds.height / 2).origin)
+      }
     }
   }
 
