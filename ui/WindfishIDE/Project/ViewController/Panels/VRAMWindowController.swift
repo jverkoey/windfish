@@ -222,8 +222,8 @@ extension VRAMWindowController: NSTableViewDataSource {
           return Data(bytesNoCopy: pointer.baseAddress!, count: 64 * 4 * 2, deallocator: .none)
         }
         return SameboyEmulator.image(from: imageData, width: 8, height: UInt(truncatingIfNeeded: oamHeight), scale: 16 / Double(oamHeight))
-      case 1: return oamInfo[row].x - 8
-      case 2: return oamInfo[row].y - 16
+      case 1: return oamInfo[row].x &- 8
+      case 2: return oamInfo[row].y &- 16
       case 3: return "$" + oamInfo[row].tile.hexString
       case 4: return "$" + (LR35902.Address(0x8000) + LR35902.Address(truncatingIfNeeded: oamInfo[row].tile) * 0x10).hexString
       case 5: return "$" + oamInfo[row].oam_addr.hexString

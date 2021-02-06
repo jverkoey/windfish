@@ -217,9 +217,9 @@ static void gb_get_backtrace_return(GB_gameboy_t *gb, int i, uint16_t *bank, uin
 }
 
 - (uint8_t)getOAMInfo:(nonnull GBOAMInfo *)dest spriteHeight:(nonnull uint8_t *)sprite_height {
-  GB_oam_info_t info = {0,};
-  uint8_t result = [_emulator getOAMInfo:&info spriteHeight:sprite_height];
-  memcpy(dest, &info, sizeof(GBOAMInfo));
+  GB_oam_info_t info[40] = {0,};
+  uint8_t result = [_emulator getOAMInfo:info spriteHeight:sprite_height];
+  memcpy(dest, info, sizeof(GBOAMInfo) * 40);
   return result;
 }
 
