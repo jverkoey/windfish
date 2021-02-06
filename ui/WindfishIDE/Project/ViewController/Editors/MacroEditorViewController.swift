@@ -110,6 +110,10 @@ final class MacroEditorViewController: NSViewController, TabSelectable {
       containerView.heightAnchor.constraint(equalToConstant: 200)
     ])
 
+    elementsController.sortDescriptors = [
+      NSSortDescriptor(key: NSUserInterfaceItemIdentifier.name.rawValue, ascending: true),
+    ]
+
     elementsController.bind(.contentArray, to: project.configuration, withKeyPath: "macros", options: nil)
     tableView.tableView?.bind(.content, to: elementsController, withKeyPath: "arrangedObjects", options: nil)
     tableView.tableView?.bind(.selectionIndexes, to: elementsController, withKeyPath:"selectionIndexes", options: nil)
