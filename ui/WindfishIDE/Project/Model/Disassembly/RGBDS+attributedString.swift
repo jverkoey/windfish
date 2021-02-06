@@ -10,6 +10,7 @@ extension RGBDS.Statement {
                         operandAttributes: WINDStringAttributes,
                         regionLookup: [String: Region]) -> NSAttributedString {
     let string: NSMutableAttributedString = NSMutableAttributedString(string: formattedString)
+    attributes.add(to: string, at: NSMakeRange(0, formattedString.count))
     opcodeAttributes.add(to: string, at: opcodeRange)
     if let spec: LR35902.Instruction.Spec = context as? LR35902.Instruction.Spec,
        let documentation: String = opcodeDocumentation[spec] {
