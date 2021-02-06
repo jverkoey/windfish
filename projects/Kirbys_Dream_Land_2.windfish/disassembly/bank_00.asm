@@ -1649,7 +1649,7 @@ toc_01_0C2A:
 toc_01_10DE:
     ld   a, $08
     call cbcallWithoutInterrupts.loadBank
-    jp   $4062
+    jp   toc_08_4062
 
     db   $1E, $09, $21, $2E, $60, $3E, $1E, $CD
     db   $CF, $05, $CD, $26, $11, $CD, $34, $11

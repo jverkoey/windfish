@@ -136,11 +136,12 @@ extension Disassembler {
 
     func advance(amount: LR35902.Address) -> Range<Int> {
       let currentCartAddress = Cartridge.Location(address: pc, bank: selectedBank)
-      visitedRange = startLocation..<(currentCartAddress + amount)
+      let advanceLocation = currentCartAddress + amount
+      visitedRange = startLocation..<advanceLocation
 
       pc += amount
 
-      return currentCartAddress.index..<(currentCartAddress + amount).index
+      return currentCartAddress.index..<advanceLocation.index
     }
 
     func hasReachedEnd() -> Bool {

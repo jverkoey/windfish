@@ -59,8 +59,25 @@ extension Disassembler {
         self.registerBankChange(to: max(1, desiredBank), at: Cartridge.Location(address: address, bank: bank))
         self.currentRun?.selectedBank = desiredBank
       }
+      let registerTransferOfControl: @convention(block) (Cartridge.Bank, LR35902.Address, Cartridge.Bank, LR35902.Address) -> Void = { [weak self] toBank, toAddress, fromBank, fromAddress in
+        guard let self = self,
+              let currentRun: Run = self.currentRun,
+              let currentInstruction: LR35902.Instruction = self.currentInstruction else {
+          return
+        }
+        print("\(toBank.hexString):\(toAddress.hexString)")
+        self.didEncounterTransferOfControl(
+          fromRun: currentRun,
+          fromAddress: fromAddress,
+          toAddress: toAddress,
+          fromBank: fromBank,
+          toBank: toBank,
+          instruction: currentInstruction
+        )
+      }
       for script in self.linearSweepScripts {
         script.context.setObject(changeBank, forKeyedSubscript: "changeBank" as NSString)
+        script.context.setObject(registerTransferOfControl, forKeyedSubscript: "registerTransferOfControl" as NSString)
       }
     }
 
@@ -82,6 +99,7 @@ extension Disassembler {
     }
 
     var currentRun: Run?
+    var currentInstruction: LR35902.Instruction?
     private func disassemble(run: Run) {
       assert(run.startLocation.bankIndex == bank)
 
@@ -104,7 +122,8 @@ extension Disassembler {
       }
 
       let advance: (LR35902.Address) -> Void = { amount in
-        run.visitHistory[Int(truncatingIfNeeded: self.bank)].visitedLocations.insert(integersIn: run.advance(amount: amount))
+        run.visitHistory[Int(truncatingIfNeeded: self.bank)]
+          .visitedLocations.insert(integersIn: run.advance(amount: amount))
       }
 
       var previousInstruction: LR35902.Instruction? = nil
@@ -125,6 +144,7 @@ extension Disassembler {
         var instructionPc = run.pc
         memory.selectedBank = run.selectedBank
         let instruction = Disassembler.disassembleInstruction(at: &instructionPc, memory: memory)
+        self.currentInstruction = instruction
 
         // STOP must be followed by 0
         if case .stop = instruction.spec, case let .imm8(immediate) = instruction.immediate, immediate != 0 {
@@ -141,13 +161,13 @@ extension Disassembler {
 
         register(instruction: instruction, at: Cartridge.Location(address: instructionContext.pc, bank: instructionContext.selectedBank))
 
+        let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!
+        advance(instructionWidth.total)
+
         if let bankChange = bankChange(at: Cartridge.Location(address: instructionContext.pc,
                                                               bank: instructionContext.selectedBank)) {
           run.selectedBank = bankChange
         }
-
-        let instructionWidth = LR35902.InstructionSet.widths[instruction.spec]!
-        advance(instructionWidth.total)
 
         let instructionContextLocation = Cartridge.Location(address: instructionContext.pc, bank: instructionContext.selectedBank)
         switch instruction.spec {
@@ -183,7 +203,8 @@ extension Disassembler {
             fromRun: run,
             fromAddress: instructionContext.pc,
             toAddress: jumpTo,
-            selectedBank: instructionContext.selectedBank,
+            fromBank: max(1, bank),
+            toBank: instructionContext.selectedBank,
             instruction: instruction
           )
 
@@ -198,11 +219,13 @@ extension Disassembler {
           }
           let jumpTo = immediate
           if jumpTo < 0x8000 {
+            let tocBank: Cartridge.Bank = max(1, instructionContext.selectedBank)
             didEncounterTransferOfControl(
               fromRun: run,
               fromAddress: instructionContext.pc,
               toAddress: jumpTo,
-              selectedBank: (instructionContext.selectedBank == 0 ? 1 : instructionContext.selectedBank),
+              fromBank: tocBank,
+              toBank: tocBank,
               instruction: instruction
             )
           }
@@ -219,11 +242,13 @@ extension Disassembler {
           }
           let jumpTo = immediate
           if jumpTo < 0x8000 {
+            let tocBank: Cartridge.Bank = max(1, instructionContext.selectedBank)
             didEncounterTransferOfControl(
               fromRun: run,
               fromAddress: instructionContext.pc,
               toAddress: jumpTo,
-              selectedBank: instructionContext.selectedBank,
+              fromBank: tocBank,
+              toBank: tocBank,
               instruction: instruction
             )
           }
@@ -254,6 +279,21 @@ extension Disassembler {
           }
         }
 
+        if run.pc >= 0x4000 && max(1, run.selectedBank) != max(1, bank) {
+          // The bank has changed mid-sweep, meaning we've effectively jumped to a new bank. Register a transfer of
+          // control and abandon this sweep.
+          let tocBank: Cartridge.Bank = max(1, instructionContext.selectedBank)
+          didEncounterTransferOfControl(
+            fromRun: run,
+            fromAddress: instructionContext.pc,
+            toAddress: instructionContext.pc,
+            fromBank: tocBank,
+            toBank: tocBank,
+            instruction: previousInstruction!
+          )
+          break
+        }
+
         previousInstruction = instruction
       }
     }
@@ -279,18 +319,18 @@ extension Disassembler {
 
     // MARK: - Events that occur during a disassembly run
 
-    private func didEncounterTransferOfControl(fromRun: Run, fromAddress: LR35902.Address, toAddress: LR35902.Address, selectedBank: Cartridge.Bank, instruction: LR35902.Instruction) {
+    private func didEncounterTransferOfControl(fromRun: Run, fromAddress: LR35902.Address, toAddress: LR35902.Address, fromBank: Cartridge.Bank, toBank: Cartridge.Bank, instruction: LR35902.Instruction) {
       guard toAddress < 0x8000 else {
         return  // We can't disassemble in-memory regions.
       }
-      let run = Run(from: toAddress, selectedBank: selectedBank, visitHistory: fromRun.visitHistory)
+      let run = Run(from: toAddress, selectedBank: toBank, visitHistory: fromRun.visitHistory)
       run.invocationInstruction = instruction
       fromRun.children.append(run)
 
       router?.schedule(run: run)
 
-      registerTransferOfControl(to: Cartridge.Location(address: toAddress, bank: selectedBank),
-                                from: Cartridge.Location(address: fromAddress, bank: selectedBank))
+      registerTransferOfControl(to: Cartridge.Location(address: toAddress, bank: toBank),
+                                from: Cartridge.Location(address: fromAddress, bank: fromBank))
     }
 
     // MARK: - Registering information discovered during disassembly
