@@ -1,4 +1,9 @@
 
+__changebank: MACRO
+    ld   a, \1
+    call cbcallWithoutInterrupts.loadBank
+    ENDM
+
 __ifNotZero: MACRO
     ld   a, \1
     or   a

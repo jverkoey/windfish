@@ -2524,8 +2524,7 @@ toc_07_5EC8:
     rl   h
     sla  l
     rl   h
-    ld   a, $07
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $07
     ld   de, $57DC
     add  hl, de
     ld   d, $40
@@ -3323,17 +3322,62 @@ toc_07_5FEE:
     db   $00, $05, $06, $06, $E8, $73, $1E, $15
     db   $1A, $FE, $04, $D8, $1E, $45, $1A, $EE
     db   $80, $12, $C9, $01, $02, $00, $FE, $FF
-    db   $02, $00, $FE, $62, $FA, $76, $A0, $B7
-    db   $20, $0F, $2E, $19, $CB, $EE, $2E, $1C
-    db   $CB, $EE, $2E, $1F, $CB, $EE, $CD, $2C
-    db   $0E, $01, $76, $A0, $0A, $21, $02, $74
-    db   $87, $85, $6F, $30, $01, $24, $2A, $66
-    db   $6F, $1E, $09, $1A, $84, $12, $1E, $0B
-    db   $1A, $85, $12, $0A, $3C, $02, $FE, $04
-    db   $D8, $62, $2E, $19, $CB, $AE, $2E, $1C
-    db   $CB, $AE, $2E, $1F, $CB, $AE, $2E, $6C
-    db   $CB, $86, $C9, $CD, $58, $74, $C3, $8B
-    db   $74
+    db   $02, $00, $FE
+
+toc_07_740A:
+    ld   h, d
+    ld   a, [$A076]
+    or   a
+    jr   nz, .else_07_7420
+
+    ld   l, $19
+    set  5, [hl]
+    ld   l, $1C
+    set  5, [hl]
+    ld   l, $1F
+    set  5, [hl]
+    call toc_01_0E2C
+.else_07_7420:
+    ld   bc, $A076
+    ld   a, [bc]
+    ld   hl, $7402
+    add  a, a
+    add  a, l
+    ld   l, a
+    jr   nc, .else_07_742D
+
+    inc  h
+.else_07_742D:
+    ldi  a, [hl]
+    ld   h, [hl]
+    ld   l, a
+    ld   e, $09
+    ld   a, [de]
+    add  a, h
+    ld   [de], a
+    ld   e, $0B
+    ld   a, [de]
+    add  a, l
+    ld   [de], a
+    ld   a, [bc]
+    inc  a
+    ld   [bc], a
+    cp   $04
+    ret  c
+
+    ld   h, d
+    ld   l, $19
+    res  5, [hl]
+    ld   l, $1C
+    res  5, [hl]
+    ld   l, $1F
+    res  5, [hl]
+    ld   l, $6C
+    res  0, [hl]
+    ret
+
+
+    db   $CD, $58, $74, $C3, $8B, $74
 
 toc_07_7458:
     ld   a, [$A071]

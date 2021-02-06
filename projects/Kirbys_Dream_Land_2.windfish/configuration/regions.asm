@@ -98,6 +98,10 @@ loadScrollPosition: ; [Label] $00:$018D [0]
 
 doCE82PlusB: ; [Label] $00:$2F31 [0]
 
+toc_01_0DFF: ; [Function] $01:$0DFF [0]
+
+toc_01_0DCE: ; [Function] $01:$0DCE [0]
+
 initialize: ; [Function] $1A:$4000 [0]
 
 waitForVBlank: ; [Label] $1A:$4003 [0]

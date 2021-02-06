@@ -784,27 +784,162 @@ toc_01_04AE:
     ret
 
 
-    db   $FA, $09, $DA, $0F, $0F, $86, $FE, $29
-    db   $D0, $1A, $1D, $B7, $28, $08, $3C, $C0
-    db   $1A, $FE, $C0, $D8, $18, $04, $1A, $FE
-    db   $C0, $D0, $C6, $10, $4F, $1D, $1A, $1D
-    db   $B7, $28, $08, $3C, $C0, $1A, $FE, $CC
-    db   $D8, $18, $04, $1A, $FE, $CC, $D0, $C6
-    db   $08, $47, $23, $FA, $08, $DA, $57, $FA
-    db   $09, $DA, $5F, $F0, $93, $17, $38, $2F
-    db   $2A, $81, $FE, $A0, $30, $1F, $12, $1C
-    db   $2A, $80, $FE, $A8, $30, $1C, $12, $1C
-    db   $F0, $94, $86, $23, $12, $1C, $F0, $95
-    db   $AE, $23, $12, $1C, $CB, $47, $28, $E0
-    db   $7B, $EA, $09, $DA, $C9, $23, $23, $2A
-    db   $18, $F2, $1D, $23, $2A, $18, $ED, $2A
-    db   $81, $FE, $A0, $30, $24, $12, $1C, $2A
-    db   $2F, $D6, $07, $80, $FE, $A8, $30, $1E
-    db   $12, $1C, $F0, $94, $86, $23, $12, $1C
-    db   $F0, $95, $AE, $EE, $20, $23, $12, $1C
-    db   $CB, $47, $28, $DB, $7B, $EA, $09, $DA
-    db   $C9, $23, $23, $2A, $18, $F2, $1D, $23
-    db   $2A, $18, $ED
+toc_01_051C:
+    ld   a, [$DA09]
+    rrca
+    rrca
+    add  a, [hl]
+    cp   $29
+    ret  nc
+
+    ld   a, [de]
+    dec  e
+    or   a
+    jr   z, .else_01_0532
+
+    inc  a
+    ret  nz
+
+    ld   a, [de]
+    cp   $C0
+    ret  c
+
+    jr   .toc_01_0536
+
+.else_01_0532:
+    ld   a, [de]
+    cp   $C0
+    ret  nc
+
+.toc_01_0536:
+    add  a, $10
+    ld   c, a
+    dec  e
+    ld   a, [de]
+    dec  e
+    or   a
+    jr   z, .else_01_0547
+
+    inc  a
+    ret  nz
+
+    ld   a, [de]
+    cp   $CC
+    ret  c
+
+    jr   .toc_01_054B
+
+.else_01_0547:
+    ld   a, [de]
+    cp   $CC
+    ret  nc
+
+.toc_01_054B:
+    add  a, $08
+    ld   b, a
+    inc  hl
+    ld   a, [$DA08]
+    ld   d, a
+    ld   a, [$DA09]
+    ld   e, a
+    ld   a, [$FF93]
+    rla
+    jr   c, .else_01_058B
+
+.loop_01_055C:
+    ldi  a, [hl]
+    add  a, c
+    cp   $A0
+    jr   nc, .else_01_0581
+
+    ld   [de], a
+    inc  e
+    ldi  a, [hl]
+    add  a, b
+    cp   $A8
+    jr   nc, .else_01_0586
+
+    ld   [de], a
+    inc  e
+    ld   a, [$FF94]
+    add  a, [hl]
+    inc  hl
+    ld   [de], a
+    inc  e
+    ld   a, [$FF95]
+    xor  [hl]
+    inc  hl
+    ld   [de], a
+    inc  e
+.toc_01_0578:
+    bit  0, a
+    jr   z, .loop_01_055C
+
+    ld   a, e
+    ld   [$DA09], a
+    ret
+
+
+.else_01_0581:
+    inc  hl
+    inc  hl
+    ldi  a, [hl]
+    jr   .toc_01_0578
+
+.else_01_0586:
+    dec  e
+    inc  hl
+    ldi  a, [hl]
+    jr   .toc_01_0578
+
+.else_01_058B:
+    ldi  a, [hl]
+    add  a, c
+    cp   $A0
+    jr   nc, .else_01_05B5
+
+    ld   [de], a
+    inc  e
+    ldi  a, [hl]
+    cpl
+    sub  a, $07
+    add  a, b
+    cp   $A8
+    jr   nc, .else_01_05BA
+
+    ld   [de], a
+    inc  e
+    ld   a, [$FF94]
+    add  a, [hl]
+    inc  hl
+    ld   [de], a
+    inc  e
+    ld   a, [$FF95]
+    xor  [hl]
+    xor  %00100000
+    inc  hl
+    ld   [de], a
+    inc  e
+.toc_01_05AC:
+    bit  0, a
+    jr   z, .else_01_058B
+
+    ld   a, e
+    ld   [$DA09], a
+    ret
+
+
+.else_01_05B5:
+    inc  hl
+    inc  hl
+    ldi  a, [hl]
+    jr   .toc_01_05AC
+
+.else_01_05BA:
+    dec  e
+    inc  hl
+    ldi  a, [hl]
+    jr   .toc_01_05AC
 
 toc_01_05BF:
     ld   [hDesiredBankChange], a
@@ -1250,8 +1385,7 @@ toc_01_07C4:
     ld   l, $48
     ld   [hl], a
     copyFromTo [hLastBank], [$FF84]
-    ld   a, $07
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $07
     ld   a, [de]
     ld   c, a
     inc  de
@@ -1521,16 +1655,70 @@ toc_01_0B94:
     ret
 
 
-    db   $7C, $FE, $A0, $D8, $FE, $B3, $D0, $2E
-    db   $00, $7E, $3C, $C8, $36, $FF, $CD, $2A
-    db   $0C, $2E, $01, $7E, $B7, $2E, $02, $20
-    db   $05, $11, $47, $DA, $18, $02, $57, $5D
-    db   $7E, $12, $B7, $2E, $01, $20, $05, $11
-    db   $46, $DA, $18, $02, $57, $5D, $7E, $12
-    db   $FA, $49, $DA, $BC, $20, $04, $7E, $EA
-    db   $49, $DA, $11, $48, $DA, $1A, $2E, $01
-    db   $77, $7C, $12, $2E, $49, $5E, $16, $BB
-    db   $AF, $12, $54, $C9
+toc_01_0BBA:
+    ld   a, h
+    cp   $A0
+    ret  c
+
+    cp   $B3
+    ret  nc
+
+    ld   l, $00
+    ld   a, [hl]
+    inc  a
+    ret  z
+
+    ld   [hl], $FF
+    call toc_01_0C2A
+    ld   l, $01
+    ld   a, [hl]
+    or   a
+    ld   l, $02
+    jr   nz, .else_01_0BD8
+
+    ld   de, $DA47
+    jr   .toc_01_0BDA
+
+.else_01_0BD8:
+    ld   d, a
+    ld   e, l
+.toc_01_0BDA:
+    ld   a, [hl]
+    ld   [de], a
+    or   a
+    ld   l, $01
+    jr   nz, .else_01_0BE6
+
+    ld   de, $DA46
+    jr   .toc_01_0BE8
+
+.else_01_0BE6:
+    ld   d, a
+    ld   e, l
+.toc_01_0BE8:
+    ld   a, [hl]
+    ld   [de], a
+    ld   a, [$DA49]
+    cp   h
+    jr   nz, .else_01_0BF4
+
+    ld   a, [hl]
+    ld   [$DA49], a
+.else_01_0BF4:
+    ld   de, $DA48
+    ld   a, [de]
+    ld   l, $01
+    ld   [hl], a
+    ld   a, h
+    ld   [de], a
+    ld   l, $49
+    ld   e, [hl]
+    ld   d, $BB
+    xor  a
+    ld   [de], a
+    ld   d, h
+    ret
+
 
 toc_01_0C06:
     ld   de, $DA47
@@ -1626,109 +1814,252 @@ toc_01_0C2A:
     db   $28, $01, $05, $8E, $22, $1C, $78, $8E
     db   $22, $1A, $86, $22, $1C, $1A, $06, $00
     db   $CB, $7F, $28, $01, $05, $8E, $22, $1C
-    db   $78, $8E, $77, $C9, $FA, $6C, $A0, $1F
-    db   $30, $0A, $3E, $07, $CD, $DD, $05, $CD
-    db   $0A, $74, $18, $12, $CD, $2C, $0E, $FA
-    db   $5D, $A0, $FE, $00, $20, $08, $3E, $0B
-    db   $CD, $DD, $05, $CD, $5B, $78, $C3, $22
-    db   $0F, $CD, $67, $34, $CD, $2C, $0E, $C3
-    db   $22, $0F, $CD, $7D, $34, $CD, $4B, $0E
-    db   $C3, $22, $0F, $CD, $01, $0F, $C3, $22
-    db   $0F, $CD, $9D, $0E, $C3, $22, $0F, $3E
-    db   $08, $CD, $DD, $05, $CD, $AC, $57, $C9
-    db   $3E, $08, $CD, $DD, $05, $CD, $CB, $53
-    db   $C9, $3E, $08, $CD, $DD, $05, $CD, $A6
-    db   $56, $C9, $1E, $04, $21, $51, $DB, $42
-    db   $0E, $09, $1A, $96, $02, $1C, $23, $0C
-    db   $1A, $9E, $02, $1C, $1C, $23, $0C, $1A
-    db   $96, $02, $1C, $23, $0C, $1A, $9E, $02
-    db   $C9, $1E, $04, $21, $51, $DB, $42, $0E
-    db   $09, $1A, $96, $02, $E0, $84, $1C, $23
-    db   $0C, $1A, $9E, $02, $3C, $FE, $01, $F0
-    db   $84, $28, $08, $30, $2D, $FE, $E0, $30
-    db   $06, $18, $27, $FE, $C0, $30, $23, $1C
-    db   $1C, $23, $0C, $1A, $96, $02, $E0, $84
-    db   $1C, $23, $0C, $1A, $9E, $02, $3C, $FE
-    db   $01, $F0, $84, $28, $08, $30, $0B, $FE
-    db   $E0, $30, $06, $18, $05, $FE, $A0, $30
-    db   $01, $C9, $1E, $15, $3E, $FF, $12, $62
-    db   $C3, $BA, $0B, $1E, $04, $21, $51, $DB
-    db   $42, $0E, $09, $1A, $96, $02, $E0, $84
-    db   $1C, $23, $0C, $1A, $9E, $02, $3C, $FE
-    db   $01, $F0, $84, $28, $08, $30, $2D, $FE
-    db   $E0, $30, $06, $18, $27, $FE, $C0, $30
-    db   $23, $1C, $1C, $23, $0C, $1A, $96, $02
-    db   $E0, $84, $1C, $23, $0C, $1A, $9E, $02
-    db   $3C, $FE, $01, $F0, $84, $28, $08, $30
-    db   $0B, $FE, $E0, $30, $06, $18, $05, $FE
-    db   $A0, $30, $01, $C9, $1E, $15, $3E, $FF
-    db   $12, $62, $D5, $CD, $BA, $0B, $D1, $1E
-    db   $48, $1A, $67, $2E, $15, $3E, $FF, $77
-    db   $CD, $BA, $0B, $F0, $9A, $57, $C9, $1E
-    db   $48, $1A, $67, $1E, $04, $2E, $09, $42
-    db   $4D, $1A, $86, $02, $1C, $2C, $0C, $1A
-    db   $8E, $02, $1C, $1C, $2C, $0C, $1A, $86
-    db   $02, $1C, $2C, $0C, $1A, $8E, $02, $C9
-    db   $1E, $15, $1A, $FE, $FF, $C8, $87, $4F
-    db   $62, $2E, $16, $2A, $CD, $DD, $05, $2A
-    db   $6E, $67, $06, $00, $09, $2A, $66, $6F
-    db   $0E, $93, $1E, $45, $1A, $E2, $1C, $0C
-    db   $1A, $E2, $1C, $0C, $1A, $E2, $1E, $0C
-    db   $D5, $CD, $1C, $05, $D1, $C9, $D5, $60
-    db   $69, $2A, $E0, $84, $2A, $47, $2A, $4F
-    db   $E5, $CD, $67, $0F, $C1, $D1, $7C, $B7
-    db   $C8, $2E, $48, $72, $C9, $62, $2E, $07
-    db   $2A, $5F, $56, $D5, $2E, $04, $2A, $5F
-    db   $56, $D5, $C3, $CA, $07, $0A, $03, $5F
-    db   $D5, $C5, $3E, $01, $E0, $84, $01, $A5
-    db   $A2, $CD, $67, $0F, $C1, $D1, $7C, $B7
-    db   $C8, $2E, $48, $72, $2E, $51, $73, $C9
-    db   $3E, $01, $E0, $84, $21, $34, $DB, $3E
-    db   $A5, $22, $36, $A2, $60, $69, $CD, $D0
-    db   $0F, $C8, $2E, $51, $F0, $80, $77, $1E
-    db   $45, $6B, $1A, $77, $C9, $3E, $02, $E0
-    db   $84, $21, $34, $DB, $3E, $A8, $22, $36
-    db   $A5, $60, $69, $CD, $D0, $0F, $C8, $2E
-    db   $5A, $F0, $80, $77, $1E, $45, $6B, $1A
-    db   $77, $2E, $4C, $36, $00, $C9, $2A, $E0
-    db   $80, $2A, $E0, $85, $2A, $E0, $86, $D5
-    db   $E5, $62, $2E, $45, $7E, $17, $F0, $85
-    db   $30, $02, $2F, $3C, $4F, $17, $9F, $47
-    db   $2E, $04, $2A, $81, $4F, $2A, $88, $47
-    db   $2C, $F0, $86, $5F, $17, $9F, $57, $2A
-    db   $83, $5F, $7E, $8A, $57, $21, $34, $DB
-    db   $2A, $66, $6F, $CD, $C6, $07, $C1, $D1
-    db   $7C, $B7, $C8, $2E, $48, $72, $C9, $CD
-    db   $47, $06, $1E, $27, $12, $C9, $1E, $45
-    db   $1A, $17, $1E, $0D, $0A, $03, $38, $04
-    db   $12, $0A, $18, $08, $2F, $C6, $01, $12
-    db   $0A, $2F, $CE, $00, $1C, $03, $12, $C9
-    db   $1E, $45, $1A, $17, $1E, $11, $0A, $03
-    db   $30, $02, $2F, $3C, $12, $C9, $1E, $07
-    db   $18, $02, $1E, $04, $60, $69, $1A, $86
-    db   $12, $1C, $23, $1A, $8E, $12, $23, $44
-    db   $4D, $C9, $26, $A0, $7C, $BA, $28, $06
-    db   $CD, $BA, $0B, $F0, $9A, $57, $24, $7C
-    db   $FE, $B3, $20, $F1, $C9, $26, $A0, $7C
-    db   $BA, $28, $0C, $2E, $19, $CB, $EE, $2E
-    db   $1C, $CB, $EE, $2E, $1F, $CB, $EE, $24
-    db   $7C, $FE, $B3, $20, $EB, $C9, $26, $A0
-    db   $7C, $BA, $28, $0C, $2E, $19, $CB, $AE
-    db   $2E, $1C, $CB, $AE, $2E, $1F, $CB, $AE
-    db   $24, $7C, $FE, $B3, $20, $EB, $C9, $0A
-    db   $5F, $03, $C5, $21, $99, $42, $3E, $1E
-    db   $CD, $CF, $05, $C1, $F0, $9A, $57, $C9
-    db   $21, $99, $42, $3E, $1E, $CD, $CF, $05
-    db   $F0, $9A, $57, $C9, $0A, $5F, $03, $C5
-    db   $21, $32, $42, $3E, $1F, $CD, $CF, $05
-    db   $C1, $F0, $9A, $57, $C9, $0A, $EA, $6F
-    db   $DB, $18, $EA, $0A, $03, $5F, $C5, $21
-    db   $6D, $60, $3E, $1E, $CD, $CF, $05, $C1
-    db   $F0, $9A, $57, $C9
+    db   $78, $8E, $77, $C9
+
+toc_01_0DCE:
+    ld   a, [$A06C]
+    rra
+    jr   nc, .else_01_0DDE
+
+    __changebank $07
+    call toc_07_740A
+    jr   .else_01_0DF0
+
+.else_01_0DDE:
+    call toc_01_0E2C
+    ifEq [$A05D], $00, .else_01_0DF0
+
+    __changebank $0B
+    call toc_0B_785B
+.else_01_0DF0:
+    jp   toc_01_0F22
+
+    db   $CD, $67, $34, $CD, $2C, $0E, $C3, $22
+    db   $0F, $CD, $7D, $34
+
+toc_01_0DFF:
+    call toc_01_0E4B
+    jp   toc_01_0F22
+
+    db   $CD, $01, $0F, $C3, $22, $0F, $CD, $9D
+    db   $0E, $C3, $22, $0F, $3E, $08, $CD, $DD
+    db   $05, $CD, $AC, $57, $C9, $3E, $08, $CD
+    db   $DD, $05, $CD, $CB, $53, $C9, $3E, $08
+    db   $CD, $DD, $05, $CD, $A6, $56, $C9
+
+toc_01_0E2C:
+    ld   e, $04
+    ld   hl, $DB51
+    ld   b, d
+    ld   c, $09
+    ld   a, [de]
+    sub  a, [hl]
+    ld   [bc], a
+    inc  e
+    inc  hl
+    inc  c
+    ld   a, [de]
+    sbc  [hl]
+    ld   [bc], a
+    inc  e
+    inc  e
+    inc  hl
+    inc  c
+    ld   a, [de]
+    sub  a, [hl]
+    ld   [bc], a
+    inc  e
+    inc  hl
+    inc  c
+    ld   a, [de]
+    sbc  [hl]
+    ld   [bc], a
+    ret
+
+
+toc_01_0E4B:
+    ld   e, $04
+    ld   hl, $DB51
+    ld   b, d
+    ld   c, $09
+    ld   a, [de]
+    sub  a, [hl]
+    ld   [bc], a
+    ld   [$FF84], a
+    inc  e
+    inc  hl
+    inc  c
+    ld   a, [de]
+    sbc  [hl]
+    ld   [bc], a
+    inc  a
+    cp   $01
+    ld   a, [$FF84]
+    jr   z, .else_01_0E6D
+
+    jr   nc, .else_01_0E94
+
+    cp   $E0
+    jr   nc, .else_01_0E71
+
+    jr   .else_01_0E94
+
+.else_01_0E6D:
+    cp   $C0
+    jr   nc, .else_01_0E94
+
+.else_01_0E71:
+    inc  e
+    inc  e
+    inc  hl
+    inc  c
+    ld   a, [de]
+    sub  a, [hl]
+    ld   [bc], a
+    ld   [$FF84], a
+    inc  e
+    inc  hl
+    inc  c
+    ld   a, [de]
+    sbc  [hl]
+    ld   [bc], a
+    inc  a
+    cp   $01
+    ld   a, [$FF84]
+    jr   z, .else_01_0E8F
+
+    jr   nc, .else_01_0E94
+
+    cp   $E0
+    jr   nc, .return_01_0E93
+
+    jr   .else_01_0E94
+
+.else_01_0E8F:
+    cp   $A0
+    jr   nc, .else_01_0E94
+
+.return_01_0E93:
+    ret
+
+
+.else_01_0E94:
+    ld   e, $15
+    ld   a, $FF
+    ld   [de], a
+    ld   h, d
+    jp   toc_01_0BBA
+
+    db   $1E, $04, $21, $51, $DB, $42, $0E, $09
+    db   $1A, $96, $02, $E0, $84, $1C, $23, $0C
+    db   $1A, $9E, $02, $3C, $FE, $01, $F0, $84
+    db   $28, $08, $30, $2D, $FE, $E0, $30, $06
+    db   $18, $27, $FE, $C0, $30, $23, $1C, $1C
+    db   $23, $0C, $1A, $96, $02, $E0, $84, $1C
+    db   $23, $0C, $1A, $9E, $02, $3C, $FE, $01
+    db   $F0, $84, $28, $08, $30, $0B, $FE, $E0
+    db   $30, $06, $18, $05, $FE, $A0, $30, $01
+    db   $C9, $1E, $15, $3E, $FF, $12, $62, $D5
+    db   $CD, $BA, $0B, $D1, $1E, $48, $1A, $67
+    db   $2E, $15, $3E, $FF, $77, $CD, $BA, $0B
+    db   $F0, $9A, $57, $C9, $1E, $48, $1A, $67
+    db   $1E, $04, $2E, $09, $42, $4D, $1A, $86
+    db   $02, $1C, $2C, $0C, $1A, $8E, $02, $1C
+    db   $1C, $2C, $0C, $1A, $86, $02, $1C, $2C
+    db   $0C, $1A, $8E, $02, $C9
+
+toc_01_0F22:
+    ld   e, $15
+    ld   a, [de]
+    cp   $FF
+    ret  z
+
+    add  a, a
+    ld   c, a
+    ld   h, d
+    ld   l, $16
+    ldi  a, [hl]
+    call cbcallWithoutInterrupts.loadBank
+    ldi  a, [hl]
+    ld   l, [hl]
+    ld   h, a
+    ld   b, $00
+    add  hl, bc
+    ldi  a, [hl]
+    ld   h, [hl]
+    ld   l, a
+    ld   c, $93
+    ld   e, $45
+    ld   a, [de]
+    ld   [$ff00+c], a
+    inc  e
+    inc  c
+    ld   a, [de]
+    ld   [$ff00+c], a
+    inc  e
+    inc  c
+    ld   a, [de]
+    ld   [$ff00+c], a
+    ld   e, $0C
+    push de
+    call toc_01_051C
+    pop  de
+    ret
+
+
+    db   $D5, $60, $69, $2A, $E0, $84, $2A, $47
+    db   $2A, $4F, $E5, $CD, $67, $0F, $C1, $D1
+    db   $7C, $B7, $C8, $2E, $48, $72, $C9, $62
+    db   $2E, $07, $2A, $5F, $56, $D5, $2E, $04
+    db   $2A, $5F, $56, $D5, $C3, $CA, $07, $0A
+    db   $03, $5F, $D5, $C5, $3E, $01, $E0, $84
+    db   $01, $A5, $A2, $CD, $67, $0F, $C1, $D1
+    db   $7C, $B7, $C8, $2E, $48, $72, $2E, $51
+    db   $73, $C9, $3E, $01, $E0, $84, $21, $34
+    db   $DB, $3E, $A5, $22, $36, $A2, $60, $69
+    db   $CD, $D0, $0F, $C8, $2E, $51, $F0, $80
+    db   $77, $1E, $45, $6B, $1A, $77, $C9, $3E
+    db   $02, $E0, $84, $21, $34, $DB, $3E, $A8
+    db   $22, $36, $A5, $60, $69, $CD, $D0, $0F
+    db   $C8, $2E, $5A, $F0, $80, $77, $1E, $45
+    db   $6B, $1A, $77, $2E, $4C, $36, $00, $C9
+    db   $2A, $E0, $80, $2A, $E0, $85, $2A, $E0
+    db   $86, $D5, $E5, $62, $2E, $45, $7E, $17
+    db   $F0, $85, $30, $02, $2F, $3C, $4F, $17
+    db   $9F, $47, $2E, $04, $2A, $81, $4F, $2A
+    db   $88, $47, $2C, $F0, $86, $5F, $17, $9F
+    db   $57, $2A, $83, $5F, $7E, $8A, $57, $21
+    db   $34, $DB, $2A, $66, $6F, $CD, $C6, $07
+    db   $C1, $D1, $7C, $B7, $C8, $2E, $48, $72
+    db   $C9, $CD, $47, $06, $1E, $27, $12, $C9
+    db   $1E, $45, $1A, $17, $1E, $0D, $0A, $03
+    db   $38, $04, $12, $0A, $18, $08, $2F, $C6
+    db   $01, $12, $0A, $2F, $CE, $00, $1C, $03
+    db   $12, $C9, $1E, $45, $1A, $17, $1E, $11
+    db   $0A, $03, $30, $02, $2F, $3C, $12, $C9
+    db   $1E, $07, $18, $02, $1E, $04, $60, $69
+    db   $1A, $86, $12, $1C, $23, $1A, $8E, $12
+    db   $23, $44, $4D, $C9, $26, $A0, $7C, $BA
+    db   $28, $06, $CD, $BA, $0B, $F0, $9A, $57
+    db   $24, $7C, $FE, $B3, $20, $F1, $C9, $26
+    db   $A0, $7C, $BA, $28, $0C, $2E, $19, $CB
+    db   $EE, $2E, $1C, $CB, $EE, $2E, $1F, $CB
+    db   $EE, $24, $7C, $FE, $B3, $20, $EB, $C9
+    db   $26, $A0, $7C, $BA, $28, $0C, $2E, $19
+    db   $CB, $AE, $2E, $1C, $CB, $AE, $2E, $1F
+    db   $CB, $AE, $24, $7C, $FE, $B3, $20, $EB
+    db   $C9, $0A, $5F, $03, $C5, $21, $99, $42
+    db   $3E, $1E, $CD, $CF, $05, $C1, $F0, $9A
+    db   $57, $C9, $21, $99, $42, $3E, $1E, $CD
+    db   $CF, $05, $F0, $9A, $57, $C9, $0A, $5F
+    db   $03, $C5, $21, $32, $42, $3E, $1F, $CD
+    db   $CF, $05, $C1, $F0, $9A, $57, $C9, $0A
+    db   $EA, $6F, $DB, $18, $EA, $0A, $03, $5F
+    db   $C5, $21, $6D, $60, $3E, $1E, $CD, $CF
+    db   $05, $C1, $F0, $9A, $57, $C9
 
 toc_01_10DE:
-    ld   a, $08
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $08
     jp   toc_08_4062
 
 toc_01_10E6:
@@ -1757,22 +2088,18 @@ toc_01_10E6:
 
 
 toc_01_1126:
-    ld   a, $0B
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $0B
     ld   hl, $68A0
     ld   de, $8000
     jp   decompressHAL
 
 toc_01_1134:
-    ld   a, $0B
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $0B
     plotFromTo $7122, $9630
-    ld   a, $0B
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $0B
     plotFromTo $720F, $8800
 .toc_01_1150:
-    ld   a, $0B
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $0B
     plotFromTo $6D87, $8600
     ret
 
@@ -1783,19 +2110,16 @@ toc_01_1166:
     cbcallNoInterrupts $02, $747D
     ifEq [$A051], $0D, .else_01_1183
 
-    ld   a, $0B
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $0B
     ld   hl, $6980
     ld   de, $8000
     jp   decompressHAL
 
 .else_01_1183:
-    ld   a, $07
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $07
     call toc_07_7458
     call .toc_01_1196
-    ld   a, $07
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $07
     call toc_07_7472
 .toc_01_1196:
     ld   a, [$DF11]
@@ -1841,11 +2165,9 @@ toc_01_11BE:
     assign [$A05D], $FF
 .else_01_11D4:
     call toc_01_086B
-    ld   a, $07
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $07
     call toc_07_4259
-    ld   a, $07
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $07
     call toc_07_43CB
     call toc_01_04AE
     cbcallNoInterrupts $07, $5B85
@@ -2047,8 +2369,7 @@ toc_01_1286:
     ld   a, $86
     jr   z, .else_01_1388
 
-    ld   a, $0C
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $0C
     plotFromTo $47D1, $8860
     ld   a, d
     and  %00001111
@@ -2110,8 +2431,7 @@ toc_01_1286:
     add  hl, bc
     ld   bc, $5629
     add  hl, bc
-    ld   a, $07
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $07
     ldi  a, [hl]
     ld   [de], a
     inc  de
@@ -2346,8 +2666,7 @@ toc_01_1513:
 
 
 toc_01_1564:
-    ld   a, $08
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $08
     ld   a, [$DB57]
     ld   l, a
     ld   h, $00
@@ -3252,8 +3571,7 @@ toc_01_2A2B:
     call decompressHAL
     assign [gbLCDC], LCDCF_BG_DISPLAY | LCDCF_OBJ_16_16 | LCDCF_OBJ_DISPLAY | LCDCF_TILEMAP_9C00
     call toc_01_046D
-    ld   a, $08
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $08
     call toc_08_4000
     pop  bc
     ld   a, [bc]
@@ -4557,8 +4875,7 @@ toc_01_3131:
     rl   h
     ld   a, [hLastBank]
     push af
-    ld   a, $07
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $07
     ld   de, $57DC
     add  hl, de
     ld   d, $40
@@ -4617,14 +4934,11 @@ toc_01_32FF:
     ld   e, $1C
     cbcallNoInterrupts $1F, $4232
     assign [gbLCDC], LCDCF_BG_DISPLAY | LCDCF_OBJ_16_16 | LCDCF_OBJ_DISPLAY | LCDCF_TILEMAP_9C00
-    ld   a, $0F
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $0F
     plotFromTo $4000, $8000
-    ld   a, $08
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $08
     call toc_08_4000
-    ld   a, $0F
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $0F
     ld   hl, $6111
     ld   a, [$DB60]
     add  a, a
@@ -4650,8 +4964,7 @@ toc_01_32FF:
     call toc_01_33D5
     call toc_01_3467
     call toc_01_3492
-    ld   a, $07
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $07
     call toc_07_41DC
     call toc_01_046D
     ld   a, [$DB60]
@@ -4665,8 +4978,7 @@ toc_01_32FF:
 .loop_01_3396:
     call toc_01_0496
     call toc_01_086B
-    ld   a, $07
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $07
     call toc_07_4259
     call toc_01_04AE
     call toc_01_0343
@@ -4830,8 +5142,7 @@ toc_01_3492:
 
 
 toc_01_34A3:
-    ld   a, $0F
-    call cbcallWithoutInterrupts.loadBank
+    __changebank $0F
     ld   a, [$DB6A]
     and  %01111111
     ld   b, $00
