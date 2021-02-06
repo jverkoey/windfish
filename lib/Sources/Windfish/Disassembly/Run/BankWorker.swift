@@ -65,7 +65,6 @@ extension Disassembler {
               let currentInstruction: LR35902.Instruction = self.currentInstruction else {
           return
         }
-        print("\(toBank.hexString):\(toAddress.hexString)")
         self.didEncounterTransferOfControl(
           fromRun: currentRun,
           fromAddress: fromAddress,
