@@ -144,6 +144,8 @@ toc_10_7A2D: ; [Function] $10:$7A2D [0]
 
 data_10_72D1: ; [Data] $10:$72D1 [26]
 
+wait: ; [Label] $1A:$40EE [0]
+
 toc_1E_6011: ; [Function] $1E:$6011 [0]
 
 toc_1E_606D: ; [Function] $1E:$606D [0]

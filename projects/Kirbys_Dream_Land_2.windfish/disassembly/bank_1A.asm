@@ -65,9 +65,9 @@ initialize:
 DMARoutine:
     assign [gbDMA], $C0
     ld   a, $28
-.loop_1A_40EE:
+.wait:
     dec  a
-    jr   nz, .loop_1A_40EE
+    jr   nz, .wait
 
     ret
 
