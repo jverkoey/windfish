@@ -1696,7 +1696,7 @@ toc_0F_6E0B:
     call toc_0F_6DB4
     call toc_0F_6C97
     call toc_01_1584
-    assign [$DA29], 255
+    assign [wDesiredLYC], 255
     ld   [gbLYC], a
     ld   a, $A8
     ld   hl, $A0B3

@@ -375,7 +375,7 @@ toc_00_022B:
     ld   sp, $DA18
     pop  hl
     ld   sp, hl
-    copyFromTo [$DA29], [gbLYC]
+    copyFromTo [wDesiredLYC], [gbLYC]
     ld   hl, $DA14
     ld   a, [$DA16]
     ldi  [hl], a
@@ -4611,7 +4611,7 @@ toc_01_3131:
 
 toc_01_32FF:
     assign [gbLYC], 255
-    ld   [$DA29], a
+    ld   [wDesiredLYC], a
     assign [$DF03], $00
     assign [$CD09], $E4
     assign [$CD0A], $E0

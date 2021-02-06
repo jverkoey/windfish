@@ -1908,7 +1908,7 @@ toc_10_7A2D:
     call toc_01_0343
     _ifZero [$DA2D], .loop_10_7AD6
 
-    ld   hl, $DA29
+    ld   hl, wDesiredLYC
     ld   a, 47
     ld   [hl], a
     ld   [gbLYC], a
@@ -1926,7 +1926,7 @@ toc_10_7A2D:
     call toc_01_0343
     _ifZero [$DA2D], .loop_10_7B0C
 
-    ld   hl, $DA29
+    ld   hl, wDesiredLYC
     ld   a, 95
     ld   [hl], a
     ld   [gbLYC], a

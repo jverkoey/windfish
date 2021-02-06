@@ -1760,7 +1760,7 @@ toc_07_5ADA:
     ldi  [hl], a
     ld   [hl], $02
     assign [gbLYC], 127
-    ld   [$DA29], a
+    ld   [wDesiredLYC], a
     xor  a
     ld   hl, gbSCY
     ldi  [hl], a
@@ -1772,7 +1772,7 @@ toc_07_5ADA:
 
 
 toc_07_5B06:
-    ld   hl, $DA29
+    ld   hl, wDesiredLYC
     ld   a, b
     ld   [hl], a
     ld   [gbLYC], a
@@ -1798,7 +1798,7 @@ toc_07_5B28:
     ldi  [hl], a
     ld   [hl], $02
     assign [gbLYC], 127
-    ld   [$DA29], a
+    ld   [wDesiredLYC], a
     ld   c, $14
     ld   de, $5B5D
     ld   hl, gbBGDAT1

@@ -1472,7 +1472,7 @@ toc_0E_6C52:
     ld   [$DA00], a
     call toc_01_1584
     assign [gbLYC], 127
-    ld   [$DA29], a
+    ld   [wDesiredLYC], a
     assign [gbLCDC], LCDCF_BG_DISPLAY | LCDCF_OBJ_16_16 | LCDCF_OBJ_DISPLAY | LCDCF_TILEMAP_9C00
     call toc_01_046D
     ld   e, $22

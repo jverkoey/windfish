@@ -34,6 +34,8 @@ wStashH EQU $DA12 ; [decimal]
 
 wLCDInterruptTrampoline EQU $DA13 ; [decimal]
 
+wDesiredLYC EQU $DA29 ; [decimal]
+
 gbOAMRAM EQU $FE00 ; [hex]
 
 gbP1 EQU $FF00 ; [JOYPAD]

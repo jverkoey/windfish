@@ -20,7 +20,7 @@ initialize:
     clear [gbTAC]
     assign [gbSTAT], STATF_LYC
     assign [gbLYC], 255
-    ld   [$DA29], a
+    ld   [wDesiredLYC], a
     ld   a, $1A
     call changeBankAndCall.loadBank
     memcpyFromTo $40E8, $FF88, $000A

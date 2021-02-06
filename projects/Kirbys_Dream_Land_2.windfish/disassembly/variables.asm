@@ -22,6 +22,8 @@ wStashH EQU $DA12
 
 wLCDInterruptTrampoline EQU $DA13
 
+wDesiredLYC EQU $DA29
+
 gbOAMRAM EQU $FE00
 
 gbP1 EQU $FF00
