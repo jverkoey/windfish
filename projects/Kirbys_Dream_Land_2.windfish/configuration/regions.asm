@@ -76,7 +76,15 @@ paintPixel: ; [Label] $00:$0757 [0]
 
 whilePixelsRemain: ; [Label] $00:$0750 [0]
 
-dequeuNextPixel: ; [Label] $00:$070E [0]
+readCommandByte: ; [Label] $00:$070E [0]
+
+fill: ; [Label] $00:$074F [0]
+
+copyBytes: ; [Label] $00:$0743 [0]
+
+decompressHAL: ; [Label] $00:$0708 [0]
+
+readLongCommand: ; [Label] $00:$0718 [0]
 
 initialize: ; [Function] $1A:$4000 [0]
 
@@ -114,6 +122,26 @@ toc_1E_5F68: ; [Function] $1E:$5F68 [0]
 
 toc_07_5FEE: ; [Function] $07:$5FEE [0]
 
+toc_08_4000: ; [Function] $08:$4000 [0]
+
+toc_1A_4246: ; [Function] $1A:$4246 [0]
+
+toc_1E_6002: ; [Function] $1E:$6002 [0]
+
+toc_1E_5FEB: ; [Function] $1E:$5FEB [0]
+
+toc_1E_5DFF: ; [Function] $1E:$5DFF [0]
+
+toc_1E_4299: ; [Function] $1E:$4299 [0]
+
+toc_08_5E92: ; [Function] $08:$5E92 [0]
+
 toc_0F_68D2: ; [Function] $0F:$68D2 [0]
 
 toc_10_7A2D: ; [Function] $10:$7A2D [0]
+
+data_10_72D1: ; [Data] $10:$72D1 [26]
+
+toc_1E_6011: ; [Function] $1E:$6011 [0]
+
+toc_1E_606D: ; [Function] $1E:$606D [0]

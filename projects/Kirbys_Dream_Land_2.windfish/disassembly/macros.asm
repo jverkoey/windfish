@@ -78,3 +78,9 @@ memcpyFromTo: MACRO
     ld   bc, \3
     call memcpy
     ENDM
+
+plotFromTo: MACRO
+    ld   hl, \1
+    ld   de, \2
+    call decompressHAL
+    ENDM

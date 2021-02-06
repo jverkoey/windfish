@@ -1071,13 +1071,9 @@ toc_07_5FEE:
     ld   a, $3E
     ldi  [hl], a
     ld   [hl], $06
-    ld   hl, $6107
-    ld   de, $8000
-    call toc_01_0708
+    plotFromTo $6107, $8000
     memcpyFromTo gbVRAM, $9000, $0800
-    ld   hl, $697D
-    ld   de, $9800
-    call toc_01_0708
+    plotFromTo $697D, $9800
     ld   a, $0B
     ld   hl, $68A0
     ld   de, $8000

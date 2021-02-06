@@ -1649,16 +1649,10 @@ toc_0F_6E0B:
     cbcallNoInterrupts $08, $4000
     ld   e, $10
     cbcallNoInterrupts $1E, $6011
-    ld   hl, $6E8C
-    ld   de, $8000
-    call toc_01_0708
+    plotFromTo $6E8C, $8000
     cbcallNoInterrupts $00, $1150
-    ld   hl, $705D
-    ld   de, $9000
-    call toc_01_0708
-    ld   hl, $72A3
-    ld   de, $9800
-    call toc_01_0708
+    plotFromTo $705D, $9000
+    plotFromTo $72A3, $9800
     call toc_0F_6CEF
     call toc_0F_6DB4
     call toc_0F_6C97

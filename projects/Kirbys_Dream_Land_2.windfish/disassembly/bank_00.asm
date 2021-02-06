@@ -852,8 +852,15 @@ cbcall:
     ret
 
 
-    db   $F3, $7D, $EA, $11, $DA, $7C, $EA, $12
-    db   $DA, $FB, $C9
+toc_01_05F9:
+    di
+    ld   a, l
+    ld   [wStashL], a
+    ld   a, h
+    ld   [wStashH], a
+    ei
+    ret
+
 
 stashHL:
     ld   a, l
@@ -869,7 +876,7 @@ toc_01_060D:
     push af
     ld   a, [hDesiredBankChange]
     call cbcallWithoutInterrupts.loadBank
-    call toc_01_0708
+    call decompressHAL
     pop  af
     jr   cbcallWithoutInterrupts.loadBank
 
@@ -986,12 +993,12 @@ toc_01_0675:
     db   $F3, $05, $5C, $CD, $0C, $60, $F1, $CD
     db   $F3, $05, $18, $B0
 
-toc_01_0708:
+decompressHAL:
     ld   a, e
     ld   [$FF97], a
     ld   a, d
     ld   [$FF98], a
-.dequeuNextPixel:
+.readCommandByte:
     ld   a, [hl]
     cp   $FF
     ret  z
@@ -1000,6 +1007,7 @@ toc_01_0708:
     cp   $E0
     jr   nz, .else_01_0728
 
+.readLongCommand:
     ld   a, [hl]
     add  a, a
     add  a, a
@@ -1029,7 +1037,7 @@ toc_01_0708:
     jr   nz, .else_01_077B
 
     cp   $20
-    jr   z, .else_01_074F
+    jr   z, .fill
 
     cp   $40
     jr   z, .else_01_075B
@@ -1037,27 +1045,27 @@ toc_01_0708:
     cp   $60
     jr   z, .else_01_076E
 
-.toc_01_0743:
+.copyBytes:
     dec  c
     jr   nz, .else_01_074A
 
     dec  b
-    jp   z, .dequeuNextPixel
+    jp   z, .readCommandByte
 
 .else_01_074A:
     ldi  a, [hl]
     ld   [de], a
     inc  de
-    jr   .toc_01_0743
+    jr   .copyBytes
 
-.else_01_074F:
+.fill:
     ldi  a, [hl]
 .whilePixelsRemain:
     dec  c
     jr   nz, .paintPixel
 
     dec  b
-    jp   z, .dequeuNextPixel
+    jp   z, .readCommandByte
 
 .paintPixel:
     ld   [de], a
@@ -1083,7 +1091,7 @@ toc_01_0708:
 .else_01_076A:
     inc  hl
     inc  hl
-    jr   .dequeuNextPixel
+    jr   .readCommandByte
 
 .else_01_076E:
     ldi  a, [hl]
@@ -1092,7 +1100,7 @@ toc_01_0708:
     jr   nz, .else_01_0776
 
     dec  b
-    jp   z, .dequeuNextPixel
+    jp   z, .readCommandByte
 
 .else_01_0776:
     ld   [de], a
@@ -1170,7 +1178,7 @@ toc_01_0708:
     pop  hl
     inc  hl
     inc  hl
-    jp   .dequeuNextPixel
+    jp   .readCommandByte
 
 toc_01_07C4:
     ld   [$FF84], a
