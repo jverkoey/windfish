@@ -52,7 +52,7 @@ copy: ; [Label] $00:$0625 [0]
 
 loadBank: ; [Label] $00:$05F3 [0]
 
-cbcall: ; [Label] $00:$05E5 [0]
+changeBankAndCall: ; [Label] $00:$05E5 [0]
 
 copyHLToFF30: ; [Label] $00:$3001 [0]
 
@@ -85,6 +85,8 @@ copyBytes: ; [Label] $00:$0743 [0]
 decompressHAL: ; [Label] $00:$0708 [0]
 
 readLongCommand: ; [Label] $00:$0718 [0]
+
+vblankHandler: ; [Label] $00:$0159 [0]
 
 initialize: ; [Function] $1A:$4000 [0]
 

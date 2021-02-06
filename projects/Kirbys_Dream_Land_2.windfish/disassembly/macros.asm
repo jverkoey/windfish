@@ -13,7 +13,7 @@ assign: MACRO
 cbcall: MACRO
     ld   a, \1
     ld   hl, \2
-    call cbcall
+    call changeBankAndCall
     ENDM
 
 cbcallNoInterrupts: MACRO

@@ -37,7 +37,7 @@ initialize:
     assign [gbLYC], 255
     ld   [$DA29], a
     ld   a, $1A
-    call cbcall.loadBank
+    call changeBankAndCall.loadBank
     memcpyFromTo $40E8, $FF88, $000A
     ld   hl, $DA21
     ld   a, $02

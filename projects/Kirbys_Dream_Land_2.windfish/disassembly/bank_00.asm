@@ -81,7 +81,7 @@ VBlankInterrupt:
     push hl
     push bc
     push de
-    jp   toc_01_0159
+    jp   vblankHandler
 
     db   $00
 
@@ -184,7 +184,7 @@ main:
     changebank $1A
     jp   initialize
 
-toc_01_0159:
+vblankHandler:
     ld   a, [$FFB5]
     or   a
     jr   z, .else_01_016F
@@ -405,10 +405,10 @@ toc_00_022B:
     ld   a, [hLastBank]
     push af
     ld   a, $00
-    call cbcall.loadBank
+    call changeBankAndCall.loadBank
     call toc_01_2BFD
     pop  af
-    call cbcall.loadBank
+    call changeBankAndCall.loadBank
     ld   a, [gbIE]
     or   IE_VBLANK
     ld   [gbIE], a
@@ -838,7 +838,7 @@ cbcallWithoutInterrupts:
     ret
 
 
-cbcall:
+changeBankAndCall:
     ld   [hDesiredBankChange], a
     ld   a, [hLastBank]
     push af
@@ -3406,7 +3406,7 @@ toc_01_2B97:
 
 toc_01_2BFD:
     ld   a, $1F
-    call cbcall.loadBank
+    call changeBankAndCall.loadBank
     ld   b, $07
 .loop_01_2C04:
     ld   h, $CE
@@ -3466,7 +3466,7 @@ toc_01_2BFD:
     jr   nz, .else_01_2C52
 
     ld   a, $1E
-    call cbcall.loadBank
+    call changeBankAndCall.loadBank
 .else_01_2C52:
     dec  b
     bit  7, b
