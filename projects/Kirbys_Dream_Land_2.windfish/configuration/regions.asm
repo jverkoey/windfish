@@ -90,6 +90,12 @@ vblankHandler: ; [Label] $00:$0159 [0]
 
 waitForVBlank: ; [Label] $00:$015E [0]
 
+passC0ToDMATransfer: ; [Label] $00:$0177 [0]
+
+startDMATransfer: ; [Label] $00:$017C [0]
+
+loadScrollPosition: ; [Label] $00:$018D [0]
+
 initialize: ; [Function] $1A:$4000 [0]
 
 waitForVBlank: ; [Label] $1A:$4003 [0]

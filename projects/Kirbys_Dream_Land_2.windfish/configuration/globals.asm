@@ -22,6 +22,12 @@ gbCARTRAM EQU $A000 ; [hex]
 
 gbRAM EQU $C000 ; [hex]
 
+wScrollPosition1 EQU $DA02 ; [decimal]
+
+wScrollPosition2 EQU $DA04 ; [decimal]
+
+wQueuedDMATransfer EQU $DA0F ; [decimal]
+
 wStashL EQU $DA11 ; [decimal]
 
 wStashH EQU $DA12 ; [decimal]

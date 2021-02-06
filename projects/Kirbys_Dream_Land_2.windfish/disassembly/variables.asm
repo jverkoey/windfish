@@ -10,6 +10,12 @@ gbCARTRAM EQU $A000
 
 gbRAM EQU $C000
 
+wScrollPosition1 EQU $DA02
+
+wScrollPosition2 EQU $DA04
+
+wQueuedDMATransfer EQU $DA0F
+
 wStashL EQU $DA11
 
 wStashH EQU $DA12

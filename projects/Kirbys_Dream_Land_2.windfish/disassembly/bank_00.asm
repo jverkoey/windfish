@@ -196,22 +196,23 @@ vblankHandler:
     jp   toc_00_022B.toc_01_029F
 
 .else_01_016F:
-    _ifGte [$DA0F], $01, .else_01_0193
+    _ifGte [wQueuedDMATransfer], 1, .else_01_0193
 
+.passC0ToDMATransfer:
     ld   a, $C0
-    jr   z, .else_01_017C
+    jr   z, .startDMATransfer
 
     inc  a
-.else_01_017C:
+.startDMATransfer:
     ld   [$FF89], a
     call $FF88
-    ld   a, [$DA0F]
+    ld   a, [wQueuedDMATransfer]
     dec  a
-    ld   hl, $DA02
-    jr   z, .else_01_018D
+    ld   hl, wScrollPosition1
+    jr   z, .loadScrollPosition
 
-    ld   hl, $DA04
-.else_01_018D:
+    ld   hl, wScrollPosition2
+.loadScrollPosition:
     ldi  a, [hl]
     ld   [gbSCY], a
     ld   a, [hl]
@@ -393,7 +394,7 @@ toc_00_022B:
     mask [gbIE], IE_LCDC | IE_PIN1013TRANSITION | IE_SERIALIO | IE_TIMEROVERFLOW | %11100000
     ei
     call $DA10
-    clear [$DA0F]
+    clear [wQueuedDMATransfer]
     assign [$DA0C], $01
 .toc_01_028A:
     ld   a, [hLastBank]
@@ -729,10 +730,10 @@ toc_01_04AE:
 
 .else_01_04CA:
     srl  h
-    ld   hl, $DA02
+    ld   hl, wScrollPosition1
     jr   nc, .else_01_04D4
 
-    ld   hl, $DA04
+    ld   hl, wScrollPosition2
 .else_01_04D4:
     ld   a, [$DA00]
     ld   b, a
@@ -777,7 +778,7 @@ toc_01_04AE:
     ld   a, c
     and  %00000001
     inc  a
-    ld   [$DA0F], a
+    ld   [wQueuedDMATransfer], a
     ld   a, c
     xor  %00000001
     ld   [$DA08], a
