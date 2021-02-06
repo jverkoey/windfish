@@ -7,27 +7,12 @@ initialize:
 
     clear [gbLCDC]
     assign [RST_0000], $0A
-    ld   hl, gbVRAM
-    ld   bc, $2000
-    ld   a, $00
-    call memset
-    ld   hl, gbRAM
-    ld   bc, $2000
-    ld   a, $00
-    call memset
+    memsetWithValue gbVRAM, $2000, $00
+    memsetWithValue gbRAM, $2000, $00
     ld   sp, $E000
-    ld   hl, gbOAMRAM
-    ld   bc, $0100
-    ld   a, $00
-    call memset
-    ld   hl, $FF80
-    ld   bc, $007F
-    ld   a, $00
-    call memset
-    ld   hl, gbCARTRAM
-    ld   bc, $1C00
-    ld   a, $00
-    call memset
+    memsetWithValue gbOAMRAM, $0100, $00
+    memsetWithValue $FF80, $007F, $00
+    memsetWithValue gbCARTRAM, $1C00, $00
     clear [gbIF]
     assign [gbIE], IE_LCDC | IE_TIMEROVERFLOW | IE_VBLANK
     assign [gbTIMA], $FF

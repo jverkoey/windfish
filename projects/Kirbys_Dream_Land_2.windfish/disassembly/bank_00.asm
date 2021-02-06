@@ -2221,10 +2221,7 @@ toc_01_1286:
     dec  c
     jr   nz, .loop_01_1465
 
-    ld   hl, $BB00
-    ld   bc, $0100
-    ld   a, $00
-    call memset
+    memsetWithValue $BB00, $0100, $00
     xor  a
     ld   hl, $DB4F
     ldi  [hl], a
@@ -2259,10 +2256,7 @@ toc_01_1286:
     sub  a, $10
     ld   [$DB56], a
     ld   [$DB7E], a
-    ld   hl, $CD56
-    ld   bc, $0018
-    ld   a, $00
-    call memset
+    memsetWithValue $CD56, $0018, $00
     clear [$DB72]
     ld   [$DB70], a
     ld   [$DB71], a

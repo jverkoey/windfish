@@ -1875,24 +1875,15 @@ toc_10_7A2D:
     assign [$CD09], $E4
     assign [$CD0A], $D0
     assign [$CD0B], $E4
-    ld   hl, gbBGDAT0
-    ld   bc, $0400
-    ld   a, $00
-    call memset
-    ld   hl, gbBGDAT1
-    ld   bc, $0400
-    ld   a, $00
-    call memset
+    memsetWithValue gbBGDAT0, $0400, $00
+    memsetWithValue gbBGDAT1, $0400, $00
     ld   e, $FF
     cbcallNoInterrupts $1F, $4232
     ld   e, $00
     cbcallNoInterrupts $1E, $606D
     plotFromTo $72D1, $8000
     memcpyFromTo gbVRAM, $9000, $0800
-    ld   hl, $8FF0
-    ld   bc, $0010
-    ld   a, $FF
-    call memset
+    memsetWithValue $8FF0, $0010, $FF
     plotFromTo $7944, $CF00
     call toc_10_7C90
     assign [gbLCDC], LCDCF_BG_DISPLAY | LCDCF_OBJ_16_16 | LCDCF_TILEMAP_9C00

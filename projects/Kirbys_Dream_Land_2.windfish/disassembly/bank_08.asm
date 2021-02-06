@@ -340,10 +340,7 @@ toc_08_449B:
     call toc_08_46CB
     clear [$DB7B]
     ld   [$DB6E], a
-    ld   hl, $DBD0
-    ld   bc, $012C
-    ld   a, $00
-    call memset
+    memsetWithValue $DBD0, $012C, $00
     assign [$DCFD], $D0
     assign [$DCFE], $DB
     cbcallNoInterrupts $0F, $6D21
