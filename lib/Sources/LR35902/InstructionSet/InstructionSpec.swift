@@ -83,7 +83,7 @@ extension LR35902.Instruction {
 
     case zeroimm8  // Used solely as a placeholder for stop's extra null byte
 
-    var lowRegister: Numeric? {
+    public var lowRegister: Numeric? {
       switch self {
       case .af: return nil
       case .bc: return .c
@@ -93,7 +93,7 @@ extension LR35902.Instruction {
       }
     }
 
-    var highRegister: Numeric? {
+    public var highRegister: Numeric? {
       switch self {
       case .af: return .a
       case .bc: return .b

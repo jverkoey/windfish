@@ -1,5 +1,7 @@
 import Foundation
 
+import LR35902
+
 /** A representation of a Gameboy cartridge as addressable memory at a given moment. */
 public class Cartridge {
   public typealias Bank = UInt8

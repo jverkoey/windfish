@@ -1,4 +1,6 @@
 import Foundation
+
+import LR35902
 @testable import Windfish
 
 class TestMemory: TraceableMemory {
@@ -25,6 +27,8 @@ class TestMemory: TraceableMemory {
   func sourceLocation(from address: LR35902.Address) -> Gameboy.SourceLocation {
     return Gameboy.sourceLocation(for: address, in: 0x01)
   }
+
+  var registerTraces: [LR35902.Instruction.Numeric : [LR35902.RegisterTrace]] = [:]
 
   var defaultReadValue: UInt8 = 0x00
   var reads: [LR35902.Address] = []

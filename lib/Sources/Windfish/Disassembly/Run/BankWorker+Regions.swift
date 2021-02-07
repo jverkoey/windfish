@@ -1,5 +1,7 @@
 import Foundation
 
+import LR35902
+
 extension Disassembler.BankRouter {
 
   /** Returns all disassembled locations. */

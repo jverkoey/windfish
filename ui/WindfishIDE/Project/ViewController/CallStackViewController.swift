@@ -2,6 +2,7 @@ import AppKit
 import Foundation
 import Cocoa
 
+import LR35902
 import Windfish
 
 extension NSUserInterfaceItemIdentifier {

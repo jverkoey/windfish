@@ -169,13 +169,10 @@ public final class LR35902 {
   /** Program counter. */
   public var pc: Address = 0x0000
 
-  /** Trace information for a given register. */
-  var registerTraces: [LR35902.Instruction.Numeric: [RegisterTrace]] = [:]
-
   /** Initializes the CPU with all nil values. */
   public init() {}
 
-  internal init(a: UInt8? = nil, b: UInt8? = nil, c: UInt8? = nil, d: UInt8? = nil, e: UInt8? = nil, h: UInt8? = nil, l: UInt8? = nil, fzero: Bool? = nil, fsubtract: Bool? = nil, fhalfcarry: Bool? = nil, fcarry: Bool? = nil, halted: Bool? = nil, sp: UInt16? = nil, pc: LR35902.Address = 0x0000, registerTraces: [LR35902.Instruction.Numeric : [LR35902.RegisterTrace]] = [:]) {
+  internal init(a: UInt8? = nil, b: UInt8? = nil, c: UInt8? = nil, d: UInt8? = nil, e: UInt8? = nil, h: UInt8? = nil, l: UInt8? = nil, fzero: Bool? = nil, fsubtract: Bool? = nil, fhalfcarry: Bool? = nil, fcarry: Bool? = nil, halted: Bool? = nil, sp: UInt16? = nil, pc: LR35902.Address = 0x0000) {
     self.a = a
     self.b = b
     self.c = c
@@ -190,15 +187,14 @@ public final class LR35902 {
     self.halted = halted
     self.sp = sp
     self.pc = pc
-    self.registerTraces = registerTraces
   }
 
   public static func zeroed() -> LR35902 {
-    return LR35902(a: 0, b: 0, c: 0, d: 0, e: 0, h: 0, l: 0, fzero: false, fsubtract: false, fhalfcarry: false, fcarry: false, sp: 0, pc: 0, registerTraces: [:])
+    return LR35902(a: 0, b: 0, c: 0, d: 0, e: 0, h: 0, l: 0, fzero: false, fsubtract: false, fhalfcarry: false, fcarry: false, sp: 0, pc: 0)
   }
 
   public func copy() -> LR35902 {
-    return LR35902(a: a, b: b, c: c, d: d, e: e, h: h, l: l, fzero: fzero, fsubtract: fsubtract, fhalfcarry: fhalfcarry, fcarry: fcarry, halted: halted, sp: sp, pc: pc, registerTraces: registerTraces)
+    return LR35902(a: a, b: b, c: c, d: d, e: e, h: h, l: l, fzero: fzero, fsubtract: fsubtract, fhalfcarry: fhalfcarry, fcarry: fcarry, halted: halted, sp: sp, pc: pc)
   }
 }
 
@@ -265,25 +261,5 @@ extension LR35902 {
     default:
       preconditionFailure()
     }
-  }
-}
-
-extension LR35902 {
-  /** Trace information for a specific register. */
-  enum RegisterTrace: Equatable {
-    /** The register's value was stored to an address in memory. */
-    case storeToAddress(LR35902.Address)
-
-    /** The register's value was loaded from an address in memory. */
-    case loadFromAddress(LR35902.Address)
-
-    /** The register's value was loaded from an immediate at some source location. */
-    case loadImmediateFromSourceLocation(Gameboy.SourceLocation)
-
-    /** The register's value was modified at some source location. */
-    case mutationWithImmediateAtSourceLocation(Gameboy.SourceLocation)
-
-    /** The register's value was modified at some source location. */
-    case mutationFromAddress(Gameboy.SourceLocation)
   }
 }

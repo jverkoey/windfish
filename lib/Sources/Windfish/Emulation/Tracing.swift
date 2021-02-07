@@ -1,5 +1,27 @@
 import Foundation
 
+import LR35902
+
+extension LR35902 {
+  /** Trace information for a specific register. */
+  enum RegisterTrace: Equatable {
+    /** The register's value was stored to an address in memory. */
+    case storeToAddress(LR35902.Address)
+
+    /** The register's value was loaded from an address in memory. */
+    case loadFromAddress(LR35902.Address)
+
+    /** The register's value was loaded from an immediate at some source location. */
+    case loadImmediateFromSourceLocation(Gameboy.SourceLocation)
+
+    /** The register's value was modified at some source location. */
+    case mutationWithImmediateAtSourceLocation(Gameboy.SourceLocation)
+
+    /** The register's value was modified at some source location. */
+    case mutationFromAddress(Gameboy.SourceLocation)
+  }
+}
+
 private final class TracerMemory: TraceableMemory {
   init(data: Data) {
     self.data = data
@@ -38,6 +60,8 @@ private final class TracerMemory: TraceableMemory {
   func sourceLocation(from address: LR35902.Address) -> Gameboy.SourceLocation {
     return .cartridge(Cartridge.Location(address: address, bank: selectedBank))
   }
+
+  var registerTraces: [LR35902.Instruction.Numeric : [LR35902.RegisterTrace]] = [:]
 }
 
 extension Disassembler {
@@ -62,7 +86,7 @@ extension Disassembler {
                    cpu: LR35902 = LR35902(),
                    context: Configuration,
                    router: BankRouter,
-                   step: ((LR35902.Instruction, Cartridge.Location, LR35902) -> Void)? = nil) {
+                   step: ((LR35902.Instruction, Cartridge.Location, LR35902, TraceableMemory) -> Void)? = nil) {
     let bank: Cartridge.Bank = range.lowerBound.bank
     let upperBoundPc: LR35902.Address = range.upperBound.address
 
@@ -89,7 +113,7 @@ extension Disassembler {
       cpu.pc += LR35902.Address(truncatingIfNeeded: opCodeBytes.count)
 
       emulator.emulate(cpu: cpu, memory: tracerMemory, sourceLocation: sourceLocation)
-      step?(instruction, location, cpu)
+      step?(instruction, location, cpu, tracerMemory)
 
       cpu.pc = initialPc + LR35902.InstructionSet.widths[instruction.spec]!.opcode
     }

@@ -1,5 +1,7 @@
 import Foundation
 
+import LR35902
+
 extension Disassembler {
   static func disassembleInstructionSpec(at pc: inout LR35902.Address, memory: DisassemblerMemory) -> LR35902.Instruction.Spec {
     // Fetch

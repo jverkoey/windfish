@@ -1,5 +1,7 @@
 import Foundation
 
+import LR35902
+
 // References:
 // - https://stackoverflow.com/questions/57958631/game-boy-half-carry-flag-and-16-bit-instructions-especially-opcode-0xe8
 
@@ -12,7 +14,7 @@ extension LR35902.Emulation {
     }
 
     func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
-      cpu.registerTraces[.sp, default: []].append(.mutationWithImmediateAtSourceLocation(sourceLocation))
+      memory.registerTraces[.sp, default: []].append(.mutationWithImmediateAtSourceLocation(sourceLocation))
 
       cpu.fzero = false
       cpu.fsubtract = false

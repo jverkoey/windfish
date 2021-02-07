@@ -1,6 +1,7 @@
 import Foundation
 
 import CPU
+import LR35902
 
 extension Disassembler.BankRouter {
   /** Registers a range as a specific region category. Will clear any existing regions in the range. */

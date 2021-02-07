@@ -2,6 +2,7 @@ import Foundation
 
 import CPU
 import FoundationExtensions
+import LR35902
 import RGBDS
 
 /**

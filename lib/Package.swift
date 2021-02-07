@@ -21,6 +21,13 @@ let package = Package(
         "FoundationExtensions",
         "CPU",
         "RGBDS",
+        "LR35902",
+      ]
+    ),
+    .target(
+      name: "LR35902",
+      dependencies: [
+        "CPU"
       ]
     ),
     .target(
@@ -53,6 +60,10 @@ let package = Package(
       resources: [
         .copy("Resources"),
       ]
+    ),
+    .testTarget(
+      name: "LR35902Tests",
+      dependencies: ["LR35902"]
     ),
     .testTarget(
       name: "CPUTests",

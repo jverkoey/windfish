@@ -1,5 +1,6 @@
 import Foundation
 
+import LR35902
 import Windfish
 
 // Docs sourced from http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf

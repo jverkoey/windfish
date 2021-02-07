@@ -2,6 +2,7 @@ import Foundation
 
 import os.log
 
+import LR35902
 import RGBDS
 
 extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {

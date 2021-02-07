@@ -1,6 +1,7 @@
 import XCTest
+
 import CPU
-@testable import Windfish
+import LR35902
 
 class InstructionSetTests: XCTestCase {
   func testWidths() {

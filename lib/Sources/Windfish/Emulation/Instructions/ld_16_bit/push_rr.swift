@@ -1,5 +1,7 @@
 import Foundation
 
+import LR35902
+
 extension LR35902.Emulation {
   final class push_rr: InstructionEmulator, InstructionEmulatorInitializable {
     init?(spec: LR35902.Instruction.Spec) {
@@ -14,12 +16,12 @@ extension LR35902.Emulation {
       guard let sp = cpu.sp else {
         return
       }
-      cpu.registerTraces[src, default: []].append(.storeToAddress(sp &- 2))
+      memory.registerTraces[src, default: []].append(.storeToAddress(sp &- 2))
       if let lowRegister: LR35902.Instruction.Numeric = src.lowRegister {
-        cpu.registerTraces[lowRegister, default: []].append(.storeToAddress(sp &- 2))
+        memory.registerTraces[lowRegister, default: []].append(.storeToAddress(sp &- 2))
       }
       if let highRegister: LR35902.Instruction.Numeric = src.highRegister {
-        cpu.registerTraces[highRegister, default: []].append(.storeToAddress(sp &- 1))
+        memory.registerTraces[highRegister, default: []].append(.storeToAddress(sp &- 1))
       }
 
       cpu.sp = sp &- 2

@@ -1,6 +1,7 @@
 import Foundation
-
 import os.log
+
+import LR35902
 
 extension Disassembler {
   public func willStart() {

@@ -1,5 +1,7 @@
 import Foundation
 
+import LR35902
+
 final class DisassemblerMemory {
   init(data: Data) {
     self.data = data

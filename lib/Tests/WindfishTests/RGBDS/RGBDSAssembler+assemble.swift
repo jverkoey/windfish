@@ -1,5 +1,6 @@
 import Foundation
 
+import LR35902
 import RGBDS
 @testable import Windfish
 

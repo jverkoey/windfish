@@ -1,5 +1,7 @@
 import Foundation
 
+import LR35902
+
 extension Disassembler.BankWorker {
   func rewriteRunGroup(_ runGroup: RunGroup) {
     assert(runGroup.startLocation?.bankIndex == bank)
@@ -38,7 +40,7 @@ extension Disassembler.BankWorker {
 
     let registers8: Set<LR35902.Instruction.Numeric> = LR35902.Instruction.Numeric.registers8
 
-    Disassembler.trace(range: visitedRange, context: context, router: router!) { (instruction: LR35902.Instruction, currentLocation: Cartridge.Location, cpu: LR35902) in
+    Disassembler.trace(range: visitedRange, context: context, router: router!) { (instruction: LR35902.Instruction, currentLocation: Cartridge.Location, cpu: LR35902, memory: TraceableMemory) in
       switch instruction.spec {
 
       // MARK: Backward type propagation
@@ -47,14 +49,14 @@ extension Disassembler.BankWorker {
         guard case let .imm16(address) = instruction.immediate else {
           preconditionFailure("Invalid immediate associated with instruction")
         }
-        self.backPropagateTypeOfLoad(from: address, cpu: cpu, register: register)
+        self.backPropagateTypeOfLoad(from: address, cpu: cpu, memory: memory, register: register)
 
       case .ld(.ffimm8addr, let register) where registers8.contains(register):
         guard case let .imm8(addressLowByte) = instruction.immediate else {
           preconditionFailure("Invalid immediate associated with instruction")
         }
         let address: LR35902.Address = 0xFF00 | LR35902.Address(addressLowByte)
-        self.backPropagateTypeOfLoad(from: address, cpu: cpu, register: register)
+        self.backPropagateTypeOfLoad(from: address, cpu: cpu, memory: memory, register: register)
 
       // MARK: Forward type propagation
 
@@ -83,7 +85,7 @@ extension Disassembler.BankWorker {
         guard self.typeAtLocation[currentLocation.address] == nil else {
           break
         }
-        guard let registerTraces: [LR35902.RegisterTrace] = cpu.registerTraces[.a],
+        guard let registerTraces: [LR35902.RegisterTrace] = memory.registerTraces[.a],
               let dataType: String = registerTraces.lazy.compactMap({ (trace: LR35902.RegisterTrace) -> String? in
                 guard case .loadFromAddress(let address) = trace else {
                   return nil
@@ -286,9 +288,9 @@ extension Disassembler.BankWorker {
    7: ld [$ff40], a
    ```
    */
-  private func backPropagateTypeOfLoad(from address: UInt16, cpu: LR35902, register: LR35902.Instruction.Numeric) {
+  private func backPropagateTypeOfLoad(from address: UInt16, cpu: LR35902, memory: TraceableMemory, register: LR35902.Instruction.Numeric) {
     if let global = self.context.global(at: address), let dataType = global.dataType,
-       let registerTraces: [LR35902.RegisterTrace] = cpu.registerTraces[register] {
+       let registerTraces: [LR35902.RegisterTrace] = memory.registerTraces[register] {
       registerTraces.forEach { (trace: LR35902.RegisterTrace) in
         switch trace {
         case .loadImmediateFromSourceLocation(.cartridge(let location)),

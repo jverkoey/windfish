@@ -43,6 +43,14 @@
         "identifier" : "FoundationExtensionsTests",
         "name" : "FoundationExtensionsTests"
       }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:..\/lib",
+        "identifier" : "LR35902Tests",
+        "name" : "LR35902Tests"
+      }
     }
   ],
   "version" : 1

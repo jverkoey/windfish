@@ -1,5 +1,6 @@
 import XCTest
-@testable import Windfish
+
+@testable import LR35902
 
 class LR35902Tests: XCTestCase {
 

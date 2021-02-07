@@ -4,6 +4,7 @@ import Darwin
 import Cocoa
 import Combine
 
+import LR35902
 import Windfish
 
 func DefaultCodeAttributes() -> [NSAttributedString.Key : Any] {

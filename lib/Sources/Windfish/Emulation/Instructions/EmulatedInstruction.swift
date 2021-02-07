@@ -1,5 +1,7 @@
 import Foundation
 
+import LR35902
+
 protocol InstructionEmulatorInitializable: class {
   init?(spec: LR35902.Instruction.Spec)
 }

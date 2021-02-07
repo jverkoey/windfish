@@ -1,5 +1,7 @@
 import Foundation
 
+import LR35902
+
 extension LR35902.Emulation {
   final class ldi_hladdr_a: InstructionEmulator, InstructionEmulatorInitializable {
     init?(spec: LR35902.Instruction.Spec) {
@@ -12,7 +14,7 @@ extension LR35902.Emulation {
       guard let address: UInt16 = cpu.hl else {
         return
       }
-      cpu.registerTraces[.a, default: []].append(.storeToAddress(address))
+      memory.registerTraces[.a, default: []].append(.storeToAddress(address))
 
       memory.write(cpu.a, to: address)
       cpu.hl = address &+ 1

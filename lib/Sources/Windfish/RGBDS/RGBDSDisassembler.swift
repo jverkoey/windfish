@@ -1,6 +1,7 @@
 import Foundation
 
 import FoundationExtensions
+import LR35902
 import RGBDS
 
 /** Turns LR3902 instructions into RGBDS assembly. */

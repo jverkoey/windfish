@@ -1,5 +1,7 @@
 import Foundation
 
+import LR35902
+
 /** A region of addressable memory can be read from and written to. */
 protocol TraceableMemory: class {
   /** Read from the given address and return the resulting byte, if it's known. */
@@ -10,4 +12,7 @@ protocol TraceableMemory: class {
 
   /** Returns a source code location for the given address based on the current memory configuration. */
   func sourceLocation(from address: LR35902.Address) -> Gameboy.SourceLocation
+
+  /** Trace information for a given register. */
+  var registerTraces: [LR35902.Instruction.Numeric: [LR35902.RegisterTrace]] { get set }
 }

@@ -1,5 +1,7 @@
 import Foundation
 
+import LR35902
+
 extension LR35902.Emulation {
   final class ld_a_ffnnaddr: InstructionEmulator, InstructionEmulatorInitializable {
     init?(spec: LR35902.Instruction.Spec) {
@@ -13,12 +15,12 @@ extension LR35902.Emulation {
         cpu.pc &+= 1
       }
       guard let lowByte: UInt8 = memory.read(from: cpu.pc) else {
-        cpu.registerTraces[.a] = []
+        memory.registerTraces[.a] = []
         cpu.a = nil
         return
       }
       let address: UInt16 = 0xFF00 | UInt16(truncatingIfNeeded: lowByte)
-      cpu.registerTraces[.a] = [.loadFromAddress(address)]
+      memory.registerTraces[.a] = [.loadFromAddress(address)]
 
       guard let value: UInt8 = memory.read(from: address) else {
         cpu.a = nil

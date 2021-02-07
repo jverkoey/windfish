@@ -1,4 +1,6 @@
 import Foundation
+
+import LR35902
 import CPU
 
 extension Disassembler {

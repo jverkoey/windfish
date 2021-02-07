@@ -1,5 +1,6 @@
 import Cocoa
 
+import LR35902
 import Windfish
 
 class VRAMWindowController: NSWindowController {

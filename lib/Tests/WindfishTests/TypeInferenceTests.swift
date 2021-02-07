@@ -1,4 +1,6 @@
 import XCTest
+
+import LR35902
 @testable import Windfish
 
 extension Disassembler.MutableConfiguration.Macro: Equatable {

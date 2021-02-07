@@ -1,5 +1,7 @@
 import Foundation
 
+import LR35902
+
 protocol Configuration: class {
   var cartridgeData: Data { get }
   var numberOfBanks: Int { get }

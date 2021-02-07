@@ -1,5 +1,7 @@
 import Foundation
 
+import LR35902
+
 extension LR35902.Emulation {
   final class ld_r_rraddr: InstructionEmulator, InstructionEmulatorInitializable {
     init?(spec: LR35902.Instruction.Spec) {
@@ -14,11 +16,11 @@ extension LR35902.Emulation {
 
     func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
       guard let address: UInt16 = cpu[src] else {
-        cpu.registerTraces[dst] = []
+        memory.registerTraces[dst] = []
         cpu.set(numeric8: dst, to: nil)
         return
       }
-      cpu.registerTraces[dst] = [.loadFromAddress(address)]
+      memory.registerTraces[dst] = [.loadFromAddress(address)]
 
       cpu[dst] = memory.read(from: address)
     }

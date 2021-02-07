@@ -3,6 +3,7 @@ import Foundation
 import os.log
 
 import CPU
+import LR35902
 import RGBDS
 
 extension Array {

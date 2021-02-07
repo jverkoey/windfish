@@ -1,5 +1,7 @@
 import Foundation
 
+import LR35902
+
 extension Disassembler.MutableConfiguration {
   func allPotentialCode() -> Set<Range<Cartridge.Location>> {
     return executableRegions

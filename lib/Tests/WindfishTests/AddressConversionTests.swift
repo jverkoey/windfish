@@ -1,4 +1,6 @@
 import XCTest
+
+import LR35902
 @testable import Windfish
 
 class AddressConversionTests: XCTestCase {
