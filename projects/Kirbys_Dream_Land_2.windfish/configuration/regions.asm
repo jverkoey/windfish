@@ -100,6 +100,12 @@ doCE82PlusB: ; [Label] $00:$2F31 [0]
 
 joypadHandler: ; [Label] $00:$041E [0]
 
+readJoypad: ; [Label] $00:$0386 [0]
+
+resetCounter: ; [Label] $00:$0432 [0]
+
+checkCounter: ; [Label] $00:$0429 [0]
+
 toc_01_0DFF: ; [Function] $01:$0DFF [0]
 
 toc_01_0DCE: ; [Function] $01:$0DCE [0]

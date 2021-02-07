@@ -486,7 +486,7 @@ toc_01_0357:
 
     ld   b, $01
     ld   hl, wJoypadStorage
-    jr   .toc_01_0386
+    jr   .readJoypad
 
 .else_01_0369:
     ld   a, [$DA38]
@@ -512,7 +512,7 @@ toc_01_0357:
     ld   d, $00
     ld   hl, wJoypadStorage
     add  hl, de
-.toc_01_0386:
+.readJoypad:
     ld   e, [hl]
     assign [gbP1], JOYPAD_BUTTONS
     ld   a, [gbP1]
@@ -614,17 +614,17 @@ joypadHandler:
     xor  e
     and  d
     ldi  [hl], a
-    jr   z, .else_01_0429
+    jr   z, .checkCounter
 
     ldi  [hl], a
     ld   [hl], $14
     ret
 
 
-.else_01_0429:
+.checkCounter:
     inc  hl
     or   [hl]
-    jr   z, .else_01_0432
+    jr   z, .resetCounter
 
     dec  [hl]
     dec  hl
@@ -632,7 +632,7 @@ joypadHandler:
     ret
 
 
-.else_01_0432:
+.resetCounter:
     ld   [hl], $03
     dec  hl
     ld   [hl], d

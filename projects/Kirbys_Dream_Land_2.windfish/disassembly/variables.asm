@@ -30,6 +30,10 @@ wJoypadStorage EQU $DA3E
 
 wJoypadStorage2 EQU $DA3F
 
+wJoypadStorage3 EQU $DA40
+
+wJoypadCounter EQU $DA41
+
 gbOAMRAM EQU $FE00
 
 gbP1 EQU $FF00

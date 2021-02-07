@@ -42,6 +42,10 @@ wJoypadStorage EQU $DA3E ; [BUTTON]
 
 wJoypadStorage2 EQU $DA3F ; [BUTTON]
 
+wJoypadStorage3 EQU $DA40 ; [BUTTON]
+
+wJoypadCounter EQU $DA41 ; [decimal]
+
 gbOAMRAM EQU $FE00 ; [hex]
 
 gbP1 EQU $FF00 ; [JOYPAD]
