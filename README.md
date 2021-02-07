@@ -40,4 +40,4 @@ Features of the IDE:
 
 ## Learn more
 
-[Learn more about the Windfish architecture](lib/README.md).
+[Learn more about the Windfish architecture](Architecture/README.md).
