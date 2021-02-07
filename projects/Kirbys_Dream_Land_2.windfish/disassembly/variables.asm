@@ -26,6 +26,10 @@ wLCDInterruptTrampoline EQU $DA13
 
 wDesiredLYC EQU $DA29
 
+wJoypadStorage EQU $DA3E
+
+wJoypadStorage2 EQU $DA3F
+
 gbOAMRAM EQU $FE00
 
 gbP1 EQU $FF00

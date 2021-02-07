@@ -38,6 +38,10 @@ wLCDInterruptTrampoline EQU $DA13 ; [decimal]
 
 wDesiredLYC EQU $DA29 ; [decimal]
 
+wJoypadStorage EQU $DA3E ; [BUTTON]
+
+wJoypadStorage2 EQU $DA3F ; [BUTTON]
+
 gbOAMRAM EQU $FE00 ; [hex]
 
 gbP1 EQU $FF00 ; [JOYPAD]

@@ -98,6 +98,8 @@ loadScrollPosition: ; [Label] $00:$018D [0]
 
 doCE82PlusB: ; [Label] $00:$2F31 [0]
 
+joypadHandler: ; [Label] $00:$041E [0]
+
 toc_01_0DFF: ; [Function] $01:$0DFF [0]
 
 toc_01_0DCE: ; [Function] $01:$0DCE [0]

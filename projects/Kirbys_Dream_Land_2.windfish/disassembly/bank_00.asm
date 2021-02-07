@@ -479,13 +479,13 @@ toc_01_0343:
 
 
 toc_01_0357:
-    copyFromTo [$DA3E], [$FF84]
+    copyFromTo [wJoypadStorage], [$FF84]
     ld   a, [$DEED]
     or   a
     jr   nz, .else_01_0369
 
     ld   b, $01
-    ld   hl, $DA3E
+    ld   hl, wJoypadStorage
     jr   .toc_01_0386
 
 .else_01_0369:
@@ -510,7 +510,7 @@ toc_01_0357:
     add  a, a
     ld   e, a
     ld   d, $00
-    ld   hl, $DA3E
+    ld   hl, wJoypadStorage
     add  hl, de
 .toc_01_0386:
     ld   e, [hl]
@@ -530,7 +530,7 @@ toc_01_0357:
     and  %00001111
     or   d
     cpl
-    call toc_01_041E
+    call joypadHandler
     assign [gbP1], JOYPAD_BUTTONS | JOYPAD_DIRECTIONS
     dec  b
     jr   nz, .loop_01_0375
@@ -576,7 +576,7 @@ toc_01_0357:
     ld   e, a
     ld   a, [bc]
     ld   hl, $FFA5
-    call toc_01_041E
+    call joypadHandler
     ld   b, $04
     ld   hl, $DA42
     ld   c, $A9
@@ -584,7 +584,7 @@ toc_01_0357:
 
 .else_01_03F8:
     ld   b, $08
-    ld   hl, $DA3E
+    ld   hl, wJoypadStorage
     ld   c, $A5
 .loop_01_03FF:
     ldi  a, [hl]
@@ -608,7 +608,7 @@ toc_01_0357:
     cbcallNoInterrupts $1E, $6002
     jp   main
 
-toc_01_041E:
+joypadHandler:
     ld   d, a
     ldi  [hl], a
     xor  e
@@ -2249,8 +2249,8 @@ toc_01_11BE:
 
     ifEq [$DA3A], $02, .else_01_1219
 
-    ld   a, [$DA3F]
-    and  %00001011
+    ld   a, [wJoypadStorage2]
+    and  J_DOWN | J_LEFT | J_RIGHT
     jr   z, .else_01_1219
 
     assign [$A082], $09
