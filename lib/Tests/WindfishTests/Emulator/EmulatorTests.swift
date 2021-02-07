@@ -46,7 +46,7 @@ ld   e, a
 
     let cpu = LR35902.zeroed()
     // TODO: Make the trace invocation a class function; it doesn't need to be executed as part of the worker.
-    Disassembler.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, context: disassembly.configuration, router: disassembly.lastBankRouter!)
+    LR35902.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, context: disassembly.configuration, router: disassembly.lastBankRouter!)
     let lastState = cpu
 
     XCTAssertEqual(lastState.a, 0xE0)
@@ -67,7 +67,7 @@ ld   e, a
 """)
 
     let cpu = LR35902.zeroed()
-    Disassembler.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, context: disassembly.configuration, router: disassembly.lastBankRouter!)
+    LR35902.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, context: disassembly.configuration, router: disassembly.lastBankRouter!)
 
     XCTAssertEqual(cpu.a, 0xE1)
     XCTAssertEqual(cpu.b, 0)
@@ -87,7 +87,7 @@ ld   e, a
 """)
 
     let cpu = LR35902.zeroed()
-    Disassembler.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, context: disassembly.configuration, router: disassembly.lastBankRouter!)
+    LR35902.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, context: disassembly.configuration, router: disassembly.lastBankRouter!)
 
     XCTAssertNil(cpu.a)
     XCTAssertEqual(cpu.b, 0)
@@ -113,7 +113,7 @@ ld   [$ffcb], a
     let cpu = LR35902()
     cpu.a = 0b0000_1111
 
-    Disassembler.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, context: disassembly.configuration, router: disassembly.lastBankRouter!)
+    LR35902.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, context: disassembly.configuration, router: disassembly.lastBankRouter!)
 
     XCTAssertEqual(cpu.a, 0b0000_1111)
     XCTAssertEqual(cpu.c, 0b0000_1111)

@@ -79,7 +79,7 @@ private final class TracerMemory: TraceableMemory {
   var registerTraces: [LR35902.Instruction.Numeric : [LR35902.RegisterTrace]] = [:]
 }
 
-extension Disassembler {
+extension LR35902 {
   // TODO: Extract this engine into a generic emulator so that the following code can be debugged in an interactive session:
   /*
    ; Store the read joypad state into c
@@ -100,7 +100,7 @@ extension Disassembler {
   class func trace(range: Range<Cartridge.Location>,
                    cpu: LR35902 = LR35902(),
                    context: Configuration,
-                   router: BankRouter,
+                   router: Disassembler.BankRouter,  // TODO: Replace router with mechanism for fetching instructions.
                    step: ((LR35902.Instruction, Cartridge.Location, LR35902, TraceableMemory) -> Void)? = nil) {
     let bank: Cartridge.Bank = range.lowerBound.bank
     let upperBoundPc: LR35902.Address = range.upperBound.address
