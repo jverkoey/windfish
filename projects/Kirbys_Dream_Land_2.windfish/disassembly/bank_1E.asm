@@ -1545,7 +1545,9 @@ toc_1E_6002:
 
     jp   toc_1E_5DF3
 
-    db   $AF, $E0, $84, $18, $28
+toc_1E_600C:
+    clear [$FF84]
+    jr   toc_1E_6035.toc_1E_6039
 
 toc_1E_6011:
     ld   a, [$DEED]

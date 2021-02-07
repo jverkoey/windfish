@@ -1104,23 +1104,92 @@ toc_01_0675:
     ret
 
 
-    db   $FA, $0F, $DA, $B7, $20, $09, $FA, $39
-    db   $DA, $B7, $C8, $AF, $EA, $39, $DA, $21
-    db   $33, $DA, $35, $C0, $FA, $34, $DA, $FE
-    db   $0C, $28, $20, $5F, $16, $CD, $FA, $38
-    db   $DA, $B7, $20, $21, $21, $00, $CD, $1A
-    db   $1C, $22, $1A, $1C, $22, $1A, $1C, $77
-    db   $7B, $EA, $34, $DA, $FA, $32, $DA, $EA
-    db   $33, $DA, $C9, $AF, $EA, $36, $DA, $21
-    db   $42, $03, $C3, $04, $06, $FA, $0C, $CD
-    db   $B7, $20, $06, $AF, $EA, $38, $DA, $18
-    db   $EB, $3D, $EA, $0C, $CD, $20, $14, $FA
-    db   $37, $DA, $FE, $FF, $28, $0D, $FE, $01
-    db   $3E, $FF, $28, $01, $AF, $21, $00, $CD
-    db   $22, $22, $77, $1A, $67, $1C, $7B, $EA
-    db   $34, $DA, $F0, $A4, $F5, $3E, $1E, $CD
-    db   $F3, $05, $5C, $CD, $0C, $60, $F1, $CD
-    db   $F3, $05, $18, $B0
+toc_01_0684:
+    ld   a, [wQueuedDMATransfer]
+    or   a
+    jr   nz, .else_01_0693
+
+    ld   a, [$DA39]
+    or   a
+    ret  z
+
+    clear [$DA39]
+.else_01_0693:
+    ld   hl, $DA33
+    dec  [hl]
+    ret  nz
+
+    ifNe [$DA34], $0C, .else_01_06BF
+
+    ld   e, a
+    ld   d, $CD
+    ld   a, [$DA38]
+    or   a
+    jr   nz, .else_01_06C9
+
+    ld   hl, $CD00
+    ld   a, [de]
+    inc  e
+    ldi  [hl], a
+    ld   a, [de]
+    inc  e
+    ldi  [hl], a
+    ld   a, [de]
+    inc  e
+    ld   [hl], a
+    ld   a, e
+    ld   [$DA34], a
+.toc_01_06B8:
+    copyFromTo [$DA32], [$DA33]
+    ret
+
+
+.else_01_06BF:
+    xor  a
+.toc_01_06C0:
+    ld   [$DA36], a
+    ld   hl, $0342
+    jp   stashHL
+
+.else_01_06C9:
+    ld   a, [$CD0C]
+    or   a
+    jr   nz, .else_01_06D5
+
+    clear [$DA38]
+    jr   .toc_01_06C0
+
+.else_01_06D5:
+    dec  a
+    ld   [$CD0C], a
+    jr   nz, .else_01_06EF
+
+    ifNe [$DA37], $FF, .else_01_06EF
+
+    cp   $01
+    ld   a, $FF
+    jr   z, .else_01_06E9
+
+    xor  a
+.else_01_06E9:
+    ld   hl, $CD00
+    ldi  [hl], a
+    ldi  [hl], a
+    ld   [hl], a
+.else_01_06EF:
+    ld   a, [de]
+    ld   h, a
+    inc  e
+    ld   a, e
+    ld   [$DA34], a
+    ld   a, [hLastBank]
+    push af
+    _changebank $1E
+    ld   e, h
+    call toc_1E_600C
+    pop  af
+    call changeBankAndCall.loadBank
+    jr   .toc_01_06B8
 
 decompressHAL:
     ld   a, e

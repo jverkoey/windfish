@@ -28,6 +28,8 @@ wScrollPosition2 EQU $DA04 ; [decimal]
 
 wQueuedDMATransfer EQU $DA0F ; [decimal]
 
+wTrampoline EQU $DA10 ; [LR35902_INSTRUCTION]
+
 wStashL EQU $DA11 ; [decimal]
 
 wStashH EQU $DA12 ; [decimal]
@@ -153,6 +155,8 @@ gbPCM12 EQU $FF76 ; [hex]
 gbPCM34 EQU $FF77 ; [hex]
 
 hDMARegion EQU $FF80 ; [hex]
+
+hDMARegion2 EQU $FF88 ; [hex]
 
 hDesiredBankChange EQU $FF96 ; [decimal]
 

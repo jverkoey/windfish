@@ -16,6 +16,8 @@ wScrollPosition2 EQU $DA04
 
 wQueuedDMATransfer EQU $DA0F
 
+wTrampoline EQU $DA10
+
 wStashL EQU $DA11
 
 wStashH EQU $DA12
@@ -141,6 +143,8 @@ gbPCM12 EQU $FF76
 gbPCM34 EQU $FF77
 
 hDMARegion EQU $FF80
+
+hDMARegion2 EQU $FF88
 
 hDesiredBankChange EQU $FF96
 

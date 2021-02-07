@@ -44,7 +44,7 @@ initialize:
     ld   [$DA2B], a
     assign [$DA08], $C0
     assign [$DA28], $C2
-    assign [$DA10], $C3
+    assign [wTrampoline], INSTRUCTION_jp_imm16
     ld   hl, $0342
     call stashHL
     ld   hl, wLCDInterruptTrampoline
