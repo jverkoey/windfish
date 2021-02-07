@@ -42,7 +42,7 @@ public protocol InstructionSet {
 
    This is typically implemented by returning the result of `computeAllWidths()`.
    */
-  static var widths: [SpecType: InstructionWidth<SpecType.WidthType>] { get }
+  static var widths: [SpecType: InstructionWidth<SpecType.AddressType>] { get }
 
   /**
    A cached map of specifications to their opcode binary representations.
@@ -96,8 +96,8 @@ extension InstructionSet {
   }
 
   /** Calculates the widths for every specification in this set. */
-  public static func computeAllWidths() -> [SpecType: InstructionWidth<SpecType.WidthType>] {
-    var widths: [SpecType: InstructionWidth<SpecType.WidthType>] = [:]
+  public static func computeAllWidths() -> [SpecType: InstructionWidth<SpecType.AddressType>] {
+    var widths: [SpecType: InstructionWidth<SpecType.AddressType>] = [:]
     allSpecs().forEach { spec in
       widths[spec] = InstructionWidth(opcode: spec.opcodeWidth, operand: spec.operandWidth)
     }

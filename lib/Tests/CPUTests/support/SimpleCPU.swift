@@ -41,7 +41,7 @@ struct SimpleCPU {
 
     /** The shape of an instruction for this CPU. */
     indirect enum Spec: CPU.InstructionSpec {
-      typealias WidthType = UInt16
+      typealias AddressType = UInt16
 
       case nop
       case cp(Numeric)

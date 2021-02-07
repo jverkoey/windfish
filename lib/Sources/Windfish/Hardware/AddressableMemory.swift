@@ -1,5 +1,6 @@
 import Foundation
 
+import CPU
 import LR35902
 
 /** A region of addressable memory can be read from and written to. */
