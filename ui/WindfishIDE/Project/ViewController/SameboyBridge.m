@@ -186,6 +186,10 @@ static void gb_get_backtrace_return(GB_gameboy_t *gb, int i, uint16_t *bank, uin
   [_emulator start];
 }
 
+- (void)reset {
+  [_emulator reset];
+}
+
 - (void)debuggerBreak {
   [_emulator debuggerBreak];
 }

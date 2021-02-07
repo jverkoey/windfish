@@ -99,7 +99,13 @@ final class SourceViewController: NSViewController {
     toggleEmulationButton.toolTip = "Toggle emulation"
     self.toggleEmulationButton = toggleEmulationButton
 
-    let buttons = [undoButton, stepOverButton, stepIntoButton, toggleEmulationButton]
+    let restartButton = NSButton(image: NSImage(systemSymbolNameOrImageName: "arrow.clockwise",
+                                                 accessibilityDescription: "Restart")!,
+                                  target: nil,
+                                  action: #selector(ProjectDocument.restartEmulation(_:)))
+    restartButton.toolTip = "Restart"
+
+    let buttons = [undoButton, stepOverButton, stepIntoButton, toggleEmulationButton, restartButton]
     for button in buttons {
       button.isBordered = false
       button.translatesAutoresizingMaskIntoConstraints = false

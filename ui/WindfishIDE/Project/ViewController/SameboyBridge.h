@@ -78,6 +78,7 @@ typedef NS_OPTIONS(NSUInteger, GBLogAttributes) {
 - (void)setDebuggerEnabled:(BOOL)debuggerEnabled;
 
 - (void)start;
+- (void)reset;
 - (void)loadROM:(nonnull NSURL *)url;
 - (void)loadROMFromBuffer:(nonnull const uint8_t *)buffer size:(size_t)size;
 - (void)debuggerBreak;
