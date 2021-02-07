@@ -136,9 +136,9 @@ toc_01_0153:
     ld   [$FF96], a
     jr   .toc_01_0167
 
-toc_01_0153.else_01_0164:
+.else_01_0164:
     call toc_01_02BB
-toc_01_0153.toc_01_0167:
+.toc_01_0167:
     call $FF80
     call toc_01_03AD
     ld   hl, $FFF0
@@ -156,7 +156,7 @@ toc_01_0179:
     ld   sp, $C016
     ld   hl, $9822
     ld   b, $06
-toc_01_0179.loop_01_0184:
+.loop_01_0184:
     pop  de
     ld   a, e
     ldi  [hl], a
@@ -299,7 +299,7 @@ toc_01_0179.loop_01_0184:
     ldi  [hl], a
     ld   a, d
     ldi  [hl], a
-toc_01_0179.loop_01_021B:
+.loop_01_021B:
     ld   a, [$FF41]
     and  %00000011
     and  a
@@ -338,7 +338,7 @@ toc_01_0179.loop_01_021B:
     ld   de, $0010
     add  hl, de
     add  sp, $04
-toc_01_0179.loop_01_0246:
+.loop_01_0246:
     ld   a, [$FF41]
     and  %00000011
     and  a
@@ -374,7 +374,7 @@ toc_01_0179.loop_01_0246:
     ldi  [hl], a
     ld   a, d
     ldi  [hl], a
-toc_01_0179.loop_01_026B:
+.loop_01_026B:
     ld   a, [$FF41]
     and  %00000011
     and  a
@@ -413,7 +413,7 @@ toc_01_0179.loop_01_026B:
     ldi  [hl], a
     ld   a, d
     ldi  [hl], a
-toc_01_0179.loop_01_0296:
+.loop_01_0296:
     ld   a, [$FF41]
     and  %00000011
     and  a
@@ -519,7 +519,7 @@ toc_01_02FD:
     ld   b, a
     res  0, a
     ld   [$FFFF], a
-toc_01_02FD.loop_01_0307:
+.loop_01_0307:
     ld   a, [$FF44]
     cp   $91
     jr   nz, .loop_01_0307
@@ -543,7 +543,7 @@ toc_01_031E:
     ld   a, $E4
     ld   [$FF47], a
     call toc_01_0356
-toc_01_031E.toc_01_0325:
+.toc_01_0325:
     ld   a, $A4
     ld   [$FF47], a
     call toc_01_0356
@@ -572,7 +572,7 @@ toc_01_0356:
     ld   b, $04
     jp   .loop_01_035B
 
-toc_01_0356.loop_01_035B:
+.loop_01_035B:
     halt
     nop
     dec  b
@@ -643,7 +643,7 @@ toc_01_0395:
 toc_01_039F:
     ld   hl, $C000
     ld   bc, $0168
-toc_01_039F.loop_01_03A5:
+.loop_01_03A5:
     xor  a
     ldi  [hl], a
     dec  bc
@@ -725,7 +725,7 @@ toc_01_0410:
     ld   c, $80
     ld   b, $0A
     ld   hl, $041E
-toc_01_0410.loop_01_0417:
+.loop_01_0417:
     ldi  a, [hl]
     ld   [$ff00+c], a
     inc  c
@@ -814,7 +814,7 @@ toc_01_047D:
     ld   a, [hl]
     push af
     ld   hl, $C000
-toc_01_047D.loop_01_049C:
+.loop_01_049C:
     ld   a, $00
     ldi  [hl], a
     ld   a, h
@@ -825,7 +825,7 @@ toc_01_047D.loop_01_049C:
     ld   sp, $DFFE
     push af
     ld   hl, $FF80
-toc_01_047D.loop_01_04AC:
+.loop_01_04AC:
     ld   a, $00
     ldi  [hl], a
     ld   a, h
@@ -958,7 +958,7 @@ toc_01_06B1:
     jr   nc, .else_01_06D3
 
     inc  [hl]
-toc_01_06B1.else_01_06D3:
+.else_01_06D3:
     ld   hl, $FFB0
     ld   de, $FFB3
     ld   a, [de]
@@ -969,7 +969,7 @@ toc_01_06B1.else_01_06D3:
 
     jr   c, .else_01_06F5
 
-toc_01_06B1.else_01_06E1:
+.else_01_06E1:
     inc  de
     inc  hl
     ld   a, [de]
@@ -980,7 +980,7 @@ toc_01_06B1.else_01_06E1:
 
     jr   c, .else_01_06F5
 
-toc_01_06B1.else_01_06EB:
+.else_01_06EB:
     inc  de
     inc  hl
     ld   a, [de]
@@ -991,7 +991,7 @@ toc_01_06B1.else_01_06EB:
 
     jr   c, .else_01_06F5
 
-toc_01_06B1.else_01_06F5:
+.else_01_06F5:
     ld   de, $FFB5
     ld   hl, $FFB2
     ldd  a, [hl]
@@ -1003,7 +1003,7 @@ toc_01_06B1.else_01_06F5:
     ld   a, [hl]
     ld   [de], a
     call toc_01_045F
-toc_01_06B1.else_01_0706:
+.else_01_0706:
     pop  de
     pop  hl
     ret
@@ -1148,12 +1148,12 @@ toc_01_0928:
     ld   e, a
     jr   .toc_01_095A
 
-toc_01_0928.else_01_0957:
+.else_01_0957:
     ld   de, $C800
-toc_01_0928.toc_01_095A:
+.toc_01_095A:
     ld   hl, $C016
     dec  de
-toc_01_0928.loop_01_095E:
+.loop_01_095E:
     inc  de
     ld   a, [de]
     res  7, a
@@ -1181,17 +1181,17 @@ toc_01_0928.loop_01_095E:
     ld   e, a
     ld   a, [$FFA5]
     ld   d, a
-toc_01_0928.loop_01_0982:
+.loop_01_0982:
     add  hl, de
     dec  b
     jr   nz, .loop_01_0982
 
-toc_01_0928.else_01_0986:
+.else_01_0986:
     pop  de
     pop  bc
     pop  af
     ld   c, $04
-toc_01_0928.loop_01_098B:
+.loop_01_098B:
     ldi  [hl], a
     inc  a
     ldi  [hl], a
@@ -1229,17 +1229,17 @@ toc_01_0928.loop_01_098B:
     ld   a, [$FFA5]
     cpl
     ld   d, a
-toc_01_0928.loop_01_09B8:
+.loop_01_09B8:
     add  hl, de
     inc  hl
     dec  b
     jr   nz, .loop_01_09B8
 
-toc_01_0928.else_01_09BD:
+.else_01_09BD:
     pop  de
     pop  bc
     pop  af
-toc_01_0928.toc_01_09C0:
+.toc_01_09C0:
     inc  b
     ld   a, b
     cp   $10
@@ -1254,14 +1254,14 @@ toc_01_0928.toc_01_09C0:
     pop  bc
     jr   .loop_01_095E
 
-toc_01_0928.else_01_09D2:
+.else_01_09D2:
     inc  hl
     inc  hl
     inc  hl
     inc  hl
     jr   .toc_01_09C0
 
-toc_01_0928.else_01_09D8:
+.else_01_09D8:
     ei
     ret
 
@@ -1320,7 +1320,7 @@ toc_01_0A2E:
 
     ld   hl, $C800
     ld   b, $10
-toc_01_0A2E.loop_01_0A37:
+.loop_01_0A37:
     ldi  a, [hl]
     cp   $0B
     ret  z
@@ -1350,7 +1350,7 @@ toc_01_0A72:
 
 toc_01_0A73:
     ld   b, $10
-toc_01_0A73.loop_01_0A75:
+.loop_01_0A75:
     res  7, [hl]
     inc  hl
     dec  b
@@ -1413,7 +1413,7 @@ toc_01_0ACB:
     ld   [$FFB6], a
     ld   [$FFB7], a
     call toc_01_0AB2
-toc_01_0ACB.toc_01_0ADE:
+.toc_01_0ADE:
     ld   a, [$FFA0]
     ld   hl, $0AAE
     ld   d, $00
@@ -1425,7 +1425,7 @@ toc_01_0ACB.toc_01_0ADE:
     ld   l, a
     ld   c, $01
     ld   e, $00
-toc_01_0ACB.toc_01_0AF1:
+.toc_01_0AF1:
     ld   a, [hl]
     and  a
     jr   z, .else_01_0B07
@@ -1441,13 +1441,13 @@ toc_01_0ACB.toc_01_0AF1:
     cp   b
     jr   z, .else_01_0B3B
 
-toc_01_0ACB.loop_01_0B01:
+.loop_01_0B01:
     ld   a, [$FFA1]
     ld   d, a
     ld   a, l
     sub  a, d
     ld   l, a
-toc_01_0ACB.else_01_0B07:
+.else_01_0B07:
     inc  c
     ld   a, c
     and  %00000011
@@ -1460,7 +1460,7 @@ toc_01_0ACB.else_01_0B07:
     ld   l, a
     jr   .toc_01_0AF1
 
-toc_01_0ACB.else_01_0B15:
+.else_01_0B15:
     ld   a, c
     cp   $10
     jr   z, .else_01_0B58
@@ -1477,7 +1477,7 @@ toc_01_0ACB.else_01_0B15:
     ld   l, a
     jr   .toc_01_0AF1
 
-toc_01_0ACB.else_01_0B28:
+.else_01_0B28:
     ld   [hl], b
     ld   a, [$FFA1]
     ld   d, a
@@ -1492,7 +1492,7 @@ toc_01_0ACB.else_01_0B28:
     ld   e, $01
     jr   .else_01_0B07
 
-toc_01_0ACB.else_01_0B3B:
+.else_01_0B3B:
     bit  7, [hl]
     jr   nz, .loop_01_0B01
 
@@ -1513,7 +1513,7 @@ toc_01_0ACB.else_01_0B3B:
     ld   e, $01
     jr   .else_01_0B07
 
-toc_01_0ACB.else_01_0B58:
+.else_01_0B58:
     call toc_01_0A7C
     ld   a, e
     and  a
@@ -1522,7 +1522,7 @@ toc_01_0ACB.else_01_0B58:
     ld   e, $00
     jp   .toc_01_0ADE
 
-toc_01_0ACB.else_01_0B64:
+.else_01_0B64:
     ld   a, [$FFA0]
     ld   [$FFA9], a
     ld   a, $01
@@ -1555,7 +1555,7 @@ toc_01_0B8A:
     add  a, l
     ld   l, a
     ld   c, $01
-toc_01_0B8A.toc_01_0BA0:
+.toc_01_0BA0:
     ld   a, [hl]
     and  a
     jr   z, .else_01_0BB6
@@ -1576,7 +1576,7 @@ toc_01_0B8A.toc_01_0BA0:
     ld   a, l
     sub  a, d
     ld   l, a
-toc_01_0B8A.else_01_0BB6:
+.else_01_0BB6:
     inc  c
     ld   a, c
     and  %00000011
@@ -1589,7 +1589,7 @@ toc_01_0B8A.else_01_0BB6:
     ld   l, a
     jr   .toc_01_0BA0
 
-toc_01_0B8A.else_01_0BC4:
+.else_01_0BC4:
     ld   a, c
     cp   $10
     jr   z, toc_01_0BDD
@@ -1661,25 +1661,25 @@ toc_01_0C0B:
     ld   d, $01
     jr   .toc_01_0C18
 
-toc_01_0C0B.else_01_0C16:
+.else_01_0C16:
     ld   d, $02
-toc_01_0C0B.toc_01_0C18:
+.toc_01_0C18:
     ld   b, $10
     ld   c, $00
     ld   hl, $C800
-toc_01_0C0B.toc_01_0C1F:
+.toc_01_0C1F:
     ldi  a, [hl]
     and  a
     jr   nz, .else_01_0C24
 
     inc  c
-toc_01_0C0B.else_01_0C24:
+.else_01_0C24:
     dec  b
     jr   z, .else_01_0C29
 
     jr   .toc_01_0C1F
 
-toc_01_0C0B.else_01_0C29:
+.else_01_0C29:
     ld   a, c
     and  a
     ret  z
@@ -1689,7 +1689,7 @@ toc_01_0C0B.else_01_0C29:
     inc  a
     ld   b, a
     ld   hl, $C800
-toc_01_0C0B.loop_01_0C37:
+.loop_01_0C37:
     ldi  a, [hl]
     and  a
     jr   nz, .loop_01_0C37
@@ -1721,7 +1721,7 @@ toc_01_0C41:
     call toc_01_0928
     call toc_01_076F
     call toc_01_033A
-toc_01_0C41.loop_01_0C6C:
+.loop_01_0C6C:
     halt
     nop
     ld   a, [$FFA6]
@@ -1754,7 +1754,7 @@ toc_01_0C41.loop_01_0C6C:
     cp   b
     jr   nz, .loop_01_0C6C
 
-toc_01_0C41.else_01_0C9C:
+.else_01_0C9C:
     xor  a
     ld   [$FFA6], a
     call toc_01_0928
@@ -1762,7 +1762,7 @@ toc_01_0C41.else_01_0C9C:
     call toc_01_0A42
     ld   a, $01
     ld   [$FF96], a
-toc_01_0C41.else_01_0CAC:
+.else_01_0CAC:
     call toc_01_0A72
     ld   a, [$FFB8]
     and  a
@@ -1782,12 +1782,12 @@ toc_01_0C41.else_01_0CAC:
     call nz, toc_01_0C06
     jr   .loop_01_0C6C
 
-toc_01_0C41.else_01_0CD2:
+.else_01_0CD2:
     call toc_01_0928
     call toc_01_076F
     ld   a, $01
     ld   [$FF96], a
-toc_01_0C41.loop_01_0CDC:
+.loop_01_0CDC:
     halt
     nop
     ld   a, [$FFFA]
@@ -1801,7 +1801,7 @@ toc_01_0C41.loop_01_0CDC:
     call toc_01_031E.toc_01_0325
     jp   toc_01_0C41
 
-toc_01_0C41.else_01_0CF0:
+.else_01_0CF0:
     ld   a, [$FFB8]
     cp   $02
     jr   nz, .loop_01_0CDC
