@@ -66,7 +66,7 @@ loadBank: ; [Label] $00:$05DD [0]
 
 LCDInterruptTrampolineReturn: ; [Function] $00:$0342 [0]
 
-toc_00_030C: ; [Function] $00:$030C [0]
+LCDCInterruptHandler: ; [Function] $00:$030C [0]
 
 wait: ; [Label] $00:$0318 [0]
 

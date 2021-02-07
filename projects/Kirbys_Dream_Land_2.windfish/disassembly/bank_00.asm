@@ -428,7 +428,7 @@ toc_00_022B:
     db   $21, $14, $DA, $3E, $C4, $22, $36, $02
     db   $FA, $2A, $DA, $E0, $45, $C3, $9F, $02
 
-toc_00_030C:
+LCDCInterruptHandler:
     push af
     push hl
     push bc
