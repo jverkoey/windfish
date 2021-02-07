@@ -25,7 +25,10 @@ class TestMemory: TraceableMemory {
   }
 
   func sourceLocation(from address: LR35902.Address) -> Gameboy.SourceLocation {
-    return Gameboy.sourceLocation(for: address, in: 0x01)
+    if address < 0x8000 {
+      return .cartridge(Cartridge.Location(address: address, bank: 0x01))
+    }
+    return .memory(address)
   }
 
   var registerTraces: [LR35902.Instruction.Numeric : [LR35902.RegisterTrace]] = [:]

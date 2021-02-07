@@ -11,7 +11,7 @@ At its core, Windfish provides an abstract representation of a CPU's instruction
 Windfish currently only supports the [LR35902 instruction set](https://github.com/lmmendes/game-boy-opcodes) for the original Gameboy.
 Other instruction sets could theoretically be supported in the future ([see project](https://github.com/jverkoey/windfish/projects/2)).
 
-Concrete implementations of CPU's instruction set are provided as separate modules.
+Concrete implementations of a CPU's instruction set are provided as separate modules.
 For example, the `LR35902` module provides a concrete implementation of the LR35902 instruction set.
 
 ## Modules

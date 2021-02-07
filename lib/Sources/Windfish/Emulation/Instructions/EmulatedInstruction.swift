@@ -299,5 +299,4 @@ extension LR35902.Emulation {
 
     private let spec: LR35902.Instruction.Spec
   }
-
 }
