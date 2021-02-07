@@ -99,14 +99,14 @@ extension LR35902 {
    */
   class func trace(range: Range<Cartridge.Location>,
                    cpu: LR35902 = LR35902(),
-                   context: Configuration,
+                   cartridgeData: Data,
                    router: Disassembler.BankRouter,  // TODO: Replace router with mechanism for fetching instructions.
                    step: ((LR35902.Instruction, Cartridge.Location, LR35902, TraceableMemory) -> Void)? = nil) {
     let bank: Cartridge.Bank = range.lowerBound.bank
     let upperBoundPc: LR35902.Address = range.upperBound.address
 
     // TODO: Evaluate whether recreating this on every trace is a memory / performance hog.
-    let tracerMemory = TracerMemory(data: context.cartridgeData)
+    let tracerMemory = TracerMemory(data: cartridgeData)
 
     cpu.pc = range.lowerBound.address
     tracerMemory.selectedBank = bank
