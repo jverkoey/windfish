@@ -12,8 +12,6 @@ extension LR35902.Emulation {
 
     func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
       // No trace needed.
-
-      cpu.halted = true
     }
   }
 }

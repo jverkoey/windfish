@@ -14,7 +14,6 @@ extension InstructionEmulatorTests {
       let mutations = cpu.copy()
 emulator.emulate(cpu: cpu, memory: memory, sourceLocation: .memory(0))
 
-      mutations.halted = true
       assertEqual(cpu, mutations, message: "Test case: \(name)")
     }
   }

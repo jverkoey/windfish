@@ -3,10 +3,6 @@ import Foundation
 // References:
 // - https://realboyemulator.files.wordpress.com/2013/01/gbcpuman.pdf
 // - https://gekkio.fi/files/gb-docs/gbctr.pdf
-// - https://www.reddit.com/r/EmuDev/comments/7qf352/game_boy_is_0xcb_a_separate_instruction_are/
-//   - "Important: an interrupt CANNOT happen between 0xCB and the other operand."
-// - https://mgba.io/2017/04/30/emulation-accuracy/
-// - https://www.reddit.com/r/emulation/comments/53jdqj/what_exactly_is_a_cycleaccurate_emulator/
 
 /**
  A sparse representation of the LR35902 CPU.
@@ -85,13 +81,6 @@ public final class LR35902 {
     }
   }
 
-  /**
-   The halt status.
-
-   When true, the CPU will stop executing instructions until the next interrupt occurs.
-   */
-  public var halted: Bool?
-
   // MARK: 16-bit registers
 
   public var af: UInt16? {
@@ -116,7 +105,7 @@ public final class LR35902 {
       guard let b = b, let c = c else {
         return nil
       }
-      return UInt16(b) << 8 | UInt16(c)
+      return (UInt16(b) << 8) | UInt16(c)
     }
     set {
       guard let newValue = newValue else {
@@ -133,7 +122,7 @@ public final class LR35902 {
       guard let d = d, let e = e else {
         return nil
       }
-      return UInt16(d) << 8 | UInt16(e)
+      return (UInt16(d) << 8) | UInt16(e)
     }
     set {
       guard let newValue = newValue else {
@@ -150,7 +139,7 @@ public final class LR35902 {
       guard let h = h, let l = l else {
         return nil
       }
-      return UInt16(h) << 8 | UInt16(l)
+      return (UInt16(h) << 8) | UInt16(l)
     }
     set {
       guard let newValue = newValue else {
@@ -172,7 +161,7 @@ public final class LR35902 {
   /** Initializes the CPU with all nil values. */
   public init() {}
 
-  internal init(a: UInt8? = nil, b: UInt8? = nil, c: UInt8? = nil, d: UInt8? = nil, e: UInt8? = nil, h: UInt8? = nil, l: UInt8? = nil, fzero: Bool? = nil, fsubtract: Bool? = nil, fhalfcarry: Bool? = nil, fcarry: Bool? = nil, halted: Bool? = nil, sp: UInt16? = nil, pc: LR35902.Address = 0x0000) {
+  internal init(a: UInt8? = nil, b: UInt8? = nil, c: UInt8? = nil, d: UInt8? = nil, e: UInt8? = nil, h: UInt8? = nil, l: UInt8? = nil, fzero: Bool? = nil, fsubtract: Bool? = nil, fhalfcarry: Bool? = nil, fcarry: Bool? = nil, sp: UInt16? = nil, pc: LR35902.Address = 0x0000) {
     self.a = a
     self.b = b
     self.c = c
@@ -184,7 +173,6 @@ public final class LR35902 {
     self.fsubtract = fsubtract
     self.fhalfcarry = fhalfcarry
     self.fcarry = fcarry
-    self.halted = halted
     self.sp = sp
     self.pc = pc
   }
@@ -194,14 +182,13 @@ public final class LR35902 {
   }
 
   public func copy() -> LR35902 {
-    return LR35902(a: a, b: b, c: c, d: d, e: e, h: h, l: l, fzero: fzero, fsubtract: fsubtract, fhalfcarry: fhalfcarry, fcarry: fcarry, halted: halted, sp: sp, pc: pc)
+    return LR35902(a: a, b: b, c: c, d: d, e: e, h: h, l: l, fzero: fzero, fsubtract: fsubtract, fhalfcarry: fhalfcarry, fcarry: fcarry, sp: sp, pc: pc)
   }
 }
 
-// MARK: - Subscript access
+// MARK: - Subscript register access
 
 extension LR35902 {
-  // MARK: Subscript access of instructions using LR35902 instruction specifications
   /** 8-bit register subscript. */
   public subscript(numeric: LR35902.Instruction.Numeric) -> UInt8? {
     get { return get(numeric8: numeric) }
@@ -223,7 +210,8 @@ extension LR35902 {
     case .h: return h
     case .l: return l
     default:
-      preconditionFailure()
+      assertionFailure("\(numeric8) is not a UInt8 register.")
+      return nil
     }
   }
   public func set(numeric8: LR35902.Instruction.Numeric, to newValue: UInt8?) {
@@ -236,7 +224,7 @@ extension LR35902 {
     case .h: h = newValue
     case .l: l = newValue
     default:
-      preconditionFailure()
+      assertionFailure("\(numeric8) is not a UInt8 register.")
     }
   }
 
@@ -248,7 +236,8 @@ extension LR35902 {
     case .hl, .hladdr:  return hl
     case .sp:           return sp
     default:
-      preconditionFailure()
+      assertionFailure("\(numeric16) is not a UInt16 register.")
+      return nil
     }
   }
   public func set(numeric16: LR35902.Instruction.Numeric, to newValue: UInt16?) {
@@ -259,7 +248,7 @@ extension LR35902 {
     case .hl, .hladdr:  hl = newValue
     case .sp:           sp = newValue
     default:
-      preconditionFailure()
+      preconditionFailure("\(numeric16) is not a UInt16 register.")
     }
   }
 }
