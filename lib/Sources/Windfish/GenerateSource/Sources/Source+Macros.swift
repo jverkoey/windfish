@@ -41,7 +41,7 @@ extension Disassembler {
 
           // Fill the immediate with a default value; it doesn't matter because we'll replace it with argumentString
           // when the RGBDS statement is created.
-          let operandWidth = LR35902.InstructionSet.widths[spec]!.operand
+          let operandWidth = LR35902.InstructionSet.widths[spec]!.immediate
           let immediate: LR35902.Instruction.ImmediateValue?
           switch operandWidth {
           case 1:  immediate = .imm8(0)

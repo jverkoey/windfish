@@ -10,12 +10,15 @@ import Foundation
  immediate (imm) value or a memory address.
  */
 public protocol Instruction {
+  /** The instruction set this instruction belongs to. */
+  associatedtype InstructionSetType: InstructionSet
+
   /**
    The type of the specification that is associated with this instruction.
 
    This type is typically an enum consisting of one case per abstract instruction.
    */
-  associatedtype SpecType: InstructionSpec
+  typealias SpecType = InstructionSetType.SpecType
 
   /**
    The type of the immediate that is associated with this instruction.
@@ -81,7 +84,7 @@ public protocol InstructionImmediate: Hashable {
 // MARK: - Automatic width computation
 
 /** An instruction operand that has a width. */
-public protocol InstructionOperandWithBinaryFootprint {
+public protocol ImmediateOperand {
   /** The width of the immediate. */
   var width: Int { get }
 }
@@ -105,7 +108,7 @@ extension InstructionSpec {
   public var operandWidth: AddressType {
     var width: AddressType = 0
     try? visit { operand, _ in
-      if let numeric = operand?.value as? InstructionOperandWithBinaryFootprint {
+      if let numeric = operand?.value as? ImmediateOperand {
         width += AddressType(numeric.width)
       }
     }

@@ -7,7 +7,7 @@ import Tracing
 func disassemblyInitialized(with assembly: String) -> Disassembler {
   let results = RGBDSAssembler.assemble(assembly: assembly)
 
-  let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+  let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
   let disassembly = Disassembler(data: data)
   disassembly.willStart()
   disassembly.mutableConfiguration.registerPotentialCode(

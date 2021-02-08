@@ -68,7 +68,7 @@ extension LR35902.Instruction {
   }
 
   /** Numeric operands in LR35902's instruction set. */
-  public enum Numeric: Hashable, InstructionOperandWithBinaryFootprint {
+  public enum Numeric: Hashable, CPU.ImmediateOperand {
     case a, af
     case b, c, bc, bcaddr
     case d, e, de, deaddr

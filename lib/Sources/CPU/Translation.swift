@@ -1,34 +1,54 @@
 import Foundation
 
-extension InstructionSet {
+// MARK: Assembly
+
+extension Instruction {
+  /**
+   Returns the data representation of an instruction.
+
+   This default implementation uses the pre-computed opcode table and its assumptions.
+   */
+  public func asData() -> Data {
+    var buffer = Data()
+    buffer.append(contentsOf: InstructionSetType.opcodeBytes[spec]!)
+    if let data = immediate?.asData() {
+      buffer.append(data)
+    }
+    return buffer
+  }
+}
+
+// MARK: Disassembly
+
+extension Instruction {
   /**
    Disassembles a complete instruction from binary data, if possible.
 
    If `data` does not contain enough bytes to represent a valid instruction, then nil is returned.
    */
-  public static func instruction(from data: Data) -> InstructionType? {
-    var iterator = data.makeIterator()
-    guard let spec = spec(from: &iterator, table: table) else {
+  public static func from(_ data: Data) -> Self? {
+    var iterator: Data.Iterator = data.makeIterator()
+    guard let spec: SpecType = spec(from: &iterator, table: InstructionSetType.table) else {
       return nil
     }
-    guard let instructionWidth = widths[spec] else {
+    guard let instructionWidth: InstructionWidth<SpecType.AddressType> = InstructionSetType.widths[spec] else {
       preconditionFailure("\(spec) is missing its width, implying a misconfiguration of the instruction set."
                           + " Verify that all specifications are computing and storing a corresponding width in the"
                           + " instruction set's width table.")
     }
 
-    if instructionWidth.operand > 0 {
+    if instructionWidth.immediate > 0 {
       var operandBytes: [UInt8] = []
-      for _ in 0..<Int(truncatingIfNeeded: instructionWidth.operand) {
-        guard let byte = iterator.next() else {
+      for _ in 0..<Int(truncatingIfNeeded: instructionWidth.immediate) {
+        guard let byte: UInt8 = iterator.next() else {
           return nil
         }
         operandBytes.append(byte)
       }
-      return InstructionType.init(spec: spec, immediate: InstructionType.ImmediateType.init(data: Data(operandBytes)))
+      return Self.init(spec: spec, immediate: Self.ImmediateType.init(data: Data(operandBytes)))
     }
 
-    return InstructionType.init(spec: spec, immediate: nil)
+    return Self.init(spec: spec, immediate: nil)
   }
 
   /**
@@ -38,11 +58,9 @@ extension InstructionSet {
    */
   public static func spec(from data: Data) -> SpecType? {
     var iterator = data.makeIterator()
-    return spec(from: &iterator, table: table)
+    return spec(from: &iterator, table: InstructionSetType.table)
   }
-}
 
-extension InstructionSet {
   /**
    Recurses through instruction lookup tables until a valid spec is found.
 
@@ -59,7 +77,7 @@ extension InstructionSet {
     }
     // TODO[https://github.com/jverkoey/windfish/issues/24]: Loop prefix tables to support 3+ byte opcodes.
     let spec = table[index]
-    if let prefixTable = Self.prefixTables[spec] {
+    if let prefixTable = InstructionSetType.prefixTables[spec] {
       return self.spec(from: &iterator, table: prefixTable)
     }
     return spec

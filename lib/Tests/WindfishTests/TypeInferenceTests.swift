@@ -33,7 +33,7 @@ class TypeInferenceTests: XCTestCase {
 """)
     XCTAssertEqual(results.errors, [])
 
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
 
     let disassembly = Disassembler(data: data)
 
@@ -91,7 +91,7 @@ SECTION "ROM Bank 00", ROM0[$00]
 """)
     XCTAssertEqual(results.errors, [])
 
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
 
     let disassembly = Disassembler(data: data)
 
@@ -151,7 +151,7 @@ else_01_0025:
 """)
     XCTAssertEqual(results.errors, [])
 
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
 
     let disassembly = Disassembler(data: data)
 
@@ -200,7 +200,7 @@ jr   z, @-$03
 """)
     XCTAssertEqual(results.errors, [])
 
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
 
     let disassembly = Disassembler(data: data)
 
@@ -287,7 +287,7 @@ inc  [hl]
 """)
     XCTAssertEqual(results.errors, [])
 
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
 
     let disassembly = Disassembler(data: data)
 
@@ -340,7 +340,7 @@ nop
 """)
     XCTAssertEqual(results.errors, [])
 
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
 
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
@@ -364,7 +364,7 @@ ld [$abcd], a
 """)
     XCTAssertEqual(results.errors, [])
 
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
 
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
@@ -389,7 +389,7 @@ jr @-$01
 """)
     XCTAssertEqual(results.errors, [])
 
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
 
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
@@ -418,7 +418,7 @@ call $4100
 """)
     XCTAssertEqual(results.errors, [])
 
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
 
     let disassembly = Disassembler(data: data)
 

@@ -8,7 +8,7 @@ class RGBDSAssemblerTests: XCTestCase {
     let results = RGBDSAssembler.assemble(assembly: """
 nop nop
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
 
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
@@ -24,7 +24,7 @@ nop nop
 nop nop
 """)
 
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
 
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
@@ -39,7 +39,7 @@ nop
 
 nop
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -55,7 +55,7 @@ nop
     let results = RGBDSAssembler.assemble(assembly: """
 nop
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
 
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
@@ -70,7 +70,7 @@ nop
 nop
 nop
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -86,7 +86,7 @@ nop
     let results = RGBDSAssembler.assemble(assembly: """
 ld bc, $1234
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -101,7 +101,7 @@ ld bc, $1234
     let results = RGBDSAssembler.assemble(assembly: """
 ld bc, 0x1234
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     XCTAssertTrue(data.isEmpty)
   }
 
@@ -109,7 +109,7 @@ ld bc, 0x1234
     let results = RGBDSAssembler.assemble(assembly: """
 ld bc, 1234
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -125,7 +125,7 @@ ld bc, 1234
     let results = RGBDSAssembler.assemble(assembly: """
 ld bc, -1234
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -142,7 +142,7 @@ ld bc, -1234
 ld bc, $1234
     nop
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -158,7 +158,7 @@ ld bc, $1234
     let results = RGBDSAssembler.assemble(assembly: """
 ld bc, $12342342342
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     XCTAssertTrue(data.isEmpty)
   }
 
@@ -166,7 +166,7 @@ ld bc, $12342342342
     let results = RGBDSAssembler.assemble(assembly: """
 ld bc, $
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     XCTAssertTrue(data.isEmpty)
   }
 
@@ -174,7 +174,7 @@ ld bc, $
     let results = RGBDSAssembler.assemble(assembly: """
 ld [bc], a
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -189,7 +189,7 @@ ld [bc], a
     let results = RGBDSAssembler.assemble(assembly: """
 inc bc
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -204,7 +204,7 @@ inc bc
     let results = RGBDSAssembler.assemble(assembly: """
 ld b, 255
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -219,7 +219,7 @@ ld b, 255
     let results = RGBDSAssembler.assemble(assembly: """
 ld b, 0xFF
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     XCTAssertTrue(data.isEmpty)
   }
 
@@ -227,7 +227,7 @@ ld b, 0xFF
     let results = RGBDSAssembler.assemble(assembly: """
 ld [$1234], sp
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -242,7 +242,7 @@ ld [$1234], sp
     let results = RGBDSAssembler.assemble(assembly: """
 ld a, [bc]
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -257,7 +257,7 @@ ld a, [bc]
     let results = RGBDSAssembler.assemble(assembly: """
 rrca
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -272,7 +272,7 @@ rrca
     let results = RGBDSAssembler.assemble(assembly: """
 jr 5
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -287,7 +287,7 @@ jr 5
     let results = RGBDSAssembler.assemble(assembly: """
 ld [$FFA0], a
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -302,7 +302,7 @@ ld [$FFA0], a
     let results = RGBDSAssembler.assemble(assembly: """
 ld [$FAA0], a
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -317,7 +317,7 @@ ld [$FAA0], a
     let results = RGBDSAssembler.assemble(assembly: """
 ret z
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -332,7 +332,7 @@ ret z
     let results = RGBDSAssembler.assemble(assembly: """
 sub a, 5
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -347,7 +347,7 @@ sub a, 5
     let results = RGBDSAssembler.assemble(assembly: """
 rst $38
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -362,7 +362,7 @@ rst $38
     let results = RGBDSAssembler.assemble(assembly: """
 rlc b
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -377,7 +377,7 @@ rlc b
     let results = RGBDSAssembler.assemble(assembly: """
 bit 2, b
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -392,7 +392,7 @@ bit 2, b
     let results = RGBDSAssembler.assemble(assembly: """
 set 6, [hl]
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -407,7 +407,7 @@ set 6, [hl]
     let results = RGBDSAssembler.assemble(assembly: """
 jr nz, 3
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -422,7 +422,7 @@ jr nz, 3
     let results = RGBDSAssembler.assemble(assembly: """
 ld hl, sp+$05
 """)
-    let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+    let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
     let disassembly = Disassembler(data: data)
     disassembly.willStart()
     disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)
@@ -456,7 +456,7 @@ ld hl, sp+$05
       }
 
       let results = RGBDSAssembler.assemble(assembly: assembly)
-      let data = results.instructions.map { LR35902.InstructionSet.data(representing: $0) }.reduce(Data(), +)
+      let data = results.instructions.map { $0.asData() }.reduce(Data(), +)
       let disassembly = Disassembler(data: data)
       disassembly.willStart()
       disassembly.disassemble(range: 0..<UInt16(data.count), inBank: 0x01)

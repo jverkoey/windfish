@@ -22,4 +22,4 @@ The disassembler is multi-threaded and highly configurable, and it can be used a
 
 ## Modules
 
-- [CPU](CPU.md)
+- [CPU](CPU/index.md)

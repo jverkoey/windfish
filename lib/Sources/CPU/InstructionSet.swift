@@ -2,28 +2,26 @@ import Foundation
 
 /** A computed representation of an instruction's binary width. */
 public struct InstructionWidth<T: BinaryInteger>: Equatable {
-  public init(opcode: T, operand: T) {
+  public init(opcode: T, immediate: T) {
     self.opcode = opcode
-    self.operand = operand
+    self.immediate = immediate
   }
 
   /** The width of the opcode. */
   public let opcode: T
 
-  /** The width of the operand(s). */
-  public let operand: T
+  /** The width of the immediate. */
+  public let immediate: T
 
   /** The total width of the instruction. */
   public var total: T {
-    return opcode + operand
+    return opcode + immediate
   }
 }
 
 /** A representation of an instruction set. */
 public protocol InstructionSet {
-  /** The instruction type this set consists of. */
-  associatedtype InstructionType: Instruction
-  typealias SpecType = InstructionType.SpecType
+  associatedtype SpecType: InstructionSpec
   typealias InstructionTable = [SpecType]
 
   /**
@@ -64,27 +62,17 @@ public protocol InstructionSet {
    This is typically implemented by returning the result of `computeAllReflectedArgumentTypes()`.
    */
   static var reflectedArgumentTypes: [SpecType: Any] { get }
-
-  /** Returns the data representation of an instruction. */
-  static func data(representing instruction: InstructionType) -> Data
 }
 
 // MARK: - Default implementations
 
 extension InstructionSet {
   /**
-   Returns the data representation of an instruction.
+   Not all instruction sets have prefix tables, so we provide a default implementation that returns an empty map.
 
-   This default implementation uses the pre-computed opcode table and its assumptions.
+   This behavior can be overridden by the conforming type.
    */
-  public static func data(representing instruction: InstructionType) -> Data {
-    var buffer = Data()
-    buffer.append(contentsOf: opcodeBytes[instruction.spec]!)
-    if let data = instruction.immediate?.asData() {
-      buffer.append(data)
-    }
-    return buffer
-  }
+  static var prefixTables: [SpecType: InstructionTable] { return [:] }
 }
 
 // MARK: - Helper methods for computing properties
@@ -99,7 +87,7 @@ extension InstructionSet {
   public static func computeAllWidths() -> [SpecType: InstructionWidth<SpecType.AddressType>] {
     var widths: [SpecType: InstructionWidth<SpecType.AddressType>] = [:]
     allSpecs().forEach { spec in
-      widths[spec] = InstructionWidth(opcode: spec.opcodeWidth, operand: spec.operandWidth)
+      widths[spec] = InstructionWidth(opcode: spec.opcodeWidth, immediate: spec.operandWidth)
     }
     return widths
   }

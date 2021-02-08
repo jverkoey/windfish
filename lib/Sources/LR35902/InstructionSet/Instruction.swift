@@ -4,6 +4,8 @@ import CPU
 extension LR35902 {
   /** A concrete representation of a single LR35902 instruction. */
   public struct Instruction: CPU.Instruction, Hashable {
+    public typealias InstructionSetType = InstructionSet
+
     public init(spec: Spec, immediate: ImmediateValue? = nil) {
       self.spec = spec
       self.immediate = immediate

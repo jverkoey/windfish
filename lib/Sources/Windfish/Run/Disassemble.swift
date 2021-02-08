@@ -30,9 +30,9 @@ extension Disassembler {
                             + " instruction set's width table.")
     }
 
-    if instructionWidth.operand > 0 {
+    if instructionWidth.immediate > 0 {
       var operandBytes: [UInt8] = []
-      for _ in 0..<Int(instructionWidth.operand) {
+      for _ in 0..<Int(instructionWidth.immediate) {
         let byte = memory.read(from: address)
         address += 1
         operandBytes.append(byte)

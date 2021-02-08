@@ -7,8 +7,6 @@ import CPU
 
 extension LR35902 {
   public struct InstructionSet: CPU.InstructionSet {
-    public typealias InstructionType = LR35902.Instruction
-
     public static let table: [Instruction.Spec] = [
       /* 0x00 */ .nop,
       /* 0x01 */ .ld(.bc, .imm16),
@@ -290,15 +288,15 @@ extension LR35902 {
       return computeAllWidths()
     }()
 
-    public static var opcodeBytes: [Instruction.Spec : [UInt8]] = {
+    public static var opcodeBytes: [Instruction.Spec: [UInt8]] = {
       return computeAllOpcodeBytes()
     }()
 
-    public static var opcodeStrings: [SpecType : String] = {
+    public static var opcodeStrings: [Instruction.Spec: String] = {
       return computeAllOpcodeStrings()
     }()
 
-    public static var reflectedArgumentTypes: [SpecType : Any] = {
+    public static var reflectedArgumentTypes: [Instruction.Spec: Any] = {
       return computeAllReflectedArgumentTypes()
     }()
   }

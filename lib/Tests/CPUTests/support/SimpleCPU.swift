@@ -5,6 +5,8 @@ import CPU
 struct SimpleCPU {
   /** A concrete representation of a single instruction for this CPU. */
   struct Instruction: CPU.Instruction {
+    typealias InstructionSetType = InstructionSet
+
     let spec: Spec
     let immediate: ImmediateValue?
 
@@ -70,8 +72,6 @@ struct SimpleCPU {
   }
 
   struct InstructionSet: CPU.InstructionSet {
-    typealias InstructionType = Instruction
-
     static let table: [Instruction.Spec] = [
       /* 0x00 */ .nop,
       /* 0x01 */ .ld(.a, .imm8),
@@ -99,13 +99,13 @@ struct SimpleCPU {
       return computeAllOpcodeStrings()
     }()
 
-    public static var reflectedArgumentTypes: [SpecType : Any] = {
+    public static var reflectedArgumentTypes: [Instruction.Spec : Any] = {
       return computeAllReflectedArgumentTypes()
     }()
   }
 }
 
-extension SimpleCPU.Instruction.Spec.Numeric: InstructionOperandWithBinaryFootprint {
+extension SimpleCPU.Instruction.Spec.Numeric: ImmediateOperand {
   var width: Int {
     switch self {
     case .imm8:
