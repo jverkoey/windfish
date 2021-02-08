@@ -87,7 +87,7 @@ extension InstructionSet {
   public static func computeAllWidths() -> [SpecType: InstructionWidth<SpecType.AddressType>] {
     var widths: [SpecType: InstructionWidth<SpecType.AddressType>] = [:]
     allSpecs().forEach { spec in
-      widths[spec] = InstructionWidth(opcode: spec.opcodeWidth, immediate: spec.operandWidth)
+      widths[spec] = InstructionWidth(opcode: spec.opcodeWidth, immediate: spec.immediateWidth)
     }
     return widths
   }

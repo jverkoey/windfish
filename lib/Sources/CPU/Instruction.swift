@@ -65,7 +65,7 @@ public protocol InstructionSpec: Hashable {
   var opcodeWidth: AddressType { get }
 
   /** The byte width of the instruction's operands, if any. */
-  var operandWidth: AddressType { get }
+  var immediateWidth: AddressType { get }
 }
 
 /**
@@ -104,13 +104,16 @@ extension InstructionSpec {
     }
   }
 
-  /** Computes the operand width by adding up the width of any immediate operands. */
-  public var operandWidth: AddressType {
+  /** Computes the immediate width by adding up the width of any immediate operands. */
+  public var immediateWidth: AddressType {
     var width: AddressType = 0
-    try? visit { operand, _ in
-      if let numeric = operand?.value as? ImmediateOperand {
-        width += AddressType(numeric.width)
+    try? visit { operand, shouldStop in
+      guard let numeric = operand?.value as? ImmediateOperand,
+            numeric.width > 0 else {
+        return
       }
+      width = AddressType(numeric.width)
+      shouldStop = true
     }
     return width
   }
