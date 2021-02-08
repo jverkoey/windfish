@@ -2,9 +2,9 @@
 
 The `CPU` module defines a protocol-based representation of a CPU's instruction set that can be used to translate between binary and semantic representations of instructions.
 
-<center>
+<p align="center">
   <img title="Interchange between binary and semantic representations" width="222" height="149" src="../diagrams/interchange.png">
-</center>
+</p>
 
 ### Introduction
 
@@ -22,9 +22,9 @@ This means that `$E0 $89` is represented as `ld [$FF89], a` in assembly.
 > Note: when an instruction is written in assembly form, each comma-separated value after the opcode is called an *operand*.
 > Some operands are implicit in the opcode's instruction definition, while others come from the immediate.
 
-<center>
+<p align="center">
   <img title="Representation of an instruction's opcode and operands" width="147" height="64" src="../diagrams/opcode_operands.png">
-</center>
+</p>
 
 ### Overview
 
