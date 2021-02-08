@@ -3,7 +3,7 @@ import Foundation
 import CPU
 import LR35902
 
-extension Disassembler.BankRouter {
+extension Disassembler.BankRouter: InstructionDisassembler {
   /** Registers a range as a specific region category. Will clear any existing regions in the range. */
   public func instruction(at location: Cartridge.Location) -> LR35902.Instruction? {
     return bankWorkers[Int(truncatingIfNeeded: location.bankIndex)].instruction(at: location)

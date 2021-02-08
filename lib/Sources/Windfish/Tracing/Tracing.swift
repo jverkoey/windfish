@@ -17,6 +17,11 @@ protocol TraceableMemory: class {
   var registerTraces: [LR35902.Instruction.Numeric: [LR35902.RegisterTrace]] { get set }
 }
 
+/** A representation of an object that is able to disassemble instructions from a given cartridge location. */
+protocol InstructionDisassembler: class {
+  func instruction(at location: Cartridge.Location) -> LR35902.Instruction?
+}
+
 extension LR35902 {
   /** Trace information for a specific register. */
   enum RegisterTrace: Equatable {
@@ -100,7 +105,7 @@ extension LR35902 {
   class func trace(range: Range<Cartridge.Location>,
                    cpu: LR35902 = LR35902(),
                    cartridgeData: Data,
-                   router: Disassembler.BankRouter,  // TODO: Replace router with mechanism for fetching instructions.
+                   disassembler: InstructionDisassembler,
                    step: ((LR35902.Instruction, Cartridge.Location, LR35902, TraceableMemory) -> Void)? = nil) {
     let bank: Cartridge.Bank = range.lowerBound.bank
     let upperBoundPc: LR35902.Address = range.upperBound.address
@@ -112,7 +117,7 @@ extension LR35902 {
     tracerMemory.selectedBank = bank
 
     while cpu.pc < upperBoundPc {
-      guard let instruction: LR35902.Instruction = router.instruction(at: Cartridge.Location(address: cpu.pc, bank: bank)) else {
+      guard let instruction: LR35902.Instruction = disassembler.instruction(at: Cartridge.Location(address: cpu.pc, bank: bank)) else {
         cpu.pc &+= 1
         continue
       }
