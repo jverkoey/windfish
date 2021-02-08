@@ -1,5 +1,6 @@
 import Foundation
 
+import CPU
 import LR35902
 
 /** A region of addressable memory can be read from and written to. */
@@ -128,13 +129,14 @@ extension LR35902 {
       let opCodeBytes = LR35902.InstructionSet.opcodeBytes[instruction.spec]!
       let opcodeIndex = opCodeBytes.count > 1 ? (256 + Int(truncatingIfNeeded: opCodeBytes[1])) : Int(truncatingIfNeeded: opCodeBytes[0])
       let emulator = LR35902.Emulation.instructionEmulators[opcodeIndex]
+      let width: InstructionWidth<UInt16> = LR35902.InstructionSet.widths[instruction.spec]!
 
-      cpu.pc += LR35902.Address(truncatingIfNeeded: opCodeBytes.count)
+      cpu.pc += width.opcode
 
       emulator.emulate(cpu: cpu, memory: tracerMemory, sourceLocation: sourceLocation)
       step?(instruction, location, cpu, tracerMemory)
 
-      cpu.pc = initialPc + LR35902.InstructionSet.widths[instruction.spec]!.opcode
+      cpu.pc = initialPc + width.total
     }
   }
 }
