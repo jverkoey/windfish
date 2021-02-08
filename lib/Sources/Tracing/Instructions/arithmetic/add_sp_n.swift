@@ -13,7 +13,7 @@ extension LR35902.Emulation {
       }
     }
 
-    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
+    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Tracer.SourceLocation) {
       memory.registerTraces[.sp, default: []].append(.mutationWithImmediateAtSourceLocation(sourceLocation))
 
       cpu.fzero = false

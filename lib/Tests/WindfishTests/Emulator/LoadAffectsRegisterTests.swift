@@ -11,7 +11,7 @@ ld   a, 1
 """)
     let cpu = LR35902.zeroed()
     let mutated = cpu.copy()
-    LR35902.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, cartridgeData: disassembly.configuration.cartridgeData, disassembler: disassembly.lastBankRouter!)
+    Tracer.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, cartridgeData: disassembly.configuration.cartridgeData, disassembler: disassembly.lastBankRouter!)
 
     mutated.a = 1
     mutated.pc = 0x0002
@@ -24,7 +24,7 @@ ld   b, 1
 """)
     let cpu = LR35902.zeroed()
     let mutated = cpu.copy()
-    LR35902.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, cartridgeData: disassembly.configuration.cartridgeData, disassembler: disassembly.lastBankRouter!)
+    Tracer.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, cartridgeData: disassembly.configuration.cartridgeData, disassembler: disassembly.lastBankRouter!)
 
     mutated.b = 1
     mutated.pc = 0x0002
@@ -37,7 +37,7 @@ ld   c, 1
 """)
     let cpu = LR35902.zeroed()
     let mutated = cpu.copy()
-    LR35902.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, cartridgeData: disassembly.configuration.cartridgeData, disassembler: disassembly.lastBankRouter!)
+    Tracer.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, cartridgeData: disassembly.configuration.cartridgeData, disassembler: disassembly.lastBankRouter!)
 
     mutated.c = 1
     mutated.pc = 0x0002
@@ -50,7 +50,7 @@ ld   d, 1
 """)
     let cpu = LR35902.zeroed()
     let mutated = cpu.copy()
-    LR35902.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, cartridgeData: disassembly.configuration.cartridgeData, disassembler: disassembly.lastBankRouter!)
+    Tracer.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, cartridgeData: disassembly.configuration.cartridgeData, disassembler: disassembly.lastBankRouter!)
 
     mutated.d = 1
     mutated.pc = 0x0002
@@ -63,7 +63,7 @@ ld   e, 1
 """)
     let cpu = LR35902.zeroed()
     let mutated = cpu.copy()
-    LR35902.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, cartridgeData: disassembly.configuration.cartridgeData, disassembler: disassembly.lastBankRouter!)
+    Tracer.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, cartridgeData: disassembly.configuration.cartridgeData, disassembler: disassembly.lastBankRouter!)
 
     mutated.e = 1
     mutated.pc = 0x0002
@@ -76,7 +76,7 @@ ld   h, 1
 """)
     let cpu = LR35902.zeroed()
     let mutated = cpu.copy()
-    LR35902.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, cartridgeData: disassembly.configuration.cartridgeData, disassembler: disassembly.lastBankRouter!)
+    Tracer.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, cartridgeData: disassembly.configuration.cartridgeData, disassembler: disassembly.lastBankRouter!)
 
     mutated.h = 1
     mutated.pc = 0x0002
@@ -89,7 +89,7 @@ ld   l, 1
 """)
     let cpu = LR35902.zeroed()
     let mutated = cpu.copy()
-    LR35902.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, cartridgeData: disassembly.configuration.cartridgeData, disassembler: disassembly.lastBankRouter!)
+    Tracer.trace(range: Cartridge.Location(address: 0, bank: 1)..<Cartridge.Location(address: LR35902.Address(disassembly.configuration.cartridgeData.count), bank: 1), cpu: cpu, cartridgeData: disassembly.configuration.cartridgeData, disassembler: disassembly.lastBankRouter!)
 
     mutated.l = 1
     mutated.pc = 0x0002

@@ -7,7 +7,7 @@ protocol InstructionEmulatorInitializable: class {
 }
 
 protocol InstructionEmulator: class {
-  func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation)
+  func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Tracer.SourceLocation)
 }
 
 extension LR35902 {
@@ -293,7 +293,7 @@ extension LR35902.Emulation {
       self.spec = spec
     }
 
-    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
+    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Tracer.SourceLocation) {
       fatalError("Not yet implemented: \(spec)")
     }
 

@@ -14,7 +14,7 @@ extension LR35902.Emulation {
       self.src = src
     }
 
-    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
+    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Tracer.SourceLocation) {
       guard let address: UInt16 = cpu[src] else {
         memory.registerTraces[dst] = []
         cpu.set(numeric8: dst, to: nil)

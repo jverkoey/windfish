@@ -10,7 +10,7 @@ extension LR35902.Emulation {
       }
     }
 
-    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
+    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Tracer.SourceLocation) {
       guard let address: UInt16 = cpu.hl else {
         memory.registerTraces[.a] = []
         cpu.a = nil

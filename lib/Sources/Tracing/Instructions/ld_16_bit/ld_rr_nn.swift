@@ -12,7 +12,7 @@ extension LR35902.Emulation {
       self.dst = dst
     }
 
-    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
+    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Tracer.SourceLocation) {
       defer {
         cpu.pc &+= 2
       }

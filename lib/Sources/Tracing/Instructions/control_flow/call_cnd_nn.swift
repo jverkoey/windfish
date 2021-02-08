@@ -11,7 +11,7 @@ extension LR35902.Emulation {
       self.cnd = cnd
     }
 
-    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
+    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Tracer.SourceLocation) {
       // No trace needed.
 
       guard let lowByte: UInt8 = memory.read(from: cpu.pc),

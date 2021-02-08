@@ -11,7 +11,7 @@ extension LR35902.Emulation {
       self.bit = bit
     }
 
-    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Gameboy.SourceLocation) {
+    func emulate(cpu: LR35902, memory: TraceableMemory, sourceLocation: Tracer.SourceLocation) {
       // No trace needed.
 
       guard let hl = cpu.hl else {

@@ -24,7 +24,7 @@ class TestMemory: TraceableMemory {
     storage[address] = byte
   }
 
-  func sourceLocation(from address: LR35902.Address) -> Gameboy.SourceLocation {
+  func sourceLocation(from address: LR35902.Address) -> Tracer.SourceLocation {
     if address < 0x8000 {
       return .cartridge(Cartridge.Location(address: address, bank: 0x01))
     }

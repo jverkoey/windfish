@@ -12,7 +12,7 @@ public protocol TraceableMemory: class {
   func write(_ byte: UInt8?, to address: LR35902.Address)
 
   /** Returns a source code location for the given address based on the current memory configuration. */
-  func sourceLocation(from address: LR35902.Address) -> Gameboy.SourceLocation
+  func sourceLocation(from address: LR35902.Address) -> Tracer.SourceLocation
 
   /** Trace information for a given register. */
   var registerTraces: [LR35902.Instruction.Numeric: [LR35902.RegisterTrace]] { get set }
@@ -33,13 +33,13 @@ extension LR35902 {
     case loadFromAddress(LR35902.Address)
 
     /** The register's value was loaded from an immediate at some source location. */
-    case loadImmediateFromSourceLocation(Gameboy.SourceLocation)
+    case loadImmediateFromSourceLocation(Tracer.SourceLocation)
 
     /** The register's value was modified at some source location. */
-    case mutationWithImmediateAtSourceLocation(Gameboy.SourceLocation)
+    case mutationWithImmediateAtSourceLocation(Tracer.SourceLocation)
 
     /** The register's value was modified at some source location. */
-    case mutationFromAddress(Gameboy.SourceLocation)
+    case mutationFromAddress(Tracer.SourceLocation)
   }
 }
 
@@ -78,14 +78,14 @@ private final class TracerMemory: TraceableMemory {
     mutatedMemory[address] = byte
   }
 
-  func sourceLocation(from address: LR35902.Address) -> Gameboy.SourceLocation {
+  func sourceLocation(from address: LR35902.Address) -> Tracer.SourceLocation {
     return .cartridge(Cartridge.Location(address: address, bank: selectedBank))
   }
 
   var registerTraces: [LR35902.Instruction.Numeric : [LR35902.RegisterTrace]] = [:]
 }
 
-public final class Gameboy {
+public final class Tracer {
   /** A representation of a specific address either in the cartridge ROM or in memory. */
   public enum SourceLocation: Equatable {
     /** An address in the cartridge's ROM data. */
@@ -94,9 +94,7 @@ public final class Gameboy {
     /** An address in the Gameboy's memory. */
     case memory(LR35902.Address)
   }
-}
 
-extension LR35902 {
   /**
    Traces execution of the instructions within the given range starting from an initial CPU state.
 
@@ -125,7 +123,7 @@ extension LR35902 {
       let initialPc: LR35902.Address = cpu.pc
 
       let location: Cartridge.Location = Cartridge.Location(address: cpu.pc, bank: bank)
-      let sourceLocation: Gameboy.SourceLocation = Gameboy.SourceLocation.cartridge(location)
+      let sourceLocation: Tracer.SourceLocation = Tracer.SourceLocation.cartridge(location)
       let opCodeBytes = LR35902.InstructionSet.opcodeBytes[instruction.spec]!
       let opcodeIndex = opCodeBytes.count > 1 ? (256 + Int(truncatingIfNeeded: opCodeBytes[1])) : Int(truncatingIfNeeded: opCodeBytes[0])
       let emulator = LR35902.Emulation.instructionEmulators[opcodeIndex]
