@@ -9,24 +9,24 @@ import Windfish
 
 extension ProjectDocument {
   @objc func disassemble(_ sender: Any?) {
-    guard let romData = project.romData else {
+    guard let romData: Data = project.romData else {
       return
     }
     project.isDisassembling = true
     self.contentViewController?.startProgressIndicator()
 
-    DispatchQueue.global(qos: .userInitiated).async {
-      let disassembly = Disassembler(data: romData)
+    DispatchQueue.global(qos: .userInitiated).async { () -> Void in
+      let disassembly: Disassembler = Disassembler(data: romData)
 
       // Integrate scripts before any disassembly in order to allow the scripts to modify the disassembly runs.
-      for script in self.project.configuration.scripts {
+      for script: Script in self.project.configuration.scripts {
         disassembly.mutableConfiguration.registerScript(named: script.name, source: script.source)
       }
 
       disassembly.willStart()
 
-      for dataType in self.project.configuration.dataTypes {
-        let mappingDict = dataType.mappings.reduce(into: [:]) { accumulator, mapping in
+      for dataType: DataType in self.project.configuration.dataTypes {
+        let mappingDict: [UInt8: String] = dataType.mappings.reduce(into: [:]) { accumulator, mapping in
           accumulator[mapping.value] = mapping.name
         }
         let representation: Disassembler.MutableConfiguration.Datatype.Representation
@@ -52,11 +52,11 @@ extension ProjectDocument {
         }
       }
 
-      for global in self.project.configuration.globals {
+      for global: Global in self.project.configuration.globals {
         disassembly.mutableConfiguration.registerGlobal(at: global.address, named: global.name, dataType: global.dataType)
       }
 
-      for region in self.project.configuration.regions {
+      for region: Region in self.project.configuration.regions {
         let location = Cartridge.Location(address: region.address, bank: region.bank)
         switch region.regionType {
         case Region.Kind.region:
@@ -95,7 +95,7 @@ extension ProjectDocument {
 
       disassembly.disassemble()
 
-      for macro in self.project.configuration.macros {
+      for macro: Macro in self.project.configuration.macros {
         disassembly.mutableConfiguration.registerMacro(named: macro.name, template: macro.source)
       }
 
@@ -140,7 +140,7 @@ extension ProjectDocument {
         })
       }
 
-      let labelColor = NSColor.systemOrange
+      let labelColor: NSColor = NSColor.systemOrange
       let baseAttributes: WINDStringAttributes = WINDStringAttributes.base()
       let opcodeAttributes: WINDStringAttributes = WINDStringAttributes.opcode()
       let macroNameAttributes: WINDStringAttributes = WINDStringAttributes.macro()
@@ -162,7 +162,7 @@ extension ProjectDocument {
       // TODO: Generate attributed text for the currently selected bank immediately and then kick off the other banks
       // once done so that we can return from disassembly faster.
       var bankTextStorage: [Cartridge.Bank: NSAttributedString] = [:]
-      let q = DispatchQueue(label: "sync queue")
+      let q: DispatchQueue = DispatchQueue(label: "sync queue")
       DispatchQueue.concurrentPerform(iterations: disassembly.mutableConfiguration.numberOfBanks) { (index: Int) in
         let signpostID = OSSignpostID(log: log)
         os_signpost(.begin, log: log, name: "Generate attributed string", signpostID: signpostID, "%{public}d", index)
