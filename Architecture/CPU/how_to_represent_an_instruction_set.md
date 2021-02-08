@@ -4,10 +4,10 @@ Let's learn how to use the `CPU` module to represent the instruction set of a hy
 
 ```
 nop
-ld a, imm8,
-ld a, imm16
-call nz, imm16
-call imm16
+ld a, (imm8)
+ld a, (imm16)
+call nz, (imm16)
+call (imm16)
 ```
 
 ## Defining the shape of an instruction
