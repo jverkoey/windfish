@@ -1,5 +1,7 @@
 import Foundation
 
+import Tracing
+
 extension Disassembler.BankRouter {
   /** Get all of the transfers of control to the given location. */
   func transfersOfControl(at location: Cartridge.Location) -> Set<Cartridge.Location>? {

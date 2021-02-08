@@ -22,6 +22,13 @@ let package = Package(
         "CPU",
         "RGBDS",
         "LR35902",
+        "Tracing",
+      ]
+    ),
+    .target(
+      name: "Tracing",
+      dependencies: [
+        "LR35902"
       ]
     ),
     .target(
@@ -64,6 +71,10 @@ let package = Package(
     .testTarget(
       name: "LR35902Tests",
       dependencies: ["LR35902"]
+    ),
+    .testTarget(
+      name: "TracingTests",
+      dependencies: ["Tracing", "FoundationExtensions"]
     ),
     .testTarget(
       name: "CPUTests",

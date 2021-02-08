@@ -1,6 +1,7 @@
 import Foundation
 
 import LR35902
+import Tracing
 
 extension Disassembler.BankWorker {
   func rewriteRunGroup(_ runGroup: RunGroup) {

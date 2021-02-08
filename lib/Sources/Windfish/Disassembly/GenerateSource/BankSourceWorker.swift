@@ -2,6 +2,7 @@ import Foundation
 
 import LR35902
 import RGBDS
+import Tracing
 
 extension Disassembler {
   final class BankSourceWorker {

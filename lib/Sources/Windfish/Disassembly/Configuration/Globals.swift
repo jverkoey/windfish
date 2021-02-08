@@ -1,6 +1,7 @@
 import Foundation
 
 import LR35902
+import Tracing
 
 extension Disassembler.MutableConfiguration {
   final class Global {

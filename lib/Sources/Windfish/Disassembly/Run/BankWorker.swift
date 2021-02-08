@@ -1,7 +1,8 @@
 import Foundation
 
-import LR35902
 import CPU
+import LR35902
+import Tracing
 
 extension Disassembler {
   final class BankWorker {

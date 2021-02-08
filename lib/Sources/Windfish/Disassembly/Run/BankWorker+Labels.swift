@@ -1,5 +1,7 @@
 import Foundation
 
+import Tracing
+
 extension Disassembler.BankRouter {
 
   /** Returns the label at the given location, if any. */

@@ -4,6 +4,7 @@ import os.log
 
 import LR35902
 import RGBDS
+import Tracing
 
 extension LR35902.Instruction.Spec: InstructionSpecDisassemblyInfo {
   var category: InstructionCategory? {

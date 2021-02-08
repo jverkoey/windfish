@@ -1,5 +1,7 @@
 import Foundation
 
+import Tracing
+
 extension Disassembler.MutableConfiguration {
   func label(at location: Cartridge.Location) -> String? {
     return labelNames[location]

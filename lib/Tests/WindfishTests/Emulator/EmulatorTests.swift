@@ -1,6 +1,7 @@
 import XCTest
 
 import LR35902
+import Tracing
 @testable import Windfish
 
 func disassemblyInitialized(with assembly: String) -> Disassembler {

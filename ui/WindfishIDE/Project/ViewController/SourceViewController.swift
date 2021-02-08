@@ -5,6 +5,7 @@ import Cocoa
 import Combine
 
 import LR35902
+import Tracing
 import Windfish
 
 func DefaultCodeAttributes() -> [NSAttributedString.Key : Any] {

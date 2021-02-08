@@ -1,5 +1,7 @@
 import Foundation
 
+import Tracing
+
 extension Disassembler.BankRouter {
   /** Registers a range as a specific region category. Will clear any existing regions in the range. */
   func bankChange(at location: Cartridge.Location) -> Cartridge.Bank? {

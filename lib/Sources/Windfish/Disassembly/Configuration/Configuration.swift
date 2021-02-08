@@ -1,6 +1,7 @@
 import Foundation
 
 import LR35902
+import Tracing
 
 protocol Configuration: class {
   var cartridgeData: Data { get }

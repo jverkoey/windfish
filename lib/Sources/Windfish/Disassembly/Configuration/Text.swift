@@ -1,5 +1,7 @@
 import Foundation
 
+import Tracing
+
 extension Disassembler.MutableConfiguration {
   func allPotentialText() -> Set<Range<Cartridge.Location>> {
     return potentialText

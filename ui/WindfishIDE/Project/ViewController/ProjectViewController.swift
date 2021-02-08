@@ -3,6 +3,7 @@ import Cocoa
 import Combine
 
 import LR35902
+import Tracing
 import Windfish
 
 final class ProjectViewController: NSViewController {

@@ -5,6 +5,7 @@ import Cocoa
 import os.log
 
 import RGBDS
+import Tracing
 import Windfish
 
 extension ProjectDocument {

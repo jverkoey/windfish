@@ -2,6 +2,7 @@ import AppKit
 import Foundation
 import Cocoa
 
+import Tracing
 import Windfish
 
 func CreateLabel() -> NSTextField {

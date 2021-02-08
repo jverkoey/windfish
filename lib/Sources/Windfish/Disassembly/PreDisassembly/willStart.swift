@@ -2,6 +2,7 @@ import Foundation
 import os.log
 
 import LR35902
+import Tracing
 
 extension Disassembler {
   public func willStart() {

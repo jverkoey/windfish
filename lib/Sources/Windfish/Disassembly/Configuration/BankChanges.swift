@@ -1,5 +1,7 @@
 import Foundation
 
+import Tracing
+
 extension Disassembler.MutableConfiguration {
   func bankChange(at location: Cartridge.Location) -> Cartridge.Bank? {
     return bankChanges[location]

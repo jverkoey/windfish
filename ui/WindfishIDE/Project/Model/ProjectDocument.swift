@@ -4,6 +4,7 @@ import Cocoa
 
 import LR35902
 import RGBDS
+import Tracing
 import Windfish
 
 final class Project: NSObject {

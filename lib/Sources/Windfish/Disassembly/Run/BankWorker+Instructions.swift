@@ -2,6 +2,7 @@ import Foundation
 
 import CPU
 import LR35902
+import Tracing
 
 extension Disassembler.BankRouter: InstructionDisassembler {
   /** Registers a range as a specific region category. Will clear any existing regions in the range. */

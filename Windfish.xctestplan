@@ -51,6 +51,14 @@
         "identifier" : "LR35902Tests",
         "name" : "LR35902Tests"
       }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:..\/lib",
+        "identifier" : "TracingTests",
+        "name" : "TracingTests"
+      }
     }
   ],
   "version" : 1

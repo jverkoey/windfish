@@ -3,6 +3,7 @@ import Foundation
 import Cocoa
 import Combine
 
+import Tracing
 import Windfish
 
 protocol LineNumberViewDelegate: NSObject {

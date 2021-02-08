@@ -1,5 +1,7 @@
 import Foundation
 
+import Tracing
+
 extension Disassembler.MutableConfiguration {
   public enum DataFormat {
     case bytes

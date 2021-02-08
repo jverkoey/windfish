@@ -1,4 +1,6 @@
 import Foundation
+
+import Tracing
 import Windfish
 
 struct ProjectMetadata: Codable {

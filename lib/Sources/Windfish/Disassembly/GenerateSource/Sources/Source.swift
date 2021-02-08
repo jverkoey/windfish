@@ -1,5 +1,7 @@
 import Foundation
 
+import Tracing
+
 extension Disassembler {
   /** The potential types of source the disassembler can generate. */
   public struct Source {

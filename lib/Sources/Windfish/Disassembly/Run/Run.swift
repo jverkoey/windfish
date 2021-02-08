@@ -2,6 +2,7 @@ import Foundation
 
 import CPU
 import LR35902
+import Tracing
 
 enum InstructionCategory {
   case call

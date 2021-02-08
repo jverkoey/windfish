@@ -3,6 +3,7 @@ import Foundation
 import FoundationExtensions
 import LR35902
 import RGBDS
+import Tracing
 
 /** Turns LR3902 instructions into RGBDS assembly. */
 public final class RGBDSDisassembler {

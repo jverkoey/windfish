@@ -3,6 +3,7 @@ import Foundation
 import Cocoa
 
 import LR35902
+import Tracing
 import Windfish
 
 extension NSUserInterfaceItemIdentifier {
