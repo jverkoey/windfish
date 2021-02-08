@@ -84,6 +84,17 @@ private final class TracerMemory: TraceableMemory {
   var registerTraces: [LR35902.Instruction.Numeric : [LR35902.RegisterTrace]] = [:]
 }
 
+public final class Gameboy {
+  /** A representation of a specific address either in the cartridge ROM or in memory. */
+  public enum SourceLocation: Equatable {
+    /** An address in the cartridge's ROM data. */
+    case cartridge(Cartridge.Location)
+
+    /** An address in the Gameboy's memory. */
+    case memory(LR35902.Address)
+  }
+}
+
 extension LR35902 {
   // TODO: Extract this engine into a generic emulator so that the following code can be debugged in an interactive session:
   /*
@@ -107,13 +118,12 @@ extension LR35902 {
                    cartridgeData: Data,
                    disassembler: InstructionDisassembler,
                    step: ((LR35902.Instruction, Cartridge.Location, LR35902, TraceableMemory) -> Void)? = nil) {
-    let bank: Cartridge.Bank = range.lowerBound.bank
     let upperBoundPc: LR35902.Address = range.upperBound.address
 
-    // TODO: Evaluate whether recreating this on every trace is a memory / performance hog.
-    let tracerMemory = TracerMemory(data: cartridgeData)
+    let tracerMemory: TracerMemory = TracerMemory(data: cartridgeData)
 
     cpu.pc = range.lowerBound.address
+    let bank: Cartridge.Bank = range.lowerBound.bank
     tracerMemory.selectedBank = bank
 
     while cpu.pc < upperBoundPc {
