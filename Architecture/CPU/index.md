@@ -152,6 +152,8 @@ An instruction consists of a specification and any immediate values associated w
 
 ```swift
 struct Instruction: CPU.Instruction {
+  typealias InstructionSetType = InstructionSet
+
   let spec: Spec
   let immediate: ImmediateValue?
 
