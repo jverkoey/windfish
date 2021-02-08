@@ -1,6 +1,8 @@
 # Windfish CPU
 
-At its core, Windfish defines a protocol-based representation of an abstract CPU's instruction set that supports bi-directional coding between binary and semantic representations of the instructions.
+The `CPU` module defines a protocol-based representation of a CPU's instruction set that can be used to translate between binary and semantic representations of instructions.
+
+![Interchange between binary and semantic representations](diagrams/interchange.png)
 
 ### Defining the shape of an instruction
 
