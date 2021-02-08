@@ -95,12 +95,7 @@ public final class Tracer {
     case memory(LR35902.Address)
   }
 
-  /**
-   Traces execution of the instructions within the given range starting from an initial CPU state.
-
-   The returned dictionary is a mapping of cartridge locations to the post-execution CPU state for the instruction at
-   that location.
-   */
+  /** Traces execution of the instructions within the given range starting from an initial CPU state. */
   public class func trace(range: Range<Cartridge.Location>,
                           cpu: LR35902 = LR35902(),
                           cartridgeData: Data,
