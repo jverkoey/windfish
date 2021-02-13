@@ -44,6 +44,7 @@
 		665D4F8D2575F92500C3A03B /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4F8C2575F92500C3A03B /* main.swift */; };
 		665D4FAE257727CA00C3A03B /* HorizontalLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665D4FAD257727CA00C3A03B /* HorizontalLine.swift */; };
 		6667E4BE25ACD3A600F14435 /* LabeledView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6667E4BD25ACD3A600F14435 /* LabeledView.swift */; };
+		6675213025D4E9F200F3958C /* Inspectors.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6675212F25D4E9F200F3958C /* Inspectors.xib */; };
 		66763D732579F26000824278 /* RegionEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66763D722579F26000824278 /* RegionEditorViewController.swift */; };
 		66763D80257AF38200824278 /* LR35902AddressFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66763D7F257AF38200824278 /* LR35902AddressFormatter.swift */; };
 		66763D97257C0D4900824278 /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66763D96257C0D4900824278 /* TextView.swift */; };
@@ -354,6 +355,7 @@
 		665D4F8C2575F92500C3A03B /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		665D4FAD257727CA00C3A03B /* HorizontalLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalLine.swift; sourceTree = "<group>"; };
 		6667E4BD25ACD3A600F14435 /* LabeledView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabeledView.swift; sourceTree = "<group>"; };
+		6675212F25D4E9F200F3958C /* Inspectors.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Inspectors.xib; sourceTree = "<group>"; };
 		66763D722579F26000824278 /* RegionEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionEditorViewController.swift; sourceTree = "<group>"; };
 		66763D7F257AF38200824278 /* LR35902AddressFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LR35902AddressFormatter.swift; sourceTree = "<group>"; };
 		66763D96257C0D4900824278 /* TextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
@@ -662,6 +664,7 @@
 				66C617CA257F1AD500E372BA /* ViewControllers */,
 				665D4FAC257727C000C3A03B /* Views */,
 				665D4F582575F75400C3A03B /* AppDelegate.swift */,
+				6675212F25D4E9F200F3958C /* Inspectors.xib */,
 				667B1B622578541F00CE670F /* NotificationNames.swift */,
 				665D4F8C2575F92500C3A03B /* main.swift */,
 				6657950825B3DB89005E155D /* MainMenu.xib */,
@@ -1112,6 +1115,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				66D0391725BC714F00EC532C /* WindfishIDEHelp.help in Resources */,
+				6675213025D4E9F200F3958C /* Inspectors.xib in Resources */,
 				6699BA3925AEBF9B005DB9BB /* Document.xib in Resources */,
 				6657950925B3DB89005E155D /* MainMenu.xib in Resources */,
 				667B1B75257854BB00CE670F /* Assets.xcassets in Resources */,
