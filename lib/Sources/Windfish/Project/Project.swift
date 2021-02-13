@@ -55,10 +55,13 @@ Regions: \(regions.map { $0.name }.joined(separator: ", "))
   /** Returns true if the save succeeded, false if it failed. */
   public func save(to url: URL) throws -> Bool {
     let scriptsUrl: URL = url.appendingPathComponent(Filenames.scriptsDir)
+    let macrosUrl: URL = url.appendingPathComponent(Filenames.macrosDir)
     try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
     try FileManager.default.createDirectory(at: scriptsUrl, withIntermediateDirectories: true, attributes: nil)
+    try FileManager.default.createDirectory(at: macrosUrl, withIntermediateDirectories: true, attributes: nil)
 
     try saveScripts(to: scriptsUrl)
+    try saveMacros(to: macrosUrl)
 
     return true
   }

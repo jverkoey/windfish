@@ -21,6 +21,13 @@ extension Project {
     }
   }
 
+  func saveMacros(to url: URL) throws {
+    for macro: Macro in macros {
+      let macroUrl: URL = url.appendingPathComponent(macro.name).appendingPathExtension("asm")
+      try macro.source.write(to: macroUrl, atomically: true, encoding: .utf8)
+    }
+  }
+
   func applyMacros(to configuration: Disassembler.MutableConfiguration) {
     for macro: Macro in macros {
       configuration.registerMacro(named: macro.name, template: macro.source)
