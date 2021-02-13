@@ -15,11 +15,10 @@ extension Project {
     let fm = FileManager.default
     return ((try? fm.contentsOfDirectory(atPath: url.path)) ?? [])
       .compactMap { (filename: String) -> Script? in
-        guard let data: Data = fm.contents(atPath: url.appendingPathComponent(filename).path) else {
+        guard let source: String = try? String(contentsOf: url.appendingPathComponent(filename), encoding: .utf8) else {
           return nil
         }
-        return Script(name: URL(fileURLWithPath: filename).deletingPathExtension().lastPathComponent,
-                      source: String(data: data, encoding: .utf8)!)
+        return Script(name: URL(fileURLWithPath: filename).deletingPathExtension().lastPathComponent, source: source)
       }
   }
 }
