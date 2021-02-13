@@ -15,24 +15,27 @@ private struct Filenames {
 
 /** A representation of a Windfish project that can be saved to and loaded from disk. */
 public final class Project: CustomStringConvertible {
-  init(scripts: [Project.Script] = []) {
+  init(scripts: [Project.Script] = [], macros: [Macro] = []) {
     self.scripts = scripts
+    self.macros = macros
   }
 
   public var description: String {
     return """
 Windfish project
 Scripts: \(scripts.map { $0.name }.joined(separator: ", "))
+Macros: \(macros.map { $0.name }.joined(separator: ", "))
 """
   }
 
   var scripts: [Script] = []
+  var macros: [Macro] = []
 
   public static func load(from url: URL) -> Project {
     let configurationUrl: URL = url.appendingPathComponent(Filenames.configurationDir)
-    let scriptsUrl: URL = configurationUrl.appendingPathComponent(Filenames.scriptsDir)
-    let scripts: [Script] = loadScripts(from: scriptsUrl)
-    return Project(scripts: scripts)
+    let scripts: [Script] = loadScripts(from: configurationUrl.appendingPathComponent(Filenames.scriptsDir))
+    let macros: [Macro] = loadMacros(from: configurationUrl.appendingPathComponent(Filenames.macrosDir))
+    return Project(scripts: scripts, macros: macros)
   }
 
   private static func loadScripts(from url: URL) -> [Script] {
@@ -44,6 +47,18 @@ Scripts: \(scripts.map { $0.name }.joined(separator: ", "))
         }
         return Script(name: URL(fileURLWithPath: filename).deletingPathExtension().lastPathComponent,
                       source: String(data: data, encoding: .utf8)!)
+      }
+  }
+
+  private static func loadMacros(from url: URL) -> [Macro] {
+    let fm = FileManager.default
+    return ((try? fm.contentsOfDirectory(atPath: url.path)) ?? [])
+      .compactMap { (filename: String) -> Macro? in
+        guard let data: Data = fm.contents(atPath: url.appendingPathComponent(filename).path) else {
+          return nil
+        }
+        return Macro(name: URL(fileURLWithPath: filename).deletingPathExtension().lastPathComponent,
+                     source: String(data: data, encoding: .utf8)!)
       }
   }
 }
