@@ -1,6 +1,7 @@
 import Foundation
 
 import LR35902
+import RGBDS
 
 extension Project {
   final class Global: NSObject {
@@ -32,7 +33,7 @@ extension Project {
       let definitionParts: [String] = code.components(separatedBy: " EQU ")
       let name: String = definitionParts[0].trimmed()
       let addressText: String = definitionParts[1].trimmed()
-      guard addressText.starts(with: "$"),
+      guard addressText.starts(with: RGBDS.NumericPrefix.hexadecimal),
             let address: LR35902.Address = LR35902.Address(addressText.dropFirst(), radix: 16) else {
         return
       }
