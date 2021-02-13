@@ -15,11 +15,12 @@ private struct Filenames {
 
 /** A representation of a Windfish project that can be saved to and loaded from disk. */
 public final class Project: CustomStringConvertible {
-  init(scripts: [Project.Script] = [], macros: [Macro] = [], globals: [Global] = [], dataTypes: [DataType] = []) {
+  init(scripts: [Project.Script] = [], macros: [Macro] = [], globals: [Global] = [], dataTypes: [DataType] = [], regions: [Region] = []) {
     self.scripts = scripts
     self.macros = macros
     self.globals = globals
     self.dataTypes = dataTypes
+    self.regions = regions
   }
 
   public var description: String {
@@ -29,6 +30,7 @@ Scripts: \(scripts.map { $0.name }.joined(separator: ", "))
 Macros: \(macros.map { $0.name }.joined(separator: ", "))
 Globals: \(globals.map { $0.name }.joined(separator: ", "))
 Data types: \(dataTypes.map { $0.name }.joined(separator: ", "))
+Regions: \(regions.map { $0.name }.joined(separator: ", "))
 """
   }
 
@@ -36,6 +38,7 @@ Data types: \(dataTypes.map { $0.name }.joined(separator: ", "))
   var macros: [Macro] = []
   var globals: [Global] = []
   var dataTypes: [DataType] = []
+  var regions: [Region] = []
 
   public static func load(from url: URL) -> Project {
     let configurationUrl: URL = url.appendingPathComponent(Filenames.configurationDir)
@@ -43,6 +46,7 @@ Data types: \(dataTypes.map { $0.name }.joined(separator: ", "))
     let macros: [Macro] = loadMacros(from: configurationUrl.appendingPathComponent(Filenames.macrosDir))
     let globals: [Global] = loadGlobals(from: configurationUrl.appendingPathComponent(Filenames.globals))
     let dataTypes: [DataType] = loadDataTypes(from: configurationUrl.appendingPathComponent(Filenames.dataTypes))
-    return Project(scripts: scripts, macros: macros, globals: globals, dataTypes: dataTypes)
+    let regions: [Region] = loadRegions(from: configurationUrl.appendingPathComponent(Filenames.regions))
+    return Project(scripts: scripts, macros: macros, globals: globals, dataTypes: dataTypes, regions: regions)
   }
 }
