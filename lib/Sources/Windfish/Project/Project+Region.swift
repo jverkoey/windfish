@@ -71,4 +71,43 @@ extension Project {
     }
     return regions
   }
+
+  func applyRegions(to configuration: Disassembler.MutableConfiguration) {
+    for region: Region in regions {
+      let location = Cartridge.Location(address: region.address, bank: region.bank)
+      switch region.regionType {
+      case Region.Kind.region:
+        configuration.registerPotentialCode(at: location..<(location + region.length), named: region.name)
+
+      case Region.Kind.function:
+        configuration.registerFunction(startingAt: location, named: region.name)
+
+      case Region.Kind.label:
+        configuration.registerLabel(at: location, named: region.name)
+
+      case Region.Kind.string:
+        configuration.registerLabel(at: location, named: region.name)
+        let startLocation = Cartridge.Location(address: region.address, bank: region.bank)
+        configuration.registerText(at: startLocation..<(startLocation + region.length), lineLength: nil)
+
+      case Region.Kind.image1bpp:
+        configuration.registerLabel(at: location, named: region.name)
+        let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
+        configuration.registerData(at: startLocation..<(startLocation + region.length), format: .image1bpp)
+
+      case Region.Kind.image2bpp:
+        configuration.registerLabel(at: location, named: region.name)
+        let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
+        configuration.registerData(at: startLocation..<(startLocation + region.length), format: .image2bpp)
+
+      case Region.Kind.data:
+        configuration.registerLabel(at: location, named: region.name)
+        let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
+        configuration.registerData(at: startLocation..<(startLocation + region.length))
+
+      default:
+        break
+      }
+    }
+  }
 }

@@ -92,4 +92,33 @@ extension Project {
     }
     return dataTypes
   }
+
+  func applyDataTypes(to configuration: Disassembler.MutableConfiguration) {
+    for dataType: DataType in dataTypes {
+      let mappingDict: [UInt8: String] = dataType.mappings.reduce(into: [:]) { accumulator, mapping in
+        accumulator[mapping.value] = mapping.name
+      }
+      let representation: Disassembler.MutableConfiguration.Datatype.Representation
+      switch dataType.representation {
+      case DataType.Representation.binary:
+        representation = .binary
+      case DataType.Representation.decimal:
+        representation = .decimal
+      case DataType.Representation.hexadecimal:
+        representation = .hexadecimal
+      default:
+        preconditionFailure()
+      }
+      switch dataType.interpretation {
+      case DataType.Interpretation.any:
+        configuration.registerDatatype(named: dataType.name, representation: representation)
+      case DataType.Interpretation.bitmask:
+        configuration.createDatatype(named: dataType.name, bitmask: mappingDict, representation: representation)
+      case DataType.Interpretation.enumerated:
+        configuration.createDatatype(named: dataType.name, enumeration: mappingDict, representation: representation)
+      default:
+        preconditionFailure()
+      }
+    }
+  }
 }

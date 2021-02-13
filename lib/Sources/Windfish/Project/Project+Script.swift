@@ -21,4 +21,11 @@ extension Project {
         return Script(name: URL(fileURLWithPath: filename).deletingPathExtension().lastPathComponent, source: source)
       }
   }
+
+  func prepareScripts(in configuration: Disassembler.MutableConfiguration) {
+    // Integrate scripts before any disassembly in order to allow the scripts to modify the disassembly runs.
+    for script: Script in scripts {
+      configuration.registerScript(named: script.name, source: script.source)
+    }
+  }
 }

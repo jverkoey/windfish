@@ -46,4 +46,10 @@ extension Project {
     }
     return globals
   }
+
+  func applyGlobals(to configuration: Disassembler.MutableConfiguration) {
+    for global: Global in globals {
+      configuration.registerGlobal(at: global.address, named: global.name, dataType: global.dataType)
+    }
+  }
 }
