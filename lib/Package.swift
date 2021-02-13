@@ -14,7 +14,18 @@ let package = Package(
       targets: ["Windfish"]
     )
   ],
+  dependencies: [
+    .package(url: "https://github.com/apple/swift-argument-parser", from: "0.3.0"),
+  ],
   targets: [
+    .target(
+      name: "ocarina",
+      dependencies: [
+        "Windfish",
+        "Tracing",
+        .product(name: "ArgumentParser", package: "swift-argument-parser"),
+      ]
+    ),
     .target(
       name: "Windfish",
       dependencies: [
