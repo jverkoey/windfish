@@ -1,5 +1,8 @@
 import Foundation
+
+#if os(macOS)
 import os.log
+#endif
 
 import CPU
 import LR35902
@@ -54,7 +57,9 @@ extension Disassembler {
   }
 
   public func generateSource() throws -> (Source, Statistics) {
+#if os(macOS)
     let log = OSLog(subsystem: "com.featherless.windfish", category: "PointsOfInterest")
+#endif
 
     var sources: [String: Source.FileDescription] = [:]
 
@@ -82,13 +87,17 @@ extension Disassembler {
     var macrosToWrite: [Disassembler.EncounteredMacro] = []
     let q = DispatchQueue(label: "sync queue")
     DispatchQueue.concurrentPerform(iterations: configuration.numberOfBanks) { (index: Int) in
+#if os(macOS)
       let signpostID = OSSignpostID(log: log)
       os_signpost(.begin, log: log, name: "Generate source", signpostID: signpostID, "%{public}d", index)
+#endif
 
       let worker = BankSourceWorker(context: configuration, bank: Cartridge.Bank(truncatingIfNeeded: index), router: lastBankRouter!, disassembler: self)
       worker.generateSource()
 
+#if os(macOS)
       os_signpost(.end, log: log, name: "Generate source", signpostID: signpostID, "%{public}d", index)
+#endif
 
       q.sync {
         macrosToWrite.append(contentsOf: worker.macrosUsed)

@@ -1,6 +1,8 @@
 import Foundation
 
+#if os(macOS)
 import os.log
+#endif
 
 import LR35902
 import RGBDS
@@ -37,9 +39,11 @@ public final class Disassembler {
     let _ = LR35902.InstructionSet.opcodeStrings
     let _ = LR35902.InstructionSet.reflectedArgumentTypes
 
+#if os(macOS)
     let log = OSLog(subsystem: "com.featherless.windfish", category: "PointsOfInterest")
     let signpostID = OSSignpostID(log: log)
     os_signpost(.begin, log: log, name: "Disassembler", signpostID: signpostID, "%{public}s", "disassemble")
+#endif
 
     for range in configuration.allPotentialCode().sorted(by: { (a: Range<Cartridge.Location>, b: Range<Cartridge.Location>) -> Bool in
       a.lowerBound < b.lowerBound
@@ -65,7 +69,10 @@ public final class Disassembler {
     for range: Range<Cartridge.Location> in configuration.allPotentialText() {
       lastBankRouter!.registerRegion(range: range, as: .text)
     }
+
+#if os(macOS)
     os_signpost(.end, log: log, name: "Disassembler", signpostID: signpostID, "%{public}s", "disassemble")
+#endif
   }
 
   /** Returns the label at the given location, if any. */

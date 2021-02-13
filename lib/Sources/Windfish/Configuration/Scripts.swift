@@ -1,11 +1,15 @@
 import Foundation
+
+#if os(macOS)
 import JavaScriptCore
+#endif
 
 extension Disassembler.MutableConfiguration {
   final class Script {
     init(source: String) {
       self.source = source
 
+#if os(macOS)
       let context = JSContext()!
       context.exceptionHandler = { context, exception in
         guard let exception = exception else {
@@ -31,6 +35,7 @@ extension Disassembler.MutableConfiguration {
       } else {
         self.disassemblyWillStart = nil
       }
+#endif
     }
     let source: String
 
@@ -38,10 +43,12 @@ extension Disassembler.MutableConfiguration {
       return Script(source: source)
     }
 
+#if os(macOS)
     let context: JSContext
     let linearSweepWillStart: JSValue?
     let linearSweepDidStep: JSValue?
     let disassemblyWillStart: JSValue?
+#endif
   }
 
   func allScripts() -> [String: Script] {

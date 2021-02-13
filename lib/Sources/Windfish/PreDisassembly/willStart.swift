@@ -1,19 +1,24 @@
 import Foundation
+#if os(macOS)
 import os.log
+#endif
 
 import LR35902
 import Tracing
 
 extension Disassembler {
   public func willStart() {
+#if os(macOS)
     let oslog = OSLog(subsystem: "com.featherless.windfish", category: "PointsOfInterest")
     let signpostID = OSSignpostID(log: oslog)
     os_signpost(.begin, log: oslog, name: "Disassembler", signpostID: signpostID, "%{public}s", "willStart")
+#endif
 
     lastBankRouter = BankRouter(numberOfBanks: configuration.numberOfBanks, context: configuration)
 
     prepareScriptContext()
 
+#if os(macOS)
     // Extract any scripted events.
     let disassemblyWillStarts = configuration.allScripts().values.filter { $0.disassemblyWillStart != nil }
     guard !disassemblyWillStarts.isEmpty else {
@@ -24,6 +29,7 @@ extension Disassembler {
       script.disassemblyWillStart?.call(withArguments: [])
     }
     os_signpost(.end, log: oslog, name: "Disassembler", signpostID: signpostID, "%{public}s", "willStart")
+#endif
   }
 
   private func getROMData(bank: Cartridge.Bank, startAddress: LR35902.Address, endAddress: LR35902.Address) -> [UInt8] {
@@ -33,6 +39,7 @@ extension Disassembler {
   }
 
   private func prepareScriptContext() {
+#if os(macOS)
     let getROMData: @convention(block) (Cartridge.Bank, LR35902.Address, LR35902.Address) -> [UInt8] = { [weak self] (bank: Cartridge.Bank, startAddress: LR35902.Address, endAddress: LR35902.Address) in
       return self?.getROMData(bank: bank, startAddress: startAddress, endAddress: endAddress) ?? []
     }
@@ -88,5 +95,6 @@ extension Disassembler {
       script.context.setObject(hex8, forKeyedSubscript: "hex8" as NSString)
       script.context.setObject(log, forKeyedSubscript: "log" as NSString)
     }
+#endif
   }
 }

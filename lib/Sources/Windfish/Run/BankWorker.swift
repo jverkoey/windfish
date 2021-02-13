@@ -16,9 +16,11 @@ extension Disassembler {
     let queue: DispatchQueue
     var runs: [Run] = []
 
+#if os(macOS)
     private let linearSweepDidSteps: [MutableConfiguration.Script]
     private let linearSweepWillStarts: [MutableConfiguration.Script]
     private let linearSweepScripts: [MutableConfiguration.Script]
+#endif
 
     init(bank: Cartridge.Bank, context: Configuration) {
       self.bank = bank
@@ -31,6 +33,7 @@ extension Disassembler {
                                  autoreleaseFrequency: .workItem,
                                  target: nil)
 
+#if os(macOS)
       let scripts: [String: MutableConfiguration.Script] = context.allScripts()
       var linearSweepDidSteps: [MutableConfiguration.Script] = []
       var linearSweepWillStarts: [MutableConfiguration.Script] = []
@@ -81,6 +84,7 @@ extension Disassembler {
         script.context.setObject(changeBank, forKeyedSubscript: "changeBank" as NSString)
         script.context.setObject(didEncounterTransferOfControl, forKeyedSubscript: "didEncounterTransferOfControl" as NSString)
       }
+#endif
     }
 
     // MARK: - Scheduling runs
@@ -119,9 +123,11 @@ extension Disassembler {
         currentRun = nil
       }
 
+#if os(macOS)
       linearSweepWillStarts.forEach {
         $0.linearSweepWillStart?.call(withArguments: [])
       }
+#endif
 
       let advance: (LR35902.Address) -> Void = { amount in
         run.visitHistory[Int(truncatingIfNeeded: self.bank)]
@@ -266,6 +272,7 @@ extension Disassembler {
           break
         }
 
+#if os(macOS)
         // linearSweepDidStep event
         if !linearSweepDidSteps.isEmpty {
           // TODO: Allow the script to specify which instruction types it cares to be invoked for.
@@ -280,6 +287,7 @@ extension Disassembler {
             linearSweepDidStep.linearSweepDidStep?.call(withArguments: args)
           }
         }
+#endif
 
         if run.pc >= 0x4000 && max(1, run.selectedBank) != max(1, bank) {
           // The bank has changed mid-sweep, meaning we've effectively jumped to a new bank. Register a transfer of
