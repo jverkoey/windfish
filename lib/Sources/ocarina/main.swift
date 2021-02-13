@@ -8,7 +8,8 @@ struct Ocarina: ParsableCommand {
   var projectDirectory: String
 
   mutating func run() throws {
-    print(projectDirectory)
+    let project = Project.load(from: URL(fileURLWithPath: projectDirectory))
+    print(project)
   }
 }
 
