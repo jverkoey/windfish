@@ -22,6 +22,13 @@ extension Project {
       }
   }
 
+  func saveScripts(to url: URL) throws {
+    for script: Script in scripts {
+      let scriptUrl: URL = url.appendingPathComponent(script.name).appendingPathExtension("js")
+      try script.source.write(to: scriptUrl, atomically: true, encoding: .utf8)
+    }
+  }
+
   func prepareScripts(in configuration: Disassembler.MutableConfiguration) {
     // Integrate scripts before any disassembly in order to allow the scripts to modify the disassembly runs.
     for script: Script in scripts {

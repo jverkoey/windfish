@@ -52,7 +52,15 @@ Regions: \(regions.map { $0.name }.joined(separator: ", "))
     return Project(scripts: scripts, macros: macros, globals: globals, dataTypes: dataTypes, regions: regions)
   }
 
-  public func save(to url: URL) {
+  /** Returns true if the save succeeded, false if it failed. */
+  public func save(to url: URL) throws -> Bool {
+    let scriptsUrl: URL = url.appendingPathComponent(Filenames.scriptsDir)
+    try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+    try FileManager.default.createDirectory(at: scriptsUrl, withIntermediateDirectories: true, attributes: nil)
+
+    try saveScripts(to: scriptsUrl)
+
+    return true
   }
 
   public func prepare(_ configuration: Disassembler.MutableConfiguration) {
