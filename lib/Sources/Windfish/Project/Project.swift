@@ -113,7 +113,7 @@ Regions: \(regions.map { $0.name }.joined(separator: ", "))
     try saveMacros(to: macrosUrl)
     try globalsAsData().write(to: configurationUrl.appendingPathComponent(Filenames.globals))
     try dataTypesAsData().write(to: configurationUrl.appendingPathComponent(Filenames.dataTypes))
-    try saveRegions(to: configurationUrl.appendingPathComponent(Filenames.regions))
+    try regionsAsData().write(to: configurationUrl.appendingPathComponent(Filenames.regions))
 
     return true
   }

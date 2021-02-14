@@ -345,11 +345,7 @@ extension ProjectDocument {
         }),
         Filenames.globals: FileWrapper(regularFileWithContents: project.configuration.storage.globalsAsData()),
         Filenames.dataTypes: FileWrapper(regularFileWithContents: project.configuration.storage.dataTypesAsData()),
-        Filenames.regions: FileWrapper(regularFileWithContents: project.configuration.regions
-                                        .sorted(by: { $0.bank < $1.bank && $0.address < $1.address })
-                                        .map { (region: Region) -> String in
-                                          "\(region.name): ; [\(region.regionType)] $\(region.bank.hexString):$\(region.address.hexString) [\(region.length)]"
-                                        }.joined(separator: "\n\n").data(using: .utf8)!),
+        Filenames.regions: FileWrapper(regularFileWithContents: project.configuration.storage.regionsAsData()),
       ])
       configuration.preferredFilename = Filenames.configurationDir
       documentFileWrapper.addFileWrapper(configuration)

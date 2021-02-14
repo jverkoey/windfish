@@ -67,14 +67,14 @@ extension Project {
     return regions
   }
 
-  func saveRegions(to url: URL) throws {
-    try regions
+  public func regionsAsData() -> Data {
+    return regions
       .sorted(by: { $0.bank < $1.bank && $0.address < $1.address })
       .map { (region: Region) -> String in
         "\(region.name): ; [\(region.regionType)] \(RGBDS.asHexString(region.bank)):\(RGBDS.asHexString(region.address)) [\(region.length)]"
       }
       .joined(separator: "\n\n")
-      .write(to: url, atomically: true, encoding: .utf8)
+      .data(using: .utf8) ?? Data()
   }
 
   func applyRegions(to configuration: Disassembler.MutableConfiguration) {
