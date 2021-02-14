@@ -4,7 +4,8 @@ import Tracing
 
 /** A representation of a Windfish project that can be saved to and loaded from disk. */
 public final class Project: CustomStringConvertible {
-  public init(scripts: [Project.Script] = [], macros: [Macro] = [], globals: [Global] = [], dataTypes: [DataType] = [], regions: [Region] = []) {
+  public init(rom: Data, scripts: [Project.Script] = [], macros: [Macro] = [], globals: [Global] = [], dataTypes: [DataType] = [], regions: [Region] = []) {
+    self.rom = rom
     self.scripts = scripts
     self.macros = macros
     self.globals = globals
@@ -36,18 +37,21 @@ Regions: \(regions.map { $0.name }.joined(separator: ", "))
 """
   }
 
+  public var rom: Data
   public var scripts: [Script] = []
   public var macros: [Macro] = []
   public var globals: [Global] = []
   public var dataTypes: [DataType] = []
   public var regions: [Region] = []
 
-  public static func load(from url: URL) -> Project {
+  public static func load(from url: URL) throws -> Project {
     let fm = FileManager.default
 
     let configurationUrl: URL = url.appendingPathComponent(Filenames.configurationDir)
     let macrosUrl: URL = configurationUrl.appendingPathComponent(Filenames.macrosDir)
     let scriptsUrl: URL = configurationUrl.appendingPathComponent(Filenames.scriptsDir)
+
+    let rom: Data = try Data(contentsOf: url.appendingPathComponent(Filenames.rom))
 
     let scripts: [Script]
     if let filenames = try? fm.contentsOfDirectory(atPath: scriptsUrl.path) {
@@ -94,7 +98,7 @@ Regions: \(regions.map { $0.name }.joined(separator: ", "))
       regions = []
     }
 
-    return Project(scripts: scripts, macros: macros, globals: globals, dataTypes: dataTypes, regions: regions)
+    return Project(rom: rom, scripts: scripts, macros: macros, globals: globals, dataTypes: dataTypes, regions: regions)
   }
 
   /** Returns true if the save succeeded, false if it failed. */
