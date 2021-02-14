@@ -280,19 +280,11 @@ extension ProjectDocument {
           Macro(name: NSString(string: key).deletingPathExtension, source: String(data: value, encoding: .utf8)!)
         })
       }
-      if let globals = configuration.fileWrappers?[Filenames.globals],
-         let content = globals.regularFileContents {
-        let globals: [Windfish.Project.Global] = Windfish.Project.loadGlobals(from: content)
-        self.project.configuration.globals = globals.map {
-          Global(storage: $0)
-        }
+      if let content: Data = configuration.fileWrappers?[Filenames.globals]?.regularFileContents {
+        self.project.configuration.globals = Windfish.Project.loadGlobals(from: content).map { Global(storage: $0) }
       }
-      if let dataTypes = configuration.fileWrappers?[Filenames.dataTypes],
-         let content = dataTypes.regularFileContents {
-        let dataTypes: [Windfish.Project.DataType] = Windfish.Project.loadDataTypes(from: content)
-        self.project.configuration.dataTypes = dataTypes.map {
-          DataType(storage: $0)
-        }
+      if let content: Data = configuration.fileWrappers?[Filenames.dataTypes]?.regularFileContents {
+        self.project.configuration.dataTypes = Windfish.Project.loadDataTypes(from: content).map { DataType(storage: $0) }
       }
       if let regions = configuration.fileWrappers?[Filenames.regions],
          let content = regions.regularFileContents {
