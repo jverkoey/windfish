@@ -1182,7 +1182,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp ${BUILT_PRODUCTS_DIR}/ocarina \"${BUILT_PRODUCTS_DIR}/${FULL_PRODUCT_NAME}/Contents/MacOS\"\n";
+			shellScript = "cp \"${BUILT_PRODUCTS_DIR}/ocarina\" \"${BUILT_PRODUCTS_DIR}/${FULL_PRODUCT_NAME}/Contents/MacOS\"\n/usr/bin/codesign --force --sign - -o runtime --entitlements \"$CODE_SIGN_ENTITLEMENTS\" \"${BUILT_PRODUCTS_DIR}/${FULL_PRODUCT_NAME}/Contents/MacOS/ocarina\"\n\n";
 		};
 		66D0390925BC702C00EC532C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
