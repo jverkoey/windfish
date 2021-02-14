@@ -18,11 +18,10 @@ extension Project {
     return Script(name: name, source: source)
   }
 
-  func saveScripts(to url: URL) throws {
-    for script: Script in scripts {
-      let scriptUrl: URL = url.appendingPathComponent(script.name).appendingPathExtension("js")
-      try script.source.write(to: scriptUrl, atomically: true, encoding: .utf8)
-    }
+  public func scriptsAsData() -> [String: Data] {
+    return scripts.reduce(into: [:], { (accumulator, script) in
+      accumulator["\(script.name).js"] = script.source.data(using: .utf8)
+    })
   }
 
   func prepareScripts(in configuration: Disassembler.MutableConfiguration) {

@@ -109,7 +109,9 @@ Regions: \(regions.map { $0.name }.joined(separator: ", "))
     try fm.createDirectory(at: scriptsUrl, withIntermediateDirectories: true, attributes: nil)
     try fm.createDirectory(at: macrosUrl, withIntermediateDirectories: true, attributes: nil)
 
-    try saveScripts(to: scriptsUrl)
+    try scriptsAsData().forEach { (key: String, value: Data) in
+      try value.write(to: scriptsUrl.appendingPathComponent(key))
+    }
     try saveMacros(to: macrosUrl)
     try globalsAsData().write(to: configurationUrl.appendingPathComponent(Filenames.globals))
     try dataTypesAsData().write(to: configurationUrl.appendingPathComponent(Filenames.dataTypes))

@@ -337,9 +337,8 @@ extension ProjectDocument {
         documentFileWrapper.removeFileWrapper(configuration)
       }
       let configuration = FileWrapper(directoryWithFileWrappers: [
-        Filenames.scriptsDir: FileWrapper(directoryWithFileWrappers: project.configuration.scripts.reduce(into: [:]) { accumulator, script in
-          accumulator[script.name + ".js"] = FileWrapper(regularFileWithContents: script.source.data(using: .utf8)!)
-        }),
+        Filenames.scriptsDir: FileWrapper(directoryWithFileWrappers: project.configuration.storage.scriptsAsData()
+                                            .mapValues { FileWrapper(regularFileWithContents: $0) }),
         Filenames.macrosDir: FileWrapper(directoryWithFileWrappers: project.configuration.macros.reduce(into: [:]) { accumulator, macro in
           accumulator[macro.name + ".asm"] = FileWrapper(regularFileWithContents: macro.source.data(using: .utf8)!)
         }),
