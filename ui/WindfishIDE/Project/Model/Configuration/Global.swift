@@ -13,4 +13,8 @@ final class Global: NSObject {
   @objc dynamic var name: String
   @objc dynamic var address: LR35902.Address
   @objc dynamic var dataType: String
+
+  func toWindfish() -> Windfish.Project.Global {
+    return Windfish.Project.Global(name: name, address: address, dataType: dataType)
+  }
 }
