@@ -36,11 +36,11 @@ Regions: \(regions.map { $0.name }.joined(separator: ", "))
 """
   }
 
-  var scripts: [Script] = []
-  var macros: [Macro] = []
-  var globals: [Global] = []
-  var dataTypes: [DataType] = []
-  var regions: [Region] = []
+  public var scripts: [Script] = []
+  public var macros: [Macro] = []
+  public var globals: [Global] = []
+  public var dataTypes: [DataType] = []
+  public var regions: [Region] = []
 
   public static func load(from url: URL) -> Project {
     let configurationUrl: URL = url.appendingPathComponent(Filenames.configurationDir)

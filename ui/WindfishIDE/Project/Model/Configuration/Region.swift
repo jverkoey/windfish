@@ -6,26 +6,36 @@ import Windfish
 
 final class Region: NSObject {
   init(regionType: String, name: String, bank: Cartridge.Bank, address: LR35902.Address, length: LR35902.Address) {
-    self.regionType = regionType
-    self.name = name
-    self.bank = bank
-    self.address = address
-    self.length = length
+    self.storage = Windfish.Project.Region(regionType: regionType, name: name, bank: bank, address: address, length: length)
   }
 
   @objc dynamic var regionType: String {
-    didSet {
-      if regionType == Windfish.Project.Region.Kind.label || regionType == Windfish.Project.Region.Kind.function {
+    get { return storage.regionType }
+    set {
+      storage.regionType = newValue
+
+      if newValue == Windfish.Project.Region.Kind.label || newValue == Windfish.Project.Region.Kind.function {
         length = 0
       }
     }
   }
-  @objc dynamic var name: String
-  @objc dynamic var bank: Cartridge.Bank
-  @objc dynamic var address: LR35902.Address
-  @objc dynamic var length: LR35902.Address
-
-  func toWindfish() -> Windfish.Project.Region {
-    return Windfish.Project.Region(regionType: regionType, name: name, bank: bank, address: address, length: length)
+  @objc dynamic var name: String {
+    get { return storage.name }
+    set { storage.name = newValue }
   }
+  @objc dynamic var bank: Cartridge.Bank {
+    get { return storage.bank }
+    set { storage.bank = newValue }
+  }
+  @objc dynamic var address: LR35902.Address {
+    get { return storage.address }
+    set { storage.address = newValue }
+  }
+  @objc dynamic var length: LR35902.Address {
+    get { return storage.length }
+    set { storage.length = newValue }
+  }
+
+  // Internal storage.
+  private let storage: Windfish.Project.Region
 }
