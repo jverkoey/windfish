@@ -18,87 +18,10 @@ extension ProjectDocument {
 
     DispatchQueue.global(qos: .userInitiated).async { () -> Void in
       let disassembly: Disassembler = Disassembler(data: romData)
-
-      // Integrate scripts before any disassembly in order to allow the scripts to modify the disassembly runs.
-      for script: Script in self.project.configuration.scripts {
-        disassembly.mutableConfiguration.registerScript(named: script.name, source: script.source)
-      }
-
+      self.project.configuration.storage.prepare(disassembly.mutableConfiguration)
       disassembly.willStart()
-
-      for dataType: DataType in self.project.configuration.dataTypes {
-        let mappingDict: [UInt8: String] = dataType.mappings.reduce(into: [:]) { accumulator, mapping in
-          accumulator[mapping.value] = mapping.name
-        }
-        let representation: Disassembler.MutableConfiguration.Datatype.Representation
-        switch dataType.representation {
-        case Windfish.Project.DataType.Representation.binary:
-          representation = .binary
-        case Windfish.Project.DataType.Representation.decimal:
-          representation = .decimal
-        case Windfish.Project.DataType.Representation.hexadecimal:
-          representation = .hexadecimal
-        default:
-          preconditionFailure()
-        }
-        switch dataType.interpretation {
-        case Windfish.Project.DataType.Interpretation.any:
-          disassembly.mutableConfiguration.registerDatatype(named: dataType.name, representation: representation)
-        case Windfish.Project.DataType.Interpretation.bitmask:
-          disassembly.mutableConfiguration.createDatatype(named: dataType.name, bitmask: mappingDict, representation: representation)
-        case Windfish.Project.DataType.Interpretation.enumerated:
-          disassembly.mutableConfiguration.createDatatype(named: dataType.name, enumeration: mappingDict, representation: representation)
-        default:
-          preconditionFailure()
-        }
-      }
-
-      for global: Global in self.project.configuration.globals {
-        disassembly.mutableConfiguration.registerGlobal(at: global.address, named: global.name, dataType: global.dataType)
-      }
-
-      for region: Region in self.project.configuration.regions {
-        let location = Cartridge.Location(address: region.address, bank: region.bank)
-        switch region.regionType {
-        case Windfish.Project.Region.Kind.region:
-          disassembly.mutableConfiguration.registerPotentialCode(at: location..<(location + region.length), named: region.name)
-
-        case Windfish.Project.Region.Kind.function:
-          disassembly.mutableConfiguration.registerFunction(startingAt: location, named: region.name)
-
-        case Windfish.Project.Region.Kind.label:
-          disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
-
-        case Windfish.Project.Region.Kind.string:
-          disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
-          let startLocation = Cartridge.Location(address: region.address, bank: region.bank)
-          disassembly.mutableConfiguration.registerText(at: startLocation..<(startLocation + region.length), lineLength: nil)
-
-        case Windfish.Project.Region.Kind.image1bpp:
-          disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
-          let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
-          disassembly.mutableConfiguration.registerData(at: startLocation..<(startLocation + region.length), format: .image1bpp)
-
-        case Windfish.Project.Region.Kind.image2bpp:
-          disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
-          let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
-          disassembly.mutableConfiguration.registerData(at: startLocation..<(startLocation + region.length), format: .image2bpp)
-
-        case Windfish.Project.Region.Kind.data:
-          disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
-          let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
-          disassembly.mutableConfiguration.registerData(at: startLocation..<(startLocation + region.length))
-
-        default:
-          break
-        }
-      }
-
+      self.project.configuration.storage.apply(to: disassembly.mutableConfiguration)
       disassembly.disassemble()
-
-      for macro: Macro in self.project.configuration.macros {
-        disassembly.mutableConfiguration.registerMacro(named: macro.name, template: macro.source)
-      }
 
       let (disassembledSource, statistics) = try! disassembly.generateSource()
 

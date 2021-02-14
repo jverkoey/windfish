@@ -19,5 +19,5 @@ class ProjectConfiguration: NSObject {
     didSet { storage.scripts = scripts.map { $0.storage } }
   }
 
-  var storage: Windfish.Project = Windfish.Project()
+  var storage: Windfish.Project = Windfish.Project(rom: nil)
 }

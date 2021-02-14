@@ -4,7 +4,7 @@ import Tracing
 
 /** A representation of a Windfish project that can be saved to and loaded from disk. */
 public final class Project: CustomStringConvertible {
-  public init(rom: Data, scripts: [Project.Script] = [], macros: [Macro] = [], globals: [Global] = [], dataTypes: [DataType] = [], regions: [Region] = []) {
+  public init(rom: Data?, scripts: [Project.Script] = [], macros: [Macro] = [], globals: [Global] = [], dataTypes: [DataType] = [], regions: [Region] = []) {
     self.rom = rom
     self.scripts = scripts
     self.macros = macros
@@ -37,7 +37,7 @@ Regions: \(regions.map { $0.name }.joined(separator: ", "))
 """
   }
 
-  public var rom: Data
+  public var rom: Data?
   public var scripts: [Script] = []
   public var macros: [Macro] = []
   public var globals: [Global] = []
@@ -117,7 +117,7 @@ Regions: \(regions.map { $0.name }.joined(separator: ", "))
     try fm.createDirectory(at: scriptsUrl, withIntermediateDirectories: true, attributes: nil)
     try fm.createDirectory(at: macrosUrl, withIntermediateDirectories: true, attributes: nil)
 
-    try rom.write(to: url.appendingPathComponent(Filenames.rom))
+    try rom?.write(to: url.appendingPathComponent(Filenames.rom))
     try gitignoreAsData().write(to: url.appendingPathComponent(Filenames.gitignore))
 
     try scriptsAsData().forEach { (key: String, value: Data) in
