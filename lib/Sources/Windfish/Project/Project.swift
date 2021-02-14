@@ -102,16 +102,23 @@ Regions: \(regions.map { $0.name }.joined(separator: ", "))
   }
 
   /** Returns true if the save succeeded, false if it failed. */
-  public func save(to url: URL) throws -> Bool {
+  public func save(to url: URL) throws {
     let configurationUrl: URL = url.appendingPathComponent(Filenames.configurationDir)
     let scriptsUrl: URL = configurationUrl.appendingPathComponent(Filenames.scriptsDir)
     let macrosUrl: URL = configurationUrl.appendingPathComponent(Filenames.macrosDir)
     let fm: FileManager = FileManager.default
     try fm.createDirectory(at: configurationUrl, withIntermediateDirectories: true, attributes: nil)
-    try fm.removeItem(at: scriptsUrl)
-    try fm.removeItem(at: macrosUrl)
+    if fm.fileExists(atPath: scriptsUrl.path) {
+      try fm.removeItem(at: scriptsUrl)
+    }
+    if fm.fileExists(atPath: macrosUrl.path) {
+      try fm.removeItem(at: macrosUrl)
+    }
     try fm.createDirectory(at: scriptsUrl, withIntermediateDirectories: true, attributes: nil)
     try fm.createDirectory(at: macrosUrl, withIntermediateDirectories: true, attributes: nil)
+
+    try rom.write(to: url.appendingPathComponent(Filenames.rom))
+    try gitignoreAsData().write(to: url.appendingPathComponent(Filenames.gitignore))
 
     try scriptsAsData().forEach { (key: String, value: Data) in
       try value.write(to: scriptsUrl.appendingPathComponent(key))
@@ -122,8 +129,16 @@ Regions: \(regions.map { $0.name }.joined(separator: ", "))
     try globalsAsData().write(to: configurationUrl.appendingPathComponent(Filenames.globals))
     try dataTypesAsData().write(to: configurationUrl.appendingPathComponent(Filenames.dataTypes))
     try regionsAsData().write(to: configurationUrl.appendingPathComponent(Filenames.regions))
+  }
 
-    return true
+  public func gitignoreAsData() -> Data {
+    return """
+rom.gb
+disassembly/game.gb
+disassembly/game.map
+disassembly/game.o
+disassembly/game.sym
+""".data(using: .utf8)!
   }
 
   public func prepare(_ configuration: Disassembler.MutableConfiguration) {

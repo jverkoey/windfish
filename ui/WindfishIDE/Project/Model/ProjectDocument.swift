@@ -343,13 +343,7 @@ extension ProjectDocument {
     }
 
     if fileWrappers[Windfish.Project.Filenames.gitignore] == nil {
-      let fileWrapper = FileWrapper(regularFileWithContents: """
-rom.gb
-disassembly/game.gb
-disassembly/game.map
-disassembly/game.o
-disassembly/game.sym
-""".data(using: .utf8)!)
+      let fileWrapper = FileWrapper(regularFileWithContents: project.configuration.storage.gitignoreAsData())
       fileWrapper.preferredFilename = Windfish.Project.Filenames.gitignore
       documentFileWrapper.addFileWrapper(fileWrapper)
     }
