@@ -1,6 +1,7 @@
 import Foundation
 
 import LR35902
+import RGBDS
 import Tracing
 
 extension Project {
@@ -70,6 +71,16 @@ extension Project {
                             length: LR35902.Address(length)!))
     }
     return regions
+  }
+
+  func saveRegions(to url: URL) throws {
+    try regions
+      .sorted(by: { $0.bank < $1.bank && $0.address < $1.address })
+      .map { (region: Region) -> String in
+        "\(region.name): ; [\(region.regionType)] \(RGBDS.asHexString(region.bank)):\(RGBDS.asHexString(region.address)) [\(region.length)]"
+      }
+      .joined(separator: "\n\n")
+      .write(to: url, atomically: true, encoding: .utf8)
   }
 
   func applyRegions(to configuration: Disassembler.MutableConfiguration) {
