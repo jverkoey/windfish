@@ -18,11 +18,10 @@ extension Project {
     return Macro(name: name, source: source)
   }
 
-  func saveMacros(to url: URL) throws {
-    for macro: Macro in macros {
-      let macroUrl: URL = url.appendingPathComponent(macro.name).appendingPathExtension("asm")
-      try macro.source.write(to: macroUrl, atomically: true, encoding: .utf8)
-    }
+  public func macrosAsData() -> [String: Data] {
+    return macros.reduce(into: [:], { (accumulator, macro) in
+      accumulator["\(macro.name).asm"] = macro.source.data(using: .utf8)
+    })
   }
 
   func applyMacros(to configuration: Disassembler.MutableConfiguration) {

@@ -339,9 +339,8 @@ extension ProjectDocument {
       let configuration = FileWrapper(directoryWithFileWrappers: [
         Filenames.scriptsDir: FileWrapper(directoryWithFileWrappers: project.configuration.storage.scriptsAsData()
                                             .mapValues { FileWrapper(regularFileWithContents: $0) }),
-        Filenames.macrosDir: FileWrapper(directoryWithFileWrappers: project.configuration.macros.reduce(into: [:]) { accumulator, macro in
-          accumulator[macro.name + ".asm"] = FileWrapper(regularFileWithContents: macro.source.data(using: .utf8)!)
-        }),
+        Filenames.macrosDir: FileWrapper(directoryWithFileWrappers: project.configuration.storage.macrosAsData()
+                                            .mapValues { FileWrapper(regularFileWithContents: $0) }),
         Filenames.globals: FileWrapper(regularFileWithContents: project.configuration.storage.globalsAsData()),
         Filenames.dataTypes: FileWrapper(regularFileWithContents: project.configuration.storage.dataTypesAsData()),
         Filenames.regions: FileWrapper(regularFileWithContents: project.configuration.storage.regionsAsData()),

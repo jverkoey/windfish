@@ -112,7 +112,9 @@ Regions: \(regions.map { $0.name }.joined(separator: ", "))
     try scriptsAsData().forEach { (key: String, value: Data) in
       try value.write(to: scriptsUrl.appendingPathComponent(key))
     }
-    try saveMacros(to: macrosUrl)
+    try macrosAsData().forEach { (key: String, value: Data) in
+      try value.write(to: macrosUrl.appendingPathComponent(key))
+    }
     try globalsAsData().write(to: configurationUrl.appendingPathComponent(Filenames.globals))
     try dataTypesAsData().write(to: configurationUrl.appendingPathComponent(Filenames.dataTypes))
     try regionsAsData().write(to: configurationUrl.appendingPathComponent(Filenames.regions))
