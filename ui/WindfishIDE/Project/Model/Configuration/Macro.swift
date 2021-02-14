@@ -3,8 +3,13 @@ import Foundation
 import Windfish
 
 final class Macro: NSObject {
-  internal init(name: String, source: String) {
-    self.storage = Windfish.Project.Macro(name: name, source: source)
+  typealias Storage = Windfish.Project.Macro
+
+  init(storage: Storage) {
+    self.storage = storage
+  }
+  init(name: String, source: String) {
+    self.storage = Storage(name: name, source: source)
   }
 
   @objc dynamic var name: String {
@@ -17,5 +22,5 @@ final class Macro: NSObject {
   }
 
   // Internal storage.
-  let storage: Windfish.Project.Macro
+  let storage: Storage
 }

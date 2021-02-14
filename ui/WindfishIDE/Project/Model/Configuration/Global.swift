@@ -4,11 +4,13 @@ import LR35902
 import Windfish
 
 final class Global: NSObject {
-  init(storage: Windfish.Project.Global) {
+  typealias Storage = Windfish.Project.Global
+
+  init(storage: Storage) {
     self.storage = storage
   }
   init(name: String, address: LR35902.Address, dataType: String) {
-    self.storage = Windfish.Project.Global(name: name, address: address, dataType: dataType)
+    self.storage = Storage(name: name, address: address, dataType: dataType)
   }
 
   @objc dynamic var name: String {
@@ -25,5 +27,5 @@ final class Global: NSObject {
   }
 
   // Internal storage.
-  let storage: Windfish.Project.Global
+  let storage: Storage
 }

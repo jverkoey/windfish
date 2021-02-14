@@ -43,9 +43,23 @@ Regions: \(regions.map { $0.name }.joined(separator: ", "))
   public var regions: [Region] = []
 
   public static func load(from url: URL) -> Project {
+    let fm = FileManager.default
+
     let configurationUrl: URL = url.appendingPathComponent(Filenames.configurationDir)
+    let macrosUrl: URL = configurationUrl.appendingPathComponent(Filenames.macrosDir)
     let scripts: [Script] = loadScripts(from: configurationUrl.appendingPathComponent(Filenames.scriptsDir))
-    let macros: [Macro] = loadMacros(from: configurationUrl.appendingPathComponent(Filenames.macrosDir))
+
+    let macros: [Macro]
+    if let filenames = try? fm.contentsOfDirectory(atPath: macrosUrl.path) {
+      macros = filenames.compactMap { (filename: String) -> Macro? in
+        guard let data: Data = try? Data(contentsOf: macrosUrl.appendingPathComponent(filename)) else {
+          return nil
+        }
+        return loadMacro(from: data, with: URL(fileURLWithPath: filename).deletingPathExtension().lastPathComponent)
+      }
+    } else {
+      macros = []
+    }
 
     let globals: [Global]
     if let data = try? Data(contentsOf: configurationUrl.appendingPathComponent(Filenames.globals)) {

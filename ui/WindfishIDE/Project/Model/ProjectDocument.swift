@@ -276,8 +276,11 @@ extension ProjectDocument {
       }
       if let macros = configuration.fileWrappers?[Filenames.macrosDir],
          let files = macros.fileWrappers?.mapValues({ $0.regularFileContents! }) {
-        self.project.configuration.macros = files.map({ key, value in
-          Macro(name: NSString(string: key).deletingPathExtension, source: String(data: value, encoding: .utf8)!)
+        self.project.configuration.macros = files.compactMap({ (key: String, value: Data) -> Macro? in
+          guard let storage = Windfish.Project.loadMacro(from: value, with: NSString(string: key).deletingPathExtension) else {
+            return nil
+          }
+          return Macro(storage: storage)
         })
       }
       if let content: Data = configuration.fileWrappers?[Filenames.globals]?.regularFileContents {

@@ -11,14 +11,11 @@ extension Project {
     public var source: String
   }
 
-  static func loadMacros(from url: URL) -> [Macro] {
-    let fm = FileManager.default
-    return ((try? fm.contentsOfDirectory(atPath: url.path)) ?? []).compactMap { (filename: String) -> Macro? in
-      guard let source: String = try? String(contentsOf: url.appendingPathComponent(filename), encoding: .utf8) else {
-        return nil
-      }
-      return Macro(name: URL(fileURLWithPath: filename).deletingPathExtension().lastPathComponent, source: source)
+  static public func loadMacro(from data: Data, with name: String) -> Macro? {
+    guard let source = String(data: data, encoding: .utf8) else {
+      return nil
     }
+    return Macro(name: name, source: source)
   }
 
   func saveMacros(to url: URL) throws {

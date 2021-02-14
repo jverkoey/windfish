@@ -3,25 +3,27 @@ import Foundation
 import Windfish
 
 final class DataType: NSObject {
-  init(storage: Windfish.Project.DataType) {
+  typealias Storage = Windfish.Project.DataType
+
+  init(storage: Storage) {
     self.storage = storage
     self.mappings = storage.mappings.map { Mapping(storage: $0) }
   }
 
   init(name: String, representation: String, interpretation: String, mappings: [Mapping]) {
-    self.storage = Windfish.Project.DataType(name: name, representation: representation, interpretation: interpretation, mappings: mappings.map {
+    self.storage = Storage(name: name, representation: representation, interpretation: interpretation, mappings: mappings.map {
       return $0.storage
     })
     self.mappings = mappings
   }
 
   final class Mapping: NSObject, Codable {
-    init(storage: Windfish.Project.DataType.Mapping) {
+    init(storage: Storage.Mapping) {
       self.storage = storage
     }
 
     init(name: String, value: UInt8) {
-      self.storage = Windfish.Project.DataType.Mapping(name: name, value: value)
+      self.storage = Storage.Mapping(name: name, value: value)
     }
 
     @objc dynamic var name: String {
@@ -34,7 +36,7 @@ final class DataType: NSObject {
     }
 
     // Internal storage.
-    fileprivate let storage: Windfish.Project.DataType.Mapping
+    fileprivate let storage: Storage.Mapping
   }
 
   @objc dynamic var name: String {
@@ -54,5 +56,5 @@ final class DataType: NSObject {
   }
 
   // Internal storage.
-  let storage: Windfish.Project.DataType
+  let storage: Storage
 }
