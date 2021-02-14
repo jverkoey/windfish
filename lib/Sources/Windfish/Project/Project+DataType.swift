@@ -92,8 +92,8 @@ extension Project {
     return dataTypes
   }
 
-  func saveDataTypes(to url: URL) throws {
-    try dataTypes
+  public func dataTypesAsData() -> Data {
+    return dataTypes
       .sorted(by: { $0.name < $1.name })
       .map { (dataType: DataType) -> String in
         (["; \(dataType.name) [\(dataType.interpretation)] [\(dataType.representation)]"]
@@ -111,7 +111,7 @@ extension Project {
           }).joined(separator: "\n")
       }
       .joined(separator: "\n\n")
-      .write(to: url, atomically: true, encoding: .utf8)
+      .data(using: .utf8) ?? Data()
   }
 
   func applyDataTypes(to configuration: Disassembler.MutableConfiguration) {

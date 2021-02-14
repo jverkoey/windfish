@@ -348,23 +348,7 @@ extension ProjectDocument {
                                         .map { (global: Global) -> String in
                                           "\(global.name) EQU $\(global.address.hexString) ; [\(global.dataType)]"
                                         }.joined(separator: "\n\n").data(using: .utf8)!),
-        Filenames.dataTypes: FileWrapper(regularFileWithContents: project.configuration.dataTypes
-                                          .sorted(by: { $0.name < $1.name })
-                                          .map { (dataType: DataType) -> String in
-                                            (["; \(dataType.name) [\(dataType.interpretation)] [\(dataType.representation)]"]
-                                              + dataType.mappings.map { (mapping: DataType.Mapping) -> String in
-                                                switch dataType.representation {
-                                                case Windfish.Project.DataType.Representation.binary:
-                                                  return "\(mapping.name) EQU \(RGBDS.NumericPrefix.binary)\(mapping.value.binaryString)"
-                                                case Windfish.Project.DataType.Representation.hexadecimal:
-                                                  return "\(mapping.name) EQU \(RGBDS.NumericPrefix.hexadecimal)\(mapping.value.hexString)"
-                                                case Windfish.Project.DataType.Representation.decimal:
-                                                  return "\(mapping.name) EQU \(mapping.value)"
-                                                default:
-                                                  fatalError()
-                                                }
-                                              }).joined(separator: "\n")
-                                          }.joined(separator: "\n\n").data(using: .utf8)!),
+        Filenames.dataTypes: FileWrapper(regularFileWithContents: project.configuration.storage.dataTypesAsData()),
         Filenames.regions: FileWrapper(regularFileWithContents: project.configuration.regions
                                         .sorted(by: { $0.bank < $1.bank && $0.address < $1.address })
                                         .map { (region: Region) -> String in
