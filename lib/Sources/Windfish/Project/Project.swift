@@ -2,19 +2,6 @@ import Foundation
 
 import Tracing
 
-private struct Filenames {
-  static let metadata = "metadata.plist"
-  static let gitignore = ".gitignore"
-  static let rom = "rom.gb"
-  static let disassembly = "disassembly"
-  static let configurationDir = "configuration"
-  static let scriptsDir = "scripts"
-  static let macrosDir = "macros"
-  static let globals = "globals.asm"
-  static let dataTypes = "datatypes.asm"
-  static let regions = "regions.asm"
-}
-
 /** A representation of a Windfish project that can be saved to and loaded from disk. */
 public final class Project: CustomStringConvertible {
   public init(scripts: [Project.Script] = [], macros: [Macro] = [], globals: [Global] = [], dataTypes: [DataType] = [], regions: [Region] = []) {
@@ -23,6 +10,19 @@ public final class Project: CustomStringConvertible {
     self.globals = globals
     self.dataTypes = dataTypes
     self.regions = regions
+  }
+
+  public struct Filenames {
+    public static let metadata = "metadata.plist"
+    public static let gitignore = ".gitignore"
+    public static let rom = "rom.gb"
+    public static let disassembly = "disassembly"
+    public static let configurationDir = "configuration"
+    public static let scriptsDir = "scripts"
+    public static let macrosDir = "macros"
+    public static let globals = "globals.asm"
+    public static let dataTypes = "datatypes.asm"
+    public static let regions = "regions.asm"
   }
 
   public var description: String {

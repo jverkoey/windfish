@@ -240,26 +240,13 @@ extension ProjectDocument {
 
 // MARK: - Document loading and saving
 
-private struct Filenames {
-  static let metadata = "metadata.plist"
-  static let gitignore = ".gitignore"
-  static let rom = "rom.gb"
-  static let disassembly = "disassembly"
-  static let configurationDir = "configuration"
-  static let scriptsDir = "scripts"
-  static let macrosDir = "macros"
-  static let globals = "globals.asm"
-  static let dataTypes = "datatypes.asm"
-  static let regions = "regions.asm"
-}
-
 extension ProjectDocument {
   override func read(from fileWrapper: FileWrapper, ofType typeName: String) throws {
     guard let fileWrappers = fileWrapper.fileWrappers else {
       preconditionFailure()
     }
 
-    if let metadataFileWrapper = fileWrappers[Filenames.metadata],
+    if let metadataFileWrapper = fileWrappers[Windfish.Project.Filenames.metadata],
        let encodedMetadata = metadataFileWrapper.regularFileContents {
       let decoder = PropertyListDecoder()
       let metadata = try decoder.decode(ProjectMetadata.self, from: encodedMetadata)
@@ -267,8 +254,8 @@ extension ProjectDocument {
     }
 
     // Configuration as human-editable files
-    if let configuration = fileWrappers[Filenames.configurationDir] {
-      if let scripts = configuration.fileWrappers?[Filenames.scriptsDir],
+    if let configuration = fileWrappers[Windfish.Project.Filenames.configurationDir] {
+      if let scripts = configuration.fileWrappers?[Windfish.Project.Filenames.scriptsDir],
          let files = scripts.fileWrappers?.mapValues({ $0.regularFileContents! }) {
         self.project.configuration.scripts = files.compactMap({ (key: String, value: Data) -> Script? in
           guard let storage = Windfish.Project.loadScript(from: value, with: NSString(string: key).deletingPathExtension) else {
@@ -277,7 +264,7 @@ extension ProjectDocument {
           return Script(storage: storage)
         })
       }
-      if let macros = configuration.fileWrappers?[Filenames.macrosDir],
+      if let macros = configuration.fileWrappers?[Windfish.Project.Filenames.macrosDir],
          let files = macros.fileWrappers?.mapValues({ $0.regularFileContents! }) {
         self.project.configuration.macros = files.compactMap({ (key: String, value: Data) -> Macro? in
           guard let storage = Windfish.Project.loadMacro(from: value, with: NSString(string: key).deletingPathExtension) else {
@@ -286,23 +273,23 @@ extension ProjectDocument {
           return Macro(storage: storage)
         })
       }
-      if let content: Data = configuration.fileWrappers?[Filenames.globals]?.regularFileContents {
+      if let content: Data = configuration.fileWrappers?[Windfish.Project.Filenames.globals]?.regularFileContents {
         self.project.configuration.globals = Windfish.Project.loadGlobals(from: content).map { Global(storage: $0) }
       }
-      if let content: Data = configuration.fileWrappers?[Filenames.dataTypes]?.regularFileContents {
+      if let content: Data = configuration.fileWrappers?[Windfish.Project.Filenames.dataTypes]?.regularFileContents {
         self.project.configuration.dataTypes = Windfish.Project.loadDataTypes(from: content).map { DataType(storage: $0) }
       }
-      if let content: Data = configuration.fileWrappers?[Filenames.regions]?.regularFileContents {
+      if let content: Data = configuration.fileWrappers?[Windfish.Project.Filenames.regions]?.regularFileContents {
         self.project.configuration.regions = Windfish.Project.loadRegions(from: content).map { Region(storage: $0) }
       }
     }
 
-    if let fileWrapper = fileWrappers[Filenames.rom],
+    if let fileWrapper = fileWrappers[Windfish.Project.Filenames.rom],
        let data = fileWrapper.regularFileContents {
       self.project.romData = data
     }
 
-    if let fileWrapper = fileWrappers[Filenames.disassembly] {
+    if let fileWrapper = fileWrappers[Windfish.Project.Filenames.disassembly] {
       if let files = fileWrapper.fileWrappers?.mapValues({ $0.regularFileContents! }) {
         self.project.disassemblyResults = DisassemblyResults(files: files, bankLines: nil)
       }
@@ -322,40 +309,40 @@ extension ProjectDocument {
       preconditionFailure()
     }
 
-    if let metadataFileWrapper = fileWrappers[Filenames.metadata] {
+    if let metadataFileWrapper = fileWrappers[Windfish.Project.Filenames.metadata] {
       documentFileWrapper.removeFileWrapper(metadataFileWrapper)
     }
     let encoder = PropertyListEncoder()
     let encodedMetadata = try encoder.encode(project.metadata)
     let metadataFileWrapper = FileWrapper(regularFileWithContents: encodedMetadata)
-    metadataFileWrapper.preferredFilename = Filenames.metadata
+    metadataFileWrapper.preferredFilename = Windfish.Project.Filenames.metadata
     documentFileWrapper.addFileWrapper(metadataFileWrapper)
 
     // Configuration as human-editable files
     if true {
-      if let configuration = fileWrappers[Filenames.configurationDir] {
+      if let configuration = fileWrappers[Windfish.Project.Filenames.configurationDir] {
         documentFileWrapper.removeFileWrapper(configuration)
       }
       let configuration = FileWrapper(directoryWithFileWrappers: [
-        Filenames.scriptsDir: FileWrapper(directoryWithFileWrappers: project.configuration.storage.scriptsAsData()
+        Windfish.Project.Filenames.scriptsDir: FileWrapper(directoryWithFileWrappers: project.configuration.storage.scriptsAsData()
                                             .mapValues { FileWrapper(regularFileWithContents: $0) }),
-        Filenames.macrosDir: FileWrapper(directoryWithFileWrappers: project.configuration.storage.macrosAsData()
+        Windfish.Project.Filenames.macrosDir: FileWrapper(directoryWithFileWrappers: project.configuration.storage.macrosAsData()
                                             .mapValues { FileWrapper(regularFileWithContents: $0) }),
-        Filenames.globals: FileWrapper(regularFileWithContents: project.configuration.storage.globalsAsData()),
-        Filenames.dataTypes: FileWrapper(regularFileWithContents: project.configuration.storage.dataTypesAsData()),
-        Filenames.regions: FileWrapper(regularFileWithContents: project.configuration.storage.regionsAsData()),
+        Windfish.Project.Filenames.globals: FileWrapper(regularFileWithContents: project.configuration.storage.globalsAsData()),
+        Windfish.Project.Filenames.dataTypes: FileWrapper(regularFileWithContents: project.configuration.storage.dataTypesAsData()),
+        Windfish.Project.Filenames.regions: FileWrapper(regularFileWithContents: project.configuration.storage.regionsAsData()),
       ])
-      configuration.preferredFilename = Filenames.configurationDir
+      configuration.preferredFilename = Windfish.Project.Filenames.configurationDir
       documentFileWrapper.addFileWrapper(configuration)
     }
 
-    if let romData = project.romData, fileWrappers[Filenames.rom] == nil {
+    if let romData = project.romData, fileWrappers[Windfish.Project.Filenames.rom] == nil {
       let fileWrapper = FileWrapper(regularFileWithContents: romData)
-      fileWrapper.preferredFilename = Filenames.rom
+      fileWrapper.preferredFilename = Windfish.Project.Filenames.rom
       documentFileWrapper.addFileWrapper(fileWrapper)
     }
 
-    if fileWrappers[Filenames.gitignore] == nil {
+    if fileWrappers[Windfish.Project.Filenames.gitignore] == nil {
       let fileWrapper = FileWrapper(regularFileWithContents: """
 rom.gb
 disassembly/game.gb
@@ -363,7 +350,7 @@ disassembly/game.map
 disassembly/game.o
 disassembly/game.sym
 """.data(using: .utf8)!)
-      fileWrapper.preferredFilename = Filenames.gitignore
+      fileWrapper.preferredFilename = Windfish.Project.Filenames.gitignore
       documentFileWrapper.addFileWrapper(fileWrapper)
     }
 
@@ -372,11 +359,11 @@ disassembly/game.sym
       let wrappers = disassemblyResults.files.mapValues { content in
         FileWrapper(regularFileWithContents: content)
       }
-      if let fileWrapper = fileWrappers[Filenames.disassembly] {
+      if let fileWrapper = fileWrappers[Windfish.Project.Filenames.disassembly] {
         documentFileWrapper.removeFileWrapper(fileWrapper)
       }
       let fileWrapper = FileWrapper(directoryWithFileWrappers: wrappers)
-      fileWrapper.preferredFilename = Filenames.disassembly
+      fileWrapper.preferredFilename = Windfish.Project.Filenames.disassembly
       documentFileWrapper.addFileWrapper(fileWrapper)
     }
     return documentFileWrapper
