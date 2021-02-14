@@ -40,13 +40,13 @@ final class RegionEditorViewController: NSViewController, TabSelectable {
 
     super.init(nibName: nil, bundle: nil)
 
-    regionTypeController.addObject(Region.Kind.region)
-    regionTypeController.addObject(Region.Kind.label)
-    regionTypeController.addObject(Region.Kind.function)
-    regionTypeController.addObject(Region.Kind.string)
-    regionTypeController.addObject(Region.Kind.data)
-    regionTypeController.addObject(Region.Kind.image1bpp)
-    regionTypeController.addObject(Region.Kind.image2bpp)
+    regionTypeController.addObject(Windfish.Project.Region.Kind.region)
+    regionTypeController.addObject(Windfish.Project.Region.Kind.label)
+    regionTypeController.addObject(Windfish.Project.Region.Kind.function)
+    regionTypeController.addObject(Windfish.Project.Region.Kind.string)
+    regionTypeController.addObject(Windfish.Project.Region.Kind.data)
+    regionTypeController.addObject(Windfish.Project.Region.Kind.image1bpp)
+    regionTypeController.addObject(Windfish.Project.Region.Kind.image2bpp)
   }
 
   required init?(coder: NSCoder) {
@@ -131,7 +131,7 @@ final class RegionEditorViewController: NSViewController, TabSelectable {
 extension RegionEditorViewController: EditorTableViewDelegate {
   func editorTableViewCreateElement(_ tableView: EditorTableView) -> String {
     project.configuration.regions.append(
-      Region(regionType: Region.Kind.label, name: "New region", bank: 0, address: 0, length: 0)
+      Region(regionType: Windfish.Project.Region.Kind.label, name: "New region", bank: 0, address: 0, length: 0)
     )
     return "Create Region"
   }

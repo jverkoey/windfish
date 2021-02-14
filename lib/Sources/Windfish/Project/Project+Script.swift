@@ -1,14 +1,14 @@
 import Foundation
 
 extension Project {
-  final class Script: NSObject {
-    init(name: String, source: String) {
+  public final class Script: NSObject {
+    public init(name: String, source: String) {
       self.name = name
       self.source = source
     }
 
-    var name: String
-    var source: String
+    public var name: String
+    public var source: String
   }
 
   static func loadScripts(from url: URL) -> [Script] {

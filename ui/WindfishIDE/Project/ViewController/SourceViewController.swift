@@ -345,7 +345,7 @@ extension SourceViewController: SourceViewDelegate {
       region.name = name
     } else {
       project.configuration.regions.append(Region(
-        regionType: Region.Kind.label,
+        regionType: Windfish.Project.Region.Kind.label,
         name: name,
         bank: lineBank,
         address: lineAddress,

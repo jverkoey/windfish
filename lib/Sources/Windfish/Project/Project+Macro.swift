@@ -1,14 +1,14 @@
 import Foundation
 
 extension Project {
-  final class Macro: NSObject {
-    init(name: String, source: String) {
+  public final class Macro: NSObject {
+    public init(name: String, source: String) {
       self.name = name
       self.source = source
     }
 
-    var name: String
-    var source: String
+    public var name: String
+    public var source: String
   }
 
   static func loadMacros(from url: URL) -> [Macro] {

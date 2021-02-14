@@ -24,9 +24,9 @@ final class RegionInspectorViewController: NSViewController, TabSelectable {
 
     super.init(nibName: nil, bundle: nil)
 
-    regionTypeController.addObject(Region.Kind.region)
-    regionTypeController.addObject(Region.Kind.label)
-    regionTypeController.addObject(Region.Kind.function)
+    regionTypeController.addObject(Windfish.Project.Region.Kind.region)
+    regionTypeController.addObject(Windfish.Project.Region.Kind.label)
+    regionTypeController.addObject(Windfish.Project.Region.Kind.function)
   }
 
   required init?(coder: NSCoder) {

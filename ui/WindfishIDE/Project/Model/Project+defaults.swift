@@ -9,23 +9,23 @@ extension Project {
     let restartSize: LR35902.Address = 8
     let rstAddresses = (0..<numberOfRestartAddresses).map { ($0 * restartSize)..<($0 * restartSize + restartSize) }
     rstAddresses.forEach {
-      configuration.regions.append(Region(regionType: Region.Kind.region, name: "RST_\($0.lowerBound.hexString)", bank: 0, address: $0.lowerBound, length: LR35902.Address($0.count)))
+      configuration.regions.append(Region(regionType: Windfish.Project.Region.Kind.region, name: "RST_\($0.lowerBound.hexString)", bank: 0, address: $0.lowerBound, length: LR35902.Address($0.count)))
     }
 
     configuration.regions.append(contentsOf: [
-      Region(regionType: Region.Kind.region, name: "VBlankInterrupt", bank: 0, address: 0x0040, length: 8),
-      Region(regionType: Region.Kind.region, name: "LCDCInterrupt", bank: 0, address: 0x0048, length: 8),
-      Region(regionType: Region.Kind.region, name: "TimerOverflowInterrupt", bank: 0, address: 0x0050, length: 8),
-      Region(regionType: Region.Kind.region, name: "SerialTransferCompleteInterrupt", bank: 0, address: 0x0058, length: 8),
-      Region(regionType: Region.Kind.region, name: "JoypadTransitionInterrupt", bank: 0, address: 0x0060, length: 8),
-      Region(regionType: Region.Kind.region, name: "Boot", bank: 0, address: 0x0100, length: 4),
-      Region(regionType: Region.Kind.image1bpp, name: "HeaderLogo", bank: 0, address: 0x0104, length: 0x0134 - 0x0104),
-      Region(regionType: Region.Kind.string, name: "HeaderTitle", bank: 0, address: 0x0134, length: 0x0143 - 0x0134),
-      Region(regionType: Region.Kind.label, name: "HeaderNewLicenseeCode", bank: 0, address: 0x0144, length: 0),
-      Region(regionType: Region.Kind.label, name: "HeaderOldLicenseeCode", bank: 0, address: 0x014B, length: 0),
-      Region(regionType: Region.Kind.label, name: "HeaderMaskROMVersion", bank: 0, address: 0x014C, length: 0),
-      Region(regionType: Region.Kind.label, name: "HeaderComplementCheck", bank: 0, address: 0x014D, length: 0),
-      Region(regionType: Region.Kind.label, name: "HeaderGlobalChecksum", bank: 0, address: 0x014E, length: 0),
+      Region(regionType: Windfish.Project.Region.Kind.region, name: "VBlankInterrupt", bank: 0, address: 0x0040, length: 8),
+      Region(regionType: Windfish.Project.Region.Kind.region, name: "LCDCInterrupt", bank: 0, address: 0x0048, length: 8),
+      Region(regionType: Windfish.Project.Region.Kind.region, name: "TimerOverflowInterrupt", bank: 0, address: 0x0050, length: 8),
+      Region(regionType: Windfish.Project.Region.Kind.region, name: "SerialTransferCompleteInterrupt", bank: 0, address: 0x0058, length: 8),
+      Region(regionType: Windfish.Project.Region.Kind.region, name: "JoypadTransitionInterrupt", bank: 0, address: 0x0060, length: 8),
+      Region(regionType: Windfish.Project.Region.Kind.region, name: "Boot", bank: 0, address: 0x0100, length: 4),
+      Region(regionType: Windfish.Project.Region.Kind.image1bpp, name: "HeaderLogo", bank: 0, address: 0x0104, length: 0x0134 - 0x0104),
+      Region(regionType: Windfish.Project.Region.Kind.string, name: "HeaderTitle", bank: 0, address: 0x0134, length: 0x0143 - 0x0134),
+      Region(regionType: Windfish.Project.Region.Kind.label, name: "HeaderNewLicenseeCode", bank: 0, address: 0x0144, length: 0),
+      Region(regionType: Windfish.Project.Region.Kind.label, name: "HeaderOldLicenseeCode", bank: 0, address: 0x014B, length: 0),
+      Region(regionType: Windfish.Project.Region.Kind.label, name: "HeaderMaskROMVersion", bank: 0, address: 0x014C, length: 0),
+      Region(regionType: Windfish.Project.Region.Kind.label, name: "HeaderComplementCheck", bank: 0, address: 0x014D, length: 0),
+      Region(regionType: Windfish.Project.Region.Kind.label, name: "HeaderGlobalChecksum", bank: 0, address: 0x014E, length: 0),
     ])
 
     configuration.dataTypes.append(DataType(name: "hex",

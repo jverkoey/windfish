@@ -45,7 +45,7 @@ extension ProjectDocument {
             $0.bank == bank && $0.address == address
           }
           self.project.configuration.regions.append(Region(
-            regionType: Region.Kind.label,
+            regionType: Windfish.Project.Region.Kind.label,
             name: String(labelName),
             bank: bank,
             address: address,

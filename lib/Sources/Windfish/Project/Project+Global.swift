@@ -4,16 +4,16 @@ import LR35902
 import RGBDS
 
 extension Project {
-  final class Global: NSObject {
-    init(name: String, address: LR35902.Address, dataType: String) {
+  public final class Global: NSObject {
+    public init(name: String, address: LR35902.Address, dataType: String) {
       self.name = name
       self.address = address
       self.dataType = dataType
     }
 
-    var name: String
-    var address: LR35902.Address
-    var dataType: String
+    public var name: String
+    public var address: LR35902.Address
+    public var dataType: String
   }
 
   static func loadGlobals(from url: URL) -> [Global] {

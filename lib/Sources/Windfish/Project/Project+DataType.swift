@@ -3,39 +3,39 @@ import Foundation
 import RGBDS
 
 extension Project {
-  final class DataType: NSObject {
-    init(name: String, representation: String, interpretation: String, mappings: [Mapping]) {
+  public final class DataType: NSObject {
+    public init(name: String, representation: String, interpretation: String, mappings: [Mapping]) {
       self.name = name
       self.representation = representation
       self.interpretation = interpretation
       self.mappings = mappings
     }
 
-    struct Interpretation {
-      static let any = "Any"
-      static let enumerated = "Enumerated"
-      static let bitmask = "Bitmask"
+    public struct Interpretation {
+      public static let any = "Any"
+      public static let enumerated = "Enumerated"
+      public static let bitmask = "Bitmask"
     }
-    struct Representation {
-      static let decimal = "Decimal"
-      static let hexadecimal = "Hex"
-      static let binary = "Binary"
+    public struct Representation {
+      public static let decimal = "Decimal"
+      public static let hexadecimal = "Hex"
+      public static let binary = "Binary"
     }
 
-    final class Mapping: NSObject, Codable {
-      init(name: String, value: UInt8) {
+    public final class Mapping: NSObject, Codable {
+      public init(name: String, value: UInt8) {
         self.name = name
         self.value = value
       }
 
-      var name: String
-      var value: UInt8
+      public var name: String
+      public var value: UInt8
     }
 
-    var name: String
-    var representation: String
-    var interpretation: String
-    var mappings: [Mapping]
+    public var name: String
+    public var representation: String
+    public var interpretation: String
+    public var mappings: [Mapping]
   }
 
 

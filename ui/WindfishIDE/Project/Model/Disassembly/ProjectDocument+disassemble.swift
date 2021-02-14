@@ -60,31 +60,31 @@ extension ProjectDocument {
       for region: Region in self.project.configuration.regions {
         let location = Cartridge.Location(address: region.address, bank: region.bank)
         switch region.regionType {
-        case Region.Kind.region:
+        case Windfish.Project.Region.Kind.region:
           disassembly.mutableConfiguration.registerPotentialCode(at: location..<(location + region.length), named: region.name)
 
-        case Region.Kind.function:
+        case Windfish.Project.Region.Kind.function:
           disassembly.mutableConfiguration.registerFunction(startingAt: location, named: region.name)
 
-        case Region.Kind.label:
+        case Windfish.Project.Region.Kind.label:
           disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
 
-        case Region.Kind.string:
+        case Windfish.Project.Region.Kind.string:
           disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
           let startLocation = Cartridge.Location(address: region.address, bank: region.bank)
           disassembly.mutableConfiguration.registerText(at: startLocation..<(startLocation + region.length), lineLength: nil)
 
-        case Region.Kind.image1bpp:
+        case Windfish.Project.Region.Kind.image1bpp:
           disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
           let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
           disassembly.mutableConfiguration.registerData(at: startLocation..<(startLocation + region.length), format: .image1bpp)
 
-        case Region.Kind.image2bpp:
+        case Windfish.Project.Region.Kind.image2bpp:
           disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
           let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
           disassembly.mutableConfiguration.registerData(at: startLocation..<(startLocation + region.length), format: .image2bpp)
 
-        case Region.Kind.data:
+        case Windfish.Project.Region.Kind.data:
           disassembly.mutableConfiguration.registerLabel(at: location, named: region.name)
           let startLocation = Cartridge.Location(address: region.address, bank: location.bank)
           disassembly.mutableConfiguration.registerData(at: startLocation..<(startLocation + region.length))
@@ -126,7 +126,7 @@ extension ProjectDocument {
           case let .label(name): fallthrough
           case let .transferOfControl(_, name):
             let region = Region(
-              regionType: Region.Kind.label,
+              regionType: Windfish.Project.Region.Kind.label,
               name: name,
               bank: bank,
               address: line.address!,
