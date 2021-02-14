@@ -292,40 +292,8 @@ extension ProjectDocument {
       if let content: Data = configuration.fileWrappers?[Filenames.dataTypes]?.regularFileContents {
         self.project.configuration.dataTypes = Windfish.Project.loadDataTypes(from: content).map { DataType(storage: $0) }
       }
-      if let regions = configuration.fileWrappers?[Filenames.regions],
-         let content = regions.regularFileContents {
-        let regionsText = String(data: content, encoding: .utf8)!
-        var regions: [Region] = []
-        regionsText.enumerateLines { line, _ in
-          if line.isEmpty {
-            return
-          }
-          let codeAndComments = line.split(separator: ";", maxSplits: 1, omittingEmptySubsequences: false)
-          let code = codeAndComments[0].trimmed()
-          if !code.hasSuffix(":") {
-            return
-          }
-          let name = String(code.dropLast())
-          let comments = codeAndComments[1].trimmed()
-          let scanner = Scanner(string: comments)
-          _ = scanner.scanUpToString("[")
-          _ = scanner.scanString("[")
-          let regionType = scanner.scanUpToString("]")!.trimmed()
-          _ = scanner.scanUpToString("$")
-          _ = scanner.scanString("$")
-          let bank = scanner.scanUpToString(":")!.trimmed()
-          _ = scanner.scanUpToString("$")
-          _ = scanner.scanString("$")
-          let address = scanner.scanUpToString("[")!.trimmed()
-          _ = scanner.scanString("[")
-          let length = scanner.scanUpToString("]")!.trimmed()
-          regions.append(Region(regionType: regionType,
-                                name: name,
-                                bank: Cartridge.Bank(bank, radix: 16)!,
-                                address: LR35902.Address(address, radix: 16)!,
-                                length: LR35902.Address(length)!))
-        }
-        self.project.configuration.regions = regions
+      if let content: Data = configuration.fileWrappers?[Filenames.regions]?.regularFileContents {
+        self.project.configuration.regions = Windfish.Project.loadRegions(from: content).map { Region(storage: $0) }
       }
     }
 

@@ -28,11 +28,10 @@ extension Project {
     public var bank: Cartridge.Bank
     public var address: LR35902.Address
     public var length: LR35902.Address
-
   }
 
-  static func loadRegions(from url: URL) -> [Region] {
-    guard let regionsText = try? String(contentsOf: url, encoding: .utf8) else {
+  static public func loadRegions(from data: Data) -> [Region] {
+    guard let regionsText = String(data: data, encoding: .utf8) else {
       return []
     }
     var regions: [Region] = []

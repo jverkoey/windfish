@@ -5,8 +5,13 @@ import Tracing
 import Windfish
 
 final class Region: NSObject {
+  typealias Storage = Windfish.Project.Region
+
+  init(storage: Storage) {
+    self.storage = storage
+  }
   init(regionType: String, name: String, bank: Cartridge.Bank, address: LR35902.Address, length: LR35902.Address) {
-    self.storage = Windfish.Project.Region(regionType: regionType, name: name, bank: bank, address: address, length: length)
+    self.storage = Storage(regionType: regionType, name: name, bank: bank, address: address, length: length)
   }
 
   @objc dynamic var regionType: String {
@@ -14,7 +19,7 @@ final class Region: NSObject {
     set {
       storage.regionType = newValue
 
-      if newValue == Windfish.Project.Region.Kind.label || newValue == Windfish.Project.Region.Kind.function {
+      if newValue == Storage.Kind.label || newValue == Storage.Kind.function {
         length = 0
       }
     }
@@ -37,5 +42,5 @@ final class Region: NSObject {
   }
 
   // Internal storage.
-  let storage: Windfish.Project.Region
+  let storage: Storage
 }

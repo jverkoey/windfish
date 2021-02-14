@@ -87,7 +87,13 @@ Regions: \(regions.map { $0.name }.joined(separator: ", "))
       dataTypes = []
     }
 
-    let regions: [Region] = loadRegions(from: configurationUrl.appendingPathComponent(Filenames.regions))
+    let regions: [Region]
+    if let data = try? Data(contentsOf: configurationUrl.appendingPathComponent(Filenames.regions)) {
+      regions = loadRegions(from: data)
+    } else {
+      regions = []
+    }
+
     return Project(scripts: scripts, macros: macros, globals: globals, dataTypes: dataTypes, regions: regions)
   }
 
