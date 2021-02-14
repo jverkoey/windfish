@@ -12,7 +12,7 @@ extension Project {
   }
 
   static public func loadMacro(from data: Data, with name: String) -> Macro? {
-    guard let source = String(data: data, encoding: .utf8) else {
+    guard let source: String = String(data: data, encoding: .utf8) else {
       return nil
     }
     return Macro(name: name, source: source)

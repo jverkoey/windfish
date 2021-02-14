@@ -270,8 +270,11 @@ extension ProjectDocument {
     if let configuration = fileWrappers[Filenames.configurationDir] {
       if let scripts = configuration.fileWrappers?[Filenames.scriptsDir],
          let files = scripts.fileWrappers?.mapValues({ $0.regularFileContents! }) {
-        self.project.configuration.scripts = files.map({ key, value in
-          Script(name: NSString(string: key).deletingPathExtension, source: String(data: value, encoding: .utf8)!)
+        self.project.configuration.scripts = files.compactMap({ (key: String, value: Data) -> Script? in
+          guard let storage = Windfish.Project.loadScript(from: value, with: NSString(string: key).deletingPathExtension) else {
+            return nil
+          }
+          return Script(storage: storage)
         })
       }
       if let macros = configuration.fileWrappers?[Filenames.macrosDir],

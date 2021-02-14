@@ -11,15 +11,11 @@ extension Project {
     public var source: String
   }
 
-  static func loadScripts(from url: URL) -> [Script] {
-    let fm = FileManager.default
-    return ((try? fm.contentsOfDirectory(atPath: url.path)) ?? [])
-      .compactMap { (filename: String) -> Script? in
-        guard let source: String = try? String(contentsOf: url.appendingPathComponent(filename), encoding: .utf8) else {
-          return nil
-        }
-        return Script(name: URL(fileURLWithPath: filename).deletingPathExtension().lastPathComponent, source: source)
-      }
+  static public func loadScript(from data: Data, with name: String) -> Script? {
+    guard let source: String = String(data: data, encoding: .utf8) else {
+      return nil
+    }
+    return Script(name: name, source: source)
   }
 
   func saveScripts(to url: URL) throws {

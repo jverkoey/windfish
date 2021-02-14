@@ -47,7 +47,19 @@ Regions: \(regions.map { $0.name }.joined(separator: ", "))
 
     let configurationUrl: URL = url.appendingPathComponent(Filenames.configurationDir)
     let macrosUrl: URL = configurationUrl.appendingPathComponent(Filenames.macrosDir)
-    let scripts: [Script] = loadScripts(from: configurationUrl.appendingPathComponent(Filenames.scriptsDir))
+    let scriptsUrl: URL = configurationUrl.appendingPathComponent(Filenames.scriptsDir)
+
+    let scripts: [Script]
+    if let filenames = try? fm.contentsOfDirectory(atPath: scriptsUrl.path) {
+      scripts = filenames.compactMap { (filename: String) -> Script? in
+        guard let data: Data = try? Data(contentsOf: scriptsUrl.appendingPathComponent(filename)) else {
+          return nil
+        }
+        return loadScript(from: data, with: URL(fileURLWithPath: filename).deletingPathExtension().lastPathComponent)
+      }
+    } else {
+      scripts = []
+    }
 
     let macros: [Macro]
     if let filenames = try? fm.contentsOfDirectory(atPath: macrosUrl.path) {

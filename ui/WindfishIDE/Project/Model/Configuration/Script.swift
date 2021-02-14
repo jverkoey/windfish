@@ -3,8 +3,13 @@ import Foundation
 import Windfish
 
 final class Script: NSObject {
+  typealias Storage = Windfish.Project.Script
+
+  init(storage: Storage) {
+    self.storage = storage
+  }
   init(name: String, source: String) {
-    self.storage = Windfish.Project.Script(name: name, source: source)
+    self.storage = Storage(name: name, source: source)
   }
 
   @objc dynamic var name: String {
@@ -17,5 +22,5 @@ final class Script: NSObject {
   }
 
   // Internal storage.
-  let storage: Windfish.Project.Script
+  let storage: Storage
 }
