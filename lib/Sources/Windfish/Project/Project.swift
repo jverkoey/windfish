@@ -54,14 +54,20 @@ Regions: \(regions.map { $0.name }.joined(separator: ", "))
 
   /** Returns true if the save succeeded, false if it failed. */
   public func save(to url: URL) throws -> Bool {
-    let scriptsUrl: URL = url.appendingPathComponent(Filenames.scriptsDir)
-    let macrosUrl: URL = url.appendingPathComponent(Filenames.macrosDir)
-    try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
-    try FileManager.default.createDirectory(at: scriptsUrl, withIntermediateDirectories: true, attributes: nil)
-    try FileManager.default.createDirectory(at: macrosUrl, withIntermediateDirectories: true, attributes: nil)
+    let configurationUrl: URL = url.appendingPathComponent(Filenames.configurationDir)
+    let scriptsUrl: URL = configurationUrl.appendingPathComponent(Filenames.scriptsDir)
+    let macrosUrl: URL = configurationUrl.appendingPathComponent(Filenames.macrosDir)
+    let globalsUrl: URL = configurationUrl.appendingPathComponent(Filenames.globals)
+    let fm: FileManager = FileManager.default
+    try fm.createDirectory(at: configurationUrl, withIntermediateDirectories: true, attributes: nil)
+    try fm.removeItem(at: scriptsUrl)
+    try fm.removeItem(at: macrosUrl)
+    try fm.createDirectory(at: scriptsUrl, withIntermediateDirectories: true, attributes: nil)
+    try fm.createDirectory(at: macrosUrl, withIntermediateDirectories: true, attributes: nil)
 
     try saveScripts(to: scriptsUrl)
     try saveMacros(to: macrosUrl)
+    try saveGlobals(to: globalsUrl)
 
     return true
   }
