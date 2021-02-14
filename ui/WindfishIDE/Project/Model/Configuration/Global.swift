@@ -22,5 +22,5 @@ final class Global: NSObject {
   }
 
   // Internal storage.
-  private let storage: Windfish.Project.Global
+  let storage: Windfish.Project.Global
 }

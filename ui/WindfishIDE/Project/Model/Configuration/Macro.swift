@@ -17,5 +17,5 @@ final class Macro: NSObject {
   }
 
   // Internal storage.
-  private let storage: Windfish.Project.Macro
+  let storage: Windfish.Project.Macro
 }

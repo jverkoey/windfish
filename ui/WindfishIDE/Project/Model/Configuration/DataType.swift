@@ -45,5 +45,5 @@ final class DataType: NSObject {
   }
 
   // Internal storage.
-  private let storage: Windfish.Project.DataType
+  let storage: Windfish.Project.DataType
 }

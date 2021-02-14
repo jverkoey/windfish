@@ -17,7 +17,7 @@ private struct Filenames {
 
 /** A representation of a Windfish project that can be saved to and loaded from disk. */
 public final class Project: CustomStringConvertible {
-  init(scripts: [Project.Script] = [], macros: [Macro] = [], globals: [Global] = [], dataTypes: [DataType] = [], regions: [Region] = []) {
+  public init(scripts: [Project.Script] = [], macros: [Macro] = [], globals: [Global] = [], dataTypes: [DataType] = [], regions: [Region] = []) {
     self.scripts = scripts
     self.macros = macros
     self.globals = globals

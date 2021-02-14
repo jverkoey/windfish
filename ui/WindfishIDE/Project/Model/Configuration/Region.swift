@@ -37,5 +37,5 @@ final class Region: NSObject {
   }
 
   // Internal storage.
-  private let storage: Windfish.Project.Region
+  let storage: Windfish.Project.Region
 }

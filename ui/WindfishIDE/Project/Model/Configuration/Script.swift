@@ -12,10 +12,10 @@ final class Script: NSObject {
     set { storage.name = newValue }
   }
   @objc dynamic var source: String {
-    get { return storage.name }
-    set { storage.name = newValue }
+    get { return storage.source }
+    set { storage.source = newValue }
   }
 
   // Internal storage.
-  private let storage: Windfish.Project.Script
+  let storage: Windfish.Project.Script
 }
