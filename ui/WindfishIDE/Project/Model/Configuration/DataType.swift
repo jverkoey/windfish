@@ -1,22 +1,13 @@
 import Foundation
 
+import Windfish
+
 final class DataType: NSObject {
   init(name: String, representation: String, interpretation: String, mappings: [Mapping]) {
     self.name = name
     self.representation = representation
     self.interpretation = interpretation
     self.mappings = mappings
-  }
-
-  struct Interpretation {
-    static let any = "Any"
-    static let enumerated = "Enumerated"
-    static let bitmask = "Bitmask"
-  }
-  struct Representation {
-    static let decimal = "Decimal"
-    static let hexadecimal = "Hex"
-    static let binary = "Binary"
   }
 
   final class Mapping: NSObject, Codable {
@@ -33,4 +24,10 @@ final class DataType: NSObject {
   @objc dynamic var representation: String
   @objc dynamic var interpretation: String
   @objc dynamic var mappings: [Mapping]
+
+  func toWindfish() -> Windfish.Project.DataType {
+    return Windfish.Project.DataType(name: name, representation: representation, interpretation: interpretation, mappings: mappings.map {
+      Windfish.Project.DataType.Mapping(name: $0.name, value: $0.value)
+    })
+  }
 }

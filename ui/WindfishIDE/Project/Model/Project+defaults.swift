@@ -29,42 +29,42 @@ extension Project {
     ])
 
     configuration.dataTypes.append(DataType(name: "hex",
-                                            representation: DataType.Representation.hexadecimal,
-                                            interpretation: DataType.Interpretation.any,
+                                            representation: Windfish.Project.DataType.Representation.hexadecimal,
+                                            interpretation: Windfish.Project.DataType.Interpretation.any,
                                             mappings: []))
     configuration.dataTypes.append(DataType(name: "decimal",
-                                            representation: DataType.Representation.decimal,
-                                            interpretation: DataType.Interpretation.any,
+                                            representation: Windfish.Project.DataType.Representation.decimal,
+                                            interpretation: Windfish.Project.DataType.Interpretation.any,
                                             mappings: []))
     configuration.dataTypes.append(DataType(name: "binary",
-                                            representation: DataType.Representation.binary,
-                                            interpretation: DataType.Interpretation.any,
+                                            representation: Windfish.Project.DataType.Representation.binary,
+                                            interpretation: Windfish.Project.DataType.Interpretation.any,
                                             mappings: []))
     configuration.dataTypes.append(DataType(name: "bool",
-                                            representation: DataType.Representation.decimal,
-                                            interpretation: DataType.Interpretation.enumerated,
+                                            representation: Windfish.Project.DataType.Representation.decimal,
+                                            interpretation: Windfish.Project.DataType.Interpretation.enumerated,
                                             mappings: [
                                               DataType.Mapping(name: "false", value: 0),
                                               DataType.Mapping(name: "true", value: 1)
                                             ]))
 
     configuration.dataTypes.append(DataType(name: "HW_COLORGAMEBOY",
-                                            representation: DataType.Representation.hexadecimal,
-                                            interpretation: DataType.Interpretation.enumerated,
+                                            representation: Windfish.Project.DataType.Representation.hexadecimal,
+                                            interpretation: Windfish.Project.DataType.Interpretation.enumerated,
                                             mappings: [
                                               DataType.Mapping(name: "not_color_gameboy", value: 0x00),
                                               DataType.Mapping(name: "is_color_gameboy", value: 0x80),
                                             ]))
     configuration.dataTypes.append(DataType(name: "HW_SUPERGAMEBOY",
-                                            representation: DataType.Representation.hexadecimal,
-                                            interpretation: DataType.Interpretation.enumerated,
+                                            representation: Windfish.Project.DataType.Representation.hexadecimal,
+                                            interpretation: Windfish.Project.DataType.Interpretation.enumerated,
                                             mappings: [
                                               DataType.Mapping(name: "not_super_gameboy", value: 0x00),
                                               DataType.Mapping(name: "is_super_gameboy", value: 0x80),
                                             ]))
     configuration.dataTypes.append(DataType(name: "HW_ROMSIZE",
-                                            representation: DataType.Representation.hexadecimal,
-                                            interpretation: DataType.Interpretation.enumerated,
+                                            representation: Windfish.Project.DataType.Representation.hexadecimal,
+                                            interpretation: Windfish.Project.DataType.Interpretation.enumerated,
                                             mappings: [
                                               DataType.Mapping(name: "romsize_2banks", value: 0),
                                               DataType.Mapping(name: "romsize_4banks", value: 1),
@@ -78,8 +78,8 @@ extension Project {
                                               DataType.Mapping(name: "romsize_96banks", value: 0x54),
                                             ]))
     configuration.dataTypes.append(DataType(name: "HW_CARTRIDGETYPE",
-                                            representation: DataType.Representation.hexadecimal,
-                                            interpretation: DataType.Interpretation.enumerated,
+                                            representation: Windfish.Project.DataType.Representation.hexadecimal,
+                                            interpretation: Windfish.Project.DataType.Interpretation.enumerated,
                                             mappings: [
                                               DataType.Mapping(name: "cartridge_romonly", value: 0),
                                               DataType.Mapping(name: "cartridge_mbc1", value: 1),
@@ -91,8 +91,8 @@ extension Project {
                                               DataType.Mapping(name: "cartridge_rom_ram_battery", value: 9),
                                             ]))
     configuration.dataTypes.append(DataType(name: "HW_RAMSIZE",
-                                            representation: DataType.Representation.hexadecimal,
-                                            interpretation: DataType.Interpretation.enumerated,
+                                            representation: Windfish.Project.DataType.Representation.hexadecimal,
+                                            interpretation: Windfish.Project.DataType.Interpretation.enumerated,
                                             mappings: [
                                               DataType.Mapping(name: "ramsize_none", value: 0),
                                               DataType.Mapping(name: "ramsize_1bank", value: 1),
@@ -101,15 +101,15 @@ extension Project {
                                               DataType.Mapping(name: "ramsize_16banks", value: 4),
                                             ]))
     configuration.dataTypes.append(DataType(name: "HW_DESTINATIONCODE",
-                                            representation: DataType.Representation.hexadecimal,
-                                            interpretation: DataType.Interpretation.enumerated,
+                                            representation: Windfish.Project.DataType.Representation.hexadecimal,
+                                            interpretation: Windfish.Project.DataType.Interpretation.enumerated,
                                             mappings: [
                                               DataType.Mapping(name: "destination_japanese", value: 0),
                                               DataType.Mapping(name: "destination_nonjapanese", value: 1),
                                             ]))
     configuration.dataTypes.append(DataType(name: "HW_IE",
-                                            representation: DataType.Representation.binary,
-                                            interpretation: DataType.Interpretation.bitmask,
+                                            representation: Windfish.Project.DataType.Representation.binary,
+                                            interpretation: Windfish.Project.DataType.Interpretation.bitmask,
                                             mappings: [
                                               DataType.Mapping(name: "IE_VBLANK", value: 0b0000_0001),
                                               DataType.Mapping(name: "IE_LCDC", value: 0b0000_0010),
@@ -118,14 +118,14 @@ extension Project {
                                               DataType.Mapping(name: "IE_PIN1013TRANSITION", value: 0b0001_0000),
                                             ]))
     configuration.dataTypes.append(DataType(name: "HW_AUDIO_ENABLE",
-                                            representation: DataType.Representation.binary,
-                                            interpretation: DataType.Interpretation.bitmask,
+                                            representation: Windfish.Project.DataType.Representation.binary,
+                                            interpretation: Windfish.Project.DataType.Interpretation.bitmask,
                                             mappings: [
                                               DataType.Mapping(name: "HW_AUDIO_ENABLE", value: 0b1000_0000),
                                             ]))
     configuration.dataTypes.append(DataType(name: "LCDCF",
-                                            representation: DataType.Representation.binary,
-                                            interpretation: DataType.Interpretation.bitmask,
+                                            representation: Windfish.Project.DataType.Representation.binary,
+                                            interpretation: Windfish.Project.DataType.Interpretation.bitmask,
                                             mappings: [
                                               DataType.Mapping(name: "LCDCF_OFF", value: 0b0000_0000),
                                               DataType.Mapping(name: "LCDCF_ON", value: 0b1000_0000),
@@ -138,8 +138,8 @@ extension Project {
                                               DataType.Mapping(name: "LCDCF_BG_DISPLAY", value: 0b0000_0001),
                                             ]))
     configuration.dataTypes.append(DataType(name: "STATF",
-                                            representation: DataType.Representation.binary,
-                                            interpretation: DataType.Interpretation.bitmask,
+                                            representation: Windfish.Project.DataType.Representation.binary,
+                                            interpretation: Windfish.Project.DataType.Interpretation.bitmask,
                                             mappings: [
                                               DataType.Mapping(name: "STATF_LYC", value: 0b0100_0000),
                                               DataType.Mapping(name: "STATF_MODE10", value: 0b0010_0000),
@@ -151,8 +151,8 @@ extension Project {
                                               DataType.Mapping(name: "STATF_HB", value: 0b0000_0000),
                                             ]))
     configuration.dataTypes.append(DataType(name: "BUTTON",
-                                            representation: DataType.Representation.binary,
-                                            interpretation: DataType.Interpretation.bitmask,
+                                            representation: Windfish.Project.DataType.Representation.binary,
+                                            interpretation: Windfish.Project.DataType.Interpretation.bitmask,
                                             mappings: [
                                               DataType.Mapping(name: "J_RIGHT", value: 0b0000_0001),
                                               DataType.Mapping(name: "J_LEFT", value: 0b0000_0010),
@@ -164,8 +164,8 @@ extension Project {
                                               DataType.Mapping(name: "J_START", value: 0b1000_0000),
                                             ]))
     configuration.dataTypes.append(DataType(name: "JOYPAD",
-                                            representation: DataType.Representation.binary,
-                                            interpretation: DataType.Interpretation.bitmask,
+                                            representation: Windfish.Project.DataType.Representation.binary,
+                                            interpretation: Windfish.Project.DataType.Interpretation.bitmask,
                                             mappings: [
                                               DataType.Mapping(name: "JOYPAD_DIRECTIONS", value: 0b0001_0000),
                                               DataType.Mapping(name: "JOYPAD_BUTTONS", value: 0b0010_0000),

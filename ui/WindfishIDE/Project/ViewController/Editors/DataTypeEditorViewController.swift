@@ -35,13 +35,13 @@ final class DataTypeEditorViewController: NSViewController, TabSelectable {
 
     super.init(nibName: nil, bundle: nil)
 
-    representationController.addObject(DataType.Representation.decimal)
-    representationController.addObject(DataType.Representation.hexadecimal)
-    representationController.addObject(DataType.Representation.binary)
+    representationController.addObject(Windfish.Project.DataType.Representation.decimal)
+    representationController.addObject(Windfish.Project.DataType.Representation.hexadecimal)
+    representationController.addObject(Windfish.Project.DataType.Representation.binary)
 
-    interpretationController.addObject(DataType.Interpretation.any)
-    interpretationController.addObject(DataType.Interpretation.bitmask)
-    interpretationController.addObject(DataType.Interpretation.enumerated)
+    interpretationController.addObject(Windfish.Project.DataType.Interpretation.any)
+    interpretationController.addObject(Windfish.Project.DataType.Interpretation.bitmask)
+    interpretationController.addObject(Windfish.Project.DataType.Interpretation.enumerated)
   }
 
   required init?(coder: NSCoder) {
@@ -135,7 +135,7 @@ extension DataTypeEditorViewController: EditorTableViewDelegate {
   func editorTableViewCreateElement(_ tableView: EditorTableView) -> String {
     if tableView == self.tableView {
       project.configuration.dataTypes.append(
-        DataType(name: "New data type", representation: DataType.Representation.decimal, interpretation: DataType.Interpretation.any, mappings: [])
+        DataType(name: "New data type", representation: Windfish.Project.DataType.Representation.decimal, interpretation: Windfish.Project.DataType.Interpretation.any, mappings: [])
       )
       return "Create Data Type"
     } else if tableView == self.mappingTableView {
@@ -240,9 +240,9 @@ extension DataTypeEditorViewController: NSTableViewDelegate {
       }
 
       if let selectedObject = elementsController.selectedObjects.first as? DataType {
-        if selectedObject.representation == DataType.Representation.hexadecimal {
+        if selectedObject.representation == Windfish.Project.DataType.Representation.hexadecimal {
           view.textField?.formatter = UInt8HexFormatter()
-        } else if selectedObject.representation == DataType.Representation.binary {
+        } else if selectedObject.representation == Windfish.Project.DataType.Representation.binary {
           view.textField?.formatter = UInt8BinaryFormatter()
         } else {
           view.textField?.formatter = NumberFormatter()

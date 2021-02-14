@@ -457,11 +457,11 @@ extension ProjectDocument {
                                             (["; \(dataType.name) [\(dataType.interpretation)] [\(dataType.representation)]"]
                                               + dataType.mappings.map { (mapping: DataType.Mapping) -> String in
                                                 switch dataType.representation {
-                                                case DataType.Representation.binary:
+                                                case Windfish.Project.DataType.Representation.binary:
                                                   return "\(mapping.name) EQU \(RGBDS.NumericPrefix.binary)\(mapping.value.binaryString)"
-                                                case DataType.Representation.hexadecimal:
+                                                case Windfish.Project.DataType.Representation.hexadecimal:
                                                   return "\(mapping.name) EQU \(RGBDS.NumericPrefix.hexadecimal)\(mapping.value.hexString)"
-                                                case DataType.Representation.decimal:
+                                                case Windfish.Project.DataType.Representation.decimal:
                                                   return "\(mapping.name) EQU \(mapping.value)"
                                                 default:
                                                   fatalError()

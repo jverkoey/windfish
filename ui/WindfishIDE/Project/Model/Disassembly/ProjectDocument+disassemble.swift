@@ -32,21 +32,21 @@ extension ProjectDocument {
         }
         let representation: Disassembler.MutableConfiguration.Datatype.Representation
         switch dataType.representation {
-        case DataType.Representation.binary:
+        case Windfish.Project.DataType.Representation.binary:
           representation = .binary
-        case DataType.Representation.decimal:
+        case Windfish.Project.DataType.Representation.decimal:
           representation = .decimal
-        case DataType.Representation.hexadecimal:
+        case Windfish.Project.DataType.Representation.hexadecimal:
           representation = .hexadecimal
         default:
           preconditionFailure()
         }
         switch dataType.interpretation {
-        case DataType.Interpretation.any:
+        case Windfish.Project.DataType.Interpretation.any:
           disassembly.mutableConfiguration.registerDatatype(named: dataType.name, representation: representation)
-        case DataType.Interpretation.bitmask:
+        case Windfish.Project.DataType.Interpretation.bitmask:
           disassembly.mutableConfiguration.createDatatype(named: dataType.name, bitmask: mappingDict, representation: representation)
-        case DataType.Interpretation.enumerated:
+        case Windfish.Project.DataType.Interpretation.enumerated:
           disassembly.mutableConfiguration.createDatatype(named: dataType.name, enumeration: mappingDict, representation: representation)
         default:
           preconditionFailure()
