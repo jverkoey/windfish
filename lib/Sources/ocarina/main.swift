@@ -39,7 +39,9 @@ struct Ocarina: ParsableCommand {
       self.romData = try Data(contentsOf: URL(fileURLWithPath: romPath))
 
     case .disassembleProject:
-      break // No extra validation required.
+      guard romPath == nil else {
+        throw ValidationError("Do not provide a rom path when disassembling; the rom is loaded from the project.")
+      }
     }
     self.command = command
   }
