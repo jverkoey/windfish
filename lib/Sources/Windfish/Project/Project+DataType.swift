@@ -38,9 +38,8 @@ extension Project {
     public var mappings: [Mapping]
   }
 
-
-  static func loadDataTypes(from url: URL) -> [DataType] {
-    guard let dataTypesText = try? String(contentsOf: url, encoding: .utf8) else {
+  static public func loadDataTypes(from data: Data) -> [DataType] {
+    guard let dataTypesText = String(data: data, encoding: .utf8) else {
       return []
     }
     var dataTypes: [DataType] = []

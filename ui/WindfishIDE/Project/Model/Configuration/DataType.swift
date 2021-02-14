@@ -3,6 +3,11 @@ import Foundation
 import Windfish
 
 final class DataType: NSObject {
+  init(storage: Windfish.Project.DataType) {
+    self.storage = storage
+    self.mappings = storage.mappings.map { Mapping(storage: $0) }
+  }
+
   init(name: String, representation: String, interpretation: String, mappings: [Mapping]) {
     self.storage = Windfish.Project.DataType(name: name, representation: representation, interpretation: interpretation, mappings: mappings.map {
       return $0.storage
@@ -11,7 +16,11 @@ final class DataType: NSObject {
   }
 
   final class Mapping: NSObject, Codable {
-    internal init(name: String, value: UInt8) {
+    init(storage: Windfish.Project.DataType.Mapping) {
+      self.storage = storage
+    }
+
+    init(name: String, value: UInt8) {
       self.storage = Windfish.Project.DataType.Mapping(name: name, value: value)
     }
 

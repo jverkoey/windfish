@@ -313,55 +313,10 @@ extension ProjectDocument {
       }
       if let dataTypes = configuration.fileWrappers?[Filenames.dataTypes],
          let content = dataTypes.regularFileContents {
-        let dataTypesText = String(data: content, encoding: .utf8)!
-        var dataTypes: [DataType] = []
-
-        var dataType = DataType(name: "", representation: "", interpretation: "", mappings: [])
-
-        dataTypesText.enumerateLines { line, _ in
-          let trimmedLine = line.trimmed()
-          if trimmedLine.isEmpty {
-            if !dataType.name.isEmpty {
-              dataTypes.append(dataType)
-            }
-            dataType = DataType(name: "", representation: "", interpretation: "", mappings: [])
-            return
-          }
-          if trimmedLine.starts(with: ";") {
-            // New data type definition
-            let scanner = Scanner(string: trimmedLine)
-            _ = scanner.scanString(";")
-            dataType.name = scanner.scanUpToString("[")!.trimmed()
-            _ = scanner.scanString("[")
-            dataType.interpretation = scanner.scanUpToString("]")!.trimmed()
-            _ = scanner.scanString("]")
-            _ = scanner.scanUpToString("[")
-            _ = scanner.scanString("[")
-            dataType.representation = scanner.scanUpToString("]")!.trimmed()
-            return
-          }
-          let codeAndComments = line.split(separator: ";", maxSplits: 1, omittingEmptySubsequences: false)
-          let code = codeAndComments[0]
-          if !code.contains(" EQU ") {
-            return
-          }
-          let definitionParts = code.components(separatedBy: " EQU ")
-          let name = definitionParts[0].trimmed()
-          let valueText = definitionParts[1].trimmed()
-          let value: UInt8
-          if valueText.starts(with: RGBDS.NumericPrefix.hexadecimal) {
-            value = UInt8(valueText.dropFirst(), radix: 16)!
-          } else if valueText.starts(with: RGBDS.NumericPrefix.binary) {
-            value = UInt8(valueText.dropFirst(), radix: 2)!
-          } else {
-            value = UInt8(valueText)!
-          }
-          dataType.mappings.append(DataType.Mapping(name: name, value: value))
+        let dataTypes: [Windfish.Project.DataType] = Windfish.Project.loadDataTypes(from: content)
+        self.project.configuration.dataTypes = dataTypes.map {
+          DataType(storage: $0)
         }
-        if !dataType.name.isEmpty {
-          dataTypes.append(dataType)
-        }
-        self.project.configuration.dataTypes = dataTypes
       }
       if let regions = configuration.fileWrappers?[Filenames.regions],
          let content = regions.regularFileContents {
