@@ -47,12 +47,12 @@ extension Project {
     return globals
   }
 
-  func saveGlobals(to url: URL) throws {
-    try globals
+  public func globalsAsData() -> Data {
+    return globals
       .sorted(by: { $0.address < $1.address })
       .map { (global: Global) -> String in "\(global.name) EQU \(RGBDS.asHexString(global.address)) ; [\(global.dataType)]" }
       .joined(separator: "\n\n")
-      .write(to: url, atomically: true, encoding: .utf8)
+      .data(using: .utf8) ?? Data()
   }
 
   func applyGlobals(to configuration: Disassembler.MutableConfiguration) {

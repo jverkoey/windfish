@@ -343,11 +343,7 @@ extension ProjectDocument {
         Filenames.macrosDir: FileWrapper(directoryWithFileWrappers: project.configuration.macros.reduce(into: [:]) { accumulator, macro in
           accumulator[macro.name + ".asm"] = FileWrapper(regularFileWithContents: macro.source.data(using: .utf8)!)
         }),
-        Filenames.globals: FileWrapper(regularFileWithContents: project.configuration.globals
-                                        .sorted(by: { $0.address < $1.address })
-                                        .map { (global: Global) -> String in
-                                          "\(global.name) EQU $\(global.address.hexString) ; [\(global.dataType)]"
-                                        }.joined(separator: "\n\n").data(using: .utf8)!),
+        Filenames.globals: FileWrapper(regularFileWithContents: project.configuration.storage.globalsAsData()),
         Filenames.dataTypes: FileWrapper(regularFileWithContents: project.configuration.storage.dataTypesAsData()),
         Filenames.regions: FileWrapper(regularFileWithContents: project.configuration.regions
                                         .sorted(by: { $0.bank < $1.bank && $0.address < $1.address })

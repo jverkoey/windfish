@@ -111,7 +111,7 @@ Regions: \(regions.map { $0.name }.joined(separator: ", "))
 
     try saveScripts(to: scriptsUrl)
     try saveMacros(to: macrosUrl)
-    try saveGlobals(to: configurationUrl.appendingPathComponent(Filenames.globals))
+    try globalsAsData().write(to: configurationUrl.appendingPathComponent(Filenames.globals))
     try dataTypesAsData().write(to: configurationUrl.appendingPathComponent(Filenames.dataTypes))
     try saveRegions(to: configurationUrl.appendingPathComponent(Filenames.regions))
 
