@@ -1,6 +1,7 @@
 import Foundation
 
 import ArgumentParser
+import Tracing
 import Windfish
 
 struct Ocarina: ParsableCommand {
@@ -20,6 +21,7 @@ struct Ocarina: ParsableCommand {
 
   var command: Command?
   var romData: Data?
+  lazy var projectUrl: URL = { URL(fileURLWithPath: projectDirectory) }()
 
   mutating func validate() throws {
     guard let commandArgument: String = commands.first else {
@@ -46,25 +48,63 @@ struct Ocarina: ParsableCommand {
     self.command = command
   }
 
-  func run() throws {
+  mutating func run() throws {
     guard let command = command else {
       throw ValidationError("Please specify a command.")
     }
-    let projectUrl: URL = URL(fileURLWithPath: projectDirectory)
     switch command {
-    case .createProject:
-      guard let romData = romData else {
-        throw ValidationError("No rom data found.")
-      }
-      print("Creating new project...")
-      let project = Project(rom: romData)
-      try project.save(to: projectUrl)
-      print("Created.")
-
-    case .disassembleProject:
-      let project = try Project.load(from: projectUrl)
-      print(project)
+    case .createProject:      try createProject()
+    case .disassembleProject: try disassembleProject()
     }
+  }
+
+  mutating func createProject() throws {
+    guard let romData = romData else {
+      throw ValidationError("No rom data found.")
+    }
+    print("Creating new project...")
+    let project = Project(rom: romData)
+    try project.save(to: projectUrl)
+    print("Created.")
+  }
+
+  mutating func disassembleProject() throws {
+    let project = try Project.load(from: projectUrl)
+    guard let romData: Data = project.rom else {
+      throw ValidationError("""
+No rom data found in the project.
+
+If the project already has a disassembly directory, then you can create the ROM by running the following commands:
+
+cd \(projectDirectory)/\(Project.Filenames.disassembly)
+make
+cp game.gb ../rom.gb
+""")
+    }
+    let disassembly: Disassembler = Disassembler(data: romData)
+    project.prepare(disassembly.mutableConfiguration)
+    disassembly.willStart()
+    project.apply(to: disassembly.mutableConfiguration)
+    disassembly.disassemble()
+
+    let (disassembledSource, statistics) = try! disassembly.generateSource()
+    let disassemblyUrl: URL = projectUrl.appendingPathComponent(Project.Filenames.disassembly)
+    try FileManager.default.createDirectory(at: disassemblyUrl, withIntermediateDirectories: true, attributes: nil)
+
+    try disassembledSource.sources.forEach { (filename: String, fileDescription: Disassembler.Source.FileDescription) in
+      try fileDescription.asData()?.write(to: disassemblyUrl.appendingPathComponent(filename))
+    }
+
+    print("""
+Disassembly statistics:
+- Instructions decoded: \(statistics.instructionsDecoded)
+- Percent of ROM decoded: \(String(format: "%.2f", statistics.percent))%
+Percent decoded of each bank:
+\(statistics.bankPercents.sorted { $0.key < $1.key }.map({ (key: Cartridge.Bank, value: Double) -> String in
+  "\(key.hexString): \(String(format: "%.2f", value))%"
+}).joined(separator: "\n"))
+""")
+    print(statistics)
   }
 }
 
