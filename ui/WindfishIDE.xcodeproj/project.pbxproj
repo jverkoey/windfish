@@ -984,11 +984,13 @@
 				665D4F522575F75400C3A03B /* Frameworks */,
 				665D4F532575F75400C3A03B /* Resources */,
 				6699BA6525AEC444005DB9BB /* CopyFiles */,
+				667F427625D8D3B100D1C553 /* ShellScript */,
 			);
 			buildRules = (
 				6699BA4F25AEC414005DB9BB /* PBXBuildRule */,
 			);
 			dependencies = (
+				667F426C25D8D30C00D1C553 /* PBXTargetDependency */,
 				66D0391D25BC811E00EC532C /* PBXTargetDependency */,
 				6699BA0E25AEBCE1005DB9BB /* PBXTargetDependency */,
 				6699BA0525AEBB1F005DB9BB /* PBXTargetDependency */,
@@ -1164,6 +1166,24 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		667F427625D8D3B100D1C553 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${BUILT_PRODUCTS_DIR}/ocarina",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cp ${BUILT_PRODUCTS_DIR}/ocarina \"${BUILT_PRODUCTS_DIR}/${FULL_PRODUCT_NAME}/Contents/MacOS\"\n";
+		};
 		66D0390925BC702C00EC532C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1313,6 +1333,10 @@
 		665D4FA02576C98C00C3A03B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = 665D4F9F2576C98C00C3A03B /* LR35902 */;
+		};
+		667F426C25D8D30C00D1C553 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 667F426B25D8D30C00D1C553 /* ocarina */;
 		};
 		6699B7D925AEA30A005DB9BB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1713,6 +1737,10 @@
 		665D4F9F2576C98C00C3A03B /* LR35902 */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = LR35902;
+		};
+		667F426B25D8D30C00D1C553 /* ocarina */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ocarina;
 		};
 		6699B9EB25AEB925005DB9BB /* Sameboy */ = {
 			isa = XCSwiftPackageProductDependency;
