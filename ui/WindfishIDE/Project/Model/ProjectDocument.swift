@@ -282,34 +282,10 @@ extension ProjectDocument {
       }
       if let globals = configuration.fileWrappers?[Filenames.globals],
          let content = globals.regularFileContents {
-        let globalText = String(data: content, encoding: .utf8)!
-        var globals: [Global] = []
-        globalText.enumerateLines { line, _ in
-          if line.isEmpty {
-            return
-          }
-          let codeAndComments = line.split(separator: ";", maxSplits: 1, omittingEmptySubsequences: false)
-          let code = codeAndComments[0]
-          if !code.contains(" EQU ") {
-            return
-          }
-          let definitionParts = code.components(separatedBy: " EQU ")
-          let name = definitionParts[0].trimmed()
-          let addressText = definitionParts[1].trimmed()
-          let address: LR35902.Address
-          if addressText.starts(with: "$") {
-            address = LR35902.Address(addressText.dropFirst(), radix: 16)!
-          } else {
-            return
-          }
-          let comments = codeAndComments[1].trimmed()
-          let scanner = Scanner(string: comments)
-          _ = scanner.scanUpToString("[")
-          _ = scanner.scanString("[")
-          let dataType = scanner.scanUpToString("]")!.trimmed()
-          globals.append(Global(name: name, address: address, dataType: dataType))
+        let globals: [Windfish.Project.Global] = Windfish.Project.loadGlobals(from: content)
+        self.project.configuration.globals = globals.map {
+          Global(storage: $0)
         }
-        self.project.configuration.globals = globals
       }
       if let dataTypes = configuration.fileWrappers?[Filenames.dataTypes],
          let content = dataTypes.regularFileContents {

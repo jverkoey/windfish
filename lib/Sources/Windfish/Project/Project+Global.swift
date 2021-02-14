@@ -16,8 +16,8 @@ extension Project {
     public var dataType: String
   }
 
-  static func loadGlobals(from url: URL) -> [Global] {
-    guard let globalText = try? String(contentsOf: url, encoding: .utf8) else {
+  static public func loadGlobals(from data: Data) -> [Global] {
+    guard let globalText = String(data: data, encoding: .utf8) else {
       return []
     }
     var globals: [Global] = []

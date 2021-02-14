@@ -46,13 +46,21 @@ Regions: \(regions.map { $0.name }.joined(separator: ", "))
     let configurationUrl: URL = url.appendingPathComponent(Filenames.configurationDir)
     let scripts: [Script] = loadScripts(from: configurationUrl.appendingPathComponent(Filenames.scriptsDir))
     let macros: [Macro] = loadMacros(from: configurationUrl.appendingPathComponent(Filenames.macrosDir))
-    let globals: [Global] = loadGlobals(from: configurationUrl.appendingPathComponent(Filenames.globals))
+
+    let globals: [Global]
+    if let data = try? Data(contentsOf: configurationUrl.appendingPathComponent(Filenames.globals)) {
+      globals = loadGlobals(from: data)
+    } else {
+      globals = []
+    }
+
     let dataTypes: [DataType]
     if let data = try? Data(contentsOf: configurationUrl.appendingPathComponent(Filenames.dataTypes)) {
       dataTypes = loadDataTypes(from: data)
     } else {
       dataTypes = []
     }
+
     let regions: [Region] = loadRegions(from: configurationUrl.appendingPathComponent(Filenames.regions))
     return Project(scripts: scripts, macros: macros, globals: globals, dataTypes: dataTypes, regions: regions)
   }

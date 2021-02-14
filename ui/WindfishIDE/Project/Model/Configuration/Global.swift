@@ -4,7 +4,10 @@ import LR35902
 import Windfish
 
 final class Global: NSObject {
-  internal init(name: String, address: LR35902.Address, dataType: String) {
+  init(storage: Windfish.Project.Global) {
+    self.storage = storage
+  }
+  init(name: String, address: LR35902.Address, dataType: String) {
     self.storage = Windfish.Project.Global(name: name, address: address, dataType: dataType)
   }
 
