@@ -57,7 +57,6 @@ Regions: \(regions.map { $0.name }.joined(separator: ", "))
     let configurationUrl: URL = url.appendingPathComponent(Filenames.configurationDir)
     let scriptsUrl: URL = configurationUrl.appendingPathComponent(Filenames.scriptsDir)
     let macrosUrl: URL = configurationUrl.appendingPathComponent(Filenames.macrosDir)
-    let globalsUrl: URL = configurationUrl.appendingPathComponent(Filenames.globals)
     let fm: FileManager = FileManager.default
     try fm.createDirectory(at: configurationUrl, withIntermediateDirectories: true, attributes: nil)
     try fm.removeItem(at: scriptsUrl)
@@ -67,7 +66,8 @@ Regions: \(regions.map { $0.name }.joined(separator: ", "))
 
     try saveScripts(to: scriptsUrl)
     try saveMacros(to: macrosUrl)
-    try saveGlobals(to: globalsUrl)
+    try saveGlobals(to: configurationUrl.appendingPathComponent(Filenames.globals))
+    try saveDataTypes(to: configurationUrl.appendingPathComponent(Filenames.dataTypes))
 
     return true
   }

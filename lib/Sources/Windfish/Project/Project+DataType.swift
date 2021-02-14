@@ -93,6 +93,28 @@ extension Project {
     return dataTypes
   }
 
+  func saveDataTypes(to url: URL) throws {
+    try dataTypes
+      .sorted(by: { $0.name < $1.name })
+      .map { (dataType: DataType) -> String in
+        (["; \(dataType.name) [\(dataType.interpretation)] [\(dataType.representation)]"]
+          + dataType.mappings.map { (mapping: DataType.Mapping) -> String in
+            switch dataType.representation {
+            case DataType.Representation.binary:
+              return "\(mapping.name) EQU \(RGBDS.asBinaryString(mapping.value))"
+            case DataType.Representation.hexadecimal:
+              return "\(mapping.name) EQU \(RGBDS.asHexString(mapping.value))"
+            case DataType.Representation.decimal:
+              return "\(mapping.name) EQU \(mapping.value)"
+            default:
+              fatalError()
+            }
+          }).joined(separator: "\n")
+      }
+      .joined(separator: "\n\n")
+      .write(to: url, atomically: true, encoding: .utf8)
+  }
+
   func applyDataTypes(to configuration: Disassembler.MutableConfiguration) {
     for dataType: DataType in dataTypes {
       let mappingDict: [UInt8: String] = dataType.mappings.reduce(into: [:]) { accumulator, mapping in
